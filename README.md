@@ -35,7 +35,7 @@ As of 2026-04-26:
 
 | Area | Status | Notes |
 |---|---|---|
-| TraceWeaver Core repo | Primary project home | `git@github.com:TraceWeaver-Systems-Engineering/traceweaver.git` |
+| TraceWeaver Core repo | Primary project home | `git@github.com:Oxiom-Systems/traceweaver.git` |
 | Agent Skills fork | Implemented candidate | `/Users/hanneszietsman/CrypotAI/agent-skills` on `feature/systems-engineering-traceability` |
 | Latest local candidate commit | `5a8831b` | `fix: separate trace debt from approved gaps` |
 | Upstream-neutral skill | Implemented candidate | `skills/systems-engineering-traceability/SKILL.md` |
@@ -181,7 +181,7 @@ Related local workspaces:
 
 Remote:
 
-- `git@github.com:TraceWeaver-Systems-Engineering/traceweaver.git`
+- `git@github.com:Oxiom-Systems/traceweaver.git`
 
 ## Near-Term Next Steps
 
