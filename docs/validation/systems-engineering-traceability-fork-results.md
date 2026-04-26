@@ -1,6 +1,6 @@
 # Systems Engineering Traceability Fork Validation
 
-Status: U5 validation complete; implementation slice ready
+Status: U5 validation complete at baseline commit; post-U5 ideation-awareness runtime candidate recorded
 
 Date: 2026-04-26
 
@@ -8,27 +8,38 @@ Fork checkout: `/Users/hanneszietsman/CrypotAI/agent-skills`
 
 Working branch: `feature/systems-engineering-traceability`
 
-Tested implementation commit: `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`
+U5 validation baseline commit: `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`
+
+Latest runtime candidate commit: `b01dd9c762d3c80d0d279aeebcbd529302b73fa1 feat: route ideation through traceability`
 
 Last stale pre-reconciliation ref: `b9923fc982e6a572b1f70d1cbe9e8f1e2bc6d017 fix: clarify traceability authority rules`
 
 Current reconciliation state: refreshed implementation commit tested locally and focused code review rerun with no remaining findings.
 
+Post-U5 reconciliation state: ideation and persona-awareness delta committed in
+the Agent Skills fork. This delta still needs focused review before packaging.
+
 Upstream issue: https://github.com/addyosmani/agent-skills/issues/103
 
 ## Gate Decision
 
-Current decision: **U5 passes; proceed to the next review and packaging step.**
+Current decision: **U5 passes at the baseline commit; review the post-U5 runtime candidate before packaging.**
 
 Reason: The upstream-neutral implementation slice is ready at tested commit `ca6ff66d46f140da72f423ea3dec819f81ef5337`. All three pre-registered validation scenarios have technical evidence, human reviewer usefulness/noise and confidence ratings are recorded below, and the distinct-value criteria are accepted across the full scenario set.
 
 U5 result: **Pass. No implementation revision is required from validation.**
 
+Post-U5 delta: commit `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` extends the
+runtime guidance so ideas, `idea-refine`, and agent personas preserve the
+systems-engineering chain. It is an implementation delta after U5 validation and
+must receive focused review before packaging.
+
 ## Completed Evidence
 
 | Area | Evidence | Result |
 |---|---|---|
-| Tested commit | Exact fork commit under review is `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`. | Pass |
+| U5 tested commit | Exact fork commit validated by VRUN-001 to VRUN-003 is `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`. | Pass |
+| Post-U5 runtime candidate | Latest fork commit is `b01dd9c762d3c80d0d279aeebcbd529302b73fa1 feat: route ideation through traceability`. | Recorded; focused review pending |
 | Focused PR scope | Required fork scope is `skills/systems-engineering-traceability/SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, `skills/using-agent-skills/SKILL.md`, and `README.md`. | Pass |
 | Skill anatomy | `SKILL.md` includes YAML frontmatter, overview, when-to-use, process, rationalizations, red flags, and verification. | Pass |
 | Frontmatter | `name` matches directory and description includes trigger conditions. | Pass |
@@ -42,7 +53,7 @@ U5 result: **Pass. No implementation revision is required from validation.**
 | README discoverability | README lists the skill as cross-cutting, counts 22 skills, and links the template. | Pass |
 | Meta-skill routing | `skills/using-agent-skills/SKILL.md` routes meaningful behavior through `systems-engineering-traceability` as a cross-cutting hop. | Pass |
 | Operating model artifact | `references/systems-engineering-traceability-operating-model.md` exists, is linked from `SKILL.md`, contains original agent-facing lifecycle rules plus source-boundary language, and includes official/public source links. | Pass |
-| Focused code review | Focused `ce-code-review` pass on the implementation slice found no remaining findings after commits `5745ab2`, `2e67062`, and `ca6ff66`. | Pass |
+| Focused code review | Focused `ce-code-review` pass on the implementation slice found no remaining findings after commits `5745ab2`, `2e67062`, and `ca6ff66`. | Pass for U5 baseline; rerun pending for `b01dd9c` |
 | VRUN-001 validation | Dummy new-feature A/B run created baseline and TraceWeaver outputs from the same seed commit. Human rating accepted in this session. | Pass |
 | VRUN-002 validation | Dummy existing-module audit A/B run created baseline and TraceWeaver Audit outputs from the same seed commit. Human rating accepted in this session. | Pass |
 | VRUN-003 validation | Dummy low-risk docs/discoverability A/B run created baseline and TraceWeaver Lite outputs from the same seed commit. Human rating accepted in this session. | Pass |
@@ -215,6 +226,41 @@ U5 closeout: **Pass. Proceed without validation-driven implementation revision.*
 | SREQ-TRACE-006 | The skill must expose missing traceability, not invent it. | Inspect inferred links. | Pass in VRUN-002: inferred requirements were recorded as Draft and no approved authority was invented. |
 | SREQ-TRACE-007 | The skill must provide distinct value beyond existing Agent Skills workflows. | Compare baseline run against traceability-enabled run. | Pass across VRUN-001, VRUN-002, and VRUN-003 with final distinct-value decision accepted. |
 
+## Post-U5 Ideation Awareness Delta
+
+Commit: `b01dd9c762d3c80d0d279aeebcbd529302b73fa1 feat: route ideation through traceability`
+
+Purpose: Ensure all skills and agent personas treat the systems-engineering
+approach as lifecycle-wide, including ideas before they become requirements or
+work.
+
+Changed runtime scope:
+
+- `skills/using-agent-skills/SKILL.md`
+- `skills/idea-refine/SKILL.md`
+- `skills/systems-engineering-traceability/SKILL.md`
+- `agents/README.md`
+- `agents/code-reviewer.md`
+- `agents/security-auditor.md`
+- `agents/test-engineer.md`
+- `references/systems-engineering-traceability-operating-model.md`
+- `references/requirements-and-vv-guide.md`
+- `references/risk-gap-and-change-control-guide.md`
+- `references/traceability-matrix-template.md`
+- `README.md`
+
+Key rule added: ideas are first-class lifecycle inputs, not implementation
+authority. Idea work must preserve candidate needs, assumptions, risks,
+success/failure signals, open decisions, and not-doing boundaries before a
+later lifecycle step converts the selected idea into approved authority.
+
+Local checks:
+
+- `git diff --check`: pass
+- SKILL.md frontmatter-start check: pass
+
+Status: Focused review pending before packaging this runtime candidate.
+
 ## Packaging Readiness
 
 No U5 validation blockers remain.
@@ -223,12 +269,8 @@ Remaining non-validation work before packaging:
 
 - Run one final focused document review on this validation record and README
   status update.
-- Commit and review any post-U5 runtime reference sync before packaging it.
-  The U5 pass above applies to tested implementation commit
-  `ca6ff66d46f140da72f423ea3dec819f81ef5337`; newer runtime copies in
-  `agent-skills/references/` must receive a refreshed implementation commit,
-  focused review, and validation-record update if they are included in the
-  package.
+- Run focused review on post-U5 runtime candidate
+  `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` before packaging it.
 - Prepare the upstream-neutral package or TraceWeaver Core release notes,
   depending on the chosen distribution path.
 - Keep the latest tested implementation commit fixed at

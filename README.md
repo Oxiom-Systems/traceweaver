@@ -37,12 +37,13 @@ As of 2026-04-26:
 |---|---|---|
 | TraceWeaver Core repo | Primary project home | `git@github.com:Oxiom-Systems/traceweaver.git` |
 | Agent Skills fork | Implementation-ready candidate | `/Users/hanneszietsman/CrypotAI/agent-skills` on `feature/systems-engineering-traceability` |
-| Latest tested candidate commit | `ca6ff66` | `docs: align skill tree count` |
-| Upstream-neutral skill | Implementation-ready candidate | `skills/systems-engineering-traceability/SKILL.md` |
+| U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
+| Latest runtime candidate commit | `b01dd9c` | `feat: route ideation through traceability`; post-U5 focused review pending |
+| Upstream-neutral skill | Runtime candidate | `skills/systems-engineering-traceability/SKILL.md` |
 | Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
-| Discovery routing | Implementation-ready candidate | `systems-engineering-traceability` is wired into `using-agent-skills` as a cross-cutting hop |
-| Validation record | Refreshed to tested commit | Points at `ca6ff66d46f140da72f423ea3dec819f81ef5337` |
+| Discovery routing | Runtime candidate | Ideas route through `idea-refine` plus `systems-engineering-traceability`; meaningful behavior routes through traceability as a cross-cutting hop |
+| Validation record | Refreshed to U5 baseline and post-U5 delta | U5 pass applies to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; latest runtime candidate is `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` |
 | Controlled validation | Complete | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded |
 | Upstream PR packaging | Next review step | U5 validation no longer blocks packaging; run final document review before packaging |
 | TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |
@@ -103,6 +104,9 @@ The agent-facing rules are intentionally compact:
 
 - Brainstorming creates candidate needs, assumptions, risks, and success
   signals. It does not create implementation authority.
+- Idea refinement is part of the lifecycle. Ideas are preserved as candidate
+  needs, assumptions, risks, success/failure signals, open decisions, and
+  not-doing boundaries before they become requirements or work.
 - Planning converts approved or candidate needs into requirements, design
   decisions, ATP/result expectations, verification paths, and validation paths.
 - Work agents may only implement meaningful behaviour when it traces to
@@ -217,9 +221,11 @@ Remote:
 
 1. Run a focused document review on the completed validation record and README
    status.
-2. Prepare the upstream-neutral package or TraceWeaver Core release notes,
+2. Run focused review on the post-U5 Agent Skills runtime candidate
+   `b01dd9c762d3c80d0d279aeebcbd529302b73fa1`.
+3. Prepare the upstream-neutral package or TraceWeaver Core release notes,
    depending on the chosen distribution path.
-3. Continue TraceWeaver CE baseline and lifecycle integration with the Core
+4. Continue TraceWeaver CE baseline and lifecycle integration with the Core
    validation surface as the control point.
 
 ## Product Direction

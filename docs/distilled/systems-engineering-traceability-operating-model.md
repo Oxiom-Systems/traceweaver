@@ -15,7 +15,7 @@ authority, evidence, ownership, and a safe-change story.
 Preserve traceability through this chain:
 
 ```text
-intent
+idea or intent
   -> stakeholder need
   -> user requirement
   -> system requirement
@@ -43,8 +43,9 @@ test report artifacts.
 
 ## Core Agent Rules
 
-1. Brainstorming creates candidate needs, assumptions, risks, and success
-   signals. It does not create implementation authority.
+1. Ideation and brainstorming create candidate needs, assumptions, risks,
+   success signals, failure signals, and open decisions. They do not create
+   implementation authority.
 
 2. Planning converts approved or candidate needs into requirements, design
    decisions, ATP/result expectations, verification paths, and validation paths.
@@ -72,6 +73,34 @@ test report artifacts.
 
 10. Missing traceability must be exposed, not invented.
 
+## Idea Capture Rule
+
+Ideas are first-class lifecycle inputs. They are not authority.
+
+Any agent or skill that creates, refines, selects, ranks, reviews, or summarizes
+ideas for a product, feature, workflow, code change, process change, or agent
+behavior must preserve the idea in systems-engineering form:
+
+- candidate `NEED-*` or problem/opportunity statement
+- stakeholder or user group
+- intended context
+- success signal
+- failure signal
+- key assumptions
+- risk candidates
+- open decisions or approval questions
+- explicit status: `Candidate` or `Draft`
+
+An idea becomes implementation authority only when a later lifecycle step
+converts it into approved authority: approved requirement, approved design
+decision, first-class approved risk control, approved traceability gap, or a
+task that closes directly to one of those authorities.
+
+Do not let an idea-refinement artifact, brainstorm note, roadmap thought, or
+review suggestion silently skip into implementation. If an idea would change
+meaningful behavior, route it through planning and traceability before work
+begins.
+
 ## Valid Authority
 
 Meaningful implementation behavior must link to at least one valid approved
@@ -86,7 +115,9 @@ authority:
 The following are not authority by themselves:
 
 - brainstorm idea
+- idea-refinement note
 - assumption
+- roadmap note
 - stakeholder need
 - review finding
 - task ID
@@ -131,7 +162,7 @@ is used.
 
 | Agent Phase | Responsibility | Output |
 |---|---|---|
-| Brainstorm | Capture candidate needs, assumptions, risks, success signals, and unresolved questions | Candidate `NEED-*`, assumptions, `RISK-*` candidates, required decisions |
+| Ideate / Brainstorm | Capture candidate needs, assumptions, risks, success and failure signals, unresolved questions, and not-doing boundaries | Candidate `NEED-*`, assumptions, `RISK-*` candidates, required decisions, `Candidate` / `Draft` status |
 | Plan | Convert approved or candidate context into requirements, authority links, tasks, ATP/result expectations, and validation paths | `UREQ-*`, `SREQ-*`, `ADR-*`, `TASK-*`, `ATP-*`, matrix rows |
 | Work | Implement only behavior backed by valid approved authority | Implementation links and immediate gap updates |
 | Test | Produce verification evidence that points to requirement IDs | `VER-*` rows and result records |
@@ -195,6 +226,7 @@ flowchart LR
 
 ```mermaid
 flowchart LR
+  idea["Idea: raw concept or opportunity"]
   brainstorm["Brainstorm: candidate needs, assumptions, risks"]
   plan["Plan: requirements, authority, ATP/result path"]
   work["Work: implement approved authority only"]
@@ -203,13 +235,14 @@ flowchart LR
   validate["Validate / ship: record VAL-* or approved path"]
   learn["Change control / learning"]
 
+  idea --> brainstorm
   brainstorm --> plan
   plan --> work
   work --> test
   test --> review
   review --> validate
   validate --> learn
-  learn --> brainstorm
+  learn --> idea
 
   plan -. "missing authority" .-> review
   work -. "new behavior found" .-> review

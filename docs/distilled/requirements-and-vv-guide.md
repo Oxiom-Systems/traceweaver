@@ -24,7 +24,7 @@ implementation. A requirement can authorize implementation only after approval.
 
 ## Candidate Need Format
 
-Use this shape during brainstorming or early specification:
+Use this shape during ideation, brainstorming, or early specification:
 
 ```markdown
 ### NEED-[SCOPE]-001: [short name]
@@ -44,6 +44,30 @@ Use this shape during brainstorming or early specification:
 Candidate needs should become approved requirements before implementation starts.
 If the team intentionally proceeds without a full requirement, record an approved
 gap with scope, owner, and review condition.
+
+## Idea Refinement Output
+
+Idea work should not stop at a persuasive concept. It should leave enough
+systems-engineering structure for planning to continue without inventing
+authority.
+
+When an idea is selected for further work, record:
+
+- candidate `NEED-*` or problem/opportunity statement
+- user or stakeholder group
+- intended context
+- success signal
+- failure signal
+- assumptions to validate
+- risk candidates
+- not-doing boundaries
+- open decisions
+- status: `Candidate` or `Draft`
+
+Do not mark an idea, need, or assumption as implementation authority. Planning
+must convert the selected idea into approved requirements, approved design
+decisions, first-class approved risk controls, approved gaps, or tasks that
+close directly to those approved authorities.
 
 ## Requirement Row Guidance
 
@@ -210,6 +234,8 @@ When validation must happen later:
 Before build:
 
 - [ ] Need/source is known.
+- [ ] Any idea-refinement output is marked `Candidate` or `Draft`, not approved
+      authority.
 - [ ] Requirement or approved authority exists.
 - [ ] Inferred requirements are `Draft`.
 - [ ] Verification method is identified.
