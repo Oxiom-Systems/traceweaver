@@ -6,13 +6,15 @@ Target repository: https://github.com/addyosmani/agent-skills
 Recommended skill path: `skills/systems-engineering-traceability/SKILL.md`
 Recommended operating model path: `references/systems-engineering-traceability-operating-model.md`
 Recommended matrix template path: `references/traceability-matrix-template.md`
+Recommended requirements/V&V guide path: `references/requirements-and-vv-guide.md`
+Recommended risk/gap/change-control guide path: `references/risk-gap-and-change-control-guide.md`
 Companion requirements doc: `docs/brainstorms/2026-04-25-systems-engineering-traceability-skill-requirements.md`
 
 ## Objective
 
 Add a lightweight systems engineering traceability skill to Agent Skills.
 
-The skill should manage the systems engineering flow for agent-generated software work. It should make AI coding agents preserve the chain from stakeholder need to requirement, design decision, implementation, verification evidence, and validation evidence. Its purpose is to prevent dark code: meaningful implementation that exists without a clear reason, requirement, test, validation path, owner, or safe-change story.
+The skill should manage the systems engineering flow for agent-generated software work. It should make AI coding agents preserve the chain from idea or intent to stakeholder need, requirement, design decision, implementation, verification evidence, validation evidence, and change control. Its purpose is to prevent dark code: meaningful implementation that exists without a clear reason, requirement, test, validation path, owner, or safe-change story.
 
 The skill should also teach agents how to set up and maintain the traceability artifacts that make the flow usable: a Markdown traceability matrix as the audit record, stable IDs as cross-artifact links, Mermaid diagrams as visual relationship maps, and explicit links from requirements docs to plans, acceptance test plans/procedures, and results.
 
@@ -32,6 +34,9 @@ The matrix remains the source of truth. Diagrams are generated or maintained vie
 
 End-state behavior:
 
+- During ideation or brainstorming, the agent preserves ideas as candidate needs,
+  assumptions, risks, success and failure signals, open decisions, and
+  not-doing boundaries. Ideas do not create implementation authority.
 - During `/spec`, the agent captures stakeholder needs, testable requirements, assumptions, success signals, and requirement IDs.
 - During `/plan`, the agent links tasks, dependencies, risks, acceptance criteria, and the plan artifact back to requirement IDs.
 - During `/build`, the agent stops when new meaningful behavior appears without a requirement, task, or approved gap.
@@ -42,7 +47,7 @@ End-state behavior:
 
 The core managed flow is:
 
-`Need -> Requirement -> Design -> Implementation -> Verification -> Validation`
+`Idea / Intent -> Need -> Requirement -> Design -> Implementation -> Verification -> Validation -> Change Control`
 
 The document traceability chain is:
 
@@ -127,12 +132,19 @@ These numbers are examples of the kind of evidence to collect, not claims about 
 
 ### PR Packaging Rules
 
-First PR should include only:
+TraceWeaver Core MVP should include:
 
 - `skills/systems-engineering-traceability/SKILL.md`
 - `references/systems-engineering-traceability-operating-model.md`
 - `references/traceability-matrix-template.md`
+- `references/requirements-and-vv-guide.md`
+- `references/risk-gap-and-change-control-guide.md`
 - Minimal README/index update only if required
+
+The upstream `agent-skills` PR is a separate acceptance surface. It may be
+packaged smaller than TraceWeaver Core if maintainers require it, but that
+reduction must be recorded as a scope decision. The matrix template and
+operating model remain required for a usable traceability MVP.
 
 First PR should not include:
 
@@ -234,7 +246,7 @@ The alternatives are narrower. The recommended name better captures the cross-cu
 
 ## MVP Scope
 
-First upstream PR should be intentionally small:
+TraceWeaver Core MVP scope:
 
 ```text
 agent-skills/
@@ -244,6 +256,8 @@ agent-skills/
 +-- references/
 |   +-- systems-engineering-traceability-operating-model.md
 |   +-- traceability-matrix-template.md
+|   +-- requirements-and-vv-guide.md
+|   +-- risk-gap-and-change-control-guide.md
 +-- README.md
 ```
 
@@ -255,6 +269,8 @@ MVP acceptance criteria:
 - The workflow covers context, requirement IDs, trace matrix updates, implementation links, verification, validation, dark-code detection, impact analysis, and completion gate.
 - The operating-model reference provides the original distilled lifecycle chain, authority rules, source hierarchy, and provisional-distillation boundary.
 - The matrix reference template provides the required audit-record shape, longer examples, table formats, and optional Mermaid relationship view.
+- The requirements/V&V guide provides mandatory runtime guidance for idea/need separation, inferred requirements, ATPs, result records, verification, and validation.
+- The risk/gap/change-control guide provides mandatory runtime guidance for first-class risk controls, approved gaps, traceability debt, dark-code classification, and impact analysis.
 - The skill makes clear that the Markdown matrix is authoritative and Mermaid is a derived visual map.
 - README lists the skill without restructuring the whole repo.
 
@@ -291,6 +307,8 @@ Create:
 skills/systems-engineering-traceability/SKILL.md
 references/systems-engineering-traceability-operating-model.md
 references/traceability-matrix-template.md
+references/requirements-and-vv-guide.md
+references/risk-gap-and-change-control-guide.md
 ```
 
 Patch:
@@ -1085,6 +1103,8 @@ Do not start with a large PR. Follow the adoption strategy:
    - `skills/systems-engineering-traceability/SKILL.md`
    - `references/systems-engineering-traceability-operating-model.md`
    - `references/traceability-matrix-template.md`
+   - `references/requirements-and-vv-guide.md`
+   - `references/risk-gap-and-change-control-guide.md`
    - one README/index update if required
 3. Test the skill on one real feature, one unclear existing module, and one low-risk change where Lite mode should avoid over-process.
 4. Collect concrete findings: dark-code candidates, missing validation paths, missing requirement links, unclear design decisions, false positives, confusing guidance, overhead, and reviewer confidence.

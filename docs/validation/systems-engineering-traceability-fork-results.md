@@ -1,6 +1,6 @@
 # Systems Engineering Traceability Fork Validation
 
-Status: U5 validation complete at baseline commit; post-U5 ideation-awareness runtime candidate recorded
+Status: U5 validation complete at baseline commit; U5.5 expanded runtime candidate pending review and validation
 
 Date: 2026-04-26
 
@@ -14,33 +14,36 @@ Latest runtime candidate commit: `b01dd9c762d3c80d0d279aeebcbd529302b73fa1 feat:
 
 Last stale pre-reconciliation ref: `b9923fc982e6a572b1f70d1cbe9e8f1e2bc6d017 fix: clarify traceability authority rules`
 
-Current reconciliation state: refreshed implementation commit tested locally and focused code review rerun with no remaining findings.
+Current reconciliation state: U5 baseline implementation commit tested locally and focused code review rerun with no remaining findings.
 
-Post-U5 reconciliation state: ideation and persona-awareness delta committed in
-the Agent Skills fork. This delta still needs focused review before packaging.
+U5.5 reconciliation state: ideation and persona-awareness delta committed in the
+Agent Skills fork. This delta still needs focused review, runtime-sync evidence,
+and lifecycle-discoverability validation before packaging.
 
 Upstream issue: https://github.com/addyosmani/agent-skills/issues/103
 
 ## Gate Decision
 
-Current decision: **U5 passes at the baseline commit; review the post-U5 runtime candidate before packaging.**
+Current decision: **U5 passes at the baseline commit; treat the post-U5 runtime candidate as U5.5 before packaging.**
 
 Reason: The upstream-neutral implementation slice is ready at tested commit `ca6ff66d46f140da72f423ea3dec819f81ef5337`. All three pre-registered validation scenarios have technical evidence, human reviewer usefulness/noise and confidence ratings are recorded below, and the distinct-value criteria are accepted across the full scenario set.
 
 U5 result: **Pass. No implementation revision is required from validation.**
 
-Post-U5 delta: commit `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` extends the
+U5.5 candidate: commit `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` extends the
 runtime guidance so ideas, `idea-refine`, and agent personas preserve the
-systems-engineering chain. It is an implementation delta after U5 validation and
-must receive focused review before packaging.
+systems-engineering chain. It is not covered by the U5 validation pass and must
+receive focused review, runtime-sync evidence, and lifecycle-discoverability
+validation before packaging.
 
 ## Completed Evidence
 
 | Area | Evidence | Result |
 |---|---|---|
 | U5 tested commit | Exact fork commit validated by VRUN-001 to VRUN-003 is `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`. | Pass |
-| Post-U5 runtime candidate | Latest fork commit is `b01dd9c762d3c80d0d279aeebcbd529302b73fa1 feat: route ideation through traceability`. | Recorded; focused review pending |
-| Focused PR scope | Required fork scope is `skills/systems-engineering-traceability/SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, `skills/using-agent-skills/SKILL.md`, and `README.md`. | Pass |
+| U5.5 runtime candidate | Latest fork commit is `b01dd9c762d3c80d0d279aeebcbd529302b73fa1 feat: route ideation through traceability`. | Recorded; focused review and validation pending |
+| U5 focused scope | Validated U5 baseline scope is `skills/systems-engineering-traceability/SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, `skills/using-agent-skills/SKILL.md`, and `README.md`. | Pass at `ca6ff66` only |
+| TraceWeaver Core MVP bundle | Core runtime bundle now includes four reference files: operating model, matrix template, requirements/V&V guide, and risk/gap/change-control guide. | Pending U5.5 acceptance |
 | Skill anatomy | `SKILL.md` includes YAML frontmatter, overview, when-to-use, process, rationalizations, red flags, and verification. | Pass |
 | Frontmatter | `name` matches directory and description includes trigger conditions. | Pass |
 | Matrix authority boundary | Skill and template define the matrix as audit record for links/status/evidence/gaps/decisions, not as replacement for source artifacts. | Pass |
@@ -59,6 +62,18 @@ must receive focused review before packaging.
 | VRUN-003 validation | Dummy low-risk docs/discoverability A/B run created baseline and TraceWeaver Lite outputs from the same seed commit. Human rating accepted in this session. | Pass |
 | Markdown hygiene | `git diff --check` passed across the branch against upstream `main`. | Pass |
 | New-file ASCII | `SKILL.md`, `systems-engineering-traceability-operating-model.md`, and `traceability-matrix-template.md` contain ASCII only. | Pass |
+
+## Runtime Guidance Sync Record
+
+Runtime guidance is not considered synced unless the mapping, version stamp,
+checksum, reviewer, review session, and implementation commit are recorded.
+
+| Runtime File | Source / Distilled Input | Version Stamp | SHA256 | Reviewed By | Review Session | Commit |
+|---|---|---|---|---|---|---|
+| `references/systems-engineering-traceability-operating-model.md` | `docs/distilled/systems-engineering-traceability-operating-model.md` | TraceWeaver `88fff79`; Agent Skills `b01dd9c` | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | Pending | Pending U5.5 focused review | `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` |
+| `references/traceability-matrix-template.md` | `docs/distilled/traceability-matrix-template.md` | TraceWeaver `88fff79`; Agent Skills `b01dd9c` | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | Pending | Pending U5.5 focused review | `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` |
+| `references/requirements-and-vv-guide.md` | `docs/distilled/requirements-and-vv-guide.md` | TraceWeaver `88fff79`; Agent Skills `b01dd9c` | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | Pending | Pending U5.5 focused review | `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` |
+| `references/risk-gap-and-change-control-guide.md` | `docs/distilled/risk-gap-and-change-control-guide.md` | TraceWeaver `88fff79`; Agent Skills `b01dd9c` | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | Pending | Pending U5.5 focused review | `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` |
 
 ## Controlled Validation Protocol
 
@@ -213,12 +228,30 @@ U5 closeout: **Pass. Proceed without validation-driven implementation revision.*
 | Change impact analysis performed | VRUN-002 baseline advised product-owner confirmation before behavior changes. | VRUN-002 created DEC-DISC and TD-DISC records before any change. | Human decision path is explicit before impact work. |
 | Reviewer confidence | VRUN-001 human rating: 2 / 5; VRUN-002 baseline 3 / 5; VRUN-003 baseline 4 / 5. | VRUN-001 human rating: 4 / 5; VRUN-002 Audit 4 / 5; VRUN-003 Lite 4 / 5. | Higher confidence in Standard/Audit cases; Lite preserves confidence without extra ceremony. |
 | Workflow overhead | VRUN-001 baseline produced 7 files; test command 0.30s. VRUN-002 baseline produced 5 files; test command 0.16s. VRUN-003 baseline produced 3 files; check command 0.01s. | VRUN-001 TraceWeaver run produced 9 files; test command 0.30s. VRUN-002 Audit produced 6 files; test command 0.28s. VRUN-003 Lite produced 4 files; check command 0.00s. | Standard/Audit modes add trace artifacts where ambiguity exists; Lite adds one minimal matrix artifact with accepted low noise. |
+| Lifecycle discoverability | Pending: no standalone lifecycle prompt without explicitly forcing traceability has been recorded yet. | Pending U5.5 validation. | Must pass before packaging any runtime bundle that claims automatic or cross-cutting discovery readiness. |
+
+## Lifecycle Discoverability Validation
+
+Scenario: Run a normal lifecycle task without explicitly forcing the traceability
+skill.
+
+Expected result:
+
+- The agent discovers the traceability skill when meaningful behavior,
+  requirements, authority, validation, or no-orphan checks are relevant.
+- The agent selects or asks for an active matrix.
+- The agent does not proceed with unapproved authority.
+- The agent records traceability evidence or blocks appropriately.
+
+Status: Pending U5.5 validation.
+
+Evidence: Pending.
 
 ## Skill-Level V&V Matrix
 
 | ID | Skill Requirement | Evidence Method | Current Result |
 |---|---|---|---|
-| SREQ-TRACE-001 | The skill must create useful traceability from intent to implementation. | Run all three pre-registered fork scenarios. | Pass across VRUN-001, VRUN-002, and VRUN-003 with human acceptance. |
+| SREQ-TRACE-001 | The skill must create useful traceability from idea / intent to implementation. | Run all three pre-registered fork scenarios. | Pass across VRUN-001, VRUN-002, and VRUN-003 with human acceptance for the U5 baseline. |
 | SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Pass in VRUN-003: Lite mode added one minimal matrix file and no full requirements/plan/ATP/results package; human noise rating 1 / 5. |
 | SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Pass: human low-value noise ratings were 2 / 5, 2 / 5, and 1 / 5 across the validation set. |
 | SREQ-TRACE-004 | The skill must improve reviewer confidence. | Reviewer rates confidence before and after using the skill. | Pass: confidence improved in VRUN-001 and VRUN-002 and stayed equal in VRUN-003. |
@@ -226,7 +259,7 @@ U5 closeout: **Pass. Proceed without validation-driven implementation revision.*
 | SREQ-TRACE-006 | The skill must expose missing traceability, not invent it. | Inspect inferred links. | Pass in VRUN-002: inferred requirements were recorded as Draft and no approved authority was invented. |
 | SREQ-TRACE-007 | The skill must provide distinct value beyond existing Agent Skills workflows. | Compare baseline run against traceability-enabled run. | Pass across VRUN-001, VRUN-002, and VRUN-003 with final distinct-value decision accepted. |
 
-## Post-U5 Ideation Awareness Delta
+## U5.5 Expanded Runtime Guidance Candidate
 
 Commit: `b01dd9c762d3c80d0d279aeebcbd529302b73fa1 feat: route ideation through traceability`
 
@@ -259,18 +292,30 @@ Local checks:
 - `git diff --check`: pass
 - SKILL.md frontmatter-start check: pass
 
-Status: Focused review pending before packaging this runtime candidate.
+Decision required:
+
+- Accept into TraceWeaver Core MVP.
+- Split into a follow-up candidate.
+- Reduce scope back to the U2-U5 validated bundle.
+
+Status: Pending focused review, runtime-sync review, and lifecycle-discoverability
+validation before packaging this runtime candidate.
 
 ## Packaging Readiness
 
-No U5 validation blockers remain.
+No U5 validation blockers remain for the `ca6ff66` baseline slice.
+
+Packaging the `b01dd9c` runtime bundle remains blocked until U5.5 is accepted
+and validated.
 
 Remaining non-validation work before packaging:
 
 - Run one final focused document review on this validation record and README
   status update.
-- Run focused review on post-U5 runtime candidate
+- Run focused review on U5.5 runtime candidate
   `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` before packaging it.
+- Complete runtime-sync review for the four reference files.
+- Complete lifecycle-discoverability validation.
 - Prepare the upstream-neutral package or TraceWeaver Core release notes,
   depending on the chosen distribution path.
 - Keep the latest tested implementation commit fixed at

@@ -6,7 +6,7 @@ Issue URL: https://github.com/addyosmani/agent-skills/issues/103
 
 I would like to propose a focused new skill: `systems-engineering-traceability`.
 
-The skill would add a lightweight traceability workflow for agent-generated behavior. It would help agents preserve the chain from stakeholder intent to requirement, design decision, implementation, verification evidence, and validation evidence or validation plan.
+The skill would add a lightweight traceability workflow for agent-generated behavior. It would help agents preserve the chain from idea or stakeholder intent to requirement, design decision, implementation, verification evidence, and validation evidence or validation plan.
 
 The goal is practical: make it easier for reviewers and maintainers to answer:
 
@@ -35,11 +35,13 @@ First PR would stay intentionally small:
 - `skills/systems-engineering-traceability/SKILL.md`
 - `references/systems-engineering-traceability-operating-model.md`
 - `references/traceability-matrix-template.md`
+- `references/requirements-and-vv-guide.md`
+- `references/risk-gap-and-change-control-guide.md`
 - Minimal README/index update only if needed for discoverability
 
-The traceability matrix template is part of the MVP. The skill is not considered usable without a matrix artifact because the matrix is the audit/control surface for requirement-to-implementation-to-verification/validation traceability. If maintainers push back on including the matrix template, that reopens MVP scope; the template should not be silently removed.
+The traceability matrix template is part of the MVP. The skill is not considered usable without a matrix artifact because the matrix is the audit/control surface for requirement-to-implementation-to-verification/validation traceability. The two companion guides are part of the TraceWeaver Core runtime bundle because they define requirements/V&V handling and risk/gap/change-control behavior. If maintainers push back on the larger bundle, that reopens MVP scope; these artifacts should not be silently removed.
 
-If this issue has already been posted upstream, add a follow-up comment clarifying that the matrix template and operating-model reference are both considered part of the proposed MVP.
+If this issue has already been posted upstream, add a follow-up comment clarifying that the matrix template and operating-model reference are both considered required for a usable traceability MVP, and that any smaller upstream packaging is a recorded scope decision rather than a change to the TraceWeaver Core bundle.
 
 The skill would guide agents to:
 
@@ -77,7 +79,7 @@ The skill would apply during normal agent workflow:
 | Review | Can a reviewer walk backward and forward through the chain? |
 | Ship | Is the stakeholder need validated or is a validation path approved? |
 
-The key implementation gate would be: no meaningful new behavior without a requirement, task, design decision, risk control, or approved traceability gap.
+The key implementation gate would be: no meaningful new behavior without approved authority. Approved authority means an approved requirement, approved ADR/design decision, first-class approved risk control, approved traceability gap, or a task that closes directly to one of those approved authorities.
 
 ## Non-goals for the First PR
 

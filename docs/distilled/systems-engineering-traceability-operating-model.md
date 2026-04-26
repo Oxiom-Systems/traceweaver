@@ -197,7 +197,7 @@ source diagrams.
 
 ```mermaid
 flowchart LR
-  intent["Intent / user request"]
+  intent["Idea / intent / user request"]
   need["NEED-* stakeholder need"]
   ureq["UREQ-* user requirement"]
   sreq["SREQ-* system requirement"]

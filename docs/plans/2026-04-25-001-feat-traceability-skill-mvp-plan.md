@@ -12,12 +12,20 @@ origin: docs/brainstorms/2026-04-25-systems-engineering-traceability-skill-requi
 
 Create a focused, upstreamable MVP for a `systems-engineering-traceability` skill for `addyosmani/agent-skills`.
 
-The first PR should stay small: one skill, one concise operating-model reference, one practical matrix template, and a minimal README or index update if required. The updated requirements add one important scope refinement: the skill must not only describe traceability, it must teach agents how to set up and maintain the traceability artifact.
+TraceWeaver Core MVP is the open-source runtime bundle: one skill, four runtime
+references, and README/index discoverability updates. The upstream
+`agent-skills` PR remains a separate acceptance surface and may be packaged
+smaller only through an explicit scope decision.
 
 The core artifact model is:
 
 - Agent-facing operating model: original, distilled lifecycle rules for agentic systems-engineering traceability.
 - Markdown traceability matrix: authoritative audit record for links, status, evidence references, gaps, and human decisions.
+- Requirements and V&V guide: runtime guidance for idea/need separation,
+  inferred requirements, ATPs, result records, verification, and validation.
+- Risk, gap, and change-control guide: runtime guidance for first-class risk
+  controls, approved gaps, traceability debt, dark-code classification, and
+  impact analysis.
 - Mermaid diagram: derived visual map.
 - Stable IDs: links across docs, code, tasks, tests, reviews, gaps, and human decisions.
 - Document chain: requirements doc -> plan doc -> traceability matrix -> ATP -> results.
@@ -143,7 +151,11 @@ references/
 README.md
 ```
 
-Implementation units U1, U1.5, U5, and U6 create local planning/evidence files. U2-U4 modify the target fork. Implementers must complete the U1.5 configuration-control preflight before editing `skills/`, `references/`, or `README.md`.
+Implementation units U1, U1.5, U5, U5.5, and U6 create local planning/evidence
+files. U2-U4 modify the target fork. U5.5 may also modify the target fork only
+after it is recorded as a scope-change candidate. Implementers must complete the
+U1.5 configuration-control preflight before editing `skills/`, `references/`, or
+`README.md`.
 
 ---
 
@@ -151,6 +163,7 @@ Implementation units U1, U1.5, U5, and U6 create local planning/evidence files. 
 
 - Include `references/traceability-matrix-template.md` in the MVP as a required traceability artifact. If the issue/RFC or maintainer feedback rejects a separate matrix template, treat that as a scope-change decision and revise the MVP shape before implementation or packaging.
 - Include `references/systems-engineering-traceability-operating-model.md` in the MVP as the original, distilled, agent-facing operating model.
+- Include `references/requirements-and-vv-guide.md` and `references/risk-gap-and-change-control-guide.md` as mandatory TraceWeaver Core runtime guidance. If upstream packaging removes either companion guide, record that as a scope decision instead of silently shrinking Core.
 - Keep `SKILL.md` concise and workflow-oriented; put longer table examples, evidence blocks, and Mermaid examples in the reference template.
 - Keep the deeper source hierarchy and lifecycle rules in the operating model reference rather than making every skill section read like a handbook.
 - Make the Markdown matrix authoritative for trace links, trace status, evidence references, gaps, and human decisions. Source artifacts remain authoritative for their own detailed content: requirements live in the requirements/spec documents, design rationale in ADRs/design notes, procedures in ATPs, and measured outcomes in result records.
@@ -197,6 +210,8 @@ skills/
 references/
   systems-engineering-traceability-operating-model.md
   traceability-matrix-template.md
+  requirements-and-vv-guide.md
+  risk-gap-and-change-control-guide.md
 README.md
 ```
 
@@ -264,7 +279,7 @@ Human decisions required
 The operating model should expose one compact lifecycle rule set:
 
 ```text
-intent
+idea / intent
   -> stakeholder need
   -> user requirement
   -> system requirement
@@ -275,7 +290,9 @@ intent
   -> change control
 ```
 
-The first PR should expose only this core loop and supporting template. Command and persona integrations remain outside the first PR.
+The first PR should expose this core loop and the selected runtime references.
+Command and persona integrations remain outside the first PR unless U5.5 is
+explicitly accepted into the packaging surface.
 
 ---
 
@@ -289,7 +306,8 @@ flowchart TB
     U2 --> U4["U4: Minimal README update"]
     U3 --> U5["U5: Fork validation"]
     U4 --> U5
-    U5 --> U6["U6: PR package"]
+    U5 --> U55["U5.5: Expanded runtime guidance decision"]
+    U55 --> U6["U6: PR package"]
 ```
 
 - [ ] **U1: Draft and open upstream issue/RFC**
@@ -458,6 +476,8 @@ Date:
 
 **Target fork files:**
 - Create: `references/systems-engineering-traceability-operating-model.md`
+- Create: `references/requirements-and-vv-guide.md`
+- Create: `references/risk-gap-and-change-control-guide.md`
 - Create: `skills/systems-engineering-traceability/SKILL.md`
 - Reference while writing: `docs/skill-anatomy.md`
 - Reference while writing: `skills/spec-driven-development/SKILL.md`
@@ -468,9 +488,11 @@ Date:
 - Create `references/systems-engineering-traceability-operating-model.md` first so `SKILL.md` can link to an existing reference.
 - Add `# Systems Engineering Traceability Operating Model`.
 - State that the file is an original, lightweight operating model for agentic software development. It is aligned with INCOSE / ISO/IEC/IEEE 15288 systems-engineering concepts, but does not reproduce the standards or the INCOSE handbook.
-- Include the lifecycle chain: intent -> stakeholder need -> user requirement -> system requirement -> design decision -> implementation -> verification -> validation -> change control.
+- Include the lifecycle chain: idea / intent -> stakeholder need -> user requirement -> system requirement -> design decision -> implementation -> verification -> validation -> change control.
 - Include direct agent rules:
-  - Brainstorming creates candidate needs, assumptions, risks, and success signals. It does not create implementation authority.
+  - Brainstorming and idea refinement create candidate ideas, needs,
+    assumptions, risks, success and failure signals, open decisions, and
+    not-doing boundaries. They do not create implementation authority.
   - Planning converts approved or candidate needs into requirements, design decisions, ATP/result expectations, verification paths, and validation paths.
   - Work agents may only implement meaningful behavior when it traces to approved authority.
   - Review findings are provenance, not authority. They become authority only when converted into an approved requirement change, design decision, risk control, or approved gap.
@@ -497,6 +519,11 @@ Date:
 - Keep wording practical and lightweight; avoid enterprise process vocabulary unless it directly changes agent behavior.
 - Reference related skills instead of duplicating spec, planning, testing, ADR, review, or shipping workflows.
 - Link to `references/systems-engineering-traceability-operating-model.md` for lifecycle rules.
+- Link to `references/requirements-and-vv-guide.md` for needs, requirements,
+  inferred links, ATPs, result records, verification, and validation.
+- Link to `references/risk-gap-and-change-control-guide.md` for risk controls,
+  approved gaps, traceability debt, dark-code classification, change control,
+  and impact analysis.
 - Include a forward link to `references/traceability-matrix-template.md` only as the matrix/template reference that U3 creates next; verify that link after U3 lands.
 
 **Required lifecycle checkpoint table in `SKILL.md`:**
@@ -657,7 +684,7 @@ This table may be embedded directly in `SKILL.md` only if it stays compact. Othe
 - Include at least one scenario with separate requirements, plan, ATP, and result artifacts.
 - The low-risk Lite-mode scenario may be small, but it still needs recorded baseline and traceability-enabled outputs so overhead and over-process can be measured.
 - Run at least one lifecycle-discoverability check using a realistic lifecycle prompt without explicitly forcing the new skill. If the skill is not selected or its guidance is not applied, record the result and narrow the MVP language to manual/direct invocation or add a follow-up integration proposal.
-- Test whether the skill helps agents maintain the chain: stakeholder need -> requirement -> design decision -> implementation -> verification -> validation.
+- Test whether the skill helps agents maintain the chain: idea / intent -> stakeholder need -> requirement -> design decision -> implementation -> verification -> validation -> change control.
 - Record the chosen mode, artifact produced, baseline workflow time, traceability-enabled workflow time, traceability gaps, false positives, confusing guidance, and reviewer confidence.
 - Track whether findings led to concrete spec, plan, ATP, result, design, validation, test, or removal decisions.
 - Capture examples without including sensitive project details.
@@ -756,7 +783,7 @@ Do not package the PR if the traceability skill only repeats what existing Agent
 
 | ID | Skill Requirement | Evidence Method | Pass Threshold |
 |---|---|---|---|
-| SREQ-TRACE-001 | The skill must create useful traceability from intent to implementation. | Run on the three required fork scenarios. | Finds at least one meaningful traceability gap, missing requirement, missing test link, missing validation path, or dark-code candidate in the new-feature and unclear-module scenarios; Lite mode may pass by avoiding unnecessary process while preserving the required minimal matrix row. |
+| SREQ-TRACE-001 | The skill must create useful traceability from idea / intent to implementation. | Run on the three required fork scenarios. | Finds at least one meaningful traceability gap, missing requirement, missing test link, missing validation path, or dark-code candidate in the new-feature and unclear-module scenarios; Lite mode may pass by avoiding unnecessary process while preserving the required minimal matrix row. |
 | SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Adds no more than roughly 10-15% overhead for small or medium changes. |
 | SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Fewer than roughly 25% of findings are false positives or low-value. |
 | SREQ-TRACE-004 | The skill must improve reviewer confidence. | Reviewer rates confidence before and after using the skill. | Confidence improves, and reviewer would use the skill again. |
@@ -795,21 +822,56 @@ The failure bar is not whether the skill made more documents. The failure bar is
 - Validation report evaluates each `SREQ-TRACE-*` row.
 - Validation report includes a pass, revise, or fail decision on whether the PR is ready.
 
+- [ ] **U5.5: Review expanded runtime guidance candidate**
+
+**Goal:** Decide whether post-U5 runtime changes become part of TraceWeaver Core,
+move to a follow-up candidate, or are reduced back to the U2-U5 validated bundle.
+
+**Requirements:** R27, R42
+
+**Dependencies:** U5 validation baseline complete at `ca6ff66`.
+
+**Candidate commit:** `b01dd9c762d3c80d0d279aeebcbd529302b73fa1 feat: route ideation through traceability`
+
+**Scope change:**
+- Adds idea / intent lifecycle framing.
+- Adds `idea-refine` and agent persona guidance.
+- Expands runtime references from two to four files.
+- Introduces additional distilled systems-engineering guidance.
+
+**Decision required:**
+- Accept into TraceWeaver Core MVP.
+- Split into follow-up candidate.
+- Reduce scope back to the U2-U5 validated bundle.
+
+**Verification:**
+- Focused document review reconciles requirements, spec, plan, README, validation
+  record, and distilled guidance.
+- Focused code review covers the expanded Agent Skills runtime candidate.
+- Runtime sync evidence records source mapping, checksums, reviewer, review
+  session, and implementation commit.
+- Lifecycle-discoverability validation is recorded before packaging.
+
 - [ ] **U6: Package first PR**
 
 **Goal:** Prepare a focused upstream PR with a clean description, test plan, validation evidence, and explicit non-goals.
 
 **Requirements:** R23-R36
 
-**Dependencies:** U1-U5 complete.
+**Dependencies:** U1-U5 complete. If packaging includes the expanded runtime
+candidate, U5.5 must also be accepted and validated.
 
 **Local prep/evidence files:**
 - Create: `docs/upstream/systems-engineering-traceability-pr.md`
 
 **Approach:**
-- PR body should emphasize the narrow contribution: one traceability skill plus operating-model reference, matrix template, and minimal index update.
+- PR body should emphasize the chosen packaging surface. TraceWeaver Core
+  includes the four-reference runtime bundle; upstream packaging may be smaller
+  only when recorded as a scope decision.
 - Include fork validation evidence from U5.
-- Explicitly state that `/trace`, persona, lifecycle patches, executable diagram generation, metrics, and high-assurance extensions are follow-ups.
+- Explicitly state that `/trace`, executable diagram generation, metrics, and
+  high-assurance extensions are follow-ups. Persona and lifecycle-routing
+  changes belong in U5.5 unless a smaller upstream package is explicitly chosen.
 - If maintainers ask to remove the separate template, stop and revise the PR scope; do not package a traceability MVP that lacks an accepted matrix artifact or explicitly approved equivalent matrix guidance.
 
 **Patterns to follow:**

@@ -11,7 +11,10 @@ AI coding agents can generate working code faster than teams can preserve the en
 
 The project needs a lightweight Agent Skills contribution that manages systems engineering traceability flow for agent-generated software work. The skill should extend the existing `spec -> plan -> build -> test -> review -> ship` lifecycle with a practical chain:
 
-`Need -> Requirement -> Design -> Implementation -> Verification -> Validation`
+`Idea / Intent -> Need -> Requirement -> Design -> Implementation -> Verification -> Validation -> Change Control`
+
+Brainstorming and idea refinement create candidate ideas, needs, assumptions,
+risks, and success signals. They do not create implementation authority.
 
 It should also trace the engineering documents themselves so the record can be followed from `requirements.md` to `plan.md`, the traceability artifact, the acceptance test plan/procedure, and the final acceptance or verification results.
 
@@ -123,7 +126,7 @@ MVP use cases:
 - R24. The MVP must follow upstream skill anatomy: frontmatter, overview, when-to-use, process, rationalizations, red flags, and verification.
 - R25. The MVP must avoid duplicating existing skill content and should reference related skills where needed.
 - R26. Supporting references and templates must live in top-level `references/`, not inside the skill directory, for the upstream `addyosmani/agent-skills` contribution.
-- R27. The MVP should include only `skills/systems-engineering-traceability/SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, and a minimal README/index update if required. The matrix template is part of the minimum traceability capability; if maintainers reject the separate template, treat that as a scope-change decision instead of silently omitting matrix guidance.
+- R27. The TraceWeaver Core MVP must include `skills/systems-engineering-traceability/SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, `references/requirements-and-vv-guide.md`, `references/risk-gap-and-change-control-guide.md`, and README/index discoverability updates if required. The two companion guides are mandatory runtime guidance for the Core MVP, not optional extras. Upstream PR packaging may be reduced only through an explicit scope decision; the matrix template and operating model remain required for a usable traceability MVP.
 - R28. The first PR must exclude `/trace`, systems engineer persona, broad lifecycle patches, executable metrics automation, high-assurance variants, and full systems engineering theory.
 
 **Adoption and Validation Strategy**
@@ -144,6 +147,7 @@ MVP use cases:
 - R39. The agent-facing operating model must be original project-specific writing that cites official or public source pages where possible and does not reproduce ISO, IEEE, INCOSE, or other protected source text.
 - R40. If licensed ground-truth sources are not yet available, provisional operating-model guidance may be drafted from public knowledge and public references, but uncertain source-derived claims must be marked provisional and must not claim standards compliance.
 - R41. The upstream MVP must separate the concise operating model from the traceability matrix template so lifecycle authority rules, source hierarchy, and provisional-distillation boundaries are not buried inside the matrix example.
+- R42. Runtime reference copies are not considered synced until the source-to-runtime mapping, version stamp, checksum, reviewer, review session, and implementation commit are recorded.
 
 ---
 
@@ -177,12 +181,15 @@ MVP use cases:
 - The first PR will not add `/trace`.
 - The first PR will not add a systems engineer persona.
 - The first PR will not patch every existing skill.
+- Any idea-refinement, lifecycle-routing, or persona-awareness work after the
+  validated U2-U5 slice must be recorded as a separate scope-change candidate
+  before packaging.
 - The first PR will not implement MBSE, SysML, DOORS, or a requirements database.
 - The first PR will not require tracing every private helper or every line of code.
 - The first PR will not add executable automation for generating diagrams, calculating metrics, or enforcing traceability gates.
 - The first PR will not claim acceptance evidence until the skill has been tested in a fork.
 - The first PR will not commit raw source materials, licensed standards, handbook PDFs, extraction notes, or long copied excerpts.
-- The first PR must include a concise operating model and a concise traceability matrix template that also shows where a Mermaid diagram belongs.
+- The TraceWeaver Core bundle must include a concise operating model, a concise traceability matrix template, the requirements/V&V guide, and the risk/gap/change-control guide. If the upstream PR is packaged smaller than Core, that reduction must be recorded as a scope decision.
 
 ---
 
@@ -219,7 +226,7 @@ MVP use cases:
 
 - The upstream repository continues to accept new skills that are specific, verifiable, battle-tested, and minimal.
 - Current upstream contribution rules and recent accepted skill patterns must be rechecked before opening the PR.
-- The existing spec in `docs/specs/systems-engineering-traceability-agent-skill.md` is the source of truth for the current proposal.
+- `docs/distilled/` is the source of truth for public TraceWeaver guidance. The requirements/spec/plan govern project scope and packaging decisions. A project traceability matrix remains the source of truth for that project's trace links, status, evidence, gaps, and human decisions.
 - Local source materials and extraction notes remain outside git in `.source-materials/`; committed docs cite public or official source pages rather than local private files.
 - A fork of `addyosmani/agent-skills` will be available for testing before opening the upstream PR.
 - Fork testing can produce concrete evidence that the skill finds useful traceability gaps without creating too much process overhead.

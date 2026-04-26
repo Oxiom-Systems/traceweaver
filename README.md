@@ -38,18 +38,20 @@ As of 2026-04-26:
 | TraceWeaver Core repo | Primary project home | `git@github.com:Oxiom-Systems/traceweaver.git` |
 | Agent Skills fork | Implementation-ready candidate | `/Users/hanneszietsman/CrypotAI/agent-skills` on `feature/systems-engineering-traceability` |
 | U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
-| Latest runtime candidate commit | `b01dd9c` | `feat: route ideation through traceability`; post-U5 focused review pending |
+| U5.5 expanded runtime candidate | `b01dd9c` | `feat: route ideation through traceability`; scope-change candidate pending focused review and validation |
 | Upstream-neutral skill | Runtime candidate | `skills/systems-engineering-traceability/SKILL.md` |
 | Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
+| Requirements and V&V guide | U5.5 runtime candidate | `references/requirements-and-vv-guide.md`; mandatory for Core, pending U5.5 review |
+| Risk, gap, and change-control guide | U5.5 runtime candidate | `references/risk-gap-and-change-control-guide.md`; mandatory for Core, pending U5.5 review |
 | Discovery routing | Runtime candidate | Ideas route through `idea-refine` plus `systems-engineering-traceability`; meaningful behavior routes through traceability as a cross-cutting hop |
-| Validation record | Refreshed to U5 baseline and post-U5 delta | U5 pass applies to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; latest runtime candidate is `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` |
-| Controlled validation | Complete | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded |
-| Upstream PR packaging | Next review step | U5 validation no longer blocks packaging; run final document review before packaging |
+| Validation record | Refreshed to U5 baseline and U5.5 candidate | U5 pass applies only to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` is not validated yet |
+| Controlled validation | Complete for U5 baseline | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded at `ca6ff66` |
+| Upstream PR packaging | Blocked on U5.5 decision | Do not package `b01dd9c` until focused review, runtime-sync evidence, and lifecycle-discoverability validation are recorded |
 | TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |
 | TraceWeaver CE lifecycle baseline | In progress | Baseline approval and validation are not closed yet |
 
-## MVP Contract
+## TraceWeaver Core MVP Bundle
 
 The TraceWeaver Core MVP is not just a skill prompt. The minimum usable
 traceability capability is:
@@ -64,6 +66,16 @@ traceability capability is:
 
 The traceability matrix is mandatory once the skill is used. Lite mode may use a
 minimal matrix row, but it cannot skip the matrix artifact entirely.
+
+The two companion guides are mandatory runtime guidance for the Core MVP, not
+optional extras.
+
+## Upstream Packaging Boundary
+
+The upstream `agent-skills` PR is a separate acceptance surface. It may be
+packaged smaller than TraceWeaver Core if required by maintainer feedback, but
+any reduction must be recorded as a scope decision. The matrix template and
+operating model remain required for a usable traceability MVP.
 
 ## Guidance Pipeline
 
@@ -83,13 +95,17 @@ When the runtime references change, the Agent Skills implementation commit must
 be refreshed, reviewed, and recorded in the validation record before that new
 runtime bundle is treated as validated.
 
+Runtime guidance is not considered synced unless the source-to-runtime mapping,
+version stamp, checksum, reviewer, review session, and implementation commit are
+recorded in the validation record.
+
 ## Operating Model
 
 TraceWeaver Core uses an original, lightweight, systems-engineering-aligned
 operating model for agentic software work:
 
 ```text
-intent
+idea / intent
 -> stakeholder need
 -> user requirement
 -> system requirement
@@ -147,9 +163,20 @@ remains orphaned until human approval resolves it.
 
 ## Validation Gate
 
-TraceWeaver Core validation is complete for the current upstream-neutral
-implementation candidate. The validation record contains all three controlled
-runs:
+TraceWeaver Core validation is complete for the U2-U5 baseline implementation
+slice at `ca6ff66d46f140da72f423ea3dec819f81ef5337`.
+
+Validation status:
+
+- `ca6ff66d46f140da72f423ea3dec819f81ef5337`: U2-U5 implementation slice
+  passed validation.
+- `b01dd9c762d3c80d0d279aeebcbd529302b73fa1`: expanded U5.5 runtime
+  candidate pending focused review and validation.
+- Packaging status: not ready for the `b01dd9c` runtime bundle until U5.5
+  review, runtime-sync evidence, and lifecycle-discoverability validation are
+  complete.
+
+The validation record contains all three controlled U5 baseline runs:
 
 | Scenario | Purpose | Status |
 |---|---|---|
@@ -221,11 +248,13 @@ Remote:
 
 1. Run a focused document review on the completed validation record and README
    status.
-2. Run focused review on the post-U5 Agent Skills runtime candidate
+2. Decide whether U5.5 accepts the expanded Agent Skills runtime candidate
    `b01dd9c762d3c80d0d279aeebcbd529302b73fa1`.
-3. Prepare the upstream-neutral package or TraceWeaver Core release notes,
+3. Record runtime-sync evidence and lifecycle-discoverability validation for
+   any accepted U5.5 runtime bundle.
+4. Prepare the upstream-neutral package or TraceWeaver Core release notes,
    depending on the chosen distribution path.
-4. Continue TraceWeaver CE baseline and lifecycle integration with the Core
+5. Continue TraceWeaver CE baseline and lifecycle integration with the Core
    validation surface as the control point.
 
 ## Product Direction

@@ -470,7 +470,7 @@ Extract:
 Bundle as:
 
 ```text
-intent
+idea / intent
 -> stakeholder need
 -> user requirement
 -> system requirement
