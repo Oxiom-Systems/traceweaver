@@ -1,0 +1,9 @@
+# Local source material cache.
+#
+# This directory may contain licensed standards, downloaded public PDFs,
+# extraction notes, and other source material used to create original
+# distilled project artifacts. It must stay out of git.
+.source-materials/
+
+# Local agent workflow/cache artifacts.
+.context/
