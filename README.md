@@ -36,13 +36,13 @@ As of 2026-04-26:
 | Area | Status | Notes |
 |---|---|---|
 | TraceWeaver Core repo | Primary project home | `git@github.com:Oxiom-Systems/traceweaver.git` |
-| Agent Skills fork | Implemented candidate | `/Users/hanneszietsman/CrypotAI/agent-skills` on `feature/systems-engineering-traceability` |
-| Latest local candidate commit | `5a8831b` | `fix: separate trace debt from approved gaps` |
-| Upstream-neutral skill | Implemented candidate | `skills/systems-engineering-traceability/SKILL.md` |
-| Operating model reference | Implemented candidate | `references/systems-engineering-traceability-operating-model.md` |
-| Traceability matrix template | Implemented candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
-| Discovery routing | Implemented candidate | `systems-engineering-traceability` is wired into `using-agent-skills` as a cross-cutting hop |
-| Validation record | Needs refresh | Must be updated to the latest tested fork commit |
+| Agent Skills fork | Implementation-ready candidate | `/Users/hanneszietsman/CrypotAI/agent-skills` on `feature/systems-engineering-traceability` |
+| Latest tested candidate commit | `ca6ff66` | `docs: align skill tree count` |
+| Upstream-neutral skill | Implementation-ready candidate | `skills/systems-engineering-traceability/SKILL.md` |
+| Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
+| Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
+| Discovery routing | Implementation-ready candidate | `systems-engineering-traceability` is wired into `using-agent-skills` as a cross-cutting hop |
+| Validation record | Refreshed to tested commit | Points at `ca6ff66d46f140da72f423ea3dec819f81ef5337` |
 | Controlled validation | Pending | All three pre-registered scenarios still need evidence |
 | Upstream PR packaging | Blocked | Do not package until validation passes |
 | TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |

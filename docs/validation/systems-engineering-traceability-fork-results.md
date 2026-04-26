@@ -1,18 +1,18 @@
 # Systems Engineering Traceability Fork Validation
 
-Status: In progress
+Status: Implementation slice ready; controlled validation pending
 
-Date: 2026-04-25
+Date: 2026-04-26
 
 Fork checkout: `/Users/hanneszietsman/CrypotAI/agent-skills`
 
 Working branch: `feature/systems-engineering-traceability`
 
-Implementation commit: Pending refreshed tested commit that includes `references/systems-engineering-traceability-operating-model.md`
+Tested implementation commit: `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`
 
-Last committed fork ref before operating-model reconciliation: `b9923fc982e6a572b1f70d1cbe9e8f1e2bc6d017 fix: clarify traceability authority rules`
+Last stale pre-reconciliation ref: `b9923fc982e6a572b1f70d1cbe9e8f1e2bc6d017 fix: clarify traceability authority rules`
 
-Current reconciliation state: operating-model artifact added in the target fork working tree; refreshed commit and final verification rerun still pending.
+Current reconciliation state: refreshed implementation commit tested locally and focused code review rerun with no remaining findings.
 
 Upstream issue: https://github.com/addyosmani/agent-skills/issues/103
 
@@ -20,23 +20,28 @@ Upstream issue: https://github.com/addyosmani/agent-skills/issues/103
 
 Current decision: **Do not package the upstream PR yet.**
 
-Reason: U2-U4 are being reconciled against the stricter MVP contract. U2 is not complete until the fork contains `SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, and the README update in a refreshed tested commit. U5 validation has not yet satisfied the required baseline comparison and human reviewer confidence evidence. The PR package remains blocked until all three pre-registered validation scenarios are complete and the distinct-value criteria pass across the full scenario set.
+Reason: The upstream-neutral implementation slice is ready at tested commit `ca6ff66d46f140da72f423ea3dec819f81ef5337`, but U5 validation has not yet satisfied the required baseline comparison and human reviewer confidence evidence. The PR package remains blocked until all three pre-registered validation scenarios are complete and the distinct-value criteria pass across the full scenario set.
 
 ## Completed Evidence
 
 | Area | Evidence | Result |
 |---|---|---|
-| Focused PR scope | Required fork scope is `skills/systems-engineering-traceability/SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, and `README.md`. | Pass in working tree; commit pending |
+| Tested commit | Exact fork commit under review is `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`. | Pass |
+| Focused PR scope | Required fork scope is `skills/systems-engineering-traceability/SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, `skills/using-agent-skills/SKILL.md`, and `README.md`. | Pass |
 | Skill anatomy | `SKILL.md` includes YAML frontmatter, overview, when-to-use, process, rationalizations, red flags, and verification. | Pass |
 | Frontmatter | `name` matches directory and description includes trigger conditions. | Pass |
 | Matrix authority boundary | Skill and template define the matrix as audit record for links/status/evidence/gaps/decisions, not as replacement for source artifacts. | Pass |
 | Lifecycle checkpoints | Skill includes checkpoints for spec, plan, build, test, review, and ship. | Pass |
-| No-orphan gate | Skill blocks meaningful behavior without requirement/task/design/risk/approved gap. | Pass |
-| Status model | Skill and template define `Draft`, `Approved`, `Implemented`, `Verified`, `Validated`, `Gap`, `Deferred`, and `Retired`. | Pass |
+| No-orphan gate | Skill blocks meaningful behavior without valid approved authority: approved requirement, approved ADR/design decision, first-class approved risk control, approved traceability gap, or task that closes directly to one of those authorities. | Pass |
+| Risk controls | Matrix template includes first-class risk controls with risk statement, owner, mitigation/control, linked requirement or approved gap, evidence path, approval status, and approval ID. | Pass |
+| Approved gaps vs debt | Matrix template separates authority-bearing approved traceability gaps from ordinary open traceability debt. | Pass |
+| Status model | Skill and template define `Draft`, `Approved`, `Implemented`, `Verified`, `Validated`, `Open`, `Gap`, `Deferred`, `Closed`, `Expired`, and `Retired`. | Pass |
 | Verification vs validation | Skill and template separate verification evidence from validation evidence or validation plan. | Pass |
-| README discoverability | README lists the skill as cross-cutting and links the template. | Pass |
-| Operating model artifact | `references/systems-engineering-traceability-operating-model.md` exists, is linked from `SKILL.md`, and contains original agent-facing lifecycle rules plus source-boundary language. | Pass in working tree; commit pending |
-| Markdown hygiene | `git diff --check` passed in the fork after operating-model reconciliation. | Pass |
+| README discoverability | README lists the skill as cross-cutting, counts 22 skills, and links the template. | Pass |
+| Meta-skill routing | `skills/using-agent-skills/SKILL.md` routes meaningful behavior through `systems-engineering-traceability` as a cross-cutting hop. | Pass |
+| Operating model artifact | `references/systems-engineering-traceability-operating-model.md` exists, is linked from `SKILL.md`, contains original agent-facing lifecycle rules plus source-boundary language, and includes official/public source links. | Pass |
+| Focused code review | Focused `ce-code-review` pass on the implementation slice found no remaining findings after commits `5745ab2`, `2e67062`, and `ca6ff66`. | Pass |
+| Markdown hygiene | `git diff --check` passed across the branch against upstream `main`. | Pass |
 | New-file ASCII | `SKILL.md`, `systems-engineering-traceability-operating-model.md`, and `traceability-matrix-template.md` contain ASCII only. | Pass |
 
 ## Controlled Validation Protocol
@@ -144,7 +149,7 @@ Status: Pending.
 | SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Pending controlled timing. |
 | SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Pending human reviewer classification. |
 | SREQ-TRACE-004 | The skill must improve reviewer confidence. | Reviewer rates confidence before and after using the skill. | Pending human reviewer rating. |
-| SREQ-TRACE-005 | The skill must not require broad repo changes. | Review PR scope. | Pass in working tree: current candidate touches one skill, one operating-model reference, one matrix template, and README only. |
+| SREQ-TRACE-005 | The skill must not require broad repo changes. | Review PR scope. | Pass at tested commit `ca6ff66`: current candidate touches one skill, one operating-model reference, one matrix template, the meta-skill discovery file, and README only. |
 | SREQ-TRACE-006 | The skill must expose missing traceability, not invent it. | Inspect inferred links. | Partial pass: skill requires inferred links to remain `Draft`; needs validation run evidence. |
 | SREQ-TRACE-007 | The skill must provide distinct value beyond existing Agent Skills workflows. | Compare baseline run against traceability-enabled run. | Pending baseline comparison. |
 
