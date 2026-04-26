@@ -1,6 +1,6 @@
 # Systems Engineering Traceability Fork Validation
 
-Status: Implementation slice ready; VRUN-001 technical evidence captured; controlled validation still pending
+Status: Implementation slice ready; VRUN-001 and VRUN-003 technical evidence captured; controlled validation still pending
 
 Date: 2026-04-26
 
@@ -42,6 +42,7 @@ Reason: The upstream-neutral implementation slice is ready at tested commit `ca6
 | Operating model artifact | `references/systems-engineering-traceability-operating-model.md` exists, is linked from `SKILL.md`, contains original agent-facing lifecycle rules plus source-boundary language, and includes official/public source links. | Pass |
 | Focused code review | Focused `ce-code-review` pass on the implementation slice found no remaining findings after commits `5745ab2`, `2e67062`, and `ca6ff66`. | Pass |
 | VRUN-001 technical evidence | Dummy new-feature A/B run created baseline and TraceWeaver outputs from the same seed commit. | Technical pass; human reviewer rating pending |
+| VRUN-003 technical evidence | Dummy low-risk docs/discoverability A/B run created baseline and TraceWeaver Lite outputs from the same seed commit. | Technical pass; human reviewer rating pending |
 | Markdown hygiene | `git diff --check` passed across the branch against upstream `main`. | Pass |
 | New-file ASCII | `SKILL.md`, `systems-engineering-traceability-operating-model.md`, and `traceability-matrix-template.md` contain ASCII only. | Pass |
 
@@ -113,7 +114,14 @@ Required evidence:
 - At least one distinct traceability gap or dark-code candidate.
 - Human classification of useful vs low-value findings.
 
-Status: Pending.
+Evidence:
+
+- `docs/validation/runs/VRUN-003/scenario.md`
+- `docs/validation/runs/VRUN-003/baseline-output.md`
+- `docs/validation/runs/VRUN-003/traceweaver-output.md`
+- `docs/validation/runs/VRUN-003/comparison.md`
+
+Status: Technical evidence captured; human reviewer usefulness/noise and confidence ratings pending.
 
 ### VRUN-003: Low-Risk Lite Mode
 
@@ -147,24 +155,24 @@ Status: Pending.
 | Unapproved inferred requirements flagged | Pending | Pending | Pending |
 | Change impact analysis performed | Pending | Pending | Pending |
 | Reviewer confidence | VRUN-001 Codex rating: 2 / 5; human confirmation pending. | VRUN-001 Codex rating: 4 / 5; human confirmation pending. | Higher confidence, pending human rating. |
-| Workflow overhead | VRUN-001 baseline produced 7 files; test command 0.30s. | VRUN-001 TraceWeaver run produced 9 files; test command 0.30s. | Additional matrix and ATP docs; acceptable for Standard-mode new feature pending human noise rating. |
+| Workflow overhead | VRUN-001 baseline produced 7 files; test command 0.30s. VRUN-003 baseline produced 3 files; check command 0.01s. | VRUN-001 TraceWeaver run produced 9 files; test command 0.30s. VRUN-003 Lite produced 4 files; check command 0.00s. | Standard mode adds matrix and ATP docs for new features; Lite mode added one minimal matrix artifact for low-risk docs. Human noise ratings pending. |
 
 ## Skill-Level V&V Matrix
 
 | ID | Skill Requirement | Evidence Method | Current Result |
 |---|---|---|---|
 | SREQ-TRACE-001 | The skill must create useful traceability from intent to implementation. | Run all three pre-registered fork scenarios. | Partial pass in VRUN-001; VRUN-002/003 and human ratings pending. |
-| SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Pending controlled timing. |
-| SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Pending human reviewer classification. |
+| SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Partial pass in VRUN-003: Lite mode added one minimal matrix file and no full requirements/plan/ATP/results package; human noise rating pending. |
+| SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Technical evidence captured in VRUN-003; human reviewer classification pending. |
 | SREQ-TRACE-004 | The skill must improve reviewer confidence. | Reviewer rates confidence before and after using the skill. | Codex rating improved in VRUN-001; human reviewer rating pending. |
 | SREQ-TRACE-005 | The skill must not require broad repo changes. | Review PR scope. | Pass at tested commit `ca6ff66`: current candidate touches one skill, one operating-model reference, one matrix template, the meta-skill discovery file, and README only. |
 | SREQ-TRACE-006 | The skill must expose missing traceability, not invent it. | Inspect inferred links. | Partial pass: skill requires inferred links to remain `Draft`; needs validation run evidence. |
-| SREQ-TRACE-007 | The skill must provide distinct value beyond existing Agent Skills workflows. | Compare baseline run against traceability-enabled run. | Partial pass in VRUN-001; broader scenario set pending. |
+| SREQ-TRACE-007 | The skill must provide distinct value beyond existing Agent Skills workflows. | Compare baseline run against traceability-enabled run. | Partial pass in VRUN-001 and VRUN-003; VRUN-002 and human ratings pending. |
 
 ## Current Blockers Before PR Packaging
 
-- VRUN-001 needs human usefulness/noise and confidence confirmation.
-- VRUN-002 and VRUN-003 controlled validation runs must be completed.
+- VRUN-001 and VRUN-003 need human usefulness/noise and confidence confirmation.
+- VRUN-002 controlled validation run must be completed.
 - Human reviewer must classify finding usefulness and low-value noise.
 - Human reviewer confidence before/after must be recorded.
 - Distinct value must be demonstrated in at least two baseline comparison areas across the full scenario set, including at least one outcome-based signal.

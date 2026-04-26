@@ -43,7 +43,7 @@ As of 2026-04-26:
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
 | Discovery routing | Implementation-ready candidate | `systems-engineering-traceability` is wired into `using-agent-skills` as a cross-cutting hop |
 | Validation record | Refreshed to tested commit | Points at `ca6ff66d46f140da72f423ea3dec819f81ef5337` |
-| Controlled validation | In progress | VRUN-001 technical evidence captured; human rating, VRUN-002, and VRUN-003 still pending |
+| Controlled validation | In progress | VRUN-001 and VRUN-003 technical evidence captured; human ratings and VRUN-002 still pending |
 | Upstream PR packaging | Blocked | Do not package until validation passes |
 | TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |
 | TraceWeaver CE lifecycle baseline | In progress | Baseline approval and validation are not closed yet |
@@ -130,7 +130,7 @@ contains all three controlled runs:
 |---|---|---|
 | VRUN-001: New feature with document chain | Prove requirement-to-plan-to-implementation-to-results traceability | Technical evidence captured; human rating pending |
 | VRUN-002: Existing module audit | Prove the skill finds dark-code candidates and missing traceability | Pending |
-| VRUN-003: Low-risk Lite mode | Prove Lite mode stays lightweight while still using a minimal matrix artifact | Pending |
+| VRUN-003: Low-risk Lite mode | Prove Lite mode stays lightweight while still using a minimal matrix artifact | Technical evidence captured; human rating pending |
 
 The validation record must compare baseline Agent Skills behaviour against the
 traceability-enabled workflow from the same starting state. It must record

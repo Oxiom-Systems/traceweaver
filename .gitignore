@@ -7,3 +7,6 @@
 
 # Local agent workflow/cache artifacts.
 .context/
+
+# macOS Finder metadata.
+.DS_Store
