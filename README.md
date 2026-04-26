@@ -160,6 +160,7 @@ used to create original distilled guidance.
 Policy:
 
 - `docs/upstream/source-materials-policy.md`
+- `docs/upstream/source-distillation-extraction-instructions.md`
 
 ## Repository Map
 
@@ -168,7 +169,7 @@ Policy:
 | `docs/brainstorms/` | Requirements and product framing |
 | `docs/specs/` | Source specification for the MVP skill |
 | `docs/plans/` | Implementation and validation plans |
-| `docs/upstream/` | Upstream issue, fork preflight, and source policy records |
+| `docs/upstream/` | Upstream issue, fork preflight, source policy, and distillation instructions |
 | `docs/validation/` | Fork validation protocol and results |
 | `.source-materials/` | Ignored local source cache |
 
