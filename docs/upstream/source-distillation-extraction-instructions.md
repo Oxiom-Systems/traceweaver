@@ -23,16 +23,31 @@ Committed TraceWeaver guidance must be original project writing. It may cite
 official or public source pages, but it must not reproduce ISO, IEEE, INCOSE,
 NASA, MIL, or other protected source text.
 
+Promotion path:
+
+```text
+.source-materials/ = private source notes and extraction work
+docs/distilled/ = committed public TraceWeaver source-of-truth guidance
+agent-skills/references/ = runtime-bundled agent reference files
+```
+
+Do not bake anything directly from `.source-materials/` into runtime agent
+references. First rewrite the source-aware notes into original TraceWeaver
+guidance under `docs/distilled/`, then sync the runtime-ready subset into
+`agent-skills/references/`.
+
 ## Bundled Distillation Targets
 
 Use the source material to improve these bundled artifacts:
 
 | Target Artifact | Purpose | Distillation Role |
 |---|---|---|
-| `references/systems-engineering-traceability-operating-model.md` | Runtime agent-facing model | Compact lifecycle chain, agent rules, authority rules, V&V distinction, change-control discipline |
-| `references/traceability-matrix-template.md` | Runtime matrix template | Required fields, statuses, authority links, verification/validation evidence, risk controls, approved gaps, traceability debt |
+| `docs/distilled/systems-engineering-traceability-operating-model.md` | Public source-of-truth operating model | Compact lifecycle chain, agent rules, authority rules, V&V distinction, change-control discipline |
+| `docs/distilled/traceability-matrix-template.md` | Public source-of-truth matrix template | Required fields, statuses, authority links, verification/validation evidence, risk controls, approved gaps, traceability debt |
+| `docs/distilled/requirements-and-vv-guide.md` | Public source-of-truth requirements and V&V guide | Need/requirement separation, inferred requirements, ATP/result records, verification evidence, validation scenarios |
+| `docs/distilled/risk-gap-and-change-control-guide.md` | Public source-of-truth risk/gap/change guide | Risk controls, approved gaps, traceability debt, dark-code candidates, impact analysis, and change control |
+| `agent-skills/references/*.md` runtime sync | Runtime agent references | Runtime-ready copies of the distilled guidance after source-hygiene review |
 | `README.md` or package index | Discoverability | Clear project positioning and source-boundary language |
-| Future `references/requirements-and-vv-guide.md` if needed | Optional support reference | Short original guidance for requirement quality, ATP/results, and validation scenarios if the operating model becomes too long |
 
 Do not add a bundled source appendix that paraphrases each standard chapter by
 chapter. Bundle only what agents need to operate TraceWeaver correctly.
@@ -722,4 +737,3 @@ Ask these questions before committing a rule:
    authority?
 9. Does it need a matrix field, a skill instruction, or only explanatory text?
 10. Can a reviewer audit the rule without seeing the private source file?
-

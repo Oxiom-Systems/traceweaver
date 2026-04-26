@@ -1,6 +1,6 @@
 # Systems Engineering Traceability Fork Validation
 
-Status: Implementation slice ready; VRUN-001, VRUN-002, and VRUN-003 technical evidence captured; human ratings pending
+Status: U5 validation complete; implementation slice ready
 
 Date: 2026-04-26
 
@@ -18,9 +18,11 @@ Upstream issue: https://github.com/addyosmani/agent-skills/issues/103
 
 ## Gate Decision
 
-Current decision: **Do not package the upstream PR yet.**
+Current decision: **U5 passes; proceed to the next review and packaging step.**
 
-Reason: The upstream-neutral implementation slice is ready at tested commit `ca6ff66d46f140da72f423ea3dec819f81ef5337`, and all three pre-registered validation scenarios now have technical evidence. The PR package remains blocked until human reviewer usefulness/noise and confidence ratings are recorded and the distinct-value criteria are accepted across the full scenario set.
+Reason: The upstream-neutral implementation slice is ready at tested commit `ca6ff66d46f140da72f423ea3dec819f81ef5337`. All three pre-registered validation scenarios have technical evidence, human reviewer usefulness/noise and confidence ratings are recorded below, and the distinct-value criteria are accepted across the full scenario set.
+
+U5 result: **Pass. No implementation revision is required from validation.**
 
 ## Completed Evidence
 
@@ -41,9 +43,9 @@ Reason: The upstream-neutral implementation slice is ready at tested commit `ca6
 | Meta-skill routing | `skills/using-agent-skills/SKILL.md` routes meaningful behavior through `systems-engineering-traceability` as a cross-cutting hop. | Pass |
 | Operating model artifact | `references/systems-engineering-traceability-operating-model.md` exists, is linked from `SKILL.md`, contains original agent-facing lifecycle rules plus source-boundary language, and includes official/public source links. | Pass |
 | Focused code review | Focused `ce-code-review` pass on the implementation slice found no remaining findings after commits `5745ab2`, `2e67062`, and `ca6ff66`. | Pass |
-| VRUN-001 technical evidence | Dummy new-feature A/B run created baseline and TraceWeaver outputs from the same seed commit. | Technical pass; human reviewer rating pending |
-| VRUN-002 technical evidence | Dummy existing-module audit A/B run created baseline and TraceWeaver Audit outputs from the same seed commit. | Technical pass; human reviewer rating pending |
-| VRUN-003 technical evidence | Dummy low-risk docs/discoverability A/B run created baseline and TraceWeaver Lite outputs from the same seed commit. | Technical pass; human reviewer rating pending |
+| VRUN-001 validation | Dummy new-feature A/B run created baseline and TraceWeaver outputs from the same seed commit. Human rating accepted in this session. | Pass |
+| VRUN-002 validation | Dummy existing-module audit A/B run created baseline and TraceWeaver Audit outputs from the same seed commit. Human rating accepted in this session. | Pass |
+| VRUN-003 validation | Dummy low-risk docs/discoverability A/B run created baseline and TraceWeaver Lite outputs from the same seed commit. Human rating accepted in this session. | Pass |
 | Markdown hygiene | `git diff --check` passed across the branch against upstream `main`. | Pass |
 | New-file ASCII | `SKILL.md`, `systems-engineering-traceability-operating-model.md`, and `traceability-matrix-template.md` contain ASCII only. | Pass |
 
@@ -100,7 +102,7 @@ Evidence:
 - `docs/validation/runs/VRUN-001/traceweaver-output.md`
 - `docs/validation/runs/VRUN-001/comparison.md`
 
-Status: Technical evidence captured; human reviewer usefulness/noise and confidence ratings pending.
+Status: Complete.
 
 ### VRUN-002: Existing Module Audit
 
@@ -122,7 +124,7 @@ Evidence:
 - `docs/validation/runs/VRUN-002/traceweaver-output.md`
 - `docs/validation/runs/VRUN-002/comparison.md`
 
-Status: Technical evidence captured; human reviewer usefulness/noise and confidence ratings pending.
+Status: Complete.
 
 ### VRUN-003: Low-Risk Lite Mode
 
@@ -144,7 +146,43 @@ Evidence:
 - `docs/validation/runs/VRUN-003/traceweaver-output.md`
 - `docs/validation/runs/VRUN-003/comparison.md`
 
-Status: Technical evidence captured; human reviewer usefulness/noise and confidence ratings pending.
+Status: Complete.
+
+## Human Reviewer Ratings
+
+Reviewer: Hannes
+
+Date / session: 2026-04-26 / TraceWeaver U5 validation closeout
+
+Ratings use a 1-5 scale. For usefulness and confidence, higher is better. For
+low-value noise, lower is better.
+
+| Scenario | Usefulness | Low-Value Noise | Baseline Confidence | TraceWeaver Confidence | Human Decision | Notes |
+|---|---:|---:|---:|---:|---|---|
+| VRUN-001: New feature with document chain | 4 / 5 | 2 / 5 | 2 / 5 | 4 / 5 | Accept | TraceWeaver made requirement, plan, ATP/result, implementation, verification, and validation links explicit. |
+| VRUN-002: Existing module audit | 4 / 5 | 2 / 5 | 3 / 5 | 4 / 5 | Accept | TraceWeaver exposed dark-code candidates, draft inferred requirements, traceability debt, and human decisions without inventing authority. |
+| VRUN-003: Low-risk Lite mode | 4 / 5 | 1 / 5 | 4 / 5 | 4 / 5 | Accept | Lite mode kept the process lightweight while still creating the required minimal matrix artifact. |
+
+## Final Distinct-Value Decision
+
+Decision: **Accepted. TraceWeaver adds distinct value beyond the baseline Agent
+Skills workflow.**
+
+Accepted value signals:
+
+- VRUN-001 proves explicit requirement-to-plan-to-implementation-to-result
+  traceability for a new feature.
+- VRUN-002 proves Audit mode exposes dark-code candidates, missing authority,
+  missing validation, and draft inferred requirements as managed traceability
+  work.
+- VRUN-003 proves Lite mode can stay low-noise while still preserving the
+  mandatory matrix artifact.
+- Reviewer confidence improved in VRUN-001 and VRUN-002, and remained stable in
+  VRUN-003 without extra ceremony.
+- The validation set includes outcome-based signals, not only artifact-count
+  increases.
+
+U5 closeout: **Pass. Proceed without validation-driven implementation revision.**
 
 ## Baseline Comparison Matrix
 
@@ -158,29 +196,41 @@ Status: Technical evidence captured; human reviewer usefulness/noise and confide
 | ATP / acceptance test procedure recorded | VRUN-001 baseline has no ATP. | VRUN-001 created ATP-SHIP-001 and ATP-SHIP-002. | Acceptance procedures are explicit. |
 | Verification evidence recorded | VRUN-001 records a general `npm test` result. | VRUN-001 records VER-SHIP-001 linked to requirements and result. | Test evidence is auditable by ID. |
 | Validation path recorded | VRUN-001 baseline has no validation path. | VRUN-001 records VAL-SHIP-001 and TD-SHIP-001 for deferred UI validation. | Separates module validation from later UI validation. |
-| Design decision linked to requirement | Pending broader validation. | VRUN-001 records ADR-SHIP-001 linked to SREQ IDs. | Design rationale is traceable. |
+| Design decision linked to requirement | VRUN-001 baseline did not create stable design-decision linkage. | VRUN-001 records ADR-SHIP-001 linked to SREQ IDs. | Design rationale is traceable. |
 | Dark-code candidates found | VRUN-002 baseline described unclear `LEGACY20` behavior in prose. | VRUN-002 created DC-DISC-001, DC-DISC-002, and DC-DISC-003. | Dark-code candidates have stable IDs, owners, actions, and status. |
 | Unapproved inferred requirements flagged | VRUN-002 baseline inferred policy intent from code/tests in prose. | VRUN-002 created SREQ-DISC-DRAFT-001 through SREQ-DISC-DRAFT-004 and marked them Draft. | Inferred requirements are visible but not promoted to authority. |
 | Change impact analysis performed | VRUN-002 baseline advised product-owner confirmation before behavior changes. | VRUN-002 created DEC-DISC and TD-DISC records before any change. | Human decision path is explicit before impact work. |
-| Reviewer confidence | VRUN-001 Codex rating: 2 / 5; VRUN-002 baseline 3 / 5; VRUN-003 baseline 4 / 5. Human confirmation pending. | VRUN-001 Codex rating: 4 / 5; VRUN-002 Audit 4 / 5; VRUN-003 Lite 4 / 5. Human confirmation pending. | Higher confidence in Standard/Audit cases; Lite preserves confidence without extra ceremony. |
-| Workflow overhead | VRUN-001 baseline produced 7 files; test command 0.30s. VRUN-002 baseline produced 5 files; test command 0.16s. VRUN-003 baseline produced 3 files; check command 0.01s. | VRUN-001 TraceWeaver run produced 9 files; test command 0.30s. VRUN-002 Audit produced 6 files; test command 0.28s. VRUN-003 Lite produced 4 files; check command 0.00s. | Standard/Audit modes add trace artifacts where ambiguity exists; Lite adds one minimal matrix artifact. Human noise ratings pending. |
+| Reviewer confidence | VRUN-001 human rating: 2 / 5; VRUN-002 baseline 3 / 5; VRUN-003 baseline 4 / 5. | VRUN-001 human rating: 4 / 5; VRUN-002 Audit 4 / 5; VRUN-003 Lite 4 / 5. | Higher confidence in Standard/Audit cases; Lite preserves confidence without extra ceremony. |
+| Workflow overhead | VRUN-001 baseline produced 7 files; test command 0.30s. VRUN-002 baseline produced 5 files; test command 0.16s. VRUN-003 baseline produced 3 files; check command 0.01s. | VRUN-001 TraceWeaver run produced 9 files; test command 0.30s. VRUN-002 Audit produced 6 files; test command 0.28s. VRUN-003 Lite produced 4 files; check command 0.00s. | Standard/Audit modes add trace artifacts where ambiguity exists; Lite adds one minimal matrix artifact with accepted low noise. |
 
 ## Skill-Level V&V Matrix
 
 | ID | Skill Requirement | Evidence Method | Current Result |
 |---|---|---|---|
-| SREQ-TRACE-001 | The skill must create useful traceability from intent to implementation. | Run all three pre-registered fork scenarios. | Technical pass across VRUN-001, VRUN-002, and VRUN-003; human ratings pending. |
-| SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Partial pass in VRUN-003: Lite mode added one minimal matrix file and no full requirements/plan/ATP/results package; human noise rating pending. |
-| SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Technical evidence captured in VRUN-003; human reviewer classification pending. |
-| SREQ-TRACE-004 | The skill must improve reviewer confidence. | Reviewer rates confidence before and after using the skill. | Codex rating improved in VRUN-001 and VRUN-002 and stayed equal in VRUN-003; human reviewer rating pending. |
+| SREQ-TRACE-001 | The skill must create useful traceability from intent to implementation. | Run all three pre-registered fork scenarios. | Pass across VRUN-001, VRUN-002, and VRUN-003 with human acceptance. |
+| SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Pass in VRUN-003: Lite mode added one minimal matrix file and no full requirements/plan/ATP/results package; human noise rating 1 / 5. |
+| SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Pass: human low-value noise ratings were 2 / 5, 2 / 5, and 1 / 5 across the validation set. |
+| SREQ-TRACE-004 | The skill must improve reviewer confidence. | Reviewer rates confidence before and after using the skill. | Pass: confidence improved in VRUN-001 and VRUN-002 and stayed equal in VRUN-003. |
 | SREQ-TRACE-005 | The skill must not require broad repo changes. | Review PR scope. | Pass at tested commit `ca6ff66`: current candidate touches one skill, one operating-model reference, one matrix template, the meta-skill discovery file, and README only. |
-| SREQ-TRACE-006 | The skill must expose missing traceability, not invent it. | Inspect inferred links. | Technical pass in VRUN-002: inferred requirements were recorded as Draft and no approved authority was invented; human rating pending. |
-| SREQ-TRACE-007 | The skill must provide distinct value beyond existing Agent Skills workflows. | Compare baseline run against traceability-enabled run. | Technical pass across VRUN-001, VRUN-002, and VRUN-003; human ratings pending. |
+| SREQ-TRACE-006 | The skill must expose missing traceability, not invent it. | Inspect inferred links. | Pass in VRUN-002: inferred requirements were recorded as Draft and no approved authority was invented. |
+| SREQ-TRACE-007 | The skill must provide distinct value beyond existing Agent Skills workflows. | Compare baseline run against traceability-enabled run. | Pass across VRUN-001, VRUN-002, and VRUN-003 with final distinct-value decision accepted. |
 
-## Current Blockers Before PR Packaging
+## Packaging Readiness
 
-- VRUN-001, VRUN-002, and VRUN-003 need human usefulness/noise and confidence confirmation.
-- Human reviewer must classify finding usefulness and low-value noise.
-- Human reviewer confidence before/after must be recorded.
-- Distinct value must be demonstrated in at least two baseline comparison areas across the full scenario set, including at least one outcome-based signal.
-- If distinct value is not demonstrated, the work must be revised into a smaller patch to an existing skill instead of a new skill PR.
+No U5 validation blockers remain.
+
+Remaining non-validation work before packaging:
+
+- Run one final focused document review on this validation record and README
+  status update.
+- Commit and review any post-U5 runtime reference sync before packaging it.
+  The U5 pass above applies to tested implementation commit
+  `ca6ff66d46f140da72f423ea3dec819f81ef5337`; newer runtime copies in
+  `agent-skills/references/` must receive a refreshed implementation commit,
+  focused review, and validation-record update if they are included in the
+  package.
+- Prepare the upstream-neutral package or TraceWeaver Core release notes,
+  depending on the chosen distribution path.
+- Keep the latest tested implementation commit fixed at
+  `ca6ff66d46f140da72f423ea3dec819f81ef5337` unless another implementation
+  change is made and re-reviewed.

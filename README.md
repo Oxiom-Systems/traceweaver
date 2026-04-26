@@ -43,8 +43,8 @@ As of 2026-04-26:
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
 | Discovery routing | Implementation-ready candidate | `systems-engineering-traceability` is wired into `using-agent-skills` as a cross-cutting hop |
 | Validation record | Refreshed to tested commit | Points at `ca6ff66d46f140da72f423ea3dec819f81ef5337` |
-| Controlled validation | Technical evidence captured | VRUN-001, VRUN-002, and VRUN-003 complete pending human ratings |
-| Upstream PR packaging | Blocked | Do not package until validation passes |
+| Controlled validation | Complete | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded |
+| Upstream PR packaging | Next review step | U5 validation no longer blocks packaging; run final document review before packaging |
 | TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |
 | TraceWeaver CE lifecycle baseline | In progress | Baseline approval and validation are not closed yet |
 
@@ -56,11 +56,31 @@ traceability capability is:
 - `skills/systems-engineering-traceability/SKILL.md`
 - `references/systems-engineering-traceability-operating-model.md`
 - `references/traceability-matrix-template.md`
+- `references/requirements-and-vv-guide.md`
+- `references/risk-gap-and-change-control-guide.md`
 - README or index discoverability updates
 - fork validation evidence from controlled scenarios
 
 The traceability matrix is mandatory once the skill is used. Lite mode may use a
 minimal matrix row, but it cannot skip the matrix artifact entirely.
+
+## Guidance Pipeline
+
+TraceWeaver uses a three-layer guidance pipeline:
+
+| Layer | Path | Git Status | Purpose |
+|---|---|---|---|
+| Private source work | `.source-materials/` | Ignored | Source cache, conversions, extraction notes, and synthesis. Not for agents. |
+| Public source of truth | `docs/distilled/` | Committed | Original TraceWeaver guidance developers review, edit, and evolve. |
+| Runtime agent bundle | `agent-skills/references/` | Committed in the Agent Skills fork | Runtime-ready copies consumed by agents. |
+
+Agent implementations must not read from `.source-materials/`. Runtime
+references must first come from reviewed `docs/distilled/` guidance, then be
+synced into `agent-skills/references/`.
+
+When the runtime references change, the Agent Skills implementation commit must
+be refreshed, reviewed, and recorded in the validation record before that new
+runtime bundle is treated as validated.
 
 ## Operating Model
 
@@ -123,14 +143,15 @@ remains orphaned until human approval resolves it.
 
 ## Validation Gate
 
-TraceWeaver Core is not PR-ready or release-ready until the validation record
-contains all three controlled runs:
+TraceWeaver Core validation is complete for the current upstream-neutral
+implementation candidate. The validation record contains all three controlled
+runs:
 
 | Scenario | Purpose | Status |
 |---|---|---|
-| VRUN-001: New feature with document chain | Prove requirement-to-plan-to-implementation-to-results traceability | Technical evidence captured; human rating pending |
-| VRUN-002: Existing module audit | Prove the skill finds dark-code candidates and missing traceability | Technical evidence captured; human rating pending |
-| VRUN-003: Low-risk Lite mode | Prove Lite mode stays lightweight while still using a minimal matrix artifact | Technical evidence captured; human rating pending |
+| VRUN-001: New feature with document chain | Prove requirement-to-plan-to-implementation-to-results traceability | Pass |
+| VRUN-002: Existing module audit | Prove the skill finds dark-code candidates and missing traceability | Pass |
+| VRUN-003: Low-risk Lite mode | Prove Lite mode stays lightweight while still using a minimal matrix artifact | Pass |
 
 The validation record must compare baseline Agent Skills behaviour against the
 traceability-enabled workflow from the same starting state. It must record
@@ -162,11 +183,19 @@ Policy:
 - `docs/upstream/source-materials-policy.md`
 - `docs/upstream/source-distillation-extraction-instructions.md`
 
+Canonical distilled guidance:
+
+- `docs/distilled/systems-engineering-traceability-operating-model.md`
+- `docs/distilled/traceability-matrix-template.md`
+- `docs/distilled/requirements-and-vv-guide.md`
+- `docs/distilled/risk-gap-and-change-control-guide.md`
+
 ## Repository Map
 
 | Path | Purpose |
 |---|---|
 | `docs/brainstorms/` | Requirements and product framing |
+| `docs/distilled/` | Public TraceWeaver source-of-truth guidance distilled from private source notes |
 | `docs/specs/` | Source specification for the MVP skill |
 | `docs/plans/` | Implementation and validation plans |
 | `docs/upstream/` | Upstream issue, fork preflight, source policy, and distillation instructions |
@@ -186,14 +215,12 @@ Remote:
 
 ## Near-Term Next Steps
 
-1. Refresh `docs/validation/systems-engineering-traceability-fork-results.md`
-   against the latest tested `agent-skills` commit.
-2. Run the three controlled validation scenarios.
-3. Record useful findings, false positives, reviewer confidence, and overhead.
-4. Decide whether the upstream-neutral Agent Skills slice is PR-ready or needs
-   revision.
-5. Continue TraceWeaver CE baseline and lifecycle integration only after the
-   Core validation surface is stable enough to govern the adapter work.
+1. Run a focused document review on the completed validation record and README
+   status.
+2. Prepare the upstream-neutral package or TraceWeaver Core release notes,
+   depending on the chosen distribution path.
+3. Continue TraceWeaver CE baseline and lifecycle integration with the Core
+   validation surface as the control point.
 
 ## Product Direction
 
