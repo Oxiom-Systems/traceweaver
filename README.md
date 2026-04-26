@@ -36,7 +36,7 @@ As of 2026-04-26:
 | Area | Status | Notes |
 |---|---|---|
 | TraceWeaver Core repo | Primary project home | `git@github.com:Oxiom-Systems/traceweaver.git` |
-| Agent Skills fork | Implementation-ready candidate | `/Users/hanneszietsman/CrypotAI/agent-skills` on `feature/systems-engineering-traceability` |
+| Agent Skills fork | Implementation-ready candidate | `feature/systems-engineering-traceability` branch in the Agent Skills fork |
 | U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
 | U5.5 expanded runtime candidate | `b01dd9c` | `feat: route ideation through traceability`; scope-change candidate pending focused review and validation |
 | Upstream-neutral skill | Runtime candidate | `skills/systems-engineering-traceability/SKILL.md` |
@@ -233,12 +233,12 @@ Canonical distilled guidance:
 | `docs/validation/` | Fork validation protocol and results |
 | `.source-materials/` | Ignored local source cache |
 
-Related local workspaces:
+Related implementation workspaces:
 
 | Workspace | Purpose |
 |---|---|
-| `/Users/hanneszietsman/CrypotAI/agent-skills` | Upstream-neutral Agent Skills candidate implementation |
-| `/Users/hanneszietsman/CrypotAI/compound-engineering-plugin` | TraceWeaver CE / Compound Engineering adapter work |
+| Agent Skills fork | Upstream-neutral Agent Skills candidate implementation |
+| Compound Engineering plugin workspace | TraceWeaver CE / Compound Engineering adapter work |
 
 Remote:
 
