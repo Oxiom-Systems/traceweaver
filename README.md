@@ -2,15 +2,47 @@
 
 Open-source systems engineering traceability for agentic software development.
 
-TraceWeaver Core is the public method layer for weaving traceability through
-multi-agent software work. It turns intent, needs, requirements, design
-decisions, implementation, verification, validation, and change control into
-explicit artifacts that agents and reviewers can maintain.
+TraceWeaver Core is a systems-engineering control layer for agentic software
+development. Its core role is to preserve intent, authority, and traceability as
+agents move from stakeholder needs to requirements, plans, code, tests, and
+release decisions.
 
-The current wedge is simple:
+The problem TraceWeaver solves is that agents can move very fast, but they often
+blur the chain between:
+
+```text
+what the stakeholder asked for
+-> what the agent interpreted
+-> what got implemented
+```
+
+TraceWeaver forces a controlled chain:
+
+```text
+stakeholder intent
+-> captured needs
+-> reviewed requirements
+-> approved authority or approved exception
+-> implementation
+-> verification
+-> validation
+-> change control
+```
+
+The key principle is:
+
+> Agents may help create requirements, plans, code, tests, and evidence, but
+> they may not silently promote their own interpretation into authority.
+
+The current wedge is:
 
 > Meaningful behaviour must trace to approved authority, or it is not ready to
 > implement, approve, or ship.
+
+In simple terms: TraceWeaver keeps agentic development aligned to the original
+intent, proves that implementation traces back to approved requirements, and
+records gaps, risks, assumptions, and changes instead of letting them become
+hidden authority.
 
 ## Naming Model
 
@@ -47,6 +79,40 @@ Ownership rule:
 - TraceWeaver CE wires those Core capabilities into Compound Engineering. CE
   wrappers must not become the source definition of the Core capabilities.
 
+## Intent Contract
+
+TraceWeaver's authority model is Intent Contract centered. Skills are
+capabilities, not authority. Every behavior-changing agent handoff must be able
+to cite:
+
+- stakeholder intent;
+- approved requirement or approved exception;
+- verification method;
+- validation question;
+- current baseline version.
+
+Alpha implementations can remain advisory, but missing authority must be
+visible as a gap, proposed requirement, change, exception, accepted-risk
+candidate, clarification record, or held claim. Agent assumptions are not
+implementation authority.
+
+The planned file-based alpha shape is:
+
+```text
+.traceweaver/
+  intent-contract.yml
+  authority-baseline.yml
+  task-capsules/
+  trace-records/
+  gaps/
+  changes/
+  exceptions/
+```
+
+The plugin package should provide templates for consuming repositories to create
+these files. It should not install project-specific authority records into a
+repo automatically.
+
 ## Current State
 
 As of 2026-04-30:
@@ -59,6 +125,7 @@ As of 2026-04-30:
 | U5 delta inventory | `CLOSED_NO_DELTA` | No exact U5 public artifact targets remain outside the U4-promoted skill-folder paths |
 | U5.5 expanded runtime candidate | `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY` | Candidate `696548694dd40ce298d77e603db069934b58f645` has file-level delta/impact records and static requirements-quality/lifecycle-discovery evidence, including referenced requirements-reviewer files, under limitation `U55-LIMIT-STATIC-DISCOVERY-001`. Dynamic discovery, package-ready, release-ready, and upstream-ready claims remain held |
 | TraceWeaver Core plugin alpha | U6b install smoke passed for static loading only | `plugins/traceweaver-core` now contains plugin manifests, selected Light v0.1 runtime skills, skill-local selected references, and thin `tw-*` adapter skills. Isolated Codex install materialized the selected skills; dynamic discovery, real invocation transcript, package-ready, release-ready, upstream-ready, and R31 claims remain held |
+| Intent Contract architecture | Requirements captured; implementation planned | Requirements R54-R62 and taxonomy R7a-R7c/R19-R22 define Intent Contract, Intent Capsule, advisory authority gates, dark behavior, and validation-question handoff. Runtime templates are planned for the next U6b Unit 2 materialization pass |
 | Core 11 public skill folders | U4-promoted public artifacts | `skills/` contains all eleven scrubbed public-candidate skill folders; only the Light v0.1 subset has U6b alpha install-smoke evidence |
 | Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |

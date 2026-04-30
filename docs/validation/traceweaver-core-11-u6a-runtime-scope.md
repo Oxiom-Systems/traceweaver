@@ -48,8 +48,8 @@ bounded static scope decision.
 
 | Surface | Scope decision | Evidence |
 | --- | --- | --- |
-| `skills/requirements-reviewer/` | selected for U6b package/install/runtime evidence | U4 file-level records plus `TWCORE-U55-FILE-DELTA-2026-04-30-001` |
-| `skills/systems-engineering-traceability/` | selected for U6b package/install/runtime evidence | U4 file-level records plus `TWCORE-U55-FILE-DELTA-2026-04-30-001` |
+| `skills/requirements-reviewer/` | selected for U6b-alpha package/install/static materialization and later U6b-dynamic/U9 runtime evidence | U4 file-level records plus `TWCORE-U55-FILE-DELTA-2026-04-30-001` |
+| `skills/systems-engineering-traceability/` | selected for U6b-alpha package/install/static materialization and later U6b-dynamic/U9 runtime evidence | U4 file-level records plus `TWCORE-U55-FILE-DELTA-2026-04-30-001` |
 | `skills/using-agent-skills/SKILL.md` | selected clauses only, static routing context | `U55-LIMIT-STATIC-DISCOVERY-001` |
 | `references/requirements-and-vv-guide.md` | selected static support reference | `TWCORE-U55-LOAD-2026-04-30-001` |
 | `references/risk-gap-and-change-control-guide.md` | selected static support reference | `TWCORE-U55-LOAD-2026-04-30-001` |

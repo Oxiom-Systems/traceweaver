@@ -4,6 +4,28 @@ TraceWeaver Core adds systems-engineering authority control to agentic software
 work. This alpha plugin is intentionally small: it wires requirement quality and
 traceability checks into planning, implementation, and review handoffs.
 
+TraceWeaver preserves intent, authority, and traceability as agents move from
+stakeholder needs to requirements, plans, code, tests, and release decisions.
+Agents may help create requirements, plans, code, tests, and evidence, but they
+may not silently promote their own interpretation into authority.
+
+The controlled chain is:
+
+```text
+stakeholder intent
+-> captured needs
+-> reviewed requirements
+-> approved authority or approved exception
+-> implementation
+-> verification
+-> validation
+-> change control
+```
+
+Alpha behavior is advisory: missing authority, weak requirements, untraced
+behavior, and validation gaps should be recorded as warnings, gaps, exceptions,
+or held claims rather than silently accepted as implementation authority.
+
 ## Runtime Scope
 
 Runtime scope: `light-v0.1-authority-traceability`
