@@ -327,8 +327,9 @@ Discovery mechanism:
 This is static runtime-discovery review evidence. It proves the intended
 selector and paths for bounded static U6a scope planning under
 `U55-LIMIT-STATIC-DISCOVERY-001`, but it is not an observed runtime transcript.
-U6b must still record package-manifest, install, and runtime execution evidence
-before any package-ready or runtime-ready claim.
+U6b alpha records package-manifest/install/static materialization evidence
+separately; real runtime execution evidence remains a U6b-dynamic/U9
+requirement before any package-ready or runtime-ready claim.
 
 ### Runtime Authority Manifest
 

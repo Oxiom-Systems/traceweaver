@@ -16,7 +16,10 @@ Record ID: `TWCORE-U6A-SCOPE-2026-04-30-001`
 
 Decision state: `passed_static_scope_decision_only`
 
-Allowed next gate: `U6b_package_install_runtime_evidence_for_exact_scope`
+Allowed next gates:
+
+- `U6b_alpha_install_static_materialization_for_exact_scope`;
+- `U6b_dynamic_or_U9_runtime_invocation_evidence_for_exact_scope`.
 
 Required upstream evidence:
 
@@ -100,19 +103,27 @@ The following remain held after U6a:
 - source-name hygiene accepted for release surfaces;
 - R31 complete.
 
-## U6b Entry Conditions
+## U6b Alpha Entry Conditions
 
-U6b may start only for the exact selected scope above. U6b must record:
+U6b alpha may start only for the exact selected scope above. U6b alpha must
+record:
 
 - package manifest or equivalent packaging inventory;
 - install/setup evidence;
-- runtime execution evidence;
-- observed loading of selected skills and selected references;
-- routing and failure behavior under runtime execution;
-- dynamic no-forced discovery transcript or an explicit U6b/U9 limitation;
+- installed/static materialization of selected skills and selected references;
+- static adapter routing inventory;
+- explicit held claims for runtime invocation and dynamic discovery;
 - hygiene scan for generated package/install/runtime artifacts;
 - stale-reset rule tied to the same candidate commit and selected file hashes,
   with explicit allowance for approved package-only public-hygiene deltas.
+
+U6b dynamic or U9 must separately record:
+
+- runtime execution evidence;
+- observed loading/opening of selected skills and selected references inside the
+  target runtime;
+- routing and failure behavior under runtime execution;
+- dynamic no-forced discovery transcript or an accepted limitation.
 
 ## Stale Reset Rule
 

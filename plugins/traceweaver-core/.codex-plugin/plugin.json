@@ -31,9 +31,9 @@
     ],
     "websiteURL": "https://github.com/Oxiom-Systems/traceweaver",
     "defaultPrompt": [
-      "/tw-requirements-review docs/requirements.md",
-      "/tw-authority-gate docs/plans/example-plan.md",
-      "/tw-traceability-check"
+      "Use the tw-requirements-review skill for requirements or planning authority review.",
+      "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
+      "Use the tw-traceability-check skill during plan, code, document, or release-evidence review."
     ],
     "screenshots": []
   }

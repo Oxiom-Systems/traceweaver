@@ -37,14 +37,18 @@ Not included yet:
 - dynamic no-forced discovery proof
 - R31 release validation
 
-## Entry Points
+## Skill Entry Points
 
-- `/tw-requirements-review <requirements or plan>` checks whether candidate
+- `tw-requirements-review` checks whether candidate
   requirements are good enough to become implementation authority.
-- `/tw-authority-gate <plan or task>` checks whether planned work has approved
+- `tw-authority-gate` checks whether planned work has approved
   authority before implementation starts.
-- `/tw-traceability-check <artifact or PR>` checks whether behavior traces to
+- `tw-traceability-check` checks whether behavior traces to
   approved authority, implementation, verification, and validation evidence.
+
+This alpha installs skills, not slash commands. Slash-command or prompt
+surfaces require a later package record that adds command/prompt files and
+proves they install.
 
 ## Installation Target
 
@@ -57,6 +61,7 @@ Example target command:
 bun run src/index.ts install ./plugins/traceweaver-core --to codex
 ```
 
-U6b must record the actual install command, runtime target, selected skills
-loaded, selected references loaded, routing behavior, failure behavior, and any
-dynamic-discovery limitation.
+U6b alpha records the install command, runtime target, selected skills
+materialized, selected references materialized, static adapter routing, and
+dynamic-discovery limitation. Real runtime invocation and slash-command surfaces
+remain later proof work.

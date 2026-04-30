@@ -51,6 +51,7 @@ Held claims:
 | Adapter skill | `plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md` | Present; routes to `requirements-reviewer`. |
 | Adapter skill | `plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md` | Present; routes to `requirements-reviewer` and `systems-engineering-traceability`. |
 | Adapter skill | `plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md` | Present; routes to `systems-engineering-traceability` and conditionally `requirements-reviewer`. |
+| Prompt/command surface | N/A | Not included in this alpha; installed manifest records `prompts: []`. |
 
 No dedicated runtime agents are included in this alpha. Placeholder agent files
 are intentionally absent because the installer treats files under `agents/` as
