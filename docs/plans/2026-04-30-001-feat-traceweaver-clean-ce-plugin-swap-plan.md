@@ -1,9 +1,10 @@
 ---
 title: Clean Swap From Compound Engineering Plugin To TraceWeaver Core
 type: feat
-status: draft
+status: active
 date: 2026-04-30
 origin: docs/validation/traceweaver-core-11-u6b-plugin-runtime.md
+current_unit: 2
 ---
 
 # Clean Swap From Compound Engineering Plugin To TraceWeaver Core
@@ -49,6 +50,9 @@ TraceWeaver controls around it.
 
 - U6b-alpha: the TraceWeaver plugin must install selected skills with the
   documented `--include-skills` command.
+- U6C inventory: Unit 2 must use
+  `docs/validation/traceweaver-core-11-ce-runtime-inventory.md` as the
+  materialization authority for selected CE workflow files and CE agent files.
 - User requirement: replace the existing Compound Engineering plugin with
   TraceWeaver Core as a clean swap.
 - User requirement: CE agents and workflow must continue.
@@ -74,6 +78,10 @@ TraceWeaver controls around it.
   added and install proof records them.
 - Do not vendor CE skills or agents without source pin, license check, file
   hash inventory, and stale-reset rules.
+- Do not invent CE workflow files. Unit 2 may only materialize CE files already
+  selected by `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`.
+- Do not make TraceWeaver enforcing mode the default for alpha. Unit 2 keeps
+  advisory mode as the default and records enforcing mode as later evidence.
 
 ## Target Runtime Shape
 
@@ -190,6 +198,8 @@ workflow continuity they need while making TraceWeaver controls visible.
 
 ### Unit 1: CE Runtime Inventory And Source Pin
 
+Status: complete in commit `63bb350`.
+
 Files:
 
 - Create: `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`
@@ -227,22 +237,54 @@ Verification:
 
 ### Unit 2: Materialize CE-Compatible TraceWeaver Plugin
 
+Status: next.
+
+Execution posture: materialization-first with hash verification before install
+smoke. This unit is mostly package assembly and validation evidence; it should
+avoid semantic rewrites to vendored CE skill files.
+
 Files:
 
 - Modify: `plugins/traceweaver-core/skills/`
-- Modify: `plugins/traceweaver-core/agents/` only if agent install is supported
+- Create/modify: `plugins/traceweaver-core/agents/`
 - Modify: `plugins/traceweaver-core/.codex-plugin/plugin.json`
+- Modify: `plugins/traceweaver-core/.claude-plugin/plugin.json`
+- Modify: `plugins/traceweaver-core/.cursor-plugin/plugin.json`
+- Modify: `plugins/traceweaver-core/AGENTS.md`
 - Modify: `plugins/traceweaver-core/README.md`
 - Create: `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`
+- Modify: `docs/validation/traceweaver-core-11-u6b-plugin-runtime.md`
+- Modify: `docs/validation/traceweaver-core-11-promotion-records.md`
 
 Plan:
 
-- Copy or mirror the approved CE runtime subset into
+- Use `docs/validation/traceweaver-core-11-ce-runtime-inventory.md` as the
+  authority for selected CE files. Materialize only the listed CE workflow
+  skills, support references, scripts, assets, and CE agent files.
+- Copy or mirror the selected CE runtime subset into
   `plugins/traceweaver-core/skills/` with original `ce-*` skill names preserved.
-- Do not alter CE skill semantics during the first materialization pass.
-- Add source inventory reference that maps each CE file to its upstream source
-  and local hash.
-- Keep TraceWeaver selected skills and `tw-*` adapters installed alongside CE.
+  Do not rename CE entrypoints and do not create substitute workflow files.
+- Materialize selected CE agent files under `plugins/traceweaver-core/agents/`
+  so the package is self-contained for later runtime proof. If the installer
+  does not copy or load agents, record that as an install/runtime limitation and
+  keep agent-backed CE behavior held.
+- Keep the existing TraceWeaver selected runtime skills installed alongside CE:
+  `requirements-reviewer`, `systems-engineering-traceability`,
+  `using-agent-skills`, `tw-requirements-review`, `tw-authority-gate`, and
+  `tw-traceability-check`.
+- Add `plugins/traceweaver-core/references/ce-upstream-source-inventory.md` as
+  the package-local source map. It should point back to the U6C inventory record
+  and list the selected CE source version, license, file hashes, local path
+  classes, and stale-reset rule without private or machine-local paths.
+- Update plugin manifests and README so public claims say
+  `alpha/advisory/static install only`. Do not advertise slash commands unless
+  prompt/command files are added and install proof records them.
+- Add or update plugin policy text so `traceweaver_mode` defaults to
+  `advisory`. Advisory mode may warn and mark claims held in evidence records;
+  it must not silently rewrite CE behavior or block CE skill execution.
+- Update U6b evidence with a Unit 2 section that records the materialized CE
+  file list, selected agents, manifest parse, install smoke, installed paths,
+  hashes, stale-reset rules, and held claims.
 
 Verification:
 
@@ -251,6 +293,57 @@ Verification:
 - Existing CE skill names remain present after install.
 - TraceWeaver selected skill hashes remain aligned with U6b-alpha authority or
   approved package-only hygiene deltas.
+- Plugin manifests parse as JSON after adding the expanded runtime surface.
+- The isolated install smoke uses the README command with `--include-skills`.
+- Installed files include selected CE-compatible workflow entries such as
+  `ce-brainstorm`, `ce-plan`, `ce-work`, `ce-code-review`, `ce-doc-review`,
+  `ce-compound`, `ce-resolve-pr-feedback`, `ce-commit`,
+  `ce-commit-push-pr`, `ce-compound-refresh`, `ce-sessions`,
+  `ce-session-inventory`, `ce-session-extract`, `ce-test-browser`,
+  `ce-test-xcode`, `ce-worktree`, `ce-setup`, `ce-debug`, and `lfg`.
+- Installed files include `requirements-reviewer` and
+  `systems-engineering-traceability` with their selected references and
+  approved hygiene deltas.
+- Selected CE agents are present in the plugin package. If the install manifest
+  or installed tree does not include agents, the evidence must explicitly keep
+  agent-backed workflow behavior held.
+- Non-selected CE workflows remain absent from the package or are explicitly
+  listed as held. Adding any CE file outside the U6C inventory requires a new
+  inventory delta before Unit 2 can pass.
+- Hygiene scans show no private paths, non-public source names, protected
+  provenance strings, or unsupported standards-conformance claims.
+- U6b Unit 2 evidence does not claim clean CE replacement, dynamic
+  no-forced-skill discovery, slash-command availability, full 11-skill runtime,
+  or release readiness.
+
+Test scenarios:
+
+- Manifest parse: all plugin manifests parse, and the Codex manifest still
+  points at `./skills/`.
+- Static package audit: every materialized CE file has a matching row in
+  `docs/validation/traceweaver-core-11-ce-runtime-inventory.md` and no
+  non-selected CE file is present.
+- Hash audit: materialized CE files match the inventory hashes unless an
+  explicit local delta row is added before review.
+- Install smoke: isolated install with the README command and `--include-skills`
+  materializes selected TraceWeaver skills and selected CE skill directories.
+- Agent boundary audit: selected CE agent files are package-present, and
+  install/runtime evidence either proves agent availability or keeps
+  agent-backed CE claims held.
+- Claim audit: README, manifests, plugin instructions, U6b evidence, and
+  promotion records say alpha/advisory/static install only.
+- Hygiene audit: plugin package and isolated install do not contain private
+  paths, protected source names, non-public candidate locators, or unsupported
+  compliance claims.
+
+Unit 2 pass condition:
+
+- `U6b_unit_2_ce_compatible_static_materialization: PASSED`
+- `U7_eligible_for_narrow_alpha_claims: true`
+- `clean_ce_replacement: HELD_FOR_U9_RUNTIME_PROOF`
+- `agent_backed_ce_behavior: HELD_UNTIL_AGENT_INSTALL_OR_DEGRADATION_PROOF`
+- `dynamic_runtime_discovery: HELD_FOR_U9`
+- `slash_command_claims: HELD`
 
 ### Unit 3: Add TraceWeaver CE Wrapper Skills
 
