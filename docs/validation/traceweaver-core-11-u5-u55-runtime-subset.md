@@ -325,10 +325,10 @@ Discovery mechanism:
 - skill-local references are resolved from `skills/<skill>/references/*`.
 
 This is static runtime-discovery review evidence. It proves the intended
-selector and paths for U6a planning, but it is not an observed runtime transcript
-and does not by itself unblock U6a. U6b must still record package-manifest,
-install, and runtime execution evidence before any package-ready or
-runtime-ready claim.
+selector and paths for bounded static U6a scope planning under
+`U55-LIMIT-STATIC-DISCOVERY-001`, but it is not an observed runtime transcript.
+U6b must still record package-manifest, install, and runtime execution evidence
+before any package-ready or runtime-ready claim.
 
 ### Runtime Authority Manifest
 
@@ -351,22 +351,22 @@ or upstream use.
 
 | Skill/surface | File path | Final candidate hash | U4 status | U4 record ID | Delta record ID | Reviewer | Decision state | Public hygiene status |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| bundle-router | `skills/using-agent-skills/SKILL.md` | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| requirements-reviewer | `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | u4_delta_recorded | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SKILL-001` | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| bundle-router | `skills/using-agent-skills/SKILL.md` | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | u4_delta_recorded | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SKILL-001` | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
 | requirements-reviewer | `skills/requirements-reviewer/agents/openai.yaml` | `ebdec17ec4de718225b6e4d417123be66c6e9b4a9225278e4bff79ba1581b829` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_manifest_only_not_runtime_claim` | `static_pass_release_held` |
-| requirements-reviewer | `skills/requirements-reviewer/references/requirement-language-rules.md` | `ea8ef42e7623e6d01492d6247f3678ca12997b709829759d23d19f7ca8ec3492` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| requirements-reviewer | `skills/requirements-reviewer/references/requirement-types-and-attributes.md` | `bd4364d6118d5cac81d5ec0fac80c2af5ddb98e3cb8fb2a7a8112968bf265976` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| requirements-reviewer | `skills/requirements-reviewer/references/requirements-quality-checklist.md` | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| requirements-reviewer | `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| requirements-reviewer | `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| requirements-reviewer | `skills/requirements-reviewer/references/source-basis.md` | `f2cc81c37d8971636ec703aec3b54aa60ebbcc71e0e4f9cfc28462a1a830e1ae` | u4_delta_recorded | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SOURCE-BASIS-001` | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| requirements-reviewer | `skills/requirements-reviewer/references/verification-validation-guide.md` | `01cb0a2736997c2ad4f169756e776aac8822986df78883d2edf54af9f3374b0e` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirement-language-rules.md` | `ea8ef42e7623e6d01492d6247f3678ca12997b709829759d23d19f7ca8ec3492` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirement-types-and-attributes.md` | `bd4364d6118d5cac81d5ec0fac80c2af5ddb98e3cb8fb2a7a8112968bf265976` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirements-quality-checklist.md` | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/source-basis.md` | `f2cc81c37d8971636ec703aec3b54aa60ebbcc71e0e4f9cfc28462a1a830e1ae` | u4_delta_recorded | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SOURCE-BASIS-001` | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/verification-validation-guide.md` | `01cb0a2736997c2ad4f169756e776aac8822986df78883d2edf54af9f3374b0e` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
 | requirements-reviewer | `skills/requirements-reviewer/tests/requirements-quality-examples.md` | `acaa1ae1d5d2343776623c80299bf52c92d9447b5d730eb4d85663d7defc15df` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_example_input_not_runtime_claim` | `static_pass_release_held` |
-| systems-engineering-traceability | `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | u4_delta_recorded | `TWCORE-PROMO-U4-SYSTEMS-TRACEABILITY-SKILL-001` | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| top-level-reference | `references/requirements-and-vv-guide.md` | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| top-level-reference | `references/risk-gap-and-change-control-guide.md` | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| top-level-reference | `references/systems-engineering-traceability-operating-model.md` | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
-| top-level-reference | `references/traceability-matrix-template.md` | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| systems-engineering-traceability | `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | u4_delta_recorded | `TWCORE-PROMO-U4-SYSTEMS-TRACEABILITY-SKILL-001` | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| top-level-reference | `references/requirements-and-vv-guide.md` | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| top-level-reference | `references/risk-gap-and-change-control-guide.md` | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| top-level-reference | `references/systems-engineering-traceability-operating-model.md` | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
+| top-level-reference | `references/traceability-matrix-template.md` | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_for_U6a_scope_only_not_runtime_claim` | `static_pass_release_held` |
 
 Row-level `static_pass_release_held` means the static path/secret/private
 provenance scan passed, while source-name policy, package use, release use, and
@@ -374,8 +374,8 @@ dynamic runtime proof remain held.
 
 Stale reset rule for every row: candidate commit drift, file hash drift,
 reference removal, U4 hash drift for U4-backed files, failed hygiene review, or
-use of the row as U6a/U6b/U7/U8 runtime/package/release proof resets that row to
-`held`.
+use of the row as dynamic U6a, U6b, U7, or U8 runtime/package/release proof
+resets that row to `held`.
 
 ### U4 Hash Reconciliation Status
 
@@ -385,7 +385,9 @@ The selected U5.5 candidate intentionally differs from U4-approved public
 skill-folder files where the Agent Skills runtime layout changes the selected
 skill files. The differences are recorded below as U5.5 candidate deltas for
 static review only; U4 remains the public skill-folder promotion authority, and
-these deltas do not rewrite U4 records or approve U6a.
+these deltas do not rewrite U4 records or approve dynamic runtime/package U6a
+claims. The terminal decision, not these row-level deltas alone, authorizes the
+bounded static U6a scope decision.
 
 | Runtime candidate file | U5.5 candidate hash | U4-approved target hash | U4 promotion record | Decision state |
 | --- | --- | --- | --- | --- |
