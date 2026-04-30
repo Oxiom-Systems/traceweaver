@@ -23,6 +23,14 @@ candidate unless separately authorized. The U5.5 deltas still need focused
 review, runtime-sync evidence, requirements-quality validation, and
 lifecycle-discoverability validation before packaging.
 
+2026-04-30 update: Core 11 U5 is recorded as `CLOSED_NO_DELTA` in
+`docs/validation/traceweaver-core-11-u5-u55-runtime-subset.md`. The first U5.5
+runtime-subset matrix is recorded as `light-v0.1-authority-traceability` with
+`requirements-reviewer` and `systems-engineering-traceability`, but its gate
+state is `held_pending_runtime_evidence`. U6 remains blocked until focused
+review, runtime discovery/loading, routing, failure-behavior, and R31 evidence
+exist for that exact subset.
+
 Architecture boundary: `requirements-reviewer` and
 `systems-engineering-traceability` are TraceWeaver Core skills. TraceWeaver CE
 is the Compound Engineering adapter that may invoke or wrap those skills, but CE

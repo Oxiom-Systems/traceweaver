@@ -56,14 +56,15 @@ As of 2026-04-29:
 | TraceWeaver Core repo | Primary project home | `git@github.com:Oxiom-Systems/traceweaver.git` |
 | Agent Skills fork | Implementation-ready candidate | `feature/systems-engineering-traceability` branch in the Agent Skills fork |
 | U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
-| U5.5 expanded runtime candidate | `987793dfd477bc205a0a49efe4ec1b1e31045903` | `fix: stabilize traceability authority rules`; proposed U5.5 review surface is ideation, requirements-reviewer, and cumulative requirements/traceability routing pending focused review, runtime-sync evidence, lifecycle-discoverability validation, and R31 real scenarios; persona-awareness is follow-up scope unless separately authorized |
+| U5 delta inventory | `CLOSED_NO_DELTA` | No exact U5 public artifact targets remain outside the U4-promoted skill-folder paths |
+| U5.5 expanded runtime candidate | `987793dfd477bc205a0a49efe4ec1b1e31045903` | `fix: stabilize traceability authority rules`; first proposed runtime subset is `light-v0.1-authority-traceability` with `requirements-reviewer` and `systems-engineering-traceability`, held pending focused review, runtime-sync evidence, lifecycle-discoverability validation, failure-behavior evidence, and R31 real scenarios; persona-awareness and `idea-refine` command wiring are follow-up scope unless separately authorized |
 | Core 11 public skill folders | U4-promoted public artifacts | `skills/` contains all eleven scrubbed public-candidate skill folders; runtime/package acceptance remains pending U5.5/U6 |
 | Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
 | Requirements and V&V guide | U5.5 runtime candidate | `references/requirements-and-vv-guide.md`; mandatory for Core, pending U5.5 review |
 | Risk, gap, and change-control guide | U5.5 runtime candidate | `references/risk-gap-and-change-control-guide.md`; mandatory for Core, pending U5.5 review |
 | Discovery routing | Runtime candidate evidence scope | Idea/intent lifecycle evidence is in scope as source-preservation and routing context only; `idea-refine` command wiring remains follow-up unless separately authorized. Requirements and success criteria route through `requirements-reviewer`; meaningful behavior routes through traceability as a cross-cutting hop |
-| Validation record | Refreshed to U5 baseline and U5.5 candidate | U5 representative pass applies only to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; `987793dfd477bc205a0a49efe4ec1b1e31045903` is not validated yet |
+| Validation record | Refreshed to U5 baseline and U5.5 candidate | U5 representative pass applies only to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; U5 delta inventory is closed no-delta; `987793dfd477bc205a0a49efe4ec1b1e31045903` has a proposed runtime-subset matrix but is not runtime-accepted yet |
 | Controlled validation | Representative complete for U5 baseline | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded at `ca6ff66`, but R31 real-project validation remains open |
 | Upstream PR packaging | Blocked on U5.5 decision and R31 real validation | Do not package `987793dfd477bc205a0a49efe4ec1b1e31045903` until focused review, runtime-sync evidence, requirements-quality validation, lifecycle-discoverability validation, and R31 real scenarios are recorded |
 | TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |
@@ -235,10 +236,9 @@ That directory is intentionally ignored by git. It may contain licensed
 standards, public downloads, extraction notes, checksums, and source inventories
 used to create original distilled guidance.
 
-Policy:
-
-- `docs/upstream/source-materials-policy.md`
-- `docs/upstream/source-distillation-extraction-instructions.md`
+Policy: public commits keep local source-processing instructions out of the
+repository. Promotion and hygiene constraints are recorded in
+`docs/validation/traceweaver-core-11-promotion-records.md`.
 
 Canonical distilled guidance:
 
@@ -256,7 +256,7 @@ Canonical distilled guidance:
 | `docs/specs/` | Source specification for the MVP skill |
 | `docs/plans/` | Implementation and validation plans |
 | `skills/` | U4-promoted public TraceWeaver Core skill folders; not runtime/package accepted until U6 records exist |
-| `docs/upstream/` | Upstream issue, fork preflight, source policy, and distillation instructions |
+| `docs/upstream/` | Upstream issue and public-safe fork preflight records |
 | `docs/validation/` | Fork validation protocol and results |
 | `.source-materials/` | Ignored local source cache |
 
@@ -273,8 +273,9 @@ Remote:
 
 ## Near-Term Next Steps
 
-1. Record U5 as a delta-only public artifact inventory, or close it as no-op if
-   no exact public artifacts remain outside the U4-promoted skill-folder paths.
+1. Complete the missing U5.5 evidence for the `light-v0.1-authority-traceability`
+   runtime subset: focused review, runtime discovery/loading, reference/schema/
+   example loading, routing behavior, failure behavior, and R31 real scenarios.
 2. Decide whether U5.5 accepts, reduces, splits, holds, blocks, rejects, or
    supersedes the expanded Agent Skills runtime candidate
    `987793dfd477bc205a0a49efe4ec1b1e31045903`, excluding persona-awareness
