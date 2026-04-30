@@ -1,6 +1,6 @@
 # Systems Engineering Traceability Fork Validation
 
-Status: U5 representative validation complete at baseline commit; R31 real-project validation and U5.5 expanded runtime candidate pending review and validation
+Status: U5 representative validation complete at baseline commit; U5.5 terminal state is split and U6a scope-decision eligible; R31 real-project validation remains open
 
 Date: 2026-04-26
 
@@ -10,36 +10,42 @@ Working branch: `feature/systems-engineering-traceability`
 
 U5 validation baseline commit: `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`
 
-Latest runtime candidate commit: `987793d fix: stabilize traceability authority rules`
+Latest runtime candidate commit: `696548694dd40ce298d77e603db069934b58f645 feat: add requirements reviewer skill`
 
 Last stale pre-reconciliation ref: `b9923fc982e6a572b1f70d1cbe9e8f1e2bc6d017 fix: clarify traceability authority rules`
 
 Current reconciliation state: U5 baseline implementation commit tested locally and focused code review rerun with no remaining findings.
 
-U5.5 reconciliation state: ideation, requirements-reviewer, and cumulative
-requirements/traceability routing deltas are committed in the Agent Skills fork.
-Broader persona-awareness is not accepted into U5.5 and must move to a follow-up
-candidate unless separately authorized. The U5.5 deltas still need focused
-review, runtime-sync evidence, requirements-quality validation, and
-lifecycle-discoverability validation before packaging.
+U5.5 reconciliation state: `light-v0.1-authority-traceability` is split and
+eligible for U6a scope decision only at
+`696548694dd40ce298d77e603db069934b58f645`. Broader persona-awareness,
+non-selected Core skills, `idea-refine` command wiring, package surfaces,
+release surfaces, and upstream-ready claims remain held unless separately
+authorized by later gates.
 
-2026-04-30 update: Core 11 U5 is recorded as `CLOSED_NO_DELTA` in
+2026-04-30 blocker-inventory update: Core 11 U5 is recorded as `CLOSED_NO_DELTA` in
 `docs/validation/traceweaver-core-11-u5-u55-runtime-subset.md`. The first U5.5
 runtime-subset matrix is recorded as `light-v0.1-authority-traceability` with
-`requirements-reviewer` and `systems-engineering-traceability`, but its gate
-state is `held_pending_runtime_evidence`. U6 remains blocked until focused
-review, runtime discovery/loading, routing, failure-behavior, and R31 evidence
-exist for that exact subset.
+`requirements-reviewer` and `systems-engineering-traceability`. This earlier
+blocker inventory was superseded by the terminal-state update below.
 
 2026-04-30 U6-unblock review update: the previous candidate commit
 `987793dfd477bc205a0a49efe4ec1b1e31045903` was not reproducible from the
 current public contributor fork ref. The observed
 `refs/heads/feature/systems-engineering-traceability` head in
 `https://github.com/jjziets/agent-skills.git` is
-`696548694dd40ce298d77e603db069934b58f645`. U5.5 remains held until the chosen
-candidate is refreshed or proven by an access-controlled evidence record and a
-new append-only terminal-state record binds all runtime evidence to that exact
-candidate.
+`696548694dd40ce298d77e603db069934b58f645`. This finding was superseded by the
+terminal-state update below after that candidate was selected and proven.
+
+2026-04-30 terminal-state update:
+`docs/validation/traceweaver-core-11-u5-u55-runtime-subset.md` records
+`TWCORE-U55-TERM-2026-04-30-001`. The candidate was refreshed and proven at
+`696548694dd40ce298d77e603db069934b58f645`; static discovery/loading, selected
+reference/schema/example loading, routing, failure behavior, and focused review
+evidence now exist for `light-v0.1-authority-traceability`. U6a may start for
+scope decision only. U6b package evidence, U7 release claim records, U8
+upstream/package surfaces, U9 post-release evidence, R31 real scenarios, and
+release hygiene remain held.
 
 Architecture boundary: `requirements-reviewer` and
 `systems-engineering-traceability` are TraceWeaver Core skills. TraceWeaver CE
@@ -84,7 +90,7 @@ internal_provenance_record: TWCORE-INT-PROV-2026-04-29-001
 publishable_source_baseline: scrubbed public candidate
 live_agent_skills_repo: addyosmani/agent-skills
 upstream_base_commit: ca6ff66d46f140da72f423ea3dec819f81ef5337
-live_candidate_commit: held_pending_refresh_or_evidence
+live_candidate_commit: 696548694dd40ce298d77e603db069934b58f645
 previous_candidate_commit: 987793dfd477bc205a0a49efe4ec1b1e31045903
 latest_observed_public_fork_head: 696548694dd40ce298d77e603db069934b58f645
 
@@ -97,20 +103,19 @@ held_candidate_skills:
   - risk-gap-change-control
 
 gates_bound_to_live_candidate_commit:
-  - R31 adoption validation
-  - U5.5 harness evidence
-  - target-runtime discovery equivalence
-  - fork-diff classification
-  - packaging anatomy check
-  - traceability-specific value scenario
+  - U5.5 harness evidence: recorded for U6a scope decision only
+  - target-runtime discovery equivalence: recorded for static Agent Skills layout
+  - fork-diff classification: split/reduced for U6a
+  - packaging anatomy check: held for U6a/U6b
+  - R31 adoption validation: held for release
+  - traceability-specific value scenario: held for R31 release evidence
 ```
 
-Checkout status: historical checkout evidence bound earlier U2 sync rows to
-`987793dfd477bc205a0a49efe4ec1b1e31045903`, but the U6-unblock review could not
-reproduce that commit from the current public fork ref. Any later validation or
-packaging gate must start from a clean checkout at the selected refreshed
-candidate commit, or cite an access-controlled evidence record that proves the
-older candidate, clean-tree status, and exact runtime file set.
+Checkout status: U5.5 terminal-state evidence uses a clean temporary checkout at
+`696548694dd40ce298d77e603db069934b58f645`. Historical checkout evidence bound
+earlier U2 sync rows to `987793dfd477bc205a0a49efe4ec1b1e31045903`, but that
+commit was not reproduced from the current public fork ref during the
+U6-unblock review.
 
 ## U2 Runtime Sync Evidence
 
@@ -138,36 +143,35 @@ U2 result:
 - Accepted-risk evidence fields are preserved for the MVP without promoting the
   deferred `risk-gap-change-control` skill into Light v0.1.
 
-Impact on gates: because U2 changed runtime/package-controlled files after the
-U1.5 index, R31 adoption validation, U5.5 harness evidence, target-runtime
-equivalence, fork-diff classification, packaging anatomy, and
-traceability-specific value remain `held` until rerun or impact-reviewed against
-`987793dfd477bc205a0a49efe4ec1b1e31045903`.
+Impact on gates: because runtime/package-controlled files changed after the
+U1.5 index, packaging anatomy, release hygiene, R31 adoption validation, and
+traceability-specific value remain `held`. U5.5 harness evidence and static
+target-runtime discovery equivalence were refreshed for U6a scope decision at
+`696548694dd40ce298d77e603db069934b58f645`.
 
 ## Gate Decision
 
-Current decision: **U5 representative validation passes at the baseline commit; R31 real-project validation remains open; treat the post-U5 runtime candidate as U5.5 before packaging.**
+Current decision: **U5 representative validation passes at the baseline commit; U5.5 is split and U6a scope-decision eligible only; R31 real-project validation remains open.**
 
 Reason: The upstream-neutral implementation slice is ready at tested commit `ca6ff66d46f140da72f423ea3dec819f81ef5337` for representative workflow validation. All three dummy validation scenarios have technical evidence, human reviewer usefulness/noise and confidence ratings are recorded below, and the distinct-value criteria are accepted across that representative scenario set. These runs verify workflow shape and evidence capture, but they do not satisfy R31's requirement for real feature, unclear existing module, and low-risk Lite-mode validation.
 
 U5 result: **Pass for representative validation. No implementation revision is required from the dummy runs. R31 remains open until all three pre-registered real validation scenarios are completed.**
 
-U5.5 candidate: commit `987793d` extends runtime guidance so ideas,
-requirements-reviewer, cumulative routing, source-preserving reframes, and
-accepted-weak-requirement conversion preserve the systems-engineering chain. It
-is not covered by the U5 representative validation pass and must receive focused
-review, requirements-quality validation, and lifecycle-discoverability
-validation before packaging. Persona-awareness in that candidate is follow-up
-scope unless separately authorized.
+U5.5 candidate: commit `696548694dd40ce298d77e603db069934b58f645` is proven for
+static discovery/loading, routing, and failure-behavior evidence for the
+`light-v0.1-authority-traceability` subset. It authorizes U6a scope decision
+only. Persona-awareness, non-selected Core skills, command wiring, package
+readiness, release readiness, and upstream readiness remain held unless
+separately authorized.
 
 ## Completed Evidence
 
 | Area | Evidence | Result |
 |---|---|---|
 | U5 tested commit | Exact fork commit validated by representative VRUN-001 to VRUN-003 is `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`. | Pass for dummy workflow validation; R31 real validation remains open |
-| U5.5 runtime candidate | Latest fork commit is `987793d fix: stabilize traceability authority rules`. | U2 runtime sync recorded; focused review and validation pending |
+| U5.5 runtime candidate | Latest fork commit is `696548694dd40ce298d77e603db069934b58f645 feat: add requirements reviewer skill`. | Split; U6a scope-decision eligible only |
 | U5 focused scope | Validated U5 baseline scope is `skills/systems-engineering-traceability/SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, `skills/using-agent-skills/SKILL.md`, and `README.md`. | Pass at `ca6ff66` only |
-| TraceWeaver Core MVP bundle | Core runtime bundle now includes two core skills plus four reference files: requirements-reviewer, systems-engineering-traceability, operating model, matrix template, requirements/V&V guide, and risk/gap/change-control guide. | Pending U5.5 acceptance |
+| TraceWeaver Core MVP bundle | Core runtime bundle candidate includes two core skills plus selected reference files: requirements-reviewer, systems-engineering-traceability, operating model, matrix template, requirements/V&V guide, and risk/gap/change-control guide. | Pending U6a reduced-scope decision |
 | Skill anatomy | `SKILL.md` includes YAML frontmatter, overview, when-to-use, process, rationalizations, red flags, and verification. | Pass |
 | Frontmatter | `name` matches directory and description includes trigger conditions. | Pass |
 | Matrix authority boundary | Skill and template define the matrix as audit record for links/status/evidence/gaps/decisions, not as replacement for source artifacts. | Pass |
@@ -180,7 +184,7 @@ scope unless separately authorized.
 | README discoverability | README lists the skill as cross-cutting, counts 22 skills, and links the template. | Pass |
 | Meta-skill routing | `skills/using-agent-skills/SKILL.md` routes meaningful behavior through `systems-engineering-traceability` as a cross-cutting hop. | Pass |
 | Operating model artifact | `references/systems-engineering-traceability-operating-model.md` exists, is linked from `SKILL.md`, contains original agent-facing lifecycle rules plus source-boundary language, and includes official/public source links. | Pass |
-| Focused code review | Focused `ce-code-review` pass on the implementation slice found no remaining findings after commits `5745ab2`, `2e67062`, and `ca6ff66`. | Pass for U5 baseline; rerun pending for `987793d` |
+| Focused code review | Focused `ce-code-review` pass on the implementation slice found no remaining findings after commits `5745ab2`, `2e67062`, and `ca6ff66`; U5.5 terminal-state focused review checked the exact `696548694dd40ce298d77e603db069934b58f645` candidate for U6a scope-decision evidence. | Pass for U5 baseline and U6a scope decision; package/release review still pending |
 | VRUN-001 validation | Dummy new-feature A/B run created baseline and TraceWeaver outputs from the same seed commit. Human rating accepted in this session. | Pass as representative workflow evidence; does not satisfy R31 real validation |
 | VRUN-002 validation | Dummy existing-module audit A/B run created baseline and TraceWeaver Audit outputs from the same seed commit. Human rating accepted in this session. | Pass as representative workflow evidence; does not satisfy R31 real validation |
 | VRUN-003 validation | Dummy low-risk docs/discoverability A/B run created baseline and TraceWeaver Lite outputs from the same seed commit. Human rating accepted in this session. | Pass as representative workflow evidence; does not satisfy R31 real validation |
@@ -364,7 +368,7 @@ are completed.**
 | Change impact analysis performed | VRUN-002 baseline advised product-owner confirmation before behavior changes. | VRUN-002 created DEC-DISC and TD-DISC records before any change. | Human decision path is explicit before impact work. |
 | Reviewer confidence | VRUN-001 human rating: 2 / 5; VRUN-002 baseline 3 / 5; VRUN-003 baseline 4 / 5. | VRUN-001 human rating: 4 / 5; VRUN-002 Audit 4 / 5; VRUN-003 Lite 4 / 5. | Higher confidence in Standard/Audit cases; Lite preserves confidence without extra ceremony. |
 | Workflow overhead | VRUN-001 baseline produced 7 files; test command 0.30s. VRUN-002 baseline produced 5 files; test command 0.16s. VRUN-003 baseline produced 3 files; check command 0.01s. | VRUN-001 TraceWeaver run produced 9 files; test command 0.30s. VRUN-002 Audit produced 6 files; test command 0.28s. VRUN-003 Lite produced 4 files; check command 0.00s. | Standard/Audit modes add trace artifacts where ambiguity exists; Lite adds one minimal matrix artifact with accepted low noise. |
-| Lifecycle discoverability | Pending: no standalone lifecycle prompt without explicitly forcing traceability has been recorded yet. | Pending U5.5 validation. | Must pass before packaging any runtime bundle that claims automatic or cross-cutting discovery readiness. |
+| Lifecycle discoverability | Static discovery/routing evidence recorded for `696548694dd40ce298d77e603db069934b58f645`; no dynamic no-forced-skill transcript is recorded yet. | Sufficient for U6a scope decision only. | Dynamic runtime evidence must pass before any package/runtime claim says automatic or cross-cutting discovery is ready. |
 
 ## Lifecycle Discoverability Validation
 
@@ -394,17 +398,25 @@ Evidence: Pending.
 
 | ID | Skill Requirement | Evidence Method | Current Result |
 |---|---|---|---|
-| SREQ-TRACE-001 | The skill must create useful traceability from stakeholder need and requirement authority to implementation, verification, and validation evidence. | Run all three pre-registered fork scenarios. | Pass across representative VRUN-001, VRUN-002, and VRUN-003 with human acceptance for the U5 baseline. R31 real-project validation remains open. Idea/intent lifecycle coverage is part of the U5.5 candidate and remains pending focused validation. |
+| SREQ-TRACE-001 | The skill must create useful traceability from stakeholder need and requirement authority to implementation, verification, and validation evidence. | Run all three pre-registered fork scenarios. | Pass across representative VRUN-001, VRUN-002, and VRUN-003 with human acceptance for the U5 baseline. R31 real-project validation remains open. U5.5 idea/intent lifecycle coverage is split and U6a scope-decision eligible only at `696548694dd40ce298d77e603db069934b58f645`. |
 | SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Pass in VRUN-003: Lite mode added one minimal matrix file and no full requirements/plan/ATP/results package; human noise rating 1 / 5. |
 | SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Pass: human low-value noise ratings were 2 / 5, 2 / 5, and 1 / 5 across the validation set. |
 | SREQ-TRACE-004 | The skill must improve reviewer confidence. | Reviewer rates confidence before and after using the skill. | Pass: confidence improved in VRUN-001 and VRUN-002 and stayed equal in VRUN-003. |
-| SREQ-TRACE-005 | The skill must not require broad repo changes. | Review PR scope. | Pass for the tested U2-U5 slice at `ca6ff66`; that slice stays focused. The expanded four-reference U5.5 runtime candidate is a separate scope decision and remains pending focused review/validation before packaging. |
+| SREQ-TRACE-005 | The skill must not require broad repo changes. | Review PR scope. | Pass for the tested U2-U5 slice at `ca6ff66`; that slice stays focused. The expanded U5.5 runtime candidate is split and only authorizes U6a to decide a reduced package scope before any packaging work. |
 | SREQ-TRACE-006 | The skill must expose missing traceability, not invent it. | Inspect inferred links. | Pass in VRUN-002: inferred requirements were recorded as Draft and no approved authority was invented. |
 | SREQ-TRACE-007 | The skill must provide distinct value beyond existing Agent Skills workflows. | Compare baseline run against traceability-enabled run. | Pass across representative VRUN-001, VRUN-002, and VRUN-003 with final distinct-value decision accepted for dummy validation; R31 real-project validation remains open. |
 
-## U5.5 Expanded Runtime Guidance Candidate
+## Historical U5.5 Expanded Runtime Guidance Candidate
 
-Commit: `987793d fix: stabilize traceability authority rules`
+Historical commit: `987793d fix: stabilize traceability authority rules`
+
+Current U6a scope-decision candidate:
+`696548694dd40ce298d77e603db069934b58f645 feat: add requirements reviewer skill`
+
+Status: this section preserves the older U5.5 planning record. The current
+terminal-state authority for U6a is
+`TWCORE-U55-TERM-2026-04-30-001` in
+`docs/validation/traceweaver-core-11-u5-u55-runtime-subset.md`.
 
 Purpose: Ensure lifecycle work treats ideas as pre-authority inputs, checks
 requirements quality before requirements or success criteria become
@@ -435,9 +447,10 @@ Excluded from accepted U5.5 scope unless separately authorized:
 - `agents/security-auditor.md`
 - `agents/test-engineer.md`
 
-If packaging is prepared from `987793d`, these excluded persona files must be
-split out, reverted in the packaging branch, or authorized by new requirements
-before they are included.
+No packaging should be prepared from `987793d`. If U6a prepares packaging from
+the current candidate, excluded persona files, non-selected Core skills, and
+command-wiring surfaces must be split out or authorized by later gates before
+they are included.
 
 Key rule added: ideas are first-class lifecycle inputs, not implementation
 authority. Idea work must preserve candidate needs, assumptions, risks,
@@ -492,7 +505,9 @@ Starting state:
 
 - Repo: `TraceWeaver`
 - Branch: `main`
-- Candidate commit: `987793d fix: stabilize traceability authority rules`
+- Candidate commit: historical `987793d fix: stabilize traceability authority rules`;
+  current U6a scope-decision candidate is
+  `696548694dd40ce298d77e603db069934b58f645`
 - Working tree status: clean
 - Runtime bundle:
   - `skills/systems-engineering-traceability/SKILL.md`
@@ -555,9 +570,9 @@ Decision required:
 - Split into a follow-up candidate.
 - Reduce scope back to the U2-U5 validated bundle.
 
-Status: Pending focused review, runtime-sync review, requirements-quality
-validation, and lifecycle-discoverability validation before packaging this
-runtime candidate.
+Status: Split. Static U5.5 evidence is sufficient for U6a scope decision.
+Packaging remains held until U6a records the reduced inventory and U6b proves
+package/install/runtime behavior.
 
 ## Packaging Readiness
 
@@ -565,16 +580,17 @@ No representative U5 validation blockers remain for the `ca6ff66` baseline
 slice. R31 real-project validation remains open before packaging claims can say
 the real validation requirement is satisfied.
 
-Packaging the `987793d` runtime bundle remains blocked until U5.5 is accepted
-and validated.
+Packaging remains blocked until U6a records a reduced package scope and U6b
+proves the package/install/runtime behavior for that exact scope.
 
 Remaining non-validation work before packaging:
 
 - Run one final focused document review on this validation record and README
   status update.
-- Run focused review on U5.5 runtime candidate `987793d` before packaging it.
-- Complete runtime-sync review for the four reference files.
-- Complete lifecycle-discoverability and requirements-quality validation.
+- Run U6a scope decision for the split U5.5 candidate at
+  `696548694dd40ce298d77e603db069934b58f645`.
+- Complete release hygiene decision for candidate source-name surfaces.
+- Complete U6b package/install/runtime evidence for the reduced scope.
 - Complete R31 real-project validation: real feature, unclear existing module,
   and low-risk Lite-mode scenarios.
 - Prepare the upstream-neutral package or TraceWeaver Core release notes,

@@ -8,10 +8,10 @@ Reviewer/session: `ce:work`, branch `codex/traceweaver-u55-runtime-subset`;
 Base commit: `6b6f62e73ac7de138a212bd2b6f8340bbba028ae`
 U6-unblock review base: `dea8fa0c9e6e9e0bce413653d1cc77e9406c92a0`
 
-Doc-review update: 2026-04-30 `ce-doc-review` found this record is a blocker
-inventory, not a U6 authorization artifact. U6 remains blocked until a later
-append-only U5.5 terminal-state record cites concrete evidence IDs for every
-required runtime field and records `accepted`, `reduced`, or `split`.
+Doc-review update: 2026-04-30 `ce-doc-review` found the original matrix was a
+blocker inventory, not a U6 authorization artifact. The append-only terminal
+state below now records a split U5.5 decision that is U6a scope-decision
+eligible only.
 
 ## U5 Delta-Only Public Artifact Inventory
 
@@ -78,10 +78,14 @@ approved derivative evidence record exist.
 
 Decision: `held_pending_runtime_evidence`
 
-U5.5 names the first proposed runtime subset, but does not accept runtime,
-package, upstream, release, or public-ready claims yet. U6 remains blocked until
-this subset reaches a terminal state of `accepted`, `reduced`, or `split` with
-the missing evidence listed below.
+This blocker inventory is retained as historical setup. It is superseded for
+forward gate purposes by append-only terminal-state record
+`TWCORE-U55-TERM-2026-04-30-001` below.
+
+The historical U5.5 matrix named the first proposed runtime subset, but did not
+accept runtime, package, upstream, release, or public-ready claims. It remained
+blocked until the later terminal-state record supplied the missing evidence
+listed below.
 
 Evidence completion unblocks only the U6a runtime-scope decision. Runtime,
 package, upstream, release, and public-ready claims remain held until the later
@@ -239,3 +243,192 @@ R31 sufficiency must cite the R31 adoption/value gate from
 must show scenario selection, rater independence or recorded limitation,
 pass/fail thresholds, and at least one traceability-specific value result that a
 representative rater keeps.
+
+## Append-Only U5.5 Terminal-State Record
+
+Record ID: `TWCORE-U55-TERM-2026-04-30-001`
+
+Date/session: 2026-04-30, `ce:work`, branch
+`codex/traceweaver-u55-terminal-evidence`
+
+Terminal state: `split`
+
+Gate effect: `U6a_scope_decision_eligible_only`
+
+U5.5 does not approve a runtime package, release surface, upstream PR, public
+availability claim, or R31 completion. It proves enough of the exact runtime
+candidate to let U6a decide a reduced package scope for
+`light-v0.1-authority-traceability`.
+
+### Candidate Proof
+
+Evidence ID: `TWCORE-U55-CANDIDATE-PROOF-2026-04-30-001`
+
+| Field | Value |
+| --- | --- |
+| Runtime repository | `https://github.com/jjziets/agent-skills.git` |
+| Runtime branch | `refs/heads/feature/systems-engineering-traceability` |
+| Candidate commit | `696548694dd40ce298d77e603db069934b58f645` |
+| Commit summary | `feat: add requirements reviewer skill` |
+| Checkout status | Clean temporary checkout at the candidate commit |
+| Verification command | `git fetch --depth=1 origin 696548694dd40ce298d77e603db069934b58f645 && git checkout FETCH_HEAD && git rev-parse HEAD` |
+| Observed result | `696548694dd40ce298d77e603db069934b58f645` |
+
+The previous candidate commit
+`987793dfd477bc205a0a49efe4ec1b1e31045903` remains historical only for this
+record because it was not reproducible from the current public fork ref during
+the U6-unblock review.
+
+### Target Runtime And Discovery Mechanism
+
+Evidence ID: `TWCORE-U55-DISCOVERY-2026-04-30-001`
+
+Target runtime: upstream Agent Skills Markdown skill layout.
+
+Discovery mechanism:
+
+- skill entrypoints are Markdown files at `skills/*/SKILL.md`;
+- skill metadata is read from `name` and `description` frontmatter;
+- cross-skill discovery and routing cues are supplied by
+  `skills/using-agent-skills/SKILL.md`;
+- required references are loaded from the paths named in each selected
+  `SKILL.md`;
+- top-level references are resolved from `references/*`;
+- skill-local references are resolved from `skills/<skill>/references/*`.
+
+This is static runtime-discovery evidence for U6a scope selection. U6b must
+still record package-manifest, install, and runtime execution evidence before
+any package-ready or runtime-ready claim.
+
+### Runtime Bundle Evidence
+
+Evidence ID: `TWCORE-U55-LOAD-2026-04-30-001`
+
+| Runtime file | SHA-256 at `696548694dd40ce298d77e603db069934b58f645` | U5.5 classification |
+| --- | --- | --- |
+| `skills/using-agent-skills/SKILL.md` | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Included for routing/discovery evidence |
+| `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Included in U6a candidate subset |
+| `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | Included reference-loading evidence |
+| `skills/requirements-reviewer/references/requirements-quality-checklist.md` | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | Included checklist-loading evidence |
+| `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Included schema-loading evidence |
+| `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Included in U6a candidate subset |
+| `references/systems-engineering-traceability-operating-model.md` | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | Included reference-loading evidence; release hygiene held |
+| `references/traceability-matrix-template.md` | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | Included reference/example-loading evidence |
+| `references/requirements-and-vv-guide.md` | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | Included reference-loading evidence |
+| `references/risk-gap-and-change-control-guide.md` | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | Included reference-loading evidence; release hygiene held |
+
+Held or excluded by default:
+
+- `skills/requirements-reviewer/references/source-basis.md`;
+- `skills/requirements-reviewer/agents/openai.yaml`;
+- `skills/requirements-reviewer/tests/*`;
+- all non-selected Core 11 skills;
+- `idea-refine` command wiring;
+- persona-awareness guidance;
+- Compound Engineering adapter hooks;
+- package manifests, release notes, and upstream PR surfaces.
+
+### Routing And Failure Behavior
+
+Evidence ID: `TWCORE-U55-ROUTING-2026-04-30-001`
+
+Routing evidence:
+
+- `using-agent-skills` routes vague ideas through idea refinement plus
+  traceability, but records ideas as lifecycle inputs, not implementation
+  authority.
+- `using-agent-skills` routes meaningful behavior through
+  `systems-engineering-traceability` as a cross-cutting hop.
+- `requirements-reviewer` is the selected gate for deciding whether needs,
+  requirements, success criteria, constraints, and acceptance criteria can
+  become approved implementation authority.
+- `systems-engineering-traceability` is the selected gate for linking meaningful
+  behavior to approved authority, implementation, verification, and validation
+  evidence.
+
+Failure-behavior evidence:
+
+- missing requirement metadata is marked `Needs revision` or `Blocked` before it
+  can become implementation authority;
+- weak requirements must not become approved authority for implementation;
+- if no source of system authority exists, traceability stops and asks the human
+  whether to create a requirement, approve a gap, or drop the behavior;
+- inferred, stale, ambiguous, or unapproved trace links keep the behavior
+  orphaned until human approval resolves them;
+- formatting-only, typo-only, comment-only, or tiny fixes with obvious scope do
+  not force full traceability use, though the reason must remain explainable.
+
+### Focused Review Disposition
+
+Evidence ID: `TWCORE-U55-FOCUSED-REVIEW-2026-04-30-001`
+
+Disposition: `pass_for_U6a_scope_decision_only`
+
+Focused review checked the exact candidate commit, required file presence,
+frontmatter discovery shape, selected reference paths, routing text, failure
+behavior text, and public hygiene scan.
+
+No private path, private repository name, local checkout path, private candidate
+locator, raw extraction path, secret, or environment-value hit was observed in
+the selected runtime evidence.
+
+Review limitation: source-name references to external standards and public
+source context exist in the candidate repository. U6a must decide whether the
+package scope excludes those surfaces, rewrites them, or records a
+release-specific source-name policy before U6b/U7. This limitation blocks
+package-ready, release-ready, and upstream-ready claims, but does not block the
+U6a scope decision.
+
+### R31 Status
+
+Evidence ID: `TWCORE-U55-R31-2026-04-30-001`
+
+R31 status: `open_explicit_release_blocker`
+
+The prior representative dummy runs remain useful U5 baseline evidence, but
+they do not satisfy the R31 real-project validation gate. Public U5.5 records
+must continue to use only role categories, pseudonymous rater IDs, sanitized
+scenario IDs, public-safe actor classes, and summarized value. R31 must remain
+held until real feature, unclear existing module, and low-risk Lite scenarios
+are completed or a later release gate records a narrower approved validation
+path.
+
+### Terminal Decision
+
+```text
+u5_5_terminal_state: split
+subset_id: light-v0.1-authority-traceability
+candidate_commit: 696548694dd40ce298d77e603db069934b58f645
+u6a_eligible: yes, for scope decision only
+u6b_eligible: no, package manifest/install/runtime evidence missing
+u7_eligible: no, release claim records and R31 status unresolved
+u8_eligible: no, upstream/package release claims remain held
+u9_eligible: no, post-release/adoption evidence cannot start before U7/U8
+release_gate_effect: held_until_U7_and_R31
+```
+
+Allowed claims:
+
+- the selected public fork candidate has been refreshed and proven at
+  `696548694dd40ce298d77e603db069934b58f645`;
+- `light-v0.1-authority-traceability` has static runtime discovery/loading,
+  routing, and failure-behavior evidence sufficient to start U6a;
+- non-selected U4-promoted Core skills remain excluded from runtime packaging
+  by default.
+
+Held claims:
+
+- package-ready;
+- release-ready;
+- upstream-ready;
+- R31 complete;
+- all-Core runtime scope;
+- automatic discovery in every agent runtime;
+- source-name hygiene accepted for release surfaces.
+
+Stale reset rule: this terminal state resets to `held` if the candidate branch
+head changes before U6a records its scope decision, any included runtime file
+hash changes, U6a attempts to include non-selected Core skills by default, U6b
+uses files outside the selected/reduced package scope, source-name hygiene is
+treated as accepted without a U7 release decision, or R31 is presented as
+complete without real-scenario evidence.
