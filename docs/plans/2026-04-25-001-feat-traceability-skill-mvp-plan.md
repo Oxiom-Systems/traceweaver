@@ -10,15 +10,34 @@ origin: docs/brainstorms/2026-04-25-systems-engineering-traceability-skill-requi
 
 ## Overview
 
-Create a focused, upstreamable MVP for a `systems-engineering-traceability` skill for `addyosmani/agent-skills`.
+Create a focused, upstreamable MVP for the TraceWeaver Core skills in
+`addyosmani/agent-skills`.
 
-TraceWeaver Core MVP is the open-source runtime bundle: one skill, four runtime
+TraceWeaver Core MVP is the open-source runtime bundle: two core skills, four runtime
 references, and README/index discoverability updates. The upstream
 `agent-skills` PR remains a separate acceptance surface and may be packaged
 smaller only through an explicit scope decision.
 
+The architecture has three layers:
+
+| Layer | Purpose | Names |
+|---|---|---|
+| Core skills | Portable, upstream-neutral capabilities usable in any agentic workflow | `requirements-reviewer`, `systems-engineering-traceability` |
+| Core lifecycle guidance | Explains how the core skills work together across the lifecycle | `traceweaver-operating-model`, matrix template, requirements/V&V guide, risk/gap/change-control guide |
+| Compound Engineering adapter | Wires core capabilities into Compound Engineering workflows, prompts, agents, and delegation | TraceWeaver CE, `ce-traceability`, `ce-traceability-reviewer`, CE hooks |
+
+Core capabilities must stay portable. CE-specific hooks, reviewer agents, and
+delegation payloads belong in TraceWeaver CE and must not become the source
+definition of the core skills.
+
 The core artifact model is:
 
+- Requirements-reviewer skill: reviews whether needs, requirements, success
+  criteria, acceptance criteria, and reframed requirements are good enough to
+  become authority.
+- Systems-engineering-traceability skill: checks whether meaningful behavior
+  traces to approved authority, implementation, verification, and validation
+  evidence.
 - Agent-facing operating model: original, distilled lifecycle rules for agentic systems-engineering traceability.
 - Markdown traceability matrix: authoritative audit record for links, status, evidence references, gaps, and human decisions.
 - Requirements and V&V guide: runtime guidance for idea/need separation,
@@ -55,8 +74,11 @@ The updated requirements also require a lightweight tooling flow. In v1, tooling
 - R29-R33. The contribution path must verify upstream rules, open an issue/RFC, validate in a fork before PR submission, capture adoption friction, and defer executable tooling.
 - R34-R36. The skill must explicitly link requirements documents, planning documents, traceability rows, ATP entries, and result records, and treat missing or stale document links as traceability gaps.
 - R37-R41. The project must keep raw source material in ignored local cache, commit only original distilled guidance, mark provisional source-derived guidance until ground-truth review, and separate the operating model from the matrix template.
+- R42. The project must make source-to-runtime guidance sync auditable through mapping, version stamp, checksum, review owner, review session, and implementation commit evidence.
+- R43-R50. The lifecycle must include requirements-reviewer quality control before requirements or success criteria can become implementation authority, preserve original stakeholder wording during agent reframing, convert accepted weak requirements into approved exceptions instead of approved requirements, and route requirements-quality and traceability skills cumulatively when both apply.
+- R51-R53. The project must keep TraceWeaver Core skills, Core lifecycle guidance, and the Compound Engineering adapter separate. Core skills stay upstream-neutral; TraceWeaver CE wires those core capabilities into CE-specific workflows without redefining them.
 - F1-F5. The implementation must support setup, maintenance, audit, visual-map, and engineering-document-chain use cases from the origin document.
-- AE1-AE7. The plan must support the acceptance examples for setup, matrix authority, helper inheritance, inferred requirements, fork validation, document-chain traceability, and source/distillation control.
+- AE1-AE10. The plan must support the acceptance examples for setup, matrix authority, helper inheritance, inferred requirements, fork validation, document-chain traceability, source/distillation control, requirements-quality control, cumulative skill routing, and core-vs-adapter separation.
 
 ---
 
@@ -153,8 +175,12 @@ README.md
 
 Implementation units U1, U1.5, U5, U5.5, and U6 create local planning/evidence
 files. U2-U4 modify the target fork. U5.5 may also modify the target fork only
-after it is recorded as a scope-change candidate. Implementers must complete the
-U1.5 configuration-control preflight before editing `skills/`, `references/`, or
+after it is recorded as a scope-change candidate and only for Core skill work:
+requirements quality, runtime guidance sync, and cumulative
+requirements/traceability routing. Persona-awareness, CE-specific reviewer
+agents, CE hooks, and broader persona wiring remain TraceWeaver CE or follow-up
+work unless separately authorized. Implementers must complete the U1.5
+configuration-control preflight before editing `skills/`, `references/`, or
 `README.md`.
 
 ---
@@ -170,13 +196,16 @@ U1.5 configuration-control preflight before editing `skills/`, `references/`, or
 - Preserve the document chain from requirements doc to plan doc to traceability matrix to ATP and results when those artifacts exist.
 - Include feature-scoped ID guidance such as `SREQ-AUTH-001` without forcing every namespace on small projects.
 - Make Lite the default mode, Standard the mode for ambiguous behavior/interface/data-flow changes, and Audit the mode for high-risk or owner-unclear work.
-- Satisfy lifecycle management through standalone skill triggers, phase checkpoints, and a traceability-focused review task in the first PR; defer command wiring and lifecycle skill patches.
-- Make clear that the skill is intended for use during `/spec`, `/plan`, `/build`, `/test`, `/review`, and `/ship` work, even though the first PR does not wire those commands automatically. If validation shows the skill is not naturally discoverable during lifecycle work, narrow the first PR claim to directly usable or manually invoked traceability support.
+- Satisfy lifecycle management through Core skill triggers, phase checkpoints, and requirements-quality plus traceability review tasks in the first PR; defer command wiring, lifecycle skill patches, and CE-specific hooks to adapter or follow-up work.
+- Make clear that the Core skills are intended for use during `/spec`, `/plan`, `/build`, `/test`, `/review`, and `/ship` work, even though the first PR does not wire those commands automatically. If validation shows the Core skills are not naturally discoverable during lifecycle work, narrow the first PR claim to directly usable or manually invoked requirements-quality and traceability support.
 - Add a no-orphan-implementation gate: before creating meaningful behavior, the agent must identify approved authority. Valid authority is an approved requirement, approved ADR/design decision, first-class approved risk control, approved traceability gap, or task that closes directly to one of those approved authorities. A task ID alone is not authority, and a bare `RISK-*` ID is not authority.
+- Add a requirements-quality gate: before a requirement or success criterion can authorize implementation, requirements-reviewer must confirm it preserves source intent and is clear, singular, necessary, feasible, verifiable, validation-aware, source-traceable, implementation-neutral unless intentionally constrained, and at the correct abstraction level.
+- Human acceptance of a weak, ambiguous, unverifiable, implementation-biased, or incomplete requirement does not make it an approved requirement. If the team chooses to proceed, convert the item into an approved gap, accepted risk, design decision, validation gap, or change-control exception with owner, approved by, date/session, allowed use, review condition, and rationale.
 - Treat inferred requirements as `Draft` until approval evidence records approver, date/session, source artifact, affected IDs, and resulting status.
 - Use evidence-based trace status transitions: `Draft -> Approved -> Implemented -> Verified -> Validated`, with non-linear statuses for `Gap`, `Deferred`, and `Retired`.
 - Treat ATP as acceptance test plan/procedure and result records as acceptance test results, verification output, or acceptance test report artifacts linked by requirement ID.
 - Validate with three scenarios before opening the upstream PR: one new feature, one unclear existing module, and one low-risk Lite-mode case.
+- Representative or dummy runs may validate workflow shape and evidence capture, but they do not satisfy R31's real-scenario validation requirement.
 - Measure validation quality by actionability, false positives, confusing guidance, overhead, and reviewer confidence, not just gap counts.
 
 ---
@@ -205,6 +234,8 @@ Target fork files:
 
 ```text
 skills/
+  requirements-reviewer/
+    SKILL.md
   systems-engineering-traceability/
     SKILL.md
 references/
@@ -328,12 +359,16 @@ flowchart TB
 - Explain the artifact model in one paragraph: matrix is audit record, Mermaid is visual map, IDs are links, and requirements/plan/ATP/results links are lightweight document traceability.
 - Keep `/trace`, persona, lifecycle patches, executable diagram generation, metrics, and high-assurance variants out of the initial ask.
 - Record the issue URL after opening.
-- Do not wait for maintainer response before beginning fork implementation. Treat the issue/RFC as upstream visibility and change-control input, not as a blocking approval gate for U2-U5.
+- If no maintainer response is available, continue only with fork-state evidence
+  and non-packaging preparation unless the product owner records an explicit
+  local-only strategy. Treat maintainer response as the upstream packaging gate,
+  not as a silent approval.
 - Before U2, record a proceed/revise/wait decision:
-  - Proceed if there is no negative maintainer signal after the agreed review window, or if the fork implementation is explicitly treated as disposable validation work.
+  - Proceed only for supportive response, bounded concern with recorded scope
+    limits, or product-owner-approved local-only evidence work.
   - Revise if maintainers signal that the artifact model, top-level references, or README framing should change.
-  - Wait if maintainers ask for discussion before a PR or question whether this belongs as a standalone skill.
-  - Pivot if maintainers prefer patching an existing lifecycle skill instead of adding a standalone skill.
+  - Wait if maintainers ask for discussion before a PR or question whether these belong as standalone Core skills.
+  - Pivot if maintainers prefer patching an existing lifecycle skill instead of adding standalone Core skills.
 - Before U6 PR packaging, review any maintainer feedback and record whether it changes scope, template inclusion, wording, or follow-up sequencing.
 
 **Patterns to follow:**
@@ -493,7 +528,15 @@ Date:
   - Brainstorming and idea refinement create candidate ideas, needs,
     assumptions, risks, success and failure signals, open decisions, and
     not-doing boundaries. They do not create implementation authority.
-  - Planning converts approved or candidate needs into requirements, design decisions, ATP/result expectations, verification paths, and validation paths.
+  - When planning converts an idea, vague stakeholder statement, or candidate
+    need into a requirement or success criterion, it preserves the original
+    wording, source, agent reframe, introduced assumptions, reframe rationale,
+    requirements-reviewer result, and approval state.
+  - Agent-reframed requirements remain `Draft` until requirements-reviewer
+    confirms they preserve intent and a human approval record accepts them.
+  - Planning converts approved needs and reviewed draft requirements into
+    design decisions, ATP/result expectations, verification paths, and
+    validation paths.
   - Work agents may only implement meaningful behavior when it traces to approved authority.
   - Review findings are provenance, not authority. They become authority only when converted into an approved requirement change, design decision, risk control, or approved gap.
   - Requirements may evolve, but they must evolve through explicit change control.
@@ -532,8 +575,8 @@ This table may be embedded directly in `SKILL.md` if it remains concise. If it m
 
 | Lifecycle phase | Agent question | Required trace update | Block condition |
 |---|---|---|---|
-| `/spec` | What stakeholder need and success signal justify this behavior? | Capture or reuse need and requirement IDs; mark inferred items as `Draft`. | Requirement is ambiguous, untestable, contradictory, or unapproved. |
-| `/plan` | Which requirement IDs does each task satisfy? | Link plan/task IDs, acceptance criteria, likely artifacts, verification method, and validation path. | Task has no requirement, risk control, design decision, or approved gap. |
+| `/spec` | What stakeholder need and success signal justify this behavior? | Capture or reuse need and requirement IDs; preserve original wording beside agent reframes; mark inferred items as `Draft`; run requirements-reviewer before approval. | Requirement is ambiguous, untestable, contradictory, unapproved, or rewritten without source-intent evidence. |
+| `/plan` | Which requirement IDs does each task satisfy? | Link plan/task IDs, acceptance criteria, likely artifacts, verification method, and validation path. | Task does not close to an approved requirement, approved ADR/design decision, first-class approved risk control, approved gap, or equivalent approved authority. |
 | `/build` | Does this implementation still match the traced intent? | Link meaningful files/modules/interfaces to requirement or design IDs; record new gaps immediately. | New meaningful behavior appears without a traced reason. |
 | `/test` | What ATP, test, or evidence proves the requirement? | Link ATP entries, test paths, commands/results, and verification evidence to requirement IDs. | Verification evidence is missing for implemented behavior. |
 | `/review` | Can a reviewer walk backward and forward through the chain? | Run traceability-focused review for provenance, links, gaps, inferred requirements, and dark-code candidates. | Unapproved inferred links, unexplained behavior, or unresolved dark-code candidates remain. |
@@ -564,7 +607,10 @@ This table may be embedded directly in `SKILL.md` only if it stays compact. Othe
 - Happy path: when an agent starts a meaningful feature, the skill tells it how to set up traceability before implementation.
 - Happy path: as work moves through plan, build, test, review, and ship phases, the skill tells the agent which trace links to update at each phase.
 - Happy path: when an agent changes behavior, the skill tells it how to maintain the matrix and evidence links.
-- Happy path: before generating meaningful behavior, the agent identifies the requirement, task, design decision, risk control, or approved gap that justifies it.
+- Happy path: before generating meaningful behavior, the agent identifies a
+  valid approved authority: approved requirement, approved ADR/design decision,
+  first-class approved risk control, approved gap, or a task that closes
+  directly to one of those authorities.
 - Happy path: before completion, a traceability-focused reviewer pass checks provenance, links, ATP/results, gaps, and validation status.
 - Happy path: when an agent reviews unclear code, the skill tells it how to identify and classify dark-code candidates.
 - Edge case: a tiny behavior change can use Lite mode with a minimal matrix row instead of a heavy matrix.
@@ -783,7 +829,7 @@ Do not package the PR if the traceability skill only repeats what existing Agent
 
 | ID | Skill Requirement | Evidence Method | Pass Threshold |
 |---|---|---|---|
-| SREQ-TRACE-001 | The skill must create useful traceability from idea / intent to implementation. | Run on the three required fork scenarios. | Finds at least one meaningful traceability gap, missing requirement, missing test link, missing validation path, or dark-code candidate in the new-feature and unclear-module scenarios; Lite mode may pass by avoiding unnecessary process while preserving the required minimal matrix row. |
+| SREQ-TRACE-001 | The skill must create useful traceability from stakeholder need and requirement authority to implementation, verification, and validation evidence. | Run on the three required fork scenarios. | Finds at least one meaningful traceability gap, missing requirement, missing test link, missing validation path, or dark-code candidate in the new-feature and unclear-module scenarios; Lite mode may pass by avoiding unnecessary process while preserving the required minimal matrix row. Idea/intent lifecycle coverage is validated separately under U5.5 before packaging claims include it. |
 | SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Adds no more than roughly 10-15% overhead for small or medium changes. |
 | SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Fewer than roughly 25% of findings are false positives or low-value. |
 | SREQ-TRACE-004 | The skill must improve reviewer confidence. | Reviewer rates confidence before and after using the skill. | Confidence improves, and reviewer would use the skill again. |
@@ -827,27 +873,141 @@ The failure bar is not whether the skill made more documents. The failure bar is
 **Goal:** Decide whether post-U5 runtime changes become part of TraceWeaver Core,
 move to a follow-up candidate, or are reduced back to the U2-U5 validated bundle.
 
-**Requirements:** R27, R42
+**Requirements:** R27, R42-R53
 
-**Dependencies:** U5 validation baseline complete at `ca6ff66`.
+**Dependencies:** Representative U5 validation baseline recorded at `ca6ff66`.
+R31 real-project validation remains open and is a packaging blocker. The
+representative VRUNs validate workflow shape and expected evidence capture, but
+they do not satisfy the real-project validation requirement.
 
-**Candidate commit:** `b01dd9c762d3c80d0d279aeebcbd529302b73fa1 feat: route ideation through traceability`
+**Candidate commit:** `987793dfd477bc205a0a49efe4ec1b1e31045903 fix: stabilize traceability authority rules`
 
 **Scope change:**
 - Adds idea / intent lifecycle framing.
-- Adds `idea-refine` and agent persona guidance.
 - Expands runtime references from two to four files.
+- Adds requirements-reviewer as a requirements-quality gate before requirements
+  or success criteria can become implementation authority.
+- Adds cumulative routing so requirements or success criteria use
+  `requirements-reviewer`, and meaningful behavior or implementation authority
+  also uses `systems-engineering-traceability`.
+- Clarifies that `requirements-reviewer` and `systems-engineering-traceability`
+  are Core skills, while CE-specific wrappers and hooks belong to TraceWeaver CE.
 - Introduces additional distilled systems-engineering guidance.
+
+U5.5 is not only a packaging/sync unit. It introduces expanded runtime guidance
+around idea/intent lifecycle framing, requirements quality, and skill discovery.
+These changes are authorized by R43-R53.
+
+Out of scope for U5.5:
+
+- broader agent persona guidance
+- persona-awareness
+- non-essential lifecycle persona wiring
+- CE-specific hooks and reviewer wrappers
+
+Those changes must move to a follow-up candidate unless separately authorized by
+new requirements.
 
 **Decision required:**
 - Accept into TraceWeaver Core MVP.
 - Split into follow-up candidate.
 - Reduce scope back to the U2-U5 validated bundle.
 
-**Verification:**
-- Focused document review reconciles requirements, spec, plan, README, validation
-  record, and distilled guidance.
-- Focused code review covers the expanded Agent Skills runtime candidate.
+**U5.5 Validation Gate:**
+
+U5.5 passes only if all of the following are true:
+
+1. A lifecycle-discoverability prompt involving requirements or success criteria
+   invokes `requirements-reviewer` without being explicitly forced.
+2. The same scenario also invokes `systems-engineering-traceability` when
+   meaningful behavior or implementation authority is involved.
+3. Original stakeholder wording is preserved beside any agent-reframed
+   requirement or success criterion.
+4. Reframed requirements remain `Draft` until requirements-reviewer confirms
+   intent preservation and human approval accepts them.
+5. Weak accepted requirements are converted into approved gaps, accepted risks,
+   design decisions, validation gaps, or change-control exceptions.
+6. Accepted-risk or exception evidence records owner, approved by, date/session,
+   allowed use, review condition, and rationale.
+7. Human reviewer rates the guidance clear enough to use.
+8. Any failure to route requirements or success criteria through
+   requirements-reviewer blocks U5.5.
+
+Fail conditions:
+
+- requirements-reviewer is bypassed for requirements or success criteria.
+- Rewritten requirements lose original intent or source text.
+- Task-only authority passes.
+- Weak requirements become approved authority.
+- Dummy or representative validation is presented as satisfying R31 real
+  validation.
+
+### VRUN-U55-001: Lifecycle Discoverability and Requirements-Reviewer Routing
+
+**Purpose:** Verify that requirements-related work discovers
+`requirements-reviewer` without explicitly forcing the skill, and invokes
+`systems-engineering-traceability` when implementation authority is involved.
+
+**Starting state:**
+
+- Repo: `TraceWeaver`
+- Branch: `main`
+- Candidate commit: `987793dfd477bc205a0a49efe4ec1b1e31045903 fix: stabilize traceability authority rules`
+- Working tree status: clean
+- Runtime bundle:
+  - `skills/systems-engineering-traceability/SKILL.md`
+  - `references/systems-engineering-traceability-operating-model.md`
+  - `references/requirements-and-vv-guide.md`
+  - `references/risk-gap-and-change-control-guide.md`
+  - `references/traceability-matrix-template.md`
+  - `skills/requirements-reviewer/SKILL.md`
+  - `skills/requirements-reviewer/references/requirements-review-finding-schema.md`
+
+**Prompt:**
+
+```text
+I want to build a small browser-based 2.5D puzzle-combat game about weaving five original elemental forces. Help me turn this idea into a buildable plan and identify what must be true before implementation can start.
+```
+
+**Expected behavior:**
+
+- Preserves the original idea text.
+- Creates candidate needs and requirements, not approved authority.
+- Invokes or recommends `requirements-reviewer` for requirement quality.
+- Keeps reframed requirements in `Draft` until reviewed.
+- Invokes or recommends `systems-engineering-traceability` before
+  implementation authority is granted.
+- Does not treat a task, idea, weak requirement, or inferred link as approved
+  authority.
+- Produces required evidence or blocks with a clear reason.
+
+**Required evidence artifact:** `docs/validation/u55-lifecycle-discoverability.md`
+
+**Human rating fields:**
+
+- Requirements-reviewer discovered without being forced: Pass / Fail
+- Traceability skill discovered when authority was needed: Pass / Fail
+- Original intent preserved: 1-5
+- Requirement quality guidance useful: 1-5
+- Traceability guidance useful: 1-5
+- Over-process level acceptable: 1-5
+- Reviewer confidence improved: Yes / No
+
+**Fail conditions:**
+
+- Requirements-reviewer is bypassed.
+- The agent rewrites the idea into requirements without preserving the original
+  source.
+- Draft requirements become authority.
+- Task-only authority passes.
+- Weak requirements become approved requirements.
+- Traceability is only checked after implementation.
+
+Additional verification:
+
+- Focused document review reconciles requirements, spec, plan, README,
+  validation record, and distilled guidance.
+- Focused code review covers the accepted U5.5 Agent Skills runtime surface.
 - Runtime sync evidence records source mapping, checksums, reviewer, review
   session, and implementation commit.
 - Lifecycle-discoverability validation is recorded before packaging.
@@ -926,8 +1086,12 @@ candidate, U5.5 must also be accepted and validated.
 ## Documentation / Operational Notes
 
 - The issue/RFC should be opened before the PR to test maintainers' appetite and framing.
-- Open the issue/RFC before U2, but do not block fork implementation on maintainer response. Treat feedback as change-control input before U6 PR packaging.
-- Do not treat the proceed/revise/wait decision as upstream approval. It is a risk-control decision for whether fork implementation should continue before maintainer response.
+- Open or refresh the issue/RFC before U2. If no maintainer response exists,
+  continue only with fork-state evidence and non-packaging preparation unless
+  the product owner records an explicit local-only strategy with scope bounds.
+- Do not treat the proceed/revise/wait decision as upstream approval. It is a
+  risk-control decision; upstream packaging remains held until maintainer
+  response or an explicit local-only scope decision exists.
 - Use `.source-materials/` only as a local source cache. Committed guidance must be original distilled writing and should cite official or public source pages rather than local private files.
 - The PR should be submitted only after fork validation produces concrete evidence.
 - Any future `/trace` command should be designed in a separate follow-up after the core skill is accepted or requested.
@@ -949,7 +1113,7 @@ candidate, U5.5 must also be accepted and validated.
 
 ## Success Metrics
 
-- Requirements R1-R41 are covered by the plan and first-prioritized work.
+- Requirements R1-R53 are covered by the plan and first-prioritized work.
 - First PR modifies only the MVP files needed for the core skill.
 - Fork validation records useful findings from new-feature and existing-code scenarios.
 - Fork validation demonstrates distinct value against an existing Agent Skills baseline in at least two comparison areas.

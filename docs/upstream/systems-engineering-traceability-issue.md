@@ -1,15 +1,31 @@
-# Proposal: systems-engineering-traceability skill for agent-generated code
+# Proposal: requirements quality and traceability skills for agent-generated code
 
 Issue URL: https://github.com/addyosmani/agent-skills/issues/103
 
+Current maintainer response class: `no response`
+
+Closeout status as of 2026-04-29: issue/RFC exists, but no upstream response is
+recorded in this repo. A product-owner-approved local-only strategy permits
+U2-U5.5 work for the local/live TraceWeaver candidate only. Upstream-ready and
+public-release-ready claims remain held while the upstream response class is
+`no response`.
+
 ## Summary
 
-I would like to propose a focused new skill: `systems-engineering-traceability`.
+I would like to propose a focused pair of lightweight skills:
+`requirements-reviewer` and `systems-engineering-traceability`.
 
-The skill would add a lightweight traceability workflow for agent-generated behavior. It would help agents preserve the chain from idea or stakeholder intent to requirement, design decision, implementation, verification evidence, and validation evidence or validation plan.
+Together, they add requirements-quality and traceability support for
+agent-generated behavior. `requirements-reviewer` checks whether needs,
+requirements, success criteria, acceptance criteria, and agent-reframed
+requirements are clear, source-preserving, verifiable, and safe to approve.
+`systems-engineering-traceability` checks whether meaningful behavior traces to
+approved authority and verification/validation evidence.
 
 The goal is practical: make it easier for reviewers and maintainers to answer:
 
+- What did the stakeholder or source text actually ask for?
+- Is the requirement or success criterion good enough to become authority?
 - Why does this behavior exist?
 - What requirement or risk control does it satisfy?
 - What design decision supports it?
@@ -32,6 +48,7 @@ Existing skills already cover specification, planning, implementation, testing, 
 
 First PR would stay intentionally small:
 
+- `skills/requirements-reviewer/SKILL.md`
 - `skills/systems-engineering-traceability/SKILL.md`
 - `references/systems-engineering-traceability-operating-model.md`
 - `references/traceability-matrix-template.md`
@@ -43,9 +60,11 @@ The traceability matrix template is part of the MVP. The skill is not considered
 
 If this issue has already been posted upstream, add a follow-up comment clarifying that the matrix template and operating-model reference are both considered required for a usable traceability MVP, and that any smaller upstream packaging is a recorded scope decision rather than a change to the TraceWeaver Core bundle.
 
-The skill would guide agents to:
+The skills would guide agents to:
 
 - capture or reuse stakeholder needs and requirement IDs;
+- keep candidate needs, draft requirements, and agent-reframed criteria out of
+  approved authority until requirements quality is reviewed;
 - link requirements to plans, design decisions, implementation artifacts, verification evidence, and validation evidence;
 - keep a lightweight Markdown traceability matrix as the audit record;
 - use Mermaid only as a visual relationship view, not the source of truth;
@@ -87,6 +106,11 @@ The first PR would not include:
 
 - a `/trace` command;
 - a systems engineer persona;
+- Compound Engineering commands, reviewers, delegation prompts, or plugin hooks;
+- broad lifecycle-orchestrator wiring or the full eleven-skill TraceWeaver Core
+  taxonomy;
+- `needs-and-requirements-capture` or `risk-gap-change-control` as promoted
+  live skills, unless separately approved as a scope change;
 - broad patches across existing skills;
 - executable Mermaid generation;
 - metrics or CI enforcement;
@@ -132,9 +156,16 @@ If the skill only repeats what existing skills already catch, I would revise it 
 
 The proposed first PR is designed to match the current contribution guidance:
 
-- specific: a traceability workflow for agent-generated behavior;
+- specific: requirements-quality and traceability workflow support for
+  agent-generated behavior;
 - verifiable: includes concrete completion gates and validation evidence;
-- battle-tested: validated in a fork before PR submission;
-- minimal: one skill, one operating-model reference, one required matrix template, and only the smallest discoverability update.
+- battle-tested: validated in a fork before PR submission; and
+- minimal for the proposed acceptance surface: two focused skills, the required
+  runtime references, and only the smallest discoverability update.
+
+The TraceWeaver Core MVP bundle is the skill plus the operating-model reference,
+matrix template, requirements/V&V guide, and risk/gap/change-control guide. Any
+smaller upstream packaging would be a recorded scope decision, not a silent
+change to the Core MVP contract.
 
 I am opening this issue first to check whether this scope and framing fit the project before preparing the focused PR.

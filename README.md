@@ -29,25 +29,43 @@ TraceWeaver Core should stay usable without the future paid layer. The paid
 layer should make the same method scalable through relationship storage,
 dashboards, governance, and integrations.
 
+## Architecture Layers
+
+| Layer | Purpose | Names |
+|---|---|---|
+| Core skills | Portable, upstream-neutral capabilities usable in any agentic workflow | Core 11 suite under `skills/`; `requirements-reviewer` and `systems-engineering-traceability` remain the current runtime-candidate subset |
+| Core lifecycle guidance | Explains how the core skills work together from idea to change control | `traceweaver-operating-model`, matrix template, requirements/V&V guide, risk/gap/change-control guide |
+| Compound Engineering adapter | Wires the core capabilities into Compound Engineering workflows, prompts, agents, and delegation | TraceWeaver CE, `ce-traceability`, `ce-traceability-reviewer`, CE hooks |
+
+Ownership rule:
+
+- `requirements-reviewer` answers whether needs, requirements, success criteria,
+  acceptance criteria, or reframed requirements are good enough to become
+  authority.
+- `systems-engineering-traceability` answers whether meaningful behaviour traces
+  to approved authority, implementation, verification, and validation evidence.
+- TraceWeaver CE wires those Core capabilities into Compound Engineering. CE
+  wrappers must not become the source definition of the Core capabilities.
+
 ## Current State
 
-As of 2026-04-26:
+As of 2026-04-29:
 
 | Area | Status | Notes |
 |---|---|---|
 | TraceWeaver Core repo | Primary project home | `git@github.com:Oxiom-Systems/traceweaver.git` |
 | Agent Skills fork | Implementation-ready candidate | `feature/systems-engineering-traceability` branch in the Agent Skills fork |
 | U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
-| U5.5 expanded runtime candidate | `b01dd9c` | `feat: route ideation through traceability`; scope-change candidate pending focused review and validation |
-| Upstream-neutral skill | Runtime candidate | `skills/systems-engineering-traceability/SKILL.md` |
+| U5.5 expanded runtime candidate | `987793dfd477bc205a0a49efe4ec1b1e31045903` | `fix: stabilize traceability authority rules`; proposed U5.5 review surface is ideation, requirements-reviewer, and cumulative requirements/traceability routing pending focused review, runtime-sync evidence, lifecycle-discoverability validation, and R31 real scenarios; persona-awareness is follow-up scope unless separately authorized |
+| Core 11 public skill folders | U4-promoted public artifacts | `skills/` contains all eleven scrubbed public-candidate skill folders; runtime/package acceptance remains pending U5.5/U6 |
 | Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
 | Requirements and V&V guide | U5.5 runtime candidate | `references/requirements-and-vv-guide.md`; mandatory for Core, pending U5.5 review |
 | Risk, gap, and change-control guide | U5.5 runtime candidate | `references/risk-gap-and-change-control-guide.md`; mandatory for Core, pending U5.5 review |
-| Discovery routing | Runtime candidate | Ideas route through `idea-refine` plus `systems-engineering-traceability`; meaningful behavior routes through traceability as a cross-cutting hop |
-| Validation record | Refreshed to U5 baseline and U5.5 candidate | U5 pass applies only to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; `b01dd9c762d3c80d0d279aeebcbd529302b73fa1` is not validated yet |
-| Controlled validation | Complete for U5 baseline | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded at `ca6ff66` |
-| Upstream PR packaging | Blocked on U5.5 decision | Do not package `b01dd9c` until focused review, runtime-sync evidence, and lifecycle-discoverability validation are recorded |
+| Discovery routing | Runtime candidate evidence scope | Idea/intent lifecycle evidence is in scope as source-preservation and routing context only; `idea-refine` command wiring remains follow-up unless separately authorized. Requirements and success criteria route through `requirements-reviewer`; meaningful behavior routes through traceability as a cross-cutting hop |
+| Validation record | Refreshed to U5 baseline and U5.5 candidate | U5 representative pass applies only to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; `987793dfd477bc205a0a49efe4ec1b1e31045903` is not validated yet |
+| Controlled validation | Representative complete for U5 baseline | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded at `ca6ff66`, but R31 real-project validation remains open |
+| Upstream PR packaging | Blocked on U5.5 decision and R31 real validation | Do not package `987793dfd477bc205a0a49efe4ec1b1e31045903` until focused review, runtime-sync evidence, requirements-quality validation, lifecycle-discoverability validation, and R31 real scenarios are recorded |
 | TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |
 | TraceWeaver CE lifecycle baseline | In progress | Baseline approval and validation are not closed yet |
 
@@ -56,6 +74,7 @@ As of 2026-04-26:
 The TraceWeaver Core MVP is not just a skill prompt. The minimum usable
 traceability capability is:
 
+- `skills/requirements-reviewer/SKILL.md`
 - `skills/systems-engineering-traceability/SKILL.md`
 - `references/systems-engineering-traceability-operating-model.md`
 - `references/traceability-matrix-template.md`
@@ -123,7 +142,10 @@ The agent-facing rules are intentionally compact:
 - Idea refinement is part of the lifecycle. Ideas are preserved as candidate
   needs, assumptions, risks, success/failure signals, open decisions, and
   not-doing boundaries before they become requirements or work.
-- Planning converts approved or candidate needs into requirements, design
+- Planning preserves original stakeholder wording beside any agent reframe,
+  marks reframed requirements as `Draft`, and uses requirements-reviewer before
+  those requirements or success criteria can become approved authority.
+- Planning converts approved needs and reviewed draft requirements into design
   decisions, ATP/result expectations, verification paths, and validation paths.
 - Work agents may only implement meaningful behaviour when it traces to
   approved authority.
@@ -163,26 +185,30 @@ remains orphaned until human approval resolves it.
 
 ## Validation Gate
 
-TraceWeaver Core validation is complete for the U2-U5 baseline implementation
-slice at `ca6ff66d46f140da72f423ea3dec819f81ef5337`.
+TraceWeaver Core representative validation is complete for the U2-U5 baseline
+implementation slice at `ca6ff66d46f140da72f423ea3dec819f81ef5337`.
 
 Validation status:
 
 - `ca6ff66d46f140da72f423ea3dec819f81ef5337`: U2-U5 implementation slice
-  passed validation.
-- `b01dd9c762d3c80d0d279aeebcbd529302b73fa1`: expanded U5.5 runtime
+  passed representative dummy validation.
+- R31 real-project validation remains open for the real feature, unclear
+  existing module, and low-risk Lite-mode scenarios.
+- `987793dfd477bc205a0a49efe4ec1b1e31045903`: expanded U5.5 runtime
   candidate pending focused review and validation.
-- Packaging status: not ready for the `b01dd9c` runtime bundle until U5.5
-  review, runtime-sync evidence, and lifecycle-discoverability validation are
-  complete.
+- Packaging status: not ready for the
+  `987793dfd477bc205a0a49efe4ec1b1e31045903` runtime bundle until U5.5
+  review, runtime-sync evidence, requirements-quality validation,
+  lifecycle-discoverability validation, and R31 real scenarios are complete.
 
-The validation record contains all three controlled U5 baseline runs:
+The validation record contains all three controlled U5 baseline runs. These are
+representative dummy runs, not R31-completing real-project validation:
 
 | Scenario | Purpose | Status |
 |---|---|---|
-| VRUN-001: New feature with document chain | Prove requirement-to-plan-to-implementation-to-results traceability | Pass |
-| VRUN-002: Existing module audit | Prove the skill finds dark-code candidates and missing traceability | Pass |
-| VRUN-003: Low-risk Lite mode | Prove Lite mode stays lightweight while still using a minimal matrix artifact | Pass |
+| VRUN-001: New feature with document chain | Prove requirement-to-plan-to-implementation-to-results traceability | Representative pass; R31 real run still required |
+| VRUN-002: Existing module audit | Prove the skill finds dark-code candidates and missing traceability | Representative pass; R31 real run still required |
+| VRUN-003: Low-risk Lite mode | Prove Lite mode stays lightweight while still using a minimal matrix artifact | Representative pass; R31 real run still required |
 
 The validation record must compare baseline Agent Skills behaviour against the
 traceability-enabled workflow from the same starting state. It must record
@@ -226,9 +252,10 @@ Canonical distilled guidance:
 | Path | Purpose |
 |---|---|
 | `docs/brainstorms/` | Requirements and product framing |
-| `docs/distilled/` | Public TraceWeaver source-of-truth guidance distilled from private source notes |
+| `docs/distilled/` | Public TraceWeaver source-of-truth guidance produced through controlled promotion records |
 | `docs/specs/` | Source specification for the MVP skill |
 | `docs/plans/` | Implementation and validation plans |
+| `skills/` | U4-promoted public TraceWeaver Core skill folders; not runtime/package accepted until U6 records exist |
 | `docs/upstream/` | Upstream issue, fork preflight, source policy, and distillation instructions |
 | `docs/validation/` | Fork validation protocol and results |
 | `.source-materials/` | Ignored local source cache |
@@ -246,15 +273,22 @@ Remote:
 
 ## Near-Term Next Steps
 
-1. Run a focused document review on the completed validation record and README
-   status.
-2. Decide whether U5.5 accepts the expanded Agent Skills runtime candidate
-   `b01dd9c762d3c80d0d279aeebcbd529302b73fa1`.
-3. Record runtime-sync evidence and lifecycle-discoverability validation for
-   any accepted U5.5 runtime bundle.
-4. Prepare the upstream-neutral package or TraceWeaver Core release notes,
-   depending on the chosen distribution path.
-5. Continue TraceWeaver CE baseline and lifecycle integration with the Core
+1. Record U5 as a delta-only public artifact inventory, or close it as no-op if
+   no exact public artifacts remain outside the U4-promoted skill-folder paths.
+2. Decide whether U5.5 accepts, reduces, splits, holds, blocks, rejects, or
+   supersedes the expanded Agent Skills runtime candidate
+   `987793dfd477bc205a0a49efe4ec1b1e31045903`, excluding persona-awareness
+   unless it is separately authorized.
+3. Record runtime-sync evidence, requirements-quality validation,
+   lifecycle-discoverability validation, and the U5.5 runtime-subset matrix for
+   any accepted, reduced, or split runtime subset.
+4. Complete R31 real-project validation.
+5. Define U6 runtime/package scope only from the exact U5.5
+   accepted/reduced/split runtime subset whose skills also have current non-held
+   U4 file-level records; U4-only skills are excluded by default.
+6. Prepare U7 release-gate decisions before any U8 upstream-neutral package,
+   PR, or release-note surface.
+7. Continue TraceWeaver CE baseline and lifecycle integration with the Core
    validation surface as the control point.
 
 ## Product Direction
