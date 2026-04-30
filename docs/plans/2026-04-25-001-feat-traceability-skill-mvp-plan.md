@@ -149,7 +149,9 @@ TraceWeaver Markdown = original agent-facing operating model.
 - Origin document: `docs/brainstorms/2026-04-25-systems-engineering-traceability-skill-requirements.md`
 - Source spec: `docs/specs/systems-engineering-traceability-agent-skill.md`
 - Existing plan updated in place: `docs/plans/2026-04-25-001-feat-traceability-skill-mvp-plan.md`
-- Source material policy: `docs/upstream/source-materials-policy.md`
+- Source material policy: public commits keep source-processing instructions out
+  of the repository; promotion and hygiene constraints are recorded in
+  `docs/validation/traceweaver-core-11-promotion-records.md`.
 - Local ignored source cache: `.source-materials/`
 - No `docs/solutions/` institutional learnings exist in this workspace.
 

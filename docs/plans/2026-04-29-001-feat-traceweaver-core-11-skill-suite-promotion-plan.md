@@ -771,7 +771,7 @@ public candidate, not only docs/distilled summaries.
   authorize runtime/package acceptance, upstream readiness, release readiness,
   or U7/U8 claims.
 
-- [ ] **U5: Delta-Only Public Artifact Inventory**
+- [x] **U5: Delta-Only Public Artifact Inventory**
 
 **Goal:** Identify whether any public artifacts remain outside the U4-promoted
 skill folders. U5 does not promote files already accepted under U4. If no exact
@@ -834,11 +834,25 @@ u5_target_inventory:
 - Every U5 public artifact has source-to-target mapping, public hygiene scan,
   and stale reset coverage.
 
+**Closure record, 2026-04-30:** U5 is `CLOSED_NO_DELTA` in
+`docs/validation/traceweaver-core-11-u5-u55-runtime-subset.md`. All 66 current
+files under `skills/` are U4-covered skill-folder files, and no exact U5 target
+artifact remains outside those paths. U5 creates no runtime, package, upstream,
+or release claim.
+
 - [ ] **U5.5: Complete Runtime-Candidate Evidence And Decision**
 
 **Goal:** Define and validate exact runtime subsets before U6 packaging scope is
 decided, while keeping runtime-candidate acceptance separate from public
 skill-folder acceptance and release readiness.
+
+**Current state, 2026-04-30:** the first proposed runtime subset
+`light-v0.1-authority-traceability` is recorded in
+`docs/validation/traceweaver-core-11-u5-u55-runtime-subset.md` with
+`requirements-reviewer` and `systems-engineering-traceability`. The subset is
+`held_pending_runtime_evidence`; U6 remains blocked until the missing focused
+review, runtime discovery/loading, routing, failure-behavior, and R31 evidence
+is recorded.
 
 **Files:**
 - Update:
