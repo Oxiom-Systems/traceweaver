@@ -23,6 +23,13 @@ adding TraceWeaver authority controls as an optional layer. Systems-engineering
 enforcement can be disabled or set to advisory, but the CE agent and workflow
 loop must continue to work.
 
+The core architecture is now Intent Contract centered. CE-compatible skills keep
+the workflow usable, but intent is preserved by a controlled authority baseline,
+not by copying skills or giving agents broad context. Every behavior-changing
+agent handoff must be able to cite stakeholder intent, an approved requirement
+or approved exception, verification method, validation question, and current
+baseline version.
+
 This plan is not U7 execution. It defines the packaging and migration work that
 must be planned before TraceWeaver claims it can replace the existing CE plugin.
 
@@ -57,6 +64,9 @@ TraceWeaver controls around it.
   TraceWeaver Core as a clean swap.
 - User requirement: CE agents and workflow must continue.
 - User requirement: systems-engineering controls may be disabled.
+- Core architecture requirement: TraceWeaver must provide an Intent Contract and
+  Intent Capsule pattern so CE agents do not silently convert their assumptions
+  into implementation authority.
 - U6a/U6b constraint: dynamic discovery, slash commands, release-ready runtime,
   and all-Core runtime claims remain held until later evidence.
 - Promotion constraint: any copied CE runtime content must have pinned source,
@@ -82,6 +92,9 @@ TraceWeaver controls around it.
   selected by `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`.
 - Do not make TraceWeaver enforcing mode the default for alpha. Unit 2 keeps
   advisory mode as the default and records enforcing mode as later evidence.
+- Do not treat CE workflow preservation as intent preservation. CE skills are
+  capabilities; the Intent Contract is the authority baseline that constrains
+  what agents may implement, review, or modify.
 
 ## Target Runtime Shape
 
@@ -115,12 +128,19 @@ plugins/traceweaver-core/
     ce-*.agent.md                 # only if target installer/runtime supports them
   references/
     traceweaver-runtime-policy.md
+    intent-contract-template.yml
+    authority-baseline-template.yml
+    task-capsule-template.yml
+    trace-record-template.yml
     ce-upstream-source-inventory.md
 ```
 
 The core compatibility rule is that existing CE skill names continue to exist.
 TraceWeaver wrapper skills may add gated workflows, but they must not make the
 base CE skill names unavailable.
+
+Consuming repositories create `.traceweaver/` from the packaged templates; the
+plugin package itself should not install project-specific authority records.
 
 ## CE Agent Continuity Rule
 
@@ -160,6 +180,47 @@ Mode behavior:
 The first clean swap should default to `advisory`. That gives users the CE
 workflow continuity they need while making TraceWeaver controls visible.
 
+## Intent Contract Architecture
+
+TraceWeaver agents are not the authority. The authority is the attached Intent
+Contract and approved requirement baseline.
+
+Minimum alpha artifact shape:
+
+```text
+.traceweaver/
+  intent-contract.yml
+  authority-baseline.yml
+  task-capsules/
+    TASK-001.yml
+  trace-records/
+    TASK-001-trace.yml
+  gaps/
+  changes/
+  exceptions/
+```
+
+Minimum contract contents:
+
+- stakeholder intent IDs and summaries;
+- validation questions that protect stakeholder intent;
+- approved requirement IDs and approved exception IDs;
+- verification methods and acceptance criteria;
+- accepted risks, gaps, and blocked assumptions;
+- out-of-scope and `must_not_change` boundaries;
+- current baseline ID and baseline hash/version.
+
+Every CE wrapper or TraceWeaver adapter that touches planning, implementation,
+or review should pass the relevant contract slice to the acting agent. If no
+approved requirement or approved exception authorizes a behavior-changing task,
+the agent can only create a gap, proposed requirement, change request, approved
+exception candidate, accepted-risk candidate, or clarification record.
+
+Alpha behavior remains advisory: TraceWeaver should warn, produce records, and
+hold claims rather than silently blocking all CE execution. The architecture
+still requires missing authority and dark behavior to be visible at every
+handoff.
+
 ## Key Decisions
 
 1. Build a self-contained TraceWeaver CE distribution.
@@ -182,13 +243,20 @@ workflow continuity they need while making TraceWeaver controls visible.
    adoption. The plugin can ship with advisory mode first, then allow enforcing
    mode after U9 runtime evidence.
 
-4. Separate install proof from runtime behavior proof.
+4. Make the Intent Contract the authority baseline.
+
+   Skill availability is not enough to preserve stakeholder intent. Every
+   behavior-changing task needs a bounded Intent Capsule with `authorized_by`,
+   `intent_served`, `verification_required`, `validation_question`,
+   `must_not_change`, and open assumptions. Agent assumptions are not authority.
+
+5. Separate install proof from runtime behavior proof.
 
    U6b-alpha proves static materialization. U9 must later prove that CE skills,
    TraceWeaver skills, wrappers, selected references, and any agents load and
    route correctly in the target runtime.
 
-5. Keep CE upstream upgrade path explicit.
+6. Keep CE upstream upgrade path explicit.
 
    Vendored or mirrored CE files need a source inventory with upstream version,
    hashes, local deltas, and a refresh procedure. Otherwise TraceWeaver will
@@ -253,6 +321,11 @@ Files:
 - Modify: `plugins/traceweaver-core/AGENTS.md`
 - Modify: `plugins/traceweaver-core/README.md`
 - Create: `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`
+- Create: `plugins/traceweaver-core/references/traceweaver-runtime-policy.md`
+- Create: `plugins/traceweaver-core/references/intent-contract-template.yml`
+- Create: `plugins/traceweaver-core/references/authority-baseline-template.yml`
+- Create: `plugins/traceweaver-core/references/task-capsule-template.yml`
+- Create: `plugins/traceweaver-core/references/trace-record-template.yml`
 - Modify: `docs/validation/traceweaver-core-11-u6b-plugin-runtime.md`
 - Modify: `docs/validation/traceweaver-core-11-promotion-records.md`
 
@@ -285,6 +358,11 @@ Plan:
   `requirements-reviewer`, `systems-engineering-traceability`,
   `using-agent-skills`, `tw-requirements-review`, `tw-authority-gate`, and
   `tw-traceability-check`.
+- Add lightweight Intent Contract templates to the plugin references. The
+  templates must show how a consuming repo creates `.traceweaver/` with
+  `intent-contract.yml`, `authority-baseline.yml`, task capsules, trace records,
+  gaps, changes, and exceptions. They are templates for alpha, not a database or
+  runtime enforcement engine.
 - Add `plugins/traceweaver-core/references/ce-upstream-source-inventory.md` as
   the package-local source map. It should point back to the U6C inventory record
   and list the selected CE source version, license, file hashes, local path
@@ -301,9 +379,14 @@ Plan:
 - Add or update plugin policy text so `traceweaver_mode` defaults to
   `advisory`. Advisory mode may warn and mark claims held in evidence records;
   it must not silently rewrite CE behavior or block CE skill execution.
+- Add plugin guidance that every acting agent prompt begins from this rule:
+  "You are not the authority. The authority is the attached Intent Contract and
+  approved requirement baseline." The guidance must require every meaningful
+  change to cite intent ID, requirement or exception ID, verification evidence,
+  validation question, and baseline version.
 - Update U6b evidence with a Unit 2 section that records the materialized CE
   file list, selected agents, manifest parse, install smoke, installed paths,
-  hashes, stale-reset rules, and held claims.
+  Intent Contract templates, hashes, stale-reset rules, and held claims.
 
 Verification:
 
@@ -327,6 +410,8 @@ Verification:
 - Installed files include `requirements-reviewer` and
   `systems-engineering-traceability` with their selected references and
   approved hygiene deltas.
+- Installed files include the Intent Contract, authority baseline, task capsule,
+  and trace-record templates.
 - Selected CE agents are present in the plugin package. If the install manifest
   or installed tree does not include agents, the evidence must explicitly keep
   agent-backed workflow behavior held.
@@ -366,6 +451,10 @@ Test scenarios:
   agent-backed CE claims held.
 - Claim audit: README, manifests, plugin instructions, U6b evidence, and
   promotion records say alpha/advisory/static install only.
+- Intent Contract audit: README, plugin instructions, and templates state that
+  agents are not authority, assumptions are not implementation authority, and
+  missing approved requirement or exception authority creates a gap/change/
+  clarification path rather than silent implementation authority.
 - Hygiene audit: plugin package and isolated install do not contain private
   paths, protected source names, non-public candidate locators, or unsupported
   compliance claims.
@@ -375,6 +464,7 @@ Unit 2 pass condition:
 - `U6b_unit_2_ce_compatible_static_materialization: PASSED`
 - `ce_upstream_source_pin: RECORDED`
 - `ce_transitive_support_closure: PASSED`
+- `intent_contract_templates_materialized: PASSED`
 - `U7_eligible_for_narrow_alpha_claims: true` only when the CE upstream source
   pin is recorded; otherwise `HELD_BY_LOCAL_CACHE_ONLY_LIMITATION`
 - `clean_ce_replacement: HELD_FOR_U9_RUNTIME_PROOF`
@@ -390,17 +480,23 @@ Files:
 - Create: `plugins/traceweaver-core/skills/tw-ce-work/SKILL.md`
 - Create: `plugins/traceweaver-core/skills/tw-ce-code-review/SKILL.md`
 - Create: `plugins/traceweaver-core/skills/tw-ce-doc-review/SKILL.md`
-- Create: `plugins/traceweaver-core/references/traceweaver-runtime-policy.md`
 
 Plan:
 
-- `tw-ce-plan` runs `tw-requirements-review` before CE planning treats
-  requirements as authority.
-- `tw-ce-work` runs `tw-authority-gate` before implementation starts when work
-  changes meaningful behavior.
+- `tw-ce-plan` runs `tw-requirements-review` and `tw-authority-gate` before CE
+  planning treats requirements as authority. Its output must name approved
+  requirements, weak requirements, missing intent, assumptions, approved
+  exceptions, and blocked areas from the Intent Contract.
+- `tw-ce-work` requires an Intent Capsule before implementation starts when work
+  changes meaningful behavior. If the capsule has no approved `authorized_by`
+  requirement or exception, the wrapper can create a gap, proposed requirement,
+  change, exception, risk, or clarification record, but must not present the task
+  as implementation-authorized.
 - `tw-ce-code-review` and `tw-ce-doc-review` run `tw-traceability-check` during
-  review, while preserving the base CE review workflow.
-- Add a policy reference that defines `off`, `advisory`, and `enforcing` modes.
+  review, while preserving the base CE review workflow. Untraced meaningful
+  behavior is dark behavior until removed, linked to authority, or approved as
+  an exception.
+- Wrappers must pass the relevant Intent Contract slice to the acting CE agent.
 
 Verification:
 
@@ -408,6 +504,9 @@ Verification:
 - Advisory mode never blocks CE execution; it records warnings and held claims.
 - Enforcing mode blocks only meaningful behavior/release claims with missing
   authority or traceability.
+- Every wrapper prompt includes the "agent is not the authority" rule and asks
+  for intent ID, requirement or exception ID, verification evidence, validation
+  question, and baseline version when behavior changes.
 
 ### Unit 4: Swap Smoke Install
 

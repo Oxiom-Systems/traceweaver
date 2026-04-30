@@ -27,6 +27,11 @@ Use Beads only if this repo has `.beads/`, this file is later updated to require
 The current productization path is U6 before U7. Do not start U7 release-claim
 records until U6b Unit 2 is patched, executed, and reviewed.
 
+TraceWeaver's current core architecture is Intent Contract centered. Skills are
+capabilities, not authority. Every behavior-changing agent handoff must be able
+to cite stakeholder intent, an approved requirement or approved exception,
+verification method, validation question, and current baseline version.
+
 Recommended next CE command sequence:
 
 1. Use `/ce-doc-review` against
@@ -34,7 +39,8 @@ Recommended next CE command sequence:
    if the Unit 2 plan changes again. The current Unit 2 plan requires a CE
    upstream source pin before vendoring selected CE files and requires a
    transitive CE reference-closure audit for selected `references/`, `scripts/`,
-   and `assets/` paths.
+   and `assets/` paths. It also requires Intent Contract templates and advisory
+   authority-gate guidance.
 2. Use `/ce:work` on Unit 2 after the plan patch is committed. Unit 2
    materializes the selected CE-compatible runtime surface inside
    `plugins/traceweaver-core` using
@@ -46,5 +52,8 @@ Recommended next CE command sequence:
    Core 11 runtime remain held until later proof.
 
 Keep `traceweaver_mode` defaulting to `advisory` for alpha. Do not silently
-rewrite CE behavior, do not invent CE workflow files, and do not copy CE files
-outside the recorded inventory without a new validation delta.
+rewrite CE behavior, do not invent CE workflow files, do not copy CE files
+outside the recorded inventory without a new validation delta, and do not let
+agent assumptions become implementation authority. If no approved requirement or
+approved exception exists, create a gap, proposed requirement, change,
+exception, accepted-risk candidate, or clarification record.

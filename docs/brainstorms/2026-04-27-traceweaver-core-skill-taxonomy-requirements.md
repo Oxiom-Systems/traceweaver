@@ -15,6 +15,24 @@ TraceWeaver Core should be the portable, systems-engineering-aligned skill set.
 TraceWeaver CE should be only the adapter that wires Core capabilities into
 Compound Engineering workflows, prompts, reviewers, and delegation payloads.
 
+The Core architecture must preserve stakeholder intent through a controlled
+authority baseline. Skills are capabilities; they do not preserve intent by
+themselves. TraceWeaver must therefore give every agent a small mandatory
+Intent Contract that defines the approved intent, requirement or exception,
+verification method, validation question, out-of-scope boundaries, and current
+baseline version for the work it is allowed to perform.
+
+Core invariant:
+
+```text
+No agent may implement, review, or modify behavior unless it can point to:
+1. stakeholder intent,
+2. approved requirement or approved exception,
+3. verification method,
+4. validation intent,
+5. current baseline version.
+```
+
 The taxonomy must answer five questions before more implementation work starts:
 
 - Which skills are Core now?
@@ -28,7 +46,7 @@ The taxonomy must answer five questions before more implementation work starts:
 
 | Category | Skills | Decision |
 |---|---|---|
-| First batch: authority foundation | `needs-and-requirements-capture`, `requirements-reviewer`, `systems-engineering-traceability`, `risk-gap-change-control` | Required before TraceWeaver can behave correctly because it defines what may become authority. |
+| First batch: authority foundation | `needs-and-requirements-capture`, `requirements-reviewer`, `systems-engineering-traceability`, `risk-gap-change-control`, Intent Contract runtime artifacts | Required before TraceWeaver can behave correctly because it defines what may become authority and how agents receive a bounded authority slice. |
 | Second batch: lifecycle and architecture control | `traceweaver-lifecycle-orchestrator`, `architecture-and-interface-reviewer`, `design-decision-reviewer` | Defines how work moves through the lifecycle, how architecture/interface structure is controlled, and how design choices are justified. |
 | Third batch: evidence, review, and brownfield control | `verification-planner`, `validation-planner`, `technical-review-and-audit-gate`, `baseline-configuration-control` | Defines proof, V&V evidence, lifecycle transition readiness, and adoption in existing projects. |
 | CE adapter only | `ce-traceability`, `ce-traceability-reviewer`, future `ce-requirements-reviewer`, CE hooks, CE delegation prompts | Adapter wrappers only. They must not define Core semantics. |
@@ -118,10 +136,12 @@ directly, what is context, and what is deferred.
 ```mermaid
 flowchart LR
     I["idea / intent"]
+    IC["intent contract"]
     N["candidate needs"]
     R["draft requirements"]
     QR["requirements-reviewer"]
     A["approved requirements or approved exceptions"]
+    TC["task intent capsule"]
     AR["architecture / interfaces"]
     D["design decisions"]
     T["traceability matrix"]
@@ -132,12 +152,16 @@ flowchart LR
     CC["change control"]
 
     I --> N
+    I --> IC
     N --> R
     R --> QR
     QR --> A
+    A --> IC
+    IC --> TC
     A --> AR
     AR --> D
     A --> T
+    TC --> IM
     AR --> T
     D --> T
     T --> IM
@@ -191,6 +215,19 @@ by the Core operating model and explicit handoff guidance.
   or impact/likelihood, mitigation/control, mitigation verification,
   residual-risk acceptance, allowed use, review condition, and lifecycle
   tracking.
+- R7a. TraceWeaver Core batch 1 must define the Intent Contract as a runtime
+  authority artifact. The contract must include stakeholder intent IDs, approved
+  requirement IDs, approved exception IDs, accepted risks where applicable,
+  verification methods, validation questions, blocked assumptions,
+  out-of-scope items, and baseline hash/version.
+- R7b. TraceWeaver Core batch 1 must define Intent Capsules for tasks. A capsule
+  must identify `authorized_by`, `intent_served`, `verification_required`,
+  `validation_question`, `must_not_change`, and open assumptions before an agent
+  can treat work as implementation-authorized.
+- R7c. TraceWeaver must treat agent assumptions as non-authority. An assumption
+  can become only an open question, proposed requirement, approved exception,
+  accepted risk, or rejected assumption until approved through the normal
+  authority path.
 
 **Core Batch 2: Lifecycle Control**
 
@@ -233,6 +270,20 @@ by the Core operating model and explicit handoff guidance.
 - R18. CE hooks for `ce-brainstorm`, `ce-plan`, `ce-work`, `ce-doc-review`,
   `ce-code-review`, `ce-compound`, and delegation prompts are adapter scope, not
   Core scope.
+- R19. TraceWeaver CE wrappers must pass the relevant Intent Contract slice or
+  Intent Capsule into CE planning, work, and review flows. They must not rely on
+  broad context or agent interpretation as the authority baseline.
+- R20. Before `ce-plan`, the adapter must run or route through requirements
+  review and authority-gate checks that identify approved requirements, weak
+  requirements, missing intent, assumptions, approved exceptions, and blocked
+  areas.
+- R21. Before `ce-work`, every behavior-changing task must have an Intent
+  Capsule. If no approved requirement or approved exception authorizes the task,
+  the agent may create a gap, proposed requirement, change, exception, or
+  clarification record, but must not implement.
+- R22. During `ce-code-review` or `ce-doc-review`, TraceWeaver CE must run or
+  route through traceability checks that classify untraced meaningful behavior
+  as dark behavior requiring removal, authority linkage, or approved exception.
 
 ## Success Criteria
 
@@ -251,6 +302,12 @@ by the Core operating model and explicit handoff guidance.
   authority. Public/runtime authority requires scrubbed public-candidate
   promotion records, review decisions, schemas, examples, and operating models.
 - CE-specific hooks and wrappers cannot redefine Core semantics.
+- TraceWeaver's authority model is explicit: every agent-facing workflow has a
+  path from stakeholder intent to approved requirement or exception,
+  verification method, validation question, and baseline version.
+- The first CE-compatible alpha can remain advisory, but it still exposes
+  missing intent, blocked assumptions, and dark behavior as records or held
+  claims instead of silently allowing agent interpretation to become authority.
 
 ## Scope Boundaries
 
@@ -258,6 +315,9 @@ by the Core operating model and explicit handoff guidance.
 - This brainstorm does not validate the scrubbed public candidate.
 - This brainstorm does not promote all eleven skills into public/runtime scope
   in one unreviewed unit.
+- This brainstorm does not require a database-backed requirements tool. The
+  Intent Contract alpha should remain file-based unless later evidence proves a
+  heavier store is needed.
 - This brainstorm does not add CE hooks or reviewer wrappers to Core.
 - This brainstorm does not claim compliance with protected source material.
   TraceWeaver guidance remains original project-specific guidance aligned to
