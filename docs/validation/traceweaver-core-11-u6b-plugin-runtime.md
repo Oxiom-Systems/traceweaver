@@ -17,6 +17,11 @@ Record ID: `TWCORE-U6B-RUNTIME-2026-04-30-001`
 
 Decision state: `passed_alpha_install_smoke_static_loading_only`
 
+U6b alpha gate:
+`U6b_alpha_install_static_materialization_for_exact_scope: PASSED`
+
+U7 eligible: `true`
+
 Runtime authority commit:
 `696548694dd40ce298d77e603db069934b58f645`
 
@@ -33,6 +38,7 @@ Allowed use:
 Held claims:
 
 - dynamic no-forced runtime discovery;
+- slash-command availability;
 - real runtime invocation transcript;
 - package-ready or release-ready status;
 - upstream-ready status;
@@ -123,11 +129,22 @@ to `held`.
 
 ## Install Smoke
 
-Command shape:
+Documented command:
+
+```sh
+bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
+```
+
+Smoke-test command shape:
 
 ```sh
 bun run <compound-plugin-cli> install ./plugins/traceweaver-core --to codex --codex-home <TEMP_CODEX_HOME> --include-skills
 ```
+
+`--include-skills` is required for the standalone Compound Engineering
+installer path used by this alpha smoke test. Without it, the installer writes
+plugin metadata and `AGENTS.md` but does not materialize the selected skill
+directories under the isolated Codex skills location.
 
 Observed result:
 
@@ -160,9 +177,45 @@ Installed selected skill files were observed under:
 <TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/
 ```
 
+Selected installed paths observed:
+
+```text
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/agents/openai.yaml
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/requirement-language-rules.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/requirement-types-and-attributes.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/requirements-quality-checklist.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/requirements-quality-operating-model.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/requirements-review-finding-schema.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/source-basis.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/verification-validation-guide.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/tests/requirements-quality-examples.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/systems-engineering-traceability/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/systems-engineering-traceability/references/requirements-and-vv-guide.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/systems-engineering-traceability/references/risk-gap-and-change-control-guide.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/systems-engineering-traceability/references/systems-engineering-traceability-operating-model.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/systems-engineering-traceability/references/traceability-matrix-template.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/tw-authority-gate/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/tw-requirements-review/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/tw-traceability-check/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/using-agent-skills/SKILL.md
+```
+
 The install smoke used `--include-skills` so the standalone converter copied
 skill directories into the isolated Codex home. Native plugin loading may use a
 different runtime path, so this record proves alpha install/materialization only.
+
+Alpha install evidence checklist:
+
+| Check | Result |
+| --- | --- |
+| Plugin manifest parses | Pass: `.codex-plugin/plugin.json`, `.claude-plugin/plugin.json`, and `.cursor-plugin/plugin.json` parse as JSON. |
+| Documented install command materializes selected skills | Pass: README command includes `--include-skills`; the isolated smoke used the same install arguments plus `--codex-home <TEMP_CODEX_HOME>`. |
+| Installed plugin contains selected skills | Pass: `requirements-reviewer`, `systems-engineering-traceability`, `using-agent-skills`, and `tw-*` adapter skill directories were observed under `<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/`. |
+| Installed plugin contains selected references | Pass: every selected `requirements-reviewer` reference, every selected `systems-engineering-traceability` skill-local reference, and `requirements-reviewer/agents/openai.yaml` were observed after install. |
+| Installed manifest records no prompts | Pass: installed manifest records `"prompts": []`. |
+| Selected installed file hashes match U5.5/U6a static authority or approved package-only hygiene delta | Pass: selected installed hashes match the U6b selected-runtime-file table, including approved public-hygiene package hashes for redacted package copies. |
+| Private/source-name leakage scan | Pass: no private paths, non-public candidate locators, protected source names, or unsupported standards-conformance strings were observed in plugin files or the isolated install. |
 
 ## Routing and Failure Boundaries
 
@@ -193,10 +246,35 @@ private repo names, non-public candidate locators, raw extraction paths, and
 unsupported release claims. The plugin alpha keeps standards-source hygiene and
 release-claim approval held for U7/U8/U9.
 
+## U7 Handoff
+
+U7 may begin release-claim record creation for the alpha install/static
+materialization claim only:
+
+```text
+claim_id: TW-CLAIM-PLUGIN-ALPHA-INSTALLS-SKILLS
+gate_state: approved
+allowed_use: installable alpha with selected skills
+blocked_claims:
+  - slash commands available
+  - dynamic no-forced discovery proven
+  - full 11-skill runtime suite
+  - external-standards conformance
+close_condition: U6b-alpha evidence accepted
+reopen_condition: plugin manifest, install command, selected skills, selected references, or package layout changes
+```
+
+Dynamic runtime discovery: `HELD_FOR_U6B_DYNAMIC_OR_U9`
+
+Slash-command claims: `HELD`
+
+Release runtime claims: `HELD`
+
 ## Stale Reset Rule
 
 This U6b record resets to `held` if any selected runtime file hash changes, the
-runtime authority commit changes, the plugin manifest changes, adapter routing
-changes, install smoke cannot be reproduced, dynamic discovery is claimed from
-static evidence, non-selected Core skills are added without a new scope decision,
-or release/upstream/package-ready claims are made before U7/U8/U9.
+runtime authority commit changes, the plugin manifest changes, documented install
+command changes, adapter routing changes, install smoke cannot be reproduced,
+dynamic discovery is claimed from static evidence, non-selected Core skills are
+added without a new scope decision, or release/upstream/package-ready claims are
+made before U7/U8/U9.

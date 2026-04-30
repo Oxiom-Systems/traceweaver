@@ -58,8 +58,13 @@ installed from the repository checkout during U6b proof.
 Example target command:
 
 ```bash
-bun run src/index.ts install ./plugins/traceweaver-core --to codex
+bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
+
+`--include-skills` is required for the standalone Compound Engineering
+installer path used by the U6b alpha smoke test. Without it, the installer
+records plugin metadata but does not copy the selected skill directories into
+the Codex skills location.
 
 U6b alpha records the install command, runtime target, selected skills
 materialized, selected references materialized, static adapter routing, and
