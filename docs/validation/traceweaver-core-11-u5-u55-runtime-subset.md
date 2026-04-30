@@ -612,7 +612,7 @@ u5_5_terminal_state: REDUCED_FOR_U6A_STATIC_SCOPE_ONLY
 subset_id: light-v0.1-authority-traceability
 candidate_commit: 696548694dd40ce298d77e603db069934b58f645
 u6a_eligible: true_for_static_scope_decision_only
-u6b_eligible: no, package manifest/install/runtime evidence missing
+u6b_eligible: true_for_alpha_install_smoke_static_loading_only
 u7_eligible: no, release claim records and R31 status unresolved
 u8_eligible: no, upstream/package release claims remain held
 u9_eligible: no, post-release/adoption evidence cannot start before U7/U8
@@ -620,14 +620,18 @@ release_gate_effect: held_until_U7_and_R31
 accepted_limitations:
   - U55-LIMIT-STATIC-DISCOVERY-001
 remaining_holds:
-  - dynamic no-forced runtime discovery transcript is deferred to U6b/U9
-  - package/install/runtime execution evidence is deferred to U6b
+  - dynamic no-forced runtime discovery transcript is deferred to U6b-dynamic/U9
+  - real adapter invocation and reference-open transcript remain unproven
   - release/source-name policy and R31 remain U7 blockers
 static_evidence_recorded:
   - TWCORE-U55-FILE-DELTA-2026-04-30-001
   - TWCORE-U55-REQQUAL-2026-04-30-001
   - TWCORE-U55-LIFECYCLE-DISCOVERY-2026-04-30-001
   - U55-LIMIT-STATIC-DISCOVERY-001
+package_materialization_recorded:
+  - TWCORE-U6B-RUNTIME-2026-04-30-001
+approved_package_only_hygiene_delta:
+  - TWCORE-U6B-HYGIENE-DELTA-2026-04-30-001
 ```
 
 Allowed claims:
@@ -654,8 +658,30 @@ Held claims:
 
 Stale reset rule: this terminal state resets to a U6a hold state and resets any
 static evidence row to `held` if candidate branch head or selected file hashes
-change, a selected runtime file lacks a recorded delta/impact row or current
-non-held U4 skill record where applicable, U6a includes non-selected Core skills
-by default, U6a treats `using-agent-skills` as a full router manifest, U6b uses
-files outside the selected/reduced scope, source-name hygiene is accepted
-without U7, or R31 is presented as complete without real-scenario evidence.
+change, except for package-only public-hygiene redactions explicitly recorded by
+`TWCORE-U6B-HYGIENE-DELTA-2026-04-30-001`. The same reset applies if a selected
+runtime file lacks a recorded delta/impact row or current non-held U4 skill
+record where applicable, U6a includes non-selected Core skills by default, U6a
+treats `using-agent-skills` as a full router manifest, U6b uses files outside
+the selected/reduced scope and approved package-only hygiene delta, source-name
+hygiene is accepted for release without U7, or R31 is presented as complete
+without real-scenario evidence.
+
+### U6b Package-Only Hygiene Delta Impact
+
+Impact ID: `TWCORE-U55-U6B-HYGIENE-IMPACT-2026-04-30-001`
+
+U5.5 keeps Agent Skills commit
+`696548694dd40ce298d77e603db069934b58f645` as the runtime authority for the
+selected subset. U6b may package a narrower public-safe copy only for the files
+covered by `TWCORE-U6B-HYGIENE-DELTA-2026-04-30-001`.
+
+| Packaged file | U5.5 authority hash | U6b package hash | Impact |
+| --- | --- | --- | --- |
+| `plugins/traceweaver-core/skills/requirements-reviewer/references/source-basis.md` | `f2cc81c37d8971636ec703aec3b54aa60ebbcc71e0e4f9cfc28462a1a830e1ae` | `29fde1872ed56ee52c408801205f8413cfd9484465481ca0f5825e05cc2ff90e` | Protected source names and internal provenance details redacted; no change to requirements-review behavior or allowed U6b claim. |
+| `plugins/traceweaver-core/skills/systems-engineering-traceability/references/systems-engineering-traceability-operating-model.md` | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | `4306c403e175902673c2fe223379462fc6cef758d88ecad8b1709a14de848813` | Protected source names and internal provenance details redacted; no change to traceability behavior or allowed U6b claim. |
+
+Decision: `approved_package_only_public_hygiene_delta_for_U6b_alpha`.
+
+This impact record does not approve dynamic discovery, package-ready,
+release-ready, upstream-ready, all-Core runtime, or R31-complete claims.

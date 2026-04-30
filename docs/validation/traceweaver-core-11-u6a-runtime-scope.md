@@ -111,13 +111,16 @@ U6b may start only for the exact selected scope above. U6b must record:
 - routing and failure behavior under runtime execution;
 - dynamic no-forced discovery transcript or an explicit U6b/U9 limitation;
 - hygiene scan for generated package/install/runtime artifacts;
-- stale-reset rule tied to the same candidate commit and selected file hashes.
+- stale-reset rule tied to the same candidate commit and selected file hashes,
+  with explicit allowance for approved package-only public-hygiene deltas.
 
 ## Stale Reset Rule
 
 This U6a decision resets to `held` if the candidate commit changes, any selected
-file hash changes, U5.5 terminal state changes away from
-`REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`, U6b uses files outside this selected scope,
-non-selected Core skills are included by default, static discovery evidence is
-used as dynamic runtime proof, source-name hygiene is accepted without U7, or
-R31 is presented as complete without real-scenario evidence.
+file hash changes outside the approved package-only public-hygiene delta
+`TWCORE-U6B-HYGIENE-DELTA-2026-04-30-001`, U5.5 terminal state changes away
+from `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`, U6b uses files outside this selected
+scope, non-selected Core skills are included by default, static discovery
+evidence is used as dynamic runtime proof, source-name hygiene is accepted for
+release without U7, or R31 is presented as complete without real-scenario
+evidence.

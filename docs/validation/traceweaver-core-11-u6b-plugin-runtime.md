@@ -112,6 +112,10 @@ only narrows public source-basis disclosure in the package.
 
 Decision state: `approved_for_alpha_public_hygiene`
 
+U5.5/U6a impact record:
+`TWCORE-U55-U6B-HYGIENE-IMPACT-2026-04-30-001` in
+`docs/validation/traceweaver-core-11-u5-u55-runtime-subset.md`.
+
 Stale reset: any reintroduction of protected source names, internal provenance,
 page references, copied source text, or compliance claims resets this U6b record
 to `held`.
