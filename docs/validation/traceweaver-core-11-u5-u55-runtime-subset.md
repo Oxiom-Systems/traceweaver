@@ -10,7 +10,7 @@ U6-unblock review base: `dea8fa0c9e6e9e0bce413653d1cc77e9406c92a0`
 
 Doc-review update: 2026-04-30 `ce-doc-review` found the original matrix was a
 blocker inventory, not a U6 authorization artifact. The terminal-state record
-below now binds selected candidate proof, approved U5.5 file-level delta/impact
+below now binds selected candidate proof, recorded U5.5 file-level delta/impact
 records, and required U5.5 validation evidence to the same final candidate
 commit. Current U5.5 state: `HELD_FOR_U6A`.
 
@@ -300,6 +300,11 @@ The previous candidate commit
 record because it was not reproducible from the current public fork ref during
 the U6-unblock review.
 
+Authority correction: U5.5 uses only the Agent Skills candidate commit above as
+runtime-authority input. The private promoted runtime snapshot is
+non-authoritative for U5.5/U6a unless it is refreshed from this exact commit and
+the whole-file hashes match this record.
+
 ### Target Runtime And Discovery Mechanism
 
 Evidence ID: `TWCORE-U55-DISCOVERY-2026-04-30-001`
@@ -323,65 +328,121 @@ and does not by itself unblock U6a. U6b must still record package-manifest,
 install, and runtime execution evidence before any package-ready or
 runtime-ready claim.
 
-### Runtime Bundle Evidence
+### Runtime Authority Manifest
 
 Evidence ID: `TWCORE-U55-LOAD-2026-04-30-001`
 
-| Runtime file | SHA-256 at `696548694dd40ce298d77e603db069934b58f645` | U5.5 classification |
-| --- | --- | --- |
-| `skills/using-agent-skills/SKILL.md` | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Approved for static U5.5 evidence only |
-| `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Approved U5.5 delta against U4 public skill file |
-| `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | Approved U5.5 runtime-support delta |
-| `skills/requirements-reviewer/references/requirements-quality-checklist.md` | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | Approved U5.5 runtime-support delta |
-| `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Approved U5.5 runtime-support delta |
-| `skills/requirements-reviewer/references/requirement-types-and-attributes.md` | `bd4364d6118d5cac81d5ec0fac80c2af5ddb98e3cb8fb2a7a8112968bf265976` | Approved U5.5 conditional runtime-support delta |
-| `skills/requirements-reviewer/references/requirement-language-rules.md` | `ea8ef42e7623e6d01492d6247f3678ca12997b709829759d23d19f7ca8ec3492` | Approved U5.5 conditional runtime-support delta |
-| `skills/requirements-reviewer/references/verification-validation-guide.md` | `01cb0a2736997c2ad4f169756e776aac8822986df78883d2edf54af9f3374b0e` | Approved U5.5 conditional runtime-support delta |
-| `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Approved U5.5 delta against U4 public skill file |
-| `references/systems-engineering-traceability-operating-model.md` | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | Approved U5.5 runtime-support delta |
-| `references/traceability-matrix-template.md` | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | Approved U5.5 runtime-support delta |
-| `references/requirements-and-vv-guide.md` | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | Approved U5.5 runtime-support delta |
-| `references/risk-gap-and-change-control-guide.md` | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | Approved U5.5 runtime-support delta |
+Final candidate commit:
+`696548694dd40ce298d77e603db069934b58f645`.
+
+For each manifest row below, `final_candidate_commit` is
+`696548694dd40ce298d77e603db069934b58f645`.
+
+The manifest below accounts for every file in the selected Agent Skills runtime
+scope: `skills/using-agent-skills`, `skills/requirements-reviewer`,
+`skills/systems-engineering-traceability`, and the four top-level references
+named by `systems-engineering-traceability/SKILL.md`. These rows record
+scrubbed candidate inputs only; they do not approve runtime, package, release,
+or upstream use.
+
+| Skill/surface | File path | Final candidate hash | U4 status | U4 record ID | Delta record ID | Reviewer | Decision state | Public hygiene status |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| bundle-router | `skills/using-agent-skills/SKILL.md` | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | u4_delta_recorded | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SKILL-001` | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/agents/openai.yaml` | `ebdec17ec4de718225b6e4d417123be66c6e9b4a9225278e4bff79ba1581b829` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_manifest_only_not_runtime_claim` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirement-language-rules.md` | `ea8ef42e7623e6d01492d6247f3678ca12997b709829759d23d19f7ca8ec3492` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirement-types-and-attributes.md` | `bd4364d6118d5cac81d5ec0fac80c2af5ddb98e3cb8fb2a7a8112968bf265976` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirements-quality-checklist.md` | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/source-basis.md` | `f2cc81c37d8971636ec703aec3b54aa60ebbcc71e0e4f9cfc28462a1a830e1ae` | u4_delta_recorded | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SOURCE-BASIS-001` | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/references/verification-validation-guide.md` | `01cb0a2736997c2ad4f169756e776aac8822986df78883d2edf54af9f3374b0e` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| requirements-reviewer | `skills/requirements-reviewer/tests/requirements-quality-examples.md` | `acaa1ae1d5d2343776623c80299bf52c92d9447b5d730eb4d85663d7defc15df` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_example_input_not_runtime_claim` | `static_pass_release_held` |
+| systems-engineering-traceability | `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | u4_delta_recorded | `TWCORE-PROMO-U4-SYSTEMS-TRACEABILITY-SKILL-001` | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| top-level-reference | `references/requirements-and-vv-guide.md` | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| top-level-reference | `references/risk-gap-and-change-control-guide.md` | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| top-level-reference | `references/systems-engineering-traceability-operating-model.md` | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+| top-level-reference | `references/traceability-matrix-template.md` | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | runtime_only | n/a | `TWCORE-U55-FILE-DELTA-2026-04-30-001` | Codex | `recorded_static_candidate_not_U6a` | `static_pass_release_held` |
+
+Row-level `static_pass_release_held` means the static path/secret/private
+provenance scan passed, while source-name policy, package use, release use, and
+dynamic runtime proof remain held.
+
+Stale reset rule for every row: candidate commit drift, file hash drift,
+reference removal, U4 hash drift for U4-backed files, failed hygiene review, or
+use of the row as U6a/U6b/U7/U8 runtime/package/release proof resets that row to
+`held`.
 
 ### U4 Hash Reconciliation Status
 
 Evidence ID: `TWCORE-U55-U4-RECONCILIATION-2026-04-30-001`
 
-The selected U5.5 candidate intentionally differs from two U4-approved public
-skill-folder `SKILL.md` files. The differences are approved below as U5.5
-runtime-candidate deltas for static U5.5 evidence only; U4 remains the public
-skill-folder promotion authority, and these deltas do not rewrite U4 records.
+The selected U5.5 candidate intentionally differs from U4-approved public
+skill-folder files where the Agent Skills runtime layout changes the selected
+skill files. The differences are recorded below as U5.5 candidate deltas for
+static review only; U4 remains the public skill-folder promotion authority, and
+these deltas do not rewrite U4 records or approve U6a.
 
 | Runtime candidate file | U5.5 candidate hash | U4-approved target hash | U4 promotion record | Decision state |
 | --- | --- | --- | --- | --- |
-| `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | `a0cff8a713abc332f2cc8860749b017c24f04356e4c08e8804b65527dabfcf4f` | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SKILL-001` | `approved_delta_for_static_U5_5_input` |
-| `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | `e1e45ce3e38d0b224cc7183e14009bc288cda2e86f572436ca3e7bea6c187e74` | `TWCORE-PROMO-U4-SYSTEMS-TRACEABILITY-SKILL-001` | `approved_delta_for_static_U5_5_input` |
+| `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | `a0cff8a713abc332f2cc8860749b017c24f04356e4c08e8804b65527dabfcf4f` | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SKILL-001` | `recorded_delta_for_static_U5_5_input_only` |
+| `skills/requirements-reviewer/references/source-basis.md` | `f2cc81c37d8971636ec703aec3b54aa60ebbcc71e0e4f9cfc28462a1a830e1ae` | `e6a1dd96de5a20530598b8e4a717ed6d844279afe89228bf76fc5121f8c53e5a` | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SOURCE-BASIS-001` | `recorded_delta_for_static_U5_5_input_only` |
+| `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | `e1e45ce3e38d0b224cc7183e14009bc288cda2e86f572436ca3e7bea6c187e74` | `TWCORE-PROMO-U4-SYSTEMS-TRACEABILITY-SKILL-001` | `recorded_delta_for_static_U5_5_input_only` |
 
 Additional selected U5.5 candidate files are top-level Agent Skills runtime
 references or requirement-reviewer runtime support files whose exact paths are
-not U4-approved TraceWeaver public skill-folder target paths. They are approved
+not U4-approved TraceWeaver public skill-folder target paths. They are recorded
 below as U5.5 runtime-support deltas for static U5.5 evidence only. Dynamic
 runtime discovery remains held before U6a.
 
-### Approved U5.5 File-Level Delta / Impact Records
+### U5.5 File-Level Delta / Impact Records
 
 Evidence ID: `TWCORE-U55-FILE-DELTA-2026-04-30-001`
 
 | File | U4 hash or source | U5.5 hash | Reason for change | Impact on U4 acceptance | Impact on U5.5 validation | Decision |
 | --- | --- | --- | --- | --- | --- | --- |
-| `skills/using-agent-skills/SKILL.md` | Agent Skills meta-skill, not a U4 TraceWeaver public skill file | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Provides target-runtime discovery/routing context. | No U4 effect. | Approved for discovery/routing evidence only. | approved |
-| `skills/requirements-reviewer/SKILL.md` | `a0cff8a713abc332f2cc8860749b017c24f04356e4c08e8804b65527dabfcf4f` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Expands runtime reference loading, quality gate, V&V mapping, and traceability handoff for Agent Skills layout. | U4 remains approved for public skill-folder artifact; runtime delta does not mutate U4. | Approved for requirements-quality validation and static U5.5 input only. | approved |
-| `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | U5.5 runtime-support reference, no matching U4 target path | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | Provides requirements-quality operating model for selected runtime. | No U4 effect. | Approved for requirements-quality evidence. | approved |
-| `skills/requirements-reviewer/references/requirements-quality-checklist.md` | U5.5 runtime-support reference, no matching U4 target path | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | Provides checklist used by requirements-quality validation. | No U4 effect. | Approved for requirements-quality evidence. | approved |
-| `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | U5.5 runtime-support reference, no matching U4 target path | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Provides runtime finding schema for requirements-quality output. | No U4 effect. | Approved for schema-loading evidence. | approved |
-| `skills/requirements-reviewer/references/requirement-types-and-attributes.md` | U5.5 conditional runtime-support reference, no matching U4 target path | `bd4364d6118d5cac81d5ec0fac80c2af5ddb98e3cb8fb2a7a8112968bf265976` | Referenced by `requirements-reviewer/SKILL.md` for classifying requirements and metadata. | No U4 effect. | Included so U6a does not omit a referenced runtime file; dynamic use remains held. | approved |
-| `skills/requirements-reviewer/references/requirement-language-rules.md` | U5.5 conditional runtime-support reference, no matching U4 target path | `ea8ef42e7623e6d01492d6247f3678ca12997b709829759d23d19f7ca8ec3492` | Referenced by `requirements-reviewer/SKILL.md` for ambiguity, weak language, compound requirements, and implementation leakage findings. | No U4 effect. | Included so U6a does not omit a referenced runtime file; dynamic use remains held. | approved |
-| `skills/requirements-reviewer/references/verification-validation-guide.md` | U5.5 conditional runtime-support reference, no matching U4 target path | `01cb0a2736997c2ad4f169756e776aac8822986df78883d2edf54af9f3374b0e` | Referenced by `requirements-reviewer/SKILL.md` for verification methods, ATPs, validation paths, and evidence claims. | No U4 effect. | Included so U6a does not omit a referenced runtime file; dynamic use remains held. | approved |
-| `skills/systems-engineering-traceability/SKILL.md` | `e1e45ce3e38d0b224cc7183e14009bc288cda2e86f572436ca3e7bea6c187e74` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Expands lifecycle traceability, no-orphan gate, mode selection, and selected top-level reference loading for Agent Skills layout. | U4 remains approved for public skill-folder artifact; runtime delta does not mutate U4. | Approved for lifecycle-discoverability and traceability evidence. | approved |
-| `references/systems-engineering-traceability-operating-model.md` | U5.5 top-level runtime reference, no matching U4 target path | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | Provides runtime operating model for selected traceability skill. | No U4 effect. | Approved for reference-loading evidence. | approved |
-| `references/traceability-matrix-template.md` | U5.5 top-level runtime reference, no matching U4 target path | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | Provides matrix/example structure for selected traceability skill. | No U4 effect. | Approved for example/loading evidence. | approved |
-| `references/requirements-and-vv-guide.md` | U5.5 top-level runtime reference, no matching U4 target path | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | Provides requirements/V&V guidance used by selected traceability skill. | No U4 effect. | Approved for reference-loading evidence. | approved |
-| `references/risk-gap-and-change-control-guide.md` | U5.5 top-level runtime reference, no matching U4 target path | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | Provides risk, gap, and change-control guidance used by selected traceability skill. | No U4 effect. | Approved for reference-loading evidence; release use remains held until U7. | approved |
+| `skills/using-agent-skills/SKILL.md` | Agent Skills meta-skill, not a U4 TraceWeaver public skill file | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Provides target-runtime discovery/routing context. | No U4 effect. | Recorded for discovery/routing evidence only. | recorded_candidate |
+| `skills/requirements-reviewer/SKILL.md` | `a0cff8a713abc332f2cc8860749b017c24f04356e4c08e8804b65527dabfcf4f` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Expands runtime reference loading, quality gate, V&V mapping, and traceability handoff for Agent Skills layout. | U4 remains approved for public skill-folder artifact; runtime delta does not mutate U4. | Recorded for requirements-quality validation and static U5.5 input only. | recorded_candidate |
+| `skills/requirements-reviewer/agents/openai.yaml` | U5.5 runtime manifest file, no matching U4 target path | `ebdec17ec4de718225b6e4d417123be66c6e9b4a9225278e4bff79ba1581b829` | Present in the exact Agent Skills candidate under the selected skill folder. | No U4 effect. | Manifest accounted for; no runtime-agent claim is approved. | recorded_candidate |
+| `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | U5.5 runtime-support reference, no matching U4 target path | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | Provides requirements-quality operating model for selected runtime. | No U4 effect. | Recorded for requirements-quality evidence. | recorded_candidate |
+| `skills/requirements-reviewer/references/requirements-quality-checklist.md` | U5.5 runtime-support reference, no matching U4 target path | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | Provides checklist used by requirements-quality validation. | No U4 effect. | Recorded for requirements-quality evidence. | recorded_candidate |
+| `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | U5.5 runtime-support reference, no matching U4 target path | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Provides runtime finding schema for requirements-quality output. | No U4 effect. | Recorded for schema-loading evidence. | recorded_candidate |
+| `skills/requirements-reviewer/references/requirement-types-and-attributes.md` | U5.5 conditional runtime-support reference, no matching U4 target path | `bd4364d6118d5cac81d5ec0fac80c2af5ddb98e3cb8fb2a7a8112968bf265976` | Referenced by `requirements-reviewer/SKILL.md` for classifying requirements and metadata. | No U4 effect. | Included so U6a cannot omit a referenced runtime file; dynamic use remains held. | recorded_candidate |
+| `skills/requirements-reviewer/references/requirement-language-rules.md` | U5.5 conditional runtime-support reference, no matching U4 target path | `ea8ef42e7623e6d01492d6247f3678ca12997b709829759d23d19f7ca8ec3492` | Referenced by `requirements-reviewer/SKILL.md` for ambiguity, weak language, compound requirements, and implementation leakage findings. | No U4 effect. | Included so U6a cannot omit a referenced runtime file; dynamic use remains held. | recorded_candidate |
+| `skills/requirements-reviewer/references/source-basis.md` | `e6a1dd96de5a20530598b8e4a717ed6d844279afe89228bf76fc5121f8c53e5a` | `f2cc81c37d8971636ec703aec3b54aa60ebbcc71e0e4f9cfc28462a1a830e1ae` | Candidate source-basis differs from U4 and is referenced by the candidate for source-provenance questions. | U4 remains approved for public skill-folder artifact; runtime delta does not mutate U4. | Recorded for manifest completeness only; provenance/release use remains held. | recorded_candidate |
+| `skills/requirements-reviewer/references/verification-validation-guide.md` | U5.5 conditional runtime-support reference, no matching U4 target path | `01cb0a2736997c2ad4f169756e776aac8822986df78883d2edf54af9f3374b0e` | Referenced by `requirements-reviewer/SKILL.md` for verification methods, ATPs, validation paths, and evidence claims. | No U4 effect. | Included so U6a cannot omit a referenced runtime file; dynamic use remains held. | recorded_candidate |
+| `skills/requirements-reviewer/tests/requirements-quality-examples.md` | U5.5 candidate example file, no matching U4 target path | `acaa1ae1d5d2343776623c80299bf52c92d9447b5d730eb4d85663d7defc15df` | Referenced by `requirements-reviewer/SKILL.md` for calibration examples. | No U4 effect. | Recorded for example completeness only; test/example execution remains held. | recorded_candidate |
+| `skills/systems-engineering-traceability/SKILL.md` | `e1e45ce3e38d0b224cc7183e14009bc288cda2e86f572436ca3e7bea6c187e74` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Expands lifecycle traceability, no-orphan gate, mode selection, and selected top-level reference loading for Agent Skills layout. | U4 remains approved for public skill-folder artifact; runtime delta does not mutate U4. | Recorded for lifecycle-discoverability and traceability evidence. | recorded_candidate |
+| `references/systems-engineering-traceability-operating-model.md` | U5.5 top-level runtime reference, no matching U4 target path | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | Provides runtime operating model for selected traceability skill. | No U4 effect. | Recorded for reference-loading evidence. | recorded_candidate |
+| `references/traceability-matrix-template.md` | U5.5 top-level runtime reference, no matching U4 target path | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | Provides matrix/example structure for selected traceability skill. | No U4 effect. | Recorded for example/loading evidence. | recorded_candidate |
+| `references/requirements-and-vv-guide.md` | U5.5 top-level runtime reference, no matching U4 target path | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | Provides requirements/V&V guidance used by selected traceability skill. | No U4 effect. | Recorded for reference-loading evidence. | recorded_candidate |
+| `references/risk-gap-and-change-control-guide.md` | U5.5 top-level runtime reference, no matching U4 target path | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | Provides risk, gap, and change-control guidance used by selected traceability skill. | No U4 effect. | Recorded for reference-loading evidence; release use remains held until U7. | recorded_candidate |
+
+No excluded reference files remain for the selected `requirements-reviewer`
+candidate. Every path named by `requirements-reviewer/SKILL.md` is either listed
+above or covered by the U4-delta rows in this section.
+
+### U5.5 Public Hygiene Scan
+
+Evidence ID: `TWCORE-U55-HYGIENE-2026-04-30-001`
+
+Scope: exact manifest files in `TWCORE-U55-LOAD-2026-04-30-001` at
+`696548694dd40ce298d77e603db069934b58f645`.
+
+Result: `static_path_secret_scan_pass_source_policy_held`.
+
+The static hygiene scan checked for private provenance, private/local paths,
+non-public commits, raw extraction output, secrets, environment values,
+unsupported package/release claims, copied source text markers, close-source
+table/checklist/diagram recreation signals, and unsupported conformance claims.
+The path/secret/private-provenance scan passed for the selected manifest. The
+source-name scan found named public and controlled standards in source-basis and
+top-level reference surfaces; this is recorded as a release/package policy hold,
+not a U6a dynamic-discovery pass. No public evidence row records private source
+paths or raw private source content. This scan treats the files as scrubbed
+candidates only. Any later source-overlap finding, source-name policy change,
+private provenance leak, or attempt to use this scan as U7/U8 release hygiene
+resets the affected U5.5 rows to `held`.
 
 Reviewer: `ce:work`, branch `codex/traceweaver-u6-unblock-next`.
 
@@ -392,9 +453,6 @@ acceptance without an accepted terminal-state update resets the affected row to
 
 Held or excluded by default:
 
-- `skills/requirements-reviewer/references/source-basis.md`;
-- `skills/requirements-reviewer/agents/openai.yaml`;
-- `skills/requirements-reviewer/tests/*`;
 - all non-selected Core 11 skills;
 - `idea-refine` command wiring;
 - persona-awareness guidance;
@@ -443,6 +501,15 @@ behavior text, public hygiene scan, file-level delta/impact records,
 requirements-quality validation, and lifecycle-discoverability validation.
 It also found that lifecycle-discoverability evidence is static review, not an
 observed no-forced runtime transcript, so U5.5 remains held for U6a.
+
+Baseline-reconciliation review rerun: 2026-04-30 `ce:work` reran the focused
+document checks after the authority-manifest patch. The selected manifest now
+matches the files from Agent Skills commit
+`696548694dd40ce298d77e603db069934b58f645`, all files referenced by
+`requirements-reviewer/SKILL.md` are included, the private runtime snapshot is
+marked non-authoritative unless refreshed to hash-match the commit, and no stale
+U6a-ready claim was found. U5.5 still remains held because dynamic no-forced
+runtime discovery is not proven and source-name release policy remains held.
 
 No private path, private repository name, local checkout path, private candidate
 locator, raw extraction path, secret, or environment-value hit was observed in
@@ -531,7 +598,7 @@ Held claims:
 
 Stale reset rule: this terminal state remains `HELD_FOR_U6A` and resets any
 static evidence row to `held` if candidate branch head or selected file hashes
-change, a selected runtime file lacks an approved delta/impact row or current
+change, a selected runtime file lacks a recorded delta/impact row or current
 non-held U4 skill record where applicable, U6a includes non-selected Core skills
 by default, U6b uses files outside the selected/reduced scope, source-name
 hygiene is accepted without U7, or R31 is presented as complete without

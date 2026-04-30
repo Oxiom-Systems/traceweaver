@@ -21,9 +21,9 @@ upstream readiness, all-Core runtime scope, or R31 completion.
 ## Method
 
 Reviewer inspected the exact candidate files from
-`696548694dd40ce298d77e603db069934b58f645` using `git show` and verified the
-frontmatter trigger, required references, quality gate, V&V separation, and
-handoff rule.
+`696548694dd40ce298d77e603db069934b58f645` in the Agent Skills candidate fork
+and verified the frontmatter trigger, required references, quality gate, V&V
+separation, and handoff rule.
 
 Public evidence records use candidate file hashes only. No private source path,
 private repository name, raw extraction path, secret, environment value, or
@@ -39,7 +39,9 @@ licensed-source passage is recorded here.
 | `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Pass |
 | `skills/requirements-reviewer/references/requirement-types-and-attributes.md` | `bd4364d6118d5cac81d5ec0fac80c2af5ddb98e3cb8fb2a7a8112968bf265976` | Pass |
 | `skills/requirements-reviewer/references/requirement-language-rules.md` | `ea8ef42e7623e6d01492d6247f3678ca12997b709829759d23d19f7ca8ec3492` | Pass |
+| `skills/requirements-reviewer/references/source-basis.md` | `f2cc81c37d8971636ec703aec3b54aa60ebbcc71e0e4f9cfc28462a1a830e1ae` | Present; provenance/release use held |
 | `skills/requirements-reviewer/references/verification-validation-guide.md` | `01cb0a2736997c2ad4f169756e776aac8822986df78883d2edf54af9f3374b0e` | Pass |
+| `skills/requirements-reviewer/tests/requirements-quality-examples.md` | `acaa1ae1d5d2343776623c80299bf52c92d9447b5d730eb4d85663d7defc15df` | Present; example execution held |
 
 ## Validation Matrix
 
@@ -55,7 +57,7 @@ licensed-source passage is recorded here.
 
 ## Decision
 
-`requirements_quality_validation_record`: approved for static U5.5 input.
+`requirements_quality_validation_record`: recorded for static U5.5 input.
 
 Allowed claim:
 
@@ -65,6 +67,7 @@ Allowed claim:
 Held claims:
 
 - U6a scope-decision ready;
+- runtime/package approval for the referenced files;
 - package-ready;
 - release-ready;
 - upstream-ready;

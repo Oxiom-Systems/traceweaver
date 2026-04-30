@@ -227,21 +227,25 @@ Recorded: 2026-04-30
 Candidate commit:
 `696548694dd40ce298d77e603db069934b58f645 feat: add requirements reviewer skill`
 
-This table records the final candidate files used by the U5.5 static review.
-It supersedes the `987793d` U2 sync rows for U5.5/U6a review. It does not prove
-dynamic runtime discovery, installed package behavior, package readiness, or
-release readiness.
+This table records the final Agent Skills candidate files in the selected U5.5
+runtime-authority manifest. It supersedes the `987793d` U2 sync rows for
+U5.5/U6a review and supersedes any non-byte-identical private runtime snapshot
+for U5.5/U6a authority. It does not prove dynamic runtime discovery, installed
+package behavior, package readiness, or release readiness.
 
 | Runtime file | Source / distilled input | Version stamp | SHA-256 | Reviewed by | Review session | Commit |
 | --- | --- | --- | --- | --- | --- | --- |
 | `skills/using-agent-skills/SKILL.md` | Agent Skills meta-skill routing context for U5.5 static discovery review | 2026-04-30 U5.5 static | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
 | `skills/requirements-reviewer/SKILL.md` | U5.5 runtime delta against U4 `requirements-reviewer/SKILL.md` | 2026-04-30 U5.5 static | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
+| `skills/requirements-reviewer/agents/openai.yaml` | U5.5 manifest file present under selected Agent Skills runtime skill; no runtime-agent claim approved | 2026-04-30 U5.5 static | `ebdec17ec4de718225b6e4d417123be66c6e9b4a9225278e4bff79ba1581b829` | Codex | `ce:work` U5.5 baseline reconciliation | `696548694dd40ce298d77e603db069934b58f645` |
 | `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | U5.5 requirements-reviewer runtime support reference | 2026-04-30 U5.5 static | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
 | `skills/requirements-reviewer/references/requirements-quality-checklist.md` | U5.5 requirements-reviewer runtime support reference | 2026-04-30 U5.5 static | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
 | `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | U5.5 requirements-reviewer runtime support schema | 2026-04-30 U5.5 static | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
 | `skills/requirements-reviewer/references/requirement-types-and-attributes.md` | U5.5 conditional requirements-reviewer runtime support reference | 2026-04-30 U5.5 static | `bd4364d6118d5cac81d5ec0fac80c2af5ddb98e3cb8fb2a7a8112968bf265976` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
 | `skills/requirements-reviewer/references/requirement-language-rules.md` | U5.5 conditional requirements-reviewer runtime support reference | 2026-04-30 U5.5 static | `ea8ef42e7623e6d01492d6247f3678ca12997b709829759d23d19f7ca8ec3492` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
+| `skills/requirements-reviewer/references/source-basis.md` | U5.5 runtime delta against U4 `requirements-reviewer` source-basis; provenance/release use held | 2026-04-30 U5.5 static | `f2cc81c37d8971636ec703aec3b54aa60ebbcc71e0e4f9cfc28462a1a830e1ae` | Codex | `ce:work` U5.5 baseline reconciliation | `696548694dd40ce298d77e603db069934b58f645` |
 | `skills/requirements-reviewer/references/verification-validation-guide.md` | U5.5 conditional requirements-reviewer runtime support reference | 2026-04-30 U5.5 static | `01cb0a2736997c2ad4f169756e776aac8822986df78883d2edf54af9f3374b0e` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
+| `skills/requirements-reviewer/tests/requirements-quality-examples.md` | U5.5 example file referenced by selected skill; example execution/package claims held | 2026-04-30 U5.5 static | `acaa1ae1d5d2343776623c80299bf52c92d9447b5d730eb4d85663d7defc15df` | Codex | `ce:work` U5.5 baseline reconciliation | `696548694dd40ce298d77e603db069934b58f645` |
 | `skills/systems-engineering-traceability/SKILL.md` | U5.5 runtime delta against U4 `systems-engineering-traceability/SKILL.md` | 2026-04-30 U5.5 static | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
 | `references/systems-engineering-traceability-operating-model.md` | `docs/distilled/systems-engineering-traceability-operating-model.md` runtime reference candidate | 2026-04-30 U5.5 static | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
 | `references/traceability-matrix-template.md` | `docs/distilled/traceability-matrix-template.md` runtime reference candidate | 2026-04-30 U5.5 static | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | Codex | `ce:work` U5.5 cleanup | `696548694dd40ce298d77e603db069934b58f645` |
