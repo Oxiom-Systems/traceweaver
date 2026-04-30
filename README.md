@@ -49,24 +49,24 @@ Ownership rule:
 
 ## Current State
 
-As of 2026-04-29:
+As of 2026-04-30:
 
 | Area | Status | Notes |
 |---|---|---|
 | TraceWeaver Core repo | Primary project home | `git@github.com:Oxiom-Systems/traceweaver.git` |
-| Agent Skills fork | U5.5 candidate observed, not U6a-eligible | `feature/systems-engineering-traceability` branch in the Agent Skills fork at `696548694dd40ce298d77e603db069934b58f645`; selected files are not reconciled to U4-approved hashes yet |
+| Agent Skills fork | U5.5 candidate approved for U6a scope input | `feature/systems-engineering-traceability` branch in the Agent Skills fork at `696548694dd40ce298d77e603db069934b58f645`; selected file deltas are approved for U6a scope decision only |
 | U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
 | U5 delta inventory | `CLOSED_NO_DELTA` | No exact U5 public artifact targets remain outside the U4-promoted skill-folder paths |
-| U5.5 expanded runtime candidate | `HELD_FOR_U6A` | Candidate `696548694dd40ce298d77e603db069934b58f645` is observed for the `light-v0.1-authority-traceability` subset, but selected file hashes are not reconciled to U4-approved public skill-folder hashes and required requirements-quality/lifecycle-discoverability validation records are missing |
+| U5.5 expanded runtime candidate | Split; U6a scope-decision eligible only | Candidate `696548694dd40ce298d77e603db069934b58f645` is approved for the `light-v0.1-authority-traceability` subset after file-level delta/impact records plus requirements-quality and lifecycle-discoverability validation evidence. U6b/package/release/upstream claims remain held |
 | Core 11 public skill folders | U4-promoted public artifacts | `skills/` contains all eleven scrubbed public-candidate skill folders; runtime/package acceptance remains pending U5.5/U6 |
 | Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
-| Requirements and V&V guide | U5.5 held candidate evidence | `references/requirements-and-vv-guide.md`; observed in the held candidate, not U6/package/release accepted |
-| Risk, gap, and change-control guide | U5.5 held candidate evidence | `references/risk-gap-and-change-control-guide.md`; observed in the held candidate, not U6/package/release accepted |
+| Requirements and V&V guide | U5.5 runtime-scope evidence | `references/requirements-and-vv-guide.md`; approved for U6a scope input, not U6b/package/release accepted |
+| Risk, gap, and change-control guide | U5.5 runtime-scope evidence | `references/risk-gap-and-change-control-guide.md`; approved for U6a scope input, not U6b/package/release accepted |
 | Discovery routing | Runtime candidate evidence scope | Idea/intent lifecycle evidence is in scope as source-preservation and routing context only; `idea-refine` command wiring remains follow-up unless separately authorized. Requirements and success criteria route through `requirements-reviewer`; meaningful behavior routes through traceability as a cross-cutting hop |
-| Validation record | Refreshed through U5.5 hold state | U5 representative pass applies only to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; U5 delta inventory is closed no-delta; U5.5 terminal state is `HELD_FOR_U6A` |
+| Validation record | Refreshed through U5.5 U6a-scope handoff | U5 representative pass applies only to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; U5 delta inventory is closed no-delta; U5.5 terminal state is split and U6a scope-decision eligible only |
 | Controlled validation | Representative complete for U5 baseline | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded at `ca6ff66`, but R31 real-project validation remains open |
-| Upstream PR packaging | Blocked before U6a | Do not start U6a, package, or claim release/upstream readiness until U5.5 candidate hashes are reconciled to U4 or covered by approved delta records and required U5.5 validation evidence exists |
+| Upstream PR packaging | U6a may start; U6b blocked | U6a may decide the reduced runtime scope from the U5.5 subset. Do not package or claim release/upstream readiness until U6b evidence, U7 claim records, R31 status, and release hygiene are closed |
 | TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |
 | TraceWeaver CE lifecycle baseline | In progress | Baseline approval and validation are not closed yet |
 
@@ -195,12 +195,12 @@ Validation status:
   passed representative dummy validation.
 - R31 real-project validation remains open for the real feature, unclear
   existing module, and low-risk Lite-mode scenarios.
-- U5.5 expanded runtime candidate: `HELD_FOR_U6A`. Candidate
-  `696548694dd40ce298d77e603db069934b58f645` is observed, but selected file
-  hashes do not match the U4-approved public skill-folder hashes and required
-  U5.5 validation records are missing.
-- Packaging status: blocked before U6a. U6a must not start until U5.5 hash
-  reconciliation and required validation evidence are recorded.
+- U5.5 expanded runtime candidate: split. Candidate
+  `696548694dd40ce298d77e603db069934b58f645` is U6a scope-decision eligible for
+  `light-v0.1-authority-traceability` after approved file-level delta/impact
+  records and required U5.5 validation evidence.
+- Packaging status: U6a may start. U6b package/install/runtime evidence, U7
+  release claim records, R31 real scenarios, and release hygiene remain held.
 
 The validation record contains all three controlled U5 baseline runs. These are
 representative dummy runs, not R31-completing real-project validation:
@@ -273,21 +273,19 @@ Remote:
 
 ## Near-Term Next Steps
 
-1. Reconcile the U5.5 runtime candidate files against U4-approved public
-   skill-folder hashes, or add explicit file-level delta/impact records for
-   every intentional difference.
-2. Add required U5.5 evidence records for the same final candidate commit:
-   requirements-quality validation, lifecycle-discoverability validation,
-   runtime discovery/loading, reference/schema/example loading, routing and
-   failure behavior, and scenario/value status.
-3. Rerun focused document review on the U5.5 hold closure before starting U6a.
-4. Start U6a only after U5.5 records an accepted/reduced/split terminal state
-   whose selected files also have current non-held U4 or approved delta records.
-5. Complete R31 real-project validation or keep it as an explicit U7 release
+1. Start U6a scope decision for the split
+   `light-v0.1-authority-traceability` subset at
+   `696548694dd40ce298d77e603db069934b58f645`.
+2. Define the reduced package inventory, package manifest, install path, and
+   release hygiene policy. Non-selected U4-promoted Core skills remain excluded
+   by default.
+3. Run U6b package/install/runtime evidence only after U6a records the exact
+   reduced scope.
+4. Complete R31 real-project validation or keep it as an explicit U7 release
    blocker.
-6. Prepare U7 release-gate decisions and release claim records before any U8
+5. Prepare U7 release-gate decisions and release claim records before any U8
    upstream-neutral package, PR, or release-note surface.
-7. Continue TraceWeaver CE baseline and lifecycle integration with the Core
+6. Continue TraceWeaver CE baseline and lifecycle integration with the Core
    validation surface as the control point.
 
 ## Product Direction

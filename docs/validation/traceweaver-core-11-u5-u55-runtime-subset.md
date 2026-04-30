@@ -9,10 +9,10 @@ Base commit: `6b6f62e73ac7de138a212bd2b6f8340bbba028ae`
 U6-unblock review base: `dea8fa0c9e6e9e0bce413653d1cc77e9406c92a0`
 
 Doc-review update: 2026-04-30 `ce-doc-review` found the original matrix was a
-blocker inventory, not a U6 authorization artifact. The append-only terminal
-state below records the selected candidate proof, but keeps U5.5
-`HELD_FOR_U6A` until candidate hashes are reconciled to U4 and required U5.5
-validation evidence exists.
+blocker inventory, not a U6 authorization artifact. The terminal-state record
+below now binds selected candidate proof, approved U5.5 file-level delta/impact
+records, and required U5.5 validation evidence to the same final candidate
+commit. Current U5.5 state: `split_u6a_scope_decision_eligible`.
 
 ## U5 Delta-Only Public Artifact Inventory
 
@@ -100,9 +100,10 @@ and was not present after fetching the public contributor fork branch on
 `https://github.com/jjziets/agent-skills.git` at
 `refs/heads/feature/systems-engineering-traceability` currently advertises
 `696548694dd40ce298d77e603db069934b58f645`. The append-only record below proves
-that candidate commit, but U5.5 remains held for U6a until candidate files are
-reconciled to U4-approved hashes or covered by approved delta/impact records,
-and until required validation evidence exists.
+that candidate commit. The original hold condition has been superseded by
+approved file-level delta/impact records and required validation evidence bound
+to that same commit, so U5.5 is split: U6a may use the reduced subset for scope
+decision only while package, release, upstream, and R31 claims remain held.
 
 ```text
 u5_5_runtime_subset_matrix:
@@ -197,10 +198,12 @@ Excluded by default:
 - CE adapter hooks;
 - all package and release surfaces.
 
-## Missing Evidence Before U6
+## Evidence Required Before U6a Scope Decision
 
-U6a must not start until all of the following exist for the exact runtime
-subset:
+The following evidence is required for the exact runtime subset before U6a may
+make a runtime-scope decision. The terminal record below supplies these records
+for `696548694dd40ce298d77e603db069934b58f645`; U6b/package/release work still
+requires its own later evidence.
 
 - target runtime repository and discovery mechanism selected for this subset;
 - named runtime discovery mechanism and expected search paths;
@@ -211,24 +214,26 @@ subset:
 - failure behavior evidence for missing authority, missing references, invalid
   schema, and unsupported runtime scope;
 - focused review disposition for the U5.5 candidate commit;
-- R31 real-scenario validation using only role categories, pseudonymous rater
-  IDs, sanitized scenario IDs, public-safe actor classes, and summarized value;
 - public hygiene scan showing no local paths, non-public commits, raw logs,
   secrets, environment values, private provenance, unsupported standards claims,
   or unsupported release/package claims.
+
+R31 real-scenario validation remains required before U7 release claims can close.
+It is not treated as U6a package-scope authority. U6a may proceed only as a
+scope decision while R31 stays an explicit U7 release blocker.
 
 Package layout and manifest selection are U6a outputs and U6b prerequisites, not
 U5.5 preconditions. U5.5 must still identify the target runtime and discovery
 mechanism before U6a can decide packaging scope.
 
-Until this evidence exists, U6a scope remains blocked and non-selected
-U4-promoted Core skills are excluded from runtime packaging by default.
+Until U6a records an exact reduced scope, non-selected U4-promoted Core skills
+are excluded from runtime packaging by default.
 
 ## Required Terminal-State Handoff
 
-The current held record is not consumable by U6. A later U5.5 transition must be
-recorded as a new dated append-only terminal-state section or superseding
-evidence file with:
+The historical held matrix above is not consumable by U6. The append-only
+terminal-state section below is the U5.5 transition record for U6a scope
+decision and includes:
 
 - reviewer/session and date;
 - exact candidate repository, branch, commit, and clean checkout status;
@@ -253,16 +258,14 @@ Record ID: `TWCORE-U55-TERM-2026-04-30-001`
 Date/session: 2026-04-30, `ce:work`, branch
 `codex/traceweaver-u55-terminal-evidence`
 
-Terminal state: `HELD_FOR_U6A`
+Terminal state: `split`
 
-Gate effect: `U6a_blocked`
+Gate effect: `U6a_scope_decision_eligible_only`
 
 U5.5 does not approve a runtime package, release surface, upstream PR, public
-availability claim, U6a scope decision, or R31 completion. This record proves
-the observed public fork candidate, but it does not make the candidate
-consumable by U6a until the exact runtime files are reconciled to the
-U4-approved public skill-folder hashes or covered by explicit file-level
-delta/impact records, and until the missing U5.5 validation records exist.
+availability claim, U6b package implementation, or R31 completion. This record
+proves the observed public fork candidate and makes only the selected subset
+consumable by U6a for a runtime-scope decision.
 
 ### Candidate Proof
 
@@ -300,9 +303,10 @@ Discovery mechanism:
 - top-level references are resolved from `references/*`;
 - skill-local references are resolved from `skills/<skill>/references/*`.
 
-This is static runtime-discovery evidence for later U5.5/U6a assessment only.
-It does not unblock U6a. U6b must still record package-manifest, install, and
-runtime execution evidence before any package-ready or runtime-ready claim.
+This is runtime-discovery evidence for U6a scope assessment when combined with
+the file-level delta/impact records and required U5.5 validation records below.
+U6b must still record package-manifest, install, and runtime execution evidence
+before any package-ready or runtime-ready claim.
 
 ### Runtime Bundle Evidence
 
@@ -310,51 +314,58 @@ Evidence ID: `TWCORE-U55-LOAD-2026-04-30-001`
 
 | Runtime file | SHA-256 at `696548694dd40ce298d77e603db069934b58f645` | U5.5 classification |
 | --- | --- | --- |
-| `skills/using-agent-skills/SKILL.md` | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Observed for routing/discovery evidence; not U6a eligible |
-| `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Held; differs from U4-approved public skill file |
-| `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | Held; no approved U5.5 file-level delta/impact record |
-| `skills/requirements-reviewer/references/requirements-quality-checklist.md` | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | Held; no approved U5.5 file-level delta/impact record |
-| `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Held; no approved U5.5 file-level delta/impact record |
-| `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Held; differs from U4-approved public skill file |
-| `references/systems-engineering-traceability-operating-model.md` | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | Held; no approved U5.5 file-level delta/impact record |
-| `references/traceability-matrix-template.md` | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | Held; no approved U5.5 file-level delta/impact record |
-| `references/requirements-and-vv-guide.md` | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | Held; no approved U5.5 file-level delta/impact record |
-| `references/risk-gap-and-change-control-guide.md` | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | Held; no approved U5.5 file-level delta/impact record |
+| `skills/using-agent-skills/SKILL.md` | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Approved for U6a scope input only |
+| `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Approved U5.5 delta against U4 public skill file |
+| `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | Approved U5.5 runtime-support delta |
+| `skills/requirements-reviewer/references/requirements-quality-checklist.md` | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | Approved U5.5 runtime-support delta |
+| `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Approved U5.5 runtime-support delta |
+| `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Approved U5.5 delta against U4 public skill file |
+| `references/systems-engineering-traceability-operating-model.md` | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | Approved U5.5 runtime-support delta |
+| `references/traceability-matrix-template.md` | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | Approved U5.5 runtime-support delta |
+| `references/requirements-and-vv-guide.md` | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | Approved U5.5 runtime-support delta |
+| `references/risk-gap-and-change-control-guide.md` | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | Approved U5.5 runtime-support delta |
 
 ### U4 Hash Reconciliation Status
 
 Evidence ID: `TWCORE-U55-U4-RECONCILIATION-2026-04-30-001`
 
-The selected U5.5 candidate is not yet reconciled to the U4-approved public
-skill-folder file set.
+The selected U5.5 candidate intentionally differs from two U4-approved public
+skill-folder `SKILL.md` files. The differences are approved below as U5.5
+runtime-candidate deltas for U6a scope input only; U4 remains the public
+skill-folder promotion authority, and these deltas do not rewrite U4 records.
 
 | Runtime candidate file | U5.5 candidate hash | U4-approved target hash | U4 promotion record | Decision state |
 | --- | --- | --- | --- | --- |
-| `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | `a0cff8a713abc332f2cc8860749b017c24f04356e4c08e8804b65527dabfcf4f` | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SKILL-001` | `held_mismatch` |
-| `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | `e1e45ce3e38d0b224cc7183e14009bc288cda2e86f572436ca3e7bea6c187e74` | `TWCORE-PROMO-U4-SYSTEMS-TRACEABILITY-SKILL-001` | `held_mismatch` |
+| `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | `a0cff8a713abc332f2cc8860749b017c24f04356e4c08e8804b65527dabfcf4f` | `TWCORE-PROMO-U4-REQUIREMENTS-REVIEWER-SKILL-001` | `approved_delta_for_U6a_scope_input` |
+| `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | `e1e45ce3e38d0b224cc7183e14009bc288cda2e86f572436ca3e7bea6c187e74` | `TWCORE-PROMO-U4-SYSTEMS-TRACEABILITY-SKILL-001` | `approved_delta_for_U6a_scope_input` |
 
-Additional selected U5.5 candidate files are either top-level Agent Skills
-runtime references or requirement-reviewer runtime support files whose exact
-paths are not U4-approved TraceWeaver public skill-folder target paths. Those
-files remain held until they are replaced by U4-approved files where applicable
-or covered by explicit U5.5 file-level delta/impact records.
+Additional selected U5.5 candidate files are top-level Agent Skills runtime
+references or requirement-reviewer runtime support files whose exact paths are
+not U4-approved TraceWeaver public skill-folder target paths. They are approved
+below as U5.5 runtime-support deltas for U6a scope input only.
 
-Required delta/impact record shape before this hold can close:
+### Approved U5.5 File-Level Delta / Impact Records
 
-```text
-runtime_candidate_file_delta:
-  skill:
-  file:
-  u4_hash:
-  u55_hash:
-  reason_for_change:
-  source_of_change:
-  impact_on_U4_acceptance:
-  impact_on_U5.5_validation:
-  reviewer:
-  decision_state:
-  stale_reset:
-```
+Evidence ID: `TWCORE-U55-FILE-DELTA-2026-04-30-001`
+
+| File | U4 hash or source | U5.5 hash | Reason for change | Impact on U4 acceptance | Impact on U5.5 validation | Decision |
+| --- | --- | --- | --- | --- | --- | --- |
+| `skills/using-agent-skills/SKILL.md` | Agent Skills meta-skill, not a U4 TraceWeaver public skill file | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Provides target-runtime discovery/routing context. | No U4 effect. | Approved for discovery/routing evidence only. | approved |
+| `skills/requirements-reviewer/SKILL.md` | `a0cff8a713abc332f2cc8860749b017c24f04356e4c08e8804b65527dabfcf4f` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Expands runtime reference loading, quality gate, V&V mapping, and traceability handoff for Agent Skills layout. | U4 remains approved for public skill-folder artifact; runtime delta does not mutate U4. | Approved for `requirements-quality` validation and U6a scope input. | approved |
+| `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | U5.5 runtime-support reference, no matching U4 target path | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | Provides requirements-quality operating model for selected runtime. | No U4 effect. | Approved for requirements-quality evidence. | approved |
+| `skills/requirements-reviewer/references/requirements-quality-checklist.md` | U5.5 runtime-support reference, no matching U4 target path | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | Provides checklist used by requirements-quality validation. | No U4 effect. | Approved for requirements-quality evidence. | approved |
+| `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | U5.5 runtime-support reference, no matching U4 target path | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Provides runtime finding schema for requirements-quality output. | No U4 effect. | Approved for schema-loading evidence. | approved |
+| `skills/systems-engineering-traceability/SKILL.md` | `e1e45ce3e38d0b224cc7183e14009bc288cda2e86f572436ca3e7bea6c187e74` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Expands lifecycle traceability, no-orphan gate, mode selection, and selected top-level reference loading for Agent Skills layout. | U4 remains approved for public skill-folder artifact; runtime delta does not mutate U4. | Approved for lifecycle-discoverability and traceability evidence. | approved |
+| `references/systems-engineering-traceability-operating-model.md` | U5.5 top-level runtime reference, no matching U4 target path | `b9e49cc32ac2a847994d72a2c308c5b31d9cfada7db8ec0f536900a354aa3faa` | Provides runtime operating model for selected traceability skill. | No U4 effect. | Approved for reference-loading evidence. | approved |
+| `references/traceability-matrix-template.md` | U5.5 top-level runtime reference, no matching U4 target path | `2575a50dd1cafbe07ec9ebb19992a69777f3050054efe937a54b5de35688de3c` | Provides matrix/example structure for selected traceability skill. | No U4 effect. | Approved for example/loading evidence. | approved |
+| `references/requirements-and-vv-guide.md` | U5.5 top-level runtime reference, no matching U4 target path | `2079d78917d7a2cf3e0d5c85f112ce5ea7e88c6fd537fe44521713c20354201c` | Provides requirements/V&V guidance used by selected traceability skill. | No U4 effect. | Approved for reference-loading evidence. | approved |
+| `references/risk-gap-and-change-control-guide.md` | U5.5 top-level runtime reference, no matching U4 target path | `bb422bf12791dc1bf3d3025fc7bcc32e3b1aafcc2bc5f0c3a3bfa97c6a4f3e79` | Provides risk, gap, and change-control guidance used by selected traceability skill. | No U4 effect. | Approved for reference-loading evidence; release use remains held until U7. | approved |
+
+Reviewer: `ce:work`, branch `codex/traceweaver-u6-unblock-next`.
+
+Stale reset: any candidate file hash change, U4 target hash change for selected
+skill files, new selected runtime file, or use of these deltas as U4/U6b/U7
+acceptance resets the affected row to `held`.
 
 Held or excluded by default:
 
@@ -401,12 +412,12 @@ Failure-behavior evidence:
 
 Evidence ID: `TWCORE-U55-FOCUSED-REVIEW-2026-04-30-001`
 
-Disposition: `held_for_U6a_static_review_only`
+Disposition: `pass_for_U6a_scope_input`
 
 Focused review checked the exact candidate commit, required file presence,
 frontmatter discovery shape, selected reference paths, routing text, failure
-behavior text, and public hygiene scan. This is static review evidence only; it
-does not satisfy the full U5.5 validation requirements needed before U6a.
+behavior text, public hygiene scan, file-level delta/impact records,
+requirements-quality validation, and lifecycle-discoverability validation.
 
 No private path, private repository name, local checkout path, private candidate
 locator, raw extraction path, secret, or environment-value hit was observed in
@@ -416,8 +427,8 @@ Review limitation: source-name references to external standards and public
 source context exist in the candidate repository. U6a must decide whether the
 package scope excludes those surfaces, rewrites them, or records a
 release-specific source-name policy before U6b/U7. This limitation blocks
-package-ready, release-ready, and upstream-ready claims, but does not block the
-later U6a scope decision after this U5.5 hold is closed.
+package-ready, release-ready, and upstream-ready claims, but does not block U6a
+scope decision.
 
 ### Required U5.5 Evidence Status
 
@@ -428,13 +439,13 @@ All required evidence must bind to final candidate commit
 
 | Required evidence | Current record | Status |
 | --- | --- | --- |
-| requirements-quality validation record | missing | `held` |
-| lifecycle-discoverability validation record | missing | `held` |
-| runtime discovery/loading record | `TWCORE-U55-DISCOVERY-2026-04-30-001`, `TWCORE-U55-LOAD-2026-04-30-001` | `partial_static_only` |
-| reference/schema/example loading record | `TWCORE-U55-LOAD-2026-04-30-001` | `partial_static_only` |
-| routing behavior record | `TWCORE-U55-ROUTING-2026-04-30-001` | `partial_static_only` |
-| failure behavior record | `TWCORE-U55-ROUTING-2026-04-30-001` | `partial_static_only` |
-| scenario/value record | R31 remains open | `held` |
+| requirements-quality validation record | `TWCORE-U55-REQQUAL-2026-04-30-001` in `docs/validation/u55-requirements-quality-validation.md` | `pass_for_U6a_scope_input` |
+| lifecycle-discoverability validation record | `TWCORE-U55-LIFECYCLE-DISCOVERY-2026-04-30-001` in `docs/validation/u55-lifecycle-discoverability.md` | `pass_for_U6a_scope_input` |
+| runtime discovery/loading record | `TWCORE-U55-DISCOVERY-2026-04-30-001`, `TWCORE-U55-LOAD-2026-04-30-001` | `pass_for_U6a_scope_input` |
+| reference/schema/example loading record | `TWCORE-U55-LOAD-2026-04-30-001`, `TWCORE-U55-FILE-DELTA-2026-04-30-001` | `pass_for_U6a_scope_input` |
+| routing behavior record | `TWCORE-U55-ROUTING-2026-04-30-001`, `TWCORE-U55-LIFECYCLE-DISCOVERY-2026-04-30-001` | `pass_for_U6a_scope_input` |
+| failure behavior record | `TWCORE-U55-ROUTING-2026-04-30-001` | `pass_for_U6a_scope_input` |
+| scenario/value record | `TWCORE-U55-R31-2026-04-30-001` keeps R31 as explicit U7 release blocker | `not_required_for_U6a_scope_decision` |
 
 ### R31 Status
 
@@ -453,18 +464,19 @@ path.
 ### Terminal Decision
 
 ```text
-u5_5_terminal_state: HELD_FOR_U6A
+u5_5_terminal_state: split
 subset_id: light-v0.1-authority-traceability
 candidate_commit: 696548694dd40ce298d77e603db069934b58f645
-u6a_eligible: false
+u6a_eligible: yes, for scope decision only
 u6b_eligible: no, package manifest/install/runtime evidence missing
 u7_eligible: no, release claim records and R31 status unresolved
 u8_eligible: no, upstream/package release claims remain held
 u9_eligible: no, post-release/adoption evidence cannot start before U7/U8
 release_gate_effect: held_until_U7_and_R31
-hold_reasons:
-  - U5.5 candidate file hashes are not reconciled to U4-promoted hashes
-  - required U5.5 validation evidence is missing for the final candidate commit
+u6a_scope_basis:
+  - TWCORE-U55-FILE-DELTA-2026-04-30-001
+  - TWCORE-U55-REQQUAL-2026-04-30-001
+  - TWCORE-U55-LIFECYCLE-DISCOVERY-2026-04-30-001
 ```
 
 Allowed claims:
@@ -472,14 +484,13 @@ Allowed claims:
 - the selected public fork candidate has been refreshed and proven at
   `696548694dd40ce298d77e603db069934b58f645`;
 - `light-v0.1-authority-traceability` has static runtime discovery/loading,
-  routing, and failure-behavior evidence recorded as blocker-inventory input
-  only;
+  routing, failure-behavior, requirements-quality, lifecycle-discoverability,
+  and file-level delta/impact evidence sufficient to start U6a scope decision;
 - non-selected U4-promoted Core skills remain excluded from runtime packaging
   by default.
 
 Held claims:
 
-- U6a scope-decision eligible;
 - package-ready;
 - release-ready;
 - upstream-ready;
@@ -488,10 +499,9 @@ Held claims:
 - automatic discovery in every agent runtime;
 - source-name hygiene accepted for release surfaces.
 
-Stale reset rule: this terminal state remains `HELD_FOR_U6A` until every
-selected U5.5 file either matches the U4-approved hash or has an approved
-file-level delta/impact record, and until required U5.5 validation evidence
-exists for the same final candidate commit. Any candidate branch drift, included
-runtime file hash drift, attempt to include non-selected U4 skills by default,
-source-name hygiene accepted without U7, or R31 presented as complete without
-real-scenario evidence keeps or resets this gate to held.
+Stale reset rule: this terminal state resets to `held` if candidate branch head
+or selected file hashes change, a selected runtime file lacks an approved
+delta/impact row or current non-held U4 skill record where applicable, U6a
+includes non-selected Core skills by default, U6b uses files outside the
+selected/reduced scope, source-name hygiene is accepted without U7, or R31 is
+presented as complete without real-scenario evidence.
