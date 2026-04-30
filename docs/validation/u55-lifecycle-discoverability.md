@@ -1,6 +1,6 @@
 # U5.5 Lifecycle Discoverability Validation
 
-Status: `PASS_FOR_U6A_SCOPE_INPUT`
+Status: `STATIC_REVIEW_ONLY`
 
 Date: 2026-04-30
 
@@ -11,12 +11,14 @@ Evidence ID: `TWCORE-U55-LIFECYCLE-DISCOVERY-2026-04-30-001`
 ## Scope
 
 This record validates whether the exact U5.5 candidate exposes enough lifecycle
-discovery metadata and routing guidance for U6a to decide a bounded runtime
-scope for `light-v0.1-authority-traceability`.
+discovery metadata and routing guidance for later U6a review of the bounded
+runtime scope for `light-v0.1-authority-traceability`.
 
-This is not U6b installed-runtime proof and does not claim automatic discovery
-in every agent runtime. U6b must still prove package manifest, install path, and
-runtime execution behavior for the U6a-selected scope.
+This is static review evidence only. It is not an observed no-forced runtime
+transcript, not U6b installed-runtime proof, and not proof of automatic
+discovery in every agent runtime. U5.5 remains held for U6a until dynamic
+runtime discovery evidence exists or a later accepted U6a limitation explicitly
+authorizes static-only scope work.
 
 ## Target Runtime Selector
 
@@ -63,8 +65,8 @@ Expected lifecycle behavior:
 
 | Check | Result | Evidence |
 | --- | --- | --- |
-| Requirements-reviewer discovered without being forced | Pass | The scenario asks for a buildable plan and "what must be true"; candidate selector maps candidate requirements and acceptance criteria to `requirements-reviewer` frontmatter. |
-| Traceability skill discovered when authority was needed | Pass | The scenario creates meaningful product behavior; `using-agent-skills` and `systems-engineering-traceability` frontmatter both route this work to traceability. |
+| Requirements-reviewer statically maps to the prompt without being named | Pass for static review only | The scenario asks for a buildable plan and "what must be true"; candidate selector maps candidate requirements and acceptance criteria to `requirements-reviewer` frontmatter. No runtime transcript is recorded. |
+| Traceability skill statically maps when authority is needed | Pass for static review only | The scenario creates meaningful product behavior; `using-agent-skills` and `systems-engineering-traceability` frontmatter both route this work to traceability. No runtime transcript is recorded. |
 | Original intent preserved | 4 / 5 | `using-agent-skills` requires ideas to remain lifecycle inputs with candidate needs, assumptions, risks, success/failure signals, open decisions, and not-doing boundaries. |
 | Requirement quality guidance useful | 4 / 5 | `requirements-reviewer` contains a concrete quality gate, V&V separation, and blocked/revise/reclassify outcomes. |
 | Traceability guidance useful | 4 / 5 | `systems-engineering-traceability` contains lifecycle checkpoints, no-orphan gate, status rules, and V&V separation. |
@@ -84,15 +86,17 @@ Expected lifecycle behavior:
 
 ## Decision
 
-`lifecycle_discoverability_validation_record`: approved for U6a scope input.
+`lifecycle_discoverability_validation_record`: static review only.
 
 Allowed claim:
 
 - The exact U5.5 candidate commit has enough frontmatter discovery and
-  cross-skill routing evidence for U6a to decide a bounded runtime scope.
+  cross-skill routing evidence for later U6a review.
 
 Held claims:
 
+- U6a scope-decision ready;
+- observed no-forced runtime discovery;
 - automatic skill discovery in every installed runtime;
 - package-ready;
 - release-ready;
@@ -100,5 +104,6 @@ Held claims:
 - R31 real-project validation complete.
 
 Stale reset rule: any candidate commit change, selected skill frontmatter change,
-`using-agent-skills` routing change, required reference hash change, or attempt to
-use this evidence as U6b/U7/U8 proof resets this record to `held` until rerun.
+`using-agent-skills` routing change, required reference hash change, or attempt
+to use this static evidence as U6a/U6b/U7/U8 dynamic proof resets this record to
+`held` until rerun or replaced by an observed runtime transcript.
