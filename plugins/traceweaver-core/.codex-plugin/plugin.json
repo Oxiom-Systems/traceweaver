@@ -1,0 +1,40 @@
+{
+  "name": "traceweaver-core",
+  "version": "0.1.0-alpha.0",
+  "description": "Systems-engineering authority control for agentic software work.",
+  "author": {
+    "name": "Oxiom Systems",
+    "url": "https://github.com/Oxiom-Systems"
+  },
+  "homepage": "https://github.com/Oxiom-Systems/traceweaver",
+  "repository": "https://github.com/Oxiom-Systems/traceweaver",
+  "license": "MIT",
+  "keywords": [
+    "traceweaver",
+    "systems-engineering",
+    "requirements",
+    "traceability",
+    "agentic-workflow",
+    "compound-engineering"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "TraceWeaver Core",
+    "shortDescription": "Authority, requirements, and traceability controls for agentic engineering.",
+    "longDescription": "TraceWeaver Core adds systems-engineering control points to agentic software workflows. The alpha runtime focuses on requirement quality review and no-orphan traceability checks before planning, implementation, review, and release claims.",
+    "developerName": "Oxiom Systems",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Read",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/Oxiom-Systems/traceweaver",
+    "defaultPrompt": [
+      "/tw-requirements-review docs/requirements.md",
+      "/tw-authority-gate docs/plans/example-plan.md",
+      "/tw-traceability-check"
+    ],
+    "screenshots": []
+  }
+}

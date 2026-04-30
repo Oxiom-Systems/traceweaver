@@ -112,7 +112,7 @@ gates_bound_to_live_candidate_commit:
   - U5.5 harness evidence: REDUCED_FOR_U6A_STATIC_SCOPE_ONLY under U55-LIMIT-STATIC-DISCOVERY-001
   - target-runtime discovery equivalence: partial static Agent Skills layout only
   - fork-diff classification: file-level delta records complete for static U5.5 review
-  - packaging anatomy check: held before U6b/package execution
+  - packaging anatomy check: U6b alpha install smoke recorded; dynamic/package/release claims held
   - R31 adoption validation: held for release
   - traceability-specific value scenario: held for R31 release evidence
 ```

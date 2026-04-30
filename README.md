@@ -57,16 +57,17 @@ As of 2026-04-30:
 | Agent Skills fork | U5.5 reduced static-scope candidate | `feature/systems-engineering-traceability` branch in the Agent Skills fork at `696548694dd40ce298d77e603db069934b58f645`; selected file deltas are recorded, but dynamic no-forced runtime discovery is deferred to U6b/U9 |
 | U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
 | U5 delta inventory | `CLOSED_NO_DELTA` | No exact U5 public artifact targets remain outside the U4-promoted skill-folder paths |
-| U5.5 expanded runtime candidate | `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY` | Candidate `696548694dd40ce298d77e603db069934b58f645` has file-level delta/impact records and static requirements-quality/lifecycle-discovery evidence, including referenced requirements-reviewer files, under limitation `U55-LIMIT-STATIC-DISCOVERY-001`. U6b/package/release/upstream claims remain held |
-| Core 11 public skill folders | U4-promoted public artifacts | `skills/` contains all eleven scrubbed public-candidate skill folders; runtime/package acceptance remains pending U6b/U7 |
+| U5.5 expanded runtime candidate | `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY` | Candidate `696548694dd40ce298d77e603db069934b58f645` has file-level delta/impact records and static requirements-quality/lifecycle-discovery evidence, including referenced requirements-reviewer files, under limitation `U55-LIMIT-STATIC-DISCOVERY-001`. Dynamic discovery, package-ready, release-ready, and upstream-ready claims remain held |
+| TraceWeaver Core plugin alpha | U6b install smoke passed for static loading only | `plugins/traceweaver-core` now contains plugin manifests, selected Light v0.1 runtime skills, skill-local selected references, and thin `tw-*` adapter skills. Isolated Codex install materialized the selected skills; dynamic discovery, real invocation transcript, package-ready, release-ready, upstream-ready, and R31 claims remain held |
+| Core 11 public skill folders | U4-promoted public artifacts | `skills/` contains all eleven scrubbed public-candidate skill folders; only the Light v0.1 subset has U6b alpha install-smoke evidence |
 | Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
-| Requirements and V&V guide | U5.5 static runtime-scope evidence | `references/requirements-and-vv-guide.md`; recorded for static U5.5/U6a scope review, not U6b/package/release accepted |
-| Risk, gap, and change-control guide | U5.5 static runtime-scope evidence | `references/risk-gap-and-change-control-guide.md`; recorded for static U5.5/U6a scope review, not U6b/package/release accepted |
+| Requirements and V&V guide | U6b alpha static loading evidence | `references/requirements-and-vv-guide.md`; packaged as a selected skill-local reference in `plugins/traceweaver-core`, but not package-ready or release accepted |
+| Risk, gap, and change-control guide | U6b alpha static loading evidence | `references/risk-gap-and-change-control-guide.md`; packaged as a selected skill-local reference in `plugins/traceweaver-core`, but not package-ready or release accepted |
 | Discovery routing | Runtime candidate evidence scope | Idea/intent lifecycle evidence is in scope as source-preservation and routing context only; `idea-refine` command wiring remains follow-up unless separately authorized. Requirements and success criteria route through `requirements-reviewer`; meaningful behavior routes through traceability as a cross-cutting hop |
 | Validation record | Refreshed through U5.5 reduced static-scope handoff | U5 representative pass applies only to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; U5 delta inventory is closed no-delta; U5.5 terminal state is `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY` |
 | Controlled validation | Representative complete for U5 baseline | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded at `ca6ff66`, but R31 real-project validation remains open |
-| Upstream PR packaging | Blocked before U6b/release | U6a now records only the bounded static runtime-scope decision under `U55-LIMIT-STATIC-DISCOVERY-001`; do not package or claim release/upstream readiness until later gates provide runtime and release evidence |
+| Upstream PR packaging | Blocked before release evidence | U6b now records only alpha install smoke and static selected-skill materialization; do not claim release/upstream readiness until later gates provide dynamic runtime, release, and R31 evidence |
 | TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |
 | TraceWeaver CE lifecycle baseline | In progress | Baseline approval and validation are not closed yet |
 
@@ -199,8 +200,9 @@ Validation status:
   `696548694dd40ce298d77e603db069934b58f645` has static file-level
   delta/impact, requirements-quality, and lifecycle-discovery evidence under
   `U55-LIMIT-STATIC-DISCOVERY-001`.
-- Packaging status: blocked before U6b. U6a records only the bounded static
-  runtime scope; dynamic discovery remains a U6b/U9 testing requirement.
+- Packaging status: U6b alpha install smoke passed for static loading only.
+  Dynamic discovery and real adapter invocation remain U9 or later
+  U6b-dynamic testing requirements.
 
 The validation record contains all three controlled U5 baseline runs. These are
 representative dummy runs, not R31-completing real-project validation:
@@ -256,6 +258,7 @@ Canonical distilled guidance:
 | `docs/specs/` | Source specification for the MVP skill |
 | `docs/plans/` | Implementation and validation plans |
 | `skills/` | U4-promoted public TraceWeaver Core skill folders; not runtime/package accepted until U6 records exist |
+| `plugins/traceweaver-core/` | Installable TraceWeaver Core alpha plugin for the U6a-selected Light v0.1 runtime scope |
 | `docs/upstream/` | Upstream issue and public-safe fork preflight records |
 | `docs/validation/` | Fork validation protocol and results |
 | `.source-materials/` | Ignored local source cache |
@@ -273,17 +276,16 @@ Remote:
 
 ## Near-Term Next Steps
 
-1. Use the U6a scope record only as a bounded static runtime-scope decision for
-   `light-v0.1-authority-traceability`.
-2. Start U6b package/install/runtime evidence only for the exact U6a selected
-   scope.
-3. Record observed no-forced runtime discovery later as U6b/U9 evidence before
+1. Treat U6b as passed only for TraceWeaver Core alpha install smoke and static
+   selected-skill materialization under `light-v0.1-authority-traceability`.
+2. Record observed no-forced runtime discovery and real adapter invocation as
+   U9 or later U6b-dynamic evidence before
    any dynamic discovery, package-ready, release-ready, or upstream-ready claim.
-4. Complete R31 real-project validation or keep it as an explicit U7 release
+3. Complete R31 real-project validation or keep it as an explicit U7 release
    blocker.
-5. Prepare U7 release-gate decisions and release claim records before any U8
+4. Prepare U7 release-gate decisions and release claim records before any U8
    upstream-neutral package, PR, or release-note surface.
-6. Continue TraceWeaver CE baseline and lifecycle integration with the Core
+5. Continue TraceWeaver CE baseline and lifecycle integration with the Core
    validation surface as the control point.
 
 ## Product Direction

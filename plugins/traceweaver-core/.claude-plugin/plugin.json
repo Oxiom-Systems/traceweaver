@@ -1,0 +1,20 @@
+{
+  "name": "traceweaver-core",
+  "version": "0.1.0-alpha.0",
+  "description": "Systems-engineering authority control for agentic software work.",
+  "author": {
+    "name": "Oxiom Systems",
+    "url": "https://github.com/Oxiom-Systems"
+  },
+  "homepage": "https://github.com/Oxiom-Systems/traceweaver",
+  "repository": "https://github.com/Oxiom-Systems/traceweaver",
+  "license": "MIT",
+  "keywords": [
+    "traceweaver",
+    "systems-engineering",
+    "requirements",
+    "traceability",
+    "agentic-workflow",
+    "compound-engineering"
+  ]
+}

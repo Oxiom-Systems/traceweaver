@@ -1010,7 +1010,16 @@ R31-complete claims.
 - Any all-eleven or upstream-subset packaging decision has explicit review
   approval.
 
-- [ ] **U6b: Runtime Packaging Implementation**
+- [x] **U6b: Runtime Packaging Implementation**
+
+**Status:** Completed for TraceWeaver Core alpha install smoke and static
+selected-skill materialization only. `TWCORE-U6B-RUNTIME-2026-04-30-001`
+records plugin manifests, selected runtime files, skill-local selected
+references, adapter skills, isolated Codex install smoke, installed manifest,
+and static adapter routing for the exact U6a `light-v0.1-authority-traceability`
+scope. Dynamic no-forced discovery, real runtime invocation transcript,
+package-ready, release-ready, upstream-ready, all-Core runtime, and R31-complete
+claims remain held for later gates.
 
 **Goal:** Implement runtime packaging only for the bounded U6a scope without
 overclaiming release readiness.

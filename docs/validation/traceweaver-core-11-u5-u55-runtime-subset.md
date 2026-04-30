@@ -212,9 +212,9 @@ Excluded by default:
 The following evidence is required for the exact runtime subset before U6a may
 make a runtime-scope decision. The terminal record below supplies static
 candidate, bundle, file-delta, requirements-quality, routing, and failure
-evidence for `696548694dd40ce298d77e603db069934b58f645`, but dynamic
-no-forced runtime discovery remains missing. U6b/package/release work still
-requires its own later evidence.
+evidence for `696548694dd40ce298d77e603db069934b58f645`. U6b alpha
+install-smoke evidence is recorded separately, but dynamic no-forced runtime
+discovery, package-ready, and release-ready claims still require later evidence.
 
 - target runtime repository and discovery mechanism selected for this subset;
 - named runtime discovery mechanism, expected search paths, and observed
