@@ -113,6 +113,15 @@ The plugin package should provide templates for consuming repositories to create
 these files. It should not install project-specific authority records into a
 repo automatically.
 
+## Requirements Baseline
+
+The draft master controlled requirements baseline is
+[requirements.md](requirements.md). It is the candidate authority index for
+current planning until `/ce-doc-review` accepts it or its blocking findings are
+resolved. After acceptance, it supersedes the older brainstorm requirement
+documents as the controlling baseline. Those brainstorm documents remain source
+evidence and rationale.
+
 ## Current State
 
 As of 2026-04-30:

@@ -32,21 +32,27 @@ capabilities, not authority. Every behavior-changing agent handoff must be able
 to cite stakeholder intent, an approved requirement or approved exception,
 verification method, validation question, and current baseline version.
 
+Use `requirements.md` as the master controlled requirements baseline. The
+brainstorm requirement documents under `docs/brainstorms/` are source evidence
+and rationale; they are not the controlling baseline by themselves.
+
 Recommended next CE command sequence:
 
-1. Use `/ce-doc-review` against
+1. Use `/ce-doc-review` against `requirements.md` before treating it as accepted
+   planning authority for U6b Unit 2 or U7 claims.
+2. Use `/ce-doc-review` against
    `docs/plans/2026-04-30-001-feat-traceweaver-clean-ce-plugin-swap-plan.md`
    if the Unit 2 plan changes again. The current Unit 2 plan requires a CE
    upstream source pin before vendoring selected CE files and requires a
    transitive CE reference-closure audit for selected `references/`, `scripts/`,
    and `assets/` paths. It also requires Intent Contract templates and advisory
    authority-gate guidance.
-2. Use `/ce:work` on Unit 2 after the plan patch is committed. Unit 2
+3. Use `/ce:work` on Unit 2 after the plan patch is committed. Unit 2
    materializes the selected CE-compatible runtime surface inside
    `plugins/traceweaver-core` using
    `docs/validation/traceweaver-core-11-ce-runtime-inventory.md` as authority.
-3. Run `/ce-doc-review` against the updated Unit 2 evidence before moving to U7.
-4. Start U7 only after Unit 2 passes review. U7 claims must stay narrow:
+4. Run `/ce-doc-review` against the updated Unit 2 evidence before moving to U7.
+5. Start U7 only after Unit 2 passes review. U7 claims must stay narrow:
    installable alpha and advisory/static install evidence may be approved if
    proven; clean CE replacement, dynamic discovery, slash commands, and full
    Core 11 runtime remain held until later proof.
