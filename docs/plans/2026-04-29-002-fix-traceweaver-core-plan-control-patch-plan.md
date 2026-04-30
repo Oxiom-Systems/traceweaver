@@ -98,8 +98,8 @@ start U5 or create runtime/package/release evidence.
 
 4. U6a consumes U5.5 subset acceptance, not raw U4 breadth.
 
-   U4-only skills remain public skill-folder accepted but are excluded from
-   runtime packaging by default.
+   Non-selected U4-promoted Core skills remain public skill-folder accepted but
+   are excluded from runtime packaging by default.
 
 5. U7 creates claim records for U8/U9.
 
@@ -244,7 +244,7 @@ Plan:
   - default runtime scope is limited to the exact U5.5 accepted, reduced, or
     split runtime subset
   - each skill in that subset must also have a current non-held U4 record
-  - U4-only skills are excluded from runtime packaging by default
+  - Non-selected U4-promoted Core skills are excluded from runtime packaging by default
 - Preserve the rule that exception records do not satisfy U4 public
   skill-folder acceptance, U6 runtime/package authorization, or U7 release
   acceptance.

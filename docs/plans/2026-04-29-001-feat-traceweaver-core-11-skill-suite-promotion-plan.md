@@ -850,9 +850,10 @@ skill-folder acceptance and release readiness.
 `light-v0.1-authority-traceability` is recorded in
 `docs/validation/traceweaver-core-11-u5-u55-runtime-subset.md` with
 `requirements-reviewer` and `systems-engineering-traceability`. The subset is
-`held_pending_runtime_evidence`; U6 remains blocked until the missing focused
-review, runtime discovery/loading, routing, failure-behavior, and R31 evidence
-is recorded.
+`held_pending_runtime_evidence`; U6 remains blocked until the selected candidate
+commit is refreshed or proven and the missing focused review, runtime
+discovery/loading, routing, failure-behavior, R31 evidence, and append-only
+terminal-state handoff are recorded.
 
 **Files:**
 - Update:
@@ -974,7 +975,8 @@ package manifests.
 - Default runtime scope is limited to skills in the exact U5.5 accepted,
   reduced, or split runtime subset that also have current non-held U4
   file-level public skill-folder records.
-- U4-only skills are excluded from runtime packaging by default.
+- Non-selected U4-promoted Core skills are excluded from runtime packaging by
+  default.
 - U2 validation records and U3 `docs/distilled/` summary records are not runtime
   packaging authority.
 - Do not package all eleven skills by default.
@@ -1193,8 +1195,8 @@ claims, held claims, follow-up work, and adoption evidence.
   current non-held U7/U8 records.
 - Runtime packaging uses a bounded U6a scope decision before U6b implementation;
   the default is limited to the exact U5.5 accepted, reduced, or split runtime
-  subset whose skills also have current non-held U4 records. U4-only skills are
-  excluded by default.
+  subset whose skills also have current non-held U4 records. Non-selected
+  U4-promoted Core skills are excluded by default.
 - U2 validation records and U3 `docs/distilled/` summary records cannot authorize
   public skill-folder acceptance or runtime packaging by themselves.
 - First-four status distinguishes scrubbed public-candidate seed status from

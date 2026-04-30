@@ -2,9 +2,16 @@
 
 Date: 2026-04-30
 
-Reviewer/session: `ce:work`, branch `codex/traceweaver-u55-runtime-subset`
+Reviewer/session: `ce:work`, branch `codex/traceweaver-u55-runtime-subset`;
+`ce-doc-review`, branch `codex/traceweaver-u6-unblock`
 
 Base commit: `6b6f62e73ac7de138a212bd2b6f8340bbba028ae`
+U6-unblock review base: `dea8fa0c9e6e9e0bce413653d1cc77e9406c92a0`
+
+Doc-review update: 2026-04-30 `ce-doc-review` found this record is a blocker
+inventory, not a U6 authorization artifact. U6 remains blocked until a later
+append-only U5.5 terminal-state record cites concrete evidence IDs for every
+required runtime field and records `accepted`, `reduced`, or `split`.
 
 ## U5 Delta-Only Public Artifact Inventory
 
@@ -34,6 +41,21 @@ git ls-tree -r --name-only HEAD skills \
 
 Observed result: `66` total skill files and `66` U4-covered skill files.
 
+U4 evidence-integrity cross-check:
+
+```bash
+git ls-tree -r --name-only HEAD skills | sort > /tmp/tw-skill-files.txt
+rg -o '`skills/[^`]+`' docs/validation/traceweaver-core-11-promotion-records.md \
+  | tr -d '`' \
+  | sort -u > /tmp/tw-u4-targets.txt
+comm -23 /tmp/tw-skill-files.txt /tmp/tw-u4-targets.txt | wc -l
+```
+
+Observed result: `0` current skill files missing from U4 target-path evidence.
+The first U5.5 subset skills also have current U4 source-preflight rows
+`TWCORE-U4-SOURCE-PREFLIGHT-REQUIREMENTS-REVIEWER-001` and
+`TWCORE-U4-SOURCE-PREFLIGHT-SYSTEMS-TRACEABILITY-001`.
+
 No exact U5 target artifact remains outside the U4-promoted skill-folder paths.
 Existing `docs/distilled/` guidance is already governed by U3 summary records,
 and README, plan, review, and validation files are control artifacts, not U5
@@ -61,11 +83,28 @@ package, upstream, release, or public-ready claims yet. U6 remains blocked until
 this subset reaches a terminal state of `accepted`, `reduced`, or `split` with
 the missing evidence listed below.
 
+Evidence completion unblocks only the U6a runtime-scope decision. Runtime,
+package, upstream, release, and public-ready claims remain held until the later
+U6, U7, and U8 gates explicitly approve their own surfaces.
+
+Candidate-source status: the previous candidate commit
+`987793dfd477bc205a0a49efe4ec1b1e31045903` is not reproducible from this repo
+and was not present after fetching the public contributor fork branch on
+2026-04-30. The public contributor fork branch
+`https://github.com/jjziets/agent-skills.git` at
+`refs/heads/feature/systems-engineering-traceability` currently advertises
+`696548694dd40ce298d77e603db069934b58f645`. U5.5 cannot move to a terminal
+U6-eligible state until the chosen candidate commit is refreshed or proven by a
+separate access-controlled evidence record with repository, branch, clean-tree
+status, and verification command.
+
 ```text
 u5_5_runtime_subset_matrix:
   subset_id: light-v0.1-authority-traceability
   subset_name: Light v0.1 authority and traceability runtime subset
-  candidate_commit: 987793dfd477bc205a0a49efe4ec1b1e31045903
+  candidate_commit: held_pending_refresh_or_evidence
+  previous_candidate_commit: 987793dfd477bc205a0a49efe4ec1b1e31045903
+  latest_observed_public_fork_head: 696548694dd40ce298d77e603db069934b58f645
   release_gate_effect: held_until_U7
   gate_state: held_pending_runtime_evidence
   skills:
@@ -119,6 +158,29 @@ u5_5_runtime_subset_matrix:
         - release-ready
         - upstream-ready
       gate_state: held_pending_runtime_evidence
+  bundle_level_artifacts:
+    - artifact: skills/using-agent-skills/SKILL.md
+      classification: held_pending_runtime_target
+      reason: required to prove no-forced-skill discovery and cumulative routing in the Agent Skills runtime path
+    - artifact: references/systems-engineering-traceability-operating-model.md
+      classification: included_if_synced_to_runtime_target
+      source_public_doc: docs/distilled/systems-engineering-traceability-operating-model.md
+      evidence_needed: source-to-runtime mapping, target hash, and reference loading evidence
+    - artifact: references/traceability-matrix-template.md
+      classification: included_if_synced_to_runtime_target
+      source_public_doc: docs/distilled/traceability-matrix-template.md
+      evidence_needed: source-to-runtime mapping, target hash, and reference loading evidence
+    - artifact: references/requirements-and-vv-guide.md
+      classification: included_if_synced_to_runtime_target
+      source_public_doc: docs/distilled/requirements-and-vv-guide.md
+      evidence_needed: source-to-runtime mapping, target hash, and reference loading evidence
+    - artifact: references/risk-gap-and-change-control-guide.md
+      classification: reduced_or_held
+      source_public_doc: docs/distilled/risk-gap-and-change-control-guide.md
+      evidence_needed: reduced-scope decision, source-to-runtime mapping, target hash, and reference loading evidence
+    - artifact: skills/requirements-reviewer/references/requirements-review-finding-schema.md
+      classification: held_pending_target_anatomy
+      reason: referenced by the Agent Skills runtime candidate but not present in the current public TraceWeaver skill folder
 ```
 
 Excluded by default:
@@ -134,8 +196,7 @@ Excluded by default:
 U6a must not start until all of the following exist for the exact runtime
 subset:
 
-- target runtime repository, package layout, or manifest selected for this
-  subset;
+- target runtime repository and discovery mechanism selected for this subset;
 - named runtime discovery mechanism and expected search paths;
 - skill loading evidence for each selected skill;
 - reference, schema, and example loading evidence for each selected skill;
@@ -150,5 +211,31 @@ subset:
   secrets, environment values, private provenance, unsupported standards claims,
   or unsupported release/package claims.
 
-Until this evidence exists, U6a scope remains blocked and U4-only skills are
-excluded from runtime packaging by default.
+Package layout and manifest selection are U6a outputs and U6b prerequisites, not
+U5.5 preconditions. U5.5 must still identify the target runtime and discovery
+mechanism before U6a can decide packaging scope.
+
+Until this evidence exists, U6a scope remains blocked and non-selected
+U4-promoted Core skills are excluded from runtime packaging by default.
+
+## Required Terminal-State Handoff
+
+The current held record is not consumable by U6. A later U5.5 transition must be
+recorded as a new dated append-only terminal-state section or superseding
+evidence file with:
+
+- reviewer/session and date;
+- exact candidate repository, branch, commit, and clean checkout status;
+- evidence IDs for runtime discovery, skill loading, reference loading, schema
+  loading, example loading, routing behavior, and failure behavior;
+- focused review disposition for the selected candidate commit;
+- R31 authority reference and result;
+- included, excluded, reduced, held, and split files;
+- stale-reset rule;
+- explicit statement that the selected runtime subset is U6a-eligible.
+
+R31 sufficiency must cite the R31 adoption/value gate from
+`docs/plans/2026-04-27-002-feat-traceability-mvp-u1-u55-closeout-plan.md` and
+must show scenario selection, rater independence or recorded limitation,
+pass/fail thresholds, and at least one traceability-specific value result that a
+representative rater keeps.

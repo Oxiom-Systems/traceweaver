@@ -31,6 +31,16 @@ state is `held_pending_runtime_evidence`. U6 remains blocked until focused
 review, runtime discovery/loading, routing, failure-behavior, and R31 evidence
 exist for that exact subset.
 
+2026-04-30 U6-unblock review update: the previous candidate commit
+`987793dfd477bc205a0a49efe4ec1b1e31045903` was not reproducible from the
+current public contributor fork ref. The observed
+`refs/heads/feature/systems-engineering-traceability` head in
+`https://github.com/jjziets/agent-skills.git` is
+`696548694dd40ce298d77e603db069934b58f645`. U5.5 remains held until the chosen
+candidate is refreshed or proven by an access-controlled evidence record and a
+new append-only terminal-state record binds all runtime evidence to that exact
+candidate.
+
 Architecture boundary: `requirements-reviewer` and
 `systems-engineering-traceability` are TraceWeaver Core skills. TraceWeaver CE
 is the Compound Engineering adapter that may invoke or wrap those skills, but CE
@@ -74,7 +84,9 @@ internal_provenance_record: TWCORE-INT-PROV-2026-04-29-001
 publishable_source_baseline: scrubbed public candidate
 live_agent_skills_repo: addyosmani/agent-skills
 upstream_base_commit: ca6ff66d46f140da72f423ea3dec819f81ef5337
-live_candidate_commit: 987793dfd477bc205a0a49efe4ec1b1e31045903
+live_candidate_commit: held_pending_refresh_or_evidence
+previous_candidate_commit: 987793dfd477bc205a0a49efe4ec1b1e31045903
+latest_observed_public_fork_head: 696548694dd40ce298d77e603db069934b58f645
 
 promoted_skills:
   - requirements-reviewer
@@ -93,12 +105,12 @@ gates_bound_to_live_candidate_commit:
   - traceability-specific value scenario
 ```
 
-Checkout status: `REDACTED_LOCAL_PATH` is on
-`feature/systems-engineering-traceability` at
-`987793dfd477bc205a0a49efe4ec1b1e31045903`, with local `AGENTS.md`
-modification present before this U1.5 refresh. Any later validation or
-packaging gate must start from a clean checkout or record why that local file is
-outside the live candidate.
+Checkout status: historical checkout evidence bound earlier U2 sync rows to
+`987793dfd477bc205a0a49efe4ec1b1e31045903`, but the U6-unblock review could not
+reproduce that commit from the current public fork ref. Any later validation or
+packaging gate must start from a clean checkout at the selected refreshed
+candidate commit, or cite an access-controlled evidence record that proves the
+older candidate, clean-tree status, and exact runtime file set.
 
 ## U2 Runtime Sync Evidence
 
