@@ -964,10 +964,17 @@ u5_5_runtime_subset_matrix:
   names, customer/project names, rater identities, raw transcripts, or
   proprietary scenario details.
 
-- [ ] **U6a: Runtime Packaging Scope Decision Gate**
+- [x] **U6a: Runtime Packaging Scope Decision Gate**
 
 **Goal:** Bound runtime packaging before implementation creates runtime files or
 package manifests.
+
+**Status:** Completed for the bounded static scope decision only in
+`docs/validation/traceweaver-core-11-u6a-runtime-scope.md`. U6a selects
+`light-v0.1-authority-traceability` for later U6b package/install/runtime
+evidence under `U55-LIMIT-STATIC-DISCOVERY-001`; it does not approve dynamic
+runtime discovery, package-ready, release-ready, upstream-ready, all-Core, or
+R31-complete claims.
 
 **Approach:**
 - Depend on a U5.5 terminal state of `accepted`, `reduced`, or `split` for the

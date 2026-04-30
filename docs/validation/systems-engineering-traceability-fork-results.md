@@ -620,8 +620,9 @@ Decision required:
 
 Status: `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`. U5.5 evidence is sufficient for a
 bounded static U6a scope decision for the selected bundle, not enough for
-package/runtime claims. Packaging remains held until U6a records that exact
-scope and U6b proves package/install/runtime behavior.
+package/runtime claims. U6a now records that exact static scope; packaging
+remains held until U6b proves package/install/runtime behavior for the same
+scope.
 
 ## Packaging Readiness
 
@@ -629,14 +630,14 @@ No representative U5 validation blockers remain for the `ca6ff66` baseline
 slice. R31 real-project validation remains open before packaging claims can say
 the real validation requirement is satisfied.
 
-Packaging remains blocked until U6a records a reduced static package scope and
-U6b proves the package/install/runtime behavior for that exact scope.
+Packaging remains blocked until U6b proves package/install/runtime behavior for
+the exact reduced static scope recorded by U6a.
 
 Remaining non-validation work before packaging:
 
-- Run one final focused document review on this validation record and README
-  status update.
-- Run U6a only as the bounded static scope decision authorized by
+- Run focused document review after U6b package/install/runtime evidence and
+  before any package-ready claim.
+- Use the U6a record only as the bounded static scope decision authorized by
   `U55-LIMIT-STATIC-DISCOVERY-001`.
 - Record observed no-forced runtime discovery later for U6b/U9 before dynamic
   runtime or release claims.
