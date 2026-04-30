@@ -256,6 +256,19 @@ Files:
 - Modify: `docs/validation/traceweaver-core-11-u6b-plugin-runtime.md`
 - Modify: `docs/validation/traceweaver-core-11-promotion-records.md`
 
+Prerequisites:
+
+- Resolve the CE upstream commit/tag for the `3.3.2` source package and update
+  `docs/validation/traceweaver-core-11-ce-runtime-inventory.md` before copying
+  CE files into `plugins/traceweaver-core`. If the upstream commit/tag cannot be
+  resolved during Unit 2, record an explicit accepted
+  `local-cache-only-materialization` limitation instead, keep public vendoring
+  and U7 release-claim eligibility held, and do not present the copied CE files
+  as release-authorized provenance.
+- Keep Unit 2 blocked if neither a resolved upstream commit/tag nor an accepted
+  local-cache-only limitation exists. A local cache path alone is not enough
+  authority for vendoring or release claims.
+
 Plan:
 
 - Use `docs/validation/traceweaver-core-11-ce-runtime-inventory.md` as the
@@ -275,7 +288,13 @@ Plan:
 - Add `plugins/traceweaver-core/references/ce-upstream-source-inventory.md` as
   the package-local source map. It should point back to the U6C inventory record
   and list the selected CE source version, license, file hashes, local path
-  classes, and stale-reset rule without private or machine-local paths.
+  classes, resolved upstream commit/tag or accepted local-cache-only limitation,
+  and stale-reset rule without private or machine-local paths.
+- Add a transitive closure audit for selected CE skill support files. The audit
+  must parse selected CE `SKILL.md` files for relative `references/`, `scripts/`,
+  and `assets/` paths, then prove each referenced support path is present in the
+  package, present after isolated install when expected, and covered by an
+  inventory hash or approved local delta.
 - Update plugin manifests and README so public claims say
   `alpha/advisory/static install only`. Do not advertise slash commands unless
   prompt/command files are added and install proof records them.
@@ -293,6 +312,10 @@ Verification:
 - Existing CE skill names remain present after install.
 - TraceWeaver selected skill hashes remain aligned with U6b-alpha authority or
   approved package-only hygiene deltas.
+- CE upstream commit/tag is recorded in the U6C inventory and package-local
+  source map before vendoring claims are allowed. If only a local-cache
+  limitation is accepted, U7 eligibility remains held for CE vendoring/release
+  claims.
 - Plugin manifests parse as JSON after adding the expanded runtime surface.
 - The isolated install smoke uses the README command with `--include-skills`.
 - Installed files include selected CE-compatible workflow entries such as
@@ -310,6 +333,10 @@ Verification:
 - Non-selected CE workflows remain absent from the package or are explicitly
   listed as held. Adding any CE file outside the U6C inventory requires a new
   inventory delta before Unit 2 can pass.
+- CE transitive support-file closure passes: every selected CE `SKILL.md`
+  relative support reference to `references/`, `scripts/`, or `assets/` resolves
+  to a packaged file, has a recorded hash, and is present after install when the
+  installer materializes skill directories.
 - Hygiene scans show no private paths, non-public source names, protected
   provenance strings, or unsupported standards-conformance claims.
 - U6b Unit 2 evidence does not claim clean CE replacement, dynamic
@@ -325,6 +352,13 @@ Test scenarios:
   non-selected CE file is present.
 - Hash audit: materialized CE files match the inventory hashes unless an
   explicit local delta row is added before review.
+- Provenance audit: the U6C inventory and package-local source map record the
+  resolved upstream commit/tag, or an accepted local-cache-only limitation that
+  keeps CE vendoring and U7 release claims held.
+- CE closure audit: extract relative support paths from selected CE `SKILL.md`
+  files, including referenced `references/`, `scripts/`, and `assets/` entries,
+  and confirm each path resolves in the package, resolves after isolated install
+  when applicable, and maps to an inventory row or approved delta.
 - Install smoke: isolated install with the README command and `--include-skills`
   materializes selected TraceWeaver skills and selected CE skill directories.
 - Agent boundary audit: selected CE agent files are package-present, and
@@ -339,7 +373,10 @@ Test scenarios:
 Unit 2 pass condition:
 
 - `U6b_unit_2_ce_compatible_static_materialization: PASSED`
-- `U7_eligible_for_narrow_alpha_claims: true`
+- `ce_upstream_source_pin: RECORDED`
+- `ce_transitive_support_closure: PASSED`
+- `U7_eligible_for_narrow_alpha_claims: true` only when the CE upstream source
+  pin is recorded; otherwise `HELD_BY_LOCAL_CACHE_ONLY_LIMITATION`
 - `clean_ce_replacement: HELD_FOR_U9_RUNTIME_PROOF`
 - `agent_backed_ce_behavior: HELD_UNTIL_AGENT_INSTALL_OR_DEGRADATION_PROOF`
 - `dynamic_runtime_discovery: HELD_FOR_U9`
