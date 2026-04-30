@@ -1,6 +1,6 @@
 # Systems Engineering Traceability Fork Validation
 
-Status: U5 representative validation complete at baseline commit; U5.5 terminal state is `HELD_FOR_U6A`; R31 real-project validation remains open
+Status: U5 representative validation complete at baseline commit; U5.5 terminal state is `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`; R31 real-project validation remains open
 
 Date: 2026-04-26
 
@@ -16,13 +16,14 @@ Last stale pre-reconciliation ref: `b9923fc982e6a572b1f70d1cbe9e8f1e2bc6d017 fix
 
 Current reconciliation state: U5 baseline implementation commit tested locally and focused code review rerun with no remaining findings.
 
-U5.5 reconciliation state: `light-v0.1-authority-traceability` is held for U6a
-at `696548694dd40ce298d77e603db069934b58f645`. Static file/delta,
-requirements-quality, and lifecycle-discovery records exist, but no observed
-no-forced runtime discovery transcript is recorded. Broader persona-awareness,
-non-selected Core skills, `idea-refine` command wiring, package surfaces,
-release surfaces, and upstream-ready claims remain held unless separately
-authorized by later gates.
+U5.5 reconciliation state: `light-v0.1-authority-traceability` is reduced to
+static U6a scope-decision use at
+`696548694dd40ce298d77e603db069934b58f645` under
+`U55-LIMIT-STATIC-DISCOVERY-001`. Static file/delta, requirements-quality, and
+lifecycle-discovery records exist, but no observed no-forced runtime discovery
+transcript is recorded. Broader persona-awareness, non-selected Core skills,
+`idea-refine` command wiring, package surfaces, release surfaces, and
+upstream-ready claims remain held unless separately authorized by later gates.
 
 2026-04-30 blocker-inventory update: Core 11 U5 is recorded as `CLOSED_NO_DELTA` in
 `docs/validation/traceweaver-core-11-u5-u55-runtime-subset.md`. The first U5.5
@@ -44,13 +45,13 @@ terminal-state update below after that candidate was selected and proven.
 `696548694dd40ce298d77e603db069934b58f645`; static discovery/loading, selected
 reference/schema/example inventory, routing, failure behavior, and focused
 review evidence are recorded for `light-v0.1-authority-traceability`. A later
-U5.5 cleanup added approved file-level delta/impact records for all selected
-and conditionally referenced files plus requirements-quality and static
-lifecycle-discoverability validation for the same candidate. U6a remains held
-until observed no-forced runtime discovery evidence exists or a later accepted
-U6a limitation authorizes static-only discovery. U6b package evidence, U7
-release claim records, U8 upstream/package surfaces, U9 post-release evidence,
-R31 real scenarios, and release hygiene remain held.
+U5.5 cleanup added file-level delta/impact records for all selected and
+conditionally referenced files plus requirements-quality and static
+lifecycle-discoverability validation for the same candidate.
+`U55-LIMIT-STATIC-DISCOVERY-001` authorizes only bounded static U6a scope
+decision. U6b package evidence, U7 release claim records, U8 upstream/package
+surfaces, U9 post-release evidence, R31 real scenarios, dynamic discovery, and
+release hygiene remain held.
 
 Architecture boundary: `requirements-reviewer` and
 `systems-engineering-traceability` are TraceWeaver Core skills. TraceWeaver CE
@@ -108,10 +109,10 @@ held_candidate_skills:
   - risk-gap-change-control
 
 gates_bound_to_live_candidate_commit:
-  - U5.5 harness evidence: HELD_FOR_U6A pending dynamic no-forced discovery
+  - U5.5 harness evidence: REDUCED_FOR_U6A_STATIC_SCOPE_ONLY under U55-LIMIT-STATIC-DISCOVERY-001
   - target-runtime discovery equivalence: partial static Agent Skills layout only
   - fork-diff classification: file-level delta records complete for static U5.5 review
-  - packaging anatomy check: held before U6a
+  - packaging anatomy check: held before U6b/package execution
   - R31 adoption validation: held for release
   - traceability-specific value scenario: held for R31 release evidence
 ```
@@ -153,22 +154,21 @@ U1.5 index, packaging anatomy, release hygiene, R31 adoption validation, and
 traceability-specific value remain `held`. U5.5 harness evidence, file-level
 delta/impact records, requirements-quality validation, lifecycle-discoverability
 static review, and static target-runtime discovery equivalence were refreshed at
-`696548694dd40ce298d77e603db069934b58f645`; they do not unblock U6a until
-observed no-forced runtime discovery evidence exists or a later accepted U6a
-limitation authorizes static-only discovery.
+`696548694dd40ce298d77e603db069934b58f645`; they support only bounded static
+U6a scope work under `U55-LIMIT-STATIC-DISCOVERY-001`.
 
 ## Gate Decision
 
-Current decision: **U5 representative validation passes at the baseline commit; U5.5 is `HELD_FOR_U6A`; R31 real-project validation remains open.**
+Current decision: **U5 representative validation passes at the baseline commit; U5.5 is `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`; R31 real-project validation remains open.**
 
 Reason: The upstream-neutral implementation slice is ready at tested commit `ca6ff66d46f140da72f423ea3dec819f81ef5337` for representative workflow validation. All three dummy validation scenarios have technical evidence, human reviewer usefulness/noise and confidence ratings are recorded below, and the distinct-value criteria are accepted across that representative scenario set. These runs verify workflow shape and evidence capture, but they do not satisfy R31's requirement for real feature, unclear existing module, and low-risk Lite-mode validation.
 
 U5 result: **Pass for representative validation. No implementation revision is required from the dummy runs. R31 remains open until all three pre-registered real validation scenarios are completed.**
 
 U5.5 candidate: commit `696548694dd40ce298d77e603db069934b58f645` is recorded
-for static U5.5 review for the `light-v0.1-authority-traceability` subset, but
-it is held for U6a until observed no-forced runtime discovery evidence exists or
-a later accepted U6a limitation authorizes static-only discovery.
+for static U5.5 review for the `light-v0.1-authority-traceability` subset.
+`U55-LIMIT-STATIC-DISCOVERY-001` authorizes only bounded static U6a scope
+decision; observed no-forced runtime discovery remains deferred to U6b/U9.
 Persona-awareness, non-selected Core skills, command wiring, package readiness,
 release readiness, and upstream readiness remain held unless separately
 authorized.
@@ -178,9 +178,9 @@ authorized.
 | Area | Evidence | Result |
 |---|---|---|
 | U5 tested commit | Exact fork commit validated by representative VRUN-001 to VRUN-003 is `ca6ff66d46f140da72f423ea3dec819f81ef5337 docs: align skill tree count`. | Pass for dummy workflow validation; R31 real validation remains open |
-| U5.5 runtime candidate | Latest fork commit is `696548694dd40ce298d77e603db069934b58f645 feat: add requirements reviewer skill`. | `HELD_FOR_U6A` pending observed no-forced runtime discovery |
+| U5.5 runtime candidate | Latest fork commit is `696548694dd40ce298d77e603db069934b58f645 feat: add requirements reviewer skill`. | `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`; dynamic discovery deferred to U6b/U9 |
 | U5 focused scope | Validated U5 baseline scope is `skills/systems-engineering-traceability/SKILL.md`, `references/systems-engineering-traceability-operating-model.md`, `references/traceability-matrix-template.md`, `skills/using-agent-skills/SKILL.md`, and `README.md`. | Pass at `ca6ff66` only |
-| TraceWeaver Core MVP bundle | Core runtime bundle candidate includes two core skills plus selected reference files: requirements-reviewer, systems-engineering-traceability, requirements-reviewer references, operating model, matrix template, requirements/V&V guide, and risk/gap/change-control guide. | Held before U6a pending dynamic discovery |
+| TraceWeaver Core MVP bundle | Core runtime bundle candidate includes two core skills plus selected reference files: requirements-reviewer, systems-engineering-traceability, requirements-reviewer references, operating model, matrix template, requirements/V&V guide, and risk/gap/change-control guide. | Static U6a scope decision only; package/runtime claims held |
 | Skill anatomy | `SKILL.md` includes YAML frontmatter, overview, when-to-use, process, rationalizations, red flags, and verification. | Pass |
 | Frontmatter | `name` matches directory and description includes trigger conditions. | Pass |
 | Matrix authority boundary | Skill and template define the matrix as audit record for links/status/evidence/gaps/decisions, not as replacement for source artifacts. | Pass |
@@ -193,7 +193,7 @@ authorized.
 | README discoverability | Historical Agent Skills README evidence at the U5 baseline listed the skill as cross-cutting, counted 22 skills, and linked the template. Current TraceWeaver Core uses the Core 11 framing. | Historical pass only |
 | Meta-skill routing | `skills/using-agent-skills/SKILL.md` routes meaningful behavior through `systems-engineering-traceability` as a cross-cutting hop. | Pass |
 | Operating model artifact | `references/systems-engineering-traceability-operating-model.md` exists, is linked from `SKILL.md`, contains original agent-facing lifecycle rules plus source-boundary language, and includes official/public source links. | Pass |
-| Focused code review | Focused `ce-code-review` pass on the implementation slice found no remaining findings after commits `5745ab2`, `2e67062`, and `ca6ff66`; U5.5 terminal-state focused review checked the exact `696548694dd40ce298d77e603db069934b58f645` candidate, then the U5.5 cleanup added file-level delta/impact records plus requirements-quality and static lifecycle-discoverability validation. | Pass for U5 baseline; U5.5 held for U6a pending dynamic discovery |
+| Focused code review | Focused `ce-code-review` pass on the implementation slice found no remaining findings after commits `5745ab2`, `2e67062`, and `ca6ff66`; U5.5 terminal-state focused review checked the exact `696548694dd40ce298d77e603db069934b58f645` candidate, then the U5.5 cleanup added file-level delta/impact records plus requirements-quality and static lifecycle-discoverability validation. | Pass for U5 baseline; U5.5 reduced to static U6a scope only |
 | VRUN-001 validation | Dummy new-feature A/B run created baseline and TraceWeaver outputs from the same seed commit. Human rating accepted in this session. | Pass as representative workflow evidence; does not satisfy R31 real validation |
 | VRUN-002 validation | Dummy existing-module audit A/B run created baseline and TraceWeaver Audit outputs from the same seed commit. Human rating accepted in this session. | Pass as representative workflow evidence; does not satisfy R31 real validation |
 | VRUN-003 validation | Dummy low-risk docs/discoverability A/B run created baseline and TraceWeaver Lite outputs from the same seed commit. Human rating accepted in this session. | Pass as representative workflow evidence; does not satisfy R31 real validation |
@@ -409,7 +409,7 @@ are completed.**
 | Change impact analysis performed | VRUN-002 baseline advised product-owner confirmation before behavior changes. | VRUN-002 created DEC-DISC and TD-DISC records before any change. | Human decision path is explicit before impact work. |
 | Reviewer confidence | VRUN-001 human rating: 2 / 5; VRUN-002 baseline 3 / 5; VRUN-003 baseline 4 / 5. | VRUN-001 human rating: 4 / 5; VRUN-002 Audit 4 / 5; VRUN-003 Lite 4 / 5. | Higher confidence in Standard/Audit cases; Lite preserves confidence without extra ceremony. |
 | Workflow overhead | VRUN-001 baseline produced 7 files; test command 0.30s. VRUN-002 baseline produced 5 files; test command 0.16s. VRUN-003 baseline produced 3 files; check command 0.01s. | VRUN-001 TraceWeaver run produced 9 files; test command 0.30s. VRUN-002 Audit produced 6 files; test command 0.28s. VRUN-003 Lite produced 4 files; check command 0.00s. | Standard/Audit modes add trace artifacts where ambiguity exists; Lite adds one minimal matrix artifact with accepted low noise. |
-| Lifecycle discoverability | Static discovery/routing evidence recorded for `696548694dd40ce298d77e603db069934b58f645`; no dynamic no-forced-skill transcript is recorded yet. | `static_review_only`; U5.5 remains held for U6a. | Dynamic no-forced discovery must be observed, or a later accepted U6a limitation must authorize static-only discovery before U5.5 can feed U6a. |
+| Lifecycle discoverability | Static discovery/routing evidence recorded for `696548694dd40ce298d77e603db069934b58f645`; no dynamic no-forced-skill transcript is recorded yet. | `reduced_static_scope_only` under `U55-LIMIT-STATIC-DISCOVERY-001`. | Dynamic no-forced discovery remains a U6b/U9 testing requirement before dynamic runtime or release claims. |
 
 ## Lifecycle Discoverability Validation
 
@@ -431,8 +431,8 @@ Expected result:
   approved by, date/session, allowed use, review condition, and rationale.
 - The agent records traceability evidence or blocks appropriately.
 
-Status: `HELD_FOR_U6A`; static evidence recorded, dynamic no-forced runtime
-discovery missing.
+Status: `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`; static evidence recorded, dynamic
+no-forced runtime discovery deferred to U6b/U9.
 
 Evidence: `TWCORE-U55-FILE-DELTA-2026-04-30-001`,
 `TWCORE-U55-REQQUAL-2026-04-30-001`, and
@@ -445,11 +445,11 @@ Evidence: `TWCORE-U55-FILE-DELTA-2026-04-30-001`,
 
 | ID | Skill Requirement | Evidence Method | Current Result |
 |---|---|---|---|
-| SREQ-TRACE-001 | The skill must create useful traceability from stakeholder need and requirement authority to implementation, verification, and validation evidence. | Run all three pre-registered fork scenarios. | Pass across representative VRUN-001, VRUN-002, and VRUN-003 with human acceptance for the U5 baseline. R31 real-project validation remains open. U5.5 idea/intent lifecycle coverage is approved as U6a scope-decision input only at `696548694dd40ce298d77e603db069934b58f645`. |
+| SREQ-TRACE-001 | The skill must create useful traceability from stakeholder need and requirement authority to implementation, verification, and validation evidence. | Run all three pre-registered fork scenarios. | Pass across representative VRUN-001, VRUN-002, and VRUN-003 with human acceptance for the U5 baseline. R31 real-project validation remains open. U5.5 idea/intent lifecycle coverage is recorded as static review evidence only for later bounded U6a scope work at `696548694dd40ce298d77e603db069934b58f645`; dynamic discovery remains a U6b/U9 testing requirement. |
 | SREQ-TRACE-002 | The skill must remain lightweight. | Compare baseline workflow time against traceability-enabled workflow time. | Pass in VRUN-003: Lite mode added one minimal matrix file and no full requirements/plan/ATP/results package; human noise rating 1 / 5. |
 | SREQ-TRACE-003 | The skill must be low-noise. | Human reviewer classifies findings as useful or low-value. | Pass: human low-value noise ratings were 2 / 5, 2 / 5, and 1 / 5 across the validation set. |
 | SREQ-TRACE-004 | The skill must improve reviewer confidence. | Reviewer rates confidence before and after using the skill. | Pass: confidence improved in VRUN-001 and VRUN-002 and stayed equal in VRUN-003. |
-| SREQ-TRACE-005 | The skill must not require broad repo changes. | Review PR scope. | Pass for the tested U2-U5 slice at `ca6ff66`; that slice stays focused. The expanded U5.5 runtime candidate has approved file-level delta/impact and validation evidence for U6a scope-decision input only. |
+| SREQ-TRACE-005 | The skill must not require broad repo changes. | Review PR scope. | Pass for the tested U2-U5 slice at `ca6ff66`; that slice stays focused. The expanded U5.5 runtime candidate has file-level delta/impact and validation evidence recorded for static-scope U6a review only under `U55-LIMIT-STATIC-DISCOVERY-001`; it is not dynamic runtime approval. |
 | SREQ-TRACE-006 | The skill must expose missing traceability, not invent it. | Inspect inferred links. | Pass in VRUN-002: inferred requirements were recorded as Draft and no approved authority was invented. |
 | SREQ-TRACE-007 | The skill must provide distinct value beyond existing Agent Skills workflows. | Compare baseline run against traceability-enabled run. | Pass across representative VRUN-001, VRUN-002, and VRUN-003 with final distinct-value decision accepted for dummy validation; R31 real-project validation remains open. |
 
@@ -494,12 +494,10 @@ Excluded from any future U5.5 scope unless separately authorized:
 - `agents/security-auditor.md`
 - `agents/test-engineer.md`
 
-No packaging should be prepared from `987793d` or from the current held
-candidate. This line is historical for the old `987793d` candidate and remains
-current for `6965486` until dynamic no-forced runtime discovery exists or a
-later accepted U6a limitation authorizes static-only discovery. If a later U5.5
-state authorizes U6a, excluded persona files, non-selected Core skills, and
-command-wiring surfaces must be split out or authorized by later gates before
+No packaging should be prepared from `987793d`. For `6965486`,
+`U55-LIMIT-STATIC-DISCOVERY-001` authorizes only bounded static U6a scope
+decision; excluded persona files, non-selected Core skills, and command-wiring
+surfaces must be split out or authorized by later gates before
 they are included.
 
 Key rule added: ideas are first-class lifecycle inputs, not implementation
@@ -620,10 +618,10 @@ Decision required:
 - Split into a follow-up candidate.
 - Reduce scope back to the U2-U5 validated bundle.
 
-Status: `HELD_FOR_U6A`. U5.5 evidence is sufficient for static review of the
-selected bundle but not yet enough to decide reduced package scope.
-Packaging remains held until U5.5 transitions out of hold, U6a records that
-exact scope, and U6b proves package/install/runtime behavior.
+Status: `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`. U5.5 evidence is sufficient for a
+bounded static U6a scope decision for the selected bundle, not enough for
+package/runtime claims. Packaging remains held until U6a records that exact
+scope and U6b proves package/install/runtime behavior.
 
 ## Packaging Readiness
 
@@ -631,18 +629,17 @@ No representative U5 validation blockers remain for the `ca6ff66` baseline
 slice. R31 real-project validation remains open before packaging claims can say
 the real validation requirement is satisfied.
 
-Packaging remains blocked until U5.5 transitions out of `HELD_FOR_U6A`, U6a
-records a reduced package scope, and U6b proves the package/install/runtime
-behavior for that exact scope.
+Packaging remains blocked until U6a records a reduced static package scope and
+U6b proves the package/install/runtime behavior for that exact scope.
 
 Remaining non-validation work before packaging:
 
 - Run one final focused document review on this validation record and README
   status update.
-- Record observed no-forced runtime discovery for the U5.5 candidate at
-  `696548694dd40ce298d77e603db069934b58f645`, or add an accepted U6a limitation
-  that authorizes static-only discovery.
-- Run U6a scope decision only after U5.5 transitions out of `HELD_FOR_U6A`.
+- Run U6a only as the bounded static scope decision authorized by
+  `U55-LIMIT-STATIC-DISCOVERY-001`.
+- Record observed no-forced runtime discovery later for U6b/U9 before dynamic
+  runtime or release claims.
 - Complete release hygiene decision for candidate source-name surfaces.
 - Complete U6b package/install/runtime evidence for the reduced scope.
 - Complete R31 real-project validation: real feature, unclear existing module,

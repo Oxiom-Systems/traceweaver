@@ -16,9 +16,9 @@ runtime scope for `light-v0.1-authority-traceability`.
 
 This is static review evidence only. It is not an observed no-forced runtime
 transcript, not U6b installed-runtime proof, and not proof of automatic
-discovery in every agent runtime. U5.5 remains held for U6a until dynamic
-runtime discovery evidence exists or a later accepted U6a limitation explicitly
-authorizes static-only scope work.
+discovery in every agent runtime. U5.5 is reduced to static U6a scope-decision
+use only under `U55-LIMIT-STATIC-DISCOVERY-001`; dynamic no-forced runtime
+discovery remains a U6b/U9 testing requirement.
 
 ## Target Runtime Selector
 
@@ -29,9 +29,15 @@ Agent Skills Markdown layout:
 - read skill entrypoints from skills/*/SKILL.md
 - read skill name and description frontmatter
 - select applicable skills by matching task intent to frontmatter descriptions
-- use skills/using-agent-skills/SKILL.md as cross-skill routing guidance
+- use selected clauses of skills/using-agent-skills/SKILL.md as static
+  cross-skill routing guidance for `light-v0.1-authority-traceability`
 - load referenced files from skills/<skill>/references/* and references/*
 ```
+
+The selector does not import every skill named by `using-agent-skills`.
+Non-selected workflow skills are excluded by
+`U55-LIMIT-STATIC-DISCOVERY-001` unless a later gate adds them with explicit
+manifest, loading, and review evidence.
 
 ## Validation Scenario
 
@@ -57,7 +63,7 @@ Expected lifecycle behavior:
 
 | Candidate file | SHA-256 | Discovery evidence | Decision |
 | --- | --- | --- | --- |
-| `skills/using-agent-skills/SKILL.md` | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Routes vague ideas to idea refinement plus systems traceability; routes meaningful behavior to systems traceability; states ideas are lifecycle inputs, not authority. | Pass |
+| `skills/using-agent-skills/SKILL.md` | `a23c1c5a0eb71ba56f3d5ae9eaa0704b6f56c80df1f4e49f3169569bb1fa31c5` | Selected clauses route meaningful behavior to systems traceability and preserve ideas as lifecycle inputs, not authority. Non-selected routed workflow skills, including idea refinement, remain excluded by `U55-LIMIT-STATIC-DISCOVERY-001`. | Pass for selected static clauses only |
 | `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Frontmatter selects this skill for needs, requirements, user stories, constraints, and acceptance criteria before they become implementation authority. | Pass |
 | `skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Frontmatter selects this skill for refining ideas, starting/changing meaningful behavior, planning verification, preparing release evidence, and work lacking requirement/test/validation path or owner. | Pass |
 
@@ -88,14 +94,16 @@ Expected lifecycle behavior:
 
 `lifecycle_discoverability_validation_record`: static review only.
 
+Accepted limitation: `U55-LIMIT-STATIC-DISCOVERY-001`.
+
 Allowed claim:
 
 - The exact U5.5 candidate commit has enough frontmatter discovery and
-  cross-skill routing evidence for later U6a review.
+  selected cross-skill routing evidence for a bounded U6a static runtime-scope
+  decision.
 
 Held claims:
 
-- U6a scope-decision ready;
 - observed no-forced runtime discovery;
 - automatic skill discovery in every installed runtime;
 - package-ready;

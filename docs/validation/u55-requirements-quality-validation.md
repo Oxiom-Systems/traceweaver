@@ -11,9 +11,9 @@ Evidence ID: `TWCORE-U55-REQQUAL-2026-04-30-001`
 ## Scope
 
 This record validates the requirements-quality behavior in the exact U5.5
-runtime candidate. It supports later U6a scope-decision work for the
-`light-v0.1-authority-traceability` subset only; it does not by itself unblock
-U6a while dynamic runtime discovery remains unproven.
+runtime candidate. It supports the bounded static U6a scope-decision work for
+the `light-v0.1-authority-traceability` subset only under
+`U55-LIMIT-STATIC-DISCOVERY-001`; it does not prove dynamic runtime discovery.
 
 This record does not approve U6b package implementation, public release,
 upstream readiness, all-Core runtime scope, or R31 completion.
@@ -34,6 +34,7 @@ licensed-source passage is recorded here.
 | File | SHA-256 | Result |
 | --- | --- | --- |
 | `skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Pass |
+| `skills/requirements-reviewer/agents/openai.yaml` | `ebdec17ec4de718225b6e4d417123be66c6e9b4a9225278e4bff79ba1581b829` | Present as config/invocation metadata; covered by manifest, not a requirements-quality behavior source |
 | `skills/requirements-reviewer/references/requirements-quality-operating-model.md` | `eac57d6d0397bd5076bce40fdef4ece61456e594687dd402d7cee0d89e0e0a2e` | Pass |
 | `skills/requirements-reviewer/references/requirements-quality-checklist.md` | `a044d685381f974923661702e00c6bbf188ce9eb15ebdee3c9f11089bed65e85` | Pass |
 | `skills/requirements-reviewer/references/requirements-review-finding-schema.md` | `3b0ae1b832311fe6b27655e0f9a488c2ee225969da5ca999ebc597b386fef83d` | Pass |
@@ -62,11 +63,11 @@ licensed-source passage is recorded here.
 Allowed claim:
 
 - The exact U5.5 candidate commit contains sufficient requirements-quality
-  behavior for later U6a review of the bounded runtime scope.
+  behavior for the bounded static U6a review of the runtime scope.
 
 Held claims:
 
-- U6a scope-decision ready;
+- dynamic U6a runtime discovery ready;
 - runtime/package approval for the referenced files;
 - package-ready;
 - release-ready;
@@ -75,6 +76,6 @@ Held claims:
 - R31 real-project validation complete.
 
 Stale reset rule: any candidate commit change, requirements-reviewer file hash
-change, required reference hash change, removal of V&V separation, or removal of
-the requirements-reviewer-to-traceability handoff resets this record to `held`
-until rerun against the new candidate.
+change, `agents/openai.yaml` hash change, required reference hash change,
+removal of V&V separation, or removal of the requirements-reviewer-to-traceability
+handoff resets this record to `held` until rerun against the new candidate.

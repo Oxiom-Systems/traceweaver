@@ -12,14 +12,15 @@ Doc-review update: 2026-04-30 `ce-doc-review` found the original matrix was a
 blocker inventory, not a U6 authorization artifact. The terminal-state record
 below now binds selected candidate proof, recorded U5.5 file-level delta/impact
 records, and required U5.5 validation evidence to the same final candidate
-commit. Current U5.5 state: `HELD_FOR_U6A`.
+commit. Current U5.5 state: `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`.
 
 U6a hold update: 2026-04-30 focused doc review found that the selected bundle
 omitted conditional `requirements-reviewer` references and that lifecycle
 discoverability evidence was static review, not an observed no-forced runtime
-transcript. This record now accounts for the missing references, but U5.5 stays
-held until dynamic runtime discovery evidence exists or a later accepted U6a
-limitation explicitly authorizes static-only scope work.
+transcript. This record now accounts for the missing references, but U5.5 is
+limited to a static U6a scope-decision handoff under
+`U55-LIMIT-STATIC-DISCOVERY-001`; dynamic runtime discovery remains a U6b/U9
+testing requirement.
 
 ## U5 Delta-Only Public Artifact Inventory
 
@@ -109,8 +110,9 @@ and was not present after fetching the public contributor fork branch on
 `696548694dd40ce298d77e603db069934b58f645`. The append-only record below proves
 that candidate commit. Later review supplied file-level delta/impact records,
 requirements-quality validation, and static lifecycle-discoverability evidence
-for that same commit, but U5.5 remains held for U6a because dynamic no-forced
-runtime discovery has not been observed.
+for that same commit. U5.5 is now reduced to static U6a scope-decision use
+under `U55-LIMIT-STATIC-DISCOVERY-001`; dynamic no-forced runtime discovery
+has not been observed and remains a U6b/U9 testing requirement.
 
 ```text
 u5_5_runtime_subset_matrix:
@@ -270,16 +272,16 @@ Record ID: `TWCORE-U55-TERM-2026-04-30-001`
 Date/session: 2026-04-30, `ce:work`, branch
 `codex/traceweaver-u55-terminal-evidence`
 
-Terminal state: `HELD_FOR_U6A`
+Terminal state: `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`
 
-Gate effect: `U6a_blocked`
+Gate effect: `U6a_static_scope_decision_allowed_only`
 
 U5.5 does not approve a runtime package, release surface, upstream PR, public
-availability claim, U6a scope decision, U6b package implementation, or R31
+availability claim, dynamic U6a discovery, U6b package implementation, or R31
 completion. This record proves the observed public fork candidate and records
-the selected bundle, but it does not make the subset consumable by U6a until
-dynamic no-forced runtime discovery evidence exists or a later accepted U6a
-limitation explicitly authorizes static-only scope work.
+the selected bundle for bounded static U6a scope-decision use only under
+`U55-LIMIT-STATIC-DISCOVERY-001`. It does not approve dynamic runtime
+discovery, packaging, release, or upstream use.
 
 ### Candidate Proof
 
@@ -338,10 +340,12 @@ Final candidate commit:
 For each manifest row below, `final_candidate_commit` is
 `696548694dd40ce298d77e603db069934b58f645`.
 
-The manifest below accounts for every file in the selected Agent Skills runtime
-scope: `skills/using-agent-skills`, `skills/requirements-reviewer`,
-`skills/systems-engineering-traceability`, and the four top-level references
-named by `systems-engineering-traceability/SKILL.md`. These rows record
+The manifest below accounts for every file in the selected Agent Skills
+runtime-file scope: `skills/requirements-reviewer`,
+`skills/systems-engineering-traceability`, the references named by those two
+selected skills, and the selected clauses of `skills/using-agent-skills/SKILL.md`
+used as static routing context. The `using-agent-skills` row does not import
+or approve non-selected workflow skills named by the router. These rows record
 scrubbed candidate inputs only; they do not approve runtime, package, release,
 or upstream use.
 
@@ -393,7 +397,7 @@ Additional selected U5.5 candidate files are top-level Agent Skills runtime
 references or requirement-reviewer runtime support files whose exact paths are
 not U4-approved TraceWeaver public skill-folder target paths. They are recorded
 below as U5.5 runtime-support deltas for static U5.5 evidence only. Dynamic
-runtime discovery remains held before U6a.
+runtime discovery remains held for U6b/U9.
 
 ### U5.5 File-Level Delta / Impact Records
 
@@ -447,9 +451,51 @@ resets the affected U5.5 rows to `held`.
 Reviewer: `ce:work`, branch `codex/traceweaver-u6-unblock-next`.
 
 Stale reset: any candidate file hash change, U4 target hash change for selected
-skill files, new referenced runtime file, or use of these deltas as U4/U6a/U6b/U7
+skill files, new referenced runtime file, or use of these deltas as U4/U6b/U7
 acceptance without an accepted terminal-state update resets the affected row to
 `held`.
+
+### Accepted Static-Discovery Limitation
+
+Limitation ID: `U55-LIMIT-STATIC-DISCOVERY-001`
+
+Decision: `accepted_for_U6a_static_scope_decision_only`
+
+`skills/using-agent-skills/SKILL.md` is used in U5.5 only for the selected
+static routing clauses that point ideas and meaningful behavior toward
+requirements-quality review and systems traceability. U5.5 does not treat the
+router as a complete runtime bundle manifest, and it does not include, approve,
+or require packaging for non-selected routed workflow skills.
+
+Explicitly out of the U5.5 static scope unless a later gate adds file-level
+manifest, delta/impact, loading, and review evidence:
+
+- `idea-refine`;
+- `spec-driven-development`;
+- `planning-and-task-breakdown`;
+- `incremental-implementation`;
+- `frontend-ui-engineering`;
+- `api-and-interface-design`;
+- `context-engineering`;
+- `source-driven-development`;
+- `test-driven-development`;
+- `browser-testing-with-devtools`;
+- `debugging-and-error-recovery`;
+- `code-review-and-quality`;
+- `security-and-hardening`;
+- `performance-optimization`;
+- `git-workflow-and-versioning`;
+- `ci-cd-and-automation`;
+- `documentation-and-adrs`;
+- `shipping-and-launch`.
+
+Allowed U6a use: U6a may make a bounded static runtime-scope decision for
+`light-v0.1-authority-traceability` using only the selected files in
+`TWCORE-U55-LOAD-2026-04-30-001` and this limitation.
+
+Blocked claims: dynamic no-forced skill discovery, package-ready runtime
+loading, release readiness, upstream readiness, all-Core routing, and packaging
+of any non-selected routed workflow skill.
 
 Held or excluded by default:
 
@@ -465,11 +511,13 @@ Evidence ID: `TWCORE-U55-ROUTING-2026-04-30-001`
 
 Routing evidence:
 
-- `using-agent-skills` routes vague ideas through idea refinement plus
-  traceability, but records ideas as lifecycle inputs, not implementation
-  authority.
-- `using-agent-skills` routes meaningful behavior through
-  `systems-engineering-traceability` as a cross-cutting hop.
+- `using-agent-skills` is used only as selected-subset static routing context:
+  its idea/meaningful-behavior clauses preserve ideas as lifecycle inputs and
+  route authority-bearing work toward requirements-quality review and
+  `systems-engineering-traceability`.
+- Non-selected workflow skill names in `using-agent-skills` are explicitly
+  excluded by `U55-LIMIT-STATIC-DISCOVERY-001` and do not expand the U5.5
+  manifest.
 - `requirements-reviewer` is the selected gate for deciding whether needs,
   requirements, success criteria, constraints, and acceptance criteria can
   become approved implementation authority.
@@ -493,14 +541,15 @@ Failure-behavior evidence:
 
 Evidence ID: `TWCORE-U55-FOCUSED-REVIEW-2026-04-30-001`
 
-Disposition: `held_for_U6a_static_review_only`
+Disposition: `reduced_for_U6a_static_scope_only`
 
 Focused review checked the exact candidate commit, required file presence,
 frontmatter discovery shape, selected reference paths, routing text, failure
 behavior text, public hygiene scan, file-level delta/impact records,
 requirements-quality validation, and lifecycle-discoverability validation.
 It also found that lifecycle-discoverability evidence is static review, not an
-observed no-forced runtime transcript, so U5.5 remains held for U6a.
+observed no-forced runtime transcript; U5.5 is therefore reduced to static U6a
+scope-decision use only under `U55-LIMIT-STATIC-DISCOVERY-001`.
 
 Baseline-reconciliation review rerun: 2026-04-30 `ce:work` reran the focused
 document checks after the authority-manifest patch. The selected manifest now
@@ -508,8 +557,9 @@ matches the files from Agent Skills commit
 `696548694dd40ce298d77e603db069934b58f645`, all files referenced by
 `requirements-reviewer/SKILL.md` are included, the private runtime snapshot is
 marked non-authoritative unless refreshed to hash-match the commit, and no stale
-U6a-ready claim was found. U5.5 still remains held because dynamic no-forced
-runtime discovery is not proven and source-name release policy remains held.
+dynamic runtime-ready claim was found. U5.5 may feed only a bounded static U6a
+scope decision; dynamic no-forced runtime discovery is not proven and
+source-name release policy remains held.
 
 No private path, private repository name, local checkout path, private candidate
 locator, raw extraction path, secret, or environment-value hit was observed in
@@ -519,9 +569,8 @@ Review limitation: source-name references to external standards and public
 source context exist in the candidate repository. U6a must decide whether the
 package scope excludes those surfaces, rewrites them, or records a
 release-specific source-name policy before U6b/U7. This limitation blocks
-package-ready, release-ready, and upstream-ready claims. U6a also remains held
-until dynamic discovery evidence exists or an accepted U6a limitation records
-how static-only discovery may be used.
+package-ready, release-ready, and upstream-ready claims. Dynamic discovery
+evidence remains deferred to U6b/U9 under `U55-LIMIT-STATIC-DISCOVERY-001`.
 
 ### Required U5.5 Evidence Status
 
@@ -533,8 +582,8 @@ All required evidence must bind to final candidate commit
 | Required evidence | Current record | Status |
 | --- | --- | --- |
 | requirements-quality validation record | `TWCORE-U55-REQQUAL-2026-04-30-001` in `docs/validation/u55-requirements-quality-validation.md` | `pass_for_static_U5_5_input` |
-| lifecycle-discoverability validation record | `TWCORE-U55-LIFECYCLE-DISCOVERY-2026-04-30-001` in `docs/validation/u55-lifecycle-discoverability.md` | `static_review_only; dynamic_no_forced_runtime_discovery_missing` |
-| runtime discovery/loading record | `TWCORE-U55-DISCOVERY-2026-04-30-001`, `TWCORE-U55-LOAD-2026-04-30-001` | `static_inventory_only; runtime_transcript_missing` |
+| lifecycle-discoverability validation record | `TWCORE-U55-LIFECYCLE-DISCOVERY-2026-04-30-001` in `docs/validation/u55-lifecycle-discoverability.md`; limitation `U55-LIMIT-STATIC-DISCOVERY-001` | `reduced_static_scope_only; dynamic_no_forced_runtime_discovery_deferred_to_U6b_U9` |
+| runtime discovery/loading record | `TWCORE-U55-DISCOVERY-2026-04-30-001`, `TWCORE-U55-LOAD-2026-04-30-001`; limitation `U55-LIMIT-STATIC-DISCOVERY-001` | `static_inventory_only_for_U6a_scope_decision; runtime_transcript_deferred` |
 | reference/schema/example loading record | `TWCORE-U55-LOAD-2026-04-30-001`, `TWCORE-U55-FILE-DELTA-2026-04-30-001` | `static_inventory_only` |
 | routing behavior record | `TWCORE-U55-ROUTING-2026-04-30-001`, `TWCORE-U55-LIFECYCLE-DISCOVERY-2026-04-30-001` | `static_review_only` |
 | failure behavior record | `TWCORE-U55-ROUTING-2026-04-30-001` | `static_review_only` |
@@ -557,22 +606,26 @@ path.
 ### Terminal Decision
 
 ```text
-u5_5_terminal_state: HELD_FOR_U6A
+u5_5_terminal_state: REDUCED_FOR_U6A_STATIC_SCOPE_ONLY
 subset_id: light-v0.1-authority-traceability
 candidate_commit: 696548694dd40ce298d77e603db069934b58f645
-u6a_eligible: false
+u6a_eligible: true_for_static_scope_decision_only
 u6b_eligible: no, package manifest/install/runtime evidence missing
 u7_eligible: no, release claim records and R31 status unresolved
 u8_eligible: no, upstream/package release claims remain held
 u9_eligible: no, post-release/adoption evidence cannot start before U7/U8
 release_gate_effect: held_until_U7_and_R31
-hold_reasons:
-  - lifecycle-discoverability evidence is static review, not observed runtime transcript
-  - no accepted U6a limitation records how static-only discovery may feed scope decision
+accepted_limitations:
+  - U55-LIMIT-STATIC-DISCOVERY-001
+remaining_holds:
+  - dynamic no-forced runtime discovery transcript is deferred to U6b/U9
+  - package/install/runtime execution evidence is deferred to U6b
+  - release/source-name policy and R31 remain U7 blockers
 static_evidence_recorded:
   - TWCORE-U55-FILE-DELTA-2026-04-30-001
   - TWCORE-U55-REQQUAL-2026-04-30-001
   - TWCORE-U55-LIFECYCLE-DISCOVERY-2026-04-30-001
+  - U55-LIMIT-STATIC-DISCOVERY-001
 ```
 
 Allowed claims:
@@ -581,14 +634,15 @@ Allowed claims:
   `696548694dd40ce298d77e603db069934b58f645`;
 - `light-v0.1-authority-traceability` has static runtime discovery/loading,
   routing, failure-behavior, requirements-quality, lifecycle-discoverability,
-  and file-level delta/impact evidence recorded for later U6a review;
+  and file-level delta/impact evidence sufficient for a bounded U6a static
+  runtime-scope decision;
 - non-selected U4-promoted Core skills remain excluded from runtime packaging
   by default.
 
 Held claims:
 
 - package-ready;
-- U6a scope-decision ready;
+- dynamic U6a runtime discovery ready;
 - release-ready;
 - upstream-ready;
 - R31 complete;
@@ -596,12 +650,10 @@ Held claims:
 - automatic discovery in every agent runtime;
 - source-name hygiene accepted for release surfaces.
 
-Stale reset rule: this terminal state remains `HELD_FOR_U6A` and resets any
+Stale reset rule: this terminal state resets to a U6a hold state and resets any
 static evidence row to `held` if candidate branch head or selected file hashes
 change, a selected runtime file lacks a recorded delta/impact row or current
 non-held U4 skill record where applicable, U6a includes non-selected Core skills
-by default, U6b uses files outside the selected/reduced scope, source-name
-hygiene is accepted without U7, or R31 is presented as complete without
-real-scenario evidence. U5.5 can transition out of `HELD_FOR_U6A` only after an
-observed no-forced runtime discovery transcript exists or a later accepted U6a
-limitation explicitly authorizes static-only discovery for scope decision.
+by default, U6a treats `using-agent-skills` as a full router manifest, U6b uses
+files outside the selected/reduced scope, source-name hygiene is accepted
+without U7, or R31 is presented as complete without real-scenario evidence.
