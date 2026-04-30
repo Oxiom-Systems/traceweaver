@@ -4,6 +4,7 @@ Status: Draft v3
 Date: 2026-04-25
 Target repository: https://github.com/addyosmani/agent-skills
 Recommended skill path: `skills/systems-engineering-traceability/SKILL.md`
+Recommended requirements-reviewer path: `skills/requirements-reviewer/SKILL.md`
 Recommended operating model path: `references/systems-engineering-traceability-operating-model.md`
 Recommended matrix template path: `references/traceability-matrix-template.md`
 Recommended requirements/V&V guide path: `references/requirements-and-vv-guide.md`
@@ -16,7 +17,28 @@ Add a lightweight systems engineering traceability skill to Agent Skills.
 
 The skill should manage the systems engineering flow for agent-generated software work. It should make AI coding agents preserve the chain from idea or intent to stakeholder need, requirement, design decision, implementation, verification evidence, validation evidence, and change control. Its purpose is to prevent dark code: meaningful implementation that exists without a clear reason, requirement, test, validation path, owner, or safe-change story.
 
+TraceWeaver separates three layers:
+
+| Layer | Purpose | Names |
+|---|---|---|
+| Core skills | Portable capabilities that can run in any agentic workflow | `requirements-reviewer`, `systems-engineering-traceability` |
+| Core lifecycle guidance | Explains how the core skills work together across the lifecycle | `traceweaver-operating-model`, matrix template, requirements/V&V guide, risk/gap/change-control guide |
+| Compound Engineering adapter | Wires the core capabilities into CE commands, prompts, reviewers, and delegation | TraceWeaver CE, `ce-traceability`, `ce-traceability-reviewer`, CE hooks |
+
+`requirements-reviewer` and `systems-engineering-traceability` are Core skills,
+not Compound Engineering adapters. CE-specific wrappers may invoke them, but
+must not redefine their source rules.
+
 The skill should also teach agents how to set up and maintain the traceability artifacts that make the flow usable: a Markdown traceability matrix as the audit record, stable IDs as cross-artifact links, Mermaid diagrams as visual relationship maps, and explicit links from requirements docs to plans, acceptance test plans/procedures, and results.
+
+Requirements quality is a companion gate to traceability. A requirement,
+success criterion, or acceptance criterion is not implementation authority just
+because it exists. Before it can authorize meaningful behavior, it must pass
+requirements-reviewer or be converted into an approved exception with recorded
+owner, approver, date/session, allowed use, review condition, and rationale.
+Requirements-quality routing is cumulative with traceability routing: a
+requirements-related prompt still needs requirements-reviewer even when the same
+work also matches systems-engineering-traceability.
 
 The upstream MVP should include an original, distilled, agent-facing operating model as a separate top-level reference. That file should explain the lifecycle chain, authority rules, candidate-vs-approved status, review-findings-as-provenance rule, verification/validation distinction, and source hierarchy in concise project-specific language. It must not reproduce protected standards or handbook text.
 
@@ -39,7 +61,8 @@ End-state behavior:
   not-doing boundaries. Ideas do not create implementation authority.
 - During `/spec`, the agent captures stakeholder needs, testable requirements, assumptions, success signals, and requirement IDs.
 - During `/plan`, the agent links tasks, dependencies, risks, acceptance criteria, and the plan artifact back to requirement IDs.
-- During `/build`, the agent stops when new meaningful behavior appears without a requirement, task, or approved gap.
+- During `/build`, the agent stops when new meaningful behavior does not trace
+  to valid approved authority.
 - During `/test`, the agent records ATP entries and verification evidence against requirements, not just generic test output.
 - During `/review`, the agent challenges untraceable behavior and flags dark-code candidates.
 - During `/ship`, the agent checks result records, validation evidence, or an approved validation path before treating stakeholder-facing work as engineering-complete.
@@ -56,6 +79,12 @@ The document traceability chain is:
 Use ATP to mean acceptance test plan/procedure. Use result records to mean acceptance test results, verification output, or acceptance test report artifacts that prove what happened.
 
 The intended result is an agent skill that makes software explainable, verifiable, validatable, changeable, and ownable.
+
+Valid approved authority means an approved requirement, approved ADR/design
+decision, first-class approved risk control, approved gap, or task that closes
+directly to one of those approved authorities. A task by itself is not
+authority. A stakeholder need by itself is not authority. A draft or inferred
+requirement is not authority.
 
 ## Upstream Fit Review
 
@@ -134,6 +163,7 @@ These numbers are examples of the kind of evidence to collect, not claims about 
 
 TraceWeaver Core MVP should include:
 
+- `skills/requirements-reviewer/SKILL.md`
 - `skills/systems-engineering-traceability/SKILL.md`
 - `references/systems-engineering-traceability-operating-model.md`
 - `references/traceability-matrix-template.md`
@@ -251,6 +281,8 @@ TraceWeaver Core MVP scope:
 ```text
 agent-skills/
 +-- skills/
+|   +-- requirements-reviewer/
+|       +-- SKILL.md
 |   +-- systems-engineering-traceability/
 |       +-- SKILL.md
 +-- references/
@@ -271,6 +303,13 @@ MVP acceptance criteria:
 - The matrix reference template provides the required audit-record shape, longer examples, table formats, and optional Mermaid relationship view.
 - The requirements/V&V guide provides mandatory runtime guidance for idea/need separation, inferred requirements, ATPs, result records, verification, and validation.
 - The risk/gap/change-control guide provides mandatory runtime guidance for first-class risk controls, approved gaps, traceability debt, dark-code classification, and impact analysis.
+- Requirements or success criteria that authorize implementation are reviewed
+  for quality before approval or converted into approved exceptions.
+- Original stakeholder wording is preserved beside any agent reframe before the
+  reframe can become authority.
+- Requirements-reviewer and systems-engineering-traceability are both selected
+  when a lifecycle task includes requirements or success criteria and also
+  affects meaningful behavior or implementation authority.
 - The skill makes clear that the Markdown matrix is authoritative and Mermaid is a derived visual map.
 - README lists the skill without restructuring the whole repo.
 
@@ -304,6 +343,7 @@ Defer these to follow-up PRs:
 Create:
 
 ```text
+skills/requirements-reviewer/SKILL.md
 skills/systems-engineering-traceability/SKILL.md
 references/systems-engineering-traceability-operating-model.md
 references/traceability-matrix-template.md
@@ -673,7 +713,9 @@ When code changes are made, update the matrix with implementation references:
 
 Do not trace every helper. Trace the behavior, interface, module, or component the helper supports.
 
-Stop and update the requirement, task, or gap list if implementation introduces meaningful behavior not already covered.
+Stop and update the authority, exception, or traceability debt list if
+implementation introduces meaningful behavior not already covered by valid
+approved authority.
 
 ### 6. Record Verification Evidence
 
@@ -799,13 +841,22 @@ Human decision required:
 
 Before claiming the work is engineering-complete, answer:
 
-- Does every meaningful behavior trace to a requirement, design decision, risk control, or approved gap?
+- Does every meaningful behavior trace to valid approved authority: approved
+  requirement, approved ADR/design decision, first-class approved risk control,
+  approved gap, or task that closes directly to one of those authorities?
+- Has every requirement or success criterion that authorizes implementation
+  passed requirements-reviewer, or been converted into an approved exception?
+- Is the original stakeholder wording preserved beside any agent-reframed
+  requirement or success criterion?
 - Does every changed requirement have implementation coverage?
 - Does every implemented behavior have verification evidence?
 - Does every stakeholder need have validation evidence or an approved validation path?
 - Do requirements docs, plan docs, traceability rows, ATP entries, and result records link to the same requirement IDs where those artifacts exist?
 - Are untraced artifacts listed as gaps?
 - Has the human approved inferred requirements and remaining gaps?
+- Are weak accepted requirements recorded as approved gaps, accepted risks,
+  design decisions, validation gaps, or change-control exceptions rather than
+  approved requirements?
 
 If not, the work may be code-complete, but it is not engineering-complete.
 
@@ -851,7 +902,7 @@ Traceability update required: Yes | No
 
 Add implementation rule:
 
-If implementation introduces meaningful behavior not covered by a requirement or task, stop and update the spec, trace matrix, or gap list before continuing.
+If implementation introduces meaningful behavior not covered by valid approved authority, stop and update the spec, trace matrix, approved gap, risk-control record, design decision, or change-control exception before continuing.
 
 ### `test-driven-development`
 
@@ -1100,6 +1151,7 @@ Do not start with a large PR. Follow the adoption strategy:
 
 1. Open an issue/RFC proposing a lightweight traceability skill for agent-generated behavior.
 2. Fork the repo and create the MVP locally:
+   - `skills/requirements-reviewer/SKILL.md`
    - `skills/systems-engineering-traceability/SKILL.md`
    - `references/systems-engineering-traceability-operating-model.md`
    - `references/traceability-matrix-template.md`

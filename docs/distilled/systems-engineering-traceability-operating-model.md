@@ -10,6 +10,20 @@ compliance.
 TraceWeaver's purpose is simple: meaningful behavior must trace to approved
 authority, evidence, ownership, and a safe-change story.
 
+## Architecture Layers
+
+TraceWeaver separates portable capability from adapter wiring:
+
+| Layer | Purpose | Names |
+|---|---|---|
+| Core skills | Portable capabilities usable in any agentic workflow | `requirements-reviewer`, `systems-engineering-traceability` |
+| Core lifecycle guidance | Explains how the core skills work together across the lifecycle | this operating model, matrix template, requirements/V&V guide, risk/gap/change-control guide |
+| Adapter | Wires Core capabilities into a specific agent framework | TraceWeaver CE for Compound Engineering |
+
+If a rule describes requirements quality or traceability in general, it belongs
+in Core. If a rule only exists to wire Compound Engineering commands, prompts,
+reviewers, or delegation payloads, it belongs in TraceWeaver CE.
+
 ## Lifecycle Chain
 
 Preserve traceability through this chain:
@@ -47,31 +61,35 @@ test report artifacts.
    success signals, failure signals, and open decisions. They do not create
    implementation authority.
 
-2. Planning converts approved or candidate needs into requirements, design
+2. Planning preserves original stakeholder wording beside any agent reframe,
+   marks reframed requirements as `Draft`, and uses requirements-reviewer before
+   those requirements or success criteria can become approved authority.
+
+3. Planning converts approved needs and reviewed draft requirements into design
    decisions, ATP/result expectations, verification paths, and validation paths.
 
-3. Work agents may only implement meaningful behavior when it traces to approved
+4. Work agents may only implement meaningful behavior when it traces to approved
    authority.
 
-4. Review findings are provenance, not authority. They become authority only
+5. Review findings are provenance, not authority. They become authority only
    when converted into an approved requirement change, approved design decision,
    first-class approved risk control, or approved gap.
 
-5. Requirements may evolve, but they must evolve through explicit change
+6. Requirements may evolve, but they must evolve through explicit change
    control.
 
-6. A task ID alone is not authority. A task only carries authority when it
+7. A task ID alone is not authority. A task only carries authority when it
    closes directly to approved upstream authority.
 
-7. A bare `RISK-*` ID is not authority. A risk control only authorizes
+8. A bare `RISK-*` ID is not authority. A risk control only authorizes
    implementation when it is approved, owned, evidenced, and linked to a
    requirement or approved gap.
 
-8. Verification asks whether the team built the thing right.
+9. Verification asks whether the team built the thing right.
 
-9. Validation asks whether the team built the right thing.
+10. Validation asks whether the team built the right thing.
 
-10. Missing traceability must be exposed, not invented.
+11. Missing traceability must be exposed, not invented.
 
 ## Idea Capture Rule
 
@@ -144,6 +162,13 @@ Candidate / Draft / Provenance
 
 Agents may propose requirements, design decisions, risk controls, and gaps. They
 must not silently promote them to approved authority.
+
+Weak, ambiguous, unverifiable, conflicting, implementation-biased, or
+misleveled requirements must not become approved requirements through acceptance
+alone. If the team intentionally proceeds with known weakness, record the
+decision as an approved gap, accepted risk, design decision, validation gap, or
+change-control exception with owner, approver, date/session, allowed use,
+rationale, linked authority, and review condition.
 
 ## Mode Selection
 

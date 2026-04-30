@@ -29,6 +29,8 @@ Required fields:
 - evidence path
 - approval status
 - residual or accepted-risk note when risk remains
+- accepted-risk evidence when risk is intentionally accepted: approved by,
+  date/session, allowed use, rationale, linked authority, and review condition
 
 If any required field is missing, the `RISK-*` row is not valid authority.
 
