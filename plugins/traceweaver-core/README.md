@@ -1,8 +1,9 @@
 # TraceWeaver Core Plugin
 
 TraceWeaver Core adds systems-engineering authority control to agentic software
-work. This alpha plugin is intentionally small: it wires requirement quality and
-traceability checks into planning, implementation, and review handoffs.
+work. This alpha plugin wires requirement quality, traceability checks, and
+selected CE-compatible workflow surfaces into planning, implementation, and
+review handoffs.
 
 TraceWeaver preserves intent, authority, and traceability as agents move from
 stakeholder needs to requirements, plans, code, tests, and release decisions.
@@ -38,6 +39,12 @@ Included skills:
 - `tw-requirements-review`
 - `tw-authority-gate`
 - `tw-traceability-check`
+- selected CE-compatible workflow skills, including `ce-brainstorm`,
+  `ce-plan`, `ce-work`, `ce-code-review`, `ce-doc-review`, `ce-compound`,
+  `ce-resolve-pr-feedback`, `ce-commit`, `ce-commit-push-pr`,
+  `ce-compound-refresh`, `ce-sessions`, `ce-session-inventory`,
+  `ce-session-extract`, `ce-test-browser`, `ce-test-xcode`, `ce-worktree`,
+  `ce-setup`, `ce-debug`, and `lfg`
 
 Included references:
 
@@ -45,6 +52,15 @@ Included references:
 - `references/risk-gap-and-change-control-guide.md`
 - `references/systems-engineering-traceability-operating-model.md`
 - `references/traceability-matrix-template.md`
+- `references/intent-contract-template.yml`
+- `references/authority-baseline-template.yml`
+- `references/task-capsule-template.yml`
+- `references/trace-record-template.yml`
+- `references/gap-template.yml`
+- `references/change-template.yml`
+- `references/exception-template.yml`
+- `references/traceweaver-runtime-policy.md`
+- `references/ce-upstream-source-inventory.md`
 
 The same four references are also packaged under
 `skills/systems-engineering-traceability/references/` so skill-local reference
@@ -53,10 +69,12 @@ loading works in Codex converter installs.
 Not included yet:
 
 - full Core 11 runtime suite
-- dedicated TraceWeaver subagents
+- proven agent-backed CE runtime behavior
 - package-ready or release-ready claims
 - upstream-ready claims
 - dynamic no-forced discovery proof
+- slash-command or prompt surfaces
+- clean CE replacement proof
 - R31 release validation
 
 ## Skill Entry Points
@@ -71,6 +89,32 @@ Not included yet:
 This alpha installs skills, not slash commands. Slash-command or prompt
 surfaces require a later package record that adds command/prompt files and
 proves they install.
+
+The selected CE-compatible skills are installed as skill directories. They are
+packaged for static alpha continuity testing only; runtime-equivalent CE
+replacement and agent-backed behavior remain held until U9 or later runtime
+proof.
+
+## Intent Contract Templates
+
+TraceWeaver alpha includes file templates for consuming repositories:
+
+```text
+.traceweaver/
+  intent-contract.yml
+  authority-baseline.yml
+  task-capsules/
+  trace-records/
+  gaps/
+  changes/
+  exceptions/
+```
+
+The packaged templates live under `references/`. They define the minimum fields
+for intent contracts, task capsules, trace records, gaps, changes, and
+exceptions. If no approved requirement or approved exception authorizes a
+meaningful change, advisory mode records a gap, change, exception candidate, or
+clarification instead of treating agent interpretation as authority.
 
 ## Installation Target
 

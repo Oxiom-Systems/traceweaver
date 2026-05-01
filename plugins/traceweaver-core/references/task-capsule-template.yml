@@ -1,0 +1,25 @@
+task_id: TASK-001
+task_status: draft
+baseline_id: "<accepted baseline id>"
+baseline_hash_sha256: "<accepted baseline hash>"
+
+authorized_by:
+  - "<approved requirement id or approved exception id>"
+intent_served:
+  - "<intent id>"
+verification_required:
+  - "<test, inspection, analysis, or demonstration evidence>"
+validation_question: "<stakeholder-value question carried into the task>"
+
+must_not_change:
+  - "<behavior or boundary this task must preserve>"
+
+open_assumptions: []
+
+missing_authority_disposition:
+  if_authorized_by_is_empty: create_gap_or_change_and_do_not_implement
+
+trace_output:
+  expected_record_path: .traceweaver/trace-records/TASK-001-trace.yml
+
+next_step: ce-work only after authority is present; otherwise create a gap/change/clarification record.

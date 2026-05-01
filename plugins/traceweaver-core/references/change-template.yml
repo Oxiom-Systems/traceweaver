@@ -1,0 +1,23 @@
+change_id: CHG-001
+status: proposed
+linked_intent: "<intent id>"
+linked_requirement: "<approved requirement id>"
+reason: "<why the baseline may need to change>"
+proposed_disposition: approve_change | reject_change | defer_change | split_requirement
+owner: "<owner>"
+review_gate: "<gate or workflow step>"
+created_at: YYYY-MM-DD
+
+impact:
+  affected_requirements: []
+  affected_tasks: []
+  affected_tests: []
+  affected_validation_questions: []
+
+approval:
+  decision: pending
+  decision_source: null
+  decided_at: null
+
+next_recommended_steps:
+  - Update the authority baseline only after this change is approved.

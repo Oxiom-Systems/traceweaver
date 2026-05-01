@@ -36,6 +36,11 @@ Use `requirements.md` as the master controlled requirements baseline. The
 brainstorm requirement documents under `docs/brainstorms/` are source evidence
 and rationale; they are not the controlling baseline by themselves.
 
+Every TraceWeaver task response must end with suggested next steps. Name the
+next recommended CE command, TraceWeaver gate, evidence record, or held
+condition. If the correct next action is "do not proceed," say which blocker or
+review finding must close first. Do not leave the next workflow step implicit.
+
 Recommended next CE command sequence:
 
 1. Use `/ce-doc-review` against `requirements.md` before treating it as accepted

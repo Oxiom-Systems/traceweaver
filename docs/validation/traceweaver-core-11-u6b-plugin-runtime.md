@@ -1,8 +1,8 @@
 # TraceWeaver Core 11 U6b Plugin Runtime Evidence
 
-Status: `PASSED_ALPHA_INSTALL_SMOKE_STATIC_LOADING_ONLY`
+Status: `PASSED_ALPHA_INSTALL_SMOKE_STATIC_LOADING_AND_U6B_UNIT2_STATIC_MATERIALIZATION`
 
-Date/session: 2026-04-30, `ce:work`, branch
+Date/session: 2026-04-30 and 2026-05-01, `ce:work`, branch
 `codex/traceweaver-u6-unblock-next`
 
 U6b materializes the bounded U6a scope as an installable TraceWeaver Core alpha
@@ -15,10 +15,14 @@ readiness, upstream readiness, all-Core runtime scope, or R31 completion.
 
 Record ID: `TWCORE-U6B-RUNTIME-2026-04-30-001`
 
-Decision state: `passed_alpha_install_smoke_static_loading_only`
+Decision state:
+`passed_alpha_install_smoke_static_loading_and_u6b_unit2_static_materialization`
 
 U6b alpha gate:
 `U6b_alpha_install_static_materialization_for_exact_scope: PASSED`
+
+U6b Unit 2 gate:
+`U6b_unit_2_ce_compatible_static_materialization: PASSED`
 
 U7 eligible: `true`
 
@@ -59,9 +63,11 @@ Held claims:
 | Adapter skill | `plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md` | Present; routes to `systems-engineering-traceability` and conditionally `requirements-reviewer`. |
 | Prompt/command surface | N/A | Not included in this alpha; installed manifest records `prompts: []`. |
 
-No dedicated runtime agents are included in this alpha. Placeholder agent files
-are intentionally absent because the installer treats files under `agents/` as
-runtime agents.
+U6b Unit 2 adds selected CE-compatible workflow skills and CE agent files from
+the source-pinned inventory. The isolated Codex install converts those source
+agent files into installed Codex agent TOML files. This proves package and
+install materialization only; it does not prove clean CE replacement or
+agent-backed workflow equivalence.
 
 ## Selected Runtime Files
 
@@ -127,7 +133,11 @@ Stale reset: any reintroduction of protected source names, internal provenance,
 page references, copied source text, or compliance claims resets this U6b record
 to `held`.
 
-## Install Smoke
+## Initial U6b Alpha Install Smoke
+
+This section preserves the initial U6b-alpha install evidence for the small
+TraceWeaver authority-control scope. The later Unit 2 section records the
+expanded CE-compatible install manifest and installed file counts.
 
 Documented command:
 
@@ -152,7 +162,7 @@ Observed result:
 Installed traceweaver-core to <TEMP_CODEX_HOME>
 ```
 
-Installed manifest:
+Initial installed manifest:
 
 ```json
 {
@@ -217,6 +227,195 @@ Alpha install evidence checklist:
 | Selected installed file hashes match U5.5/U6a static authority or approved package-only hygiene delta | Pass: selected installed hashes match the U6b selected-runtime-file table, including approved public-hygiene package hashes for redacted package copies. |
 | Private/source-name leakage scan | Pass: no private paths, non-public candidate locators, protected source names, or unsupported standards-conformance strings were observed in plugin files or the isolated install. |
 
+## U6b Unit 2 CE-Compatible Static Materialization
+
+Record ID: `TWCORE-U6B-UNIT2-2026-05-01-001`
+
+Decision state: `passed_ce_compatible_static_materialization_source_pinned`
+
+CE source pin:
+
+```text
+source_repository: https://github.com/EveryInc/compound-engineering-plugin
+source_version: 3.3.2
+source_tags: compound-engineering-v3.3.2, cli-v3.3.2
+source_commit: e5b397c9d1883354f03e338dd00f98be3da39f9f
+license: MIT
+aggregate_fingerprint: 53e5dfdb773f9120b7854a12b0d666666220a26fb2cde66fa0b87b8fdfa764f4
+```
+
+Materialized package scope:
+
+| Class | Count / paths | Decision |
+| --- | --- | --- |
+| Selected CE skill/support files | 73 files under selected `skills/ce-*` and `skills/lfg` directories | Package-present and hash-aligned to `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`. |
+| Selected CE source agents | 49 files under `plugins/traceweaver-core/agents/` | Package-present and installed as Codex agent TOML in isolated smoke. |
+| Source-absent CE inventory agents | `ce-cli-agent-readiness-reviewer`, `ce-cli-readiness-reviewer` | Excluded from Unit 2 materialization and clean-swap claims because they are absent from the source-pinned CE package. |
+| TraceWeaver authority templates | `intent-contract-template.yml`, `authority-baseline-template.yml`, `task-capsule-template.yml`, `trace-record-template.yml`, `gap-template.yml`, `change-template.yml`, `exception-template.yml`, `traceweaver-runtime-policy.md` | Package-present and parse-checked where YAML applies. |
+| Prompt/command surface | `prompts: []` | Still held; this alpha installs skills and agents, not slash commands. |
+
+Static scope audit:
+
+```text
+scripts/traceweaver-audit-plugin-scope
+selected_files=122
+packaged_ce_files=122
+missing=none
+extra=none
+hash_mismatches=none
+```
+
+CE support-closure audit:
+
+```text
+scripts/traceweaver-audit-ce-closure
+skill_entrypoints=19
+support_references_checked=43
+missing=none
+untracked=none
+```
+
+Manifest and template parse:
+
+```text
+parse_ok=plugins/traceweaver-core/.codex-plugin/plugin.json
+parse_ok=plugins/traceweaver-core/.claude-plugin/plugin.json
+parse_ok=plugins/traceweaver-core/.cursor-plugin/plugin.json
+parse_ok=plugins/traceweaver-core/references/intent-contract-template.yml
+parse_ok=plugins/traceweaver-core/references/authority-baseline-template.yml
+parse_ok=plugins/traceweaver-core/references/task-capsule-template.yml
+parse_ok=plugins/traceweaver-core/references/trace-record-template.yml
+parse_ok=plugins/traceweaver-core/references/gap-template.yml
+parse_ok=plugins/traceweaver-core/references/change-template.yml
+parse_ok=plugins/traceweaver-core/references/exception-template.yml
+```
+
+Isolated Unit 2 install command:
+
+```sh
+bun run src/index.ts install <TRACEWEAVER_REPO>/plugins/traceweaver-core --to codex --codex-home <TEMP_CODEX_HOME> --include-skills
+```
+
+Observed install summary:
+
+```text
+Installed traceweaver-core to <TEMP_CODEX_HOME>
+skill_md_count=25
+agent_toml_count=49
+prompts=[]
+```
+
+Installed CE agent manifest entries:
+
+```text
+ce-adversarial-document-reviewer.toml
+ce-adversarial-reviewer.toml
+ce-agent-native-reviewer.toml
+ce-ankane-readme-writer.toml
+ce-api-contract-reviewer.toml
+ce-architecture-strategist.toml
+ce-best-practices-researcher.toml
+ce-code-simplicity-reviewer.toml
+ce-coherence-reviewer.toml
+ce-correctness-reviewer.toml
+ce-data-integrity-guardian.toml
+ce-data-migration-expert.toml
+ce-data-migrations-reviewer.toml
+ce-deployment-verification-agent.toml
+ce-design-implementation-reviewer.toml
+ce-design-iterator.toml
+ce-design-lens-reviewer.toml
+ce-dhh-rails-reviewer.toml
+ce-feasibility-reviewer.toml
+ce-figma-design-sync.toml
+ce-framework-docs-researcher.toml
+ce-git-history-analyzer.toml
+ce-issue-intelligence-analyst.toml
+ce-julik-frontend-races-reviewer.toml
+ce-kieran-python-reviewer.toml
+ce-kieran-rails-reviewer.toml
+ce-kieran-typescript-reviewer.toml
+ce-learnings-researcher.toml
+ce-maintainability-reviewer.toml
+ce-pattern-recognition-specialist.toml
+ce-performance-oracle.toml
+ce-performance-reviewer.toml
+ce-pr-comment-resolver.toml
+ce-previous-comments-reviewer.toml
+ce-product-lens-reviewer.toml
+ce-project-standards-reviewer.toml
+ce-reliability-reviewer.toml
+ce-repo-research-analyst.toml
+ce-schema-drift-detector.toml
+ce-scope-guardian-reviewer.toml
+ce-security-lens-reviewer.toml
+ce-security-reviewer.toml
+ce-security-sentinel.toml
+ce-session-historian.toml
+ce-slack-researcher.toml
+ce-spec-flow-analyzer.toml
+ce-swift-ios-reviewer.toml
+ce-testing-reviewer.toml
+ce-web-researcher.toml
+```
+
+Agent identity rule: each installed TOML entry above must map to a selected
+source agent in `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`
+by replacing `.toml` with `.agent.md` under `plugins/traceweaver-core/agents/`.
+The two source-absent CLI readiness agents are intentionally absent from both
+the package and installed manifest.
+
+Observed identity check:
+
+```text
+agent_identity_check installed=49 source=49 missing=none extra=none
+```
+
+Selected installed paths checked:
+
+```text
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/agents/openai.yaml
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/requirement-language-rules.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/requirement-types-and-attributes.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/requirements-reviewer/references/verification-validation-guide.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/systems-engineering-traceability/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/ce-plan/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/ce-work/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/ce-code-review/SKILL.md
+<TEMP_CODEX_HOME>/.codex/skills/traceweaver-core/ce-doc-review/SKILL.md
+<TEMP_CODEX_HOME>/.codex/agents/traceweaver-core/ce-correctness-reviewer.toml
+<TEMP_CODEX_HOME>/.codex/traceweaver-core/install-manifest.json
+```
+
+CE workflow claim classes:
+
+| Workflow surface | Unit 2 claim class | Held boundary |
+| --- | --- | --- |
+| `ce-brainstorm`, `ce-plan`, `ce-work`, `ce-code-review`, `ce-doc-review`, `ce-compound` | `static_package_and_install_materialized` | Runtime-equivalent behavior and TraceWeaver-integrated workflow behavior remain held for U9. |
+| `ce-resolve-pr-feedback`, `ce-commit`, `ce-commit-push-pr`, `ce-compound-refresh`, `ce-sessions`, `ce-session-inventory`, `ce-session-extract`, `ce-test-browser`, `ce-test-xcode`, `ce-worktree`, `ce-setup`, `ce-debug`, `lfg` | `static_package_and_install_materialized` | Runtime invocation, environment/tool integration, and clean replacement remain held for U9. |
+| CE reviewer/research agents | `installed_as_codex_agent_toml` | Agent-backed behavior, persona selection, and parity with the installed CE plugin remain held until runtime transcript proof. |
+
+Hygiene scan: no actual local user paths, local cache paths, non-public
+candidate locators, protected source names, or unsupported standards-conformance
+claims were found in the plugin package. Generic CE examples that show
+placeholder absolute paths remain accepted as upstream CE instructional text,
+not TraceWeaver provenance.
+
+U7 effect:
+`U7_eligible_for_narrow_alpha_claims: true`
+
+Held after Unit 2:
+
+- dynamic no-forced discovery;
+- runtime invocation transcript;
+- slash-command/prompt claims;
+- clean CE replacement;
+- TraceWeaver-integrated CE workflow behavior;
+- full Core 11 runtime suite;
+- enforcing mode;
+- release-ready, package-ready, and upstream-ready claims.
+
 ## Routing and Failure Boundaries
 
 Static routing evidence:
@@ -227,11 +426,12 @@ Static routing evidence:
 - `tw-traceability-check` routes to `systems-engineering-traceability` and
   conditionally `requirements-reviewer`.
 
-Failure behavior observed during install smoke:
+Failure and packaging behavior observed during install smoke:
 
 - a placeholder `agents/README.md` was treated as a runtime agent by the
   installer and produced an unintended installed agent entry;
-- the placeholder file was removed, leaving no dedicated alpha agents;
+- the placeholder file was removed before Unit 2, so only the 49 selected CE
+  source agents install as Codex agent TOML files;
 - the systems traceability support references were copied into the skill-local
   `references/` directory so Codex converter installs do not drop selected
   references that were top-level in the source candidate.
@@ -248,20 +448,27 @@ release-claim approval held for U7/U8/U9.
 
 ## U7 Handoff
 
-U7 may begin release-claim record creation for the alpha install/static
-materialization claim only:
+U7 may begin release-claim record creation for narrow alpha install/static
+materialization claims only:
 
 ```text
-claim_id: TW-CLAIM-PLUGIN-ALPHA-INSTALLS-SKILLS
+claim_id: TW-CLAIM-PLUGIN-ALPHA-STATIC-MATERIALIZATION
 gate_state: approved
-allowed_use: installable alpha with selected skills
+allowed_use:
+  - installable alpha with selected TraceWeaver authority skills
+  - selected CE-compatible workflow skills package-present and installed
+  - selected CE source agents installed as Codex TOML files
+  - Intent Contract, task capsule, trace record, gap, change, exception, and policy templates package-present
 blocked_claims:
   - slash commands available
   - dynamic no-forced discovery proven
+  - runtime-equivalent CE workflow behavior
+  - clean CE replacement
+  - enforcing authority gate behavior
   - full 11-skill runtime suite
   - external-standards conformance
-close_condition: U6b-alpha evidence accepted
-reopen_condition: plugin manifest, install command, selected skills, selected references, or package layout changes
+close_condition: U6b-alpha and U6b Unit 2 evidence accepted
+reopen_condition: plugin manifest, install command, selected skills, selected references, selected CE files, selected agents, templates, source pin, or package layout changes
 ```
 
 Dynamic runtime discovery: `HELD_FOR_U6B_DYNAMIC_OR_U9`
@@ -273,8 +480,12 @@ Release runtime claims: `HELD`
 ## Stale Reset Rule
 
 This U6b record resets to `held` if any selected runtime file hash changes, the
-runtime authority commit changes, the plugin manifest changes, documented install
-command changes, adapter routing changes, install smoke cannot be reproduced,
-dynamic discovery is claimed from static evidence, non-selected Core skills are
-added without a new scope decision, or release/upstream/package-ready claims are
+runtime authority commit changes, the CE source pin changes, the CE inventory or
+selected CE file hashes drift, the plugin manifest changes, documented install
+command changes, adapter routing changes, selected CE package scope changes,
+Intent Contract/template files drift without updated evidence, installed CE
+agent identity differs from the selected manifest above, install smoke cannot be
+reproduced, the CE support-closure audit fails, dynamic discovery is claimed
+from static evidence, non-selected Core or CE skills are added without a new
+scope decision, or release/upstream/package-ready/runtime-equivalence claims are
 made before U7/U8/U9.

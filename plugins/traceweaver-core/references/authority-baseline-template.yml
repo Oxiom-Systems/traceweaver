@@ -1,0 +1,27 @@
+baseline_id: REQ-BASELINE-YYYY-MM-DD-001
+baseline_status: draft
+baseline_hash_sha256: "<canonical requirements.md hash after review>"
+source: requirements.md
+review_evidence_id: "<review evidence id>"
+accepted_at: null
+owner: "<project owner>"
+
+canonical_hash_procedure:
+  - Use LF line endings and UTF-8 bytes.
+  - Replace the self-referential hash field with CANONICAL_HASH_PLACEHOLDER.
+  - Compute SHA-256 over the canonicalized content.
+  - Record the hash and review evidence before treating this baseline as authority.
+
+approved_requirements: []
+held_requirements: []
+superseded_requirements: []
+
+stale_reset_triggers:
+  - requirements.md content changes
+  - approved requirement status changes
+  - accepted exception changes
+  - baseline hash changes
+  - validation evidence is superseded
+
+next_recommended_steps:
+  - Run tw-requirements-review before accepting this baseline.

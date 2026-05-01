@@ -1,0 +1,49 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "digest"
+
+inventory_path = ARGV[0] || "docs/validation/traceweaver-core-11-ce-runtime-inventory.md"
+plugin_root = ARGV[1] || "plugins/traceweaver-core"
+
+inventory = File.read(inventory_path)
+selected = inventory.scan(/`((?:skills|agents)\/[^`]+)` \| `([0-9a-f]{64})` \| selected (?:skill|agent) file/).to_h
+
+abort "No selected CE files found in #{inventory_path}" if selected.empty?
+
+packaged_patterns = [
+  "skills/ce-*",
+  "skills/lfg",
+  "agents/ce-*"
+]
+
+packaged = packaged_patterns.flat_map do |pattern|
+  Dir.glob(File.join(plugin_root, pattern)).flat_map do |entry|
+    if File.file?(entry)
+      [entry]
+    else
+      Dir.glob(File.join(entry, "**", "*"))
+    end
+  end
+end
+  .select { |path| File.file?(path) }
+  .map { |path| path.delete_prefix("#{plugin_root}/") }
+  .uniq
+
+missing = selected.keys.reject { |path| File.file?(File.join(plugin_root, path)) }
+extra = packaged.reject { |path| selected.key?(path) }
+hash_mismatches = selected.each_with_object([]) do |(path, expected), records|
+  full = File.join(plugin_root, path)
+  next records unless File.file?(full)
+
+  actual = Digest::SHA256.file(full).hexdigest
+  records << [path, expected, actual] unless actual == expected
+end
+
+puts "selected_files=#{selected.size}"
+puts "packaged_ce_files=#{packaged.size}"
+puts "missing=#{missing.empty? ? 'none' : missing.join(',')}"
+puts "extra=#{extra.empty? ? 'none' : extra.join(',')}"
+puts "hash_mismatches=#{hash_mismatches.empty? ? 'none' : hash_mismatches.map { |path, expected, actual| "#{path}:#{expected}:#{actual}" }.join(',')}"
+
+exit 1 unless missing.empty? && extra.empty? && hash_mismatches.empty?

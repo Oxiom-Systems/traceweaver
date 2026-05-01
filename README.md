@@ -122,6 +122,150 @@ resolved. After acceptance, it supersedes the older brainstorm requirement
 documents as the controlling baseline. Those brainstorm documents remain source
 evidence and rationale.
 
+## Compound Engineering Workflow
+
+TraceWeaver does not replace the Compound Engineering loop. It wraps that loop
+with authority control, traceability, verification, validation, and change
+control.
+
+The base workflow is:
+
+```text
+idea
+-> brainstorm
+-> TraceWeaver requirements baseline
+-> plan
+-> work
+-> review
+-> verification
+-> validation
+-> compound learning
+```
+
+The important control point is between `brainstorm` and `plan`: ideas stop being
+loose context and become controlled requirements authority only after they are
+captured, reviewed, and baselined.
+
+| CE stage | TraceWeaver control step | Purpose |
+|---|---|---|
+| `idea` | intent capture | Capture stakeholder intent. Ideas are not authority yet. |
+| `ce-brainstorm` | `tw-requirements-review`, then `tw-authority-baseline` | Explore needs, risks, options, assumptions, and gaps, then convert accepted ideas into `requirements.md`, intent IDs, requirement IDs, exceptions, validation questions, and baseline version. |
+| `ce-plan` | `tw-authority-gate` | Plan only against approved requirements or approved exceptions. Every task gets an Intent Capsule. |
+| `ce-work` | `tw-traceability-check` | Agents implement only what their capsule authorizes. Assumptions become gaps or change requests, not code. |
+| `ce-code-review` / `ce-doc-review` | `tw-verification`, then `tw-validation` | Check what changed, what requirement authorized it, what verifies it, and whether it still satisfies the stakeholder validation question. |
+| `ce-compound` | learning-to-change-control handoff | Record lessons and patterns without silently changing authority. New learning creates proposed requirements or change records when needed. |
+
+The target TraceWeaver-controlled CE loop is:
+
+```text
+idea
+-> ce-brainstorm
+-> tw-requirements-review
+-> tw-authority-baseline
+-> ce-plan
+-> tw-authority-gate
+-> ce-work
+-> tw-traceability-check
+-> ce-code-review / ce-doc-review
+-> tw-verification
+-> tw-validation
+-> ce-compound
+```
+
+In the current alpha, this is a workflow architecture and documentation
+baseline. Runtime wrappers, clean CE replacement behavior, slash-command
+surfaces, and dynamic discovery remain held until the relevant U6b-dynamic, U7,
+or U9 evidence records approve them.
+
+TraceWeaver is strongest at five handoffs:
+
+1. After `brainstorm`, before `plan`: turn ideas into controlled requirements.
+2. Before `work`: warn in advisory mode, and block only after enforcing mode is
+   approved, when a task has no approved authority.
+3. During `review`: detect untraced dark behavior.
+4. Before release: verify and validate against the original intent.
+5. During `compound`: preserve learning without silently rewriting the baseline.
+
+Every TraceWeaver task should end with suggested next steps. The handoff should
+name the next CE command, TraceWeaver gate, evidence record, or held condition so
+contributors do not have to reconstruct the workflow state from validation
+history.
+
+## Fast Path To TraceWeaver-First Use
+
+The fastest useful path is not to wait for full CE replacement. Use TraceWeaver
+first as an advisory authority layer while CE remains the execution engine, then
+replace CE only after the selected CE-compatible workflow surface is proven.
+
+Immediate advisory use:
+
+1. Capture project intent and requirements in `requirements.md`.
+2. Create `.traceweaver/intent-contract.yml` from the accepted baseline.
+3. Require every plan/work/review handoff to cite the baseline, intent IDs,
+   requirement IDs or exceptions, verification method, and validation question.
+4. Treat missing authority as a warning, gap, proposed requirement, change
+   request, exception, or held claim.
+5. Keep using CE commands for execution until TraceWeaver proves the replacement
+   surface.
+
+TraceWeaver can replace the CE plugin only when these conditions are met:
+
+- selected CE workflow skill names are materialized in `plugins/traceweaver-core`;
+- selected CE agent files are materialized or explicitly held with degradation
+  behavior;
+- `tw-*` adapters invoke Core skills without redefining Core authority rules;
+- install evidence proves the selected skills, references, agents, and manifests
+  are present after install;
+- runtime proof shows planning, work, review, verification, validation, and
+  compound-learning flows operate without the installed CE plugin;
+- clean CE replacement, dynamic discovery, slash commands, and enforcing mode
+  stay held until their evidence records pass.
+
+```mermaid
+flowchart TD
+  A["Idea / stakeholder intent"] --> B["ce-brainstorm"]
+  B --> C["tw-requirements-review"]
+  C --> D["tw-authority-baseline<br/>requirements.md + intent contract"]
+  D --> E["ce-plan"]
+  E --> F["tw-authority-gate<br/>advisory alpha: warn / hold / gap"]
+  F --> G["ce-work"]
+  G --> H["tw-traceability-check<br/>detect dark behavior"]
+  H --> I["ce-code-review / ce-doc-review"]
+  I --> J["tw-verification<br/>built right"]
+  J --> K["tw-validation<br/>built the right thing"]
+  K --> L["ce-compound"]
+  L --> M["learning-to-change-control<br/>new requirement / change / exception"]
+  M --> D
+
+  subgraph "Current alpha"
+    B
+    E
+    G
+    I
+    L
+  end
+
+  subgraph "TraceWeaver authority layer"
+    C
+    D
+    F
+    H
+    J
+    K
+    M
+  end
+```
+
+The operational migration is:
+
+| Stage | What changes | What remains held |
+|---|---|---|
+| Advisory overlay | Keep CE installed; use TraceWeaver baseline, Intent Capsules, and trace checks on every meaningful task. | CE replacement, enforcing mode, dynamic discovery claims. |
+| TraceWeaver plugin alpha | Install `plugins/traceweaver-core` with selected skills and references; record static install evidence. | Agent-backed CE parity, slash commands, clean replacement. |
+| CE-compatible runtime | Materialize selected CE workflow skills and selected agents or record explicit limitations. | Full CE replacement until runtime proof passes. |
+| Replacement proof | Run planning, work, review, verification, validation, and compound-learning smoke tests without CE installed. | Release-ready and full Core 11 claims until U9/R31 pass. |
+| TraceWeaver-first | Use the TraceWeaver plugin as the default workflow surface. | Enterprise/release/upstream claims unless separately approved. |
+
 ## Current State
 
 As of 2026-04-30:

@@ -1,0 +1,23 @@
+exception_id: EXC-001
+status: proposed
+linked_requirements:
+  - "<approved requirement id>"
+linked_intent: "<intent id>"
+reason: "<why an exception is needed>"
+owner: "<owner>"
+decision_source: null
+created_at: YYYY-MM-DD
+revisit_trigger: "<condition that reopens or closes this exception>"
+
+allowed_claims: []
+blocked_claims:
+  - release_ready
+  - clean_replacement
+
+stale_reset_triggers:
+  - linked requirement changes
+  - affected package/runtime surface changes
+  - revisit trigger occurs
+
+next_recommended_steps:
+  - Record approval before treating this exception as authority.
