@@ -1,0 +1,1374 @@
+---
+record_id: TWCORE-CE-REPLACEMENT-CLASSIFICATION-2026-05-04-001
+status: units1_4_static_readiness_accepted_current_core_with_broad_surface_held
+date: 2026-05-04
+owner: Oxiom Systems
+traceweaver_mode: advisory
+baseline:
+  id: REQ-BASELINE-2026-04-30-001
+  hash_sha256: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+  authority_source: requirements.md
+  linked_requirements:
+  - REQ-TW-014
+  - REQ-TW-020
+  - REQ-TW-033
+  - REQ-TW-034
+  - REQ-TW-041
+  - REQ-TW-043
+  - REQ-TW-044
+  - REQ-TW-045
+  - REQ-TW-046
+  - REQ-TW-047
+  - REQ-TW-048
+source_evidence:
+  plan: docs/plans/2026-05-04-001-feat-ce-replacement-inventory-classifier-plan.md
+  plan_review_evidence_id: CE-DOC-REVIEW-2026-05-04-CE-REPLACEMENT-CLASSIFIER-PLAN-CLEAN-001
+  unit0_review_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  units1_4_review_evidence_id: CE-DOC-REVIEW-2026-05-04-UNITS1-4-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  units1_4_implementation_evidence_id: TWCORE-CE-REPLACEMENT-CLASSIFIER-GENERATED-2026-05-04-001
+  origin_roadmap: docs/plans/2026-05-02-001-feat-full-ce-341-traceweaver-authority-wrapping-plan.md
+  selected_ce_inventory: docs/validation/traceweaver-core-11-ce-runtime-inventory.md
+  ce_source_pin: plugins/traceweaver-core/references/ce-upstream-source-inventory.md
+  matrix: traceability-matrix.md
+  intent_contract: ".traceweaver/intent-contract.yml"
+unit0_checkpoint:
+  id: TWCORE-CE-REPLACEMENT-UNIT1A-CHECKPOINT-2026-05-04-001
+  status: accepted_implementation_input
+  decision_owner: Oxiom Systems
+  decision: narrow_to_core_method
+  scope_mode: current_core_with_broad_surface_held
+  default_rule: narrow_to_core_method_unless_threshold_or_exception_passes
+  full_surface_threshold: at_least_three_non_core_ce_surfaces_needed_by_real_or_representative_users_for_target_traceweaver_workflow
+  accepted_product_exception:
+  representative_user_workflow_signals:
+  - The user asked for a mechanical CE replacement inventory and classification before
+    removing CE and relying on TraceWeaver-installed skills.
+  - The accepted product intent requires TraceWeaver to preserve the simple CE method
+    while embedding authority, traceability, verification, validation, and change
+    control.
+  - Current reviewed evidence shows host conflicts and held runtime claims, not demand
+    evidence for broad non-core CE surfaces.
+  non_core_ce_surfaces_requested: []
+  core_method_alternative_considered:
+    outcome: selected
+    surfaces:
+    - idea_or_intent_deepening
+    - brainstorm_source_evidence
+    - requirements_baseline
+    - plan
+    - authority_gate
+    - work
+    - traceability_check
+    - document_review
+    - code_review
+    - verification_handoff
+    - validation_handoff
+    - publication_stop
+    - compound_learning
+  rationale: The available evidence supports making TraceWeaver safe for the CE-style
+    core method before attempting broad CE replacement. The full CE roadmap requires
+    a falsifiable checkpoint and defaults to the core-method path when evidence is
+    weak. No accepted product exception exists, and no evidence identifies at least
+    three non-core CE surfaces needed by real or representative users.
+  disconfirming_test: Reopen as full_surface_supported only if reviewed evidence shows
+    at least three non-core CE surfaces are needed for the target TraceWeaver workflow,
+    or an accepted product exception names the broader scope.
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+allowed_implementation_scope:
+  current_core_classification: true
+  current_packaged_held_surfaces: true
+  broad_surface_held_skeletons: true
+  exhaustive_full_surface_classification: false
+  host_ce_removal: false
+  runtime_invocation_claims: false
+  clean_replacement_claims: false
+current_core_surface_candidates:
+- id: TW-SKILL-tw-grill
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/tw-grill/SKILL.md
+  reason: optional post-ideation source-evidence intent deepening
+  evidence_status: static_proven_runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: candidate_source_evidence
+  class_rationale: Current packaged intent-deepening surface remains candidate source
+    evidence only until reviewed authority promotes its output.
+  disconfirming_test: Any attempt to treat tw-grill output as implementation authority
+    without requirements review must keep the row held.
+  confidence: medium
+  close_condition: reviewed promotion evidence proves tw-grill authority boundaries
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001
+  source_version: traceweaver_delta
+  expected_hash: 666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-ce-brainstorm
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/ce-brainstorm/SKILL.md
+  reason: brainstorm/source-evidence continuity path
+  evidence_status: provisional_target
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-014
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: candidate_source_evidence
+  class_rationale: Brainstorming can feed TraceWeaver source evidence, but its outputs
+    are not authority until routed through requirements review.
+  disconfirming_test: If brainstorm output can bypass requirements-quality review
+    or baseline promotion, this row must remain held.
+  confidence: medium
+  close_condition: reviewed wrapper evidence proves source-evidence routing and stop
+    behavior
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: b70007d3cf7ed68e64a7f581bd644a2a3e13858c8e826273dd04084cea005aab
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-ce-plan
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/ce-plan/SKILL.md
+  reason: planning stage in the CE-style method path
+  evidence_status: runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-014
+    - REQ-TW-020
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: planning_authority_candidate
+  class_rationale: Planning must preserve approved authority, traceability, verification,
+    validation, and held-claim boundaries before work execution.
+  disconfirming_test: A plan that can authorize implementation from candidate-only
+    evidence keeps this row held.
+  confidence: medium
+  close_condition: reviewed wrapper evidence proves authority-gated planning
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: 51e97828c6c188850c74d9cbe8b1e7f4db6b5f88f6f9ecdafeaffdef1e2aaf11
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: TW-SKILL-tw-requirements-review
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md
+  reason: requirements baseline and promotion review adapter for the core authority
+    path
+  evidence_status: static_proven_runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-020
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: authority_review
+  class_rationale: Requirements review is a core authority control surface, but runtime
+    invocation and enforcement are still held.
+  disconfirming_test: If requirements review can mark unreviewed amendments as accepted,
+    this row must remain held.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves promotion gates and stale-reset
+    behavior
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: traceweaver_delta
+  expected_hash: f45459c1144646ece057f882da5eb730ff223ec725c19041d59cc3e3c9b7c4e1
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: TW-SKILL-requirements-reviewer
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/requirements-reviewer/SKILL.md
+  reason: requirements quality review support used by the core authority path
+  evidence_status: static_proven_runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-020
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: authority_review_support
+  class_rationale: Requirements quality support is packaged for review assistance,
+    not as standalone implementation authority.
+  disconfirming_test: If reviewer support can promote authority without controlled
+    review evidence, this row must remain held.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves reviewer support boundaries
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: traceweaver_delta
+  expected_hash: 1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: TW-SKILL-tw-authority-gate
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md
+  reason: authority check before behavior-changing work
+  evidence_status: static_proven_runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-014
+    - REQ-TW-020
+    - REQ-TW-033
+    - REQ-TW-034
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: authority_gate
+  class_rationale: Authority gating is core to TraceWeaver, but enforcement and runtime
+    invocation remain held until proven.
+  disconfirming_test: Any behavior-changing handoff that proceeds without the required
+    authority chain keeps this row held.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves gate invocation and fail-closed
+    behavior
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: traceweaver_delta
+  expected_hash: 93d78f160ee5dd78bd7ebf5dd9cff28e9c1ec3b8f5bfe2b25474b11512e475e3
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-ce-work
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/ce-work/SKILL.md
+  reason: work execution stage in the CE-style method path
+  evidence_status: runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-014
+    - REQ-TW-020
+    - REQ-TW-041
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: behavior_change_execution
+  class_rationale: Work execution can mutate behavior and must cite approved authority,
+    verification, validation, and trace evidence before proceeding.
+  disconfirming_test: If ce-work can implement from candidate-only evidence or stale
+    authority, this row must remain held.
+  confidence: medium
+  close_condition: reviewed wrapper evidence proves authority-gated execution
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: 4d3a91e7025f5fdedf2e454e56ab79e2d8588680a35f7d4d4a35aee933d49b36
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: TW-SKILL-tw-traceability-check
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md
+  reason: traceability and dark-behavior check
+  evidence_status: static_proven_runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-033
+    - REQ-TW-034
+    - REQ-TW-041
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: traceability_review
+  class_rationale: Traceability checking is a core control surface, but automated
+    enforcement and runtime invocation remain held.
+  disconfirming_test: If dark behavior can be accepted without trace evidence or validation
+    questions, this row must remain held.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves traceability checking and stale-reset
+    behavior
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: traceweaver_delta
+  expected_hash: c2ac0332032b577e1749bb7990b01b6875f33d81bbec31de31f52d742250b943
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: TW-SKILL-systems-engineering-traceability
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/systems-engineering-traceability/SKILL.md
+  reason: traceability support surface for the core authority path
+  evidence_status: static_proven_runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-033
+    - REQ-TW-034
+    - REQ-TW-041
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: traceability_support
+  class_rationale: Systems-engineering traceability support can assist evidence review
+    but cannot become authority by itself.
+  disconfirming_test: If support guidance can replace the controlled matrix or Intent
+    Contract, this row must remain held.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves support-surface boundaries
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: traceweaver_delta
+  expected_hash: e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-ce-doc-review
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/ce-doc-review/SKILL.md
+  reason: document review stage for requirements, plans, and evidence
+  evidence_status: runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-020
+    - REQ-TW-033
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: review_evidence
+  class_rationale: Document review can supply reviewer evidence, but clean review
+    must be recorded before candidate material becomes authority.
+  disconfirming_test: If document review status can be cited after referenced evidence
+    changes without stale reset, this row must remain held.
+  confidence: medium
+  close_condition: reviewed wrapper evidence proves stale-reset and evidence-record
+    routing
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: 9b197bee814542328be6153afa5cf560f638eb3fe3ea94ba62c5b66129bdc246
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-ce-code-review
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/ce-code-review/SKILL.md
+  reason: code review stage for behavior-bearing diffs
+  evidence_status: runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-041
+    - REQ-TW-043
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: implementation_review
+  class_rationale: Code review can identify defects in implementation evidence, but
+    cannot promote runtime, release, or clean-replacement claims by itself.
+  disconfirming_test: If a clean code review can bypass required document or authority
+    review, this row must remain held.
+  confidence: medium
+  close_condition: reviewed wrapper evidence proves review scope and held-claim routing
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: 66a1da73677a5fe2e5d3e6292872a2375c697704353799adf0eaa7b3a9f947f9
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-ce-test-browser
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/ce-test-browser/SKILL.md
+  reason: browser verification evidence candidate
+  evidence_status: runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-041
+    - REQ-TW-043
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: verification_evidence
+  class_rationale: Browser testing can provide verification evidence, but tool runtime
+    and claim boundaries remain held.
+  disconfirming_test: If browser evidence is cited without requirement trace and validation
+    question linkage, this row must remain held.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves browser verification routing
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: a7240cf469d410b2ee46fbf24ef19cf70becaefa55549b13a0d4eaa63166a71f
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-ce-test-xcode
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/ce-test-xcode/SKILL.md
+  reason: Xcode verification evidence candidate
+  evidence_status: runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-041
+    - REQ-TW-043
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: verification_evidence
+  class_rationale: Xcode testing can provide verification evidence, but tool runtime
+    and claim boundaries remain held.
+  disconfirming_test: If Xcode evidence is cited without requirement trace and validation
+    question linkage, this row must remain held.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves Xcode verification routing
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: 27945c9e4a4c72543988698699f5d08d3a7a04d94d1ca7d49b425b9cb169a544
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-ce-compound
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/ce-compound/SKILL.md
+  reason: compound learning path after reviewed work
+  evidence_status: runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-044
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: learning_record
+  class_rationale: Compound learning can preserve reviewed lessons, but must not convert
+    unreviewed implementation context into authority.
+  disconfirming_test: If learning records can be created from unreviewed or stale
+    evidence, this row must remain held.
+  confidence: medium
+  close_condition: reviewed wrapper evidence proves learning-record authority boundaries
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: 0c07a5487a5d4f63b5552d065d7e12d67545eb846dda923b994de9c8de1d3ec3
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-ce-compound-refresh
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/ce-compound-refresh/SKILL.md
+  reason: compound learning refresh path after reviewed work
+  evidence_status: runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-044
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: learning_record_refresh
+  class_rationale: Compound refresh can update learning records, but must preserve
+    reviewed authority provenance and stale-reset behavior.
+  disconfirming_test: If refreshed learning can supersede controlled requirements
+    or validation evidence, this row must remain held.
+  confidence: medium
+  close_condition: reviewed wrapper evidence proves refresh provenance and stale-reset
+    routing
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: 8f1518e73314feed67847da627879bde918c95b0bfb1d800f2b0ad3b22e3395a
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: CE-SKILL-lfg
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/lfg/SKILL.md
+  reason: familiar automation alias that must delegate to tw-auto
+  evidence_status: static_proven_runtime_held
+  classification: aliased
+  authority_evidence:
+    requirements:
+    - REQ-TW-045
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: automation_alias
+  class_rationale: The familiar lfg entrypoint is allowed only as an alias to TraceWeaver's
+    bounded advisory tw-auto flow.
+  disconfirming_test: If lfg can execute CE automation directly or bypass tw-auto
+    held stops, this row must lose aliased classification.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves lfg delegates to tw-auto and preserves
+    held claims
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: ce_3.4.1_selected_traceweaver_package
+  expected_hash: ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: TW-SKILL-tw-auto
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/tw-auto/SKILL.md
+  reason: bounded advisory automation loop for the core TraceWeaver method
+  evidence_status: static_proven_runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-045
+    - REQ-TW-048
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: advisory_automation
+  class_rationale: tw-auto may orchestrate bounded advisory CE-style loops, but commit,
+    publication, runtime enforcement, and release claims remain held.
+  disconfirming_test: If tw-auto can continue past missing authority or held publication
+    boundaries, this row must remain held.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves bounded advisory stops and trace
+    updates
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: traceweaver_delta
+  expected_hash: a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+- id: TW-SKILL-using-agent-skills
+  surface_type: skill
+  traceweaver_path: plugins/traceweaver-core/skills/using-agent-skills/SKILL.md
+  reason: packaged routing and skill-use support for TraceWeaver-controlled handoffs
+  evidence_status: static_proven_runtime_held
+  classification: held
+  authority_evidence:
+    requirements:
+    - REQ-TW-014
+    - REQ-TW-047
+    source: requirements.md
+    baseline_id: REQ-BASELINE-2026-04-30-001
+    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    accepted_exception:
+    validation_question: Does this surface preserve the approved TraceWeaver authority
+      chain without promoting held runtime, release, publication, host-removal, or
+      clean-replacement claims?
+  side_effect_category: routing_support
+  class_rationale: Skill-use support helps route packaged capabilities but must not
+    make skills themselves authoritative.
+  disconfirming_test: If skill routing can bypass the Intent Contract or approved
+    requirement chain, this row must remain held.
+  confidence: medium
+  close_condition: reviewed runtime evidence proves routing support preserves authority
+    gates
+  reviewer_evidence_id: CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001
+  source_version: traceweaver_delta
+  expected_hash: 7c658b4551214c7a8434b0d20aa8b32ff93b666dca8f6faa049bfb6761a2e1d0
+  support_closure_depth: dependency_and_consumer
+  allowed_claims:
+  - current/core static classification only
+  held_claims:
+  - runtime invocation
+  - enforcing authority gates
+  - publication
+  - release-ready
+  - host CE removal
+  - clean replacement
+current_packaged_held_surfaces:
+  status: held_current_package_surface_requires_classification
+  support_closure_depth: dependency_and_consumer
+  default_allowed_claims:
+  - current packaged manual continuity only
+  default_held_claims:
+  - implementation authority
+  - runtime equivalence
+  - clean replacement
+  - publication authority
+  rows:
+  - id: CE-CURRENT-HELD-ce-commit
+    surface_type: skill
+    traceweaver_path: plugins/traceweaver-core/skills/ce-commit/SKILL.md
+    blocker: Commit behavior has publication side effects and needs authority, trace,
+      verification, review, and release-boundary gates before direct TraceWeaver use.
+    evidence_status: runtime_held
+    allowed_claims:
+    - current packaged manual continuity only
+    held_claims:
+    - commit publication authority
+    - runtime equivalence
+    - clean replacement
+    reopen_condition: Reclassify only after Unit 1 through Unit 4 evidence proves
+      wrapper, stop, absence, or read-only behavior and publication gates.
+    classification: held
+    source_version: ce_3.4.1_selected_traceweaver_package
+    expected_hash: 1ba086277e311a5f2630d2f6fc8c0bd0713b07a4a3f273949e22ea6ae893cdb2
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+  - id: CE-CURRENT-HELD-ce-commit-push-pr
+    surface_type: skill
+    traceweaver_path: plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md
+    blocker: Commit, push, and PR behavior crosses publication boundaries and needs
+      authority, trace, verification, review, release, and human-approval gates before
+      direct TraceWeaver use.
+    evidence_status: runtime_held
+    allowed_claims:
+    - current packaged manual continuity only
+    held_claims:
+    - autonomous publication
+    - pull request authority
+    - runtime equivalence
+    - clean replacement
+    reopen_condition: Reclassify only after Unit 1 through Unit 4 evidence proves
+      wrapper, stop, absence, or read-only behavior and publication gates.
+    classification: held
+    source_version: ce_3.4.1_selected_traceweaver_package
+    expected_hash: 21385f78158777fd726a3763e56f1b9a3183c4eb24bc3a374355820286fa996c
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+  - id: CE-CURRENT-HELD-ce-debug
+    surface_type: skill
+    traceweaver_path: plugins/traceweaver-core/skills/ce-debug/SKILL.md
+    blocker: Debug and defect-resolution work can change behavior and needs a defect,
+      requirement, gap, exception, test, and trace route before direct TraceWeaver
+      use.
+    evidence_status: runtime_held
+    allowed_claims:
+    - current packaged manual continuity only
+    held_claims:
+    - implementation authority
+    - runtime equivalence
+    - clean replacement
+    reopen_condition: Reclassify only after Unit 1 through Unit 4 evidence proves
+      defect-source routing, test evidence, trace updates, and authority stops.
+    classification: held
+    source_version: ce_3.4.1_selected_traceweaver_package
+    expected_hash: 6785594317d403e2aac454d07eb1545d9e1f772c1f62606b0193728e1453864e
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+  - id: CE-CURRENT-HELD-ce-resolve-pr-feedback
+    surface_type: skill
+    traceweaver_path: plugins/traceweaver-core/skills/ce-resolve-pr-feedback/SKILL.md
+    blocker: PR feedback resolution can mutate scope, evidence, review state, and
+      publication readiness, so it needs authority and release-boundary guards before
+      direct TraceWeaver use.
+    evidence_status: runtime_held
+    allowed_claims:
+    - current packaged manual continuity only
+    held_claims:
+    - implementation authority
+    - review closure authority
+    - publication authority
+    - clean replacement
+    reopen_condition: Reclassify only after Unit 1 through Unit 4 evidence proves
+      feedback provenance, authority gates, trace updates, and held publication stops.
+    classification: held
+    source_version: ce_3.4.1_selected_traceweaver_package
+    expected_hash: 313229520b5bc240e7ae5ca644205b2b87d2f34c15d5838677133a3666539b10
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+  - id: CE-CURRENT-HELD-ce-session-extract
+    surface_type: skill
+    traceweaver_path: plugins/traceweaver-core/skills/ce-session-extract/SKILL.md
+    blocker: Session extraction is source-evidence ingestion and needs privacy, provenance,
+      retention, and authority-boundary policy before direct TraceWeaver use.
+    evidence_status: runtime_held
+    allowed_claims:
+    - current packaged manual continuity only
+    held_claims:
+    - source authority
+    - implementation authority
+    - clean replacement
+    reopen_condition: Reclassify only after Unit 1 through Unit 4 evidence proves
+      privacy/provenance handling and prevents session material from becoming authority
+      without review.
+    classification: held
+    source_version: ce_3.4.1_selected_traceweaver_package
+    expected_hash: 05c6a86282fd8a49ffb715e2e80b81ecd80aa88c84e6528fcfb92443049c1cd5
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+  - id: CE-CURRENT-HELD-ce-session-inventory
+    surface_type: skill
+    traceweaver_path: plugins/traceweaver-core/skills/ce-session-inventory/SKILL.md
+    blocker: Session inventory discovers candidate source evidence and needs privacy,
+      provenance, retention, and authority-boundary policy before direct TraceWeaver
+      use.
+    evidence_status: runtime_held
+    allowed_claims:
+    - current packaged manual continuity only
+    held_claims:
+    - source authority
+    - implementation authority
+    - clean replacement
+    reopen_condition: Reclassify only after Unit 1 through Unit 4 evidence proves
+      privacy/provenance handling and prevents session material from becoming authority
+      without review.
+    classification: held
+    source_version: ce_3.4.1_selected_traceweaver_package
+    expected_hash: de08c87a9e0c500e87311734f2b22e6cb7245b935cfdbdef5cbbc7125825c08b
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+  - id: CE-CURRENT-HELD-ce-sessions
+    surface_type: skill
+    traceweaver_path: plugins/traceweaver-core/skills/ce-sessions/SKILL.md
+    blocker: Session search can surface candidate source evidence and needs privacy,
+      provenance, retention, and authority-boundary policy before direct TraceWeaver
+      use.
+    evidence_status: runtime_held
+    allowed_claims:
+    - current packaged manual continuity only
+    held_claims:
+    - source authority
+    - implementation authority
+    - clean replacement
+    reopen_condition: Reclassify only after Unit 1 through Unit 4 evidence proves
+      privacy/provenance handling and prevents session material from becoming authority
+      without review.
+    classification: held
+    source_version: ce_3.4.1_selected_traceweaver_package
+    expected_hash: f13c6b143097e13705d521cee152672f0b599057b2c0e4fc87b7af61c61f9553
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+  - id: CE-CURRENT-HELD-ce-setup
+    surface_type: skill
+    traceweaver_path: plugins/traceweaver-core/skills/ce-setup/SKILL.md
+    blocker: Setup and health-check behavior can mutate or report environment state
+      and needs pre/post evidence plus authority-stop rules before direct TraceWeaver
+      use.
+    evidence_status: runtime_held
+    allowed_claims:
+    - current packaged manual continuity only
+    held_claims:
+    - environment readiness authority
+    - implementation authority
+    - clean replacement
+    reopen_condition: Reclassify only after Unit 1 through Unit 4 evidence proves
+      setup operations, environment claims, and stop boundaries.
+    classification: held
+    source_version: ce_3.4.1_selected_traceweaver_package
+    expected_hash: 626696dc061455a1320559b48ef8bced72fe8b87403d3d4d55592627c99ea6ec
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+  - id: CE-CURRENT-HELD-ce-worktree
+    surface_type: skill
+    traceweaver_path: plugins/traceweaver-core/skills/ce-worktree/SKILL.md
+    blocker: Worktree behavior mutates repository/workspace state and needs pre/post
+      evidence, branch policy, and authority-stop rules before direct TraceWeaver
+      use.
+    evidence_status: runtime_held
+    allowed_claims:
+    - current packaged manual continuity only
+    held_claims:
+    - workspace mutation authority
+    - implementation authority
+    - clean replacement
+    reopen_condition: Reclassify only after Unit 1 through Unit 4 evidence proves
+      workspace mutation boundaries, trace updates, and held publication stops.
+    classification: held
+    source_version: ce_3.4.1_selected_traceweaver_package
+    expected_hash: 5a1d6d9babb6e24da1af1bbe630c73306adfec8a75faa1442f611cebc804edc3
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+package_support_surfaces:
+  status: held_current_package_support_requires_classification
+  rows:
+  - id: TW-SUPPORT-codex-default-prompt
+    surface_type: default_prompt
+    manifest_path: ".codex-plugin/plugin.json"
+    surface_key: ".codex-plugin/plugin.json:interface.defaultPrompt"
+    classification: held
+    blocker: Codex default prompts steer agent behavior and need authority-boundary
+      review before they can support U9 or host-removal readiness.
+    evidence_status: static_proven_runtime_held
+    allowed_claims:
+    - current packaged advisory routing only
+    held_claims:
+    - default prompt authority
+    - runtime invocation
+    - clean replacement
+    reopen_condition: Reclassify only after reviewed evidence proves default prompt
+      routing preserves TraceWeaver authority gates and held publication stops.
+    support_closure_depth: dependency_and_consumer
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reclassify
+broad_surface_skeletons:
+  status: held_until_checkpoint_reopened_or_exception_accepted
+  support_closure_depth: dependency_and_consumer
+  default_allowed_claims:
+  - broad surface named as held planning skeleton only
+  default_held_claims:
+  - broad familiar ce-* compatibility
+  - broad whole-plugin replacement policy
+  - connector/provider/style add-ons
+  - clean CE replacement
+  - runtime-equivalent CE behavior
+  rows:
+  - id: CE-BROAD-ce-agent-native-architecture
+    surface: ce-agent-native-architecture
+    blocker: Architecture guidance requires separate authority, design, validation,
+      and provenance routing before TraceWeaver-controlled use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - architecture advice authority
+    - runtime equivalence
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove dependency closure,
+      consumer routing, authority gates, and validation handling.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-agent-native-audit
+    surface: ce-agent-native-audit
+    blocker: Audit scoring requires separate authority, validation, and score provenance
+      routing before TraceWeaver-controlled use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - audit score authority
+    - runtime equivalence
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove dependency closure,
+      consumer routing, authority gates, and validation handling.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-frontend-design
+    surface: ce-frontend-design
+    blocker: Frontend design guidance requires UI validation evidence, artifact provenance,
+      and release-claim controls before TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - design validation authority
+    - runtime equivalence
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove UI validation routing,
+      artifact provenance, dependency closure, and publication stops.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-polish-beta
+    surface: ce-polish-beta
+    blocker: Browser-polish workflows require runtime and UI validation boundaries
+      before TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - design validation authority
+    - runtime equivalence
+    - release readiness
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove UI validation routing,
+      dependency closure, and held publication boundaries.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-demo-reel
+    surface: ce-demo-reel
+    blocker: Demo capture touches artifact provenance and publication boundaries before
+      TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - demo publication authority
+    - release readiness
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove artifact provenance,
+      dependency closure, and held publication boundaries.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-ideate
+    surface: ce-ideate
+    blocker: Ideation can create candidate source evidence and needs provenance, stakeholder-intent,
+      and baseline-promotion routing before use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - stakeholder intent authority
+    - implementation authority
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove source-evidence routing,
+      provenance handling, dependency closure, and promotion stops.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-strategy
+    surface: ce-strategy
+    blocker: Strategy work can create product-source evidence and needs stakeholder
+      intent, provenance, and baseline-promotion routing before use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - product signal authority
+    - implementation authority
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove source-evidence routing,
+      provenance handling, dependency closure, and promotion stops.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-product-pulse
+    surface: ce-product-pulse
+    blocker: Product-signal reporting needs privacy, provenance, and authority routing
+      before TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - product signal authority
+    - implementation authority
+    - runtime equivalence
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove privacy, provenance,
+      dependency closure, and baseline-promotion stops.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-optimize
+    surface: ce-optimize
+    blocker: Optimization mutates behavior or evaluation criteria and needs metric
+      authority, regression validation, and rollback boundaries before use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - metric authority
+    - behavior-change authority
+    - runtime equivalence
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove metric authority, dependency
+      closure, regression evidence, and change control.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-simplify-code
+    surface: ce-simplify-code
+    blocker: Simplification can mutate behavior or review criteria and needs traceability,
+      regression validation, and rollback boundaries before use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - behavior-change authority
+    - runtime equivalence
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove trace authority, dependency
+      closure, regression evidence, and change-control routing.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-proof
+    surface: ce-proof
+    blocker: Proof loops touch validation and publication boundaries and need explicit
+      release gates before TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - proof loop authority
+    - publication authority
+    - release readiness
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove validation routing,
+      dependency closure, publication gates, and R31 held handling.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-release-notes
+    surface: ce-release-notes
+    blocker: Release notes touch publication and R31 release claims and need explicit
+      release gates before TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - release note authority
+    - publication authority
+    - release readiness
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove dependency closure,
+      publication gates, and R31 held-claim handling.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-slack-research
+    surface: ce-slack-research
+    blocker: Slack research needs external-source provenance, privacy, and trust-boundary
+      controls before TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - external source authority
+    - connector readiness
+    - runtime equivalence
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove connector provenance,
+      privacy handling, dependency closure, and source routing.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-report-bug
+    surface: ce-report-bug
+    blocker: Bug reporting needs defect/source-record policy, provenance, and trust-boundary
+      controls before TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - defect authority
+    - connector readiness
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove provenance, dependency
+      closure, and defect/source-record routing.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-update
+    surface: ce-update
+    blocker: Update flows mutate package boundaries and need update policy, runtime
+      proof, and publication stops before TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - update authority
+    - runtime equivalence
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove update policy, dependency
+      closure, runtime proof, and publication stops.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+  - id: CE-BROAD-ce-work-beta
+    surface: ce-work-beta
+    blocker: Delegated work mutates execution boundaries and needs subagent authority
+      slices, runtime proof, and publication stops before TraceWeaver use.
+    dependency_check: dependency_and_consumer
+    consumer_check: required_before_reopen
+    allowed_claims:
+    - broad surface named as held planning skeleton only
+    held_claims:
+    - delegated work authority
+    - runtime equivalence
+    - clean replacement
+    reopen_condition: Reopen only after reviewed demand evidence or an accepted product
+      exception names this surface and Units 1 through 4 prove delegate policy, authority-slice
+      routing, dependency closure, and publication stops.
+    surface_type: skill
+    classification: held
+    evidence_status: package_surface_held
+upstream_out_of_scope_surfaces:
+  status: intentionally_out_of_scope_under_current_unit0_scope
+  support_closure_depth: not_applicable
+  rows:
+  - id: CE-OOS-ce-clean-gone-branches
+    surface_type: skill
+    upstream_path: skills/ce-clean-gone-branches/SKILL.md
+    classification: out_of_scope
+    blocker: Git branch hygiene is outside the authority-preserving TraceWeaver alpha
+      workflow and is not packaged in the current TraceWeaver surface.
+    dependency_check: not_applicable
+    consumer_check: no_current_traceweaver_consumer
+    allowed_claims:
+    - deliberately out of scope for Unit 0 current/core work
+    held_claims:
+    - clean replacement
+    - runtime equivalence
+    - host removal readiness
+    reopen_condition: Reopen only if reviewed demand evidence, a new requirement,
+      or an accepted product exception makes branch-cleanup behavior part of the TraceWeaver-controlled
+      method.
+    evidence_status: package_surface_held
+    support_closure_depth: not_applicable
+  - id: CE-OOS-ce-dhh-rails-style
+    surface_type: skill
+    upstream_path: skills/ce-dhh-rails-style/SKILL.md
+    classification: out_of_scope
+    blocker: Framework-specific Rails style guidance is outside the baseline authority-preserving
+      TraceWeaver alpha workflow and is not packaged in the current TraceWeaver surface.
+    dependency_check: not_applicable
+    consumer_check: no_current_traceweaver_consumer
+    allowed_claims:
+    - deliberately out of scope for Unit 0 current/core work
+    held_claims:
+    - clean replacement
+    - runtime equivalence
+    - host removal readiness
+    reopen_condition: Reopen only if reviewed demand evidence, a new requirement,
+      or an accepted product exception makes framework-specific Rails style behavior
+      part of the TraceWeaver-controlled method.
+    evidence_status: package_surface_held
+    support_closure_depth: not_applicable
+  - id: CE-OOS-ce-gemini-imagegen
+    surface_type: skill
+    upstream_path: skills/ce-gemini-imagegen/SKILL.md
+    classification: out_of_scope
+    blocker: External image-generation provider behavior is outside the baseline authority-preserving
+      TraceWeaver alpha workflow and is not packaged in the current TraceWeaver surface.
+    dependency_check: not_applicable
+    consumer_check: no_current_traceweaver_consumer
+    allowed_claims:
+    - deliberately out of scope for Unit 0 current/core work
+    held_claims:
+    - clean replacement
+    - runtime equivalence
+    - host removal readiness
+    reopen_condition: Reopen only if reviewed demand evidence, a new requirement,
+      or an accepted product exception makes external image-generation behavior part
+      of the TraceWeaver-controlled method.
+    evidence_status: package_surface_held
+    support_closure_depth: not_applicable
+stale_reset_triggers:
+- requirements baseline hash changes.
+- plan review evidence changes or is superseded.
+- Unit 1A checkpoint evidence changes.
+- non-core CE demand evidence adds or removes requested surfaces.
+- accepted product exception is added, changed, expires, or is withdrawn.
+- TraceWeaver packaged skill surface changes.
+- CE upstream source version, commit, tag, or aggregate fingerprint changes.
+- host-visible skill surface changes.
+next_required_steps:
+- Treat Units 1 through 4 static readiness as accepted implementation input within
+  current_core_with_broad_surface_held unless the Unit 0 checkpoint, Units 1 through
+  4 review evidence, generated classifier evidence, or source baseline is reviewed
+  and superseded.
+- Use this accepted static-readiness evidence as input to plan Unit 5 host-removal
+  readiness checking and Unit 6 authority-record handoff.
+- Do not remove host CE or claim runtime behavior from this record.
+- Keep host CE removal, runtime invocation, clean replacement, enforcing, publication,
+  release-ready, package-ready, upstream-ready, and R31 claims held.
