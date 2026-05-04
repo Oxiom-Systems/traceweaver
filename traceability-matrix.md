@@ -393,8 +393,8 @@ per-file/per-skill and later function/class-level rows.
 
 ## Suggested Next Steps
 
-1. Refresh downstream task capsules and validation records with the promoted
-   REQ-TW-048 baseline hash before new work uses this authority set.
+1. Run refreshed Unit 9 behavior-code review and authority doc review before
+   accepting Unit 9 as U9 input.
 2. Keep runtime invocation, automatic wrapper sequencing, commit/push/PR
    automation claims, enforcing mode, clean CE replacement, and release-ready
    claims held until their evidence gates pass.

@@ -110,9 +110,9 @@ u9_unit3_gate_behavior_smoke_scope: scripts/traceweaver-smoke-u9-fixtures, docs/
 u9_unit3_review_required_before_input: false
 u9_input_status: u9_unit1_reviewed_for_planning_input_unit2_fixture_smoke_reviewed_for_fixture_input_unit3_gate_behavior_code_reviewed_doc_reviewed_for_fixture_input_u9_unit4_boundary_smoke_code_reviewed_doc_reviewed_for_boundary_input_u9_unit5_host_registry_filesystem_probe_reviewed_held_unit7_host_install_attempt_doc_reviewed_held_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_unit9_registry_shape_auth_boundary_patch_code_review_pending_authority_doc_review_pending_runtime_claims_held
 matrix_source: traceability-matrix.md
-matrix_hash_sha256: dd442bb2103660a351839b617275d22595f99b9bdac9d2b1ee5ba8aa80a7b007
+matrix_hash_sha256: 562f9091d3a0655e39535e896657bf880512b5044652baa2a8a0c5f644287ba4
 u7_static_advisory_record: docs/validation/traceweaver-u7-static-advisory-claims.md
-u7_static_advisory_record_sha256: 7167009d64e80ce9e84887f3d8b88ee5724f9bd9fc4639cd259b3ccbbd7c7dc1
+u7_static_advisory_record_sha256: 1421cf235e6bf1189b0364d5f1cb4ff418b44a2b24b4738f0026c764905ab6a8
 u7_static_advisory_state: static_advisory_accepted_runtime_held
 authority_tree_rule:
   controlling_tree_for_review: working_tree
@@ -206,27 +206,27 @@ source_artifacts:
     role: Candidate implementation plan for tw-auto after controlled-autonomy authority promotion.
   - id: SRC-PLAN-003
     path: docs/plans/2026-05-02-001-feat-full-ce-341-traceweaver-authority-wrapping-plan.md
-    sha256: f58cc917c5191d54bbda82e4e6cfbdc12aaf4a9079e9783b59fadb668b2552cf
+    sha256: 80adcde74b5641577643b300d57620ca952995d7c1540972da18835adfb4ad10
     role: Active full CE 3.4.1 authority-wrapping roadmap with refreshed canonical requirements baseline hash.
   - id: SRC-MATRIX-001
     path: traceability-matrix.md
-    sha256: dd442bb2103660a351839b617275d22595f99b9bdac9d2b1ee5ba8aa80a7b007
+    sha256: 562f9091d3a0655e39535e896657bf880512b5044652baa2a8a0c5f644287ba4
     role: Root traceability authority recording accepted narrow U7 static/advisory claims, refreshed current-hash install smoke, approved REQ-TW-048 static/advisory source-evidence scope, U9 Units 1-8 reviewed evidence, and U9 Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending and runtime invocation held.
   - id: SRC-VAL-005
     path: docs/validation/traceweaver-controlled-autonomy-alpha.md
-    sha256: 67368b23bd951a7e3d9e4c5e845e445843a974a735c4063bee277b1c8a7e97d7
+    sha256: 5ab8ae1b2830f56b9297e77d579453feb22bb86ca89cba2a0449c1ff7f725e6a
     role: Controlled-autonomy alpha static/install evidence with approved REQ-TW-048 static/advisory source-evidence scope, Units 1-8 reviewed evidence, and Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending; host-registry/runtime claims held.
   - id: SRC-VAL-006
     path: docs/validation/traceweaver-u7-static-advisory-claims.md
-    sha256: 7167009d64e80ce9e84887f3d8b88ee5724f9bd9fc4639cd259b3ccbbd7c7dc1
+    sha256: 1421cf235e6bf1189b0364d5f1cb4ff418b44a2b24b4738f0026c764905ab6a8
     role: U7 static/advisory claim record accepting tw-auto, lfg, README install-command, and tw-grill source-evidence static/advisory claims while recording current install smoke passed, code review passed, REQ-TW-048 amendment doc review passed, and held runtime/tw-grill implementation authority.
   - id: SRC-VAL-007
     path: docs/validation/traceweaver-u9-codex-runtime-discovery.md
-    sha256: 574cae7edd70b1b414c81e72504ff0a6e5ca200815c88c1b747d49b1bbe60f25
+    sha256: 76c16f22c1d078ca500627daa732a0121774ab1efed3f5d9136cd0cbf3995f18
     role: U9 Units 1-8 reviewed evidence plus Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending; prompt-input visibility passed after removing duplicate active skill surfaces, exact sentinel was observed with a copied-auth boundary, and real runtime invocation remains held.
   - id: SRC-PLAN-004
     path: docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
-    sha256: 53cec3cff757a9ccb01b874d2a2d4ff0a93bdb000bb8089d45596acf872cd52c
+    sha256: 341f9720d79433efb810cce842a7c98d10f949b373c687b8dfbfbb7d1c40583b
     role: U9 Codex runtime/discovery proof plan with Unit 9 registry-shape/auth-boundary repair and refreshed code/doc review pending after Units 1-8.
   - id: SRC-SMOKE-001
     path: scripts/traceweaver-smoke-codex-discovery
@@ -970,7 +970,7 @@ open_gaps:
     status: held
 
 next_recommended_steps:
-  - Record the promoted REQ-TW-048 baseline hash in downstream validation and task-capsule references before using the refreshed authority set for new work.
+  - Run refreshed Unit 9 behavior-code review and authority doc review before accepting Unit 9 as U9 input.
   - Keep tw-grill output as source evidence only; it does not create implementation authority.
   - Keep tw-auto, tw-grill, and the lfg compatibility alias in static/advisory/source-evidence scope until runtime behavior evidence passes.
   - Keep clean CE replacement, enforcing mode, dynamic discovery, slash commands, autonomous commit/push/PR, U9 runtime claims, and release-ready claims held until their evidence gates pass.

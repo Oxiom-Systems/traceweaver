@@ -63,13 +63,13 @@ capsules, trace records, or runtime validation evidence.
 - R8. Prove `lfg` delegates to `tw-auto` and cannot run raw CE autopilot.
 - R9. Prove reviewer subagent capacity/backpressure is reported as incomplete
   coverage and cannot close required review gates.
-- R10. Prove `tw-auto`, `lfg`, and candidate-scoped `tw-grill` stop before
+- R10. Prove `tw-auto`, `lfg`, and source-evidence-scoped `tw-grill` stop before
   commit, push, PR creation, release publication, enforcing behavior, slash
   commands, clean replacement, runtime-equivalence, or U9 runtime-claim closure
   unless later evidence explicitly authorizes those claims.
 - R11. Record U9 evidence in the matrix and a dedicated validation record
-  without promoting REQ-TW-048 or runtime/release claims beyond what the proof
-  actually demonstrates.
+  without promoting `tw-grill` implementation authority or runtime/release
+  claims beyond what the proof actually demonstrates.
 
 ## Scope Boundaries
 
@@ -81,8 +81,8 @@ capsules, trace records, or runtime validation evidence.
   proven.
 - No enforcing-mode claim; `traceweaver_mode` remains advisory.
 - No clean CE replacement or broad familiar `ce-*` wrapper claim.
-- `tw-grill` remains candidate source evidence only until REQ-TW-048 is
-  promoted by requirements review.
+- `tw-grill` is approved only for static/advisory source evidence; runtime
+  behavior and implementation authority remain held.
 - Do not mutate the real user Codex home during proof runs.
 
 ### Deferred to Separate Tasks
@@ -92,7 +92,7 @@ capsules, trace records, or runtime validation evidence.
 - Existing-home upgrade/conflict matrix beyond direct callable unowned
   directory protection.
 - R31 real-project validation and release/upstream readiness.
-- Promotion or continued hold decision for REQ-TW-048.
+- Runtime proof or continued hold decision for `tw-grill` behavior.
 
 ## Context & Research
 
@@ -156,8 +156,8 @@ capsules, trace records, or runtime validation evidence.
   surfaces that route to requirements and traceability reviewers.
 - `plugins/traceweaver-core/skills/lfg/SKILL.md` is the compatibility alias
   that must delegate to `tw-auto`.
-- `plugins/traceweaver-core/skills/tw-grill/SKILL.md` is installed/static
-  candidate source evidence only.
+- `plugins/traceweaver-core/skills/tw-grill/SKILL.md` is approved only for
+  installed/static source evidence.
 - `plugins/traceweaver-core/references/*-template.yml` and
   `plugins/traceweaver-core/skills/tw-auto/references/` provide authority,
   matrix, task capsule, trace record, gap, change, exception, and loop-state
@@ -196,7 +196,8 @@ records.
   Runtime claims require the U9 evidence record, matrix update, and clean
   review.
 - Should `tw-grill` be treated as implementation authority during U9? No.
-  Candidate source evidence only until REQ-TW-048 is promoted.
+  REQ-TW-048 approves static/advisory source evidence only; implementation
+  authority remains held.
 
 ### Deferred to Implementation
 
@@ -805,7 +806,7 @@ shape in an isolated Codex home.
 | --- | --- |
 | File-level discovery is mistaken for runtime invocation proof. | Separate discovery, deterministic scenario checks, and host-level invocation evidence in the validation record. |
 | A shell smoke cannot invoke Codex skills the same way the host does. | Record shell checks as deterministic support only; require manual Codex transcript or host runner evidence for full host-level invocation claims. |
-| U9 proof accidentally promotes `tw-grill` implementation authority. | Keep REQ-TW-048 candidate-only in all fixtures and matrix rows unless a separate requirements review promotes it. |
+| U9 proof accidentally promotes `tw-grill` implementation authority. | Treat REQ-TW-048 as approved static/advisory source evidence only in fixtures and matrix rows unless a later requirements review and runtime evidence explicitly authorize implementation authority. |
 | Negative publication checks miss a new route. | Reuse `scripts/traceweaver-smoke-no-publication` and add stale-reset triggers for any changed publication-related skill/script. |
 | Reviewer backpressure cannot be forced deterministically. | Simulate policy classification first and keep live capacity behavior held until actual host evidence is captured. |
 | Existing user Codex home differs from isolated install. | Scope this plan to isolated install; record existing-home behavior as held except for direct-callable conflict protection. |

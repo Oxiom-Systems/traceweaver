@@ -5,7 +5,7 @@ status: active
 date: 2026-05-02
 origin: requirements.md
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 89fb1dc59cf561302932cbc7658abc7cf3b333a9d5955f609f23efd091a87535
+baseline_hash_sha256: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
 traceweaver_mode: advisory
 ---
 
@@ -68,7 +68,7 @@ This document is a roadmap with a bounded executable front slice:
 - Current canonical baseline verification command:
   `perl -0pe 's/^(baseline_hash_sha256: ).*$/baseline_hash_sha256: CANONICAL_HASH_PLACEHOLDER/m' requirements.md | shasum -a 256`.
   As of this plan patch, both the working tree and staged `requirements.md`
-  resolve to `89fb1dc59cf561302932cbc7658abc7cf3b333a9d5955f609f23efd091a87535`.
+  resolve to `6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba`.
 
 ## Requirements Trace
 
@@ -84,14 +84,14 @@ This document is a roadmap with a bounded executable front slice:
 | REQ-TW-045 | Idea and brainstorm flows must create or update root `requirements.md`, root `traceability-matrix.md`, `.traceweaver/intent-contract.yml`, and gap/change/exception records. |
 | REQ-TW-046 | Traceability checks must flag untraced, duplicate, unnecessary, or logical-but-uncaptured behavior as dark behavior or a proposed authority change. |
 | REQ-TW-047 | Public systems-engineering guidance must use original TraceWeaver wording and must not copy protected standards text or overclaim conformance. |
-| REQ-TW-048 | `tw-grill` remains optional post-ideation source evidence until reviewed and promoted. |
+| REQ-TW-048 | `tw-grill` is approved for static/advisory post-ideation source evidence; implementation authority and runtime behavior remain held. |
 
 ## Intent Capsule
 
 ```yaml
 task_id: TW-TASK-FULL-CE-341-AUTHORITY-WRAPPING
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 89fb1dc59cf561302932cbc7658abc7cf3b333a9d5955f609f23efd091a87535
+baseline_hash_sha256: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
 authority_status: planning_only_runtime_held
 authorized_by:
   - REQ-TW-033
@@ -235,11 +235,11 @@ CE wrapping program, not only upstream CE skills.
 | --- | --- | --- |
 | `tw-auto` | Controlled automation path and candidate first-run bootstrap. | Accepted authority contract, dependency-resolution proof, missing-authority stop, matrix bootstrap proof, stop-before-publication proof, bounded-loop proof, runtime smoke, close/reopen conditions, and disconfirming tests proving it does not route through raw CE behavior. |
 | TraceWeaver `lfg` alias | Familiar alias that must delegate to `tw-auto`. | Alias-resolution proof that it cannot invoke raw CE autopilot, negative smoke with `tw-auto` absent, and held familiar-name compatibility when external CE exact-name interception is not proven. |
-| `tw-grill` | Optional post-ideation intent-deepening/source-evidence helper. | Held/out-of-scope for Units 0-2 except current-package safety classification. It may not become implementation authority or first-run bootstrap until a later accepted plan selects it and proves source-evidence, privacy, and non-authority behavior. |
+| `tw-grill` | Optional post-ideation intent-deepening/source-evidence helper. | Approved only for static/advisory source-evidence scope. It may not become implementation authority or runtime behavior until a later accepted plan and runtime evidence prove the selected behavior. |
 
-REQ-TW-048 is satisfied in this roadmap only by classifying `tw-grill` as a held
-TraceWeaver-native surface. This plan does not authorize `tw-grill` promotion,
-runtime invocation, or first-run/bootstrap use.
+REQ-TW-048 is satisfied in this roadmap only as approved static/advisory source
+evidence. This plan does not authorize `tw-grill` implementation authority,
+runtime invocation, or runtime first-run/bootstrap behavior.
 
 `tw-auto` may remain a static/advisory recommendation while its install evidence
 is accepted, but it may not become the default first-run bootstrap or `lfg`
@@ -375,10 +375,10 @@ Out of scope for this plan:
 ### Prerequisites
 
 - `/ce-doc-review requirements.md` must be clean before REQ-TW-033 through
-  REQ-TW-047 are used as implementation authority, or unresolved findings must
-  be recorded as approved exceptions or held conditions in the baseline.
-  REQ-TW-048 remains candidate source evidence until a separate requirements
-  review promotes it.
+  REQ-TW-048 are used as planning authority for their approved scopes, or
+  unresolved findings must be recorded as approved exceptions or held conditions
+  in the baseline. REQ-TW-048 is approved only for static/advisory source
+  evidence; implementation authority and runtime behavior remain held.
 - `.traceweaver/intent-contract.yml` and root `traceability-matrix.md` must be
   checked for freshness against the same baseline id/hash before Unit 0-2
   wrapper policy or package-surface decisions are accepted. If either artifact is
@@ -873,7 +873,8 @@ Approach:
 Verification:
 
 - Policy inspection maps every approved obligation to REQ-TW-033 through
-  REQ-TW-047 and keeps REQ-TW-048 as candidate source evidence until promoted.
+  REQ-TW-048 while keeping `tw-grill` implementation authority and runtime
+  behavior held.
 - Static scan confirms docs do not claim full replacement until runtime proof.
 - Name and package-surface decision table is accepted before any wrapper
   implementation unit starts. The table may mark familiar `ce-*` compatibility
@@ -1536,10 +1537,10 @@ requirements change or plan amendment explicitly replaces them.
 
 Run `/ce-doc-review docs/plans/2026-05-02-001-feat-full-ce-341-traceweaver-authority-wrapping-plan.md`.
 If that review passes, run `/ce-doc-review requirements.md` and confirm the
-canonical baseline hash before using REQ-TW-033 through REQ-TW-047 as
-implementation authority. Keep REQ-TW-048 held as candidate source evidence
-until a separate requirements review promotes it. After that baseline gate is
-clean or explicitly held, run `/ce:work` on Unit 0 first to snapshot and prove the current packaged
+canonical baseline hash before using REQ-TW-033 through REQ-TW-048 as planning
+authority for their approved scopes. Keep `tw-grill` implementation authority
+and runtime behavior held. After that baseline gate is clean or explicitly held,
+run `/ce:work` on Unit 0 first to snapshot and prove the current packaged
 CE-derived surface is delegate-only, stop-only, absent, or read-only support.
 Then run Unit 1A to create the current/core inventory and product-checkpoint
 evidence. Run Unit 1B full-surface inventory and broad Unit 2 policy only if the
