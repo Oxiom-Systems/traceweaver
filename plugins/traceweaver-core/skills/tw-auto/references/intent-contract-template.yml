@@ -1,0 +1,92 @@
+intent_contract_id: TW-IC-YYYY-MM-DD-001
+contract_status: draft
+contract_type: project_authority_baseline
+created_at: YYYY-MM-DD
+owner: "<project owner>"
+
+baseline_id: REQ-BASELINE-YYYY-MM-DD-001
+baseline_hash_sha256: "<canonical requirements.md hash>"
+baseline_source: requirements.md
+baseline_review_id: "<review evidence id>"
+baseline_status: accepted_controlled_baseline
+
+traceweaver_mode: advisory
+mode_policy:
+  default: advisory
+  allowed_values: [off, advisory, enforcing]
+  off: CE workflow may run without TraceWeaver authority gates; TraceWeaver skills remain manually callable.
+  advisory: TraceWeaver gates warn, create gap/change/exception records, and hold unsupported claims without blocking CE execution.
+  enforcing: Held until dynamic/runtime validation approves blocking behavior.
+  override_rule: This project-local intent contract is the only project-local override point for traceweaver_mode.
+
+authority_rule:
+  invariant: >-
+    No agent may implement, review, or modify meaningful behavior unless it can
+    cite stakeholder intent, an approved requirement or approved exception, a
+    verification method, a validation question, and the current baseline version.
+  missing_authority_disposition:
+    - gap
+    - proposed_requirement
+    - change_request
+    - approved_exception_candidate
+    - accepted_risk_candidate
+    - clarification_needed
+    - held_claim
+
+stakeholder_intent:
+  - id: INTENT-001
+    source: "<source document, issue, interview, or decision record>"
+    summary: "<what the stakeholder actually wants>"
+    validation_question: "<how we will know this solved the right problem>"
+
+approved_requirements:
+  - id: REQ-001
+    intent_ids: [INTENT-001]
+    statement: "<approved requirement statement>"
+    authority_status: approved
+    verification_method: test
+    validation_method: stakeholder_review
+    validation_question: "<validation question>"
+    acceptance_criteria:
+      - "<observable acceptance criterion>"
+
+approved_exceptions: []
+held_claims: []
+closed_exceptions: []
+
+must_not_change:
+  - "<explicit out-of-scope behavior or boundary>"
+
+blocked_assumptions:
+  - id: ASM-001
+    statement: "<assumption that is not approved authority>"
+    action: clarification_needed
+
+workflow_controls:
+  - stage: plan
+    ce_command: ce-plan
+    traceweaver_control: tw-authority-gate
+    rule: Plan only against approved requirements or approved exceptions.
+    next_step: ce-work
+
+task_capsule_minimum:
+  task_id: required
+  baseline_id: "<baseline id>"
+  baseline_hash_sha256: "<baseline hash>"
+  authorized_by: approved requirement ID or approved exception ID required for meaningful implementation
+  intent_served: at least one intent ID
+  verification_required: required
+  validation_question: required
+  must_not_change: required when applicable
+  open_assumptions: empty list or explicit assumption records
+  next_step: required
+
+drift_check:
+  purpose: Fast advisory requirement/intent drift check for plans, reviews, and task capsules.
+  statuses: [aligned, warning, gap, held_claim, clarification_needed]
+  enforcement: advisory_only
+
+open_gaps: []
+
+next_recommended_steps:
+  - Run tw-authority-gate before meaningful implementation.

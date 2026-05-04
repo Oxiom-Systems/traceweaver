@@ -1,0 +1,327 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+tmp_root="$(mktemp -d)"
+trap 'rm -rf "$tmp_root"' EXIT
+
+hash_file() {
+  shasum -a 256 "$1" | awk '{print $1}'
+}
+
+json_query() {
+  python3 - "$1" "$2" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+query = sys.argv[2].split(".")
+with open(path, "r", encoding="utf-8") as handle:
+    value = json.load(handle)
+for part in query:
+    value = value[part]
+if isinstance(value, list):
+    print("\n".join(str(item) for item in value))
+else:
+    print(value)
+PY
+}
+
+json_len() {
+  python3 - "$1" "$2" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+query = sys.argv[2].split(".")
+with open(path, "r", encoding="utf-8") as handle:
+    value = json.load(handle)
+for part in query:
+    value = value[part]
+print(len(value))
+PY
+}
+
+assert_file() {
+  if [ ! -f "$1" ]; then
+    echo "missing_file=$1"
+    exit 1
+  fi
+}
+
+assert_dir() {
+  if [ ! -d "$1" ]; then
+    echo "missing_directory=$1"
+    exit 1
+  fi
+}
+
+assert_equal() {
+  local label="$1"
+  local expected="$2"
+  local actual="$3"
+  if [ "$expected" != "$actual" ]; then
+    echo "${label}=failed expected=${expected} actual=${actual}"
+    exit 1
+  fi
+}
+
+assert_marker() {
+  local marker="$1"
+  local expected_skill="$2"
+  python3 - "$marker" "$expected_skill" <<'PY'
+import json
+import sys
+
+marker_path, expected_skill = sys.argv[1], sys.argv[2]
+with open(marker_path, "r", encoding="utf-8") as handle:
+    marker = json.load(handle)
+expected = {
+    "plugin": "traceweaver-core",
+    "skill": expected_skill,
+    "purpose": "direct-callable-skill-copy",
+}
+for key, value in expected.items():
+    if marker.get(key) != value:
+        raise SystemExit(f"marker_{key}=failed expected={value} actual={marker.get(key)}")
+PY
+}
+
+expected_direct_skills=(
+  tw-auto
+  lfg
+  tw-authority-gate
+  tw-traceability-check
+  tw-requirements-review
+  tw-grill
+  ce-plan
+  ce-work
+  ce-code-review
+  ce-doc-review
+)
+
+expected_visible_skills=(
+  tw-auto
+  lfg
+  tw-authority-gate
+  tw-traceability-check
+  tw-requirements-review
+  tw-grill
+  ce-plan
+  ce-work
+  ce-code-review
+  ce-doc-review
+)
+
+identity_skills=(
+  tw-auto
+  lfg
+  tw-authority-gate
+  tw-traceability-check
+  tw-requirements-review
+  tw-grill
+  ce-plan
+  ce-work
+  ce-code-review
+  ce-doc-review
+)
+
+codex_home="$tmp_root/codex-home"
+mkdir -p "$codex_home"
+
+install_output="$tmp_root/install.out"
+bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" \
+  --to codex \
+  --include-skills \
+  --codexHome "$codex_home" >"$install_output"
+
+codex_root="$codex_home/.codex"
+manifest="$codex_root/traceweaver-core/install-manifest.json"
+packaged_skills_root="$codex_root/traceweaver-core/skills"
+callable_skills_root="$codex_root/skills"
+agents_root="$codex_root/agents/traceweaver-core"
+references_root="$codex_root/traceweaver-core/references"
+visible_skills="$tmp_root/visible-skills.txt"
+
+assert_file "$manifest"
+assert_dir "$packaged_skills_root"
+assert_dir "$callable_skills_root"
+assert_dir "$agents_root"
+assert_dir "$references_root"
+
+if [ -d "$codex_root/skills/traceweaver-core" ]; then
+  echo "active_namespaced_skill_surface=failed path=$codex_root/skills/traceweaver-core"
+  exit 1
+fi
+
+source_skill_count="$(find "$repo_root/plugins/traceweaver-core/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
+source_agent_count="$(find "$repo_root/plugins/traceweaver-core/agents" -maxdepth 1 -type f -name '*.agent.md' | wc -l | tr -d ' ')"
+source_reference_count="$(find "$repo_root/plugins/traceweaver-core/references" -type f | wc -l | tr -d ' ')"
+
+manifest_skill_count="$(json_len "$manifest" skills)"
+manifest_callable_count="$(json_len "$manifest" callableSkills)"
+manifest_agent_count="$(json_len "$manifest" agents)"
+manifest_reference_count="$(json_len "$manifest" references)"
+manifest_prompt_count="$(json_len "$manifest" prompts)"
+manifest_prompt_file_count="$(json_len "$manifest" promptFiles)"
+
+installed_packaged_count="$(find "$packaged_skills_root" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
+installed_callable_count=0
+for skill_name in $(json_query "$manifest" callableSkills); do
+  assert_dir "$callable_skills_root/$skill_name"
+  assert_file "$callable_skills_root/$skill_name/.traceweaver-core-install.json"
+  assert_marker "$callable_skills_root/$skill_name/.traceweaver-core-install.json" "$skill_name"
+  installed_callable_count=$((installed_callable_count + 1))
+done
+
+assert_equal "manifest_skill_count" "$source_skill_count" "$manifest_skill_count"
+assert_equal "manifest_callable_skill_count" "$source_skill_count" "$manifest_callable_count"
+assert_equal "manifest_agent_count" "$source_agent_count" "$manifest_agent_count"
+assert_equal "manifest_reference_count" "$source_reference_count" "$manifest_reference_count"
+assert_equal "manifest_prompt_count" "0" "$manifest_prompt_count"
+assert_equal "manifest_prompt_file_count" "0" "$manifest_prompt_file_count"
+assert_equal "installed_packaged_skill_count" "$source_skill_count" "$installed_packaged_count"
+assert_equal "installed_callable_skill_count" "$source_skill_count" "$installed_callable_count"
+grep -Fq "legacy_active_namespaced_skill_surface=absent" "$install_output"
+
+for skill_name in "${expected_direct_skills[@]}"; do
+  assert_dir "$packaged_skills_root/$skill_name"
+  assert_dir "$callable_skills_root/$skill_name"
+done
+
+for skill_name in "${identity_skills[@]}"; do
+  source_hash="$(hash_file "$repo_root/plugins/traceweaver-core/skills/$skill_name/SKILL.md")"
+  packaged_hash="$(hash_file "$packaged_skills_root/$skill_name/SKILL.md")"
+  callable_hash="$(hash_file "$callable_skills_root/$skill_name/SKILL.md")"
+  assert_equal "${skill_name}_packaged_hash" "$source_hash" "$packaged_hash"
+  assert_equal "${skill_name}_callable_hash" "$source_hash" "$callable_hash"
+  echo "skill_hash_${skill_name}=${source_hash}"
+done
+
+HOME="$codex_home" CODEX_HOME="$codex_root" codex debug prompt-input \
+  "Use all TraceWeaver tw skills: tw-auto tw-authority-gate tw-traceability-check tw-requirements-review tw-grill." \
+  | jq -r '.. | strings' \
+  | perl -ne 'print "$1\n" if /^- ([A-Za-z0-9_.:-]+): /' \
+  | sort -u >"$visible_skills"
+
+for skill_name in "${expected_visible_skills[@]}"; do
+  if ! grep -qx "$skill_name" "$visible_skills"; then
+    echo "codex_prompt_input_visible_skill=failed missing=$skill_name"
+    echo "visible_skills=$(paste -sd, "$visible_skills")"
+    exit 1
+  fi
+done
+
+grep -Fq "Invoke \`tw-auto\` with the same arguments" "$callable_skills_root/lfg/SKILL.md"
+grep -Fq "Do not run \`ce-plan\`, \`ce-work\`, \`ce-code-review\`, \`ce-commit\`" "$callable_skills_root/lfg/SKILL.md"
+grep -Fq "Do not fall back to raw CE \`lfg\`" "$callable_skills_root/lfg/SKILL.md"
+
+if [ -d "$codex_root/prompts" ] || [ -d "$codex_root/commands" ]; then
+  echo "prompt_or_command_surface=failed"
+  exit 1
+fi
+
+conflict_home="$tmp_root/conflict-home"
+mkdir -p "$conflict_home/.codex/skills/ce-work"
+printf 'unowned skill\n' >"$conflict_home/.codex/skills/ce-work/SKILL.md"
+
+set +e
+bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" \
+  --to codex \
+  --include-skills \
+  --codexHome "$conflict_home" >"$tmp_root/conflict.out" 2>"$tmp_root/conflict.err"
+conflict_status=$?
+set -e
+
+if [ "$conflict_status" -eq 0 ]; then
+  echo "unowned_direct_callable_conflict=failed expected_nonzero"
+  exit 1
+fi
+
+if ! grep -Fq "will not overwrite existing global callable skill directories" "$tmp_root/conflict.err"; then
+  echo "unowned_direct_callable_conflict_message=failed"
+  cat "$tmp_root/conflict.err"
+  exit 1
+fi
+
+assert_equal "unowned_conflict_file_preserved" "unowned skill" "$(cat "$conflict_home/.codex/skills/ce-work/SKILL.md")"
+
+legacy_home="$tmp_root/legacy-home"
+legacy_codex_root="$legacy_home/.codex"
+legacy_active_root="$legacy_codex_root/skills/traceweaver-core"
+legacy_manifest_dir="$legacy_codex_root/traceweaver-core"
+mkdir -p "$legacy_active_root/tw-auto" "$legacy_manifest_dir"
+printf 'legacy active traceweaver skill\n' >"$legacy_active_root/tw-auto/SKILL.md"
+cat >"$legacy_manifest_dir/install-manifest.json" <<'JSON'
+{
+  "plugin": "traceweaver-core",
+  "target": "codex",
+  "includeSkills": true,
+  "skills": ["tw-auto"],
+  "callableSkills": ["tw-auto"]
+}
+JSON
+
+legacy_install_output="$tmp_root/legacy-install.out"
+bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" \
+  --to codex \
+  --include-skills \
+  --codexHome "$legacy_home" >"$legacy_install_output"
+
+if [ -d "$legacy_active_root" ]; then
+  echo "owned_legacy_active_skill_surface_cleanup=failed path=$legacy_active_root"
+  exit 1
+fi
+grep -Fq "legacy_active_namespaced_skill_surface=removed_owned_upgrade" "$legacy_install_output"
+assert_dir "$legacy_codex_root/traceweaver-core/skills/tw-auto"
+assert_dir "$legacy_codex_root/skills/tw-auto"
+
+unowned_legacy_home="$tmp_root/unowned-legacy-home"
+unowned_legacy_codex_root="$unowned_legacy_home/.codex"
+unowned_legacy_active_root="$unowned_legacy_codex_root/skills/traceweaver-core"
+mkdir -p "$unowned_legacy_active_root/tw-auto"
+printf 'unowned legacy active skill\n' >"$unowned_legacy_active_root/tw-auto/SKILL.md"
+
+set +e
+bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" \
+  --to codex \
+  --include-skills \
+  --codexHome "$unowned_legacy_home" >"$tmp_root/unowned-legacy.out" 2>"$tmp_root/unowned-legacy.err"
+unowned_legacy_status=$?
+set -e
+
+if [ "$unowned_legacy_status" -eq 0 ]; then
+  echo "unowned_legacy_active_skill_surface=failed expected_nonzero"
+  exit 1
+fi
+
+if ! grep -Fq "will not remove legacy active TraceWeaver skill surface without ownership proof" "$tmp_root/unowned-legacy.err"; then
+  echo "unowned_legacy_active_skill_surface_message=failed"
+  cat "$tmp_root/unowned-legacy.err"
+  exit 1
+fi
+
+assert_equal "unowned_legacy_active_file_preserved" "unowned legacy active skill" "$(cat "$unowned_legacy_active_root/tw-auto/SKILL.md")"
+
+echo "codex_discovery_smoke=pass"
+echo "temp_codex_home=$codex_home"
+echo "installed_manifest=$manifest"
+echo "installed_packaged_skill_directory_count=$installed_packaged_count"
+echo "installed_callable_skill_directory_count=$installed_callable_count"
+echo "installed_agent_toml_count=$manifest_agent_count"
+echo "installed_reference_file_count=$manifest_reference_count"
+echo "installed_manifest_prompts=$manifest_prompt_count"
+echo "installed_manifest_prompt_files=$manifest_prompt_file_count"
+echo "direct_callable_required_skills=${expected_direct_skills[*]}"
+echo "codex_prompt_input_visible_required_skills=${expected_visible_skills[*]}"
+echo "active_namespaced_skill_surface=absent"
+echo "packaged_traceweaver_skills_root=$packaged_skills_root"
+echo "direct_callable_skills_root=$callable_skills_root"
+echo "selected_agents_root=$agents_root"
+echo "references_root=$references_root"
+echo "unowned_direct_callable_conflict=blocked_before_overwrite"
+echo "owned_legacy_active_skill_surface=removed_on_upgrade"
+echo "unowned_legacy_active_skill_surface=blocked_before_removal"
+echo "installed_lfg_delegation=pass"
+echo "installed_lfg_no_raw_ce_autopilot=pass"
+echo "host_codex_registry_discovery=held_manual_fresh_session_or_reload_required"

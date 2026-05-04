@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 if [ $# -lt 1 ]; then
     echo "Usage: get-pr-comments PR_NUMBER [OWNER/REPO]"
@@ -11,7 +11,7 @@ fi
 
 PR_NUMBER=$1
 
-if [ -n "$2" ]; then
+if [ -n "${2:-}" ]; then
     OWNER=$(echo "$2" | cut -d/ -f1)
     REPO=$(echo "$2" | cut -d/ -f2)
 else
@@ -51,6 +51,7 @@ query FetchPRFeedback($owner: String!, $repo: String!, $pr: Int!) {
     pullRequest(number: $pr) {
       author { login }
       reviewThreads(first: 50) {
+        pageInfo { hasNextPage }
         edges {
           node {
             id
@@ -62,6 +63,7 @@ query FetchPRFeedback($owner: String!, $repo: String!, $pr: Int!) {
             startLine
             originalStartLine
             comments(first: 10) {
+              pageInfo { hasNextPage }
               nodes {
                 id
                 author { login }
@@ -74,6 +76,7 @@ query FetchPRFeedback($owner: String!, $repo: String!, $pr: Int!) {
         }
       }
       comments(first: 100) {
+        pageInfo { hasNextPage }
         nodes {
           id
           author { login }
@@ -81,6 +84,7 @@ query FetchPRFeedback($owner: String!, $repo: String!, $pr: Int!) {
         }
       }
       reviews(first: 50) {
+        pageInfo { hasNextPage }
         nodes {
           id
           author { login }
@@ -90,7 +94,19 @@ query FetchPRFeedback($owner: String!, $repo: String!, $pr: Int!) {
       }
     }
   }
-}' | jq '.data.repository.pullRequest as $pr |
+}' | jq -e '
+  .data.repository.pullRequest as $pr |
+  if $pr == null then
+    error("GitHub GraphQL response did not include pullRequest data")
+  elif $pr.reviewThreads.pageInfo.hasNextPage
+    or $pr.comments.pageInfo.hasNextPage
+    or $pr.reviews.pageInfo.hasNextPage
+    or any($pr.reviewThreads.edges[]?.node.comments.pageInfo.hasNextPage; .) then
+    error("GitHub feedback response is paginated; rerun with pagination support before resolving review feedback")
+  else
+    .
+  end |
+  .data.repository.pullRequest as $pr |
   # Structurally non-actionable bot output; always dropped.
   ["codecov"] as $ci_bot_logins |
   # Unresolved threads. `isOutdated` means the diff hunk around the comment

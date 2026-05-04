@@ -8,6 +8,34 @@ argument-hint: "[optional: feature description, requirements doc path, plan path
 
 **Note: The current year is 2026.** Use this when dating plans and searching for recent documentation.
 
+## TraceWeaver Package Boundary
+
+When this `ce-plan` skill is installed by the TraceWeaver plugin, direct
+invocation is a legacy/manual-continuity surface. It is not, by itself, a
+TraceWeaver-authority-enforced workflow.
+
+For TraceWeaver-controlled planning, use `tw-auto` or explicitly run the
+TraceWeaver sequence first:
+
+```text
+tw-requirements-review
+-> authority-baseline record
+-> ce-plan
+-> tw-authority-gate
+```
+
+Before planning meaningful behavior in TraceWeaver-controlled work, load the
+project root `requirements.md`, `.traceweaver/intent-contract.yml`, and
+`traceability-matrix.md` when they exist. If they are missing, draft, stale, or
+do not authorize the work, stop and recommend `tw-auto` bootstrap or
+`tw-requirements-review`; do not treat a bare prompt, plan request, or agent
+interpretation as implementation authority.
+
+If the user explicitly asks for legacy/manual CE planning anyway, proceed with
+the upstream CE planning workflow, but state in the output that the resulting
+plan does not close TraceWeaver authority, traceability, verification, or
+validation gates until `tw-authority-gate` and `tw-traceability-check` run.
+
 `ce-brainstorm` defines **WHAT** to build. `ce-plan` defines **HOW** to build it. `ce-work` executes the plan. A prior brainstorm is useful context but never required — `ce-plan` works from any input: a requirements doc, a bug report, a feature idea, or a rough description.
 
 **When directly invoked, always plan.** Never classify a direct invocation as "not a planning task" and abandon the workflow. If the input is unclear, ask clarifying questions or use the planning bootstrap (Phase 0.4) to establish enough context — but always stay in the planning workflow.
@@ -886,7 +914,7 @@ When deepening is warranted, read `references/deepening-workflow.md` for confide
 
 ##### 5.3.8–5.4 Document Review, Final Checks, and Post-Generation Options
 
-**STOP. Load `references/plan-handoff.md` now before continuing.** It carries the full instructions for 5.3.8 (document review), 5.3.9 (final checks and cleanup), and 5.4 (post-generation handoff, including the Proof HITL flow, post-HITL re-review, and Issue Creation branching). **This load is non-optional** — without it, the agent renders the post-generation menu, captures the user's selection, and stops without firing the routed action. Document review at 5.3.8 is also mandatory regardless of whether the confidence check already ran.
+**STOP. Load `references/plan-handoff.md` now before continuing.** It carries the full instructions for 5.3.8 (document review), 5.3.9 (final checks and cleanup), and 5.4 (post-generation handoff, including Issue Creation branching). **This load is non-optional** — without it, the agent renders the post-generation menu, captures the user's selection, and stops without firing the routed action. Document review at 5.3.8 is also mandatory regardless of whether the confidence check already ran.
 
 After document review and final checks, present this menu using the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_user` in Gemini, `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to numbered options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
 
@@ -894,15 +922,13 @@ After document review and final checks, present this menu using the platform's b
 
 **Options:**
 1. **Start `/ce-work`** (recommended) - Begin implementing this plan in the current session
-2. **Create Issue** - Create a tracked issue from this plan in your configured issue tracker (GitHub or Linear)
-3. **Open in Proof (web app) — review and comment to iterate with the agent** - Open the doc in Every's Proof editor, iterate with the agent via comments, or copy a link to share with others
-4. **Done for now** - Pause; the plan file is saved and can be resumed later
+2. **Draft Issue** - Draft tracked-issue content from this plan without publishing it
+3. **Done for now** - Pause; the plan file is saved and can be resumed later
 
-**Routing.** Act on the user's selection — do not just announce it. Elaborate sub-flows (Proof HITL state machine, Issue Creation tracker detection, post-HITL resync) live in `references/plan-handoff.md`.
+**Routing.** Act on the user's selection — do not just announce it. Elaborate sub-flows for Issue Creation tracker detection live in `references/plan-handoff.md`.
 
 - **Start `/ce-work`** — Invoke the `ce-work` skill via the platform's skill-invocation primitive (`Skill` in Claude Code, `Skill` in Codex, the equivalent on Gemini/Pi), passing the plan path as the skill argument. Do not merely tell the user to type `/ce-work` — fire the invocation now so the plan executes in this session.
-- **Create Issue** — Detect the project tracker (`gh` for GitHub, `linear` for Linear) and create the issue from the plan file as described under "Issue Creation" in `references/plan-handoff.md`. After creation, display the issue URL and ask whether to proceed to `/ce-work` via the platform's blocking question tool.
-- **Open in Proof (web app) — review and comment to iterate with the agent** — Load the `ce-proof` skill in HITL-review mode with the plan file as `source file`, the plan title as `doc title`, identity `ai:compound-engineering` / `Compound Engineering`, and recommended next step `/ce-work`. Then follow the post-HITL resync logic in `references/plan-handoff.md`, which handles the four `ce-proof` return statuses, re-runs `ce-doc-review` after material edits, and falls back gracefully on upload failure.
+- **Draft Issue** — Draft the issue title/body that would be created from the plan file as described under "Issue Creation" in `references/plan-handoff.md`, but do not call GitHub, Linear, or any other tracker. In the TraceWeaver packaged alpha, issue publication remains held until a future TraceWeaver publication gate approves remote mutation. After showing the draft, ask whether to proceed to `/ce-work` via the platform's blocking question tool.
 - **Done for now** — Display a brief confirmation that the plan file is saved and end the turn. Do not start follow-up work without an explicit further user prompt.
 
 If the user asks for another document review (either from a contextual prompt about residual findings or via free-form request), load the `ce-doc-review` skill with the plan path for another pass and then return to this menu. For free-text revisions outside the four options, accept the input and loop back to this menu after applying the revision.

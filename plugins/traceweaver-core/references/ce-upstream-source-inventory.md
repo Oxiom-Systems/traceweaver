@@ -1,6 +1,6 @@
 # CE Upstream Source Inventory
 
-Record ID: `TWCORE-CE-SOURCE-PIN-2026-05-01-001`
+Record ID: `TWCORE-CE-SOURCE-PIN-2026-05-01-002`
 
 This package includes a selected Compound Engineering compatibility surface for
 TraceWeaver U6b Unit 2 static materialization.
@@ -11,13 +11,13 @@ TraceWeaver U6b Unit 2 static materialization.
 | --- | --- |
 | Source package | Compound Engineering plugin |
 | Source repository | `https://github.com/EveryInc/compound-engineering-plugin` |
-| Source version | `3.3.2` |
-| Source tags | `compound-engineering-v3.3.2`, `cli-v3.3.2` |
-| Source commit | `e5b397c9d1883354f03e338dd00f98be3da39f9f` |
+| Source version | `3.4.1` |
+| Source tags | `compound-engineering-v3.4.1`, `cli-v3.4.1` |
+| Source commit | `d685f0794863a73ae3ca3620d2ae747510e9eaa0` |
 | Source license | MIT, from source plugin manifest |
 | Capture date | 2026-05-01 |
-| Source basis | locally installed plugin cache for the pinned version |
-| Full cache aggregate fingerprint | `53e5dfdb773f9120b7854a12b0d666666220a26fb2cde66fa0b87b8fdfa764f4` |
+| Source basis | upstream tag fetched from GitHub plus locally installed plugin cache for the pinned version |
+| Full cache aggregate fingerprint | `6892159ad685e59230514f9e58fb7ffd06052d84da643c73ac95b787e3c60d23` |
 
 ## Selected File Authority
 
@@ -28,18 +28,17 @@ Unit 2 materializes only selected CE files from that inventory. Adding any CE
 file outside that inventory requires a validation delta before it can be treated
 as package authority.
 
+`skills/lfg/SKILL.md` is a selected TraceWeaver package delta over the CE source
+name. It is retained for familiar entrypoint continuity, but the packaged file
+must delegate to `tw-auto` and must not run raw CE autopilot directly. Its
+package hash is controlled by the inventory rather than by the upstream CE
+source hash.
+
 ## Agent Boundary
 
-The pinned source package contains 49 selected CE agent files. Two previously
-inventoried CLI readiness agent rows are absent from the pinned upstream tag and
-the local source package:
-
-- `agents/ce-cli-agent-readiness-reviewer.agent.md`
-- `agents/ce-cli-readiness-reviewer.agent.md`
-
-Those paths are excluded from Unit 2 materialization. CE agent-backed runtime
-equivalence remains held until runtime evidence proves agent loading and
-workflow behavior.
+The pinned source package contains 49 selected CE agent files.
+CE agent-backed runtime equivalence remains held until runtime evidence proves
+agent loading and workflow behavior.
 
 ## Stale Reset
 
@@ -48,10 +47,11 @@ This source map resets to held if:
 - the CE source version or tag changes;
 - the source commit changes;
 - selected CE file hashes change;
+- the packaged `skills/lfg/SKILL.md` alias stops delegating to `tw-auto`;
 - the source license or package shape changes;
 - TraceWeaver packages any CE file outside the selected inventory;
 - static evidence is used to claim clean CE replacement or runtime-equivalent
   agent behavior.
 
-Next recommended step: review the U6b Unit 2 evidence, then create narrow U7
-alpha claims only if review stays clean.
+Next recommended step: review the refreshed U6b Unit 2 evidence, then create
+narrow U7 alpha claims only if review stays clean.

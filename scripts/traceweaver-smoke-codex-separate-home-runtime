@@ -1,0 +1,153 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+tmp_home="$(mktemp -d /tmp/traceweaver-u9-separate-home.XXXXXX)"
+codex_home="$tmp_home/.codex"
+model="${TRACEWEAVER_CODEX_MODEL:-gpt-5.2}"
+exec_timeout_seconds="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-120}"
+auth_copy="$codex_home/auth.json"
+auth_copy_used=false
+
+mkdir -p "$codex_home"
+
+cleanup_auth_copy() {
+  rm -f "$auth_copy"
+}
+
+trap cleanup_auth_copy EXIT
+
+if [ -f "$HOME/.codex/auth.json" ]; then
+  cp "$HOME/.codex/auth.json" "$auth_copy"
+  auth_copy_used=true
+fi
+
+prompt="$tmp_home/prompt.txt"
+last_message="$tmp_home/last-message.txt"
+events="$tmp_home/exec-events.jsonl"
+stderr_log="$tmp_home/exec.err"
+install_log="$tmp_home/install.out"
+prompt_input="$tmp_home/prompt-input.json"
+visible_skills="$tmp_home/visible-skills.txt"
+required_visible_skills=(
+  tw-auto
+  lfg
+  tw-authority-gate
+  tw-traceability-check
+  tw-requirements-review
+  tw-grill
+  ce-plan
+  ce-work
+  ce-code-review
+  ce-doc-review
+)
+
+cat >"$prompt" <<'EOF'
+Use the tw-authority-gate skill. You may run read-only shell commands only to
+open or hash the installed skill file named in the available-skills list. Do not
+edit files.
+
+Reply exactly in this format and nothing else, replacing HASH with the SHA-256
+of the installed tw-authority-gate SKILL.md file you inspected:
+
+TRACEWEAVER_SKILL_HASH=HASH
+
+If the skill is unavailable, not listed, not loaded, or cannot be used, reply
+exactly with this one line and nothing else:
+
+TRACEWEAVER_SKILL_HELD=not_available
+EOF
+
+bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" \
+  --to codex \
+  --include-skills \
+  --codexHome "$tmp_home" >"$install_log"
+
+expected_skill_hash="$(shasum -a 256 "$codex_home/skills/tw-authority-gate/SKILL.md" | awk '{print $1}')"
+HOME="$tmp_home" CODEX_HOME="$codex_home" codex debug prompt-input \
+  "Use the tw-authority-gate skill." >"$prompt_input"
+jq -r '.. | strings' "$prompt_input" | perl -ne 'print "$1\n" if /^- ([A-Za-z0-9_.:-]+): /' >"$visible_skills"
+
+missing_visible_skills=()
+for skill_name in "${required_visible_skills[@]}"; do
+  if ! grep -qx "$skill_name" "$visible_skills"; then
+    missing_visible_skills+=("$skill_name")
+  fi
+done
+
+set +e
+HOME="$tmp_home" CODEX_HOME="$codex_home" perl -e 'alarm shift; exec @ARGV' "$exec_timeout_seconds" codex exec \
+  --ignore-user-config \
+  -m "$model" \
+  --sandbox read-only \
+  --skip-git-repo-check \
+  --ignore-rules \
+  --output-last-message "$last_message" \
+  --json <"$prompt" >"$events" 2>"$stderr_log"
+exec_status=$?
+set -e
+
+cleanup_auth_copy
+
+message="$(cat "$last_message" 2>/dev/null || true)"
+normalized_message="$(printf '%s' "$message" | tr -d '\r' | sed -e 's/[[:space:]]*$//')"
+
+echo "separate_codex_home=$tmp_home"
+echo "separate_codex_dot_home=$codex_home"
+echo "separate_home_install_log=$install_log"
+echo "separate_home_exec_events=$events"
+echo "separate_home_exec_stderr=$stderr_log"
+echo "separate_home_exec_last_message=$last_message"
+echo "separate_home_prompt_input=$prompt_input"
+echo "separate_home_visible_skills=$visible_skills"
+echo "separate_home_install_result=pass"
+echo "separate_home_runtime_home_isolated=true"
+if [ "$auth_copy_used" = true ]; then
+  echo "fresh_codex_auth_boundary=held_live_auth_copy_available_to_read_only_exec_until_tokenless_probe_exists"
+else
+  echo "fresh_codex_auth_boundary=pass_no_auth_copy_used"
+fi
+echo "fresh_codex_invocation_target=tw-authority-gate"
+echo "fresh_codex_expected_skill_hash=$expected_skill_hash"
+echo "fresh_codex_exec_exit_code=$exec_status"
+echo "fresh_codex_tw_authority_gate_visible=$(grep -qx 'tw-authority-gate' "$visible_skills" && echo true || echo false)"
+if [ "${#missing_visible_skills[@]}" -eq 0 ]; then
+  echo "fresh_codex_required_skills_visible=true"
+else
+  echo "fresh_codex_required_skills_visible=false"
+  echo "fresh_codex_missing_required_visible_skills=${missing_visible_skills[*]}"
+fi
+
+if [ "${#missing_visible_skills[@]}" -ne 0 ]; then
+  echo "fresh_codex_reload_probe=held_skill_registry_visible_list_excludes_required_traceweaver_skills"
+  echo "fresh_codex_runtime_skill_invocation=held_skill_registry_visible_list_excludes_required_traceweaver_skills"
+  echo "fresh_codex_registry_loading_observation=held_required_traceweaver_skills_not_in_visible_skill_list"
+  exit 0
+fi
+
+if [ "$exec_status" -ne 0 ]; then
+  echo "fresh_codex_reload_probe=held_codex_exec_failed"
+  echo "fresh_codex_runtime_skill_invocation=held_codex_exec_failed"
+  exit 0
+fi
+
+if [ "$normalized_message" = "TRACEWEAVER_SKILL_HELD=not_available" ] || printf '%s' "$message" | grep -Eiq "(available skills list|current skill list|current skills list|installed skill list).*(does not include|for this session|not present|isn.?t available)|not present in the current skill list|not available in this session|isn.?t available in this session|unavailable|not loaded|cannot load|can.?t load|could not load|couldn.?t load|not found|no such skill"; then
+  echo "fresh_codex_reload_probe=held_skill_not_visible_in_fresh_exec_registry"
+  echo "fresh_codex_runtime_skill_invocation=held_skill_not_visible_in_fresh_exec_registry"
+  exit 0
+fi
+
+if [ "$normalized_message" = "TRACEWEAVER_SKILL_HASH=$expected_skill_hash" ] && [ "$auth_copy_used" = true ]; then
+  echo "fresh_codex_reload_probe=held_auth_boundary_after_skill_hash_sentinel"
+  echo "fresh_codex_runtime_skill_invocation=held_live_auth_copy_boundary"
+  exit 0
+fi
+
+if [ "$normalized_message" = "TRACEWEAVER_SKILL_HASH=$expected_skill_hash" ]; then
+  echo "fresh_codex_reload_probe=pass_skill_visible_in_fresh_exec_registry"
+  echo "fresh_codex_runtime_skill_invocation=pass_tw_authority_gate_skill_file_read"
+  exit 0
+fi
+
+echo "fresh_codex_reload_probe=held_unclassified_exec_transcript"
+echo "fresh_codex_runtime_skill_invocation=held_unclassified_exec_transcript"

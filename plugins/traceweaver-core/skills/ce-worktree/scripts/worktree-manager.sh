@@ -1,9 +1,9 @@
 #!/bin/bash
 #
-# Create a new git worktree with environment files and dev-tool trust.
+# Create a new git worktree with dev-tool trust.
 #
 # The distinctive work this script does (vs. raw `git worktree add`):
-#   1. Copies .env* files from the main repo (skipping .env.example)
+#   1. Does not copy secret-bearing .env* files unless --copy-env is passed.
 #   2. Trusts mise/direnv configs with branch-aware safety rules,
 #      so hooks and scripts don't block on interactive trust prompts
 #   3. Ensures .worktrees is gitignored (via `git check-ignore`)
@@ -27,13 +27,17 @@ WORKTREE_DIR="$GIT_ROOT/.worktrees"
 
 usage() {
   cat <<'EOF'
-Usage: worktree-manager.sh create <branch-name> [from-branch]
+Usage: worktree-manager.sh create <branch-name> [from-branch] [--copy-env]
 
 Creates .worktrees/<branch-name> with <branch-name> branched from
 [from-branch] (default: origin's default branch, or main).
 
 The main repo checkout is not modified; from-branch is fetched but
 not checked out.
+
+Options:
+  --copy-env  Explicitly copy local .env* files. Do not use this for PR/review
+              branches or externally supplied code.
 EOF
 }
 
@@ -52,7 +56,8 @@ ensure_gitignore() {
   echo "Added .worktrees to .gitignore"
 }
 
-# Copy .env* files (except .env.example) from main repo to worktree.
+# Copy .env* files (except .env.example) from main repo to worktree only after
+# explicit opt-in. This may copy secrets.
 # Backs up any pre-existing destination file.
 copy_env_files() {
   local worktree_path="$1"
@@ -66,11 +71,17 @@ copy_env_files() {
     [[ "$name" == ".env.example" ]] && continue
 
     local dest="$worktree_path/$name"
+    if [[ -L "$dest" ]]; then
+      echo "Error: refusing to copy $name over a symlink in $worktree_path" >&2
+      return 1
+    fi
     if [[ -f "$dest" ]]; then
       cp "$dest" "${dest}.backup"
       echo "  Backed up existing $name to ${name}.backup"
     fi
-    cp "$source" "$dest"
+    local tmp_dest="${dest}.tmp.$$"
+    cp "$source" "$tmp_dest"
+    mv -f "$tmp_dest" "$dest"
     echo "  Copied $name"
     copied=$((copied + 1))
   done
@@ -156,6 +167,24 @@ trust_dev_tools() {
 create_worktree() {
   local branch_name="${1:-}"
   local from_branch="${2:-}"
+  local copy_env="false"
+
+  if [[ "${branch_name:-}" == "--copy-env" ]]; then
+    echo "Error: branch name required before --copy-env" >&2
+    usage >&2
+    exit 1
+  fi
+
+  if [[ "${from_branch:-}" == "--copy-env" ]]; then
+    from_branch=""
+    copy_env="true"
+  elif [[ "${3:-}" == "--copy-env" ]]; then
+    copy_env="true"
+  elif [[ -n "${3:-}" ]]; then
+    echo "Error: unknown option '${3:-}'" >&2
+    usage >&2
+    exit 1
+  fi
 
   if [[ -z "$branch_name" ]]; then
     echo "Error: branch name required" >&2
@@ -193,7 +222,13 @@ create_worktree() {
   git worktree add -b "$branch_name" "$worktree_path" "$base_ref"
 
   echo "Environment files:"
-  copy_env_files "$worktree_path"
+  if [[ "$copy_env" == "true" ]]; then
+    echo "  --copy-env supplied; copying local .env* files may copy secrets"
+    copy_env_files "$worktree_path"
+  else
+    echo "  Skipped .env* copy by default"
+    echo "  Use --copy-env only for trusted branches after reviewing secret exposure"
+  fi
 
   echo "Dev tool trust:"
   local trust_branch="$default_branch"

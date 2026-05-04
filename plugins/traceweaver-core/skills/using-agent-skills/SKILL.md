@@ -13,29 +13,26 @@ Agent Skills is a collection of engineering workflow skills organized by develop
 
 When a task arrives, identify the development phase and apply the corresponding skill:
 
+```text
+Vague idea or need refinement -> ce-brainstorm as source evidence, then tw-requirements-review
+Intent deepening after ideation -> tw-grill as source evidence, then tw-requirements-review
+New project, feature, or change -> tw-auto
+Reviewed plan with approved authority -> tw-auto, or tw-authority-gate before any delegated CE work
+Trace or requirement check -> tw-traceability-check, tw-requirements-review, requirements-reviewer
+Code review -> tw-traceability-check, then ce-code-review with publication held
+Document review -> tw-requirements-review, then ce-doc-review with publication held
+Debugging -> tw-auto or tw-authority-gate before ce-debug no-publication mode
+Browser or Xcode verification -> ce-test-browser or ce-test-xcode
+Session/source context -> ce-sessions, ce-session-inventory, or ce-session-extract as cited evidence only
+Commit, push, PR, release -> held in TraceWeaver alpha; stop before publication
 ```
-Task arrives
-    │
-    ├── Vague idea/need refinement? ──→ idea-refine + systems-engineering-traceability
-    ├── Meaningful behavior involved? → systems-engineering-traceability (cross-cutting)
-    ├── New project/feature/change? ──→ spec-driven-development
-    ├── Have a spec, need tasks? ──────→ planning-and-task-breakdown
-    ├── Implementing code? ────────────→ incremental-implementation
-    │   ├── UI work? ─────────────────→ frontend-ui-engineering
-    │   ├── API work? ────────────────→ api-and-interface-design
-    │   ├── Need better context? ─────→ context-engineering
-    │   └── Need doc-verified code? ───→ source-driven-development
-    ├── Writing/running tests? ────────→ test-driven-development
-    │   └── Browser-based? ───────────→ browser-testing-with-devtools
-    ├── Something broke? ──────────────→ debugging-and-error-recovery
-    ├── Reviewing code? ───────────────→ code-review-and-quality
-    │   ├── Security concerns? ───────→ security-and-hardening
-    │   └── Performance concerns? ────→ performance-optimization
-    ├── Committing/branching? ─────────→ git-workflow-and-versioning
-    ├── CI/CD pipeline work? ──────────→ ci-cd-and-automation
-    ├── Writing docs/ADRs? ───────────→ documentation-and-adrs
-    └── Deploying/launching? ─────────→ shipping-and-launch
-```
+
+Direct `ce-*` entrypoints in the TraceWeaver package are legacy/manual-continuity
+surfaces until a wrapper is accepted. Do not select raw `ce-plan`, `ce-work`,
+`ce-debug`, `ce-code-review`, `ce-doc-review`, or publication-capable CE skills as
+the first step for TraceWeaver-controlled work. Start from `tw-auto` or a
+TraceWeaver gate, then treat any CE skill as delegated work under the Intent
+Contract, requirements baseline, traceability matrix, and alpha publication hold.
 
 ## Cross-Cutting Traceability Rule
 
@@ -62,11 +59,12 @@ Do not require it for formatting-only, spelling-only, or comment-only changes th
 
 If meaningful behavior is involved, traceability is a hop, not an optional extra.
 
-Ideas are lifecycle inputs, not authority. When `idea-refine` produces a concept
-that may become work, preserve it as candidate needs, assumptions, risks,
-success/failure signals, open decisions, and not-doing boundaries. Do not let an
-idea, brainstorm note, roadmap thought, or review suggestion skip directly into
-implementation without planning and approved authority.
+Ideas are lifecycle inputs, not authority. When `ce-brainstorm` or `tw-grill`
+produces a concept that may become work, preserve it as candidate needs,
+assumptions, risks, success/failure signals, open decisions, and not-doing
+boundaries. Do not let an idea, brainstorm note, roadmap thought, or review
+suggestion skip directly into implementation without planning and approved
+authority.
 
 ## Core Operating Behaviors
 
@@ -158,62 +156,53 @@ These are the subtle errors that look like productivity but create problems:
 
 2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
 
-3. **Multiple skills can apply.** A feature implementation might involve `idea-refine` → `systems-engineering-traceability` → `spec-driven-development` → `planning-and-task-breakdown` → `incremental-implementation` → `test-driven-development` → `code-review-and-quality` → `shipping-and-launch` in sequence.
+3. **Multiple skills can apply.** A TraceWeaver-controlled feature implementation might involve `ce-brainstorm` -> `tw-grill` -> `systems-engineering-traceability` -> `tw-auto` -> `tw-authority-gate` -> `ce-work` in no-publication mode -> `tw-traceability-check` -> `ce-code-review` / `ce-doc-review` in sequence.
 
-4. **When in doubt, start with a spec.** If the task is non-trivial and there's no spec, begin with `spec-driven-development`.
+4. **When in doubt, start with authority.** If the task is non-trivial and there is no accepted requirement, Intent Contract, or traceability row, begin with `tw-auto` bootstrap or `tw-requirements-review`.
 
 ## Lifecycle Sequence
 
 For a complete feature, the typical skill sequence is:
 
-```
-1. idea-refine                 → Refine vague ideas
-2. systems-engineering-traceability → Preserve candidate needs, authority, V&V, and no-orphan links
-3. spec-driven-development     → Define what we're building
-4. planning-and-task-breakdown → Break into verifiable chunks
-5. context-engineering         → Load the right context
-6. source-driven-development   → Verify against official docs
-7. incremental-implementation  → Build slice by slice
-8. test-driven-development     → Prove each slice works
-9. code-review-and-quality     → Review before merge
-10. git-workflow-and-versioning → Clean commit history
-11. documentation-and-adrs     → Document decisions
-12. shipping-and-launch        → Deploy safely
+```text
+1. ce-brainstorm or tw-grill -> Refine ideas and preserve source evidence
+2. systems-engineering-traceability -> Preserve candidate needs, authority, V&V, and no-orphan links
+3. tw-requirements-review or requirements-reviewer -> Improve requirement quality
+4. tw-auto or ce-plan guarded by TraceWeaver authority -> Define and plan work
+5. tw-authority-gate -> Confirm approved authority before implementation
+6. ce-work no-publication mode -> Build the authorized slice
+7. ce-test-browser or ce-test-xcode -> Verify runtime behavior when applicable
+8. tw-traceability-check -> Prove trace links and dark-behavior handling
+9. ce-code-review or ce-doc-review -> Review before closure
+10. publication -> held in TraceWeaver alpha until later gates approve it
 ```
 
-Not every task needs every skill. A bug fix might only need: `debugging-and-error-recovery` → `test-driven-development` → `code-review-and-quality`.
+Not every task needs every skill. A bug fix might only need: `ce-debug` ->
+`tw-authority-gate` -> `ce-work` no-publication mode ->
+`tw-traceability-check` -> `ce-code-review`.
 
 ## Quick Reference
 
 | Phase | Skill | One-Line Summary |
 |-------|-------|-----------------|
-| Define | idea-refine | Refine ideas through structured divergent and convergent thinking |
-| Define | spec-driven-development | Requirements and acceptance criteria before code |
-| Plan | planning-and-task-breakdown | Decompose into small, verifiable tasks |
+| Define | ce-brainstorm / tw-grill | Refine ideas, challenge assumptions, and preserve source evidence |
+| Define | tw-requirements-review / requirements-reviewer | Requirements and acceptance criteria before code |
+| Plan | tw-auto / ce-plan | Decompose approved authority into bounded work |
 | Cross-cutting | systems-engineering-traceability | Candidate needs, approved authority, no-orphan gate, verification, and validation links |
-| Build | incremental-implementation | Thin vertical slices, test each before expanding |
-| Build | source-driven-development | Verify against official docs before implementing |
-| Build | context-engineering | Right context at the right time |
-| Build | frontend-ui-engineering | Production-quality UI with accessibility |
-| Build | api-and-interface-design | Stable interfaces with clear contracts |
-| Verify | test-driven-development | Failing test first, then make it pass |
-| Verify | browser-testing-with-devtools | Chrome DevTools MCP for runtime verification |
-| Verify | debugging-and-error-recovery | Reproduce → localize → fix → guard |
-| Review | code-review-and-quality | Five-axis review with quality gates |
-| Review | security-and-hardening | OWASP prevention, input validation, least privilege |
-| Review | performance-optimization | Measure first, optimize only what matters |
-| Ship | git-workflow-and-versioning | Atomic commits, clean history |
-| Ship | ci-cd-and-automation | Automated quality gates on every change |
-| Ship | documentation-and-adrs | Document the why, not just the what |
-| Ship | shipping-and-launch | Pre-launch checklist, monitoring, rollback plan |
+| Build | ce-work | Thin authorized slices in TraceWeaver no-publication mode |
+| Context | ce-sessions / ce-session-inventory / ce-session-extract | Source/session context as cited evidence only |
+| Verify | ce-test-browser / ce-test-xcode | Runtime verification when applicable |
+| Verify | ce-debug | Reproduce, localize, fix, and guard |
+| Review | ce-code-review / ce-doc-review | Review with TraceWeaver traceability checks |
+| Ship | held | Commit, push, PR, release, and clean-replacement claims remain held in alpha |
 
 ## Routing Examples
 
 | Situation | Skills to consider |
 |---|---|
-| Vague product, project, workflow, or feature idea | `idea-refine`, `systems-engineering-traceability` |
-| New feature or changed behavior | `spec-driven-development`, `planning-and-task-breakdown`, `systems-engineering-traceability` |
-| Implementation work | `incremental-implementation`, `test-driven-development`, `systems-engineering-traceability` |
-| Code review | `code-review-and-quality`, `systems-engineering-traceability` |
-| Unclear code or dark code | `systems-engineering-traceability`, `code-review-and-quality`, `deprecation-and-migration` |
-| Release or shipping | `shipping-and-launch`, `systems-engineering-traceability` |
+| Vague product, project, workflow, or feature idea | `ce-brainstorm`, `tw-grill`, `systems-engineering-traceability` |
+| New feature or changed behavior | `tw-auto`, `ce-plan`, `tw-authority-gate`, `systems-engineering-traceability` |
+| Implementation work | `ce-work` no-publication mode, `tw-traceability-check`, `systems-engineering-traceability` |
+| Code review | `ce-code-review`, `tw-traceability-check`, `systems-engineering-traceability` |
+| Unclear code or dark code | `systems-engineering-traceability`, `tw-traceability-check`, `ce-code-review` |
+| Release or shipping | Held in TraceWeaver alpha; record the publication gate or future wrapper-plan requirement |

@@ -8,6 +8,60 @@ argument-hint: "[Plan doc path or description of work. Blank to auto use latest 
 
 Execute work efficiently while maintaining quality and finishing features.
 
+## TraceWeaver Package Boundary
+
+When this `ce-work` skill is installed by the TraceWeaver plugin, direct
+invocation is a legacy/manual-continuity surface and must still run in
+TraceWeaver no-publication mode for the current alpha. It is not, by itself, a
+TraceWeaver-authority-enforced workflow, and it cannot close TraceWeaver
+authority, traceability, verification, validation, commit, push, or PR gates.
+
+For TraceWeaver-controlled implementation, use `tw-auto` or explicitly run the
+TraceWeaver sequence first:
+
+```text
+tw-authority-gate
+-> ce-work
+-> tw-traceability-check
+-> ce-code-review / ce-doc-review
+```
+
+Before changing meaningful behavior in TraceWeaver-controlled work, load the
+project root `requirements.md`, `.traceweaver/intent-contract.yml`, and
+`traceability-matrix.md`. If approved authority, validation intent, or required
+verification evidence is missing, stop and create or recommend a gap, change,
+exception, accepted-risk candidate, or clarification record. Do not treat a plan,
+bare prompt, task ID, or agent interpretation as authority by itself.
+
+If the user explicitly asks for legacy/manual CE work anyway, proceed only in
+no-publication mode. State in the output that the work does not close
+TraceWeaver authority, traceability, verification, validation, commit, push, or
+PR gates until `tw-authority-gate`, matrix updates, `tw-traceability-check`, and
+a future approved publication gate run.
+
+### TraceWeaver Controlled No-Publication Mode
+
+When this skill is installed by TraceWeaver, enter no-publication mode before
+Phase 0 for every invocation:
+
+- keep the authority capsule, approved requirements/exceptions, validation
+  question, verification target, and matrix-update requirement visible while
+  working;
+- implement and test only the authorized behavior;
+- update trace evidence or report the exact trace gap before claiming completion;
+- do not stage files, create commits, push, open PRs, create issues, update plan
+  status to `completed`, or load `ce-commit`, `ce-commit-push-pr`, or Phase 4
+  shipping instructions;
+- do not allow subagents to stage, commit, push, or publish, even in isolated
+  worktrees;
+- after implementation, tests, trace updates, and review handoff are complete,
+  return control to `tw-auto` with changed files, verification evidence, matrix
+  status, open gaps, held claims, and the next required review or human decision.
+
+If any later instruction in this skill or its references conflicts with
+TraceWeaver no-publication mode, the TraceWeaver boundary wins and the
+publication step is skipped.
+
 ## Introduction
 
 This command takes a work document (plan or specification) or a bare prompt describing the work, and executes it systematically. The focus is on **shipping complete features** by understanding requirements quickly, following existing patterns, and maintaining quality throughout.
@@ -57,7 +111,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
    - If anything is unclear or ambiguous, ask clarifying questions now
    - If clarifying questions were needed above, get user approval on the resolved answers. If no clarifications were needed, proceed without a separate approval step — plan scope is the plan's authority, not something to renegotiate
    - **Do not skip this** - better to ask questions now than build the wrong thing
-   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker. The only plan mutation during ce-work is the final `status: active → completed` flip at shipping (see `references/shipping-workflow.md` Phase 4 Step 2). Legacy plans may contain `- [ ]` / `- [x]` marks on unit headings — ignore them as state; per-unit completion is determined during execution by reading the current file state.
+   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker. The only plan mutation during ordinary CE work is the final `status: active → completed` flip at shipping (see `references/shipping-workflow.md` Phase 4 Step 2). In TraceWeaver no-publication mode, do not perform that status flip; report the proposed status update back to `tw-auto` instead. Legacy plans may contain `- [ ]` / `- [x]` marks on unit headings — ignore them as state; per-unit completion is determined during execution by reading the current file state.
 
 2. **Setup Environment**
 
@@ -157,7 +211,8 @@ Determine how to proceed based on what was provided in `<input_document>`.
    **Shared-directory fallback constraints** — apply only when worktree isolation is unavailable:
    - Instruct each subagent: "Do not stage files (`git add`), create commits, or run the project test suite. The orchestrator handles testing, staging, and committing after all parallel units complete."
    - These constraints prevent git index contention and test interference between concurrent subagents.
-   - With worktree isolation active, omit these constraints — subagents may stage, commit, and run their unit's tests within their own worktree branch.
+   - With worktree isolation active, omit these constraints — subagents may stage, commit, and run their unit's tests within their own worktree branch unless TraceWeaver no-publication mode is active.
+   - In TraceWeaver no-publication mode, subagents must not stage, commit, push, publish, create issues, or open PRs in any isolation mode.
 
    **Permission mode:** Omit the `mode` parameter when dispatching subagents so the user's configured permission settings apply. Do not pass `mode: "auto"` — it overrides user-level settings like `bypassPermissions`.
 
@@ -169,6 +224,12 @@ Determine how to proceed based on what was provided in `<input_document>`.
    5. Dispatch the next unit
 
    **After all parallel subagents in a batch complete (worktree-isolated mode):**
+   - In TraceWeaver no-publication mode, do not use this merge/commit flow.
+     Instead, wait for every subagent, collect each worktree diff, changed-file
+     list, verification result, trace/matrix status, and open gap, then return
+     that evidence to `tw-auto` or the TraceWeaver controller. Do not stage,
+     commit, merge subagent branches, push, create issues, open PRs, or remove a
+     worktree whose unmerged changes are still needed for human review.
    1. Wait for every subagent in the current parallel batch to finish.
    2. For each completed subagent, in dependency order: review the worktree's diff against the orchestrator's branch. If the subagent did not commit its own work, stage and commit it inside that worktree.
    3. Merge each subagent's branch into the orchestrator's branch sequentially in dependency order. **If a merge conflict surfaces, abort the merge (`git merge --abort`) and re-dispatch the conflicting unit serially against the now-merged tree** — hand-resolving silently picks a side and discards one unit's intent. (Predicted overlap from the Parallel Safety Check surfaces here as a conflict, not as silent data loss in shared-directory mode.)
@@ -181,6 +242,12 @@ Determine how to proceed based on what was provided in `<input_document>`.
    7. Dispatch the next batch of independent units, or the next dependent unit.
 
    **After all parallel subagents in a batch complete (shared-directory fallback):**
+   - In TraceWeaver no-publication mode, do not use this staging/commit flow.
+     Instead, wait for every subagent, cross-check file collisions, collect the
+     combined diff, changed-file list, verification results, trace/matrix status,
+     and open gaps, then return that evidence to `tw-auto` or the TraceWeaver
+     controller. Do not stage files, create commits, push, create issues, open
+     PRs, or mark the plan complete.
    1. Wait for every subagent in the current parallel batch to finish before acting on any of their results
    2. Cross-check for discovered file collisions: compare the actual files modified by all subagents in the batch (not just their declared `Files:` lists). Subagents may create or modify files not anticipated during planning — this is expected, since plans describe *what* not *how*. A collision only matters when 2+ subagents in the same batch modified the same file. In a shared working directory, only the last writer's version survives — the other unit's changes to that file are lost. If a collision is detected: commit all non-colliding files from all units first, then re-run the affected units serially for the shared file so each builds on the other's committed work
    3. For each completed unit, in dependency order: review the diff, run the relevant test suite, stage only that unit's files, and commit with a conventional message derived from the unit's Goal
@@ -246,7 +313,12 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
 2. **Incremental Commits**
 
-   After completing each task, evaluate whether to create an incremental commit:
+   In TraceWeaver no-publication mode, skip this section entirely. Record the
+   completed logical unit, changed files, verification evidence, trace update,
+   and next review/human decision for `tw-auto`; do not stage or commit.
+
+   After completing each task in ordinary CE work, evaluate whether to create an
+   incremental commit:
 
    | Commit when... | Don't commit when... |
    |----------------|---------------------|
@@ -321,7 +393,14 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
 ### Phase 3-4: Quality Check and Finishing Work
 
-When all Phase 2 tasks are complete and execution transitions to quality check, you must read `references/shipping-workflow.md` for the full shipping workflow.Do not skip this.
+When all Phase 2 tasks are complete and execution transitions to quality check
+in ordinary CE work, you must read `references/shipping-workflow.md` for the
+full shipping workflow. Do not skip this.
+
+In TraceWeaver no-publication mode, do not read or execute
+`references/shipping-workflow.md`. Instead run the relevant verification and
+review handoff, update or report required trace evidence, and return control to
+`tw-auto` with the stop reason and suggested next step.
 
 ## Key Principles
 

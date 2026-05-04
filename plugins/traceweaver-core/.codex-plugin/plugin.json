@@ -1,7 +1,7 @@
 {
   "name": "traceweaver-core",
   "version": "0.1.0-alpha.0",
-  "description": "Systems-engineering authority control for agentic software work.",
+  "description": "Systems-engineering authority control and advisory automation for agentic software work.",
   "author": {
     "name": "Oxiom Systems",
     "url": "https://github.com/Oxiom-Systems"
@@ -21,7 +21,7 @@
   "interface": {
     "displayName": "TraceWeaver Core",
     "shortDescription": "Authority, requirements, and traceability controls for agentic engineering.",
-    "longDescription": "TraceWeaver Core adds systems-engineering control points to agentic software workflows. The alpha runtime focuses on requirement quality review and no-orphan traceability checks before planning, implementation, review, and release claims.",
+    "longDescription": "TraceWeaver Core repackages the selected Compound Engineering method with systems-engineering authority. The alpha runtime focuses on requirement quality review, no-orphan traceability checks, root requirements and matrix bootstrap, advisory controlled automation, and dark-behavior routing before planning, implementation, review, and release claims.",
     "developerName": "Oxiom Systems",
     "category": "Coding",
     "capabilities": [
@@ -31,9 +31,12 @@
     ],
     "websiteURL": "https://github.com/Oxiom-Systems/traceweaver",
     "defaultPrompt": [
-      "Use the tw-requirements-review skill for requirements or planning authority review.",
-      "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
-      "Use the tw-traceability-check skill during plan, code, document, or release-evidence review."
+            "Use the tw-requirements-review skill for requirements or planning authority review.",
+            "Use the tw-grill skill after ideation and before brainstorming when one selected idea needs deeper interview; its output is source evidence, not authority.",
+            "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
+      "Use the tw-traceability-check skill during plan, code, document, or release-evidence review.",
+      "Use the tw-auto skill for advisory controlled autonomy; it preserves the CE-style loop while adding authority, traceability, verification, validation, and dark-behavior controls.",
+      "The packaged lfg name delegates to tw-auto and must stop before commit, push, or PR creation in this alpha."
     ],
     "screenshots": []
   }

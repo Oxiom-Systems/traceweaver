@@ -7,7 +7,7 @@ description: Create an isolated git worktree for parallel feature work or PR rev
 
 Create a worktree under `.worktrees/<branch>` with branch-specific setup that `git worktree add` alone does not handle:
 
-- Copies `.env`, `.env.local`, `.env.test`, etc. from the main repo (skips `.env.example`)
+- Does not copy `.env*` secret-bearing files by default; copying local env files requires explicit `--copy-env` opt-in after reviewing branch trust
 - Trusts `mise`/`direnv` configs, with branch-aware safety rules so review branches do not auto-grant trust to untrusted `.envrc` content
 - Adds `.worktrees` to `.gitignore` if not already ignored
 - Does not modify the main repo checkout — `from-branch` is fetched, not checked out
@@ -15,12 +15,14 @@ Create a worktree under `.worktrees/<branch>` with branch-specific setup that `g
 ## Creating a worktree
 
 ```bash
-bash scripts/worktree-manager.sh create <branch-name> [from-branch]
+bash scripts/worktree-manager.sh create <branch-name> [from-branch] [--copy-env]
 ```
 
 Defaults:
 - `from-branch` defaults to origin's default branch (or `main` if that cannot be resolved)
 - The new branch is created at `origin/<from-branch>` (or the local ref if the remote is unavailable)
+- `.env*` files are not copied unless `--copy-env` is supplied. Do not use
+  `--copy-env` for PR/review branches or externally supplied code.
 
 Examples:
 ```bash

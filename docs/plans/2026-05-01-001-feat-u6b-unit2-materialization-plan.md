@@ -108,7 +108,7 @@ plugins/traceweaver-core/
   AGENTS.md
   README.md
   agents/
-    ce-*.agent.md
+    selected CE agent files from docs/validation/traceweaver-core-11-ce-runtime-inventory.md
   references/
     authority-baseline-template.yml
     ce-upstream-source-inventory.md
@@ -199,7 +199,7 @@ copying CE runtime files.
 - Modify: `docs/validation/traceweaver-core-11-u6b-plugin-runtime.md`
 
 **Approach:**
-- Preferred path: resolve the CE `3.3.2` source package to an upstream
+- Preferred path: resolve the CE `3.4.1` source package to an upstream
   commit/tag and record source repository, observed version, license, capture
   date, aggregate fingerprint, and selected-file hashes.
 - Fallback path: if the upstream pin cannot be resolved during Unit 2, create

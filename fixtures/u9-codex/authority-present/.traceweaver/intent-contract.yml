@@ -1,0 +1,51 @@
+intent_contract_id: TW-FIX-U9-AUTH-PRESENT-001
+contract_status: fixture_only
+contract_type: synthetic_u9_fixture
+created_at: 2026-05-03
+owner: Oxiom Systems
+
+baseline_id: REQ-FIX-U9-AUTH-PRESENT-001
+baseline_source: requirements.md
+baseline_hash_sha256: 8dff15a195efe8849372f330433f450ed2c3ea765d306a95be84a8a0b4893f68
+baseline_review_id: fixture_not_review_authority
+baseline_status: fixture_only_not_project_authority
+
+matrix_source: traceability-matrix.md
+matrix_hash_sha256: ee265542c7ba0ab4b750c29178ab0e0d00003ca730b2844adfdf5061641ec17a
+
+traceweaver_mode: advisory
+
+authority_rule:
+  invariant: >-
+    Fixture work may proceed only when requirements.md, traceability-matrix.md,
+    and this Intent Contract are present and declared hashes match computed
+    fixture hashes.
+  missing_authority_disposition:
+    - blocked
+    - fixture_gap
+    - held_claim
+
+approved_requirements:
+  - id: REQ-FIX-001
+    intent_ids: [INTENT-FIX-001]
+    statement: The fixture workflow must load a requirements baseline, Intent Contract, and traceability matrix before work starts.
+    authority_status: approved
+    verification_method: inspection
+  - id: REQ-FIX-002
+    intent_ids: [INTENT-FIX-001]
+    statement: The fixture workflow must reject stale authority hashes before work starts.
+    authority_status: approved
+    verification_method: hash_check
+  - id: REQ-FIX-003
+    intent_ids: [INTENT-FIX-001]
+    statement: The fixture workflow must keep writes inside a throwaway fixture workspace.
+    authority_status: approved
+    verification_method: smoke_test
+
+held_claims:
+  - active_codex_host_registry_discovery
+  - real_tw_skill_runtime_invocation
+  - project_authority_promotion
+
+next_recommended_steps:
+  - Run scripts/traceweaver-smoke-u9-fixtures against fixture-only inputs.

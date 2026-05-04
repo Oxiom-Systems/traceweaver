@@ -39,10 +39,27 @@ The current wedge is:
 > Meaningful behaviour must trace to approved authority, or it is not ready to
 > implement, approve, or ship.
 
+The code-level gate is:
+
+> Every meaningful behavior-bearing unit must trace to approved authority and
+> verification evidence.
+
+In practice, a behavior-bearing skill, workflow wrapper, command, script,
+function, method, or class cannot be treated as done until the traceability
+matrix names the requirement or approved exception that authorizes it, the
+implementation location, and the verification evidence that proves it.
+
 In simple terms: TraceWeaver keeps agentic development aligned to the original
 intent, proves that implementation traces back to approved requirements, and
 records gaps, risks, assumptions, and changes instead of letting them become
 hidden authority.
+
+TraceWeaver is intended to become a standalone plugin that can replace the
+installed Compound Engineering plugin for this workflow. It is based on the
+selected CE planning, work, review, and learning surface, but TraceWeaver adds
+the controlling authority layer: Intent Contract, requirements baseline,
+traceability matrix, verification evidence, validation questions, and explicit
+gap/change/exception handling.
 
 ## Naming Model
 
@@ -99,6 +116,8 @@ implementation authority.
 The planned file-based alpha shape is:
 
 ```text
+requirements.md
+traceability-matrix.md
 .traceweaver/
   intent-contract.yml
   authority-baseline.yml
@@ -113,14 +132,26 @@ The plugin package should provide templates for consuming repositories to create
 these files. It should not install project-specific authority records into a
 repo automatically.
 
+For TraceWeaver projects, `requirements.md` and `traceability-matrix.md` should
+live at the repository root because they are primary human-facing authority
+files. Supporting plans, validation records, brainstorms, and review evidence
+can live under `docs/` as normal. Operational TraceWeaver records, task
+capsules, gaps, changes, and exceptions live under `.traceweaver/`.
+
 ## Requirements Baseline
 
-The draft master controlled requirements baseline is
-[requirements.md](requirements.md). It is the candidate authority index for
-current planning until `/ce-doc-review` accepts it or its blocking findings are
-resolved. After acceptance, it supersedes the older brainstorm requirement
-documents as the controlling baseline. Those brainstorm documents remain source
-evidence and rationale.
+The accepted master controlled requirements baseline is
+[requirements.md](requirements.md). It is the current planning authority for
+TraceWeaver Core and supersedes the older brainstorm requirement documents as
+the controlling baseline. Those brainstorm documents remain source evidence and
+rationale.
+
+The project traceability matrix is
+[traceability-matrix.md](traceability-matrix.md). In the early project shape,
+it intentionally lives beside `requirements.md` because it is a primary
+human-facing authority file: `requirements.md` says what is approved, while
+`traceability-matrix.md` shows how intent, requirements, artifacts,
+verification, validation, gaps, and held claims connect.
 
 ## Compound Engineering Workflow
 
@@ -149,10 +180,10 @@ captured, reviewed, and baselined.
 | CE stage | TraceWeaver control step | Purpose |
 |---|---|---|
 | `idea` | intent capture | Capture stakeholder intent. Ideas are not authority yet. |
-| `ce-brainstorm` | `tw-requirements-review`, then `tw-authority-baseline` | Explore needs, risks, options, assumptions, and gaps, then convert accepted ideas into `requirements.md`, intent IDs, requirement IDs, exceptions, validation questions, and baseline version. |
+| `ce-brainstorm` | `tw-requirements-review`, then authority-baseline record | Explore needs, risks, options, assumptions, and gaps, then convert accepted ideas into `requirements.md`, intent IDs, requirement IDs, exceptions, validation questions, and baseline version. |
 | `ce-plan` | `tw-authority-gate` | Plan only against approved requirements or approved exceptions. Every task gets an Intent Capsule. |
 | `ce-work` | `tw-traceability-check` | Agents implement only what their capsule authorizes. Assumptions become gaps or change requests, not code. |
-| `ce-code-review` / `ce-doc-review` | `tw-verification`, then `tw-validation` | Check what changed, what requirement authorized it, what verifies it, and whether it still satisfies the stakeholder validation question. |
+| `ce-code-review` / `ce-doc-review` | verification evidence record, then validation evidence record | Check what changed, what requirement authorized it, what verifies it, and whether it still satisfies the stakeholder validation question. |
 | `ce-compound` | learning-to-change-control handoff | Record lessons and patterns without silently changing authority. New learning creates proposed requirements or change records when needed. |
 
 The target TraceWeaver-controlled CE loop is:
@@ -161,14 +192,14 @@ The target TraceWeaver-controlled CE loop is:
 idea
 -> ce-brainstorm
 -> tw-requirements-review
--> tw-authority-baseline
+-> authority-baseline record
 -> ce-plan
 -> tw-authority-gate
 -> ce-work
 -> tw-traceability-check
 -> ce-code-review / ce-doc-review
--> tw-verification
--> tw-validation
+-> verification evidence record
+-> validation evidence record
 -> ce-compound
 ```
 
@@ -190,6 +221,142 @@ Every TraceWeaver task should end with suggested next steps. The handoff should
 name the next CE command, TraceWeaver gate, evidence record, or held condition so
 contributors do not have to reconstruct the workflow state from validation
 history.
+
+## CE Static Continuity And Future Wrapper Rule
+
+TraceWeaver should not reimplement Compound Engineering workflow logic when a
+selected CE workflow skill can be preserved. The standalone TraceWeaver plugin
+uses selected CE-compatible skills as implementation components, then routes
+the normal autonomous entrypoint through TraceWeaver authority controls.
+
+The user-facing controlled workflow is:
+
+```text
+idea
+-> ideation source
+-> tw-grill
+-> ce-brainstorm
+-> tw-requirements-review
+-> authority-baseline record
+-> ce-plan
+-> tw-authority-gate
+-> ce-work
+-> tw-traceability-check
+-> ce-code-review / ce-doc-review
+-> verification evidence record
+-> validation evidence record
+-> ce-compound
+```
+
+The alpha rule is:
+
+- preserve selected `ce-*` workflow behavior as static implementation
+  components unless runtime evidence approves deeper wrapper sequencing or
+  replacement;
+- use `tw-*` skills for TraceWeaver-specific adapters: requirements review,
+  optional post-ideation grilling, authority gate, traceability check, and
+  evidence handoff;
+- represent authority-baseline, verification, and validation as records in the
+  current alpha, not as installed skills, unless a later unit explicitly
+  materializes and proves those skills;
+- create `tw-auto` as the TraceWeaver-controlled autonomy surface;
+- make packaged `lfg` a compatibility alias that delegates to `tw-auto` so the
+  familiar autonomous entrypoint cannot bypass TraceWeaver authority;
+- keep direct `ce-*` invocation as legacy/manual-continuity only until wrapper
+  sequencing is materialized and runtime-proven;
+- keep clean CE replacement, slash commands, enforcing mode, and dynamic
+  no-forced discovery held until U9 or a later accepted runtime proof.
+
+`tw-auto` is the advisory automation path for this model. It groups CE-style
+planning, work, and review with TraceWeaver authority checks, matrix updates,
+bounded review-fix cycles, and next-step handoffs. In the alpha it must stop
+before commit, push, or PR creation; publication automation remains a later
+runtime claim.
+
+There are two valid blank-project starts:
+
+```text
+intent-first path:
+idea
+-> ideation source
+-> tw-grill
+-> ce-brainstorm
+-> tw-requirements-review
+-> accepted requirements baseline
+-> tw-auto
+```
+
+```text
+fast bootstrap path:
+tw-auto "build X"
+-> draft requirements.md
+-> draft traceability-matrix.md
+-> draft .traceweaver/intent-contract.yml
+-> stop for tw-requirements-review
+```
+
+`tw-auto` does not automatically run idea generation or `tw-grill`. When a new
+project has no TraceWeaver authority files yet, it bootstraps draft
+`requirements.md`, `traceability-matrix.md`, and
+`.traceweaver/intent-contract.yml`, then stops for requirements review before
+implementation. Missing authority starts a baseline conversation; it does not
+authorize code.
+
+`tw-grill` is an optional source-evidence step between ideation and
+`ce-brainstorm`. It stress-tests one selected idea, inspects repo context instead
+of asking when the answer is discoverable, and gives a recommended answer for
+each user-facing question. Its output is not authority until reviewed into
+`requirements.md`. In this alpha, `ce:ideate` is optional external CE context,
+not a packaged TraceWeaver skill.
+
+## CE Method With TraceWeaver Authority
+
+The product intent is not to install CE skills beside separate TraceWeaver
+skills and expect users to remember the right sequence. TraceWeaver should
+repackage the selected Compound Engineering method so the familiar simple steps
+remain, but each step carries systems-engineering authority.
+
+That means the TraceWeaver plugin should turn:
+
+```text
+idea -> ideate -> grill -> brainstorm -> plan -> work -> review -> compound learning
+```
+
+into:
+
+```text
+idea
+-> selected idea stress-tested by tw-grill when needed
+-> captured stakeholder intent
+-> brainstormed needs, risks, options, assumptions, and gaps
+-> reviewed requirements baseline
+-> Intent Contract and task capsules
+-> plan/work/review with authority gates
+-> traceability matrix updates
+-> verification evidence
+-> validation against the original intent
+-> compound learning routed to change control
+```
+
+The selected CE skills are implementation components for that flow. They should
+be wrapped or aliased by TraceWeaver entrypoints when needed so users get the CE
+style of work, but TraceWeaver remains the authority layer.
+
+Every wrapped step must ask the same control questions:
+
+- What stakeholder intent is this serving?
+- Which approved requirement or approved exception authorizes it?
+- Is the requirement good enough to become implementation authority?
+- What traceability-matrix row needs to be created or updated?
+- What verification proves we built it right?
+- What validation question proves we built the right thing?
+- Did this introduce dark behavior, duplicate behavior, a missing requirement,
+  or a logical implementation that has not been captured as authority?
+
+If the answer is missing, the workflow creates a gap, proposed requirement,
+change, exception, accepted-risk candidate, clarification, or removal candidate.
+It does not let the agent silently turn useful-looking code into product
+behavior.
 
 ## Fast Path To TraceWeaver-First Use
 
@@ -225,14 +392,14 @@ TraceWeaver can replace the CE plugin only when these conditions are met:
 flowchart TD
   A["Idea / stakeholder intent"] --> B["ce-brainstorm"]
   B --> C["tw-requirements-review"]
-  C --> D["tw-authority-baseline<br/>requirements.md + intent contract"]
+  C --> D["authority-baseline record<br/>requirements.md + intent contract"]
   D --> E["ce-plan"]
   E --> F["tw-authority-gate<br/>advisory alpha: warn / hold / gap"]
   F --> G["ce-work"]
   G --> H["tw-traceability-check<br/>detect dark behavior"]
   H --> I["ce-code-review / ce-doc-review"]
-  I --> J["tw-verification<br/>built right"]
-  J --> K["tw-validation<br/>built the right thing"]
+  I --> J["verification evidence record<br/>built right"]
+  J --> K["validation evidence record<br/>built the right thing"]
   K --> L["ce-compound"]
   L --> M["learning-to-change-control<br/>new requirement / change / exception"]
   M --> D
@@ -261,14 +428,14 @@ The operational migration is:
 | Stage | What changes | What remains held |
 |---|---|---|
 | Advisory overlay | Keep CE installed; use TraceWeaver baseline, Intent Capsules, and trace checks on every meaningful task. | CE replacement, enforcing mode, dynamic discovery claims. |
-| TraceWeaver plugin alpha | Install `plugins/traceweaver-core` with selected skills and references; record static install evidence. | Agent-backed CE parity, slash commands, clean replacement. |
+| TraceWeaver plugin alpha | Install `plugins/traceweaver-core` with selected skills and references; use `tw-auto` or the `lfg` compatibility alias for controlled automation; record static install evidence. | Agent-backed CE parity, slash commands, clean replacement. |
 | CE-compatible runtime | Materialize selected CE workflow skills and selected agents or record explicit limitations. | Full CE replacement until runtime proof passes. |
 | Replacement proof | Run planning, work, review, verification, validation, and compound-learning smoke tests without CE installed. | Release-ready and full Core 11 claims until U9/R31 pass. |
 | TraceWeaver-first | Use the TraceWeaver plugin as the default workflow surface. | Enterprise/release/upstream claims unless separately approved. |
 
 ## Current State
 
-As of 2026-04-30:
+As of 2026-05-01:
 
 | Area | Status | Notes |
 |---|---|---|
@@ -277,8 +444,8 @@ As of 2026-04-30:
 | U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
 | U5 delta inventory | `CLOSED_NO_DELTA` | No exact U5 public artifact targets remain outside the U4-promoted skill-folder paths |
 | U5.5 expanded runtime candidate | `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY` | Candidate `696548694dd40ce298d77e603db069934b58f645` has file-level delta/impact records and static requirements-quality/lifecycle-discovery evidence, including referenced requirements-reviewer files, under limitation `U55-LIMIT-STATIC-DISCOVERY-001`. Dynamic discovery, package-ready, release-ready, and upstream-ready claims remain held |
-| TraceWeaver Core plugin alpha | U6b install smoke passed for static loading only | `plugins/traceweaver-core` now contains plugin manifests, selected Light v0.1 runtime skills, skill-local selected references, and thin `tw-*` adapter skills. Isolated Codex install materialized the selected skills; dynamic discovery, real invocation transcript, package-ready, release-ready, upstream-ready, and R31 claims remain held |
-| Intent Contract architecture | Requirements captured; implementation planned | Requirements R54-R62 and taxonomy R7a-R7c/R19-R22 define Intent Contract, Intent Capsule, advisory authority gates, dark behavior, and validation-question handoff. Runtime templates are planned for the next U6b Unit 2 materialization pass |
+| TraceWeaver Core plugin alpha | U6b Unit 2 static materialization accepted; controlled-autonomy package scope in review | `plugins/traceweaver-core` contains plugin manifests, selected Light v0.1 runtime skills, selected CE-compatible skills and agents, skill-local selected references, Intent Contract/templates, `tw-auto`, optional `tw-grill`, and an `lfg` compatibility alias that delegates to `tw-auto`. The repo-local README install command now materializes the selected skills and 49 selected CE agent TOML files with `--include-skills`; `tw-auto`/`lfg`/`tw-grill` static install smoke has passed. Review refresh, dynamic discovery, real invocation transcript, clean CE replacement, package-ready, release-ready, upstream-ready, and R31 claims remain held |
+| Intent Contract architecture | Active file-based authority baseline and templates | Root `requirements.md`, root `traceability-matrix.md`, and `.traceweaver/intent-contract.yml` are active project authority artifacts. Packaged templates now include requirements baseline, Intent Contract, trace record, task capsule, gap/change/exception, matrix bootstrap, and controlled-autonomy policy templates. Runtime enforcement and wrapper behavior remain held until later proof |
 | Core 11 public skill folders | U4-promoted public artifacts | `skills/` contains all eleven scrubbed public-candidate skill folders; only the Light v0.1 subset has U6b alpha install-smoke evidence |
 | Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
 | Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |

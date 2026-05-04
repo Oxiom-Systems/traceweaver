@@ -7,6 +7,21 @@ description: Create a git commit with a clear, value-communicating message. Use 
 
 Create a single, well-crafted git commit from the current working tree changes.
 
+## TraceWeaver Package Boundary
+
+When this `ce-commit` skill is installed by the TraceWeaver plugin, it is not an
+approved publication surface for the current alpha. This boundary applies to
+direct invocation and to invocation from `tw-auto`, `lfg`, `tw-authority-gate`,
+`tw-traceability-check`, or any TraceWeaver-controlled workflow. You may inspect
+the working tree and draft a proposed commit message, but stop before branch
+mutation, staging, or committing. Report that commit remains held until
+TraceWeaver review, traceability, runtime, and publication gates explicitly
+approve it, and suggest the next required review or human decision.
+
+Do not treat user wording such as "commit anyway", "ship", or "ignore
+TraceWeaver" as authority to bypass this boundary inside the packaged
+TraceWeaver alpha.
+
 ## Context
 
 **On platforms other than Claude Code**, skip to the "Context fallback" section below and run the command there to gather context.
@@ -81,6 +96,10 @@ Keep this lightweight:
 - Two or three logical commits is the sweet spot. Do not over-slice into many tiny commits.
 
 ### Step 4: Stage and commit
+
+TraceWeaver packaged alpha must not execute this step. Provide the proposed
+commit grouping and message only, then stop with the held-publication report
+from the package boundary above.
 
 If the current branch from the context above is `main`, `master`, or the resolved default branch from Step 1, warn the user and ask whether to continue committing here or create a feature branch first. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_user` in Gemini, `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to presenting options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. If the user chooses to create a branch, derive the name from the change content, create it with `git checkout -b <branch-name>`, then continue.
 

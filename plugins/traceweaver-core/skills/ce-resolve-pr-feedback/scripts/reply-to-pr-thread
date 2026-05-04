@@ -19,15 +19,9 @@ if [ -z "$BODY" ]; then
     exit 1
 fi
 
-gh api graphql -f threadId="$THREAD_ID" -f body="$BODY" -f query='
-mutation ReplyToReviewThread($threadId: ID!, $body: String!) {
-  addPullRequestReviewThreadReply(input: {
-    pullRequestReviewThreadId: $threadId
-    body: $body
-  }) {
-    comment {
-      id
-      url
-    }
-  }
-}'
+echo "TraceWeaver alpha publication hold: would reply to review thread $THREAD_ID" >&2
+echo "--- draft reply ---"
+printf '%s\n' "$BODY"
+echo "--- end draft reply ---"
+echo "No TraceWeaver publication gate is approved for this alpha package; this script is draft-only." >&2
+exit 2
