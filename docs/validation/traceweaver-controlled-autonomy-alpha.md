@@ -57,7 +57,7 @@ Held claims:
 
 | File | SHA-256 | Role | Decision |
 | --- | --- | --- | --- |
-| `src/index.ts` | `d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5` | Repository-local self-contained Codex installer for the README command; installs selected skills, selected CE agents, plugin-level references, and direct callable skill copies without overwriting unowned global skill directories; Unit 9 registry-shape repair and legacy-upgrade cleanup code-reviewed | Static materialized; Unit 9 authority doc review pending. |
+| `src/index.ts` | `d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5` | Repository-local self-contained Codex installer for the README command; installs selected skills, selected CE agents, plugin-level references, and direct callable skill copies without overwriting unowned global skill directories; Unit 9 registry-shape, legacy-upgrade cleanup, and auth-boundary harness code-reviewed | Static materialized; Unit 9 behavior code review and authority doc review passed; runtime held. |
 | `plugins/traceweaver-core/skills/tw-auto/SKILL.md` | `a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3` | Advisory controlled-autonomy skill with TraceWeaver-packaged dependency resolution, privacy bootstrap gate, no-publication work handoff, and reviewer subagent capacity/backpressure handling | Static materialized; current code review passed; prior authority-state doc review passed; runtime held. |
 | `plugins/traceweaver-core/skills/lfg/SKILL.md` | `ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083` | TraceWeaver compatibility alias for `tw-auto` | Static materialized; runtime held. |
 | `plugins/traceweaver-core/skills/tw-grill/SKILL.md` | `666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90` | Optional post-ideation intent-deepening skill with bootstrap and delta/gap modes | Static materialized; refreshed isolated install smoke passed; REQ-TW-048 amendment doc review passed; runtime held; context mutation held to source evidence only. |
@@ -99,9 +99,9 @@ Held claims:
 | `plugins/traceweaver-core/skills/ce-brainstorm/references/handoff.md` | `710d2c48567a4a57aa5e8aec6e70d3ad4089e201a95f3396bf0a16af052b8d76` | CE-derived brainstorm handoff patched to prefer TraceWeaver requirements authority before planning/work | Legacy/manual-continuity CE handoffs explicitly marked. |
 | `plugins/traceweaver-core/skills/using-agent-skills/SKILL.md` | `7c658b4551214c7a8434b0d20aa8b32ff93b666dca8f6faa049bfb6761a2e1d0` | Meta-routing table for TraceWeaver-controlled work | Routes new work to `tw-auto` or TraceWeaver gates before raw CE skills. |
 | `README.md` | `5bdb8c035a1fb7c2a1503b241adc94cf9fb226926f7f95f8d242ad89fdff97b2` | Root product docs | Static updated; review pending. |
-| `traceability-matrix.md` | `562f9091d3a0655e39535e896657bf880512b5044652baa2a8a0c5f644287ba4` | Root traceability authority | Updated with behavior-bearing `tw-auto`, `lfg`, approved source-evidence `tw-grill`, direct callable install checks, no-publication smoke coverage, behavior-level verification gap, reviewer subagent capacity/backpressure coverage, code-review-passed/prior-doc-review-passed alpha evidence state, canonical baseline hash refresh, accepted narrow U7 static-advisory claim boundary, refreshed current install-smoke evidence, REQ-TW-048 amendment doc review passed, U9 Units 1-8 reviewed evidence, and U9 Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending while real runtime invocation remains held. |
+| `traceability-matrix.md` | `e8feb99eb548662579f3df45903750aed1e81b90aaa69a14fde3d11da07a4b11` | Root traceability authority | Updated with behavior-bearing `tw-auto`, `lfg`, approved source-evidence `tw-grill`, direct callable install checks, no-publication smoke coverage, behavior-level verification gap, reviewer subagent capacity/backpressure coverage, code-review-passed/prior-doc-review-passed alpha evidence state, canonical baseline hash refresh, accepted narrow U7 static-advisory claim boundary, refreshed current install-smoke evidence, REQ-TW-048 amendment doc review passed, U9 Units 1-8 reviewed evidence, and U9 Unit 9 registry-shape/auth-boundary repair with refreshed behavior code review and authority doc review passed while real runtime invocation remains held. |
 | `scripts/traceweaver-smoke-codex-host-registry` | `73f046143ae3f3b0815cb1032ee6a4c8ae6c75c9ca5754cb0cd2aebc48555813` | Read-only current Codex host-home filesystem registry probe | Held: current host is missing TraceWeaver-native direct callable `tw-*` entries and has unmarked/stale direct callable continuity entries. |
-| `scripts/traceweaver-smoke-codex-separate-home-runtime` | `0c17c2eaba9e7f57acd8460881e0bd19b5981b3114d715ef3604edcae26661ed` | Separate Codex home install plus fresh exec registry probe, updated to require every Unit 9 required skill in the visible-skill list and hold live-auth-copy runtime results | Unit 9 records required skills visible and the exact sentinel, but runtime acceptance remains held by the copied-auth boundary; refreshed code/doc review pending. |
+| `scripts/traceweaver-smoke-codex-separate-home-runtime` | `0c17c2eaba9e7f57acd8460881e0bd19b5981b3114d715ef3604edcae26661ed` | Separate Codex home install plus fresh exec registry probe, updated to require every Unit 9 required skill in the visible-skill list and hold live-auth-copy runtime results | Unit 9 records required skills visible and the exact sentinel, but runtime acceptance remains held by the copied-auth boundary; refreshed behavior code review and authority doc review passed. |
 | `scripts/traceweaver-smoke-no-publication` | `9e14b7066ed0d6d7e55f82df106dff41db8d18eb0d59be88dd5748e73f9def40` | Negative smoke for alpha publication hold on executable PR support scripts, env-var bypass attempts, static skill stop markers, `lfg` delegation, and event-derived reviewer backpressure classification | Pass accepted for deterministic Unit 4 boundary scope; full skill runtime invocation remains held. |
 | `docs/brainstorms/2026-05-01-traceweaver-ce-method-authority-correction.md` | `2ad22c4fde83fff9fcc996c59706d1665897ef1d69f78267bc3afdfb5ca327ff` | Pinned source record for CE-method wrapping and anti-drift correction | Source evidence recorded; review pending. |
 | `docs/brainstorms/2026-05-01-traceweaver-grill-intent-deepening-requirements.md` | `63bc4ba5677ef411569f1663620a7ef4a0f7afefff654f11fc853c5f7e323c33` | Pinned source record for post-ideation intent deepening, bootstrap mode, and delta/gap mode | Source evidence recorded; review pending. |
@@ -368,15 +368,17 @@ u9_unit8_review_status=code_review_passed_authority_doc_review_passed_reviewed_h
 u9_unit8_code_review_id=CE-CODE-REVIEW-2026-05-04-U9-SEPARATE-HOME-HARNESS-CLEAN-002
 u9_unit8_doc_review_id=CE-DOC-REVIEW-2026-05-04-U9-UNIT8-AUTHORITY-CLEAN-002
 u9_unit8_accepted_scope=reviewed held separate-home install/fresh-exec registry limitation evidence only
-u9_unit9_registry_shape_repair_status=auth_boundary_patch_code_review_pending_authority_doc_review_pending
+u9_unit9_registry_shape_repair_status=auth_boundary_patch_code_review_passed_authority_doc_review_passed_runtime_held
 u9_unit9_prompt_input_visibility=passed_required_traceweaver_and_wrapped_ce_skills_visible
 u9_unit9_owned_legacy_active_surface=removed_on_upgrade
 u9_unit9_unowned_legacy_active_surface=blocked_before_removal
 u9_unit9_real_runtime_invocation=held_live_auth_copy_boundary_after_exact_skill_hash_sentinel
-u9_unit9_code_review_gate=pending_after_auth_boundary_patch
+u9_unit9_code_review_gate=passed_no_findings_after_auth_boundary_patch
+u9_unit9_code_review_id=CE-CODE-REVIEW-2026-05-04-U9-UNIT9-AUTH-BOUNDARY-HARNESS-CLEAN-001
 u9_unit9_prior_code_review_id=CE-CODE-REVIEW-2026-05-04-U9-UNIT9-INSTALLER-HARNESS-CLEAN-001
-u9_unit9_authority_review_gate=pending
-u9_unit9_accepted_scope=none_until_clean_behavior_code_review_and_authority_doc_review
+u9_unit9_authority_review_gate=passed_no_findings
+u9_unit9_authority_review_id=CE-DOC-REVIEW-2026-05-04-U9-UNIT9-AUTHORITY-CLEAN-001
+u9_unit9_accepted_scope=reviewed held registry-shape/auth-boundary evidence only
 remaining_runtime_gate=host_registry_discovery_real_tw_runtime_invocation_project_level_trace_write_behavior_and_release_claims_held
 ```
 
