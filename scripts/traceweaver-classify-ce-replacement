@@ -1,0 +1,675 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require "digest"
+require "fileutils"
+require "json"
+require "optparse"
+require "yaml"
+
+DEFAULT_CLASSIFICATION = "plugins/traceweaver-core/references/ce-replacement-classification.yml"
+DEFAULT_PLUGIN_ROOT = "plugins/traceweaver-core"
+DEFAULT_INVENTORY = "docs/validation/traceweaver-core-11-ce-runtime-inventory.md"
+DEFAULT_SOURCE_PIN = "plugins/traceweaver-core/references/ce-upstream-source-inventory.md"
+DEFAULT_ROADMAP = "docs/plans/2026-05-02-001-feat-full-ce-341-traceweaver-authority-wrapping-plan.md"
+DEFAULT_JSON_OUT = ".traceweaver/ce-replacement-classification.generated.json"
+DEFAULT_MARKDOWN_OUT = "docs/validation/traceweaver-ce-replacement-classification.md"
+MARKER_BEGIN = "<!-- BEGIN TRACEWEAVER CE REPLACEMENT GENERATED EVIDENCE -->"
+MARKER_END = "<!-- END TRACEWEAVER CE REPLACEMENT GENERATED EVIDENCE -->"
+
+options = {
+  classification: DEFAULT_CLASSIFICATION,
+  plugin_root: DEFAULT_PLUGIN_ROOT,
+  inventory: DEFAULT_INVENTORY,
+  source_pin: DEFAULT_SOURCE_PIN,
+  roadmap: DEFAULT_ROADMAP,
+  json_out: DEFAULT_JSON_OUT,
+  markdown_out: DEFAULT_MARKDOWN_OUT,
+  update_evidence: false
+}
+
+OptionParser.new do |parser|
+  parser.banner = "Usage: scripts/traceweaver-classify-ce-replacement [options]"
+  parser.on("--classification PATH") { |value| options[:classification] = value }
+  parser.on("--plugin-root PATH") { |value| options[:plugin_root] = value }
+  parser.on("--inventory PATH") { |value| options[:inventory] = value }
+  parser.on("--source-pin PATH") { |value| options[:source_pin] = value }
+  parser.on("--roadmap PATH") { |value| options[:roadmap] = value }
+  parser.on("--codex-home PATH") { |value| options[:codex_home] = value }
+  parser.on("--upstream-root PATH") { |value| options[:upstream_root] = value }
+  parser.on("--json-out PATH") { |value| options[:json_out] = value }
+  parser.on("--markdown-out PATH") { |value| options[:markdown_out] = value }
+  parser.on("--update-evidence") { options[:update_evidence] = true }
+end.parse!
+
+def require_file(path)
+  abort "missing_file=#{path}" unless File.file?(path)
+end
+
+def sha256(path)
+  Digest::SHA256.file(path).hexdigest
+end
+
+def skill_name_from_traceweaver_path(path)
+  path.split("/").then { |parts| parts[parts.index("skills") + 1] }
+end
+
+def resolve_controlled_path(plugin_root, path)
+  return path if File.file?(path)
+
+  prefixed = path.delete_prefix("#{plugin_root}/")
+  File.join(plugin_root, prefixed)
+end
+
+def read_text(path)
+  File.file?(path) ? File.read(path) : ""
+end
+
+def scan_support_refs(path)
+  text = read_text(path)
+  text.scan(/(?<![\w\/.-])(?:@?(?:\.\/|\.\.\/)*)((?:references|scripts|assets)\/[A-Za-z0-9._\/-]+)/)
+    .flatten
+    .map { |ref| ref.sub(/[),.;:]+$/, "") }
+    .reject { |ref| ref.end_with?("/") }
+    .uniq
+end
+
+def plugin_files(root, relative)
+  Dir.glob(File.join(root, relative, "**", "*")).select { |path| File.file?(path) }
+end
+
+def plugin_skill_dirs(root)
+  Dir.glob(File.join(root, "skills", "*", "SKILL.md"))
+    .map { |path| File.basename(File.dirname(path)) }
+    .sort
+end
+
+def upstream_skill_dirs(root)
+  Dir.glob(File.join(root, "skills", "*", "SKILL.md"))
+    .map { |path| File.basename(File.dirname(path)) }
+    .sort
+end
+
+def load_json(path)
+  return {} unless File.file?(path)
+
+  JSON.parse(File.read(path))
+rescue JSON::ParserError
+  {}
+end
+
+def manifest_surface_entries(manifest_data)
+  manifest_data.flat_map do |path, data|
+    entries = []
+    prompt_keys = %w[prompts promptFiles]
+    command_keys = %w[commands slashCommands]
+    connector_keys = %w[mcp appConnectors connectors]
+
+    prompt_keys.each do |key|
+      Array(data[key]).each do |entry|
+        entries << { manifest: path, surface_type: "prompt", key: key, value: entry }
+      end
+    end
+
+    command_keys.each do |key|
+      Array(data[key]).each do |entry|
+        entries << { manifest: path, surface_type: "command", key: key, value: entry }
+      end
+    end
+
+    connector_keys.each do |key|
+      Array(data[key]).each do |entry|
+        entries << { manifest: path, surface_type: "mcp_app_connector", key: key, value: entry }
+      end
+    end
+
+    if present?(data["defaultPrompts"])
+      entries << { manifest: path, surface_type: "default_prompt", key: "defaultPrompts", value: data["defaultPrompts"] }
+    end
+
+    if present?(data.dig("interface", "defaultPrompt"))
+      entries << { manifest: path, surface_type: "default_prompt", key: "interface.defaultPrompt", value: data.dig("interface", "defaultPrompt") }
+    end
+
+    entries
+  end
+end
+
+def row_value(row, key)
+  row[key] || row[key.to_sym]
+end
+
+def present?(value)
+  !value.nil? && !(value.respond_to?(:empty?) && value.empty?)
+end
+
+def missing_fields(row, fields)
+  fields.reject { |field| present?(row_value(row, field)) }
+end
+
+def normalize_current_core(rows, plugin_root)
+  rows.map do |row|
+    path = row.fetch("traceweaver_path")
+    full_path = resolve_controlled_path(plugin_root, path)
+    skill_name = skill_name_from_traceweaver_path(path)
+    {
+      id: row.fetch("id"),
+      surface: skill_name,
+      surface_type: row.fetch("surface_type"),
+      classification: row["classification"],
+      path: path,
+      evidence_status: row.fetch("evidence_status"),
+      reason: row.fetch("reason"),
+      authority_evidence: row["authority_evidence"],
+      source_version: row["source_version"],
+      expected_hash: row["expected_hash"],
+      support_closure_depth: row["support_closure_depth"],
+      side_effect_category: row["side_effect_category"],
+      class_rationale: row["class_rationale"],
+      disconfirming_test: row["disconfirming_test"],
+      confidence: row["confidence"],
+      allowed_claims: row["allowed_claims"],
+      held_claims: row["held_claims"],
+      close_condition: row["close_condition"],
+      reviewer_evidence_id: row["reviewer_evidence_id"],
+      actual_hash: File.file?(full_path) ? sha256(full_path) : nil,
+      checker_status: File.file?(full_path) ? "present" : "missing_traceweaver_path"
+    }
+  end
+end
+
+def normalize_current_held(rows, plugin_root)
+  rows.map do |row|
+    path = row.fetch("traceweaver_path")
+    full_path = resolve_controlled_path(plugin_root, path)
+    {
+      id: row.fetch("id"),
+      surface: skill_name_from_traceweaver_path(path),
+      surface_type: row.fetch("surface_type"),
+      classification: row.fetch("classification"),
+      path: path,
+      blocker: row.fetch("blocker"),
+      source_version: row["source_version"],
+      expected_hash: row["expected_hash"],
+      support_closure_depth: row["support_closure_depth"],
+      evidence_status: row.fetch("evidence_status"),
+      dependency_check: row.fetch("dependency_check"),
+      consumer_check: row.fetch("consumer_check"),
+      allowed_claims: row.fetch("allowed_claims"),
+      held_claims: row.fetch("held_claims"),
+      reopen_condition: row.fetch("reopen_condition"),
+      actual_hash: File.file?(full_path) ? sha256(full_path) : nil,
+      checker_status: File.file?(full_path) ? "held" : "missing_traceweaver_path"
+    }
+  end
+end
+
+def normalize_package_support(rows, plugin_root)
+  rows.map do |row|
+    {
+      id: row.fetch("id"),
+      surface: row.fetch("surface_key"),
+      surface_type: row.fetch("surface_type"),
+      classification: row.fetch("classification"),
+      manifest: row["manifest_path"],
+      evidence_status: row.fetch("evidence_status"),
+      support_closure_depth: row["support_closure_depth"],
+      dependency_check: row.fetch("dependency_check"),
+      consumer_check: row.fetch("consumer_check"),
+      blocker: row.fetch("blocker"),
+      allowed_claims: row.fetch("allowed_claims"),
+      held_claims: row.fetch("held_claims"),
+      reopen_condition: row.fetch("reopen_condition"),
+      checker_status: "held"
+    }
+  end
+end
+
+classification = YAML.load_file(options[:classification])
+plugin_root = options[:plugin_root]
+require_file(options[:classification])
+require_file(options[:inventory])
+require_file(options[:source_pin])
+require_file(options[:roadmap])
+
+errors = []
+warnings = []
+
+unless classification.fetch("unit0_checkpoint").fetch("scope_mode") == "current_core_with_broad_surface_held"
+  errors << "scope_mode_not_current_core_with_broad_surface_held"
+end
+
+allowed = classification.fetch("allowed_implementation_scope")
+%w[exhaustive_full_surface_classification host_ce_removal runtime_invocation_claims clean_replacement_claims].each do |claim|
+  errors << "unsafe_allowed_scope=#{claim}" unless allowed[claim] == false
+end
+
+plugin_skill_names = plugin_skill_dirs(plugin_root)
+current_core_rows = classification.fetch("current_core_surface_candidates")
+current_held_rows = classification.fetch("current_packaged_held_surfaces").fetch("rows")
+broad_rows = classification.fetch("broad_surface_skeletons").fetch("rows")
+out_of_scope_rows = classification.fetch("upstream_out_of_scope_surfaces").fetch("rows")
+package_support_rows = classification.fetch("package_support_surfaces", {}).fetch("rows", [])
+
+current_core = normalize_current_core(current_core_rows, plugin_root)
+current_held = normalize_current_held(current_held_rows, plugin_root)
+package_support = normalize_package_support(package_support_rows, plugin_root)
+represented_packaged = (current_core + current_held).map { |row| row[:surface] }
+counts = Hash.new(0)
+represented_packaged.each { |skill| counts[skill] += 1 }
+missing_packaged = plugin_skill_names - represented_packaged
+extra_packaged = represented_packaged - plugin_skill_names
+duplicate_packaged = counts.select { |_skill, count| count > 1 }.keys
+
+errors << "unclassified_packaged_skills=#{missing_packaged.join(",")}" unless missing_packaged.empty?
+errors << "classification_rows_for_missing_packaged_skills=#{extra_packaged.join(",")}" unless extra_packaged.empty?
+errors << "duplicate_packaged_classification_rows=#{duplicate_packaged.join(",")}" unless duplicate_packaged.empty?
+
+valid_classifications = %w[wrapped aliased hidden held out_of_scope]
+required_authority_evidence = %w[
+  requirements
+  source
+  baseline_id
+  baseline_hash
+  validation_question
+]
+required_file_control_fields = %w[
+  source_version
+  expected_hash
+  support_closure_depth
+]
+
+required_current_core = %w[
+  id
+  surface_type
+  traceweaver_path
+  reason
+  evidence_status
+  classification
+  authority_evidence
+  side_effect_category
+  class_rationale
+  disconfirming_test
+  confidence
+  source_version
+  expected_hash
+  support_closure_depth
+  allowed_claims
+  held_claims
+  close_condition
+  reviewer_evidence_id
+]
+current_core_rows.each do |row|
+  missing = missing_fields(row, required_current_core)
+  errors << "#{row["id"] || "current_core"}_missing=#{missing.join(",")}" unless missing.empty?
+  unless valid_classifications.include?(row["classification"])
+    errors << "#{row["id"] || "current_core"}_invalid_classification=#{row["classification"] || "missing"}"
+  end
+  if row["classification"] == "out_of_scope"
+    errors << "#{row["id"]}_current_core_classification_out_of_scope"
+  end
+  missing_authority = missing_fields(row["authority_evidence"] || {}, required_authority_evidence)
+  errors << "#{row["id"]}_authority_evidence_missing=#{missing_authority.join(",")}" unless missing_authority.empty?
+end
+
+required_current_held = %w[
+  id
+  surface_type
+  traceweaver_path
+  classification
+  source_version
+  expected_hash
+  support_closure_depth
+  blocker
+  evidence_status
+  dependency_check
+  consumer_check
+  allowed_claims
+  held_claims
+  reopen_condition
+]
+current_held_rows.each do |row|
+  missing = missing_fields(row, required_current_held)
+  errors << "#{row["id"] || "current_held"}_missing=#{missing.join(",")}" unless missing.empty?
+  errors << "#{row["id"]}_classification_not_held" unless row["classification"] == "held"
+end
+
+required_broad = %w[id surface_type surface classification blocker evidence_status dependency_check consumer_check allowed_claims held_claims reopen_condition]
+broad_rows.each do |row|
+  missing = missing_fields(row, required_broad)
+  errors << "#{row["id"] || "broad"}_missing=#{missing.join(",")}" unless missing.empty?
+  if row["surfaces"]
+    errors << "#{row["id"] || "broad"}_grouped_surfaces_not_allowed"
+  end
+  errors << "#{row["id"]}_classification_not_held" unless row["classification"] == "held"
+end
+
+required_out_of_scope = %w[id surface_type upstream_path classification blocker evidence_status dependency_check consumer_check allowed_claims held_claims reopen_condition]
+out_of_scope_rows.each do |row|
+  missing = missing_fields(row, required_out_of_scope)
+  errors << "#{row["id"] || "out_of_scope"}_missing=#{missing.join(",")}" unless missing.empty?
+  errors << "#{row["id"]}_classification_not_out_of_scope" unless row["classification"] == "out_of_scope"
+end
+
+required_package_support = %w[id surface_type surface_key classification blocker evidence_status dependency_check consumer_check allowed_claims held_claims reopen_condition]
+package_support_rows.each do |row|
+  missing = missing_fields(row, required_package_support)
+  errors << "#{row["id"] || "package_support"}_missing=#{missing.join(",")}" unless missing.empty?
+  unless valid_classifications.include?(row["classification"])
+    errors << "#{row["id"] || "package_support"}_invalid_classification=#{row["classification"] || "missing"}"
+  end
+end
+
+classification_rows = current_core_rows + current_held_rows + broad_rows + out_of_scope_rows + package_support_rows
+held_evidence_statuses = %w[
+  package_surface_held
+  runtime_held
+  static_proven_runtime_held
+  provisional_target
+]
+classification_rows.each do |row|
+  classification_value = row["classification"]
+  next unless classification_value
+
+  unless valid_classifications.include?(classification_value)
+    errors << "#{row["id"]}_invalid_classification=#{classification_value}"
+  end
+
+  if %w[wrapped aliased hidden].include?(classification_value)
+    %w[authority_evidence side_effect_category class_rationale disconfirming_test confidence close_condition reviewer_evidence_id].each do |field|
+      errors << "#{row["id"]}_missing=#{field}" unless present?(row[field])
+    end
+  end
+
+  if classification_value == "wrapped" && row["confidence"] == "low" && !held_evidence_statuses.include?(row["evidence_status"])
+    errors << "#{row["id"]}_low_confidence_wrapped_without_held_evidence_status"
+  end
+end
+
+missing_expected_hash_rows = []
+bad_hash_rows = []
+(current_core_rows + current_held_rows).each do |row|
+  expected = row["expected_hash"]
+  full_path = resolve_controlled_path(plugin_root, row.fetch("traceweaver_path"))
+  if File.file?(full_path) && !present?(expected)
+    missing_expected_hash_rows << row.fetch("id")
+    next
+  end
+  next unless expected
+
+  if File.file?(full_path)
+    actual = sha256(full_path)
+    bad_hash_rows << "#{row.fetch("id")}:#{expected}:#{actual}" unless expected == actual
+  else
+    bad_hash_rows << "#{row.fetch("id")}:missing_file"
+  end
+end
+errors << "missing_expected_hashes=#{missing_expected_hash_rows.join(",")}" unless missing_expected_hash_rows.empty?
+errors << "hash_mismatches=#{bad_hash_rows.join(",")}" unless bad_hash_rows.empty?
+
+roadmap_text = File.read(options[:roadmap])
+roadmap_ce_skills = roadmap_text.scan(/^\| `(ce-[^`]+)` \|/).flatten.sort
+upstream_skills = options[:upstream_root] ? upstream_skill_dirs(options[:upstream_root]) : (roadmap_ce_skills + ["lfg"])
+required_upstream_ce_skills = if options[:upstream_root]
+  upstream_skills.select { |skill| skill.start_with?("ce-") }.sort
+else
+  roadmap_ce_skills
+end
+represented_roadmap = (
+  represented_packaged +
+  broad_rows.map { |row| row.fetch("surface") } +
+  out_of_scope_rows.map { |row| row.fetch("id").sub("CE-OOS-", "") }
+).uniq.sort
+missing_upstream_ce = required_upstream_ce_skills - represented_roadmap
+surface_source = options[:upstream_root] ? "upstream" : "roadmap"
+errors << "#{surface_source}_ce_surfaces_unrepresented=#{missing_upstream_ce.join(",")}" unless missing_upstream_ce.empty?
+
+lfg_row = current_core.find { |row| row[:surface] == "lfg" }
+if plugin_skill_names.include?("lfg") || upstream_skills.include?("lfg")
+  errors << "packaged_lfg_alias_missing" unless lfg_row && lfg_row[:classification] == "aliased" && lfg_row[:reason].include?("tw-auto")
+end
+
+inventory_text = File.read(options[:inventory])
+selected_skill_files = inventory_text.scan(/`(skills\/[^`]+)` \| `([0-9a-f]{64})` \| selected skill file/).to_h
+selected_agent_files = inventory_text.scan(/`(agents\/[^`]+)` \| `([0-9a-f]{64})` \| selected agent file/).to_h
+source_pin_text = File.read(options[:source_pin])
+source_pin = {
+  record_id: source_pin_text[/Record ID: `([^`]+)`/, 1],
+  version: source_pin_text[/\| Source version \| `([^`]+)` \|/, 1],
+  commit: source_pin_text[/\| Source commit \| `([^`]+)` \|/, 1],
+  aggregate_fingerprint: source_pin_text[/\| Full cache aggregate fingerprint \| `([^`]+)` \|/, 1]
+}
+
+manifest_paths = [
+  ".codex-plugin/plugin.json",
+  ".claude-plugin/plugin.json",
+  ".cursor-plugin/plugin.json"
+]
+manifests = manifest_paths.select { |path| File.file?(File.join(plugin_root, path)) }
+manifest_data = manifests.to_h { |path| [path, load_json(File.join(plugin_root, path))] }
+manifest_surfaces = manifest_surface_entries(manifest_data)
+prompt_surfaces = manifest_surfaces.select { |entry| entry[:surface_type] == "prompt" }
+command_surfaces = manifest_surfaces.select { |entry| entry[:surface_type] == "command" }
+default_prompt_surfaces = manifest_surfaces.select { |entry| entry[:surface_type] == "default_prompt" }
+mcp_app_connectors = manifest_surfaces.select { |entry| entry[:surface_type] == "mcp_app_connector" }
+install_metadata_surfaces = manifests.map { |path| { manifest: path, surface_type: "install_metadata", key: "manifest", value: path } }
+external_dependencies = []
+hidden_rows = classification_rows.select { |row| row["classification"] == "hidden" }
+held_rows = current_core_rows.select { |row| row["classification"] == "held" } + current_held_rows + broad_rows + package_support_rows
+
+discovered_support_keys = default_prompt_surfaces.map { |entry| "#{entry[:manifest]}:#{entry[:key]}" }.sort
+represented_support_keys = package_support_rows.map { |row| row.fetch("surface_key") }.sort
+missing_support_classification = discovered_support_keys - represented_support_keys
+extra_support_classification = represented_support_keys - discovered_support_keys
+errors << "unclassified_package_support_surfaces=#{missing_support_classification.join(",")}" unless missing_support_classification.empty?
+errors << "classification_rows_for_missing_package_support_surfaces=#{extra_support_classification.join(",")}" unless extra_support_classification.empty?
+
+plugin_refs = plugin_files(plugin_root, "references").map { |path| path.delete_prefix("#{plugin_root}/") }.sort
+plugin_agents = plugin_files(plugin_root, "agents").map { |path| path.delete_prefix("#{plugin_root}/") }.sort
+plugin_support_refs = {}
+Dir.glob(File.join(plugin_root, "skills", "*", "SKILL.md")).sort.each do |skill_path|
+  skill = File.basename(File.dirname(skill_path))
+  refs = scan_support_refs(skill_path)
+  plugin_support_refs[skill] = refs.map { |ref| File.join("skills", skill, ref) }
+end
+
+missing_support_files = []
+unselected_support_files = []
+plugin_support_refs.each_value do |refs|
+  refs.each do |relative|
+    missing_support_files << relative unless File.file?(File.join(plugin_root, relative))
+    if relative.start_with?("skills/ce-") || relative.start_with?("skills/lfg")
+      unselected_support_files << relative unless selected_skill_files.key?(relative)
+    end
+  end
+end
+
+errors << "missing_support_files=#{missing_support_files.uniq.join(",")}" unless missing_support_files.uniq.empty?
+errors << "unselected_ce_support_files=#{unselected_support_files.uniq.join(",")}" unless unselected_support_files.uniq.empty?
+
+host_visible_skills = []
+if options[:codex_home]
+  host_visible_skills = Dir.glob(File.join(options[:codex_home], ".codex", "skills", "*", "SKILL.md"))
+    .map { |path| File.basename(File.dirname(path)) }
+    .sort
+end
+
+checker_status = errors.empty? ? "passed_static_readiness" : "failed_static_readiness"
+generated_at = Time.now.utc.strftime("%Y-%m-%dT%H:%M:%SZ")
+held_claims = [
+  "runtime invocation",
+  "enforcing authority gates",
+  "publication",
+  "release-ready",
+  "package-ready",
+  "upstream-ready",
+  "host CE removal",
+  "clean replacement",
+  "runtime-equivalent CE behavior",
+  "R31-complete status"
+]
+
+result = {
+  record_id: "TWCORE-CE-REPLACEMENT-CLASSIFIER-GENERATED-2026-05-04-001",
+  generated_at: generated_at,
+  checker_status: checker_status,
+  traceweaver_mode: classification.fetch("traceweaver_mode"),
+  scope_mode: classification.fetch("unit0_checkpoint").fetch("scope_mode"),
+  baseline: classification.fetch("baseline"),
+  source_pin: source_pin,
+  plan: classification.fetch("source_evidence").fetch("plan"),
+  unit0_review_evidence_id: classification.fetch("source_evidence").fetch("unit0_review_evidence_id"),
+  counts: {
+    upstream_ce_skills: required_upstream_ce_skills.size,
+    upstream_lfg: upstream_skills.include?("lfg") ? 1 : 0,
+    packaged_traceweaver_skills: plugin_skill_names.size,
+    current_core_rows: current_core.size,
+    current_packaged_held_rows: current_held.size,
+    broad_held_rows: broad_rows.size,
+    out_of_scope_rows: out_of_scope_rows.size,
+    package_support_rows: package_support.size,
+    selected_agent_files: selected_agent_files.size,
+    direct_callable_skills: plugin_skill_names.size,
+    prompt_surfaces: prompt_surfaces.size,
+    command_surfaces: command_surfaces.size,
+    default_prompt_surfaces: default_prompt_surfaces.size,
+    mcp_app_connectors: mcp_app_connectors.size,
+    install_metadata: install_metadata_surfaces.size,
+    external_dependencies: external_dependencies.size,
+    hidden_rows: hidden_rows.size,
+    held_rows: held_rows.size,
+    prompts_or_commands: prompt_surfaces.size + command_surfaces.size,
+    manifests: manifests.size,
+    references: plugin_refs.size,
+    host_visible_skills: host_visible_skills.size,
+    unclassified_rows: missing_packaged.size + missing_upstream_ce.size + missing_support_classification.size
+  },
+  inventories: {
+    upstream_skills: upstream_skills,
+    packaged_skills: plugin_skill_names,
+    selected_skill_files: selected_skill_files.keys.sort,
+    selected_agent_files: selected_agent_files.keys.sort,
+    plugin_agents: plugin_agents,
+    plugin_references: plugin_refs,
+    manifest_surfaces: manifest_surfaces,
+    prompt_surfaces: prompt_surfaces,
+    command_surfaces: command_surfaces,
+    default_prompt_surfaces: default_prompt_surfaces,
+    mcp_app_connectors: mcp_app_connectors,
+    install_metadata: install_metadata_surfaces,
+    external_dependencies: external_dependencies,
+    host_visible_skills: host_visible_skills,
+    support_edges: plugin_support_refs
+  },
+  classifications: {
+    current_core: current_core,
+    current_packaged_held: current_held,
+    package_support: package_support,
+    broad_held: broad_rows,
+    out_of_scope: out_of_scope_rows
+  },
+  blockers: {
+    errors: errors,
+    warnings: warnings,
+    held_claims: held_claims
+  }
+}
+
+FileUtils.mkdir_p(File.dirname(options[:json_out]))
+File.write(options[:json_out], JSON.pretty_generate(result) + "\n")
+
+markdown = <<~MARKDOWN
+  #{MARKER_BEGIN}
+  ## Generated CE Replacement Classifier Evidence
+
+  Generated: #{generated_at}
+
+  Checker status: `#{checker_status}`
+
+  Scope mode: `#{result[:scope_mode]}`
+
+  Unit 0 review evidence:
+  `#{result[:unit0_review_evidence_id]}`
+
+  Baseline:
+  `#{result[:baseline]["id"]}` /
+  `#{result[:baseline]["hash_sha256"]}`
+
+  CE source pin:
+  `#{source_pin[:record_id]}` /
+  version `#{source_pin[:version]}` /
+  commit `#{source_pin[:commit]}` /
+  aggregate fingerprint `#{source_pin[:aggregate_fingerprint]}`
+
+  ### Blockers First
+
+  #{errors.empty? ? "- No static/readiness blockers found for Units 1-4 current/core scope." : errors.map { |error| "- `#{error}`" }.join("\n")}
+
+  Held claims:
+
+  #{held_claims.map { |claim| "- #{claim}" }.join("\n")}
+
+  ### Counts
+
+  | Count | Value |
+  | --- | ---: |
+  | Upstream CE skills represented | #{result[:counts][:upstream_ce_skills]} |
+  | Upstream `lfg` represented | #{result[:counts][:upstream_lfg]} |
+  | Packaged TraceWeaver skills | #{result[:counts][:packaged_traceweaver_skills]} |
+  | Current/core rows | #{result[:counts][:current_core_rows]} |
+  | Current packaged held rows | #{result[:counts][:current_packaged_held_rows]} |
+  | Package support held rows | #{result[:counts][:package_support_rows]} |
+  | Broad held rows | #{result[:counts][:broad_held_rows]} |
+  | Out-of-scope rows | #{result[:counts][:out_of_scope_rows]} |
+  | Direct callable skills | #{result[:counts][:direct_callable_skills]} |
+  | Selected agent files | #{result[:counts][:selected_agent_files]} |
+  | Prompt surfaces discovered | #{result[:counts][:prompt_surfaces]} |
+  | Command surfaces discovered | #{result[:counts][:command_surfaces]} |
+  | Default prompt surfaces discovered | #{result[:counts][:default_prompt_surfaces]} |
+  | MCP/app connector surfaces discovered | #{result[:counts][:mcp_app_connectors]} |
+  | Install metadata surfaces discovered | #{result[:counts][:install_metadata]} |
+  | External dependencies discovered | #{result[:counts][:external_dependencies]} |
+  | Hidden rows | #{result[:counts][:hidden_rows]} |
+  | Held rows | #{result[:counts][:held_rows]} |
+  | Plugin manifests discovered | #{result[:counts][:manifests]} |
+  | Plugin references discovered | #{result[:counts][:references]} |
+  | Host-visible skills scanned | #{result[:counts][:host_visible_skills]} |
+  | Unclassified rows | #{result[:counts][:unclassified_rows]} |
+
+  Generated JSON:
+  `.traceweaver/ce-replacement-classification.generated.json`
+
+  Runtime invocation, enforcement, publication, release-ready, clean-replacement,
+  host CE removal, package-ready, upstream-ready, and R31 claims remain held.
+  #{MARKER_END}
+MARKDOWN
+
+if options[:update_evidence]
+  existing = File.file?(options[:markdown_out]) ? File.read(options[:markdown_out]) : ""
+  updated = if existing.include?(MARKER_BEGIN) && existing.include?(MARKER_END)
+    existing.sub(/#{Regexp.escape(MARKER_BEGIN)}.*#{Regexp.escape(MARKER_END)}/m, markdown.strip)
+  elsif existing.empty?
+    markdown
+  else
+    "#{existing.rstrip}\n\n#{markdown}"
+  end
+  File.write(options[:markdown_out], updated.rstrip + "\n")
+else
+  FileUtils.mkdir_p(File.dirname(options[:markdown_out]))
+  File.write(options[:markdown_out], markdown)
+end
+
+puts "checker_status=#{checker_status}"
+puts "scope_mode=#{result[:scope_mode]}"
+puts "packaged_traceweaver_skills=#{plugin_skill_names.size}"
+puts "current_core_rows=#{current_core.size}"
+puts "current_packaged_held_rows=#{current_held.size}"
+puts "broad_held_rows=#{broad_rows.size}"
+puts "out_of_scope_rows=#{out_of_scope_rows.size}"
+puts "unclassified_rows=#{result[:counts][:unclassified_rows]}"
+puts "json_out=#{options[:json_out]}"
+puts "markdown_out=#{options[:markdown_out]}"
+puts "held_claims=#{held_claims.join(",")}"
+puts "errors=#{errors.empty? ? "none" : errors.join(";")}"
+
+exit(errors.empty? ? 0 : 1)

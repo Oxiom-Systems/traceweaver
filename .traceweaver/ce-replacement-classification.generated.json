@@ -1,0 +1,1931 @@
+{
+  "record_id": "TWCORE-CE-REPLACEMENT-CLASSIFIER-GENERATED-2026-05-04-001",
+  "generated_at": "2026-05-04T14:34:41Z",
+  "checker_status": "passed_static_readiness",
+  "traceweaver_mode": "advisory",
+  "scope_mode": "current_core_with_broad_surface_held",
+  "baseline": {
+    "id": "REQ-BASELINE-2026-04-30-001",
+    "hash_sha256": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+    "authority_source": "requirements.md",
+    "linked_requirements": [
+      "REQ-TW-014",
+      "REQ-TW-020",
+      "REQ-TW-033",
+      "REQ-TW-034",
+      "REQ-TW-041",
+      "REQ-TW-043",
+      "REQ-TW-044",
+      "REQ-TW-045",
+      "REQ-TW-046",
+      "REQ-TW-047",
+      "REQ-TW-048"
+    ]
+  },
+  "source_pin": {
+    "record_id": "TWCORE-CE-SOURCE-PIN-2026-05-01-002",
+    "version": "3.4.1",
+    "commit": "d685f0794863a73ae3ca3620d2ae747510e9eaa0",
+    "aggregate_fingerprint": "6892159ad685e59230514f9e58fb7ffd06052d84da643c73ac95b787e3c60d23"
+  },
+  "plan": "docs/plans/2026-05-04-001-feat-ce-replacement-inventory-classifier-plan.md",
+  "unit0_review_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+  "counts": {
+    "upstream_ce_skills": 37,
+    "upstream_lfg": 1,
+    "packaged_traceweaver_skills": 27,
+    "current_core_rows": 18,
+    "current_packaged_held_rows": 9,
+    "broad_held_rows": 16,
+    "out_of_scope_rows": 3,
+    "package_support_rows": 1,
+    "selected_agent_files": 49,
+    "direct_callable_skills": 27,
+    "prompt_surfaces": 0,
+    "command_surfaces": 0,
+    "default_prompt_surfaces": 1,
+    "mcp_app_connectors": 0,
+    "install_metadata": 3,
+    "external_dependencies": 0,
+    "hidden_rows": 0,
+    "held_rows": 43,
+    "prompts_or_commands": 0,
+    "manifests": 3,
+    "references": 18,
+    "host_visible_skills": 0,
+    "unclassified_rows": 0
+  },
+  "inventories": {
+    "upstream_skills": [
+      "ce-agent-native-architecture",
+      "ce-agent-native-audit",
+      "ce-brainstorm",
+      "ce-clean-gone-branches",
+      "ce-code-review",
+      "ce-commit",
+      "ce-commit-push-pr",
+      "ce-compound",
+      "ce-compound-refresh",
+      "ce-debug",
+      "ce-demo-reel",
+      "ce-dhh-rails-style",
+      "ce-doc-review",
+      "ce-frontend-design",
+      "ce-gemini-imagegen",
+      "ce-ideate",
+      "ce-optimize",
+      "ce-plan",
+      "ce-polish-beta",
+      "ce-product-pulse",
+      "ce-proof",
+      "ce-release-notes",
+      "ce-report-bug",
+      "ce-resolve-pr-feedback",
+      "ce-session-extract",
+      "ce-session-inventory",
+      "ce-sessions",
+      "ce-setup",
+      "ce-simplify-code",
+      "ce-slack-research",
+      "ce-strategy",
+      "ce-test-browser",
+      "ce-test-xcode",
+      "ce-update",
+      "ce-work",
+      "ce-work-beta",
+      "ce-worktree",
+      "lfg"
+    ],
+    "packaged_skills": [
+      "ce-brainstorm",
+      "ce-code-review",
+      "ce-commit",
+      "ce-commit-push-pr",
+      "ce-compound",
+      "ce-compound-refresh",
+      "ce-debug",
+      "ce-doc-review",
+      "ce-plan",
+      "ce-resolve-pr-feedback",
+      "ce-session-extract",
+      "ce-session-inventory",
+      "ce-sessions",
+      "ce-setup",
+      "ce-test-browser",
+      "ce-test-xcode",
+      "ce-work",
+      "ce-worktree",
+      "lfg",
+      "requirements-reviewer",
+      "systems-engineering-traceability",
+      "tw-authority-gate",
+      "tw-auto",
+      "tw-grill",
+      "tw-requirements-review",
+      "tw-traceability-check",
+      "using-agent-skills"
+    ],
+    "selected_skill_files": [
+      "skills/ce-brainstorm/SKILL.md",
+      "skills/ce-brainstorm/references/handoff.md",
+      "skills/ce-brainstorm/references/requirements-capture.md",
+      "skills/ce-brainstorm/references/synthesis-summary.md",
+      "skills/ce-brainstorm/references/universal-brainstorming.md",
+      "skills/ce-brainstorm/references/visual-communication.md",
+      "skills/ce-code-review/SKILL.md",
+      "skills/ce-code-review/references/bulk-preview.md",
+      "skills/ce-code-review/references/diff-scope.md",
+      "skills/ce-code-review/references/findings-schema.json",
+      "skills/ce-code-review/references/persona-catalog.md",
+      "skills/ce-code-review/references/resolve-base.sh",
+      "skills/ce-code-review/references/review-output-template.md",
+      "skills/ce-code-review/references/subagent-template.md",
+      "skills/ce-code-review/references/tracker-defer.md",
+      "skills/ce-code-review/references/validator-template.md",
+      "skills/ce-code-review/references/walkthrough.md",
+      "skills/ce-commit-push-pr/SKILL.md",
+      "skills/ce-commit-push-pr/references/branch-creation.md",
+      "skills/ce-commit-push-pr/references/pr-description-writing.md",
+      "skills/ce-commit/SKILL.md",
+      "skills/ce-compound-refresh/SKILL.md",
+      "skills/ce-compound-refresh/assets/resolution-template.md",
+      "skills/ce-compound-refresh/references/schema.yaml",
+      "skills/ce-compound-refresh/references/yaml-schema.md",
+      "skills/ce-compound-refresh/scripts/validate-frontmatter.py",
+      "skills/ce-compound/SKILL.md",
+      "skills/ce-compound/assets/resolution-template.md",
+      "skills/ce-compound/references/schema.yaml",
+      "skills/ce-compound/references/yaml-schema.md",
+      "skills/ce-compound/scripts/validate-frontmatter.py",
+      "skills/ce-debug/SKILL.md",
+      "skills/ce-debug/references/anti-patterns.md",
+      "skills/ce-debug/references/defense-in-depth.md",
+      "skills/ce-debug/references/investigation-techniques.md",
+      "skills/ce-doc-review/SKILL.md",
+      "skills/ce-doc-review/references/bulk-preview.md",
+      "skills/ce-doc-review/references/findings-schema.json",
+      "skills/ce-doc-review/references/open-questions-defer.md",
+      "skills/ce-doc-review/references/review-output-template.md",
+      "skills/ce-doc-review/references/subagent-template.md",
+      "skills/ce-doc-review/references/synthesis-and-presentation.md",
+      "skills/ce-doc-review/references/walkthrough.md",
+      "skills/ce-plan/SKILL.md",
+      "skills/ce-plan/references/deepening-workflow.md",
+      "skills/ce-plan/references/plan-handoff.md",
+      "skills/ce-plan/references/synthesis-summary.md",
+      "skills/ce-plan/references/universal-planning.md",
+      "skills/ce-plan/references/visual-communication.md",
+      "skills/ce-resolve-pr-feedback/SKILL.md",
+      "skills/ce-resolve-pr-feedback/scripts/get-pr-comments",
+      "skills/ce-resolve-pr-feedback/scripts/get-thread-for-comment",
+      "skills/ce-resolve-pr-feedback/scripts/reply-to-pr-thread",
+      "skills/ce-resolve-pr-feedback/scripts/resolve-pr-thread",
+      "skills/ce-session-extract/SKILL.md",
+      "skills/ce-session-extract/scripts/extract-errors.py",
+      "skills/ce-session-extract/scripts/extract-skeleton.py",
+      "skills/ce-session-inventory/SKILL.md",
+      "skills/ce-session-inventory/scripts/discover-sessions.sh",
+      "skills/ce-session-inventory/scripts/extract-metadata.py",
+      "skills/ce-sessions/SKILL.md",
+      "skills/ce-setup/SKILL.md",
+      "skills/ce-setup/references/config-template.yaml",
+      "skills/ce-setup/scripts/check-health",
+      "skills/ce-test-browser/SKILL.md",
+      "skills/ce-test-xcode/SKILL.md",
+      "skills/ce-work/SKILL.md",
+      "skills/ce-work/references/shipping-workflow.md",
+      "skills/ce-work/references/tracker-defer.md",
+      "skills/ce-worktree/SKILL.md",
+      "skills/ce-worktree/scripts/worktree-manager.sh",
+      "skills/lfg/SKILL.md",
+      "skills/lfg/references/tracker-defer.md"
+    ],
+    "selected_agent_files": [
+      "agents/ce-adversarial-document-reviewer.agent.md",
+      "agents/ce-adversarial-reviewer.agent.md",
+      "agents/ce-agent-native-reviewer.agent.md",
+      "agents/ce-ankane-readme-writer.agent.md",
+      "agents/ce-api-contract-reviewer.agent.md",
+      "agents/ce-architecture-strategist.agent.md",
+      "agents/ce-best-practices-researcher.agent.md",
+      "agents/ce-code-simplicity-reviewer.agent.md",
+      "agents/ce-coherence-reviewer.agent.md",
+      "agents/ce-correctness-reviewer.agent.md",
+      "agents/ce-data-integrity-guardian.agent.md",
+      "agents/ce-data-migration-expert.agent.md",
+      "agents/ce-data-migrations-reviewer.agent.md",
+      "agents/ce-deployment-verification-agent.agent.md",
+      "agents/ce-design-implementation-reviewer.agent.md",
+      "agents/ce-design-iterator.agent.md",
+      "agents/ce-design-lens-reviewer.agent.md",
+      "agents/ce-dhh-rails-reviewer.agent.md",
+      "agents/ce-feasibility-reviewer.agent.md",
+      "agents/ce-figma-design-sync.agent.md",
+      "agents/ce-framework-docs-researcher.agent.md",
+      "agents/ce-git-history-analyzer.agent.md",
+      "agents/ce-issue-intelligence-analyst.agent.md",
+      "agents/ce-julik-frontend-races-reviewer.agent.md",
+      "agents/ce-kieran-python-reviewer.agent.md",
+      "agents/ce-kieran-rails-reviewer.agent.md",
+      "agents/ce-kieran-typescript-reviewer.agent.md",
+      "agents/ce-learnings-researcher.agent.md",
+      "agents/ce-maintainability-reviewer.agent.md",
+      "agents/ce-pattern-recognition-specialist.agent.md",
+      "agents/ce-performance-oracle.agent.md",
+      "agents/ce-performance-reviewer.agent.md",
+      "agents/ce-pr-comment-resolver.agent.md",
+      "agents/ce-previous-comments-reviewer.agent.md",
+      "agents/ce-product-lens-reviewer.agent.md",
+      "agents/ce-project-standards-reviewer.agent.md",
+      "agents/ce-reliability-reviewer.agent.md",
+      "agents/ce-repo-research-analyst.agent.md",
+      "agents/ce-schema-drift-detector.agent.md",
+      "agents/ce-scope-guardian-reviewer.agent.md",
+      "agents/ce-security-lens-reviewer.agent.md",
+      "agents/ce-security-reviewer.agent.md",
+      "agents/ce-security-sentinel.agent.md",
+      "agents/ce-session-historian.agent.md",
+      "agents/ce-slack-researcher.agent.md",
+      "agents/ce-spec-flow-analyzer.agent.md",
+      "agents/ce-swift-ios-reviewer.agent.md",
+      "agents/ce-testing-reviewer.agent.md",
+      "agents/ce-web-researcher.agent.md"
+    ],
+    "plugin_agents": [
+      "agents/ce-adversarial-document-reviewer.agent.md",
+      "agents/ce-adversarial-reviewer.agent.md",
+      "agents/ce-agent-native-reviewer.agent.md",
+      "agents/ce-ankane-readme-writer.agent.md",
+      "agents/ce-api-contract-reviewer.agent.md",
+      "agents/ce-architecture-strategist.agent.md",
+      "agents/ce-best-practices-researcher.agent.md",
+      "agents/ce-code-simplicity-reviewer.agent.md",
+      "agents/ce-coherence-reviewer.agent.md",
+      "agents/ce-correctness-reviewer.agent.md",
+      "agents/ce-data-integrity-guardian.agent.md",
+      "agents/ce-data-migration-expert.agent.md",
+      "agents/ce-data-migrations-reviewer.agent.md",
+      "agents/ce-deployment-verification-agent.agent.md",
+      "agents/ce-design-implementation-reviewer.agent.md",
+      "agents/ce-design-iterator.agent.md",
+      "agents/ce-design-lens-reviewer.agent.md",
+      "agents/ce-dhh-rails-reviewer.agent.md",
+      "agents/ce-feasibility-reviewer.agent.md",
+      "agents/ce-figma-design-sync.agent.md",
+      "agents/ce-framework-docs-researcher.agent.md",
+      "agents/ce-git-history-analyzer.agent.md",
+      "agents/ce-issue-intelligence-analyst.agent.md",
+      "agents/ce-julik-frontend-races-reviewer.agent.md",
+      "agents/ce-kieran-python-reviewer.agent.md",
+      "agents/ce-kieran-rails-reviewer.agent.md",
+      "agents/ce-kieran-typescript-reviewer.agent.md",
+      "agents/ce-learnings-researcher.agent.md",
+      "agents/ce-maintainability-reviewer.agent.md",
+      "agents/ce-pattern-recognition-specialist.agent.md",
+      "agents/ce-performance-oracle.agent.md",
+      "agents/ce-performance-reviewer.agent.md",
+      "agents/ce-pr-comment-resolver.agent.md",
+      "agents/ce-previous-comments-reviewer.agent.md",
+      "agents/ce-product-lens-reviewer.agent.md",
+      "agents/ce-project-standards-reviewer.agent.md",
+      "agents/ce-reliability-reviewer.agent.md",
+      "agents/ce-repo-research-analyst.agent.md",
+      "agents/ce-schema-drift-detector.agent.md",
+      "agents/ce-scope-guardian-reviewer.agent.md",
+      "agents/ce-security-lens-reviewer.agent.md",
+      "agents/ce-security-reviewer.agent.md",
+      "agents/ce-security-sentinel.agent.md",
+      "agents/ce-session-historian.agent.md",
+      "agents/ce-slack-researcher.agent.md",
+      "agents/ce-spec-flow-analyzer.agent.md",
+      "agents/ce-swift-ios-reviewer.agent.md",
+      "agents/ce-testing-reviewer.agent.md",
+      "agents/ce-web-researcher.agent.md"
+    ],
+    "plugin_references": [
+      "references/authority-baseline-template.yml",
+      "references/automation-loop-state-template.yml",
+      "references/ce-replacement-classification.yml",
+      "references/ce-upstream-source-inventory.md",
+      "references/change-template.yml",
+      "references/exception-template.yml",
+      "references/gap-template.yml",
+      "references/intent-contract-template.yml",
+      "references/requirements-and-vv-guide.md",
+      "references/requirements-baseline-template.md",
+      "references/risk-gap-and-change-control-guide.md",
+      "references/systems-engineering-traceability-operating-model.md",
+      "references/task-capsule-template.yml",
+      "references/trace-record-template.yml",
+      "references/traceability-matrix-bootstrap-template.md",
+      "references/traceability-matrix-template.md",
+      "references/traceweaver-controlled-autonomy-policy.md",
+      "references/traceweaver-runtime-policy.md"
+    ],
+    "manifest_surfaces": [
+      {
+        "manifest": ".codex-plugin/plugin.json",
+        "surface_type": "default_prompt",
+        "key": "interface.defaultPrompt",
+        "value": [
+          "Use the tw-requirements-review skill for requirements or planning authority review.",
+          "Use the tw-grill skill after ideation and before brainstorming when one selected idea needs deeper interview; its output is source evidence, not authority.",
+          "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
+          "Use the tw-traceability-check skill during plan, code, document, or release-evidence review.",
+          "Use the tw-auto skill for advisory controlled autonomy; it preserves the CE-style loop while adding authority, traceability, verification, validation, and dark-behavior controls.",
+          "The packaged lfg name delegates to tw-auto and must stop before commit, push, or PR creation in this alpha."
+        ]
+      }
+    ],
+    "prompt_surfaces": [
+
+    ],
+    "command_surfaces": [
+
+    ],
+    "default_prompt_surfaces": [
+      {
+        "manifest": ".codex-plugin/plugin.json",
+        "surface_type": "default_prompt",
+        "key": "interface.defaultPrompt",
+        "value": [
+          "Use the tw-requirements-review skill for requirements or planning authority review.",
+          "Use the tw-grill skill after ideation and before brainstorming when one selected idea needs deeper interview; its output is source evidence, not authority.",
+          "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
+          "Use the tw-traceability-check skill during plan, code, document, or release-evidence review.",
+          "Use the tw-auto skill for advisory controlled autonomy; it preserves the CE-style loop while adding authority, traceability, verification, validation, and dark-behavior controls.",
+          "The packaged lfg name delegates to tw-auto and must stop before commit, push, or PR creation in this alpha."
+        ]
+      }
+    ],
+    "mcp_app_connectors": [
+
+    ],
+    "install_metadata": [
+      {
+        "manifest": ".codex-plugin/plugin.json",
+        "surface_type": "install_metadata",
+        "key": "manifest",
+        "value": ".codex-plugin/plugin.json"
+      },
+      {
+        "manifest": ".claude-plugin/plugin.json",
+        "surface_type": "install_metadata",
+        "key": "manifest",
+        "value": ".claude-plugin/plugin.json"
+      },
+      {
+        "manifest": ".cursor-plugin/plugin.json",
+        "surface_type": "install_metadata",
+        "key": "manifest",
+        "value": ".cursor-plugin/plugin.json"
+      }
+    ],
+    "external_dependencies": [
+
+    ],
+    "host_visible_skills": [
+
+    ],
+    "support_edges": {
+      "ce-brainstorm": [
+        "skills/ce-brainstorm/references/universal-brainstorming.md",
+        "skills/ce-brainstorm/references/synthesis-summary.md",
+        "skills/ce-brainstorm/references/requirements-capture.md",
+        "skills/ce-brainstorm/references/handoff.md"
+      ],
+      "ce-code-review": [
+        "skills/ce-code-review/references/resolve-base.sh",
+        "skills/ce-code-review/references/validator-template.md",
+        "skills/ce-code-review/references/tracker-defer.md",
+        "skills/ce-code-review/references/walkthrough.md",
+        "skills/ce-code-review/references/bulk-preview.md",
+        "skills/ce-code-review/references/persona-catalog.md",
+        "skills/ce-code-review/references/subagent-template.md",
+        "skills/ce-code-review/references/diff-scope.md",
+        "skills/ce-code-review/references/findings-schema.json",
+        "skills/ce-code-review/references/review-output-template.md"
+      ],
+      "ce-commit-push-pr": [
+        "skills/ce-commit-push-pr/references/pr-description-writing.md",
+        "skills/ce-commit-push-pr/references/branch-creation.md"
+      ],
+      "ce-commit": [
+
+      ],
+      "ce-compound-refresh": [
+        "skills/ce-compound-refresh/references/schema.yaml",
+        "skills/ce-compound-refresh/references/yaml-schema.md",
+        "skills/ce-compound-refresh/assets/resolution-template.md",
+        "skills/ce-compound-refresh/scripts/validate-frontmatter.py"
+      ],
+      "ce-compound": [
+        "skills/ce-compound/references/schema.yaml",
+        "skills/ce-compound/references/yaml-schema.md",
+        "skills/ce-compound/assets/resolution-template.md",
+        "skills/ce-compound/scripts/validate-frontmatter.py"
+      ],
+      "ce-debug": [
+        "skills/ce-debug/references/investigation-techniques.md",
+        "skills/ce-debug/references/anti-patterns.md",
+        "skills/ce-debug/references/defense-in-depth.md"
+      ],
+      "ce-doc-review": [
+        "skills/ce-doc-review/references/walkthrough.md",
+        "skills/ce-doc-review/references/bulk-preview.md",
+        "skills/ce-doc-review/references/synthesis-and-presentation.md",
+        "skills/ce-doc-review/references/subagent-template.md",
+        "skills/ce-doc-review/references/findings-schema.json"
+      ],
+      "ce-plan": [
+        "skills/ce-plan/references/universal-planning.md",
+        "skills/ce-plan/references/synthesis-summary.md",
+        "skills/ce-plan/references/visual-communication.md",
+        "skills/ce-plan/references/plan-handoff.md",
+        "skills/ce-plan/references/deepening-workflow.md"
+      ],
+      "ce-resolve-pr-feedback": [
+        "skills/ce-resolve-pr-feedback/scripts/get-pr-comments",
+        "skills/ce-resolve-pr-feedback/scripts/reply-to-pr-thread",
+        "skills/ce-resolve-pr-feedback/scripts/get-thread-for-comment",
+        "skills/ce-resolve-pr-feedback/scripts/resolve-pr-thread"
+      ],
+      "ce-session-extract": [
+        "skills/ce-session-extract/scripts/extract-skeleton.py",
+        "skills/ce-session-extract/scripts/extract-errors.py"
+      ],
+      "ce-session-inventory": [
+        "skills/ce-session-inventory/scripts/discover-sessions.sh",
+        "skills/ce-session-inventory/scripts/extract-metadata.py"
+      ],
+      "ce-sessions": [
+
+      ],
+      "ce-setup": [
+        "skills/ce-setup/scripts/check-health",
+        "skills/ce-setup/references/config-template.yaml"
+      ],
+      "ce-test-browser": [
+
+      ],
+      "ce-test-xcode": [
+
+      ],
+      "ce-work": [
+        "skills/ce-work/references/shipping-workflow.md"
+      ],
+      "ce-worktree": [
+        "skills/ce-worktree/scripts/worktree-manager.sh"
+      ],
+      "lfg": [
+
+      ],
+      "requirements-reviewer": [
+        "skills/requirements-reviewer/references/requirements-quality-operating-model.md",
+        "skills/requirements-reviewer/references/requirements-quality-checklist.md",
+        "skills/requirements-reviewer/references/requirements-review-finding-schema.md",
+        "skills/requirements-reviewer/references/requirement-types-and-attributes.md",
+        "skills/requirements-reviewer/references/requirement-language-rules.md",
+        "skills/requirements-reviewer/references/verification-validation-guide.md",
+        "skills/requirements-reviewer/references/source-basis.md"
+      ],
+      "systems-engineering-traceability": [
+        "skills/systems-engineering-traceability/references/systems-engineering-traceability-operating-model.md",
+        "skills/systems-engineering-traceability/references/traceability-matrix-template.md",
+        "skills/systems-engineering-traceability/references/requirements-and-vv-guide.md",
+        "skills/systems-engineering-traceability/references/risk-gap-and-change-control-guide.md"
+      ],
+      "tw-authority-gate": [
+
+      ],
+      "tw-auto": [
+        "skills/tw-auto/references/requirements-baseline-template.md",
+        "skills/tw-auto/references/intent-contract-template.yml",
+        "skills/tw-auto/references/traceability-matrix-bootstrap-template.md",
+        "skills/tw-auto/references/automation-loop-state-template.yml",
+        "skills/tw-auto/references/traceweaver-controlled-autonomy-policy.md"
+      ],
+      "tw-grill": [
+        "skills/tw-grill/references/upstream-notice.md"
+      ],
+      "tw-requirements-review": [
+
+      ],
+      "tw-traceability-check": [
+
+      ],
+      "using-agent-skills": [
+
+      ]
+    }
+  },
+  "classifications": {
+    "current_core": [
+      {
+        "id": "TW-SKILL-tw-grill",
+        "surface": "tw-grill",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/tw-grill/SKILL.md",
+        "evidence_status": "static_proven_runtime_held",
+        "reason": "optional post-ideation source-evidence intent deepening",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "traceweaver_delta",
+        "expected_hash": "666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "candidate_source_evidence",
+        "class_rationale": "Current packaged intent-deepening surface remains candidate source evidence only until reviewed authority promotes its output.",
+        "disconfirming_test": "Any attempt to treat tw-grill output as implementation authority without requirements review must keep the row held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed promotion evidence proves tw-grill authority boundaries",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001",
+        "actual_hash": "666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-ce-brainstorm",
+        "surface": "ce-brainstorm",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-brainstorm/SKILL.md",
+        "evidence_status": "provisional_target",
+        "reason": "brainstorm/source-evidence continuity path",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-014",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "b70007d3cf7ed68e64a7f581bd644a2a3e13858c8e826273dd04084cea005aab",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "candidate_source_evidence",
+        "class_rationale": "Brainstorming can feed TraceWeaver source evidence, but its outputs are not authority until routed through requirements review.",
+        "disconfirming_test": "If brainstorm output can bypass requirements-quality review or baseline promotion, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed wrapper evidence proves source-evidence routing and stop behavior",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "b70007d3cf7ed68e64a7f581bd644a2a3e13858c8e826273dd04084cea005aab",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-ce-plan",
+        "surface": "ce-plan",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-plan/SKILL.md",
+        "evidence_status": "runtime_held",
+        "reason": "planning stage in the CE-style method path",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-014",
+            "REQ-TW-020",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "51e97828c6c188850c74d9cbe8b1e7f4db6b5f88f6f9ecdafeaffdef1e2aaf11",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "planning_authority_candidate",
+        "class_rationale": "Planning must preserve approved authority, traceability, verification, validation, and held-claim boundaries before work execution.",
+        "disconfirming_test": "A plan that can authorize implementation from candidate-only evidence keeps this row held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed wrapper evidence proves authority-gated planning",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "51e97828c6c188850c74d9cbe8b1e7f4db6b5f88f6f9ecdafeaffdef1e2aaf11",
+        "checker_status": "present"
+      },
+      {
+        "id": "TW-SKILL-tw-requirements-review",
+        "surface": "tw-requirements-review",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md",
+        "evidence_status": "static_proven_runtime_held",
+        "reason": "requirements baseline and promotion review adapter for the core authority path",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-020",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "traceweaver_delta",
+        "expected_hash": "f45459c1144646ece057f882da5eb730ff223ec725c19041d59cc3e3c9b7c4e1",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "authority_review",
+        "class_rationale": "Requirements review is a core authority control surface, but runtime invocation and enforcement are still held.",
+        "disconfirming_test": "If requirements review can mark unreviewed amendments as accepted, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves promotion gates and stale-reset behavior",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "f45459c1144646ece057f882da5eb730ff223ec725c19041d59cc3e3c9b7c4e1",
+        "checker_status": "present"
+      },
+      {
+        "id": "TW-SKILL-requirements-reviewer",
+        "surface": "requirements-reviewer",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/requirements-reviewer/SKILL.md",
+        "evidence_status": "static_proven_runtime_held",
+        "reason": "requirements quality review support used by the core authority path",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-020"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "traceweaver_delta",
+        "expected_hash": "1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "authority_review_support",
+        "class_rationale": "Requirements quality support is packaged for review assistance, not as standalone implementation authority.",
+        "disconfirming_test": "If reviewer support can promote authority without controlled review evidence, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves reviewer support boundaries",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d",
+        "checker_status": "present"
+      },
+      {
+        "id": "TW-SKILL-tw-authority-gate",
+        "surface": "tw-authority-gate",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md",
+        "evidence_status": "static_proven_runtime_held",
+        "reason": "authority check before behavior-changing work",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-014",
+            "REQ-TW-020",
+            "REQ-TW-033",
+            "REQ-TW-034"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "traceweaver_delta",
+        "expected_hash": "93d78f160ee5dd78bd7ebf5dd9cff28e9c1ec3b8f5bfe2b25474b11512e475e3",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "authority_gate",
+        "class_rationale": "Authority gating is core to TraceWeaver, but enforcement and runtime invocation remain held until proven.",
+        "disconfirming_test": "Any behavior-changing handoff that proceeds without the required authority chain keeps this row held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves gate invocation and fail-closed behavior",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "93d78f160ee5dd78bd7ebf5dd9cff28e9c1ec3b8f5bfe2b25474b11512e475e3",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-ce-work",
+        "surface": "ce-work",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-work/SKILL.md",
+        "evidence_status": "runtime_held",
+        "reason": "work execution stage in the CE-style method path",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-014",
+            "REQ-TW-020",
+            "REQ-TW-041",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "4d3a91e7025f5fdedf2e454e56ab79e2d8588680a35f7d4d4a35aee933d49b36",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "behavior_change_execution",
+        "class_rationale": "Work execution can mutate behavior and must cite approved authority, verification, validation, and trace evidence before proceeding.",
+        "disconfirming_test": "If ce-work can implement from candidate-only evidence or stale authority, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed wrapper evidence proves authority-gated execution",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "4d3a91e7025f5fdedf2e454e56ab79e2d8588680a35f7d4d4a35aee933d49b36",
+        "checker_status": "present"
+      },
+      {
+        "id": "TW-SKILL-tw-traceability-check",
+        "surface": "tw-traceability-check",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md",
+        "evidence_status": "static_proven_runtime_held",
+        "reason": "traceability and dark-behavior check",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-033",
+            "REQ-TW-034",
+            "REQ-TW-041"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "traceweaver_delta",
+        "expected_hash": "c2ac0332032b577e1749bb7990b01b6875f33d81bbec31de31f52d742250b943",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "traceability_review",
+        "class_rationale": "Traceability checking is a core control surface, but automated enforcement and runtime invocation remain held.",
+        "disconfirming_test": "If dark behavior can be accepted without trace evidence or validation questions, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves traceability checking and stale-reset behavior",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "c2ac0332032b577e1749bb7990b01b6875f33d81bbec31de31f52d742250b943",
+        "checker_status": "present"
+      },
+      {
+        "id": "TW-SKILL-systems-engineering-traceability",
+        "surface": "systems-engineering-traceability",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/systems-engineering-traceability/SKILL.md",
+        "evidence_status": "static_proven_runtime_held",
+        "reason": "traceability support surface for the core authority path",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-033",
+            "REQ-TW-034",
+            "REQ-TW-041"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "traceweaver_delta",
+        "expected_hash": "e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "traceability_support",
+        "class_rationale": "Systems-engineering traceability support can assist evidence review but cannot become authority by itself.",
+        "disconfirming_test": "If support guidance can replace the controlled matrix or Intent Contract, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves support-surface boundaries",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-ce-doc-review",
+        "surface": "ce-doc-review",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-doc-review/SKILL.md",
+        "evidence_status": "runtime_held",
+        "reason": "document review stage for requirements, plans, and evidence",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-020",
+            "REQ-TW-033",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "9b197bee814542328be6153afa5cf560f638eb3fe3ea94ba62c5b66129bdc246",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "review_evidence",
+        "class_rationale": "Document review can supply reviewer evidence, but clean review must be recorded before candidate material becomes authority.",
+        "disconfirming_test": "If document review status can be cited after referenced evidence changes without stale reset, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed wrapper evidence proves stale-reset and evidence-record routing",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "9b197bee814542328be6153afa5cf560f638eb3fe3ea94ba62c5b66129bdc246",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-ce-code-review",
+        "surface": "ce-code-review",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-code-review/SKILL.md",
+        "evidence_status": "runtime_held",
+        "reason": "code review stage for behavior-bearing diffs",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-041",
+            "REQ-TW-043",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "66a1da73677a5fe2e5d3e6292872a2375c697704353799adf0eaa7b3a9f947f9",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "implementation_review",
+        "class_rationale": "Code review can identify defects in implementation evidence, but cannot promote runtime, release, or clean-replacement claims by itself.",
+        "disconfirming_test": "If a clean code review can bypass required document or authority review, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed wrapper evidence proves review scope and held-claim routing",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "66a1da73677a5fe2e5d3e6292872a2375c697704353799adf0eaa7b3a9f947f9",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-ce-test-browser",
+        "surface": "ce-test-browser",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-test-browser/SKILL.md",
+        "evidence_status": "runtime_held",
+        "reason": "browser verification evidence candidate",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-041",
+            "REQ-TW-043"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "a7240cf469d410b2ee46fbf24ef19cf70becaefa55549b13a0d4eaa63166a71f",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "verification_evidence",
+        "class_rationale": "Browser testing can provide verification evidence, but tool runtime and claim boundaries remain held.",
+        "disconfirming_test": "If browser evidence is cited without requirement trace and validation question linkage, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves browser verification routing",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "a7240cf469d410b2ee46fbf24ef19cf70becaefa55549b13a0d4eaa63166a71f",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-ce-test-xcode",
+        "surface": "ce-test-xcode",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-test-xcode/SKILL.md",
+        "evidence_status": "runtime_held",
+        "reason": "Xcode verification evidence candidate",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-041",
+            "REQ-TW-043"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "27945c9e4a4c72543988698699f5d08d3a7a04d94d1ca7d49b425b9cb169a544",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "verification_evidence",
+        "class_rationale": "Xcode testing can provide verification evidence, but tool runtime and claim boundaries remain held.",
+        "disconfirming_test": "If Xcode evidence is cited without requirement trace and validation question linkage, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves Xcode verification routing",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "27945c9e4a4c72543988698699f5d08d3a7a04d94d1ca7d49b425b9cb169a544",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-ce-compound",
+        "surface": "ce-compound",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-compound/SKILL.md",
+        "evidence_status": "runtime_held",
+        "reason": "compound learning path after reviewed work",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-044",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "0c07a5487a5d4f63b5552d065d7e12d67545eb846dda923b994de9c8de1d3ec3",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "learning_record",
+        "class_rationale": "Compound learning can preserve reviewed lessons, but must not convert unreviewed implementation context into authority.",
+        "disconfirming_test": "If learning records can be created from unreviewed or stale evidence, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed wrapper evidence proves learning-record authority boundaries",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "0c07a5487a5d4f63b5552d065d7e12d67545eb846dda923b994de9c8de1d3ec3",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-ce-compound-refresh",
+        "surface": "ce-compound-refresh",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-compound-refresh/SKILL.md",
+        "evidence_status": "runtime_held",
+        "reason": "compound learning refresh path after reviewed work",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-044",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "8f1518e73314feed67847da627879bde918c95b0bfb1d800f2b0ad3b22e3395a",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "learning_record_refresh",
+        "class_rationale": "Compound refresh can update learning records, but must preserve reviewed authority provenance and stale-reset behavior.",
+        "disconfirming_test": "If refreshed learning can supersede controlled requirements or validation evidence, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed wrapper evidence proves refresh provenance and stale-reset routing",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "8f1518e73314feed67847da627879bde918c95b0bfb1d800f2b0ad3b22e3395a",
+        "checker_status": "present"
+      },
+      {
+        "id": "CE-SKILL-lfg",
+        "surface": "lfg",
+        "surface_type": "skill",
+        "classification": "aliased",
+        "path": "plugins/traceweaver-core/skills/lfg/SKILL.md",
+        "evidence_status": "static_proven_runtime_held",
+        "reason": "familiar automation alias that must delegate to tw-auto",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-045",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "automation_alias",
+        "class_rationale": "The familiar lfg entrypoint is allowed only as an alias to TraceWeaver's bounded advisory tw-auto flow.",
+        "disconfirming_test": "If lfg can execute CE automation directly or bypass tw-auto held stops, this row must lose aliased classification.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves lfg delegates to tw-auto and preserves held claims",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083",
+        "checker_status": "present"
+      },
+      {
+        "id": "TW-SKILL-tw-auto",
+        "surface": "tw-auto",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
+        "evidence_status": "static_proven_runtime_held",
+        "reason": "bounded advisory automation loop for the core TraceWeaver method",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-045",
+            "REQ-TW-048"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "traceweaver_delta",
+        "expected_hash": "a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "advisory_automation",
+        "class_rationale": "tw-auto may orchestrate bounded advisory CE-style loops, but commit, publication, runtime enforcement, and release claims remain held.",
+        "disconfirming_test": "If tw-auto can continue past missing authority or held publication boundaries, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves bounded advisory stops and trace updates",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3",
+        "checker_status": "present"
+      },
+      {
+        "id": "TW-SKILL-using-agent-skills",
+        "surface": "using-agent-skills",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/using-agent-skills/SKILL.md",
+        "evidence_status": "static_proven_runtime_held",
+        "reason": "packaged routing and skill-use support for TraceWeaver-controlled handoffs",
+        "authority_evidence": {
+          "requirements": [
+            "REQ-TW-014",
+            "REQ-TW-047"
+          ],
+          "source": "requirements.md",
+          "baseline_id": "REQ-BASELINE-2026-04-30-001",
+          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "accepted_exception": null,
+          "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
+        },
+        "source_version": "traceweaver_delta",
+        "expected_hash": "7c658b4551214c7a8434b0d20aa8b32ff93b666dca8f6faa049bfb6761a2e1d0",
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "routing_support",
+        "class_rationale": "Skill-use support helps route packaged capabilities but must not make skills themselves authoritative.",
+        "disconfirming_test": "If skill routing can bypass the Intent Contract or approved requirement chain, this row must remain held.",
+        "confidence": "medium",
+        "allowed_claims": [
+          "current/core static classification only"
+        ],
+        "held_claims": [
+          "runtime invocation",
+          "enforcing authority gates",
+          "publication",
+          "release-ready",
+          "host CE removal",
+          "clean replacement"
+        ],
+        "close_condition": "reviewed runtime evidence proves routing support preserves authority gates",
+        "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
+        "actual_hash": "7c658b4551214c7a8434b0d20aa8b32ff93b666dca8f6faa049bfb6761a2e1d0",
+        "checker_status": "present"
+      }
+    ],
+    "current_packaged_held": [
+      {
+        "id": "CE-CURRENT-HELD-ce-commit",
+        "surface": "ce-commit",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-commit/SKILL.md",
+        "blocker": "Commit behavior has publication side effects and needs authority, trace, verification, review, and release-boundary gates before direct TraceWeaver use.",
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "1ba086277e311a5f2630d2f6fc8c0bd0713b07a4a3f273949e22ea6ae893cdb2",
+        "support_closure_depth": "dependency_and_consumer",
+        "evidence_status": "runtime_held",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "allowed_claims": [
+          "current packaged manual continuity only"
+        ],
+        "held_claims": [
+          "commit publication authority",
+          "runtime equivalence",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves wrapper, stop, absence, or read-only behavior and publication gates.",
+        "actual_hash": "1ba086277e311a5f2630d2f6fc8c0bd0713b07a4a3f273949e22ea6ae893cdb2",
+        "checker_status": "held"
+      },
+      {
+        "id": "CE-CURRENT-HELD-ce-commit-push-pr",
+        "surface": "ce-commit-push-pr",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md",
+        "blocker": "Commit, push, and PR behavior crosses publication boundaries and needs authority, trace, verification, review, release, and human-approval gates before direct TraceWeaver use.",
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "21385f78158777fd726a3763e56f1b9a3183c4eb24bc3a374355820286fa996c",
+        "support_closure_depth": "dependency_and_consumer",
+        "evidence_status": "runtime_held",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "allowed_claims": [
+          "current packaged manual continuity only"
+        ],
+        "held_claims": [
+          "autonomous publication",
+          "pull request authority",
+          "runtime equivalence",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves wrapper, stop, absence, or read-only behavior and publication gates.",
+        "actual_hash": "21385f78158777fd726a3763e56f1b9a3183c4eb24bc3a374355820286fa996c",
+        "checker_status": "held"
+      },
+      {
+        "id": "CE-CURRENT-HELD-ce-debug",
+        "surface": "ce-debug",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-debug/SKILL.md",
+        "blocker": "Debug and defect-resolution work can change behavior and needs a defect, requirement, gap, exception, test, and trace route before direct TraceWeaver use.",
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "6785594317d403e2aac454d07eb1545d9e1f772c1f62606b0193728e1453864e",
+        "support_closure_depth": "dependency_and_consumer",
+        "evidence_status": "runtime_held",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "allowed_claims": [
+          "current packaged manual continuity only"
+        ],
+        "held_claims": [
+          "implementation authority",
+          "runtime equivalence",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves defect-source routing, test evidence, trace updates, and authority stops.",
+        "actual_hash": "6785594317d403e2aac454d07eb1545d9e1f772c1f62606b0193728e1453864e",
+        "checker_status": "held"
+      },
+      {
+        "id": "CE-CURRENT-HELD-ce-resolve-pr-feedback",
+        "surface": "ce-resolve-pr-feedback",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-resolve-pr-feedback/SKILL.md",
+        "blocker": "PR feedback resolution can mutate scope, evidence, review state, and publication readiness, so it needs authority and release-boundary guards before direct TraceWeaver use.",
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "313229520b5bc240e7ae5ca644205b2b87d2f34c15d5838677133a3666539b10",
+        "support_closure_depth": "dependency_and_consumer",
+        "evidence_status": "runtime_held",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "allowed_claims": [
+          "current packaged manual continuity only"
+        ],
+        "held_claims": [
+          "implementation authority",
+          "review closure authority",
+          "publication authority",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves feedback provenance, authority gates, trace updates, and held publication stops.",
+        "actual_hash": "313229520b5bc240e7ae5ca644205b2b87d2f34c15d5838677133a3666539b10",
+        "checker_status": "held"
+      },
+      {
+        "id": "CE-CURRENT-HELD-ce-session-extract",
+        "surface": "ce-session-extract",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-session-extract/SKILL.md",
+        "blocker": "Session extraction is source-evidence ingestion and needs privacy, provenance, retention, and authority-boundary policy before direct TraceWeaver use.",
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "05c6a86282fd8a49ffb715e2e80b81ecd80aa88c84e6528fcfb92443049c1cd5",
+        "support_closure_depth": "dependency_and_consumer",
+        "evidence_status": "runtime_held",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "allowed_claims": [
+          "current packaged manual continuity only"
+        ],
+        "held_claims": [
+          "source authority",
+          "implementation authority",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves privacy/provenance handling and prevents session material from becoming authority without review.",
+        "actual_hash": "05c6a86282fd8a49ffb715e2e80b81ecd80aa88c84e6528fcfb92443049c1cd5",
+        "checker_status": "held"
+      },
+      {
+        "id": "CE-CURRENT-HELD-ce-session-inventory",
+        "surface": "ce-session-inventory",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-session-inventory/SKILL.md",
+        "blocker": "Session inventory discovers candidate source evidence and needs privacy, provenance, retention, and authority-boundary policy before direct TraceWeaver use.",
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "de08c87a9e0c500e87311734f2b22e6cb7245b935cfdbdef5cbbc7125825c08b",
+        "support_closure_depth": "dependency_and_consumer",
+        "evidence_status": "runtime_held",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "allowed_claims": [
+          "current packaged manual continuity only"
+        ],
+        "held_claims": [
+          "source authority",
+          "implementation authority",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves privacy/provenance handling and prevents session material from becoming authority without review.",
+        "actual_hash": "de08c87a9e0c500e87311734f2b22e6cb7245b935cfdbdef5cbbc7125825c08b",
+        "checker_status": "held"
+      },
+      {
+        "id": "CE-CURRENT-HELD-ce-sessions",
+        "surface": "ce-sessions",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-sessions/SKILL.md",
+        "blocker": "Session search can surface candidate source evidence and needs privacy, provenance, retention, and authority-boundary policy before direct TraceWeaver use.",
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "f13c6b143097e13705d521cee152672f0b599057b2c0e4fc87b7af61c61f9553",
+        "support_closure_depth": "dependency_and_consumer",
+        "evidence_status": "runtime_held",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "allowed_claims": [
+          "current packaged manual continuity only"
+        ],
+        "held_claims": [
+          "source authority",
+          "implementation authority",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves privacy/provenance handling and prevents session material from becoming authority without review.",
+        "actual_hash": "f13c6b143097e13705d521cee152672f0b599057b2c0e4fc87b7af61c61f9553",
+        "checker_status": "held"
+      },
+      {
+        "id": "CE-CURRENT-HELD-ce-setup",
+        "surface": "ce-setup",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-setup/SKILL.md",
+        "blocker": "Setup and health-check behavior can mutate or report environment state and needs pre/post evidence plus authority-stop rules before direct TraceWeaver use.",
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "626696dc061455a1320559b48ef8bced72fe8b87403d3d4d55592627c99ea6ec",
+        "support_closure_depth": "dependency_and_consumer",
+        "evidence_status": "runtime_held",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "allowed_claims": [
+          "current packaged manual continuity only"
+        ],
+        "held_claims": [
+          "environment readiness authority",
+          "implementation authority",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves setup operations, environment claims, and stop boundaries.",
+        "actual_hash": "626696dc061455a1320559b48ef8bced72fe8b87403d3d4d55592627c99ea6ec",
+        "checker_status": "held"
+      },
+      {
+        "id": "CE-CURRENT-HELD-ce-worktree",
+        "surface": "ce-worktree",
+        "surface_type": "skill",
+        "classification": "held",
+        "path": "plugins/traceweaver-core/skills/ce-worktree/SKILL.md",
+        "blocker": "Worktree behavior mutates repository/workspace state and needs pre/post evidence, branch policy, and authority-stop rules before direct TraceWeaver use.",
+        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "expected_hash": "5a1d6d9babb6e24da1af1bbe630c73306adfec8a75faa1442f611cebc804edc3",
+        "support_closure_depth": "dependency_and_consumer",
+        "evidence_status": "runtime_held",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "allowed_claims": [
+          "current packaged manual continuity only"
+        ],
+        "held_claims": [
+          "workspace mutation authority",
+          "implementation authority",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves workspace mutation boundaries, trace updates, and held publication stops.",
+        "actual_hash": "5a1d6d9babb6e24da1af1bbe630c73306adfec8a75faa1442f611cebc804edc3",
+        "checker_status": "held"
+      }
+    ],
+    "package_support": [
+      {
+        "id": "TW-SUPPORT-codex-default-prompt",
+        "surface": ".codex-plugin/plugin.json:interface.defaultPrompt",
+        "surface_type": "default_prompt",
+        "classification": "held",
+        "manifest": ".codex-plugin/plugin.json",
+        "evidence_status": "static_proven_runtime_held",
+        "support_closure_depth": "dependency_and_consumer",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reclassify",
+        "blocker": "Codex default prompts steer agent behavior and need authority-boundary review before they can support U9 or host-removal readiness.",
+        "allowed_claims": [
+          "current packaged advisory routing only"
+        ],
+        "held_claims": [
+          "default prompt authority",
+          "runtime invocation",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reclassify only after reviewed evidence proves default prompt routing preserves TraceWeaver authority gates and held publication stops.",
+        "checker_status": "held"
+      }
+    ],
+    "broad_held": [
+      {
+        "id": "CE-BROAD-ce-agent-native-architecture",
+        "surface": "ce-agent-native-architecture",
+        "blocker": "Architecture guidance requires separate authority, design, validation, and provenance routing before TraceWeaver-controlled use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "architecture advice authority",
+          "runtime equivalence",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove dependency closure, consumer routing, authority gates, and validation handling.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-agent-native-audit",
+        "surface": "ce-agent-native-audit",
+        "blocker": "Audit scoring requires separate authority, validation, and score provenance routing before TraceWeaver-controlled use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "audit score authority",
+          "runtime equivalence",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove dependency closure, consumer routing, authority gates, and validation handling.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-frontend-design",
+        "surface": "ce-frontend-design",
+        "blocker": "Frontend design guidance requires UI validation evidence, artifact provenance, and release-claim controls before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "design validation authority",
+          "runtime equivalence",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove UI validation routing, artifact provenance, dependency closure, and publication stops.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-polish-beta",
+        "surface": "ce-polish-beta",
+        "blocker": "Browser-polish workflows require runtime and UI validation boundaries before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "design validation authority",
+          "runtime equivalence",
+          "release readiness",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove UI validation routing, dependency closure, and held publication boundaries.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-demo-reel",
+        "surface": "ce-demo-reel",
+        "blocker": "Demo capture touches artifact provenance and publication boundaries before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "demo publication authority",
+          "release readiness",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove artifact provenance, dependency closure, and held publication boundaries.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-ideate",
+        "surface": "ce-ideate",
+        "blocker": "Ideation can create candidate source evidence and needs provenance, stakeholder-intent, and baseline-promotion routing before use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "stakeholder intent authority",
+          "implementation authority",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove source-evidence routing, provenance handling, dependency closure, and promotion stops.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-strategy",
+        "surface": "ce-strategy",
+        "blocker": "Strategy work can create product-source evidence and needs stakeholder intent, provenance, and baseline-promotion routing before use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "product signal authority",
+          "implementation authority",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove source-evidence routing, provenance handling, dependency closure, and promotion stops.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-product-pulse",
+        "surface": "ce-product-pulse",
+        "blocker": "Product-signal reporting needs privacy, provenance, and authority routing before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "product signal authority",
+          "implementation authority",
+          "runtime equivalence"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove privacy, provenance, dependency closure, and baseline-promotion stops.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-optimize",
+        "surface": "ce-optimize",
+        "blocker": "Optimization mutates behavior or evaluation criteria and needs metric authority, regression validation, and rollback boundaries before use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "metric authority",
+          "behavior-change authority",
+          "runtime equivalence"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove metric authority, dependency closure, regression evidence, and change control.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-simplify-code",
+        "surface": "ce-simplify-code",
+        "blocker": "Simplification can mutate behavior or review criteria and needs traceability, regression validation, and rollback boundaries before use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "behavior-change authority",
+          "runtime equivalence",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove trace authority, dependency closure, regression evidence, and change-control routing.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-proof",
+        "surface": "ce-proof",
+        "blocker": "Proof loops touch validation and publication boundaries and need explicit release gates before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "proof loop authority",
+          "publication authority",
+          "release readiness"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove validation routing, dependency closure, publication gates, and R31 held handling.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-release-notes",
+        "surface": "ce-release-notes",
+        "blocker": "Release notes touch publication and R31 release claims and need explicit release gates before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "release note authority",
+          "publication authority",
+          "release readiness"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove dependency closure, publication gates, and R31 held-claim handling.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-slack-research",
+        "surface": "ce-slack-research",
+        "blocker": "Slack research needs external-source provenance, privacy, and trust-boundary controls before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "external source authority",
+          "connector readiness",
+          "runtime equivalence"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove connector provenance, privacy handling, dependency closure, and source routing.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-report-bug",
+        "surface": "ce-report-bug",
+        "blocker": "Bug reporting needs defect/source-record policy, provenance, and trust-boundary controls before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "defect authority",
+          "connector readiness",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove provenance, dependency closure, and defect/source-record routing.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-update",
+        "surface": "ce-update",
+        "blocker": "Update flows mutate package boundaries and need update policy, runtime proof, and publication stops before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "update authority",
+          "runtime equivalence",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove update policy, dependency closure, runtime proof, and publication stops.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-work-beta",
+        "surface": "ce-work-beta",
+        "blocker": "Delegated work mutates execution boundaries and needs subagent authority slices, runtime proof, and publication stops before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "delegated work authority",
+          "runtime equivalence",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove delegate policy, authority-slice routing, dependency closure, and publication stops.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      }
+    ],
+    "out_of_scope": [
+      {
+        "id": "CE-OOS-ce-clean-gone-branches",
+        "surface_type": "skill",
+        "upstream_path": "skills/ce-clean-gone-branches/SKILL.md",
+        "classification": "out_of_scope",
+        "blocker": "Git branch hygiene is outside the authority-preserving TraceWeaver alpha workflow and is not packaged in the current TraceWeaver surface.",
+        "dependency_check": "not_applicable",
+        "consumer_check": "no_current_traceweaver_consumer",
+        "allowed_claims": [
+          "deliberately out of scope for Unit 0 current/core work"
+        ],
+        "held_claims": [
+          "clean replacement",
+          "runtime equivalence",
+          "host removal readiness"
+        ],
+        "reopen_condition": "Reopen only if reviewed demand evidence, a new requirement, or an accepted product exception makes branch-cleanup behavior part of the TraceWeaver-controlled method.",
+        "evidence_status": "package_surface_held",
+        "support_closure_depth": "not_applicable"
+      },
+      {
+        "id": "CE-OOS-ce-dhh-rails-style",
+        "surface_type": "skill",
+        "upstream_path": "skills/ce-dhh-rails-style/SKILL.md",
+        "classification": "out_of_scope",
+        "blocker": "Framework-specific Rails style guidance is outside the baseline authority-preserving TraceWeaver alpha workflow and is not packaged in the current TraceWeaver surface.",
+        "dependency_check": "not_applicable",
+        "consumer_check": "no_current_traceweaver_consumer",
+        "allowed_claims": [
+          "deliberately out of scope for Unit 0 current/core work"
+        ],
+        "held_claims": [
+          "clean replacement",
+          "runtime equivalence",
+          "host removal readiness"
+        ],
+        "reopen_condition": "Reopen only if reviewed demand evidence, a new requirement, or an accepted product exception makes framework-specific Rails style behavior part of the TraceWeaver-controlled method.",
+        "evidence_status": "package_surface_held",
+        "support_closure_depth": "not_applicable"
+      },
+      {
+        "id": "CE-OOS-ce-gemini-imagegen",
+        "surface_type": "skill",
+        "upstream_path": "skills/ce-gemini-imagegen/SKILL.md",
+        "classification": "out_of_scope",
+        "blocker": "External image-generation provider behavior is outside the baseline authority-preserving TraceWeaver alpha workflow and is not packaged in the current TraceWeaver surface.",
+        "dependency_check": "not_applicable",
+        "consumer_check": "no_current_traceweaver_consumer",
+        "allowed_claims": [
+          "deliberately out of scope for Unit 0 current/core work"
+        ],
+        "held_claims": [
+          "clean replacement",
+          "runtime equivalence",
+          "host removal readiness"
+        ],
+        "reopen_condition": "Reopen only if reviewed demand evidence, a new requirement, or an accepted product exception makes external image-generation behavior part of the TraceWeaver-controlled method.",
+        "evidence_status": "package_surface_held",
+        "support_closure_depth": "not_applicable"
+      }
+    ]
+  },
+  "blockers": {
+    "errors": [
+
+    ],
+    "warnings": [
+
+    ],
+    "held_claims": [
+      "runtime invocation",
+      "enforcing authority gates",
+      "publication",
+      "release-ready",
+      "package-ready",
+      "upstream-ready",
+      "host CE removal",
+      "clean replacement",
+      "runtime-equivalent CE behavior",
+      "R31-complete status"
+    ]
+  }
+}

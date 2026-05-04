@@ -1,0 +1,374 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+tmp_root="$(mktemp -d)"
+trap 'rm -rf "$tmp_root"' EXIT
+
+json_out="$tmp_root/generated.json"
+markdown_out="$tmp_root/generated.md"
+
+ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --json-out "$json_out" \
+  --markdown-out "$markdown_out"
+
+python3 - "$json_out" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = json.load(handle)
+
+assert data["checker_status"] == "passed_static_readiness"
+assert data["scope_mode"] == "current_core_with_broad_surface_held"
+assert data["counts"]["packaged_traceweaver_skills"] == 27
+assert data["counts"]["upstream_ce_skills"] == 37
+assert data["counts"]["upstream_lfg"] == 1
+assert data["counts"]["current_core_rows"] == 18
+assert data["counts"]["current_packaged_held_rows"] == 9
+assert data["counts"]["package_support_rows"] == 1
+assert data["counts"]["broad_held_rows"] == 16
+assert data["counts"]["out_of_scope_rows"] == 3
+assert data["counts"]["default_prompt_surfaces"] == 1
+assert data["counts"]["mcp_app_connectors"] == 0
+assert data["counts"]["install_metadata"] == 3
+assert data["counts"]["external_dependencies"] == 0
+assert data["counts"]["hidden_rows"] == 0
+assert data["counts"]["held_rows"] == 43
+assert data["counts"]["unclassified_rows"] == 0
+assert data["inventories"]["default_prompt_surfaces"][0]["key"] == "interface.defaultPrompt"
+
+held = set(data["blockers"]["held_claims"])
+for claim in [
+    "runtime invocation",
+    "enforcing authority gates",
+    "publication",
+    "release-ready",
+    "host CE removal",
+    "clean replacement",
+]:
+    assert claim in held, claim
+PY
+
+grep -Fq "Runtime invocation, enforcement, publication, release-ready" "$markdown_out"
+grep -Fq 'Checker status: `passed_static_readiness`' "$markdown_out"
+grep -Fq "Default prompt surfaces discovered | 1" "$markdown_out"
+grep -Fq "aggregate fingerprint" "$markdown_out"
+
+missing_classification="$tmp_root/missing-row.yml"
+cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$missing_classification"
+python3 - "$missing_classification" <<'PY'
+import sys
+import yaml
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = yaml.safe_load(handle)
+data["current_core_surface_candidates"] = [
+    row for row in data["current_core_surface_candidates"]
+    if row["traceweaver_path"] != "plugins/traceweaver-core/skills/tw-auto/SKILL.md"
+]
+with open(path, "w", encoding="utf-8") as handle:
+    yaml.safe_dump(data, handle, sort_keys=False)
+PY
+
+if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --classification "$missing_classification" \
+  --json-out "$tmp_root/missing-row.json" \
+  --markdown-out "$tmp_root/missing-row.md" >/tmp/traceweaver-missing-row.out 2>&1; then
+  echo "missing_packaged_row_check=failed"
+  cat /tmp/traceweaver-missing-row.out
+  exit 1
+fi
+grep -Fq "unclassified_packaged_skills=tw-auto" /tmp/traceweaver-missing-row.out
+
+missing_core_authority="$tmp_root/missing-core-authority.yml"
+cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$missing_core_authority"
+python3 - "$missing_core_authority" <<'PY'
+import sys
+import yaml
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = yaml.safe_load(handle)
+del data["current_core_surface_candidates"][0]["authority_evidence"]
+with open(path, "w", encoding="utf-8") as handle:
+    yaml.safe_dump(data, handle, sort_keys=False)
+PY
+
+if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --classification "$missing_core_authority" \
+  --json-out "$tmp_root/missing-core-authority.json" \
+  --markdown-out "$tmp_root/missing-core-authority.md" >/tmp/traceweaver-missing-core-authority.out 2>&1; then
+  echo "missing_core_authority_check=failed"
+  cat /tmp/traceweaver-missing-core-authority.out
+  exit 1
+fi
+grep -Fq "TW-SKILL-tw-grill_missing=authority_evidence" /tmp/traceweaver-missing-core-authority.out
+
+missing_expected_hash="$tmp_root/missing-expected-hash.yml"
+cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$missing_expected_hash"
+python3 - "$missing_expected_hash" <<'PY'
+import sys
+import yaml
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = yaml.safe_load(handle)
+del data["current_core_surface_candidates"][0]["expected_hash"]
+with open(path, "w", encoding="utf-8") as handle:
+    yaml.safe_dump(data, handle, sort_keys=False)
+PY
+
+if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --classification "$missing_expected_hash" \
+  --json-out "$tmp_root/missing-expected-hash.json" \
+  --markdown-out "$tmp_root/missing-expected-hash.md" >/tmp/traceweaver-missing-expected-hash.out 2>&1; then
+  echo "missing_expected_hash_check=failed"
+  cat /tmp/traceweaver-missing-expected-hash.out
+  exit 1
+fi
+grep -Fq "TW-SKILL-tw-grill_missing=expected_hash" /tmp/traceweaver-missing-expected-hash.out
+grep -Fq "missing_expected_hashes=TW-SKILL-tw-grill" /tmp/traceweaver-missing-expected-hash.out
+
+bad_broad="$tmp_root/bad-broad.yml"
+cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$bad_broad"
+python3 - "$bad_broad" <<'PY'
+import sys
+import yaml
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = yaml.safe_load(handle)
+del data["broad_surface_skeletons"]["rows"][0]["reopen_condition"]
+del data["broad_surface_skeletons"]["rows"][0]["classification"]
+with open(path, "w", encoding="utf-8") as handle:
+    yaml.safe_dump(data, handle, sort_keys=False)
+PY
+
+if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --classification "$bad_broad" \
+  --json-out "$tmp_root/bad-broad.json" \
+  --markdown-out "$tmp_root/bad-broad.md" >/tmp/traceweaver-bad-broad.out 2>&1; then
+  echo "broad_gate_check=failed"
+  cat /tmp/traceweaver-bad-broad.out
+  exit 1
+fi
+grep -Fq "CE-BROAD-ce-agent-native-architecture_missing=classification,reopen_condition" /tmp/traceweaver-bad-broad.out
+
+missing_authority="$tmp_root/missing-authority.yml"
+cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$missing_authority"
+python3 - "$missing_authority" <<'PY'
+import sys
+import yaml
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = yaml.safe_load(handle)
+row = data["upstream_out_of_scope_surfaces"]["rows"][0]
+row["classification"] = "wrapped"
+row["confidence"] = "high"
+row["evidence_status"] = "runtime_proven"
+with open(path, "w", encoding="utf-8") as handle:
+    yaml.safe_dump(data, handle, sort_keys=False)
+PY
+
+if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --classification "$missing_authority" \
+  --json-out "$tmp_root/missing-authority.json" \
+  --markdown-out "$tmp_root/missing-authority.md" >/tmp/traceweaver-missing-authority.out 2>&1; then
+  echo "missing_authority_evidence_check=failed"
+  cat /tmp/traceweaver-missing-authority.out
+  exit 1
+fi
+grep -Fq "CE-OOS-ce-clean-gone-branches_missing=authority_evidence" /tmp/traceweaver-missing-authority.out
+
+low_confidence="$tmp_root/low-confidence.yml"
+cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$low_confidence"
+python3 - "$low_confidence" <<'PY'
+import sys
+import yaml
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = yaml.safe_load(handle)
+row = data["upstream_out_of_scope_surfaces"]["rows"][0]
+row.update({
+    "classification": "wrapped",
+    "authority_evidence": {"requirements": ["REQ-TW-014"]},
+    "side_effect_category": "source_control_hygiene",
+    "class_rationale": "fixture row",
+    "disconfirming_test": "fixture drift",
+    "confidence": "low",
+    "close_condition": "fixture close",
+    "reviewer_evidence_id": "fixture-review",
+    "evidence_status": "runtime_proven",
+})
+with open(path, "w", encoding="utf-8") as handle:
+    yaml.safe_dump(data, handle, sort_keys=False)
+PY
+
+if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --classification "$low_confidence" \
+  --json-out "$tmp_root/low-confidence.json" \
+  --markdown-out "$tmp_root/low-confidence.md" >/tmp/traceweaver-low-confidence.out 2>&1; then
+  echo "low_confidence_wrapped_check=failed"
+  cat /tmp/traceweaver-low-confidence.out
+  exit 1
+fi
+grep -Fq "CE-OOS-ce-clean-gone-branches_low_confidence_wrapped_without_held_evidence_status" /tmp/traceweaver-low-confidence.out
+
+bad_hash="$tmp_root/bad-hash.yml"
+cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$bad_hash"
+python3 - "$bad_hash" <<'PY'
+import sys
+import yaml
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = yaml.safe_load(handle)
+data["current_core_surface_candidates"][0]["expected_hash"] = "0" * 64
+with open(path, "w", encoding="utf-8") as handle:
+    yaml.safe_dump(data, handle, sort_keys=False)
+PY
+
+if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --classification "$bad_hash" \
+  --json-out "$tmp_root/bad-hash.json" \
+  --markdown-out "$tmp_root/bad-hash.md" >/tmp/traceweaver-bad-hash.out 2>&1; then
+  echo "stale_hash_check=failed"
+  cat /tmp/traceweaver-bad-hash.out
+  exit 1
+fi
+grep -Fq "hash_mismatches=TW-SKILL-tw-grill" /tmp/traceweaver-bad-hash.out
+
+fixture_roadmap="$tmp_root/fixture-roadmap.md"
+cat >"$fixture_roadmap" <<'MD'
+| CE skill | Current package state | Target class | TraceWeaver treatment |
+| --- | --- | --- | --- |
+| `ce-sample` | Packaged direct CE-derived skill | wrapped | Fixture direct CE-derived skill. |
+MD
+
+fixture_inventory="$tmp_root/fixture-inventory.md"
+cat >"$fixture_inventory" <<'MD'
+| Path | SHA-256 | Role |
+| --- | --- | --- |
+| `skills/ce-sample/references/ce-sample-support.md` | `0000000000000000000000000000000000000000000000000000000000000000` | selected skill file |
+MD
+
+fixture_classification_positive="$tmp_root/fixture-classification-positive.yml"
+cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$fixture_classification_positive"
+python3 - "$fixture_classification_positive" <<'PY'
+import sys
+import yaml
+import hashlib
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = yaml.safe_load(handle)
+
+def row(skill, classification, reason):
+    skill_path = f"fixtures/ce-replacement-classifier/traceweaver/skills/{skill}/SKILL.md"
+    with open(skill_path, "rb") as handle:
+        digest = hashlib.sha256(handle.read()).hexdigest()
+    return {
+        "id": f"FIXTURE-{skill}",
+        "surface_type": "skill",
+        "traceweaver_path": skill_path,
+        "reason": reason,
+        "evidence_status": "static_proven_runtime_held",
+        "classification": classification,
+        "authority_evidence": {
+            "requirements": ["REQ-TW-014"],
+            "source": "fixture",
+            "baseline_id": "fixture-baseline",
+            "baseline_hash": "fixture-hash",
+            "accepted_exception": None,
+            "validation_question": "fixture question",
+        },
+        "source_version": "fixture",
+        "expected_hash": digest,
+        "support_closure_depth": "dependency_and_consumer",
+        "side_effect_category": "fixture",
+        "class_rationale": "fixture classification row",
+        "disconfirming_test": "fixture drift",
+        "confidence": "medium",
+        "allowed_claims": ["fixture static classification only"],
+        "held_claims": ["fixture runtime held"],
+        "close_condition": "fixture close",
+        "reviewer_evidence_id": "fixture-review",
+    }
+
+data["current_core_surface_candidates"] = [
+    row("ce-sample", "held", "fixture direct CE-derived skill"),
+    row("tw-sample", "held", "fixture native TraceWeaver skill"),
+]
+data["current_packaged_held_surfaces"]["rows"] = []
+data["broad_surface_skeletons"]["rows"] = []
+data["upstream_out_of_scope_surfaces"]["rows"] = []
+data["package_support_surfaces"]["rows"] = []
+with open(path, "w", encoding="utf-8") as handle:
+    yaml.safe_dump(data, handle, sort_keys=False)
+PY
+
+ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --classification "$fixture_classification_positive" \
+  --plugin-root "$repo_root/fixtures/ce-replacement-classifier/traceweaver" \
+  --inventory "$fixture_inventory" \
+  --upstream-root "$repo_root/fixtures/ce-replacement-classifier/upstream-ce" \
+  --roadmap "$fixture_roadmap" \
+  --json-out "$tmp_root/fixture-positive.json" \
+  --markdown-out "$tmp_root/fixture-positive.md"
+
+python3 - "$tmp_root/fixture-positive.json" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as handle:
+    data = json.load(handle)
+assert data["checker_status"] == "passed_static_readiness"
+assert data["inventories"]["upstream_skills"] == ["ce-sample"]
+assert data["counts"]["upstream_ce_skills"] == 1
+assert data["counts"]["upstream_lfg"] == 0
+PY
+
+fixture_classification="$tmp_root/fixture-classification.yml"
+cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$fixture_classification"
+python3 - "$fixture_classification" <<'PY'
+import sys
+import yaml
+
+path = sys.argv[1]
+with open(path, "r", encoding="utf-8") as handle:
+    data = yaml.safe_load(handle)
+data["current_core_surface_candidates"] = [
+    {
+        "id": "TW-SKILL-tw-sample",
+        "surface_type": "skill",
+        "traceweaver_path": "fixtures/ce-replacement-classifier/traceweaver/skills/tw-sample/SKILL.md",
+        "reason": "fixture native wrapper",
+        "evidence_status": "static_proven_runtime_held",
+    }
+]
+data["current_packaged_held_surfaces"]["rows"] = []
+data["broad_surface_skeletons"]["rows"] = []
+data["upstream_out_of_scope_surfaces"]["rows"] = []
+data["package_support_surfaces"]["rows"] = []
+with open(path, "w", encoding="utf-8") as handle:
+    yaml.safe_dump(data, handle, sort_keys=False)
+PY
+
+if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+  --classification "$fixture_classification" \
+  --plugin-root "$repo_root/fixtures/ce-replacement-classifier/traceweaver" \
+  --roadmap "$fixture_roadmap" \
+  --json-out "$tmp_root/fixture-unclassified.json" \
+  --markdown-out "$tmp_root/fixture-unclassified.md" >/tmp/traceweaver-fixture-unclassified.out 2>&1; then
+  echo "fixture_unclassified_check=failed"
+  cat /tmp/traceweaver-fixture-unclassified.out
+  exit 1
+fi
+grep -Fq "unclassified_packaged_skills=ce-sample" /tmp/traceweaver-fixture-unclassified.out
+
+echo "traceweaver_ce_replacement_classifier_smoke=passed"

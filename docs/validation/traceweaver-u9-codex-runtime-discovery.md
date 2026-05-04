@@ -88,8 +88,8 @@ required skills as visible. After the auth-boundary patch, the real `codex exec`
 transcript reached the exact skill-hash sentinel, but the harness held the result
 because the probe used a copied live Codex auth file during execution. The
 registry-shape and legacy-upgrade code review passed before the auth-boundary
-patch; refreshed behavior-code review and authority doc review remain pending,
-and Unit 9 does not accept real runtime invocation.
+patch; refreshed behavior-code review and authority doc review passed after the
+auth-boundary patch, and Unit 9 does not accept real runtime invocation.
 
 Allowed use after refreshed Unit 8 authority review closure:
 
@@ -110,9 +110,8 @@ Allowed use after refreshed Unit 8 authority review closure:
 - cite Unit 8 only as reviewed-held separate-home install/fresh-exec registry
   limitation evidence; it does not support runtime-discoverable claims until a
   passing registry transcript exists;
-- cite Unit 9 only as review-pending registry-shape and auth-boundary evidence
-  until refreshed behavior-code review and authority doc review close; do not
-  cite it as accepted runtime invocation proof;
+- cite Unit 9 as reviewed-held registry-shape and auth-boundary evidence only;
+  do not cite it as runtime invocation proof;
 - continue planning later U9 host-registry/runtime work with host-registry
   discovery, real skill invocation, and project-level runtime write behavior
   explicitly held.
@@ -135,17 +134,17 @@ Held claims:
 
 | File | SHA-256 | Role | Decision |
 | --- | --- | --- | --- |
-| `src/index.ts` | `d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5` | Repo-local Codex installer | Unit 9 registry-shape repair code review passed; authority doc review pending; runtime held. Packaged skills now install outside `.codex/skills`, leaving only direct callable skills as active registry surface, and owned legacy active namespaced surfaces are removed during upgrade. |
-| `scripts/traceweaver-smoke-codex-discovery` | `20856843b57a9dcf852c8a2b7905cac19555837884a037dc821ba7d934b362c5` | Unit 1 isolated Codex install/discovery smoke harness plus Unit 4 installed `lfg` boundary check and Unit 9 registry-shape visibility/legacy-upgrade proof | Unit 9 smoke passed; code review passed; authority doc review pending; runtime held. |
+| `src/index.ts` | `d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5` | Repo-local Codex installer | Unit 9 registry-shape repair code review and authority doc review passed; runtime held. Packaged skills now install outside `.codex/skills`, leaving only direct callable skills as active registry surface, and owned legacy active namespaced surfaces are removed during upgrade. |
+| `scripts/traceweaver-smoke-codex-discovery` | `20856843b57a9dcf852c8a2b7905cac19555837884a037dc821ba7d934b362c5` | Unit 1 isolated Codex install/discovery smoke harness plus Unit 4 installed `lfg` boundary check and Unit 9 registry-shape visibility/legacy-upgrade proof | Unit 9 smoke passed; code review and authority doc review passed; runtime held. |
 | `scripts/traceweaver-smoke-codex-host-registry` | `73f046143ae3f3b0815cb1032ee6a4c8ae6c75c9ca5754cb0cd2aebc48555813` | Unit 5 read-only current Codex host-home filesystem registry probe | Held: current host is missing TraceWeaver-native direct callable `tw-*` entries and has unmarked/stale direct callable continuity entries. |
-| `scripts/traceweaver-smoke-codex-separate-home-runtime` | `0c17c2eaba9e7f57acd8460881e0bd19b5981b3114d715ef3604edcae26661ed` | Unit 8 separate Codex home install plus fresh `codex exec` registry probe, updated by Unit 9 to require all required visible skills and hold live-auth-copy runtime results | Unit 9 records required skills visible and an exact skill-hash sentinel, but holds runtime acceptance because a copied live Codex auth file was available to read-only exec; refreshed code/doc review pending. |
+| `scripts/traceweaver-smoke-codex-separate-home-runtime` | `0c17c2eaba9e7f57acd8460881e0bd19b5981b3114d715ef3604edcae26661ed` | Unit 8 separate Codex home install plus fresh `codex exec` registry probe, updated by Unit 9 to require all required visible skills and hold live-auth-copy runtime results | Unit 9 records required skills visible and an exact skill-hash sentinel, but holds runtime acceptance because a copied live Codex auth file was available to read-only exec; refreshed behavior code review and authority doc review passed. |
 | `scripts/traceweaver-smoke-no-publication` | `9e14b7066ed0d6d7e55f82df106dff41db8d18eb0d59be88dd5748e73f9def40` | Unit 4 PR-helper publication-stop, `lfg` delegation, and event-derived reviewer backpressure boundary smoke | Pass accepted as reviewed deterministic boundary evidence. |
 | `scripts/traceweaver-smoke-u9-fixtures` | `0646c25d475cb5bfa33864e84f6b9167b4c2fddb4b8061612a5979a1034c1d3f` | Unit 2 fixture classification, temporary-copy trace-write, and Unit 3 deterministic gate-behavior smoke harness | Unit 2 pass accepted; Unit 3 dependency-coverage patch recorded / behavior-bearing code review passed. |
 | `fixtures/u9-codex/` | aggregate `3134b4f39d4856137574f35f1377eb4289b03a95fb94e82f99212b281ca423de` | Synthetic U9 fixture workspaces | Fixture-only evidence; not project authority. |
 | `fixtures/u9-codex/authority-present/.traceweaver/intent-contract.yml` | `ef69fea4eb63e724876619b37c15efcc4ec7bf334c7178c1d47f0c5c35a24f1c` | Fixture Intent Contract with matching requirements and matrix hashes | Pass candidate for fixture scan. |
 | `fixtures/u9-codex/authority-present/requirements.md` | `8dff15a195efe8849372f330433f450ed2c3ea765d306a95be84a8a0b4893f68` | Fixture accepted-requirements baseline | Hash matches fixture Intent Contract. |
 | `fixtures/u9-codex/authority-present/traceability-matrix.md` | `ee265542c7ba0ab4b750c29178ab0e0d00003ca730b2844adfdf5061641ec17a` | Fixture traceability matrix | Hash matches fixture Intent Contract. |
-| `docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md` | `341f9720d79433efb810cce842a7c98d10f949b373c687b8dfbfbb7d1c40583b` | U9 Codex runtime/discovery proof plan | Unit 1 through Unit 8 reviewed/held inputs plus Unit 9 registry-shape, legacy-upgrade repair, and auth-boundary patch with refreshed code/doc review pending; host-registry/runtime claims remain held. |
+| `docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md` | `0937adaffbc79c78a20404922c3f50ad873357f468211dd42a76f9ea74ea80fd` | U9 Codex runtime/discovery proof plan | Unit 1 through Unit 8 reviewed/held inputs plus Unit 9 registry-shape, legacy-upgrade repair, and auth-boundary patch with refreshed behavior code review and authority doc review passed; host-registry/runtime claims remain held. |
 | `plugins/traceweaver-core/skills/tw-auto/SKILL.md` | `a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3` | Controlled-autonomy alpha skill | Source, packaged installed copy, and direct callable copy hashes matched. |
 | `plugins/traceweaver-core/skills/lfg/SKILL.md` | `ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083` | TraceWeaver compatibility alias | Source, packaged installed copy, and direct callable copy hashes matched. |
 | `plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md` | `93d78f160ee5dd78bd7ebf5dd9cff28e9c1ec3b8f5bfe2b25474b11512e475e3` | Authority gate skill | Source, packaged installed copy, and direct callable copy hashes matched. |
@@ -595,7 +594,7 @@ exec environment.
 ## Unit 9 Review State
 
 ```text
-unit9_registry_shape_repair_status=auth_boundary_patch_code_review_pending_authority_doc_review_pending
+unit9_registry_shape_repair_status=auth_boundary_patch_code_review_passed_authority_doc_review_passed_runtime_held
 unit9_installer_hash=d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5
 unit9_discovery_harness_hash=20856843b57a9dcf852c8a2b7905cac19555837884a037dc821ba7d934b362c5
 unit9_separate_home_harness_hash=0c17c2eaba9e7f57acd8460881e0bd19b5981b3114d715ef3604edcae26661ed
@@ -603,12 +602,16 @@ unit9_prompt_input_visibility=passed_required_traceweaver_and_wrapped_ce_skills_
 unit9_owned_legacy_active_surface=removed_on_upgrade
 unit9_unowned_legacy_active_surface=blocked_before_removal
 unit9_real_runtime_invocation=held_live_auth_copy_boundary_after_exact_skill_hash_sentinel
-unit9_behavior_code_review_status=pending_after_auth_boundary_patch
+unit9_behavior_code_review_status=passed_no_findings_after_auth_boundary_patch
+unit9_behavior_code_review_id=CE-CODE-REVIEW-2026-05-04-U9-UNIT9-AUTH-BOUNDARY-HARNESS-CLEAN-001
 unit9_prior_behavior_code_review_id=CE-CODE-REVIEW-2026-05-04-U9-UNIT9-INSTALLER-HARNESS-CLEAN-001
 unit9_behavior_code_review_scope=src/index.ts, scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-codex-separate-home-runtime
 unit9_behavior_code_review_coverage=main_thread_review_only_no_reviewer_subagents
-unit9_authority_doc_review_status=pending
-unit9_accepted_scope=none_until_clean_behavior_code_review_and_authority_doc_review
+unit9_authority_doc_review_status=passed_no_findings
+unit9_authority_doc_review_id=CE-DOC-REVIEW-2026-05-04-U9-UNIT9-AUTHORITY-CLEAN-001
+unit9_authority_doc_review_scope=.traceweaver/intent-contract.yml, traceability-matrix.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/validation/traceweaver-u9-codex-runtime-discovery.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
+unit9_authority_doc_review_coverage=main_thread_review_only_no_reviewer_subagents
+unit9_accepted_scope=reviewed held registry-shape/auth-boundary evidence only
 unit9_held_scope=real tw-auto/lfg/tw-grill runtime invocation, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
 ```
 

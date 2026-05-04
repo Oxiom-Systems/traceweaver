@@ -13,7 +13,7 @@ current_amendment_id: REQ-AMEND-2026-05-03-001
 current_amendment_review_id: CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001
 current_amendment_authority_status: approved_static_advisory_source_evidence_runtime_held
 baseline_hash_authority_status: accepted_requirements_including_req_tw_048_static_advisory_source_evidence
-baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_pending_authority_doc_review_pending_req_tw_048_amendment_doc_review_passed_runtime_held
+baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_passed_authority_doc_review_passed_req_tw_048_amendment_doc_review_passed_runtime_held
 baseline_refresh_code_review_status: passed_no_findings_current_reviewer_capacity_authority_diff
 baseline_refresh_code_review_scope: plugins/traceweaver-core/skills/tw-auto/SKILL.md, .traceweaver/intent-contract.yml, traceability-matrix.md
 baseline_refresh_doc_review_status: prior_passed_no_findings_before_u9_unit1_authority_set
@@ -91,16 +91,20 @@ u9_unit8_authority_doc_review_coverage: main_thread_review_only_no_reviewer_suba
 u9_unit8_review_required_before_input: false
 u9_unit8_accepted_scope: reviewed held separate-home install/fresh-exec registry limitation evidence only
 u9_unit8_held_scope: active Codex host-registry discovery, fresh Codex skill-registry exposure for TraceWeaver-installed skills, real tw-auto/lfg/tw-grill runtime invocation, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
-u9_unit9_registry_shape_repair_status: auth_boundary_patch_code_review_pending_authority_doc_review_pending
+u9_unit9_registry_shape_repair_status: auth_boundary_patch_code_review_passed_authority_doc_review_passed_runtime_held
 u9_unit9_registry_shape_repair_scope: src/index.ts, scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-codex-separate-home-runtime, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
 u9_unit9_registry_shape_repair_result: active namespaced skill surface removed from .codex/skills, packaged skills moved under .codex/traceweaver-core/skills, owned legacy active namespaced surface removed on upgrade, unowned legacy active namespaced surface blocked before removal, required tw/lfg/wrapped CE skills visible in prompt-input, exact skill-hash sentinel observed with copied-auth boundary, runtime invocation held
-u9_unit9_behavior_code_review_status: pending_after_auth_boundary_patch
+u9_unit9_behavior_code_review_status: passed_no_findings_after_auth_boundary_patch
+u9_unit9_behavior_code_review_id: CE-CODE-REVIEW-2026-05-04-U9-UNIT9-AUTH-BOUNDARY-HARNESS-CLEAN-001
 u9_unit9_prior_behavior_code_review_id: CE-CODE-REVIEW-2026-05-04-U9-UNIT9-INSTALLER-HARNESS-CLEAN-001
 u9_unit9_behavior_code_review_scope: src/index.ts, scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-codex-separate-home-runtime
 u9_unit9_behavior_code_review_coverage: main_thread_review_only_no_reviewer_subagents
-u9_unit9_authority_doc_review_status: pending
-u9_unit9_review_required_before_input: true
-u9_unit9_accepted_scope: none_until_clean_behavior_code_review_and_authority_doc_review
+u9_unit9_authority_doc_review_status: passed_no_findings
+u9_unit9_authority_doc_review_id: CE-DOC-REVIEW-2026-05-04-U9-UNIT9-AUTHORITY-CLEAN-001
+u9_unit9_authority_doc_review_scope: .traceweaver/intent-contract.yml, traceability-matrix.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/validation/traceweaver-u9-codex-runtime-discovery.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
+u9_unit9_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit9_review_required_before_input: false
+u9_unit9_accepted_scope: reviewed held registry-shape/auth-boundary evidence only
 u9_unit9_held_scope: real tw-auto/lfg/tw-grill runtime invocation, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
 u9_unit2_fixture_smoke_status: passed_doc_review_passed
 u9_unit2_fixture_smoke_scope: fixtures/u9-codex/, scripts/traceweaver-smoke-u9-fixtures, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
@@ -108,9 +112,9 @@ u9_unit2_review_required_before_input: false
 u9_unit3_gate_behavior_smoke_status: passed_code_review_passed_doc_review_passed
 u9_unit3_gate_behavior_smoke_scope: scripts/traceweaver-smoke-u9-fixtures, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
 u9_unit3_review_required_before_input: false
-u9_input_status: u9_unit1_reviewed_for_planning_input_unit2_fixture_smoke_reviewed_for_fixture_input_unit3_gate_behavior_code_reviewed_doc_reviewed_for_fixture_input_u9_unit4_boundary_smoke_code_reviewed_doc_reviewed_for_boundary_input_u9_unit5_host_registry_filesystem_probe_reviewed_held_unit7_host_install_attempt_doc_reviewed_held_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_unit9_registry_shape_auth_boundary_patch_code_review_pending_authority_doc_review_pending_runtime_claims_held
+u9_input_status: u9_unit1_reviewed_for_planning_input_unit2_fixture_smoke_reviewed_for_fixture_input_unit3_gate_behavior_code_reviewed_doc_reviewed_for_fixture_input_u9_unit4_boundary_smoke_code_reviewed_doc_reviewed_for_boundary_input_u9_unit5_host_registry_filesystem_probe_reviewed_held_unit7_host_install_attempt_doc_reviewed_held_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_unit9_registry_shape_auth_boundary_patch_code_reviewed_doc_reviewed_held_runtime_claims_held
 matrix_source: traceability-matrix.md
-matrix_hash_sha256: 562f9091d3a0655e39535e896657bf880512b5044652baa2a8a0c5f644287ba4
+matrix_hash_sha256: e8feb99eb548662579f3df45903750aed1e81b90aaa69a14fde3d11da07a4b11
 u7_static_advisory_record: docs/validation/traceweaver-u7-static-advisory-claims.md
 u7_static_advisory_record_sha256: 1421cf235e6bf1189b0364d5f1cb4ff418b44a2b24b4738f0026c764905ab6a8
 u7_static_advisory_state: static_advisory_accepted_runtime_held
@@ -210,28 +214,28 @@ source_artifacts:
     role: Active full CE 3.4.1 authority-wrapping roadmap with refreshed canonical requirements baseline hash.
   - id: SRC-MATRIX-001
     path: traceability-matrix.md
-    sha256: 562f9091d3a0655e39535e896657bf880512b5044652baa2a8a0c5f644287ba4
-    role: Root traceability authority recording accepted narrow U7 static/advisory claims, refreshed current-hash install smoke, approved REQ-TW-048 static/advisory source-evidence scope, U9 Units 1-8 reviewed evidence, and U9 Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending and runtime invocation held.
+    sha256: e8feb99eb548662579f3df45903750aed1e81b90aaa69a14fde3d11da07a4b11
+    role: Root traceability authority recording accepted narrow U7 static/advisory claims, refreshed current-hash install smoke, approved REQ-TW-048 static/advisory source-evidence scope, U9 Units 1-8 reviewed evidence, and U9 Unit 9 registry-shape/auth-boundary repair with refreshed code review and authority doc review passed while runtime invocation remains held.
   - id: SRC-VAL-005
     path: docs/validation/traceweaver-controlled-autonomy-alpha.md
-    sha256: 5ab8ae1b2830f56b9297e77d579453feb22bb86ca89cba2a0449c1ff7f725e6a
-    role: Controlled-autonomy alpha static/install evidence with approved REQ-TW-048 static/advisory source-evidence scope, Units 1-8 reviewed evidence, and Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending; host-registry/runtime claims held.
+    sha256: d7accb65498b684de0df3889de341cf7263f336bf84784ce678835a14d6d7d7d
+    role: Controlled-autonomy alpha static/install evidence with approved REQ-TW-048 static/advisory source-evidence scope, Units 1-8 reviewed evidence, and Unit 9 registry-shape/auth-boundary repair with refreshed code review and authority doc review passed; host-registry/runtime claims held.
   - id: SRC-VAL-006
     path: docs/validation/traceweaver-u7-static-advisory-claims.md
     sha256: 1421cf235e6bf1189b0364d5f1cb4ff418b44a2b24b4738f0026c764905ab6a8
     role: U7 static/advisory claim record accepting tw-auto, lfg, README install-command, and tw-grill source-evidence static/advisory claims while recording current install smoke passed, code review passed, REQ-TW-048 amendment doc review passed, and held runtime/tw-grill implementation authority.
   - id: SRC-VAL-007
     path: docs/validation/traceweaver-u9-codex-runtime-discovery.md
-    sha256: 76c16f22c1d078ca500627daa732a0121774ab1efed3f5d9136cd0cbf3995f18
-    role: U9 Units 1-8 reviewed evidence plus Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending; prompt-input visibility passed after removing duplicate active skill surfaces, exact sentinel was observed with a copied-auth boundary, and real runtime invocation remains held.
+    sha256: cedf93b1760543064e55c70c86ac1b4173192d412d6670409a0a11a5ac674a36
+    role: U9 Units 1-8 reviewed evidence plus Unit 9 registry-shape/auth-boundary repair with refreshed code review and authority doc review passed; prompt-input visibility passed after removing duplicate active skill surfaces, exact sentinel was observed with a copied-auth boundary, and real runtime invocation remains held.
   - id: SRC-PLAN-004
     path: docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
-    sha256: 341f9720d79433efb810cce842a7c98d10f949b373c687b8dfbfbb7d1c40583b
-    role: U9 Codex runtime/discovery proof plan with Unit 9 registry-shape/auth-boundary repair and refreshed code/doc review pending after Units 1-8.
+    sha256: 0937adaffbc79c78a20404922c3f50ad873357f468211dd42a76f9ea74ea80fd
+    role: U9 Codex runtime/discovery proof plan with Unit 9 registry-shape/auth-boundary repair, refreshed code review passed, and authority doc review passed after Units 1-8.
   - id: SRC-SMOKE-001
     path: scripts/traceweaver-smoke-codex-discovery
     sha256: 20856843b57a9dcf852c8a2b7905cac19555837884a037dc821ba7d934b362c5
-    role: U9 isolated Codex install/discovery smoke harness with Unit 9 registry-shape visibility and legacy-upgrade proof; registry-shape code review passed, with refreshed Unit 9 auth-boundary code/doc review still pending.
+    role: U9 isolated Codex install/discovery smoke harness with Unit 9 registry-shape visibility and legacy-upgrade proof; refreshed Unit 9 behavior code review and authority doc review passed while real runtime invocation remains held.
   - id: SRC-SMOKE-004
     path: scripts/traceweaver-smoke-codex-host-registry
     sha256: 73f046143ae3f3b0815cb1032ee6a4c8ae6c75c9ca5754cb0cd2aebc48555813
@@ -239,7 +243,7 @@ source_artifacts:
   - id: SRC-SMOKE-005
     path: scripts/traceweaver-smoke-codex-separate-home-runtime
     sha256: 0c17c2eaba9e7f57acd8460881e0bd19b5981b3114d715ef3604edcae26661ed
-    role: U9 separate Codex home install and fresh codex exec registry probe updated for Unit 9 required-skill visibility and copied-auth-boundary hold; refreshed code/doc review pending and real runtime invocation remains held.
+    role: U9 separate Codex home install and fresh codex exec registry probe updated for Unit 9 required-skill visibility and copied-auth-boundary hold; refreshed code review and authority doc review passed, and real runtime invocation remains held.
   - id: SRC-FIXTURE-001
     path: fixtures/u9-codex/
     aggregate_sha256: 3134b4f39d4856137574f35f1377eb4289b03a95fb94e82f99212b281ca423de
@@ -255,7 +259,7 @@ source_artifacts:
   - id: SRC-INSTALL-001
     path: src/index.ts
     sha256: d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5
-    role: Repo-local installer implementation with Unit 9 registry-shape and legacy-upgrade repair previously code-reviewed; accepted static/advisory install-command claim remains limited to prior reviewed scope until refreshed Unit 9 code/doc review closes.
+    role: Repo-local installer implementation with Unit 9 registry-shape, legacy-upgrade repair, and auth-boundary harness reviewed clean; accepted static/advisory install-command claim remains limited to prior reviewed scope until refreshed Unit 9 authority doc review closes.
   - id: SRC-SKILL-001
     path: plugins/traceweaver-core/skills/tw-auto/SKILL.md
     sha256: a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3
@@ -970,7 +974,7 @@ open_gaps:
     status: held
 
 next_recommended_steps:
-  - Run refreshed Unit 9 behavior-code review and authority doc review before accepting Unit 9 as U9 input.
+  - Proceed to an auth-safe fresh exec/runtime proof before any real tw-* invocation claim.
   - Keep tw-grill output as source evidence only; it does not create implementation authority.
   - Keep tw-auto, tw-grill, and the lfg compatibility alias in static/advisory/source-evidence scope until runtime behavior evidence passes.
   - Keep clean CE replacement, enforcing mode, dynamic discovery, slash commands, autonomous commit/push/PR, U9 runtime claims, and release-ready claims held until their evidence gates pass.
