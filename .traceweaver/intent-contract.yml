@@ -1,0 +1,976 @@
+intent_contract_id: TW-IC-2026-04-30-001
+contract_status: active
+contract_type: project_authority_baseline
+created_at: 2026-04-30
+owner: Oxiom Systems
+
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_hash_sha256: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+baseline_source: requirements.md
+baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
+baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
+current_amendment_id: REQ-AMEND-2026-05-03-001
+current_amendment_review_id: CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001
+current_amendment_authority_status: approved_static_advisory_source_evidence_runtime_held
+baseline_hash_authority_status: accepted_requirements_including_req_tw_048_static_advisory_source_evidence
+baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_pending_authority_doc_review_pending_req_tw_048_amendment_doc_review_passed_runtime_held
+baseline_refresh_code_review_status: passed_no_findings_current_reviewer_capacity_authority_diff
+baseline_refresh_code_review_scope: plugins/traceweaver-core/skills/tw-auto/SKILL.md, .traceweaver/intent-contract.yml, traceability-matrix.md
+baseline_refresh_doc_review_status: prior_passed_no_findings_before_u9_unit1_authority_set
+baseline_refresh_doc_review_id: CE-DOC-REVIEW-2026-05-02-AUTHORITY-STATE-CLEAN-001
+baseline_refresh_doc_review_scope: .traceweaver/intent-contract.yml, traceability-matrix.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/validation/traceweaver-u7-static-advisory-claims.md
+u9_unit1_authority_doc_review_status: passed_no_findings_after_2026-05-03_metadata_repairs
+u9_unit1_authority_doc_review_id: CE-DOC-REVIEW-2026-05-03-U9-UNIT1-AUTHORITY-CLEAN-001
+u9_unit1_authority_doc_review_scope: .traceweaver/intent-contract.yml, traceability-matrix.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/validation/traceweaver-u9-codex-runtime-discovery.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md, scripts/traceweaver-smoke-codex-discovery
+u9_unit1_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit1_authority_doc_review_held_scope: active Codex host-registry discovery, real tw-auto/lfg/tw-grill runtime invocation, trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
+u9_unit2_authority_doc_review_status: passed_no_findings_after_allowed_use_and_plan_snapshot_repairs
+u9_unit2_authority_doc_review_id: CE-DOC-REVIEW-2026-05-03-U9-UNIT2-AUTHORITY-CLEAN-001
+u9_unit2_authority_doc_review_scope: fixtures/u9-codex/, scripts/traceweaver-smoke-u9-fixtures, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md, .traceweaver/intent-contract.yml, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
+u9_unit2_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit2_authority_doc_review_held_scope: active Codex host-registry discovery, real tw-auto/lfg/tw-grill runtime invocation, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
+u9_unit3_authority_doc_review_status: passed_no_findings
+u9_unit3_authority_doc_review_id: CE-DOC-REVIEW-2026-05-03-U9-UNIT3-AUTHORITY-CLEAN-001
+u9_unit3_authority_doc_review_scope: scripts/traceweaver-smoke-u9-fixtures, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md, .traceweaver/intent-contract.yml, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
+u9_unit3_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit3_authority_doc_review_held_scope: active Codex host-registry discovery, real tw-auto/lfg/tw-grill runtime invocation, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
+u9_unit3_behavior_code_review_status: passed_no_findings_after_dependency_resolution_coverage_patch
+u9_unit3_behavior_code_review_id: CE-CODE-REVIEW-2026-05-03-U9-UNIT3-HARNESS-CLEAN-001
+u9_unit3_behavior_code_review_scope: scripts/traceweaver-smoke-u9-fixtures
+u9_unit3_behavior_code_review_finding_patched: P1 missing-skill smoke omits required tw-auto dependencies
+u9_unit3_behavior_code_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit4_boundary_smoke_status: passed_code_review_passed_doc_review_passed
+u9_unit4_boundary_smoke_scope: scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-no-publication, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
+u9_unit4_authority_doc_review_status: passed_no_findings
+u9_unit4_authority_doc_review_id: CE-DOC-REVIEW-2026-05-03-U9-UNIT4-AUTHORITY-CLEAN-001
+u9_unit4_authority_doc_review_scope: .traceweaver/intent-contract.yml, traceability-matrix.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/validation/traceweaver-u9-codex-runtime-discovery.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md, scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-no-publication
+u9_unit4_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit4_behavior_code_review_status: passed_no_findings_after_no_publication_backpressure_scope_patch
+u9_unit4_behavior_code_review_id: CE-CODE-REVIEW-2026-05-03-U9-UNIT4-HARNESS-CLEAN-001
+u9_unit4_behavior_code_review_scope: scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-no-publication
+u9_unit4_behavior_code_review_finding_patched: P1 reviewer backpressure smoke can pass without exercising backpressure; P1 publication stop result is broader than tested commands
+u9_unit4_behavior_code_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit4_review_required_before_input: false
+u9_unit4_held_scope: active Codex host-registry discovery, real tw-auto/lfg/tw-grill runtime invocation, live reviewer-subagent backpressure behavior, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
+u9_unit5_host_registry_filesystem_probe_status: held_missing_or_untrusted_direct_callable_files
+u9_unit5_host_registry_filesystem_probe_scope: scripts/traceweaver-smoke-codex-host-registry, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
+u9_unit5_host_registry_filesystem_probe_result: current host missing tw-auto, tw-authority-gate, tw-traceability-check, tw-requirements-review, and tw-grill direct callable files; lfg and CE-compatible continuity entries are unmarked/stale relative to TraceWeaver-packaged source
+u9_unit5_behavior_code_review_status: passed_no_findings
+u9_unit5_authority_doc_review_status: passed_no_findings
+u9_unit5_behavior_code_review_id: CE-CODE-REVIEW-2026-05-03-U9-UNIT5-HOST-REGISTRY-HARNESS-CLEAN-001
+u9_unit5_behavior_code_review_scope: scripts/traceweaver-smoke-codex-host-registry
+u9_unit5_behavior_code_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit5_authority_doc_review_id: CE-DOC-REVIEW-2026-05-03-U9-UNIT5-AUTHORITY-CLEAN-001
+u9_unit5_authority_doc_review_scope: .traceweaver/intent-contract.yml, traceability-matrix.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/validation/traceweaver-u9-codex-runtime-discovery.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md, scripts/traceweaver-smoke-codex-host-registry, README.md, docs/plans/2026-05-02-001-feat-full-ce-341-traceweaver-authority-wrapping-plan.md, src/index.ts, plugins/traceweaver-core/skills/tw-auto/SKILL.md, plugins/traceweaver-core/skills/tw-grill/SKILL.md
+u9_unit5_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit5_review_required_before_input: false
+u9_unit5_held_scope: active Codex host-registry discovery, real tw-auto/lfg/tw-grill runtime invocation, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
+u9_unit7_host_install_attempt_status: blocked_unowned_direct_callable_conflicts_before_overwrite
+u9_unit7_host_install_attempt_scope: default current Codex home install command, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
+u9_unit7_host_install_attempt_result: installer exited with code 1 before overwrite because existing global callable skill directories are unowned by TraceWeaver
+u9_unit7_authority_doc_review_status: passed_no_findings
+u9_unit7_authority_doc_review_id: CE-DOC-REVIEW-2026-05-03-U9-UNIT7-AUTHORITY-CLEAN-001
+u9_unit7_authority_doc_review_scope: .traceweaver/intent-contract.yml, traceability-matrix.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/validation/traceweaver-u9-codex-runtime-discovery.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
+u9_unit7_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit7_review_required_before_input: false
+u9_unit7_accepted_scope: reviewed held current-host install-conflict limitation evidence only
+u9_unit7_next_proof_route: Unit 8 separate-home install/fresh exec probe recorded reviewed-held registry evidence with clean code review and authority doc review; next gate is Codex skill-registry loading investigation before any runtime-discoverable claim
+u9_unit7_held_scope: active Codex host-registry discovery, real tw-auto/lfg/tw-grill runtime invocation, successful host install in the active host, fresh Codex session/reload registry proof, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
+u9_unit8_separate_home_runtime_probe_status: held_skill_registry_visible_list_excludes_tw_authority_gate
+u9_unit8_separate_home_runtime_probe_scope: scripts/traceweaver-smoke-codex-separate-home-runtime, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
+u9_unit8_separate_home_runtime_probe_result: separate Codex home install passed, fresh codex exec exited 0, visible-skill registry list excluded tw-authority-gate, and the harness now records only the held observation instead of asserting a registry-loading cause
+u9_unit8_behavior_code_review_status: passed_no_findings_after_visibility_list_observation_patch
+u9_unit8_behavior_code_review_id: CE-CODE-REVIEW-2026-05-04-U9-SEPARATE-HOME-HARNESS-CLEAN-002
+u9_unit8_behavior_code_review_scope: scripts/traceweaver-smoke-codex-separate-home-runtime
+u9_unit8_behavior_code_review_finding_patched: P2 blocker cause is asserted, not proven by the harness
+u9_unit8_behavior_code_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit8_authority_doc_review_status: passed_no_findings_after_next_route_repair
+u9_unit8_authority_doc_review_id: CE-DOC-REVIEW-2026-05-04-U9-UNIT8-AUTHORITY-CLEAN-002
+u9_unit8_authority_doc_review_scope: .traceweaver/intent-contract.yml, traceability-matrix.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/validation/traceweaver-u9-codex-runtime-discovery.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md, scripts/traceweaver-smoke-codex-separate-home-runtime
+u9_unit8_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit8_review_required_before_input: false
+u9_unit8_accepted_scope: reviewed held separate-home install/fresh-exec registry limitation evidence only
+u9_unit8_held_scope: active Codex host-registry discovery, fresh Codex skill-registry exposure for TraceWeaver-installed skills, real tw-auto/lfg/tw-grill runtime invocation, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
+u9_unit9_registry_shape_repair_status: auth_boundary_patch_code_review_pending_authority_doc_review_pending
+u9_unit9_registry_shape_repair_scope: src/index.ts, scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-codex-separate-home-runtime, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
+u9_unit9_registry_shape_repair_result: active namespaced skill surface removed from .codex/skills, packaged skills moved under .codex/traceweaver-core/skills, owned legacy active namespaced surface removed on upgrade, unowned legacy active namespaced surface blocked before removal, required tw/lfg/wrapped CE skills visible in prompt-input, exact skill-hash sentinel observed with copied-auth boundary, runtime invocation held
+u9_unit9_behavior_code_review_status: pending_after_auth_boundary_patch
+u9_unit9_prior_behavior_code_review_id: CE-CODE-REVIEW-2026-05-04-U9-UNIT9-INSTALLER-HARNESS-CLEAN-001
+u9_unit9_behavior_code_review_scope: src/index.ts, scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-codex-separate-home-runtime
+u9_unit9_behavior_code_review_coverage: main_thread_review_only_no_reviewer_subagents
+u9_unit9_authority_doc_review_status: pending
+u9_unit9_review_required_before_input: true
+u9_unit9_accepted_scope: none_until_clean_behavior_code_review_and_authority_doc_review
+u9_unit9_held_scope: real tw-auto/lfg/tw-grill runtime invocation, project-level trace/matrix/gap/change/exception write behavior, clean CE replacement, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, and R31 validation status
+u9_unit2_fixture_smoke_status: passed_doc_review_passed
+u9_unit2_fixture_smoke_scope: fixtures/u9-codex/, scripts/traceweaver-smoke-u9-fixtures, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
+u9_unit2_review_required_before_input: false
+u9_unit3_gate_behavior_smoke_status: passed_code_review_passed_doc_review_passed
+u9_unit3_gate_behavior_smoke_scope: scripts/traceweaver-smoke-u9-fixtures, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
+u9_unit3_review_required_before_input: false
+u9_input_status: u9_unit1_reviewed_for_planning_input_unit2_fixture_smoke_reviewed_for_fixture_input_unit3_gate_behavior_code_reviewed_doc_reviewed_for_fixture_input_u9_unit4_boundary_smoke_code_reviewed_doc_reviewed_for_boundary_input_u9_unit5_host_registry_filesystem_probe_reviewed_held_unit7_host_install_attempt_doc_reviewed_held_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_unit9_registry_shape_auth_boundary_patch_code_review_pending_authority_doc_review_pending_runtime_claims_held
+matrix_source: traceability-matrix.md
+matrix_hash_sha256: 562f9091d3a0655e39535e896657bf880512b5044652baa2a8a0c5f644287ba4
+u7_static_advisory_record: docs/validation/traceweaver-u7-static-advisory-claims.md
+u7_static_advisory_record_sha256: 1421cf235e6bf1189b0364d5f1cb4ff418b44a2b24b4738f0026c764905ab6a8
+u7_static_advisory_state: static_advisory_accepted_runtime_held
+authority_tree_rule:
+  controlling_tree_for_review: working_tree
+  staged_split_policy: >-
+    If an authority file has staged and unstaged differences, the working tree
+    is only a review candidate. Agents must not treat HEAD, the index, or the
+    split working tree as U9/runtime input until the current doc review passes
+    and the reviewed authority files are staged together as one matching set.
+  u9_input_requires:
+    - current_doc_review_passed
+    - reviewed_authority_files_staged_together
+    - no_staged_unstaged_split_for_authority_files
+
+traceweaver_mode: advisory
+mode_policy:
+  default: advisory
+  allowed_values:
+    - off
+    - advisory
+    - enforcing
+  off: CE workflow may run without TraceWeaver authority gates; TraceWeaver skills remain manually callable.
+  advisory: TraceWeaver gates warn, create gap/change/exception records, and hold unsupported claims without blocking CE execution.
+  enforcing: Held until dynamic/runtime validation approves blocking behavior.
+  override_rule: This consuming-repo intent contract is the only project-local override point for traceweaver_mode.
+
+authority_rule:
+  invariant: >-
+    No agent may implement, review, or modify meaningful behavior unless it can
+    cite stakeholder intent, an approved requirement or approved exception, a
+    verification method, a validation question, and the current baseline version.
+  agent_prompt: >-
+    You are not the authority. The authority is this Intent Contract and the
+    accepted requirements baseline. You may reason, propose, and identify gaps,
+    but you may not silently convert your interpretation into implementation
+    authority.
+  meaningful_behavior_threshold: >-
+    Treat changes to skill instructions, workflow routing, installed artifacts,
+    validation claims, public docs, release/package claims, source provenance,
+    user-visible behavior, or the authority chain itself as meaningful unless an
+    approved record says otherwise.
+  missing_authority_disposition:
+    - gap
+    - proposed_requirement
+    - change_request
+    - approved_exception_candidate
+    - accepted_risk_candidate
+    - clarification_needed
+    - held_claim
+
+source_artifacts:
+  - id: SRC-README-001
+    path: README.md
+    sha256: 5bdb8c035a1fb7c2a1503b241adc94cf9fb226926f7f95f8d242ad89fdff97b2
+    role: Product framing, architecture layers, CE workflow map, fast-path migration, and current state.
+  - id: SRC-REQ-001
+    path: docs/brainstorms/2026-04-25-systems-engineering-traceability-skill-requirements.md
+    sha256: 35e347980e92bf08051cbb1b8f8f9adbd27fd6bdad8fdca10c665b3be70a7278
+    role: Original systems-engineering traceability and Intent Contract requirements.
+  - id: SRC-REQ-002
+    path: docs/brainstorms/2026-04-27-traceweaver-core-skill-taxonomy-requirements.md
+    sha256: 89e5ecfc04a18a047de5d618f72e522ff0f5bdeac4460b17cac33bc0b95ff94a
+    role: Core 11 taxonomy, CE adapter boundary, and Intent Contract taxonomy requirements.
+  - id: SRC-ARCH-001
+    path: docs/distilled/systems-engineering-traceability-operating-model.md
+    sha256: b4bbb625a35156b2c85fcde29d1084768c22b9b9e099dbbcd86423e3a5ecee07
+    role: Distilled lifecycle chain, authority rules, valid-authority model, and matrix-as-audit-surface guidance.
+  - id: SRC-SPEC-001
+    path: docs/specs/systems-engineering-traceability-agent-skill.md
+    sha256: 9fd99cc8eec4b269e2ceeef94538aaa07fa8b8846eaff07bdf630303f09763a1
+    role: MVP skill architecture, dark-code problem statement, upstream packaging boundary, and traceability workflow behavior.
+  - id: SRC-PLAN-001
+    path: docs/plans/2026-04-30-001-feat-traceweaver-clean-ce-plugin-swap-plan.md
+    sha256: bf69e08e07cc331a59ce55b11c8f6980f756920b8afec32c3aefe2381fc8d0b1
+    role: Active U6b Unit 2 plan for CE-compatible plugin materialization.
+  - id: SRC-REQ-003
+    path: docs/brainstorms/2026-05-01-traceweaver-controlled-autonomy-requirements.md
+    sha256: 713f93f230356994f0c614b38463b1bb1bf7f135f153266dbefcbc53fea7162f
+    role: Controlled-autonomy workflow, tw-auto, matrix bootstrap, loop bounds, stop conditions, severity policy, and test-traceability requirements.
+  - id: SRC-REQ-004
+    path: docs/brainstorms/2026-05-01-traceweaver-ce-method-authority-correction.md
+    sha256: 2ad22c4fde83fff9fcc996c59706d1665897ef1d69f78267bc3afdfb5ca327ff
+    role: CE-method wrapping, first-run baseline bootstrap, dark-behavior detection, duplicate/uncaptured behavior routing, and public-safe systems-engineering guidance correction.
+  - id: SRC-REQ-005
+    path: docs/brainstorms/2026-05-01-traceweaver-grill-intent-deepening-requirements.md
+    sha256: 63bc4ba5677ef411569f1663620a7ef4a0f7afefff654f11fc853c5f7e323c33
+    role: Optional post-ideation intent-deepening interview requirements for tw-grill, including bootstrap and delta/gap modes; promoted into requirements.md as approved static/advisory source-evidence scope only.
+  - id: SRC-PLAN-002
+    path: docs/plans/2026-05-01-003-feat-traceweaver-controlled-autonomy-plan.md
+    canonical_sha256: a6a16c0accbc5e4c7d1e4a4c0ac1237d1d8a15e127c290bc7a83dfe910a6b0a2
+    canonicalization: replace baseline_hash_sha256 values with CANONICAL_HASH_PLACEHOLDER before hashing
+    role: Candidate implementation plan for tw-auto after controlled-autonomy authority promotion.
+  - id: SRC-PLAN-003
+    path: docs/plans/2026-05-02-001-feat-full-ce-341-traceweaver-authority-wrapping-plan.md
+    sha256: 80adcde74b5641577643b300d57620ca952995d7c1540972da18835adfb4ad10
+    role: Active full CE 3.4.1 authority-wrapping roadmap with refreshed canonical requirements baseline hash.
+  - id: SRC-MATRIX-001
+    path: traceability-matrix.md
+    sha256: 562f9091d3a0655e39535e896657bf880512b5044652baa2a8a0c5f644287ba4
+    role: Root traceability authority recording accepted narrow U7 static/advisory claims, refreshed current-hash install smoke, approved REQ-TW-048 static/advisory source-evidence scope, U9 Units 1-8 reviewed evidence, and U9 Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending and runtime invocation held.
+  - id: SRC-VAL-005
+    path: docs/validation/traceweaver-controlled-autonomy-alpha.md
+    sha256: 5ab8ae1b2830f56b9297e77d579453feb22bb86ca89cba2a0449c1ff7f725e6a
+    role: Controlled-autonomy alpha static/install evidence with approved REQ-TW-048 static/advisory source-evidence scope, Units 1-8 reviewed evidence, and Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending; host-registry/runtime claims held.
+  - id: SRC-VAL-006
+    path: docs/validation/traceweaver-u7-static-advisory-claims.md
+    sha256: 1421cf235e6bf1189b0364d5f1cb4ff418b44a2b24b4738f0026c764905ab6a8
+    role: U7 static/advisory claim record accepting tw-auto, lfg, README install-command, and tw-grill source-evidence static/advisory claims while recording current install smoke passed, code review passed, REQ-TW-048 amendment doc review passed, and held runtime/tw-grill implementation authority.
+  - id: SRC-VAL-007
+    path: docs/validation/traceweaver-u9-codex-runtime-discovery.md
+    sha256: 76c16f22c1d078ca500627daa732a0121774ab1efed3f5d9136cd0cbf3995f18
+    role: U9 Units 1-8 reviewed evidence plus Unit 9 registry-shape/auth-boundary repair with refreshed code/doc review pending; prompt-input visibility passed after removing duplicate active skill surfaces, exact sentinel was observed with a copied-auth boundary, and real runtime invocation remains held.
+  - id: SRC-PLAN-004
+    path: docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
+    sha256: 341f9720d79433efb810cce842a7c98d10f949b373c687b8dfbfbb7d1c40583b
+    role: U9 Codex runtime/discovery proof plan with Unit 9 registry-shape/auth-boundary repair and refreshed code/doc review pending after Units 1-8.
+  - id: SRC-SMOKE-001
+    path: scripts/traceweaver-smoke-codex-discovery
+    sha256: 20856843b57a9dcf852c8a2b7905cac19555837884a037dc821ba7d934b362c5
+    role: U9 isolated Codex install/discovery smoke harness with Unit 9 registry-shape visibility and legacy-upgrade proof; registry-shape code review passed, with refreshed Unit 9 auth-boundary code/doc review still pending.
+  - id: SRC-SMOKE-004
+    path: scripts/traceweaver-smoke-codex-host-registry
+    sha256: 73f046143ae3f3b0815cb1032ee6a4c8ae6c75c9ca5754cb0cd2aebc48555813
+    role: U9 Unit 5 read-only current Codex host-home filesystem registry probe; records held state when TraceWeaver-native direct callable files are missing or untrusted.
+  - id: SRC-SMOKE-005
+    path: scripts/traceweaver-smoke-codex-separate-home-runtime
+    sha256: 0c17c2eaba9e7f57acd8460881e0bd19b5981b3114d715ef3604edcae26661ed
+    role: U9 separate Codex home install and fresh codex exec registry probe updated for Unit 9 required-skill visibility and copied-auth-boundary hold; refreshed code/doc review pending and real runtime invocation remains held.
+  - id: SRC-FIXTURE-001
+    path: fixtures/u9-codex/
+    aggregate_sha256: 3134b4f39d4856137574f35f1377eb4289b03a95fb94e82f99212b281ca423de
+    role: U9 Unit 2 synthetic fixture workspaces for authority-present, missing-authority, stale-authority, weak-requirement, trace-gap, and trace-write cases; fixture-only evidence, not project authority.
+  - id: SRC-SMOKE-002
+    path: scripts/traceweaver-smoke-u9-fixtures
+    sha256: 0646c25d475cb5bfa33864e84f6b9167b4c2fddb4b8061612a5979a1034c1d3f
+    role: U9 Unit 2 fixture classification, temporary-copy trace/gap/change/exception/matrix write smoke, and Unit 3 deterministic gate-behavior smoke harness; Unit 3 doc review passed, missing TraceWeaver-native dependency coverage patched, code review passed, and host-registry/runtime claims remain held.
+  - id: SRC-SMOKE-003
+    path: scripts/traceweaver-smoke-no-publication
+    sha256: 9e14b7066ed0d6d7e55f82df106dff41db8d18eb0d59be88dd5748e73f9def40
+    role: U9 Unit 4 PR-helper publication-stop, lfg delegation, broader static publication-stop marker, and event-derived reviewer-capacity backpressure boundary smoke; code review and doc review passed, with host-registry/runtime claims still held.
+  - id: SRC-INSTALL-001
+    path: src/index.ts
+    sha256: d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5
+    role: Repo-local installer implementation with Unit 9 registry-shape and legacy-upgrade repair previously code-reviewed; accepted static/advisory install-command claim remains limited to prior reviewed scope until refreshed Unit 9 code/doc review closes.
+  - id: SRC-SKILL-001
+    path: plugins/traceweaver-core/skills/tw-auto/SKILL.md
+    sha256: a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3
+    role: Advisory controlled-autonomy alpha skill surface with bounded reviewer subagent capacity management and degraded-review limitation handling; current behavior-bearing code review passed; doc review and runtime behavior remain held for U9 proof.
+  - id: SRC-SKILL-002
+    path: plugins/traceweaver-core/skills/lfg/SKILL.md
+    sha256: ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083
+    role: TraceWeaver compatibility alias that delegates to tw-auto and must not run raw CE autopilot directly.
+  - id: SRC-SKILL-003
+    path: plugins/traceweaver-core/skills/tw-grill/SKILL.md
+    sha256: 666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90
+    role: Approved static/advisory source-evidence intent-deepening skill with bootstrap and delta/gap modes; runtime behavior and implementation-authority claims remain held.
+
+stakeholder_intent:
+  - id: INTENT-TW-001
+    source: requirements.md
+    summary: Preserve the stakeholder's original intent through agentic planning, implementation, review, and release decisions.
+    validation_question: Can a reviewer trace each meaningful behavior change back to what the stakeholder actually wanted?
+  - id: INTENT-TW-002
+    source: requirements.md
+    summary: Prevent agents from silently converting their own assumptions into implementation authority.
+    validation_question: When an agent assumes something, is it recorded as a question, proposed requirement, exception, risk, or rejected assumption instead of implemented silently?
+  - id: INTENT-TW-003
+    source: requirements.md
+    summary: Provide a lightweight systems-engineering workflow usable by coding agents without a heavyweight requirements database.
+    validation_question: Can a normal repo use file-based TraceWeaver artifacts to control requirements, traceability, evidence, and changes?
+  - id: INTENT-TW-004
+    source: requirements.md
+    summary: Preserve the Compound Engineering workflow while adding TraceWeaver authority controls.
+    validation_question: Can users keep CE planning, work, review, and compound workflows while TraceWeaver records authority warnings and held claims?
+  - id: INTENT-TW-005
+    source: requirements.md
+    summary: Ship only claims that have evidence and keep unproven runtime/release claims explicitly held.
+    validation_question: Are alpha, static, dynamic, release, upstream, and clean-replacement claims separated in validation records?
+  - id: INTENT-TW-006
+    source: requirements.md
+    summary: Keep public artifacts clean of private provenance, protected source text, and unsupported compliance claims.
+    validation_question: Do public docs and plugin files avoid private paths, protected source names, copied source text, and unsupported standards-conformance language?
+  - id: INTENT-TW-007
+    source: requirements.md
+    summary: Provide a standalone TraceWeaver plugin based on the selected Compound Engineering workflow surface, with TraceWeaver authority and traceability as the default control layer.
+    validation_question: If a user installs TraceWeaver instead of CE, do the familiar workflow entrypoints route through TraceWeaver intent, authority, traceability, verification, and validation controls rather than raw CE automation?
+  - id: INTENT-TW-008
+    source: requirements.md
+    summary: Repackage the Compound Engineering method with systems-engineering authority so the simple CE steps remain, but each step preserves intent, requirements quality, traceability, verification, validation, and change control.
+    validation_question: Can a user move from idea to brainstorm to requirements to plan, work, review, and learning without dark code, duplicate behavior, hidden assumptions, or missing requirements entering the product?
+
+approved_requirements:
+  - id: REQ-TW-001
+    intent_ids: [INTENT-TW-001, INTENT-TW-002]
+    statement: TraceWeaver must define an Intent Contract as the controlled authority baseline for agent work.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Does every agent-facing workflow identify the authority baseline before behavior changes?
+    acceptance_criteria:
+      - Intent Contract exists and cites accepted baseline ID and hash.
+      - Agent-facing workflows cite the Intent Contract before meaningful behavior changes.
+  - id: REQ-TW-002
+    intent_ids: [INTENT-TW-001, INTENT-TW-002]
+    statement: Agents may not implement, review, or modify meaningful behavior unless they cite stakeholder intent, approved authority, verification method, validation question, and current baseline version.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Are unauthorized changes routed to gaps, changes, or exceptions instead of implementation?
+    acceptance_criteria:
+      - Meaningful task records include authorized_by, intent_served, verification_required, validation_question, and baseline hash.
+  - id: REQ-TW-003
+    intent_ids: [INTENT-TW-002]
+    statement: Agent assumptions must become open questions, proposed requirements, approved exceptions, accepted risks, or rejected assumptions, not implementation authority.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Can reviewers see each assumption's disposition?
+    acceptance_criteria:
+      - Assumption records have explicit status and disposition.
+  - id: REQ-TW-004
+    intent_ids: [INTENT-TW-001, INTENT-TW-002]
+    statement: Every meaningful task must have an Intent Capsule or equivalent bounded work package.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Does each task carry enough authority context to prevent drift?
+    acceptance_criteria:
+      - Task capsules cite authorized_by, intent_served, verification_required, validation_question, must_not_change, and open_assumptions.
+  - id: REQ-TW-005
+    intent_ids: [INTENT-TW-001, INTENT-TW-003]
+    statement: TraceWeaver must maintain a controlled chain from stakeholder intent to needs, requirements, authority, implementation, verification, validation, and change control.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Can a reviewer traverse the chain without guessing?
+    acceptance_criteria:
+      - Trace records preserve the lifecycle chain and expose missing links.
+  - id: REQ-TW-006
+    intent_ids: [INTENT-TW-001, INTENT-TW-002]
+    statement: Meaningful behavior without approved intent, requirement, or exception trace must be classified as dark behavior.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Are untraced behaviors removed, linked, or approved as exceptions?
+    acceptance_criteria:
+      - Dark behavior is recorded as remove, link, exception candidate, or held claim.
+  - id: REQ-TW-007
+    intent_ids: [INTENT-TW-001, INTENT-TW-003]
+    statement: TraceWeaver must keep verification evidence separate from validation evidence and carry validation questions with tasks.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Does passing tests still leave the stakeholder-value question visible?
+    acceptance_criteria:
+      - Verification and validation fields are distinct in task capsules and trace records.
+  - id: REQ-TW-008
+    intent_ids: [INTENT-TW-003]
+    statement: The Markdown traceability matrix is the authoritative audit record; diagrams are derived views only.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: operational_evidence
+    validation_question: If a diagram and matrix disagree, does the matrix control?
+    acceptance_criteria:
+      - Matrix records control over generated or Mermaid diagrams.
+  - id: REQ-TW-009
+    intent_ids: [INTENT-TW-003, INTENT-TW-005]
+    statement: TraceWeaver Core must target the eleven-skill systems-engineering suite in controlled promotion increments.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: review_evidence
+    validation_question: Is the full suite visible without claiming all skills are runtime-ready?
+    acceptance_criteria:
+      - Non-selected Core skills remain staged or held unless separately scoped.
+  - id: REQ-TW-010
+    intent_ids: [INTENT-TW-003, INTENT-TW-004]
+    statement: requirements-reviewer and systems-engineering-traceability must remain upstream-neutral Core skills and not depend on CE-specific hooks.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: operational_evidence
+    validation_question: Can the Core skills be used outside CE?
+    acceptance_criteria:
+      - Core skill instructions do not require CE commands, prompts, agents, or delegation payloads.
+  - id: REQ-TW-011
+    intent_ids: [INTENT-TW-001, INTENT-TW-003]
+    statement: U6b Unit 2 alpha materialization must include only the selected authority foundation and selected CE-compatible surfaces approved by scope records.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: install_smoke
+    validation_question: Does the first alpha slice define authority without pulling the full Core suite into runtime scope?
+    acceptance_criteria:
+      - Runtime materialization stays limited to selected scope and Intent Contract templates.
+  - id: REQ-TW-012
+    intent_ids: [INTENT-TW-005]
+    statement: Runtime scope must stay staged; U6 alpha may include only selected Light v0.1 runtime skills and later selected CE-compatible surfaces until new scope decisions approve more.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: install_smoke
+    validation_question: Are non-selected Core 11 skills held until separately scoped?
+    acceptance_criteria:
+      - Package scope records identify included and held skills.
+  - id: REQ-TW-013
+    intent_ids: [INTENT-TW-004]
+    statement: TraceWeaver CE wrappers must invoke Core skills without redefining Core authority, requirements quality, traceability, risk/gap handling, verification, validation, or baseline rules.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: code_review
+    validation_question: Can CE adapter code change without changing Core semantics?
+    acceptance_criteria:
+      - CE wrappers point to Core rules rather than duplicating or changing them.
+  - id: REQ-TW-014
+    intent_ids: [INTENT-TW-004, INTENT-TW-005]
+    statement: TraceWeaver must preserve selected CE workflow skill names for compatibility while keeping clean CE replacement claims held until runtime proof exists.
+    authority_status: approved
+    verification_method: install_smoke
+    validation_method: runtime_smoke
+    validation_question: Can users keep their CE workflow without TraceWeaver overclaiming replacement?
+    acceptance_criteria:
+      - CE-compatible names are package-present or explicitly held with degradation behavior.
+  - id: REQ-TW-015
+    intent_ids: [INTENT-TW-005]
+    statement: Plugin README and manifests must describe alpha skill invocation accurately and must not advertise slash commands unless prompt/command files are installed and proven.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: install_smoke
+    validation_question: Does a user get exactly what the docs say they get after install?
+    acceptance_criteria:
+      - Public docs match install manifest and runtime surface.
+  - id: REQ-TW-016
+    intent_ids: [INTENT-TW-004, INTENT-TW-005]
+    statement: The documented Codex install command for alpha must materialize selected skills using --include-skills.
+    authority_status: approved
+    verification_method: install_smoke
+    validation_method: operational_evidence
+    validation_question: Can a developer copy the command and get usable skills?
+    acceptance_criteria:
+      - Isolated install with README command copies selected skills.
+  - id: REQ-TW-017
+    intent_ids: [INTENT-TW-005, INTENT-TW-006]
+    statement: Unit 2 must resolve CE upstream source pin before vendoring selected CE files or record an accepted local-cache-only limitation that keeps CE vendoring/release claims held.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: review_evidence
+    validation_question: Is copied CE content traceable to a source authority or explicitly limited?
+    acceptance_criteria:
+      - CE source pin or accepted limitation exists before CE vendoring or release claims.
+  - id: REQ-TW-018
+    intent_ids: [INTENT-TW-004, INTENT-TW-005]
+    statement: Unit 2 must prove transitive closure for selected CE support files referenced by SKILL.md files under references, scripts, and assets.
+    authority_status: approved
+    verification_method: static_closure_audit
+    validation_method: install_smoke
+    validation_question: Can a selected CE skill run without dangling support-file references?
+    acceptance_criteria:
+      - Closure audit proves all selected CE support files are present and hashed.
+  - id: REQ-TW-019
+    intent_ids: [INTENT-TW-005]
+    statement: U6b-alpha must be limited to package/install/static materialization evidence; runtime invocation and dynamic discovery remain U6b-dynamic or U9 proof.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: review_evidence
+    validation_question: Can reviewers distinguish static install evidence from runtime behavior proof?
+    acceptance_criteria:
+      - Static and dynamic/runtime claims are separated in evidence records.
+  - id: REQ-TW-020
+    intent_ids: [INTENT-TW-005]
+    statement: U7 release-claim records must stay narrow and keep clean CE replacement, dynamic discovery, slash commands, full Core 11 runtime, and release-ready status held unless proven.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: release_review
+    validation_question: Do release claims match the evidence actually collected?
+    acceptance_criteria:
+      - U7 claims approve only proven installable alpha/static/advisory evidence.
+  - id: REQ-TW-021
+    intent_ids: [INTENT-TW-006]
+    statement: Public artifacts must not include private paths, protected source names, raw standards text, copied source material, or unsupported compliance claims.
+    authority_status: approved
+    verification_method: hygiene_scan
+    validation_method: document_review
+    validation_question: Could the public repo be shared without leaking private/protected source basis?
+    acceptance_criteria:
+      - Hygiene scans and document review find no private/protected leakage.
+  - id: REQ-TW-023
+    intent_ids: [INTENT-TW-003, INTENT-TW-005]
+    statement: Every completed TraceWeaver task must end with suggested next steps naming the next CE command, TraceWeaver gate, evidence record, or held condition.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Can a contributor tell what should happen next without reconstructing validation history?
+    acceptance_criteria:
+      - Task summaries end with actionable next steps.
+  - id: REQ-TW-024
+    intent_ids: [INTENT-TW-001, INTENT-TW-002]
+    statement: TraceWeaver must classify changes conservatively; authority-chain and user-visible changes are meaningful by default.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Can agents avoid authority controls by labeling support or documentation work as non-meaningful?
+    acceptance_criteria:
+      - Meaningful behavior threshold appears in task and review guidance.
+  - id: REQ-TW-025
+    intent_ids: [INTENT-TW-003, INTENT-TW-005]
+    statement: Advisory alpha must support a minimal Intent Capsule for low-risk or documentation-only work without bypassing authority.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Can contributors use TraceWeaver without heavyweight process or authority bypass?
+    acceptance_criteria:
+      - Minimal capsule still cites approved requirement/exception or blocks implementation with a gap/change proposal.
+  - id: REQ-TW-026
+    intent_ids: [INTENT-TW-003, INTENT-TW-005]
+    statement: Needs capture and risk/gap/change-control runtime materialization remain future or separately scoped Core batch work unless later selected.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: scope_review
+    validation_question: Can U6b Unit 2 proceed without silently expanding into the full Core 11 suite?
+    acceptance_criteria:
+      - Future skills may appear only as templates or held routing targets in advisory alpha.
+  - id: REQ-TW-027
+    intent_ids: [INTENT-TW-004, INTENT-TW-005]
+    statement: U6b Unit 2 must define static advisory policy only; runtime warning/gap-routing behavior remains held for Unit 3/U9 proof.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: install_smoke
+    validation_question: Can users understand static advisory policy without mistaking it for proven runtime behavior?
+    acceptance_criteria:
+      - Unit 2 docs say alpha/advisory/static install only.
+  - id: REQ-TW-028
+    intent_ids: [INTENT-TW-004, INTENT-TW-005]
+    statement: Unit 2 must materialize selected CE agents or record explicit per-workflow limitations and allowed claim classes.
+    authority_status: approved
+    verification_method: package_file_list
+    validation_method: install_smoke
+    validation_question: Can ce-code-review and ce-doc-review compatibility claims be evaluated without guessing whether their agents are present?
+    acceptance_criteria:
+      - Each affected CE workflow is classified as name_preserved_only, static_wrapper_available, agent_backed_unavailable, or runtime_equivalent_proven.
+  - id: REQ-TW-029
+    intent_ids: [INTENT-TW-005, INTENT-TW-006]
+    statement: Local-cache-only CE source limitations must record provenance, observed version, hashes, claim restrictions, stale reset, close condition, and unproven scope.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: review_evidence
+    validation_question: Does the local-cache path preserve provenance discipline instead of weakening the vendoring gate?
+    acceptance_criteria:
+      - Local-cache limitation cannot authorize release claims without required fields.
+  - id: REQ-TW-030
+    intent_ids: [INTENT-TW-004, INTENT-TW-005]
+    statement: TraceWeaver alpha must default to advisory mode through a controlled policy contract.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: install_smoke
+    validation_question: Do users understand alpha warnings are advisory and evidence-bound rather than proven enforcement?
+    acceptance_criteria:
+      - Package default exposes traceweaver_mode: advisory and enforcing remains held.
+  - id: REQ-TW-031
+    intent_ids: [INTENT-TW-001, INTENT-TW-003]
+    statement: Unit 2 must materialize the alpha Intent Contract template set and schema under .traceweaver.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: install_smoke
+    validation_question: Can implementers create authority records without inventing schema decisions during U6b Unit 2?
+    acceptance_criteria:
+      - Intent Contract, task capsule, trace record, gap, change, and exception templates exist.
+  - id: REQ-TW-032
+    intent_ids: [INTENT-TW-001, INTENT-TW-003, INTENT-TW-004]
+    statement: TraceWeaver alpha must provide a low-friction advisory drift check for plans, reviews, or task capsules.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Can users quickly detect requirement/intent drift before full TraceWeaver replacement is proven?
+    acceptance_criteria:
+      - Drift check returns aligned, warning, gap, held_claim, or clarification_needed without claiming enforcement.
+  - id: REQ-TW-033
+    intent_ids: [INTENT-TW-001, INTENT-TW-004]
+    statement: TraceWeaver-controlled workflow composition must group authority-control steps with relevant CE-compatible workflow stages once wrapper sequencing is implemented and proven.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Can users follow the CE loop without losing TraceWeaver authority controls or overclaiming automatic wrappers?
+    acceptance_criteria:
+      - Alpha docs state that current CE-compatible skills require manual TraceWeaver gate sequencing.
+  - id: REQ-TW-034
+    intent_ids: [INTENT-TW-004, INTENT-TW-005, INTENT-TW-007]
+    statement: The first TraceWeaver-controlled autonomous alpha surface must be a new tw-auto skill. Packaged lfg must be a TraceWeaver compatibility alias that delegates to tw-auto and must not run raw CE autopilot directly.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: install_smoke
+    validation_question: Can users invoke the familiar lfg name without bypassing TraceWeaver authority controls?
+    acceptance_criteria:
+      - tw-auto is the controlled-autonomy surface.
+      - Packaged lfg delegates to tw-auto.
+      - Packaged lfg does not call raw ce-plan, ce-work, ce-code-review, ce-commit, ce-commit-push-pr, or raw CE autopilot directly.
+  - id: REQ-TW-035
+    intent_ids: [INTENT-TW-001, INTENT-TW-002, INTENT-TW-005]
+    statement: TraceWeaver-controlled automation may continue only while authority remains clear and must stop for missing or changed authority, unresolved dark behavior, or human authority decisions.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Does automation stop before turning missing authority into implementation?
+    acceptance_criteria:
+      - Stop conditions include missing requirements, changed intent, unapproved assumptions, contradictory authority, scope expansion, and unresolved dark behavior.
+  - id: REQ-TW-036
+    intent_ids: [INTENT-TW-001, INTENT-TW-003]
+    statement: tw-auto must not start implementation until traceability-matrix.md exists. If the file is missing in a consuming project, alpha must create a bootstrap matrix from accepted requirements.md and .traceweaver/intent-contract.yml, record the bootstrap as the first loop action, and run a traceability check before continuing.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: smoke_test
+    validation_question: Can controlled automation proceed without silently skipping the matrix?
+    acceptance_criteria:
+      - Missing matrix bootstrap is the first loop action.
+      - A traceability check runs before implementation continues.
+  - id: REQ-TW-037
+    intent_ids: [INTENT-TW-003, INTENT-TW-005]
+    statement: The autonomous review-fix loop must be bounded by progress checks and default to at most two review-fix cycles per run unless a reviewed Intent Contract override says otherwise.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Can the automation avoid infinite or low-value review/fix loops?
+    acceptance_criteria:
+      - Stop on cycle limit, no material diff, repeated blocking finding, repeated status without new evidence, or repeated verification failure.
+      - Reviewer subagent dispatch queues pending reviewers under host capacity limits, treats active-agent/thread-limit errors as backpressure, closes completed reviewer agents when possible, and reports incomplete reviewer coverage instead of claiming success.
+  - id: REQ-TW-038
+    intent_ids: [INTENT-TW-001, INTENT-TW-003]
+    statement: Behavior-bearing code changes made by controlled automation must link test evidence to the matrix by default, unless an approved requirement or gap/exception authorizes non-test verification.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Do behavior-bearing units trace to tests unless a justified non-test method is approved?
+    acceptance_criteria:
+      - Matrix rows link tests by default for code behavior changes.
+      - Non-test verification records owner, scope, review condition, and next step.
+  - id: REQ-TW-039
+    intent_ids: [INTENT-TW-002, INTENT-TW-005]
+    statement: tw-auto must stop before commit, push, or PR while authority, verification, review, traceability, dark-behavior, stale-evidence, or gap/change/exception write blockers remain.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Can automation avoid publishing work that lacks authority, evidence, or clean review state?
+    acceptance_criteria:
+      - Commit, push, and PR steps are blocked until stop-before-PR conditions are clear.
+  - id: REQ-TW-040
+    intent_ids: [INTENT-TW-003, INTENT-TW-005]
+    statement: tw-auto must define review severity policy before running automation.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Are review findings routed consistently during autonomous cycles?
+    acceptance_criteria:
+      - P0 and P1 always block.
+      - P2 blocks when authority, requirements, tests, traceability, validation, release claims, security, data integrity, or runtime safety are affected.
+      - P3 may be non-blocking debt only with owner and next step.
+  - id: REQ-TW-041
+    intent_ids: [INTENT-TW-004, INTENT-TW-007]
+    statement: TraceWeaver must be productized as a standalone plugin based on the selected CE workflow surface, not as a secondary helper that requires users to keep invoking CE directly. Familiar CE-derived automation names that remain installed must either route through TraceWeaver authority controls or be clearly marked as legacy/manual-continuity components that do not close TraceWeaver work.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Does installing TraceWeaver make the TraceWeaver-controlled path the normal path for users?
+    acceptance_criteria:
+      - Plugin docs present TraceWeaver as the controlled workflow surface.
+      - Familiar automation aliases route through TraceWeaver controls or are clearly held/manual.
+      - Direct CE-compatible component invocation does not close TraceWeaver authority or traceability gates by itself.
+  - id: REQ-TW-042
+    intent_ids: [INTENT-TW-001, INTENT-TW-003, INTENT-TW-007]
+    statement: A fresh TraceWeaver install must provide an authority bootstrap path before implementation. If requirements.md, traceability-matrix.md, or .traceweaver/intent-contract.yml is missing, tw-auto or a future dedicated initializer must create draft authority artifacts from packaged templates and stop for requirements review before work begins.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: smoke_test
+    validation_question: Can a new project start TraceWeaver without manually discovering the authority files or bypassing them?
+    acceptance_criteria:
+      - Missing requirements.md or Intent Contract triggers bootstrap mode.
+      - Bootstrap creates draft requirements, Intent Contract, and matrix artifacts.
+      - Bootstrap stops before implementation and recommends requirements review.
+  - id: REQ-TW-043
+    intent_ids: [INTENT-TW-004, INTENT-TW-005, INTENT-TW-007]
+    statement: Direct selected CE-compatible skills may remain packaged as implementation components for alpha continuity, but public docs and default prompts must direct users to tw-auto or TraceWeaver gates for controlled work. Direct CE skill invocation does not by itself satisfy TraceWeaver authority, traceability, verification, or validation closure.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Can reviewers distinguish packaged CE building blocks from approved TraceWeaver workflow completion?
+    acceptance_criteria:
+      - README and plugin README distinguish direct CE-compatible components from TraceWeaver-controlled closure.
+      - Default prompt points users to tw-auto or TraceWeaver gates.
+      - Held-claim records preserve runtime-equivalence and clean-replacement boundaries.
+  - id: REQ-TW-044
+    intent_ids: [INTENT-TW-004, INTENT-TW-008]
+    statement: TraceWeaver must wrap or repackage the selected CE method steps, not merely install adjacent TraceWeaver skills. The wrapped steps must keep the simple CE flow while injecting systems-engineering checks for intent capture, requirement quality, authority, traceability matrix updates, verification evidence, validation questions, gap/change/exception routing, and next-step handoff.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Does the user get the CE-style workflow with TraceWeaver controls embedded at each handoff instead of having to remember separate gates?
+    acceptance_criteria:
+      - Wrapped or aliased CE-derived entrypoints identify the TraceWeaver control performed at the same handoff.
+      - Docs describe CE skills as implementation components of a TraceWeaver-controlled method.
+      - Missing authority routes to gaps, changes, exceptions, risks, clarifications, or held claims.
+  - id: REQ-TW-045
+    intent_ids: [INTENT-TW-001, INTENT-TW-003, INTENT-TW-008]
+    statement: >-
+      The idea and brainstorm flow must be able to create or update the first
+      controlled authority set: root requirements.md, root
+      traceability-matrix.md, .traceweaver/intent-contract.yml, and supporting
+      gap/change/exception records. Ideas and brainstorm outputs remain source
+      material until reviewed requirements become baseline authority.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Can a new project move from loose idea to controlled baseline without losing the stakeholder intent?
+    acceptance_criteria:
+      - Fresh-project bootstrap creates draft authority files.
+      - Brainstorm output is reviewed before becoming requirement authority.
+      - The matrix starts tracing requirements before implementation.
+  - id: REQ-TW-046
+    intent_ids: [INTENT-TW-001, INTENT-TW-002, INTENT-TW-008]
+    statement: TraceWeaver review and traceability checks must flag behavior-bearing code, skill logic, commands, scripts, functions, methods, or classes that lack requirement authority, duplicate existing behavior without authority, implement a logical but uncaptured requirement, or fail to link verification evidence.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: workflow_review
+    validation_question: Does TraceWeaver prevent useful-looking but unauthorized code from silently becoming product behavior?
+    acceptance_criteria:
+      - Untraced behavior is classified as dark behavior.
+      - Logical but uncaptured behavior becomes a proposed requirement or gap before implementation closure.
+      - Duplicate or unnecessary behavior is removed, linked to authority, or explicitly accepted.
+  - id: REQ-TW-047
+    intent_ids: [INTENT-TW-006, INTENT-TW-008]
+    statement: TraceWeaver's systems-engineering guidance may summarize and operationalize IEEE 15288/INCOSE-style principles for requirement quality, verification, validation, lifecycle traceability, and change control, but public artifacts must use original TraceWeaver wording and must not copy protected standards text or overclaim formal conformance.
+    authority_status: approved
+    verification_method: hygiene_scan
+    validation_method: document_review
+    validation_question: Can TraceWeaver apply systems-engineering discipline without leaking protected material or claiming certification it has not proven?
+    acceptance_criteria:
+      - Public guidance uses original wording.
+      - Source-basis records preserve provenance without protected text leakage.
+      - Compliance/conformance claims remain held unless separately proven.
+  - id: REQ-TW-048
+    intent_ids: [INTENT-TW-001, INTENT-TW-003, INTENT-TW-008]
+    statement: TraceWeaver must provide optional tw-grill intent-deepening after an ideation source and before ce-brainstorm, with bootstrap mode only when no controlled authority artifacts exist and delta/gap mode whenever any controlled authority artifact exists. In delta/gap mode, tw-grill must inventory existing requirements, Intent Contract, traceability matrix, gaps, changes, and exceptions before broad questioning, classify meaningful proposed behavior against authority coverage, focus questions on missing, weak, stale, contradictory, or dark-behavior coverage, and route outputs to source-evidence authority deltas. tw-grill must inspect the repo and existing domain docs instead of asking when answers are discoverable, challenge terminology against CONTEXT.md, CONTEXT-MAP.md, and ADR records when present, provide a recommended answer for each user-facing question, give upstream credit for the grill-with-docs inspiration, and output source evidence only. ce:ideate remains optional external CE context until separately selected for packaging.
+    authority_status: approved
+    verification_method: inspection
+    validation_method: stakeholder_review
+    validation_question: Can a selected idea be interrogated at the right depth for its current authority state, preserving stakeholder intent and domain language while identifying authority gaps without turning interview answers into implementation authority?
+    acceptance_criteria:
+      - tw-grill is packaged as a skill.
+      - tw-grill appears after ideation and before brainstorming in workflow docs.
+      - tw-grill output is explicitly source evidence only; accepted requirements and approved exceptions remain the only implementation authority.
+      - tw-grill chooses bootstrap mode only when no controlled authority set exists.
+      - tw-grill chooses delta/gap mode whenever any controlled authority artifact exists.
+      - tw-grill inventories existing requirements, Intent Contract, traceability matrix, gaps, changes, and exceptions in delta/gap mode before broad questioning.
+      - tw-grill classifies coverage as covered, weak_requirement, missing_intent, missing_requirement, missing_verification, missing_validation, contradiction, changed_intent, or dark_behavior_candidate.
+      - tw-grill routes unresolved outputs to proposed requirements, change requests, gap records, exception candidates, accepted-risk candidates, validation questions, or rejected assumptions as source evidence.
+      - tw-grill instructs agents to inspect the repo instead of asking when answers are discoverable.
+      - tw-grill provides recommended answers for user-facing questions.
+      - tw-grill checks existing CONTEXT and ADR records when present.
+      - tw-grill includes a skill-local upstream attribution notice.
+
+candidate_requirements: []
+
+held_requirements:
+  - id: REQ-TW-022
+    intent_ids: [INTENT-TW-005]
+    statement: R31 real-project validation remains required before release-ready or upstream-ready claims.
+    authority_status: held
+    hold_reason: Representative or dummy validation does not satisfy real-project validation.
+    close_condition: R31 real-project validation and later release records pass.
+
+approved_exceptions:
+  - id: EXC-TW-001
+    linked_requirements: [REQ-TW-019]
+    reason: Dynamic no-forced discovery may remain held after U6b-alpha.
+    owner: Oxiom Systems
+    decision_source: requirements.md
+    revisit_trigger: U6b-dynamic or U9 runtime discovery evidence is recorded, or a later superseding limitation explicitly replaces this one.
+
+held_claims:
+  - id: EXC-TW-002
+    linked_requirements: [REQ-TW-014]
+    claim: clean_ce_replacement
+    reason: Clean CE replacement is not approved by static materialization alone.
+    close_condition: U9 proves CE workflow continuity without installed CE plugin dependency.
+  - id: EXC-TW-003
+    linked_requirements: [REQ-TW-015]
+    claim: slash_commands_available
+    reason: Alpha installs skills, not prompt/command files.
+    close_condition: Prompt/command files are added and install/runtime evidence proves them.
+  - id: EXC-TW-004
+    linked_requirements: [REQ-TW-022]
+    claim: release_ready_or_upstream_ready
+    reason: R31 and later release gates have not passed.
+    close_condition: R31 real-project validation and release records pass.
+  - id: EXC-TW-006
+    linked_requirements: [REQ-TW-017, REQ-TW-029]
+    claim: local_cache_ce_source_authority
+    reason: Local-cache-only CE source use is not accepted until a complete limitation record exists.
+    close_condition: Upstream CE source pin is resolved, or complete accepted local-cache limitation is recorded.
+  - id: EXC-TW-007
+    linked_requirements: [REQ-TW-034, REQ-TW-039, REQ-TW-040, REQ-TW-041, REQ-TW-043, REQ-TW-044, REQ-TW-048]
+    claim: autonomous_commit_push_pr_or_publication
+    reason: Alpha skills must stop before commit, push, PR creation, release publication, and other publication actions.
+    close_condition: Later runtime/U9 evidence and approved publication claim records explicitly authorize the relevant publication behavior.
+  - id: EXC-TW-008
+    linked_requirements: [REQ-TW-019, REQ-TW-035, REQ-TW-036, REQ-TW-037, REQ-TW-038, REQ-TW-039, REQ-TW-040, REQ-TW-041, REQ-TW-042, REQ-TW-043, REQ-TW-044, REQ-TW-045, REQ-TW-046, REQ-TW-047, REQ-TW-048]
+    claim: u9_runtime_behavior
+    reason: Behavior-level tw-auto, lfg alias, tw-grill interview execution, CE-method wrapper sequencing, dynamic discovery, reviewer subagent capacity/backpressure handling, and dark-behavior routing are not proven by static materialization.
+    close_condition: U9 runtime smoke proves all runtime scenarios named in the matrix, including reviewer capacity/backpressure handling and dynamic discovery boundaries.
+  - id: EXC-TW-009
+    linked_requirements: [REQ-TW-034, REQ-TW-040]
+    claim: enforcing_mode
+    reason: Enforcing authority gates are held during advisory alpha.
+    close_condition: Dynamic/runtime validation approves blocking behavior and a reviewed Intent Contract update enables enforcing mode.
+  - id: EXC-TW-010
+    linked_requirements: [REQ-TW-048]
+    claim: tw_grill_implementation_authority
+    reason: REQ-TW-048 is approved for static/advisory source-evidence behavior only; tw-grill output is source evidence, not implementation authority.
+    close_condition: A later reviewed requirement explicitly changes the source-evidence-only boundary and runtime evidence proves the approved behavior.
+
+closed_exceptions:
+  - id: EXC-TW-005
+    linked_requirements: [REQ-TW-001, REQ-TW-002]
+    reason: Bootstrap exception closed by accepted baseline and recorded baseline hash.
+    close_evidence: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
+
+must_not_change:
+  - Do not treat ideas, brainstorm notes, review findings, task IDs, inferred requirements, draft requirements, bare risk IDs, or traceability debt as implementation authority by themselves.
+  - Do not make enforcing mode the default during alpha.
+  - Do not claim clean CE replacement until runtime proof shows CE workflow continuity without the installed CE plugin dependency.
+  - Do not advertise slash commands unless prompt or command files are installed and proven.
+  - Do not expand the default runtime scope to the full Core 11 suite without a later accepted scope decision.
+  - Do not let TraceWeaver CE wrappers redefine Core requirements quality, traceability, verification, validation, risk/gap, or baseline semantics.
+  - Do not vendor CE files without upstream source pin or an accepted local-cache-only limitation.
+  - Do not include private paths, protected source names, raw standards text, copied source material, or unsupported compliance claims in public artifacts.
+
+blocked_assumptions:
+  - id: ASM-TW-001
+    statement: Static install evidence proves dynamic runtime discovery or real adapter invocation.
+    action: Must remain held for U6b-dynamic or U9 evidence.
+  - id: ASM-TW-002
+    statement: The current alpha plugin is a clean replacement for the Compound Engineering plugin.
+    action: Must remain held until CE-compatible workflow, selected agents or limitations, and runtime proof pass.
+  - id: ASM-TW-003
+    statement: Installed skills imply slash-command availability.
+    action: Must remain held until prompt/command surfaces are installed and proven.
+  - id: ASM-TW-004
+    statement: Agent interpretation can update the baseline without review.
+    action: Must become a gap, proposed requirement, change request, exception candidate, or rejected assumption.
+  - id: ASM-TW-005
+    statement: Full Core 11 public folder presence means full Core 11 runtime readiness.
+    action: Must remain held until each skill has accepted runtime/package evidence.
+
+workflow_controls:
+  - stage: idea
+    ce_command: none
+    traceweaver_control: intent_capture
+    rule: Capture stakeholder intent, candidate needs, assumptions, risks, success/failure signals, open decisions, and not-doing boundaries. Ideas are not authority.
+    next_step: ideation_source
+  - stage: ideate
+    ce_command: optional_external_ce_ideate_or_other_ideation_source
+    traceweaver_control: candidate_direction_generation
+    rule: Generate and rank candidate directions. Ideation output is not implementation authority.
+    next_step: ce-brainstorm
+    optional_candidate_source_evidence: tw-grill
+    candidate_source_rule: tw-grill may be used manually as approved static/advisory source-evidence support for one selected idea, using bootstrap mode only when no controlled authority artifacts exist and delta/gap mode whenever any controlled authority artifact exists; it is not implementation authority and runtime behavior remains held until runtime evidence passes.
+  - stage: brainstorm
+    ce_command: ce-brainstorm
+    traceweaver_control: tw-requirements-review_then_manual_authority_baseline_record
+    rule: Convert accepted ideas into reviewed requirements, intent IDs, exceptions, validation questions, and baseline version before planning. The baseline record step is manual/file-based until a packaged initializer skill is materialized.
+    next_step: ce-plan
+  - stage: plan
+    ce_command: ce-plan
+    traceweaver_control: tw-authority-gate
+    rule: Plan only against approved requirements or approved exceptions. Every meaningful task gets an Intent Capsule.
+    next_step: ce-work
+  - stage: work
+    ce_command: ce-work
+    traceweaver_control: tw-traceability-check
+    rule: Implement only what the task capsule authorizes. Assumptions become gaps, changes, or clarification records.
+    next_step: ce-code-review_or_ce-doc-review
+  - stage: review
+    ce_command: ce-code-review_or_ce-doc-review
+    traceweaver_control: tw-traceability-check_then_manual_verification_validation_record
+    rule: Check what changed, what requirement authorized it, what verifies it, and whether it satisfies the stakeholder validation question. Verification/validation recording is manual/file-based until a packaged runtime skill is materialized.
+    next_step: ce-compound
+  - stage: compound_learning
+    ce_command: ce-compound
+    traceweaver_control: learning_to_change_control_handoff
+    rule: Preserve learning without silently rewriting authority. New learning creates proposed requirements or change records.
+    next_step: update_baseline_or_continue_U6b
+
+task_capsule_minimum:
+  task_id: required
+  baseline_id: REQ-BASELINE-2026-04-30-001
+  baseline_hash_sha256: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+  authorized_by: approved requirement ID or approved exception ID required for meaningful implementation
+  intent_served: at least one INTENT-TW ID
+  verification_required: required
+  validation_question: required
+  must_not_change: required when applicable
+  open_assumptions: empty list or explicit assumption records
+  next_step: required
+
+drift_check:
+  purpose: Fast advisory requirement/intent drift check for plans, reviews, and task capsules.
+  inputs:
+    - proposed behavior
+    - intent IDs
+    - approved requirement or approved exception IDs
+    - verification method
+    - validation question
+    - baseline ID and hash
+  statuses:
+    - aligned
+    - warning
+    - gap
+    - held_claim
+    - clarification_needed
+  enforcement: advisory_only
+
+open_gaps:
+  - id: GAP-TW-U6B-UNIT2-TEMPLATES
+    linked_intent: INTENT-TW-003
+    linked_requirements: [REQ-TW-031]
+    reason: Plugin-packaged Intent Contract, authority baseline, task capsule, trace record, gap, change, and exception templates are accepted for static Unit 2 materialization; runtime warning/gap-routing behavior remains held.
+    proposed_disposition: Keep static materialization accepted and defer runtime behavior to U9/runtime proof.
+    owner: Oxiom Systems
+    review_gate: U9 runtime behavior
+    status: closed_static_runtime_held
+  - id: GAP-TW-CE-SOURCE-PIN
+    linked_intent: INTENT-TW-005
+    linked_requirements: [REQ-TW-017]
+    reason: CE upstream source pin is recorded for static materialization; release/upstream claims still require U7/U9/R31 gates.
+    proposed_disposition: Keep source-pinned static materialization accepted and defer release/upstream claims to later gates.
+    owner: Oxiom Systems
+    review_gate: U7/U9/R31
+    status: closed_static_release_held
+  - id: GAP-TW-CE-CLOSURE-AUDIT
+    linked_intent: INTENT-TW-004
+    linked_requirements: [REQ-TW-018]
+    reason: Selected CE support-file transitive closure is accepted for static materialization; runtime behavior remains held.
+    proposed_disposition: Keep closure accepted for static scope and defer runtime behavior to U9.
+    owner: Oxiom Systems
+    review_gate: U9 runtime behavior
+    status: closed_static_runtime_held
+  - id: GAP-TW-CE-AGENT-CONTINUITY
+    linked_intent: INTENT-TW-004
+    linked_requirements: [REQ-TW-028]
+    reason: CE agent-backed workflow continuity is not yet runtime-proven in the TraceWeaver plugin.
+    proposed_disposition: Materialize selected CE agents or record per-workflow limitations.
+    owner: Oxiom Systems
+    review_gate: U6b Unit 2 and U9
+    status: open
+  - id: GAP-TW-R31-REAL-PROJECT-VALIDATION
+    linked_intent: INTENT-TW-005
+    linked_requirements: [REQ-TW-022]
+    reason: Real-project validation is required before release-ready or upstream-ready claims.
+    proposed_disposition: Run R31 real feature, unclear module, and low-risk Lite validation scenarios.
+    owner: Oxiom Systems
+    review_gate: U7/U9
+    status: held
+
+next_recommended_steps:
+  - Run refreshed Unit 9 behavior-code review and authority doc review before accepting Unit 9 as U9 input.
+  - Keep tw-grill output as source evidence only; it does not create implementation authority.
+  - Keep tw-auto, tw-grill, and the lfg compatibility alias in static/advisory/source-evidence scope until runtime behavior evidence passes.
+  - Keep clean CE replacement, enforcing mode, dynamic discovery, slash commands, autonomous commit/push/PR, U9 runtime claims, and release-ready claims held until their evidence gates pass.

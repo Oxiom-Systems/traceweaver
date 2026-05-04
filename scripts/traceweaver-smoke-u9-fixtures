@@ -1,0 +1,204 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/u9-codex"
+
+sha256_file() {
+  shasum -a 256 "$1" | awk '{print $1}'
+}
+
+aggregate_dir_hash() {
+  find "$1" -type f -print0 | sort -z | xargs -0 shasum -a 256 | shasum -a 256 | awk '{print $1}'
+}
+
+require_file() {
+  local path="$1"
+  if [[ ! -f "$path" ]]; then
+    echo "missing_required_file=$path" >&2
+    exit 1
+  fi
+}
+
+require_text() {
+  local pattern="$1"
+  local path="$2"
+  local failure="$3"
+  if ! grep -Eq "$pattern" "$path"; then
+    echo "$failure" >&2
+    exit 1
+  fi
+}
+
+authority_dir="$FIXTURE_ROOT/authority-present"
+require_file "$authority_dir/requirements.md"
+require_file "$authority_dir/traceability-matrix.md"
+require_file "$authority_dir/.traceweaver/intent-contract.yml"
+
+declared_req_hash="$(awk -F': ' '/baseline_hash_sha256:/ {print $2}' "$authority_dir/.traceweaver/intent-contract.yml")"
+declared_matrix_hash="$(awk -F': ' '/matrix_hash_sha256:/ {print $2}' "$authority_dir/.traceweaver/intent-contract.yml")"
+actual_req_hash="$(sha256_file "$authority_dir/requirements.md")"
+actual_matrix_hash="$(sha256_file "$authority_dir/traceability-matrix.md")"
+
+if [[ "$declared_req_hash" != "$actual_req_hash" ]]; then
+  echo "authority_present_hash_mismatch=requirements declared=$declared_req_hash actual=$actual_req_hash" >&2
+  exit 1
+fi
+
+if [[ "$declared_matrix_hash" != "$actual_matrix_hash" ]]; then
+  echo "authority_present_hash_mismatch=matrix declared=$declared_matrix_hash actual=$actual_matrix_hash" >&2
+  exit 1
+fi
+
+echo "u9_fixture_authority_present=pass"
+echo "tw_authority_gate_authority_present=pass"
+echo "tw_auto_authority_load=pass"
+
+complete_matrix="$authority_dir/traceability-matrix.md"
+require_text "TRACE-FIX-001" "$complete_matrix" "complete_trace_fixture_missing_trace_id"
+require_text "REQ-FIX-001" "$complete_matrix" "complete_trace_fixture_missing_requirement"
+require_text "fixture authority scan" "$complete_matrix" "complete_trace_fixture_missing_verification"
+require_text "Does the gate find all required authority files" "$complete_matrix" "complete_trace_fixture_missing_validation_question"
+echo "tw_traceability_check_complete_trace=pass"
+
+approved_req="$authority_dir/requirements.md"
+require_text "REQ-FIX-001 .*\\| approved \\|" "$approved_req" "approved_requirement_fixture_missing_approved_status"
+require_text "Verification Method" "$approved_req" "approved_requirement_fixture_missing_verification_method"
+require_text "Validation Question" "$approved_req" "approved_requirement_fixture_missing_validation_question"
+if grep -Eq "candidate_for_review|TBD" "$approved_req"; then
+  echo "approved_requirement_fixture_contains_candidate_or_tbd_marker" >&2
+  exit 1
+fi
+echo "tw_requirements_review_approved_fixture=pass"
+
+missing_dir="$FIXTURE_ROOT/missing-authority"
+if [[ -e "$missing_dir/requirements.md" || -e "$missing_dir/traceability-matrix.md" || -e "$missing_dir/.traceweaver/intent-contract.yml" ]]; then
+  echo "missing_authority_fixture_unexpected_authority_file=present" >&2
+  exit 1
+fi
+echo "u9_fixture_missing_authority=blocked_missing_requirements_intent_contract_matrix"
+echo "tw_authority_gate_missing_authority=blocked_missing_requirements_intent_contract_matrix"
+echo "tw_auto_missing_authority=blocked_missing_authority"
+
+stale_file="$FIXTURE_ROOT/stale-authority/requirements.md"
+require_file "$stale_file"
+declared_stale_hash="$(awk '/Declared requirements hash:/ {getline; print $0}' "$stale_file" | tr -d '`')"
+actual_stale_hash="$(sha256_file "$stale_file")"
+if [[ "$declared_stale_hash" == "$actual_stale_hash" ]]; then
+  echo "stale_authority_fixture_unexpected_hash_match=$actual_stale_hash" >&2
+  exit 1
+fi
+echo "u9_fixture_stale_authority=blocked_hash_mismatch"
+echo "tw_authority_gate_stale_authority=blocked_hash_mismatch"
+
+weak_file="$FIXTURE_ROOT/weak-requirement/requirements.md"
+require_file "$weak_file"
+if ! grep -q "candidate_for_review" "$weak_file" || ! grep -q "TBD" "$weak_file"; then
+  echo "weak_requirement_fixture_missing_candidate_or_tbd_marker" >&2
+  exit 1
+fi
+echo "u9_fixture_weak_requirement=blocked_candidate_not_implementation_ready"
+echo "tw_requirements_review_weak_requirement=blocked_candidate_not_implementation_ready"
+
+gap_matrix="$FIXTURE_ROOT/trace-gap/traceability-matrix.md"
+require_file "$gap_matrix"
+if ! grep -q "MISSING" "$gap_matrix"; then
+  echo "trace_gap_fixture_missing_gap_marker" >&2
+  exit 1
+fi
+echo "u9_fixture_trace_gap=blocked_missing_evidence_link"
+echo "tw_traceability_check_trace_gap=blocked_dark_behavior_candidate"
+
+trace_write_dir="$FIXTURE_ROOT/trace-write"
+before_hash="$(aggregate_dir_hash "$trace_write_dir")"
+tmp_dir="$(mktemp -d)"
+trap 'rm -rf "$tmp_dir"' EXIT
+cp -R "$trace_write_dir" "$tmp_dir/trace-write"
+tmp_trace="$tmp_dir/trace-write"
+
+cat > "$tmp_trace/.traceweaver/trace-records/TASK-FIX-U9-TRACE-WRITE-001-trace.yml" <<'TRACE'
+trace_record_id: TRACE-TASK-FIX-U9-TRACE-WRITE-001
+task_id: TASK-FIX-U9-TRACE-WRITE-001
+baseline_id: REQ-FIX-U9-TRACE-WRITE-001
+baseline_hash_sha256: fixture_temp_copy_only
+status: generated_in_temp_copy
+changes:
+  - path: traceability-matrix.md
+    summary: Fixture-local matrix update generated by smoke harness.
+    authorized_by: REQ-FIX-003
+    intent_served: [INTENT-FIX-001]
+    verification_evidence: [scripts/traceweaver-smoke-u9-fixtures]
+    validation_question: Does the write proof leave real project authority files unchanged?
+    dark_behavior_status: none
+TRACE
+
+cat > "$tmp_trace/.traceweaver/gaps/GAP-FIX-U9-TRACE-WRITE-001.yml" <<'GAP'
+gap_id: GAP-FIX-U9-TRACE-WRITE-001
+status: fixture_generated
+linked_intent: INTENT-FIX-001
+linked_requirement: REQ-FIX-003
+reason: Fixture gap candidate generated in a temporary copy only.
+proposed_disposition: rejected_assumption
+implementation_rule: This fixture gap is not project authority.
+GAP
+
+cat > "$tmp_trace/.traceweaver/changes/CHANGE-FIX-U9-TRACE-WRITE-001.yml" <<'CHANGE'
+change_id: CHANGE-FIX-U9-TRACE-WRITE-001
+status: fixture_generated
+linked_requirement: REQ-FIX-003
+summary: Fixture change candidate generated in a temporary copy only.
+implementation_rule: This fixture change is not project authority.
+CHANGE
+
+cat > "$tmp_trace/.traceweaver/exceptions/EXC-FIX-U9-TRACE-WRITE-001.yml" <<'EXCEPTION'
+exception_id: EXC-FIX-U9-TRACE-WRITE-001
+status: fixture_generated
+linked_requirement: REQ-FIX-003
+scope: Temporary fixture copy only.
+implementation_rule: This fixture exception is not project authority.
+EXCEPTION
+
+cat >> "$tmp_trace/traceability-matrix.md" <<'MATRIX'
+| TRACE-FIX-WRITE-002 | REQ-FIX-003 | `.traceweaver/trace-records/TASK-FIX-U9-TRACE-WRITE-001-trace.yml` | fixture trace-write smoke | Does the write proof leave real project authority files unchanged? | Generated in temp copy |
+MATRIX
+
+for generated in \
+  "$tmp_trace/.traceweaver/trace-records/TASK-FIX-U9-TRACE-WRITE-001-trace.yml" \
+  "$tmp_trace/.traceweaver/gaps/GAP-FIX-U9-TRACE-WRITE-001.yml" \
+  "$tmp_trace/.traceweaver/changes/CHANGE-FIX-U9-TRACE-WRITE-001.yml" \
+  "$tmp_trace/.traceweaver/exceptions/EXC-FIX-U9-TRACE-WRITE-001.yml"; do
+  require_file "$generated"
+done
+
+after_hash="$(aggregate_dir_hash "$trace_write_dir")"
+if [[ "$before_hash" != "$after_hash" ]]; then
+  echo "trace_write_fixture_real_files_changed=before:$before_hash after:$after_hash" >&2
+  exit 1
+fi
+
+echo "u9_fixture_trace_write=temp_write_pass_real_repo_unchanged"
+echo "tw_trace_write_runtime_behavior=held_temp_copy_only_no_project_runtime_write"
+
+skill_tmp="$tmp_dir/skills"
+mkdir -p "$skill_tmp"/{tw-auto,tw-authority-gate,ce-plan,ce-code-review,ce-doc-review}
+required_resolved_skills=(tw-auto tw-authority-gate tw-traceability-check ce-plan ce-work ce-code-review ce-doc-review)
+missing_resolved_skills=()
+for skill in "${required_resolved_skills[@]}"; do
+  if [[ ! -d "$skill_tmp/$skill" ]]; then
+    missing_resolved_skills+=("$skill")
+  fi
+done
+
+if [[ "${missing_resolved_skills[*]}" != "tw-traceability-check ce-work" ]]; then
+  echo "missing_skill_resolution_fixture_unexpected_missing_set=${missing_resolved_skills[*]}" >&2
+  exit 1
+fi
+
+require_text "tw-authority-gate" "$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/SKILL.md" "tw_auto_missing_authority_gate_resolution_requirement"
+require_text "tw-traceability-check" "$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/SKILL.md" "tw_auto_missing_traceability_check_resolution_requirement"
+require_text "Do not fall back to an external raw CE path" "$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/SKILL.md" "tw_auto_missing_external_ce_fallback_stop"
+echo "tw_auto_missing_skill_resolution=held_install_package_gap_no_external_ce_fallback missing=tw-traceability-check,ce-work"
+echo "host_codex_registry_discovery=held_manual_fresh_session_or_reload_required"
+echo "real_tw_skill_runtime_invocation=held_no_host_transcript_or_runner"
+echo "u9_gate_behavior_smoke=pass"
+echo "u9_fixture_smoke=pass"

@@ -1,0 +1,27 @@
+trace_record_id: TRACE-TASK-001
+task_id: TASK-001
+baseline_id: "<accepted baseline id>"
+baseline_hash_sha256: "<accepted baseline hash>"
+status: draft
+
+changes:
+  - path: "<changed file or artifact>"
+    summary: "<meaningful behavior or evidence change>"
+    authorized_by: "<approved requirement id or approved exception id>"
+    intent_served: ["<intent id>"]
+    verification_evidence: ["<test, inspection, analysis, or demonstration evidence>"]
+    validation_question: "<validation question>"
+    dark_behavior_status: none
+
+dark_behavior:
+  - id: DARK-001
+    description: "<untraced behavior, if any>"
+    disposition: remove | link_to_authority | exception_candidate | held_claim
+
+review:
+  reviewer: "<agent or human reviewer>"
+  reviewed_at: YYYY-MM-DD
+  result: draft
+
+next_recommended_steps:
+  - Run tw-traceability-check during review.

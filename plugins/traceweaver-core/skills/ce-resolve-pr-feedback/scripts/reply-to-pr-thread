@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+
+# Replies to a PR review thread. Body is read from stdin to avoid
+# shell escaping issues with markdown (quotes, newlines, etc.).
+
+set -e
+
+if [ $# -lt 1 ]; then
+    echo "Usage: echo 'reply body' | reply-to-pr-thread THREAD_ID"
+    echo "Example: echo 'Addressed: added null check' | reply-to-pr-thread PRRT_kwDOABC123"
+    exit 1
+fi
+
+THREAD_ID=$1
+BODY=$(cat)
+
+if [ -z "$BODY" ]; then
+    echo "Error: No body provided on stdin."
+    exit 1
+fi
+
+echo "TraceWeaver alpha publication hold: would reply to review thread $THREAD_ID" >&2
+echo "--- draft reply ---"
+printf '%s\n' "$BODY"
+echo "--- end draft reply ---"
+echo "No TraceWeaver publication gate is approved for this alpha package; this script is draft-only." >&2
+exit 2

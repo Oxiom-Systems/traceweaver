@@ -1,0 +1,69 @@
+loop_state_id: TW-AUTO-YYYY-MM-DD-NNN
+traceweaver_mode: advisory
+status: loading_authority
+
+baseline:
+  baseline_id: "<accepted baseline id>"
+  baseline_hash_sha256: "<accepted baseline hash>"
+  requirements_path: requirements.md
+  intent_contract_path: .traceweaver/intent-contract.yml
+  traceability_matrix_path: traceability-matrix.md
+
+request:
+  summary: "<requested work>"
+  source: "<issue, prompt, plan, or human request>"
+  stakeholder_intent_ids: []
+
+authority:
+  authorized_by: []
+  approved_exceptions: []
+  authority_status: unknown
+  validation_questions: []
+  missing_authority_disposition: create_gap_or_change_and_stop
+
+loop:
+  plan_path: "<docs/plans/... or pending>"
+  cycle_count: 0
+  max_review_fix_cycles: 2
+  progress_check:
+    material_diff_observed: false
+    trace_update_observed: false
+    repeated_finding_ids: []
+    repeated_verification_failures: []
+
+artifacts:
+  changed_paths: []
+  trace_record_path: .traceweaver/trace-records/TW-AUTO-YYYY-MM-DD-NNN-trace.yml
+  matrix_rows_updated: []
+  gaps_created: []
+  changes_created: []
+  exceptions_created: []
+
+verification:
+  required_evidence: []
+  commands_or_reviews_run: []
+  result: pending
+  failed_items: []
+
+review:
+  findings:
+    p0: []
+    p1: []
+    p2_blocking: []
+    p2_non_blocking: []
+    p3_debt: []
+  severity_policy_result: pending
+
+held_claims:
+  commit_push_pr_automation: held
+  clean_ce_replacement: held
+  enforcing_mode: held
+  slash_commands: held
+  runtime_equivalence: held
+
+stop:
+  stopped: false
+  stop_reason: null
+  human_decision_required: false
+
+next_recommended_step: "<one concrete CE/TW command, evidence record, or human decision>"

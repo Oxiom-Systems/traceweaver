@@ -964,10 +964,17 @@ u5_5_runtime_subset_matrix:
   names, customer/project names, rater identities, raw transcripts, or
   proprietary scenario details.
 
-- [ ] **U6a: Runtime Packaging Scope Decision Gate**
+- [x] **U6a: Runtime Packaging Scope Decision Gate**
 
 **Goal:** Bound runtime packaging before implementation creates runtime files or
 package manifests.
+
+**Status:** Completed for the bounded static scope decision only in
+`docs/validation/traceweaver-core-11-u6a-runtime-scope.md`. U6a selects
+`light-v0.1-authority-traceability` for later U6b package/install/runtime
+evidence under `U55-LIMIT-STATIC-DISCOVERY-001`; it does not approve dynamic
+runtime discovery, package-ready, release-ready, upstream-ready, all-Core, or
+R31-complete claims.
 
 **Approach:**
 - Depend on a U5.5 terminal state of `accepted`, `reduced`, or `split` for the
@@ -1003,7 +1010,16 @@ package manifests.
 - Any all-eleven or upstream-subset packaging decision has explicit review
   approval.
 
-- [ ] **U6b: Runtime Packaging Implementation**
+- [x] **U6b: Runtime Packaging Implementation**
+
+**Status:** Completed for TraceWeaver Core alpha install smoke and static
+selected-skill materialization only. `TWCORE-U6B-RUNTIME-2026-04-30-001`
+records plugin manifests, selected runtime files, skill-local selected
+references, adapter skills, isolated Codex install smoke, installed manifest,
+and static adapter routing for the exact U6a `light-v0.1-authority-traceability`
+scope. Dynamic no-forced discovery, real runtime invocation transcript,
+package-ready, release-ready, upstream-ready, all-Core runtime, and R31-complete
+claims remain held for later gates.
 
 **Goal:** Implement runtime packaging only for the bounded U6a scope without
 overclaiming release readiness.

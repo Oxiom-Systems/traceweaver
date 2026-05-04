@@ -16,6 +16,28 @@ The project needs a lightweight Agent Skills contribution that manages systems e
 Brainstorming and idea refinement create candidate ideas, needs, assumptions,
 risks, and success signals. They do not create implementation authority.
 
+TraceWeaver's core architecture must preserve intent through a controlled
+authority baseline, not through broad agent context alone. The requirement
+document is not merely helpful background; it is part of the authority baseline
+that bounds what agents may implement, review, or modify.
+
+Core invariant:
+
+```text
+No agent may implement, review, or modify behavior unless it can point to:
+1. stakeholder intent,
+2. approved requirement or approved exception,
+3. verification method,
+4. validation intent,
+5. current baseline version.
+```
+
+Agents may reason, propose, and identify gaps, but they must not silently
+convert their own interpretation into implementation authority. If an agent says
+"I assumed...", that assumption must become an open question, proposed
+requirement, approved exception, accepted risk, or rejected assumption before it
+can affect implementation authority.
+
 It should also trace the engineering documents themselves so the record can be followed from `requirements.md` to `plan.md`, the traceability artifact, the acceptance test plan/procedure, and the final acceptance or verification results.
 
 The skill also needs practical setup and maintenance tooling, expressed first as agent-executable workflow and Markdown artifacts rather than executable automation. In systems engineering terms:
@@ -176,6 +198,41 @@ MVP use cases:
 - R52. TraceWeaver Core lifecycle guidance must explain how the core skills work together across idea / intent, candidate needs, draft requirements, requirements quality review, approved requirements or approved exceptions, design decisions, implementation, verification, validation, and change control.
 - R53. TraceWeaver CE is the Compound Engineering adapter. CE-specific wrappers such as `ce-traceability`, `ce-traceability-reviewer`, and any future `ce-requirements-reviewer` may wire the core capabilities into CE workflows, but they must not become the source definition of the core capabilities.
 
+**Intent Contract and Authority Baseline**
+- R54. TraceWeaver must define an Intent Contract as the mandatory lightweight
+  authority package for agent work. The contract must identify stakeholder
+  intent, approved requirements, approved exceptions, blocked assumptions,
+  verification methods, validation questions, out-of-scope items, and current
+  baseline version/hash.
+- R55. The alpha Intent Contract may be file-based and repo-local, using
+  `.traceweaver/intent-contract.yml` and supporting files rather than a
+  database.
+- R56. Every meaningful planning, implementation, review, or behavior-change
+  task must have an Intent Capsule or equivalent bounded work package that names
+  `authorized_by`, `intent_served`, `verification_required`,
+  `validation_question`, `must_not_change`, and open assumptions.
+- R57. If a task has no approved requirement or approved exception in its Intent
+  Capsule, the agent must not implement or review behavior as authorized. It may
+  only create an open question, proposed requirement, gap, risk, exception, or
+  change request.
+- R58. Before planning treats a requirements document as authority,
+  TraceWeaver must run requirements review and authority-gate checks against the
+  Intent Contract or produce advisory findings showing missing intent,
+  weak requirements, assumptions, approved exceptions, and blocked areas.
+- R59. During implementation, agents must output an intent check that cites the
+  requirement or exception being implemented, the stakeholder intent served,
+  what changed, what did not change, assumptions discovered, and trace evidence.
+- R60. During review, TraceWeaver must classify any meaningful behavior without
+  approved intent/requirement/exception trace as dark behavior. Dark behavior
+  must be removed, linked to authority, or recorded as an approved exception.
+- R61. Verification evidence must travel with the requirement or Intent Capsule,
+  but test success alone is not sufficient. The validation question must also
+  travel with the task so reviewers can ask whether the work still solves the
+  stakeholder's intended problem.
+- R62. The alpha workflow may remain advisory. Advisory mode may warn, produce
+  records, and mark claims held, but it must still make missing authority and
+  intent drift visible at every handoff.
+
 ---
 
 ## Acceptance Examples
@@ -190,6 +247,16 @@ MVP use cases:
 - AE8. **Covers R43-R49.** Given an agent reframes a vague stakeholder statement into success criteria, when the criteria may authorize implementation, requirements-reviewer preserves the original wording and source, reviews the reframe for quality and intent preservation, leaves the reframe in `Draft` until approval, and blocks weak requirements from becoming approved requirements unless they are converted into approved exceptions.
 - AE9. **Covers R50.** Given a lifecycle prompt includes both requirements or success criteria and meaningful behavior, when skill discovery runs, the agent routes through both requirements-reviewer and systems-engineering-traceability instead of stopping after the first broad match.
 - AE10. **Covers R51-R53.** Given a CE adapter needs traceability in `ce-work` or `ce-doc-review`, when it is implemented, it wraps or invokes the Core skills instead of redefining requirements quality or traceability rules inside CE-specific guidance.
+- AE11. **Covers R54-R62.** Given an agent starts a behavior-changing task,
+  when it receives no Intent Capsule with approved `authorized_by` authority,
+  then it stops implementation and creates a gap, proposed requirement,
+  exception, or clarification record instead of treating its assumption as
+  authority.
+- AE12. **Covers R54-R62.** Given `ce-code-review` inspects a PR, when it finds
+  meaningful behavior with no linked stakeholder intent, approved requirement or
+  exception, verification method, validation question, and baseline version, it
+  labels that behavior as dark behavior and requires removal, authority linkage,
+  or an approved exception.
 
 ---
 
@@ -206,6 +273,10 @@ MVP use cases:
 - The requirements-reviewer capability is defined as a first-class lifecycle quality gate before requirements become implementation authority.
 - Requirements-quality routing and traceability routing are cumulative when both apply to the same lifecycle work.
 - Requirements-reviewer and systems-engineering-traceability are clearly defined as Core capabilities, while TraceWeaver CE is clearly defined as the Compound Engineering adapter.
+- The Intent Contract is defined as the controlled authority baseline for agent
+  work, and every meaningful behavior change has a visible path to stakeholder
+  intent, approved authority, verification evidence, validation intent, and the
+  current baseline.
 
 ---
 
@@ -226,6 +297,9 @@ MVP use cases:
 - The TraceWeaver Core bundle must include the core skills, a concise operating model, a concise traceability matrix template, the requirements/V&V guide, and the risk/gap/change-control guide. If the upstream PR is packaged smaller than Core, that reduction must be recorded as a scope decision.
 - Compound Engineering-specific hooks, reviewers, delegation payloads, and CE wrappers belong to TraceWeaver CE, not the Core source definition.
 - Human acceptance of weak, ambiguous, unverifiable, implementation-biased, or incomplete requirements must create an approved exception record, not an approved requirement.
+- Alpha enforcement may stay advisory, but missing Intent Contract authority
+  must be visible as warnings, held claims, gaps, proposed requirements,
+  exceptions, or change records.
 
 ---
 
@@ -244,6 +318,15 @@ MVP use cases:
 - Treat validation plans as acceptable before merge when real validation depends on later stakeholder review, staged rollout, telemetry, or production use.
 - Treat inferred requirements as `Draft` until human-approved to reduce fake traceability.
 - Keep executable tooling out of the first PR unless maintainers explicitly ask for it.
+- Introduce `.traceweaver/intent-contract.yml` as the lightweight authority
+  baseline shape before adding heavier automation. Use files for alpha:
+  `.traceweaver/authority-baseline.yml`, `.traceweaver/task-capsules/`,
+  `.traceweaver/trace-records/`, `.traceweaver/gaps/`,
+  `.traceweaver/changes/`, and `.traceweaver/exceptions/`.
+- Treat every agent prompt as bounded by the Intent Contract. Agents are not the
+  authority; they may propose changes, but they must cite intent, requirement or
+  exception, verification evidence, validation question, and baseline version
+  for every meaningful behavior change.
 
 ---
 

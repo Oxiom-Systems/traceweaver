@@ -1,0 +1,25 @@
+task_id: TASK-FIX-U9-TRACE-WRITE-001
+task_status: fixture_only
+baseline_id: REQ-FIX-U9-TRACE-WRITE-001
+baseline_hash_sha256: fixture_temp_copy_only
+
+authorized_by:
+  - REQ-FIX-003
+intent_served:
+  - INTENT-FIX-001
+verification_required:
+  - fixture trace-write smoke writes only to a temporary copy
+validation_question: Does the write proof leave real project authority files unchanged?
+
+must_not_change:
+  - real repository authority files outside the temporary fixture copy
+
+open_assumptions: []
+
+missing_authority_disposition:
+  if_authorized_by_is_empty: create_gap_or_change_and_do_not_implement
+
+trace_output:
+  expected_record_path: .traceweaver/trace-records/TASK-FIX-U9-TRACE-WRITE-001-trace.yml
+
+next_step: Run the fixture smoke harness in a temporary copy.

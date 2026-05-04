@@ -1,0 +1,16 @@
+gap_id: GAP-001
+status: open
+linked_intent: "<intent id>"
+linked_requirement: null
+proposed_requirement_id: REQ-PROPOSED-001
+clarification_question_id: null
+reason: "<missing, weak, conflicting, or ambiguous authority>"
+proposed_disposition: proposed_requirement | clarification_needed | rejected_assumption | accepted_risk_candidate
+owner: "<owner>"
+review_gate: "<gate or workflow step>"
+created_at: YYYY-MM-DD
+
+implementation_rule: No meaningful implementation may use this gap as authority until it is promoted to an approved requirement or approved exception.
+
+next_recommended_steps:
+  - Run tw-requirements-review after the proposed requirement or clarification is drafted.

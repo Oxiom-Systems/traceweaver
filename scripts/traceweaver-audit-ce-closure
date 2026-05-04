@@ -1,0 +1,52 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+inventory_path = ARGV[0] || "docs/validation/traceweaver-core-11-ce-runtime-inventory.md"
+plugin_root = ARGV[1] || "plugins/traceweaver-core"
+
+inventory = File.read(inventory_path)
+selected_skill_files = inventory.scan(/`(skills\/[^`]+)` \| `[0-9a-f]{64}` \| selected skill file/).flatten
+selected_set = selected_skill_files.to_h { |path| [path, true] }
+skill_dirs = selected_skill_files
+  .select { |path| path.end_with?("/SKILL.md") }
+  .map { |path| path.split("/")[0, 2].join("/") }
+  .select { |path| path.start_with?("skills/ce-") || path == "skills/lfg" }
+selected_ce_files = selected_skill_files.select do |path|
+  skill_dirs.any? { |dir| path == dir || path.start_with?("#{dir}/") }
+end
+
+abort "No selected CE skill entrypoints found in #{inventory_path}" if skill_dirs.empty?
+
+support_pattern = /(?<![\w\/.-])(?:@?(?:\.\/|\.\.\/)*)((?:references|scripts|assets)\/[A-Za-z0-9._\/-]+)/
+missing = []
+untracked = []
+checked = []
+scanned = []
+
+selected_ce_files.uniq.each do |selected_path|
+  path = File.join(plugin_root, selected_path)
+  unless File.file?(path)
+    missing << selected_path
+    next
+  end
+
+  scanned << selected_path
+  skill_dir = selected_path.split("/")[0, 2].join("/")
+  File.read(path).scan(support_pattern).flatten.uniq.each do |relative|
+    relative = relative.sub(/[),.;:]+$/, "")
+    next if relative.end_with?("/")
+
+    packaged_relative = File.join(skill_dir, relative)
+    checked << packaged_relative
+    missing << packaged_relative unless File.file?(File.join(plugin_root, packaged_relative))
+    untracked << packaged_relative unless selected_set[packaged_relative]
+  end
+end
+
+puts "skill_entrypoints=#{skill_dirs.size}"
+puts "selected_ce_files_scanned=#{scanned.uniq.size}"
+puts "support_references_checked=#{checked.uniq.size}"
+puts "missing=#{missing.uniq.empty? ? 'none' : missing.uniq.join(',')}"
+puts "untracked=#{untracked.uniq.empty? ? 'none' : untracked.uniq.join(',')}"
+
+exit 1 unless missing.uniq.empty? && untracked.uniq.empty?
