@@ -103,7 +103,7 @@ capsules, trace records, or runtime validation evidence.
   `6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba`,
   prior review evidence `CE-DOC-REVIEW-2026-05-02-AUTHORITY-STATE-CLEAN-001`,
   Unit 1 through Unit 8 reviewed/held evidence, and `u9_input_status` ending in
-  `unit9_registry_shape_auth_boundary_patch_code_review_pending_authority_doc_review_pending_runtime_claims_held`.
+  `unit9_registry_shape_auth_boundary_patch_code_reviewed_doc_reviewed_held_runtime_claims_held`.
   Unit 1 evidence is reviewed only as isolated install/discovery planning input.
   Unit 2 fixture smoke is reviewed only as fixture classification and
   temporary-copy trace-write input for later U9 units. Unit 3 deterministic
@@ -128,8 +128,12 @@ capsules, trace records, or runtime validation evidence.
   `.codex/traceweaver-core/skills`, proved prompt-input visibility for required
   `tw-*`, `lfg`, and wrapped CE skills, then added a live-auth-copy boundary
   hold after the fresh exec probe reached the exact skill-hash sentinel.
-  Refreshed Unit 9 behavior-code review and authority doc review remain pending;
-  real runtime invocation and release claims stay held.
+  Refreshed Unit 9 behavior-code review passed as
+  `CE-CODE-REVIEW-2026-05-04-U9-UNIT9-AUTH-BOUNDARY-HARNESS-CLEAN-001`;
+  authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-04-U9-UNIT9-AUTHORITY-CLEAN-001`. Unit 9 is accepted
+  only as reviewed-held registry-shape/auth-boundary evidence; real runtime
+  invocation and release claims stay held.
 - `traceability-matrix.md` records U7 static/advisory acceptance while keeping
   U9/runtime, release, clean-replacement, enforcing, slash-command, autonomous
   publication, and `tw-grill` implementation-authority claims held.
@@ -750,7 +754,7 @@ TraceWeaver skills are visible to the runtime registry.
   Active host-registry discovery, real `tw-*` runtime invocation, and runtime
   claims remain held.
 
-- [ ] **Unit 9: Registry-Shape Repair And Prompt-Input Visibility Proof**
+- [x] **Unit 9: Registry-Shape Repair And Prompt-Input Visibility Proof**
 
 **Goal:** Remove the duplicate active Codex skill surface that kept the `tw-*`
 adapters out of the visible skill registry, then prove the repaired install
@@ -797,8 +801,12 @@ shape in an isolated Codex home.
   Codex auth file during read-only exec.
 - Registry-shape and legacy-upgrade code review passed with no findings as
   `CE-CODE-REVIEW-2026-05-04-U9-UNIT9-INSTALLER-HARNESS-CLEAN-001`; refreshed
-  behavior-code review for the auth-boundary patch and authority doc review are
-  pending before Unit 9 can be accepted as U9 input.
+  behavior-code review for the auth-boundary patch passed as
+  `CE-CODE-REVIEW-2026-05-04-U9-UNIT9-AUTH-BOUNDARY-HARNESS-CLEAN-001`;
+  authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-04-U9-UNIT9-AUTHORITY-CLEAN-001`. Unit 9 is accepted
+  only as reviewed-held registry-shape/auth-boundary evidence; runtime
+  invocation remains held.
 
 ## Risks And Mitigations
 
@@ -832,8 +840,7 @@ shape in an isolated Codex home.
 
 ## Suggested Next Step
 
-Run `/ce-code-review` on the refreshed Unit 9 behavior harness set, then
-`/ce-doc-review` on the Unit 9 authority set before accepting Unit 9 as U9
-input. Keep real `tw-*` runtime invocation and release/runtime claims held until
-a passing fresh exec transcript exists without the copied-auth boundary or an
-accepted limitation explicitly holds that boundary.
+Proceed to an auth-safe fresh exec/runtime proof before any real `tw-*`
+invocation claim. Keep release/runtime claims held until a passing fresh exec
+transcript exists without the copied-auth boundary or an accepted limitation
+explicitly holds that boundary.
