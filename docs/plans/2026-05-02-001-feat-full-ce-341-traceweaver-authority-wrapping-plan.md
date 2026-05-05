@@ -313,9 +313,10 @@ on `plugins/traceweaver-core/skills/` as of this plan.
 Executable scope for this plan:
 
 - Create the Unit 1A current/core inventory and product-checkpoint evidence.
-  Full 37-skill and whole-plugin inventory is executable only as Unit 1B after
-  the checkpoint returns `full_surface_supported` or records an accepted
-  `product_exception`; otherwise broad surfaces are held with reopen triggers.
+  Full 38 `ce-*` skill inventory plus upstream `lfg` and whole-plugin inventory
+  is executable only as Unit 1B after the checkpoint returns
+  `full_surface_supported` or records an accepted `product_exception`;
+  otherwise broad surfaces are held with reopen triggers.
 - Define the wrapper architecture, first-run/bootstrap policy, canonical naming
   rules, package-surface states, and migration/default-prompt guidance needed
   before wrapper implementation.
@@ -684,8 +685,8 @@ Verification:
 - Unit 1A inventory count proves current packaged behavior-bearing entrypoint
   count, core CE method surface count, and upstream `lfg` presence for the
   product-checkpoint evidence boundary.
-- Unit 1B inventory count proves `upstream_ce_skill_count=37` for `ce-*`
-  directories and `upstream_loader_skill_directory_count=38` when upstream `lfg`
+- Unit 1B inventory count proves `upstream_ce_skill_count=38` for `ce-*`
+  directories and `upstream_loader_skill_directory_count=39` when upstream `lfg`
   is included, or records broad-surface inventory as held when Unit 1A returns
   `narrow_to_core_method`.
 - Unit 1B whole-plugin inventory count proves every upstream manifest, prompt,
