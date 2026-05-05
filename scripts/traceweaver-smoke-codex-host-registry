@@ -4,9 +4,39 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 codex_home="${CODEX_HOME:-$HOME/.codex}"
 skills_root="$codex_home/skills"
+config_file="$codex_home/config.toml"
+model="${TRACEWEAVER_CODEX_MODEL:-gpt-5.2}"
+exec_timeout_seconds="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-60}"
+host_runtime_exec="${TRACEWEAVER_HOST_RUNTIME_EXEC:-1}"
 
 hash_file() {
   shasum -a 256 "$1" | awk '{print $1}'
+}
+
+compound_engineering_plugin_enabled() {
+  if [ ! -f "$config_file" ]; then
+    echo "unknown_config_missing"
+    return
+  fi
+
+  awk '
+    $0 == "[plugins.\"compound-engineering@compound-engineering-plugin\"]" {
+      in_section = 1
+      next
+    }
+    /^\[/ && in_section {
+      in_section = 0
+    }
+    in_section && $1 == "enabled" {
+      gsub(/[[:space:]]/, "", $3)
+      print $3
+      found = 1
+      exit
+    }
+    END {
+      if (!found) print "unknown_setting_missing"
+    }
+  ' "$config_file"
 }
 
 required_direct_skills=(
@@ -67,23 +97,130 @@ for skill_name in "${traceweaver_native_skills[@]}"; do
   fi
 done
 
+active_skill_directory_count="$(find "$skills_root" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')"
+ce_plugin_enabled="$(compound_engineering_plugin_enabled)"
+
+runtime_tmp="$(mktemp -d /tmp/traceweaver-host-runtime.XXXXXX)"
+prompt_input="$runtime_tmp/prompt-input.json"
+visible_skills="$runtime_tmp/visible-skills.txt"
+prompt="$runtime_tmp/prompt.txt"
+last_message="$runtime_tmp/last-message.txt"
+events="$runtime_tmp/exec-events.jsonl"
+stderr_log="$runtime_tmp/exec.err"
+expected_authority_gate_hash=""
+
+cat >"$prompt" <<'EOF'
+Use the tw-authority-gate skill. You may run read-only shell commands only to
+open or hash the installed skill file named in the available-skills list. Do not
+edit files.
+
+Reply exactly in this format and nothing else, replacing HASH with the SHA-256
+of the installed tw-authority-gate SKILL.md file you inspected:
+
+TRACEWEAVER_SKILL_HASH=HASH
+
+If the skill is unavailable, not listed, not loaded, or cannot be used, reply
+exactly with this one line and nothing else:
+
+TRACEWEAVER_SKILL_HELD=not_available
+EOF
+
+set +e
+codex debug prompt-input "Use the tw-authority-gate skill." >"$prompt_input" 2>"$runtime_tmp/prompt-input.err"
+prompt_input_status=$?
+set -e
+
+if [ "$prompt_input_status" -eq 0 ]; then
+  jq -r '.. | strings' "$prompt_input" | perl -ne 'print "$1\n" if /^- ([A-Za-z0-9_.:-]+): /' >"$visible_skills"
+else
+  : >"$visible_skills"
+fi
+
+missing_prompt_input_skills=()
+for skill_name in "${required_direct_skills[@]}"; do
+  if ! grep -qx "$skill_name" "$visible_skills"; then
+    missing_prompt_input_skills+=("$skill_name")
+  fi
+done
+
+if [ -f "$skills_root/tw-authority-gate/SKILL.md" ]; then
+  expected_authority_gate_hash="$(hash_file "$skills_root/tw-authority-gate/SKILL.md")"
+fi
+
+exec_status=99
+normalized_message=""
+if [ "$host_runtime_exec" = "1" ]; then
+  set +e
+  perl -e 'alarm shift; exec @ARGV' "$exec_timeout_seconds" codex exec \
+    -m "$model" \
+    --sandbox read-only \
+    --skip-git-repo-check \
+    --ignore-rules \
+    --output-last-message "$last_message" \
+    --json <"$prompt" >"$events" 2>"$stderr_log"
+  exec_status=$?
+  set -e
+  message="$(cat "$last_message" 2>/dev/null || true)"
+  normalized_message="$(printf '%s' "$message" | tr -d '\r' | sed -e 's/[[:space:]]*$//')"
+fi
+
 echo "codex_host_skills_root=$skills_root"
+echo "codex_host_active_skill_directory_count=$active_skill_directory_count"
+echo "codex_host_compound_engineering_plugin_enabled=$ce_plugin_enabled"
 echo "codex_host_required_skills=${required_direct_skills[*]}"
 echo "codex_host_present_skills=${present[*]:-none}"
 echo "codex_host_missing_skills=${missing[*]:-none}"
 echo "codex_host_unmarked_skills=${unmarked[*]:-none}"
 echo "codex_host_stale_skills=${stale[*]:-none}"
+echo "codex_host_prompt_input=$prompt_input"
+echo "codex_host_visible_skills=$visible_skills"
+echo "codex_host_prompt_input_exit_code=$prompt_input_status"
 
 if [ "${#native_missing[@]}" -gt 0 ]; then
   echo "codex_host_traceweaver_native_missing=${native_missing[*]}"
 fi
 
+if [ "${#missing_prompt_input_skills[@]}" -eq 0 ]; then
+  echo "codex_host_prompt_input_registry_probe=pass_required_skills_visible"
+  if [ "$ce_plugin_enabled" = "false" ]; then
+    echo "codex_host_registry_visibility_condition=pass_required_skills_visible_with_external_ce_plugin_disabled"
+  else
+    echo "codex_host_registry_visibility_condition=pass_required_skills_visible_with_current_plugin_config"
+  fi
+else
+  echo "codex_host_prompt_input_registry_probe=held_required_skills_not_visible"
+  echo "codex_host_prompt_input_missing_skills=${missing_prompt_input_skills[*]}"
+fi
+
 if [ "${#missing[@]}" -eq 0 ] && [ "${#stale[@]}" -eq 0 ] && [ "${#unmarked[@]}" -eq 0 ]; then
   echo "codex_host_registry_filesystem_probe=pass_traceweaver_direct_callable_files_present"
-  echo "host_codex_registry_discovery=held_active_session_callable_registry_not_proven"
+  if [ "${#missing_prompt_input_skills[@]}" -eq 0 ]; then
+    echo "host_codex_registry_discovery=pass_prompt_input_registry_required_skills_visible"
+  else
+    echo "host_codex_registry_discovery=held_active_session_callable_registry_not_proven"
+  fi
 else
   echo "codex_host_registry_filesystem_probe=held_missing_or_untrusted_direct_callable_files"
   echo "host_codex_registry_discovery=held_missing_traceweaver_direct_callable_host_install_or_active_registry_reload"
 fi
 
-echo "real_tw_skill_runtime_invocation=held_no_host_transcript_or_runner"
+echo "codex_host_runtime_exec_enabled=$host_runtime_exec"
+echo "codex_host_exec_events=$events"
+echo "codex_host_exec_stderr=$stderr_log"
+echo "codex_host_exec_last_message=$last_message"
+echo "codex_host_expected_tw_authority_gate_hash=${expected_authority_gate_hash:-missing}"
+echo "codex_host_exec_exit_code=$exec_status"
+
+if [ "$host_runtime_exec" != "1" ]; then
+  echo "real_tw_skill_runtime_invocation=held_host_runtime_exec_disabled"
+elif [ "$exec_status" -ne 0 ]; then
+  echo "real_tw_skill_runtime_invocation=held_host_codex_exec_failed"
+elif [ "$normalized_message" = "TRACEWEAVER_SKILL_HELD=not_available" ] || printf '%s' "$normalized_message" | grep -Eiq "(not available|not listed|not loaded|cannot be used|unavailable|not found|no such skill)"; then
+  echo "real_tw_skill_runtime_invocation=held_host_exec_skill_not_available"
+elif [ -n "$expected_authority_gate_hash" ] && [ "$normalized_message" = "TRACEWEAVER_SKILL_HASH=$expected_authority_gate_hash" ] && { [ "${#missing[@]}" -ne 0 ] || [ "${#stale[@]}" -ne 0 ] || [ "${#unmarked[@]}" -ne 0 ] || [ "${#missing_prompt_input_skills[@]}" -ne 0 ]; }; then
+  echo "real_tw_skill_runtime_invocation=held_host_registry_untrusted_after_skill_hash_sentinel"
+elif [ -n "$expected_authority_gate_hash" ] && [ "$normalized_message" = "TRACEWEAVER_SKILL_HASH=$expected_authority_gate_hash" ]; then
+  echo "real_tw_skill_runtime_invocation=pass_host_tw_authority_gate_skill_file_read"
+else
+  echo "real_tw_skill_runtime_invocation=held_host_exec_unclassified_transcript"
+fi
