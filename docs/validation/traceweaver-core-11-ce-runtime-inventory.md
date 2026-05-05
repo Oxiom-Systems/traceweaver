@@ -1,6 +1,6 @@
 # TraceWeaver Core 11 CE Runtime Inventory
 
-Status: `SOURCE_INVENTORY_REFRESHED_FOR_U6B_REVIEW`
+Status: `HISTORICAL_CE_341_INVENTORY_SUPERSEDED_FOR_CURRENT_WRAPPER_BACKLOG_BY_CE_350_SOURCE_REFRESH`
 
 Date/session: 2026-05-01, upstream refresh from Compound Engineering `3.4.1` on branch
 `codex/traceweaver-u6-unblock-next`
@@ -10,17 +10,30 @@ TraceWeaver clean-swap plan. U6b Unit 2 consumes this inventory for static
 materialization evidence, but this record alone does not prove CE runtime
 loading, approve a clean swap, or create U7 release claims.
 
+Supersession note for current wrapper-backlog work:
+
+- This record remains historical U6b evidence for the originally reviewed
+  selected package deltas.
+- Current full-surface and wrapper-backlog decisions use Compound Engineering
+  3.5.0 from `/Users/hanneszietsman/CrypotAI/compound-engineering-plugin-main-3.5.0`
+  at upstream commit `1f3c6466e4eb4e1b584c658953dfb1ca98dd3335`.
+- Agents must not use this CE 3.4.1 inventory to claim current CE plugin parity,
+  current source-surface coverage, clean replacement, or support for unwrapped
+  CE 3.5.0 skills.
+
 ## Decision Record
 
 Record ID: `TWCORE-CE-RUNTIME-INVENTORY-2026-05-01-002`
 
-Decision state: `source_pin_refreshed_for_u6b_unit2_static_materialization_review`
+Decision state: `historical_source_pin_for_u6b_unit2_static_materialization_review_current_backlog_superseded_by_ce_350`
 
 Allowed use:
 
 - plan the TraceWeaver clean-swap runtime bundle;
 - decide which CE files need license/provenance/hash records before copying;
 - identify agent-backed CE claims that remain held until runtime behavior proof.
+- compare historical U6b selected deltas against the current CE 3.5.0
+  source-surface refresh only as stale-context evidence, not current authority.
 
 Held claims:
 

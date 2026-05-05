@@ -1,6 +1,6 @@
 # TraceWeaver U9 Codex Runtime Discovery Evidence
 
-Status: `UNIT1_ISOLATED_CODEX_INSTALL_DISCOVERY_SMOKE_DOC_REVIEW_PASSED_UNIT2_FIXTURE_SMOKE_DOC_REVIEW_PASSED_UNIT3_GATE_BEHAVIOR_SMOKE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT4_BOUNDARY_SMOKE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT5_HOST_REGISTRY_FILESYSTEM_PROBE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT7_HOST_INSTALL_ATTEMPT_DOC_REVIEW_PASSED_UNIT8_SEPARATE_HOME_INSTALL_PASSED_FRESH_EXEC_REGISTRY_REVIEWED_HELD_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT9_REGISTRY_SHAPE_REPAIR_AUTH_BOUNDARY_PATCH_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_UNIT10_AUTH_SAFE_FRESH_EXEC_AND_ACTIVE_HOST_RUNTIME_PROBES_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_REVIEWED_HELD_UNIT11_ACTIVE_HOST_RECONCILED_RUNTIME_PASS_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_CONSTRAINED_RUNTIME_ACCEPTED`
+Status: `UNIT1_ISOLATED_CODEX_INSTALL_DISCOVERY_SMOKE_DOC_REVIEW_PASSED_UNIT2_FIXTURE_SMOKE_DOC_REVIEW_PASSED_UNIT3_GATE_BEHAVIOR_SMOKE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT4_BOUNDARY_SMOKE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT5_HOST_REGISTRY_FILESYSTEM_PROBE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT7_HOST_INSTALL_ATTEMPT_DOC_REVIEW_PASSED_UNIT8_SEPARATE_HOME_INSTALL_PASSED_FRESH_EXEC_REGISTRY_REVIEWED_HELD_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT9_REGISTRY_SHAPE_REPAIR_AUTH_BOUNDARY_PATCH_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_UNIT10_AUTH_SAFE_FRESH_EXEC_AND_ACTIVE_HOST_RUNTIME_PROBES_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_REVIEWED_HELD_UNIT11_ACTIVE_HOST_RECONCILED_RUNTIME_PASS_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_CONSTRAINED_RUNTIME_ACCEPTED_WRAPPER_DIRECT_CALLABLE_EXPANSION_RECORDED_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PENDING`
 
 Date/session: 2026-05-02, `ce:work`
 
@@ -151,15 +151,16 @@ Allowed use after refreshed Unit 8 authority review closure:
   with external CE plugin disabled and non-required user skills moved out of the
   active scan path;
 - continue planning later U9 host-registry/runtime work with unconstrained host
-  support, broader skill invocation, and project-level runtime write behavior
-  explicitly held.
+  support, broader skill invocation including `tw-code-review`/`tw-doc-review`
+  wrapper behavior, and project-level runtime write behavior explicitly held.
 
 Held claims:
 
 - unconstrained active Codex host-registry discovery;
 - real fresh Codex exec skill invocation beyond the constrained Unit 11
   active-host `tw-authority-gate` sentinel proof;
-- real `tw-auto`, `lfg`, or `tw-grill` runtime invocation;
+- real `tw-auto`, `lfg`, `tw-grill`, `tw-code-review`, or `tw-doc-review`
+  runtime invocation;
 - matrix/trace/gap/change/exception write behavior outside temporary-copy
   fixture proof;
 - clean CE replacement;
@@ -173,24 +174,26 @@ Held claims:
 | File | SHA-256 | Role | Decision |
 | --- | --- | --- | --- |
 | `src/index.ts` | `d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5` | Repo-local Codex installer | Unit 9 registry-shape repair code review and authority doc review passed; runtime held. Packaged skills now install outside `.codex/skills`, leaving only direct callable skills as active registry surface, and owned legacy active namespaced surfaces are removed during upgrade. |
-| `scripts/traceweaver-smoke-codex-discovery` | `20856843b57a9dcf852c8a2b7905cac19555837884a037dc821ba7d934b362c5` | Unit 1 isolated Codex install/discovery smoke harness plus Unit 4 installed `lfg` boundary check and Unit 9 registry-shape visibility/legacy-upgrade proof | Unit 9 smoke passed; code review and authority doc review passed; runtime held. |
-| `scripts/traceweaver-smoke-codex-host-registry` | `5e2a89b0e44b171f6d0589d4092620d22410ec77388f2ecd1ab0c3b09a0aa636` | Unit 5 read-only current Codex host-home filesystem registry probe, extended by Unit 10 to capture active prompt-input and read-only host `codex exec` runtime evidence, and extended by Unit 11 to print active skill-surface count plus external CE plugin state | Unit 11 constrained runtime proof accepted: active host has 11 active skill directories, external CE plugin disabled, all required direct callable files present/marked/current, required skills visible in prompt-input, and `codex exec` returned the exact `tw-authority-gate` skill-hash sentinel. Code review and authority doc review passed; broader runtime claims remain held. |
-| `scripts/traceweaver-smoke-codex-separate-home-runtime` | `af6414475e1d8b0cb60649412e0a9c6c4e1901d452016a92cc8c0ef56955a659` | Unit 8 separate Codex home install plus fresh `codex exec` registry probe, updated by Unit 9 to require all required visible skills and hold live-auth-copy runtime results, and updated by Unit 10 to default to auth-safe no-copy execution | Unit 10 separate-home auth-safe probe behavior-code review passed. Required skills are visible and no auth copy is retained, but isolated `codex exec` fails with auth required; authority doc review passed for reviewed-held limitation evidence only, and runtime invocation remains held. |
+| `scripts/traceweaver-smoke-codex-discovery` | `ffd91f8fd9c1da054acdcb817ff9d74acf1e7fda869ec9f09c40baa32f08a5ce` | Unit 1 isolated Codex install/discovery smoke harness plus Unit 4 installed `lfg` boundary check, Unit 9 registry-shape visibility/legacy-upgrade proof, wrapper direct-callable visibility expansion, and candidate `tw-code-review`/`tw-doc-review` visibility expansion | Wrapper expansion recorded/code-review-passed/authority-doc-review-pending for prior CE wrappers; candidate review wrappers recorded/review-pending: isolated smoke now expects `tw-code-review` and `tw-doc-review` as required direct callable and prompt-input visible skill sets. Runtime wrapper behavior and publication remain held. |
+| `scripts/traceweaver-smoke-codex-host-registry` | `e65c8a24ffb5d3192ade9f721e6a7a60b0ebb56489fce62c3646fa8d218aa224` | Unit 5 read-only current Codex host-home filesystem registry probe, extended by Unit 10 to capture active prompt-input and read-only host `codex exec` runtime evidence, extended by Unit 11 to print active skill-surface count plus external CE plugin state, and extended to require selected CE wrapper continuity entries plus candidate TW review wrappers | Candidate review-wrapper expansion recorded/review-pending: required direct callable lists now include `tw-code-review` and `tw-doc-review`; current host probe holds because those new direct callable entries are not installed in the active host and `tw-auto` is stale until the next host reconciliation/install. Runtime wrapper behavior, commit, push, PR, and publication claims remain held. |
+| `scripts/traceweaver-smoke-codex-separate-home-runtime` | `a6852d5b3f90a1328723f6284f88aaedf67a579f79e0737402a52e5309507b63` | Unit 8 separate Codex home install plus fresh `codex exec` registry probe, updated by Unit 9 to require all required visible skills, updated by Unit 10 to default to auth-safe no-copy execution, and extended to require selected CE wrapper continuity entries plus candidate TW review wrappers in the visible-skill set | Candidate review-wrapper expansion recorded/review-pending; isolated visible-skill expectations now include `tw-code-review` and `tw-doc-review`. Runtime invocation remains limited to the existing `tw-authority-gate` sentinel path and broader wrapper behavior remains held. |
 | `scripts/traceweaver-smoke-no-publication` | `9e14b7066ed0d6d7e55f82df106dff41db8d18eb0d59be88dd5748e73f9def40` | Unit 4 PR-helper publication-stop, `lfg` delegation, and event-derived reviewer backpressure boundary smoke | Pass accepted as reviewed deterministic boundary evidence. |
 | `scripts/traceweaver-smoke-u9-fixtures` | `0646c25d475cb5bfa33864e84f6b9167b4c2fddb4b8061612a5979a1034c1d3f` | Unit 2 fixture classification, temporary-copy trace-write, and Unit 3 deterministic gate-behavior smoke harness | Unit 2 pass accepted; Unit 3 dependency-coverage patch recorded / behavior-bearing code review passed. |
 | `fixtures/u9-codex/` | aggregate `3134b4f39d4856137574f35f1377eb4289b03a95fb94e82f99212b281ca423de` | Synthetic U9 fixture workspaces | Fixture-only evidence; not project authority. |
 | `fixtures/u9-codex/authority-present/.traceweaver/intent-contract.yml` | `ef69fea4eb63e724876619b37c15efcc4ec7bf334c7178c1d47f0c5c35a24f1c` | Fixture Intent Contract with matching requirements and matrix hashes | Pass candidate for fixture scan. |
 | `fixtures/u9-codex/authority-present/requirements.md` | `8dff15a195efe8849372f330433f450ed2c3ea765d306a95be84a8a0b4893f68` | Fixture accepted-requirements baseline | Hash matches fixture Intent Contract. |
 | `fixtures/u9-codex/authority-present/traceability-matrix.md` | `ee265542c7ba0ab4b750c29178ab0e0d00003ca730b2844adfdf5061641ec17a` | Fixture traceability matrix | Hash matches fixture Intent Contract. |
-| `docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md` | `84b36f3484ab09412fb444a508b7ebb103f71749d5d03b692b94c7b52f9dfd42` | U9 Codex runtime/discovery proof plan | Unit 1 through Unit 10 reviewed/held inputs plus constrained Unit 11 active-host `tw-authority-gate` runtime proof under a controlled host-reconciliation exception with code/doc review passed; broader runtime claims remain held. |
-| `plugins/traceweaver-core/skills/tw-auto/SKILL.md` | `a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3` | Controlled-autonomy alpha skill | Source, packaged installed copy, and direct callable copy hashes matched. |
+| `docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md` | `e5e091453af8e36be37f18222e8e9692ec6b5d5532b1b7670b02b7df0f0e10f5` | U9 Codex runtime/discovery proof plan | Unit 1 through Unit 10 reviewed/held inputs plus constrained Unit 11 active-host `tw-authority-gate` runtime proof under a controlled host-reconciliation exception with code/doc review passed; wrapper direct-callable expansion code review passed / authority doc review pending; candidate `tw-code-review`/`tw-doc-review` visibility/routing recorded review-pending; broader runtime/publication claims remain held. |
+| `plugins/traceweaver-core/skills/tw-auto/SKILL.md` | `f8d89aa7edbb7a7d843cb39ea660ab86ada5e334fbb6c7eaa5673461aeaed73d` | Controlled-autonomy alpha skill | Candidate review-wrapper routing and controlled publication-route wording recorded: review handoffs now use `tw-code-review` and `tw-doc-review` before CE review delegation, and publication remains gated by explicit TraceWeaver publication-route proof. Runtime and publication behavior remain held. |
+| `plugins/traceweaver-core/skills/tw-code-review/SKILL.md` | `3d0e15dc6ebd1dcf8a3f645b8529941ac5378af80f1a617e0e2c79b291051b2f` | Candidate TraceWeaver code-review wrapper | Requires authority load and `tw-traceability-check` before `ce-code-review`; candidate/review-pending; runtime behavior held. |
+| `plugins/traceweaver-core/skills/tw-doc-review/SKILL.md` | `f5cc1fa0a2276184cc9afd5fe9e5ccbc04768b11ff41fa6f526b35c27c34b8d3` | Candidate TraceWeaver doc-review wrapper | Requires requirements-quality and trace/hash/status preflights before `ce-doc-review`; candidate/review-pending; runtime behavior held. |
 | `plugins/traceweaver-core/skills/lfg/SKILL.md` | `ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083` | TraceWeaver compatibility alias | Source, packaged installed copy, and direct callable copy hashes matched. |
 | `plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md` | `93d78f160ee5dd78bd7ebf5dd9cff28e9c1ec3b8f5bfe2b25474b11512e475e3` | Authority gate skill | Source, packaged installed copy, and direct callable copy hashes matched. |
 | `plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md` | `c2ac0332032b577e1749bb7990b01b6875f33d81bbec31de31f52d742250b943` | Traceability check skill | Source, packaged installed copy, and direct callable copy hashes matched. |
 | `plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md` | `f45459c1144646ece057f882da5eb730ff223ec725c19041d59cc3e3c9b7c4e1` | Requirements review skill | Source, packaged installed copy, and direct callable copy hashes matched. |
 | `plugins/traceweaver-core/skills/tw-grill/SKILL.md` | `666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90` | Approved static/advisory source-evidence skill | Source, packaged installed copy, and direct callable copy hashes matched after the two-mode amendment repair; runtime and implementation-authority claims remain held. |
 | `plugins/traceweaver-core/skills/ce-plan/SKILL.md` | `51e97828c6c188850c74d9cbe8b1e7f4db6b5f88f6f9ecdafeaffdef1e2aaf11` | Required `tw-auto` CE-compatible planning dependency | Source, packaged installed copy, and direct callable copy hashes matched. |
-| `plugins/traceweaver-core/skills/ce-work/SKILL.md` | `4d3a91e7025f5fdedf2e454e56ab79e2d8588680a35f7d4d4a35aee933d49b36` | Required `tw-auto` CE-compatible work dependency | Source, packaged installed copy, and direct callable copy hashes matched. |
+| `plugins/traceweaver-core/skills/ce-work/SKILL.md` | `27220abdd867043b957a97c4a051aaab574b7c1eb098e7e5ed97bd6fdc59dfd0` | Required `tw-auto` CE-compatible work dependency | Current source is publication-gated and remains non-publishing until a controlled TraceWeaver publication route authorizes the exact action; runtime and publication behavior remain held. |
 | `plugins/traceweaver-core/skills/ce-code-review/SKILL.md` | `66a1da73677a5fe2e5d3e6292872a2375c697704353799adf0eaa7b3a9f947f9` | Required `tw-auto` CE-compatible code-review dependency | Source, packaged installed copy, and direct callable copy hashes matched. |
 | `plugins/traceweaver-core/skills/ce-doc-review/SKILL.md` | `9b197bee814542328be6153afa5cf560f638eb3fe3ea94ba62c5b66129bdc246` | Required `tw-auto` CE-compatible doc-review dependency | Source, packaged installed copy, and direct callable copy hashes matched. |
 
@@ -209,15 +212,16 @@ The smoke harness performs these checks:
   `bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills --codexHome <TEMP_CODEX_HOME>`;
 - verifies direct callable skill directories for `tw-auto`, `lfg`,
   `tw-authority-gate`, `tw-traceability-check`, `tw-requirements-review`,
-  `tw-grill`, `ce-plan`, `ce-work`, `ce-code-review`, and `ce-doc-review`;
+  `tw-code-review`, `tw-doc-review`, `tw-grill`, `ce-plan`, `ce-work`,
+  `ce-code-review`, and `ce-doc-review`;
 - verifies packaged TraceWeaver copies under
   `<TEMP_CODEX_HOME>/.codex/traceweaver-core/skills/`;
 - verifies each required direct callable copy contains
   `.traceweaver-core-install.json` with plugin `traceweaver-core` and purpose
   `direct-callable-skill-copy`;
 - verifies selected source and installed `SKILL.md` hashes match;
-- verifies the install manifest records 27 skills, 27 direct callable skill
-  copies, 49 selected agent TOML files, 17 reference files, zero prompts, and
+- verifies the install manifest records 29 skills, 29 direct callable skill
+  copies, 49 selected agent TOML files, 18 reference files, zero prompts, and
   zero prompt files;
 - verifies no prompt or command directory is created in the isolated Codex home;
 - verifies a second isolated install fails closed before overwriting an existing
@@ -229,26 +233,28 @@ The smoke harness performs these checks:
 ## Result
 
 ```text
-skill_hash_tw-auto=a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3
+skill_hash_tw-auto=f8d89aa7edbb7a7d843cb39ea660ab86ada5e334fbb6c7eaa5673461aeaed73d
 skill_hash_lfg=ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083
 skill_hash_tw-authority-gate=93d78f160ee5dd78bd7ebf5dd9cff28e9c1ec3b8f5bfe2b25474b11512e475e3
 skill_hash_tw-traceability-check=c2ac0332032b577e1749bb7990b01b6875f33d81bbec31de31f52d742250b943
 skill_hash_tw-requirements-review=f45459c1144646ece057f882da5eb730ff223ec725c19041d59cc3e3c9b7c4e1
+skill_hash_tw-code-review=3d0e15dc6ebd1dcf8a3f645b8529941ac5378af80f1a617e0e2c79b291051b2f
+skill_hash_tw-doc-review=f5cc1fa0a2276184cc9afd5fe9e5ccbc04768b11ff41fa6f526b35c27c34b8d3
 skill_hash_tw-grill=666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90
 skill_hash_ce-plan=51e97828c6c188850c74d9cbe8b1e7f4db6b5f88f6f9ecdafeaffdef1e2aaf11
-skill_hash_ce-work=4d3a91e7025f5fdedf2e454e56ab79e2d8588680a35f7d4d4a35aee933d49b36
+skill_hash_ce-work=27220abdd867043b957a97c4a051aaab574b7c1eb098e7e5ed97bd6fdc59dfd0
 skill_hash_ce-code-review=66a1da73677a5fe2e5d3e6292872a2375c697704353799adf0eaa7b3a9f947f9
 skill_hash_ce-doc-review=9b197bee814542328be6153afa5cf560f638eb3fe3ea94ba62c5b66129bdc246
 codex_discovery_smoke=pass
 temp_codex_home=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home
 installed_manifest=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home/.codex/traceweaver-core/install-manifest.json
-installed_skill_directory_count=27
-installed_callable_skill_directory_count=27
+installed_packaged_skill_directory_count=29
+installed_callable_skill_directory_count=29
 installed_agent_toml_count=49
-installed_reference_file_count=17
+installed_reference_file_count=18
 installed_manifest_prompts=0
 installed_manifest_prompt_files=0
-direct_callable_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review
+direct_callable_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-code-review tw-doc-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
 packaged_traceweaver_skills_root=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home/.codex/traceweaver-core/skills
 direct_callable_skills_root=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home/.codex/skills
 selected_agents_root=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home/.codex/agents/traceweaver-core
@@ -600,7 +606,7 @@ Observed deterministic discovery output:
 codex_discovery_smoke=pass
 installed_packaged_skill_directory_count=27
 installed_callable_skill_directory_count=27
-codex_prompt_input_visible_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review
+codex_prompt_input_visible_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
 active_namespaced_skill_surface=absent
 owned_legacy_active_skill_surface=removed_on_upgrade
 unowned_legacy_active_skill_surface=blocked_before_removal
@@ -700,7 +706,7 @@ Observed active-host runtime output:
 
 ```text
 codex_host_skills_root=/Users/hanneszietsman/.codex/skills
-codex_host_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review
+codex_host_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
 codex_host_present_skills=lfg ce-plan ce-work ce-code-review ce-doc-review
 codex_host_missing_skills=tw-auto tw-authority-gate tw-traceability-check tw-requirements-review tw-grill
 codex_host_unmarked_skills=lfg ce-plan ce-work ce-code-review ce-doc-review
@@ -787,7 +793,7 @@ real_tw_skill_runtime_invocation=pass_host_tw_authority_gate_skill_file_read
 
 ```text
 unit11_active_host_reconciled_runtime_probe_status=constrained_runtime_pass_accepted_code_review_passed_authority_doc_review_passed
-unit11_host_registry_harness_hash=5e2a89b0e44b171f6d0589d4092620d22410ec77388f2ecd1ab0c3b09a0aa636
+unit11_host_registry_harness_hash_at_review=5e2a89b0e44b171f6d0589d4092620d22410ec77388f2ecd1ab0c3b09a0aa636
 unit11_runtime_condition=active host skill surface reduced to TraceWeaver-required entries and external CE plugin disabled
 unit11_code_review_status=passed_no_findings
 unit11_code_review_id=CE-CODE-REVIEW-2026-05-05-U9-UNIT11-HOST-REGISTRY-HARNESS-CLEAN-001
@@ -795,6 +801,68 @@ unit11_authority_doc_review_status=passed_no_findings
 unit11_authority_doc_review_id=CE-DOC-REVIEW-2026-05-05-U9-UNIT11-AUTHORITY-CLEAN-001
 unit11_accepted_scope=constrained active-host tw-authority-gate runtime invocation proof only
 unit11_held_scope=clean CE replacement, project-level trace/matrix/gap/change/exception write behavior, enforcing authority gate behavior, slash-command or prompt availability, autonomous commit/push/PR publication, release-ready, package-ready, upstream-ready, R31 validation status, and unconstrained host configuration support
+```
+
+## Wrapped CE Direct Callable Expansion
+
+Observed wrapper expansion:
+
+```text
+wrapper_expansion_backup=/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260505T132921Z-wrapper-expansion
+active_skill_surface=.system plus tw-auto, lfg, tw-authority-gate, tw-traceability-check, tw-requirements-review, tw-grill, ce-plan, ce-work, ce-code-review, ce-doc-review, ce-debug, ce-commit, ce-commit-push-pr
+external_compound_engineering_plugin=disabled
+```
+
+Observed isolated install/discovery output:
+
+```text
+codex_discovery_smoke=pass
+prior_ce_wrapper_direct_callable_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
+prior_ce_wrapper_prompt_input_visible_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
+```
+
+Prior active-host wrapper visibility output before candidate
+`tw-code-review`/`tw-doc-review` expansion:
+
+```text
+codex_host_active_skill_directory_count=14
+codex_host_compound_engineering_plugin_enabled=false
+codex_host_present_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
+codex_host_missing_skills=none
+codex_host_unmarked_skills=none
+codex_host_stale_skills=none
+codex_host_prompt_input_registry_probe=pass_required_skills_visible
+host_codex_registry_discovery=pass_prompt_input_registry_required_skills_visible
+real_tw_skill_runtime_invocation=pass_host_tw_authority_gate_skill_file_read
+```
+
+```text
+wrapper_direct_callable_expansion_status=recorded_code_review_passed_authority_doc_review_pending
+wrapper_direct_callable_expansion_scope=ce-debug, ce-commit, ce-commit-push-pr active direct callable visibility only
+wrapper_direct_callable_expansion_discovery_hash_at_code_review=8cda6b1bf54c8626d86f27fcd756b1436c7ea156ec004adf04f09f02cd87911d
+wrapper_direct_callable_expansion_host_registry_hash_at_code_review=4b044132409c9e2ffbe9814c638b511c32aa2f8b5a51a980bf184ea1d733796c
+wrapper_direct_callable_expansion_separate_home_hash_at_code_review=a3e512bd5f23dbefe1cafa9e14808d7681213eb2603751e90a40a8a7ce71e464
+wrapper_direct_callable_expansion_code_review_status=passed_no_findings
+wrapper_direct_callable_expansion_code_review_id=CE-CODE-REVIEW-2026-05-05-WRAPPER-DIRECT-CALLABLE-CLEAN-001
+wrapper_direct_callable_expansion_code_review_scope=scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-codex-host-registry, scripts/traceweaver-smoke-codex-separate-home-runtime
+wrapper_direct_callable_expansion_code_review_coverage=main_thread_review_only_no_reviewer_subagents
+wrapper_direct_callable_expansion_accepted_scope=none_until_clean_authority_doc_review
+wrapper_direct_callable_expansion_held_scope=ce-debug runtime behavior, ce-commit commit behavior, ce-commit-push-pr push/PR behavior, autonomous publication, clean CE replacement, project-level trace writes, enforcing behavior, release/package/upstream readiness, R31 validation, and unconstrained host support
+```
+
+Current candidate review-wrapper host probe output after adding
+`tw-code-review` and `tw-doc-review`:
+
+```text
+codex_host_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-code-review tw-doc-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
+codex_host_missing_skills=tw-code-review tw-doc-review
+codex_host_stale_skills=tw-auto
+codex_host_prompt_input_registry_probe=held_required_skills_not_visible
+host_codex_registry_discovery=held_missing_traceweaver_direct_callable_host_install_or_active_registry_reload
+codex_host_runtime_exec_enabled=0
+real_tw_skill_runtime_invocation=held_host_runtime_exec_disabled
+review_wrapper_skills_status=recorded_review_pending
+review_wrapper_skills_accepted_scope=none_until_requirements_review_code_review_authority_doc_review_and_runtime_or_fixture_proof
 ```
 
 ## Document Review

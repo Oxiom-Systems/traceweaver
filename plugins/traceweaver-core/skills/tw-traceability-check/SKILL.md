@@ -9,6 +9,8 @@ description: TraceWeaver adapter for checking whether plans, code, PRs, docs, or
 
 Check whether meaningful behavior has a visible chain from need and approved
 authority through implementation, verification, and validation evidence.
+When that chain is broken, return actionable reviewer-style findings instead
+of only returning a prose status.
 
 ## Runtime Scope
 
@@ -25,8 +27,16 @@ This adapter routes to `systems-engineering-traceability`. It may also route to
    missing verification or validation paths.
 4. Use `requirements-reviewer` if the requirement itself is ambiguous,
    unverifiable, unapproved, or source-free.
-5. Record findings as `Pass`, `Needs revision`, `Blocked`, `Approved gap
-   required`, or `Human decision`.
+5. Emit structured findings for traceability failures. Include severity,
+   status, title, evidence, affected requirement/trace/evidence IDs, file path
+   and line range when available, blocked/allowed/held claim impact, and
+   concrete remediation.
+6. In Codex contexts with a concrete file/line anchor, use
+   `::code-comment{...}` for findings that should appear inline. Use normal
+   Markdown findings when the issue is cross-file, artifact-level, or lacks a
+   stable line anchor.
+7. Record the overall result as `Pass`, `Needs revision`, `Blocked`,
+   `Approved gap required`, or `Human decision`.
 
 ## Output
 
@@ -39,6 +49,8 @@ Return:
 - validation status
 - gaps and risks
 - dark-code candidates
+- structured findings with severity, status, affected IDs, evidence, file/line
+  anchors when available, claim impact, and remediation
 - allowed claims
 - held claims
 
@@ -47,3 +59,8 @@ Return:
 Do not claim engineering-complete, package-ready, release-ready, or
 upstream-ready status when behavior lacks approved authority, implementation
 links, verification evidence, or a validation path.
+
+Do not mark traceability as passed while any P0/P1 blocker, unapproved held
+claim, missing authority, stale matrix/hash, missing verification/validation
+path, dark behavior, missing code/test anchor, dead-TDD candidate, or
+unsupported done/release claim remains unresolved.

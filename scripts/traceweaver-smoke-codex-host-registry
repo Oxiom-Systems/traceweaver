@@ -45,11 +45,16 @@ required_direct_skills=(
   tw-authority-gate
   tw-traceability-check
   tw-requirements-review
+  tw-code-review
+  tw-doc-review
   tw-grill
   ce-plan
   ce-work
   ce-code-review
   ce-doc-review
+  ce-debug
+  ce-commit
+  ce-commit-push-pr
 )
 
 traceweaver_native_skills=(
@@ -57,6 +62,8 @@ traceweaver_native_skills=(
   tw-authority-gate
   tw-traceability-check
   tw-requirements-review
+  tw-code-review
+  tw-doc-review
   tw-grill
 )
 
@@ -126,7 +133,7 @@ TRACEWEAVER_SKILL_HELD=not_available
 EOF
 
 set +e
-codex debug prompt-input "Use the tw-authority-gate skill." >"$prompt_input" 2>"$runtime_tmp/prompt-input.err"
+codex debug prompt-input "Use TraceWeaver required direct skills: tw-authority-gate tw-auto lfg tw-traceability-check tw-requirements-review tw-code-review tw-doc-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr." >"$prompt_input" 2>"$runtime_tmp/prompt-input.err"
 prompt_input_status=$?
 set -e
 

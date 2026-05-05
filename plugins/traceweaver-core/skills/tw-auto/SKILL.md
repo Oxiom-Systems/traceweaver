@@ -1,6 +1,6 @@
 ---
 name: tw-auto
-description: TraceWeaver-controlled autonomous alpha workflow. Use when you want CE-style plan/work/review iteration with Intent Contract, authority, traceability, verification, and stop-before-commit controls.
+description: TraceWeaver-controlled autonomous alpha workflow. Use when you want CE-style plan/work/review/publication iteration with Intent Contract, authority, traceability, verification, and publication-route controls.
 argument-hint: "[feature description or plan path]"
 disable-model-invocation: true
 ---
@@ -12,7 +12,8 @@ disable-model-invocation: true
 Run a bounded CE-style engineering loop while preserving TraceWeaver authority
 control. This alpha is advisory and static: it coordinates the workflow,
 bootstraps missing authority files for new projects, records trace evidence, and
-stops before commit, push, or PR creation.
+defaults to stopping before publication unless the controlled TraceWeaver
+publication route explicitly passes.
 
 Use `tw-auto` instead of `lfg` when the work must preserve stakeholder intent,
 approved requirements, traceability, verification, validation questions, and
@@ -80,8 +81,8 @@ Required resolutions:
 - `tw-authority-gate`
 - `ce-work`
 - `tw-traceability-check`
-- `ce-code-review`
-- `ce-doc-review`
+- `tw-code-review`
+- `tw-doc-review`
 
 If any required skill is unavailable as a TraceWeaver-packaged entry in the
 host's available-skills list, stop and report the missing skill as an
@@ -129,11 +130,13 @@ review completion.
    accepted-risk candidate, or clarification record. Do not implement from an
    assumption.
 7. Run implementation using the resolved selected CE-compatible work skill
-   (`ce-work`) only in TraceWeaver controlled no-publication mode and only while
-   authority remains clear. Pass the authority capsule, verification target,
-   matrix-update requirement, and the explicit instruction that `ce-work` must
-   not stage files, create commits, push, open PRs, update plan status to
-   completed, or load `ce-commit`, `ce-commit-push-pr`, or Phase 4 shipping.
+   (`ce-work`) only in TraceWeaver controlled publication-gated mode and only
+   while authority remains clear. Pass the authority capsule, verification
+   target, matrix-update requirement, and the explicit instruction that
+   `ce-work` must not stage files, create commits, push, open PRs, update plan
+   status to completed, or load `ce-commit`, `ce-commit-push-pr`, or Phase 4
+   shipping unless the controlled TraceWeaver publication route authorizes that
+   specific publication target.
 8. After each meaningful work cycle, update:
    - `.traceweaver/trace-records/<task-or-run-id>-trace.yml`
    - `traceability-matrix.md`
@@ -142,11 +145,14 @@ review completion.
      created
 9. Run the resolved `tw-traceability-check` before claiming work/review
    completion.
-10. Run the resolved relevant CE-compatible review skill:
-   - `ce-code-review` for code-like skill, script, policy, manifest, validation,
-     runtime, or behavior-bearing changes;
-   - `ce-doc-review` for requirements, plans, docs, evidence, and matrix
-     changes.
+10. Run the resolved relevant TraceWeaver review wrapper:
+   - `tw-code-review` for code-like skill, script, policy, manifest,
+     validation, runtime, or behavior-bearing changes. It must run or require
+     `tw-traceability-check` before delegating to `ce-code-review`;
+   - `tw-doc-review` for requirements, plans, docs, evidence, and matrix
+     changes. It must run or require `tw-requirements-review` for
+     requirements/authority text and trace/hash/status consistency checks for
+     authority records before delegating to `ce-doc-review`.
 11. During review, apply the reviewer subagent capacity rules above so pending
     reviewer personas are queued, completed agents are closed, and capacity
     backpressure is reported instead of mistaken for success.
@@ -158,8 +164,16 @@ review completion.
     - matrix and trace records can be updated;
     - no repeated blocking finding or no-progress state occurs;
     - the review-fix cycle budget is not exceeded.
-14. Stop before commit, push, or PR creation. Report the evidence status and the
-    next command, review, or human decision required.
+14. Stop before publication by default. Stage, commit, push, or create/update a
+    PR only through the controlled TraceWeaver publication route. Requirements
+    review is required when requirements, authority, validation intent, release
+    claims, or publication policy changed; normal code publication does not need
+    a new requirements gate when approved authority is unchanged. The
+    publication route must prove matrix/trace coherence, verification evidence,
+    blocking-review closure, staged-tree identity, explicit target,
+    credential/remote boundary, and human confirmation for that target or a
+    reviewed Intent Contract publication override. Report the evidence status
+    and the next command, review, or human decision required.
 
 ## Stop Conditions
 
@@ -181,8 +195,8 @@ Stop immediately when any of these are true:
 - the same blocking finding repeats after a fix cycle;
 - no material diff or trace update occurs in a fix cycle;
 - gap/change/exception/trace-record writes fail;
-- commit, push, PR, release, clean-replacement, slash-command, enforcing-mode,
-  or runtime-equivalence claims would be required to proceed.
+- unapproved commit, push, PR, release, clean-replacement, slash-command,
+  enforcing-mode, or runtime-equivalence claims would be required to proceed.
 
 ## Severity Policy
 

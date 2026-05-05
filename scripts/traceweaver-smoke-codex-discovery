@@ -93,11 +93,16 @@ expected_direct_skills=(
   tw-authority-gate
   tw-traceability-check
   tw-requirements-review
+  tw-code-review
+  tw-doc-review
   tw-grill
   ce-plan
   ce-work
   ce-code-review
   ce-doc-review
+  ce-debug
+  ce-commit
+  ce-commit-push-pr
 )
 
 expected_visible_skills=(
@@ -106,11 +111,16 @@ expected_visible_skills=(
   tw-authority-gate
   tw-traceability-check
   tw-requirements-review
+  tw-code-review
+  tw-doc-review
   tw-grill
   ce-plan
   ce-work
   ce-code-review
   ce-doc-review
+  ce-debug
+  ce-commit
+  ce-commit-push-pr
 )
 
 identity_skills=(
@@ -119,11 +129,16 @@ identity_skills=(
   tw-authority-gate
   tw-traceability-check
   tw-requirements-review
+  tw-code-review
+  tw-doc-review
   tw-grill
   ce-plan
   ce-work
   ce-code-review
   ce-doc-review
+  ce-debug
+  ce-commit
+  ce-commit-push-pr
 )
 
 codex_home="$tmp_root/codex-home"
@@ -199,7 +214,7 @@ for skill_name in "${identity_skills[@]}"; do
 done
 
 HOME="$codex_home" CODEX_HOME="$codex_root" codex debug prompt-input \
-  "Use all TraceWeaver tw skills: tw-auto tw-authority-gate tw-traceability-check tw-requirements-review tw-grill." \
+  "Use all TraceWeaver direct skills: tw-auto tw-authority-gate tw-traceability-check tw-requirements-review tw-code-review tw-doc-review tw-grill lfg ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr." \
   | jq -r '.. | strings' \
   | perl -ne 'print "$1\n" if /^- ([A-Za-z0-9_.:-]+): /' \
   | sort -u >"$visible_skills"
