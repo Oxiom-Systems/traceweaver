@@ -1,4 +1,5 @@
 #!/usr/bin/env ruby
+# encoding: UTF-8
 # frozen_string_literal: true
 
 require "digest"
@@ -62,7 +63,7 @@ def resolve_controlled_path(plugin_root, path)
 end
 
 def read_text(path)
-  File.file?(path) ? File.read(path) : ""
+  File.file?(path) ? File.read(path, mode: "r:BOM|UTF-8") : ""
 end
 
 def scan_support_refs(path)
@@ -93,7 +94,7 @@ end
 def load_json(path)
   return {} unless File.file?(path)
 
-  JSON.parse(File.read(path))
+  JSON.parse(read_text(path))
 rescue JSON::ParserError
   {}
 end
@@ -407,7 +408,7 @@ end
 errors << "missing_expected_hashes=#{missing_expected_hash_rows.join(",")}" unless missing_expected_hash_rows.empty?
 errors << "hash_mismatches=#{bad_hash_rows.join(",")}" unless bad_hash_rows.empty?
 
-roadmap_text = File.read(options[:roadmap])
+roadmap_text = read_text(options[:roadmap])
 roadmap_ce_skills = roadmap_text.scan(/^\| `(ce-[^`]+)` \|/).flatten.sort
 upstream_skills = options[:upstream_root] ? upstream_skill_dirs(options[:upstream_root]) : (roadmap_ce_skills + ["lfg"])
 required_upstream_ce_skills = if options[:upstream_root]
@@ -429,10 +430,10 @@ if plugin_skill_names.include?("lfg") || upstream_skills.include?("lfg")
   errors << "packaged_lfg_alias_missing" unless lfg_row && lfg_row[:classification] == "aliased" && lfg_row[:reason].include?("tw-auto")
 end
 
-inventory_text = File.read(options[:inventory])
+inventory_text = read_text(options[:inventory])
 selected_skill_files = inventory_text.scan(/`(skills\/[^`]+)` \| `([0-9a-f]{64})` \| selected skill file/).to_h
 selected_agent_files = inventory_text.scan(/`(agents\/[^`]+)` \| `([0-9a-f]{64})` \| selected agent file/).to_h
-source_pin_text = File.read(options[:source_pin])
+source_pin_text = read_text(options[:source_pin])
 source_pin = {
   record_id: source_pin_text[/Record ID: `([^`]+)`/, 1],
   version: source_pin_text[/\| Source version \| `([^`]+)` \|/, 1],
@@ -645,7 +646,7 @@ markdown = <<~MARKDOWN
 MARKDOWN
 
 if options[:update_evidence]
-  existing = File.file?(options[:markdown_out]) ? File.read(options[:markdown_out]) : ""
+  existing = read_text(options[:markdown_out])
   updated = if existing.include?(MARKER_BEGIN) && existing.include?(MARKER_END)
     existing.sub(/#{Regexp.escape(MARKER_BEGIN)}.*#{Regexp.escape(MARKER_END)}/m, markdown.strip)
   elsif existing.empty?
