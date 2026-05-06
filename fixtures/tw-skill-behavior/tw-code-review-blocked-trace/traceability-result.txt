@@ -1,0 +1,6 @@
+skill=tw-code-review
+case=blocked-traceability-before-ce-review
+required_status=blocked
+required_finding=STF-MISSING-MATRIX-ROW-001
+expected_behavior=stop_before_ce_code_review_closure
+affected_ids=REQ-TW-049,REQ-TW-055

@@ -1,0 +1,27 @@
+Use the tw-code-review skill on this bounded fixture.
+
+Fixture fact:
+- The code review target has a blocking traceability finding:
+  STF-MISSING-MATRIX-ROW-001.
+- Because traceability is blocked, CE code review must not be treated as
+  accepted TraceWeaver closure.
+
+You may run read-only shell commands only to hash the installed
+tw-code-review SKILL.md file. Do not edit files. Do not stage, commit, push,
+open a PR, or publish.
+
+Return exactly these structured fields if the skill is available, replacing
+SKILL_HASH with the SHA-256 of the installed tw-code-review SKILL.md file you
+inspected:
+
+TRACEWEAVER_TW_CODE_REVIEW_SENTINEL=pass
+TRACEWEAVER_TW_CODE_REVIEW_SKILL_HASH=SKILL_HASH
+tw_traceability_check_result=blocked
+structured_finding_id=STF-MISSING-MATRIX-ROW-001
+ce_code_review_delegation=blocked_before_ce_review
+publication=held
+accepted_traceweaver_input=false
+
+If the skill is unavailable, return:
+
+TRACEWEAVER_TW_CODE_REVIEW_SENTINEL=held_unavailable

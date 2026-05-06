@@ -1,0 +1,6 @@
+skill=tw-auto
+case=clean-task-closure
+required_route=tw-authority-gate,ce-work,tw-traceability-check,tw-code-review,tw-doc-review
+required_stop=clean_accepted_state_or_explicit_held_state
+publication=held_until_controlled_publication_route
+affected_ids=REQ-TW-056

@@ -1,0 +1,6 @@
+skill=tw-auto
+case=contradictory-requirement-pause
+required_status=human-decision
+required_behavior=route_to_requirements_review
+forbidden_behavior=continue_implementation_from_assumption
+affected_ids=REQ-TW-035,REQ-TW-056

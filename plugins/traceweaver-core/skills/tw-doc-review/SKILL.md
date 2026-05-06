@@ -44,7 +44,10 @@ authority until the authority files exist and review passes.
 5. Keep `ce-doc-review` in TraceWeaver no-publication mode. It may report
    findings and policy-allowed local fixes, but it must not stage, commit, push,
    open PRs, update PRs, or claim release/clean-replacement readiness.
-6. Report document-review findings together with requirement-quality status,
+6. Report structured traceability/hash/status findings before CE document-review
+   findings. Preserve severity, status, affected IDs, file/line anchors when
+   available, claim impact, and remediation.
+7. Report document-review findings together with requirement-quality status,
    traceability/hash/status consistency, accepted scope, held claims, and the
    next required command or human decision.
 
@@ -56,6 +59,8 @@ Return:
 - document type and authority role
 - `tw-requirements-review` result when applicable
 - `tw-traceability-check` or trace/hash/status consistency result when applicable
+- structured traceability/hash/status findings, preserving file/line anchors
+  when available
 - CE document-review coverage and findings
 - accepted scope and held claims
 - whether the document may be used as accepted TraceWeaver input
@@ -67,3 +72,7 @@ Do not allow weak, ambiguous, unverifiable, source-free, stale, or unreviewed
 requirements or authority records to become implementation authority. Do not
 claim accepted authority-state review when required files are untracked,
 unstaged, hash-stale, or split between staged and unstaged versions.
+
+Do not collapse structured TraceWeaver findings into prose-only summaries.
+Report them before CE document-review findings so stale authority or held claims
+cannot be hidden by a clean CE review.

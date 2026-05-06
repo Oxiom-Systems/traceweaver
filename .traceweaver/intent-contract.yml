@@ -13,10 +13,10 @@ current_amendment_id: REQ-AMEND-2026-05-03-001
 current_amendment_review_id: CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001
 current_amendment_authority_status: approved_static_advisory_source_evidence_runtime_held
 candidate_amendment_id: REQ-AMEND-CANDIDATE-2026-05-05-001
-candidate_amendment_status: req_tw_049_req_tw_050_req_tw_051_req_tw_052_req_tw_053_req_tw_054_req_tw_055_review_pending_not_accepted_authority
-candidate_requirements_working_hash_sha256: 41e36f518a808ca0a2117d5102a81a080b8d0e215b774dd808e6855f165d7988
-baseline_hash_authority_status: accepted_requirements_including_req_tw_048_static_advisory_source_evidence_with_req_tw_049_req_tw_050_req_tw_051_req_tw_052_req_tw_053_req_tw_054_req_tw_055_candidate_review_pending
-baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_passed_authority_doc_review_passed_req_tw_048_amendment_doc_review_passed_u9_unit10_auth_safe_fresh_exec_and_active_host_runtime_probes_code_review_passed_authority_doc_review_passed_reviewed_held_u9_unit11_active_host_reconciled_runtime_pass_code_review_passed_authority_doc_review_passed_constrained_runtime_accepted_dogfood_classifier_code_review_passed_authority_doc_review_passed_skill_behavior_audit_unit1_behavior_contracts_recorded_authority_doc_review_pending_wrapper_direct_callable_expansion_recorded_code_review_passed_authority_doc_review_pending_review_wrapper_skills_recorded_review_pending_ce_350_skill_surface_inventory_source_refreshed_review_pending_tw_wrapper_backlog_reviewed_against_ce_350_recorded_review_pending_controlled_publication_gate_recorded_review_pending_code_test_trace_anchor_requirement_recorded_review_pending_structured_traceability_findings_requirement_recorded_review_pending_publication_held
+candidate_amendment_status: req_tw_049_req_tw_050_req_tw_051_req_tw_052_req_tw_053_req_tw_054_req_tw_055_req_tw_056_authority_doc_review_passed_planning_input_only_behavior_held
+candidate_requirements_working_hash_sha256: aedc740de4fe36c00342e47ad11f74e72549927ca0c3fa4bf32af265165e673b
+baseline_hash_authority_status: accepted_requirements_including_req_tw_048_static_advisory_source_evidence_with_req_tw_049_req_tw_050_req_tw_051_req_tw_052_req_tw_053_req_tw_054_req_tw_055_req_tw_056_candidate_authority_doc_review_passed_planning_input
+baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_passed_authority_doc_review_passed_req_tw_048_amendment_doc_review_passed_u9_unit10_auth_safe_fresh_exec_and_active_host_runtime_probes_code_review_passed_authority_doc_review_passed_reviewed_held_u9_unit11_active_host_reconciled_runtime_pass_code_review_passed_authority_doc_review_passed_constrained_runtime_accepted_dogfood_classifier_code_review_passed_authority_doc_review_passed_skill_behavior_audit_unit1_behavior_contracts_authority_doc_review_passed_runtime_held_wrapper_direct_callable_expansion_recorded_code_review_passed_authority_doc_review_passed_runtime_held_review_wrapper_skills_recorded_authority_doc_review_passed_runtime_held_ce_350_skill_surface_inventory_source_refreshed_authority_doc_review_passed_parity_held_tw_wrapper_backlog_reviewed_against_ce_350_authority_doc_review_passed_per_wrapper_proof_pending_controlled_publication_gate_recorded_authority_doc_review_passed_behavior_held_code_test_trace_anchor_requirement_recorded_authority_doc_review_passed_scanner_held_structured_traceability_findings_fixture_smoke_patched_code_review_passed_authority_doc_review_passed_runtime_held_tw_auto_closure_loop_requirement_recorded_authority_doc_review_passed_tw_auto_code_review_passed_behavior_held_tw_skill_behavior_fixture_smoke_passed_code_review_passed_authority_doc_review_passed_active_host_tw_traceability_check_structured_runtime_passed_authority_doc_review_passed_active_host_tw_code_doc_wrapper_file_access_observation_recorded_code_review_passed_authority_doc_review_passed_human_decision_pause_behavior_held_runtime_held_publication_held
 baseline_refresh_code_review_status: passed_no_findings_current_reviewer_capacity_authority_diff
 baseline_refresh_code_review_scope: plugins/traceweaver-core/skills/tw-auto/SKILL.md, .traceweaver/intent-contract.yml, traceability-matrix.md
 baseline_refresh_doc_review_status: prior_passed_no_findings_before_u9_unit1_authority_set
@@ -158,20 +158,27 @@ dogfood_authority_doc_review_id: CE-DOC-REVIEW-2026-05-05-DOGFOOD-AUTHORITY-CLEA
 dogfood_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
 dogfood_audit_review_required_before_input: false
 dogfood_audit_held_scope: unconstrained host configuration support, real tw-requirements-review/tw-traceability-check/tw-code-review/tw-doc-review/tw-auto/lfg/tw-grill runtime invocation beyond the constrained Unit 11 tw-authority-gate sentinel proof, project-level runtime trace writes, automatic Mermaid generation, code-level annotation mandate, clean CE replacement, enforcing behavior, publication, release-ready, package-ready, upstream-ready, and R31 validation status
-skill_behavior_audit_status: unit1_behavior_contracts_recorded_authority_doc_review_pending
+skill_behavior_audit_status: unit1_behavior_contracts_authority_doc_review_passed_structured_findings_harness_patch_code_review_passed_authority_doc_review_passed_tw_skill_behavior_fixture_smoke_passed_code_review_passed_authority_doc_review_passed_active_host_tw_traceability_check_structured_runtime_passed_authority_doc_review_passed_active_host_tw_code_doc_wrapper_file_access_observation_recorded_code_review_passed_authority_doc_review_passed
 skill_behavior_audit_plan: docs/plans/2026-05-05-002-feat-tw-skill-behavior-audit-plan.md
 skill_behavior_audit_evidence: docs/validation/traceweaver-skill-behavior-audit.md
 skill_behavior_audit_scope: tw-requirements-review, tw-authority-gate, tw-traceability-check, tw-code-review, tw-doc-review, tw-grill, tw-auto, lfg, ce-debug, ce-commit, ce-commit-push-pr
-skill_behavior_audit_result: Unit 1 behavior contracts recorded with required inputs, required behavior, allowed outputs, fail-closed conditions, evidence expectations, and held claims; private source-oracle boundary recorded as internal-only and public-safe
-skill_behavior_audit_review_required_before_input: true
-skill_behavior_audit_accepted_scope: none_until_clean_authority_doc_review
-skill_behavior_audit_held_scope: real TW skill runtime invocation beyond the constrained Unit 11 tw-authority-gate sentinel proof, including tw-requirements-review, tw-traceability-check, tw-code-review, tw-doc-review, tw-auto, lfg, and tw-grill; wrapped CE continuity runtime behavior beyond active-surface visibility, including ce-debug, ce-commit, and ce-commit-push-pr; code/test trace-anchor scanner behavior and dead-TDD classification; structured tw-traceability-check finding emission, severity mapping, file/line anchoring, Codex code-comment output, and review-wrapper integration; project-level trace/matrix/gap/change/exception writes, clean CE replacement, enforcing behavior, slash-command or prompt availability, controlled publication-route behavior, release-ready, package-ready, upstream-ready, R31 validation status, and unconstrained host support
-review_wrapper_skills_status: recorded_review_pending
+skill_behavior_audit_result: Unit 1 behavior contracts recorded with required inputs, required behavior, allowed outputs, fail-closed conditions, evidence expectations, and held claims; private source-oracle boundary recorded as internal-only and public-safe; deterministic TW skill behavior smoke passed, code review passed, and authority doc review passed for tw-code-review preflight sequencing, tw-doc-review preflight sequencing, tw-auto wrapper routing, tw-auto closure-loop pause fixtures, and structured-finding static contract checks; constrained active-host tw-traceability-check structured runtime passed after host reconciliation and authority doc review passed; reviewed active-host tw-code-review and tw-doc-review prompt-satisfied file-access observations are recorded with clean behavior code review and authority doc review passed as limitation evidence
+skill_behavior_audit_authority_doc_review_status: passed_no_findings_after_wrapper_file_access_observation_recording
+skill_behavior_audit_authority_doc_review_id: CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001
+skill_behavior_audit_authority_doc_review_scope: .traceweaver/intent-contract.yml, traceability-matrix.md, requirements.md, docs/plans/2026-05-05-002-feat-tw-skill-behavior-audit-plan.md, docs/plans/2026-05-05-003-feat-structured-traceability-findings-plan.md, docs/validation/traceweaver-skill-behavior-audit.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/validation/traceweaver-u9-codex-runtime-discovery.md, docs/validation/traceweaver-core-11-ce-runtime-inventory.md, docs/plans/2026-05-02-001-feat-full-ce-341-traceweaver-authority-wrapping-plan.md, docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md, plugins/traceweaver-core/skills/tw-auto/SKILL.md, plugins/traceweaver-core/skills/tw-code-review/SKILL.md, plugins/traceweaver-core/skills/tw-doc-review/SKILL.md, plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md, plugins/traceweaver-core/skills/tw-traceability-check/references/structured-findings.md, scripts/traceweaver-smoke-structured-findings, fixtures/structured-traceability-findings/
+skill_behavior_audit_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+skill_behavior_audit_review_required_before_input: false
+skill_behavior_audit_accepted_scope: reviewed_static_behavior_contracts_ce_350_inventory_wrapper_backlog_publication_route_code_anchor_requirement_patched_structured_finding_fixture_tw_auto_closure_loop_and_tw_skill_behavior_fixture_planning_input_only; constrained active-host tw-traceability-check structured runtime is reviewed evidence; reviewed active-host tw-code-review and tw-doc-review prompt-satisfied file-access observations are code-review-passed and authority-doc-review-passed limitation evidence; broader automation behavior remains held
+skill_behavior_audit_held_scope: real TW skill runtime invocation beyond the constrained Unit 11 tw-authority-gate sentinel proof, constrained reviewed tw-traceability-check structured runtime proof, and reviewed held tw-code-review/tw-doc-review prompt-satisfied file-access limitation observations, including tw-requirements-review, successful CE review delegation on clean wrapper inputs, tw-auto, lfg, and tw-grill; wrapped CE continuity runtime behavior beyond active-surface visibility, including ce-debug, ce-commit, and ce-commit-push-pr; code/test trace-anchor scanner behavior and dead-TDD classification; structured tw-traceability-check finding emission beyond the constrained fixture, file/line anchoring, Codex code-comment output, and review-wrapper integration; project-level trace/matrix/gap/change/exception writes, clean CE replacement, enforcing behavior, slash-command or prompt availability, controlled publication-route behavior, release-ready, package-ready, upstream-ready, R31 validation status, and unconstrained host support
+review_wrapper_skills_status: recorded_authority_doc_review_passed_runtime_held
 review_wrapper_skills_scope: tw-code-review, tw-doc-review, tw-auto review handoff routing, discovery/host/separate-home required-skill lists
-review_wrapper_skills_result: tw-code-review and tw-doc-review skill files created; tw-auto now routes code and doc review handoffs through TW wrappers; isolated discovery smoke passed with the new direct callable entries; current host probe is held because tw-code-review/tw-doc-review are not installed in the active host and tw-auto is stale until the next host reconciliation/install
-review_wrapper_skills_accepted_scope: none_until_requirements_review_code_review_authority_doc_review_and_runtime_or_fixture_proof
-review_wrapper_skills_held_scope: real tw-code-review/tw-doc-review runtime invocation, CE review delegation behavior, accepted TraceWeaver review closure, clean replacement, publication, release/package/upstream readiness, R31 validation status, and unconstrained host support
-wrapper_direct_callable_expansion_status: recorded_code_review_passed_authority_doc_review_pending
+review_wrapper_skills_result: tw-code-review and tw-doc-review skill files created; tw-auto now routes code and doc review handoffs through TW wrappers; isolated discovery smoke passed with the new direct callable entries; active-host wrapper hashes now match this branch for the held prompt-satisfied file-access observations recorded under tw_skill_behavior_fixture
+review_wrapper_skills_authority_doc_review_status: passed_no_findings
+review_wrapper_skills_authority_doc_review_id: CE-DOC-REVIEW-2026-05-05-SKILL-BEHAVIOR-AUTHORITY-CLEAN-001
+review_wrapper_skills_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+review_wrapper_skills_accepted_scope: reviewed_static_wrapper_routing_planning_input_only_runtime_or_fixture_proof_still_required
+review_wrapper_skills_held_scope: successful CE review delegation on clean wrapper inputs, accepted TraceWeaver review closure, clean replacement, publication, release/package/upstream readiness, R31 validation status, and unconstrained host support
+wrapper_direct_callable_expansion_status: recorded_code_review_passed_authority_doc_review_passed_runtime_held
 wrapper_direct_callable_expansion_scope: ce-debug, ce-commit, ce-commit-push-pr active direct callable visibility only
 wrapper_direct_callable_expansion_result: prior CE-wrapper expansion evidence only; isolated install/discovery smoke passed with the prior 13 required direct callables, active host expanded to .system plus those 13 TraceWeaver-marked direct callable skills, prompt-input visibility passed, and existing constrained tw-authority-gate sentinel still passed; candidate tw-code-review/tw-doc-review host expectations are tracked separately as review_wrapper_skills and remain held
 wrapper_direct_callable_expansion_discovery_harness_current_hash: ffd91f8fd9c1da054acdcb817ff9d74acf1e7fda869ec9f09c40baa32f08a5ce
@@ -183,8 +190,10 @@ wrapper_direct_callable_expansion_code_review_status: passed_no_findings
 wrapper_direct_callable_expansion_code_review_id: CE-CODE-REVIEW-2026-05-05-WRAPPER-DIRECT-CALLABLE-CLEAN-001
 wrapper_direct_callable_expansion_code_review_scope: scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-codex-host-registry, scripts/traceweaver-smoke-codex-separate-home-runtime
 wrapper_direct_callable_expansion_code_review_coverage: main_thread_review_only_no_reviewer_subagents
-wrapper_direct_callable_expansion_review_required_before_input: true
-wrapper_direct_callable_expansion_accepted_scope: none_until_clean_authority_doc_review
+wrapper_direct_callable_expansion_authority_doc_review_status: passed_no_findings
+wrapper_direct_callable_expansion_authority_doc_review_id: CE-DOC-REVIEW-2026-05-05-SKILL-BEHAVIOR-AUTHORITY-CLEAN-001
+wrapper_direct_callable_expansion_review_required_before_input: false
+wrapper_direct_callable_expansion_accepted_scope: reviewed_static_visibility_and_planning_input_only_runtime_publication_held
 wrapper_direct_callable_expansion_held_scope: ce-debug runtime behavior, ce-commit commit behavior, ce-commit-push-pr push/PR behavior, autonomous publication, clean CE replacement, project-level trace writes, enforcing behavior, release/package/upstream readiness, R31 validation status, and unconstrained host support
 u9_unit2_fixture_smoke_status: passed_doc_review_passed
 u9_unit2_fixture_smoke_scope: fixtures/u9-codex/, scripts/traceweaver-smoke-u9-fixtures, docs/validation/traceweaver-u9-codex-runtime-discovery.md, traceability-matrix.md
@@ -194,7 +203,7 @@ u9_unit3_gate_behavior_smoke_scope: scripts/traceweaver-smoke-u9-fixtures, docs/
 u9_unit3_review_required_before_input: false
 u9_input_status: u9_unit1_reviewed_for_planning_input_unit2_fixture_smoke_reviewed_for_fixture_input_unit3_gate_behavior_code_reviewed_doc_reviewed_for_fixture_input_u9_unit4_boundary_smoke_code_reviewed_doc_reviewed_for_boundary_input_u9_unit5_host_registry_filesystem_probe_reviewed_held_unit7_host_install_attempt_doc_reviewed_held_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_unit9_registry_shape_auth_boundary_patch_code_reviewed_doc_reviewed_held_unit10_auth_safe_fresh_exec_and_active_host_runtime_probes_code_reviewed_authority_doc_reviewed_reviewed_held_unit11_active_host_reconciled_runtime_pass_code_reviewed_authority_doc_reviewed_constrained_runtime_accepted
 matrix_source: traceability-matrix.md
-ce_skill_surface_inventory_status: ce_350_source_surface_refreshed_review_pending
+ce_skill_surface_inventory_status: ce_350_source_surface_refreshed_authority_doc_review_passed_parity_held
 ce_skill_surface_inventory_scope: active CE 3.5.0 skill directories from the clean source worktree compared with TraceWeaver-packaged skill directories
 ce_skill_surface_inventory_source_worktree: /Users/hanneszietsman/CrypotAI/compound-engineering-plugin-main-3.5.0
 ce_skill_surface_inventory_source_commit: 1f3c6466e4eb4e1b584c658953dfb1ca98dd3335
@@ -204,23 +213,77 @@ ce_skill_surface_inventory_codex_manifest_hash_sha256: 57e1fc9fb85d953fd6b2f2e9f
 ce_skill_surface_inventory_source_skill_count: 39
 ce_skill_surface_inventory_source_ce_skill_count: 38
 ce_skill_surface_inventory_missing_or_unclassified: ce-agent-native-architecture, ce-agent-native-audit, ce-clean-gone-branches, ce-demo-reel, ce-dhh-rails-style, ce-frontend-design, ce-gemini-imagegen, ce-ideate, ce-optimize, ce-polish-beta, ce-product-pulse, ce-proof, ce-release-notes, ce-report-bug, ce-riffrec-feedback-analysis, ce-simplify-code, ce-slack-research, ce-strategy, ce-update, ce-work-beta
-ce_skill_surface_inventory_accepted_scope: none_until_requirements_review_source_inventory_review_classification_and_authority_doc_review
+ce_skill_surface_inventory_authority_doc_review_status: passed_no_findings
+ce_skill_surface_inventory_authority_doc_review_id: CE-DOC-REVIEW-2026-05-05-SKILL-BEHAVIOR-AUTHORITY-CLEAN-001
+ce_skill_surface_inventory_accepted_scope: reviewed_ce_350_source_surface_inventory_and_wrapper_backlog_planning_input_only
 ce_skill_surface_inventory_held_scope: full CE plugin parity, clean CE replacement, support for unclassified CE 3.5.0 skills, runtime wrapper behavior, publication, release/package/upstream readiness, R31 validation status, and unconstrained host support
-tw_wrapper_backlog_status: reviewed_against_ce_350_source_surface_recorded_review_pending
+tw_wrapper_backlog_status: reviewed_against_ce_350_source_surface_authority_doc_review_passed_per_wrapper_proof_pending
 tw_wrapper_backlog_scope: packaged/manual-continuity CE skills, TraceWeaver lfg alias to tw-auto, and missing CE 3.5.0 skills that need a TW route, alias, manual-continuity decision, hidden/internal decision, held future-surface decision, or out-of-scope decision
-tw_wrapper_backlog_accepted_scope: none_until_requirements_review_backlog_review_per_wrapper_behavior_contracts_and_runtime_or_fixture_proof
+tw_wrapper_backlog_authority_doc_review_status: passed_no_findings
+tw_wrapper_backlog_authority_doc_review_id: CE-DOC-REVIEW-2026-05-05-SKILL-BEHAVIOR-AUTHORITY-CLEAN-001
+tw_wrapper_backlog_accepted_scope: reviewed_wrapper_backlog_planning_input_only_per_wrapper_behavior_and_runtime_or_fixture_proof_still_required
 tw_wrapper_backlog_held_scope: additional TW wrappers beyond tw-code-review/tw-doc-review candidates, full CE plugin parity, clean CE replacement, publication, release/package/upstream readiness, R31 validation status, and unconstrained host support
-code_trace_anchor_requirement_status: recorded_review_pending
+code_trace_anchor_requirement_status: recorded_authority_doc_review_passed_scanner_held
 code_trace_anchor_requirement_scope: REQ-TW-054 candidate requirement, ART-TW-041, TRACE-TW-027, ATP-TW-011, RESULT-TW-011, VER-TW-036, skill behavior audit evidence, and matrix change-impact updates
 code_trace_anchor_requirement_result: candidate requirement recorded for file-level, selected high-level function, test, fixture, and smoke-script anchors linking behavior-bearing artifacts to `REQ-TW-*` and verification IDs without line-by-line annotation
-code_trace_anchor_requirement_accepted_scope: none_until_clean_requirements_review_authority_doc_review_scanner_plan_fixture_proof_and_code_review_preflight_update
+code_trace_anchor_requirement_authority_doc_review_status: passed_no_findings
+code_trace_anchor_requirement_authority_doc_review_id: CE-DOC-REVIEW-2026-05-05-SKILL-BEHAVIOR-AUTHORITY-CLEAN-001
+code_trace_anchor_requirement_accepted_scope: reviewed_candidate_requirement_and_planning_input_only_scanner_plan_fixture_proof_and_code_review_preflight_update_still_required
 code_trace_anchor_requirement_held_scope: code/test trace-anchor scanner behavior, matrix code-anchor table behavior, `tw-code-review` enforcement, project-level trace writes, dead-TDD classification, release-ready claims, and R31 validation status
-structured_traceability_findings_requirement_status: recorded_review_pending
-structured_traceability_findings_requirement_scope: REQ-TW-055 candidate requirement, ART-TW-042, TRACE-TW-028, ATP-TW-012, RESULT-TW-012, VER-TW-037, tw-traceability-check skill notes, skill behavior audit evidence, and matrix change-impact updates
-structured_traceability_findings_requirement_result: candidate requirement recorded for reviewer-style traceability findings with severity, status, affected IDs, evidence, file/line anchors when available, claim impact, and remediation
-structured_traceability_findings_requirement_accepted_scope: none_until_clean_requirements_review_authority_doc_review_fixture_proof_code_review_and_wrapper_integration
-structured_traceability_findings_requirement_held_scope: runtime structured finding behavior, file/line anchoring, severity mapping, Codex code-comment output, tw-code-review/tw-doc-review integration, release-ready claims, and R31 validation status
-matrix_hash_sha256: 8a570a989073f8c97ee3013a691ab31d887b39c36cb551458cd720a8774b3a45
+structured_traceability_findings_requirement_status: fixture_smoke_patch_code_review_passed_authority_doc_review_passed_constrained_active_host_tw_traceability_check_runtime_passed_authority_doc_review_passed
+structured_traceability_findings_requirement_scope: REQ-TW-055 candidate requirement, ART-TW-042, TRACE-TW-028, ATP-TW-012, RESULT-TW-012, VER-TW-037, ART-TW-043, TRACE-TW-029, ATP-TW-013, RESULT-TW-013, VER-TW-038, tw-traceability-check skill notes, structured finding reference, deterministic fixture set, smoke harness, review-wrapper handoff notes, skill behavior audit evidence, and matrix change-impact updates
+structured_traceability_findings_requirement_result: deterministic fixture smoke now verifies the complete-trace positive control as one linked row and guards the real repository authority file set; smoke still passes with 8 structured findings, 6 P1 blocked findings, 2 P2 held findings, JSONL/Markdown artifact output, and real repository authority files unchanged; prior code review returned P1 harness findings, findings are patched, clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001, and authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001
+structured_traceability_findings_requirement_authority_doc_review_status: passed_no_findings_after_harness_patch
+structured_traceability_findings_requirement_authority_doc_review_id: CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001
+structured_traceability_findings_requirement_accepted_scope: patched_fixture_evidence_reviewed_static_input_plus_constrained_active_host_tw_traceability_check_runtime
+structured_traceability_findings_code_review_status: passed_no_findings_after_harness_patch
+structured_traceability_findings_prior_code_review_id: CE-CODE-REVIEW-2026-05-05-STRUCTURED-FINDINGS-CLEAN-001
+structured_traceability_findings_code_review_id: CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001
+structured_traceability_findings_code_review_scope: scripts/traceweaver-smoke-structured-findings
+structured_traceability_findings_code_review_coverage: main_thread_review_only_no_reviewer_subagents
+structured_traceability_findings_requirement_held_scope: authority doc review of constrained active-host tw-traceability-check runtime recording, project-level trace writes, code/test trace-anchor scanner enforcement, dead-TDD classification as accepted behavior, tw-auto autonomous routing, publication behavior, clean CE replacement, enforcing behavior, release/package/upstream readiness, R31, and unconstrained host support
+tw_auto_closure_loop_requirement_status: recorded_authority_doc_review_passed_tw_auto_code_review_passed_runtime_held
+tw_auto_closure_loop_requirement_scope: REQ-TW-056 candidate requirement, ART-TW-044, TRACE-TW-030, ATP-TW-014, RESULT-TW-014, VER-TW-039, tw-auto skill note, future closure-loop fixtures, skill behavior audit evidence, and matrix change-impact updates
+tw_auto_closure_loop_requirement_result: candidate requirement recorded for tw-auto task/plan closure-loop orchestration across authority gate, TraceWeaver-packaged ce-work, trace/matrix/evidence updates, tw-traceability-check, tw-code-review, tw-doc-review, bounded finding repair, hash refresh, human-decision pauses for unclear/contradictory/missing requirements, and clean-or-held stop classification
+tw_auto_closure_loop_requirement_authority_doc_review_status: passed_no_findings
+tw_auto_closure_loop_requirement_authority_doc_review_id: CE-DOC-REVIEW-2026-05-05-SKILL-BEHAVIOR-AUTHORITY-CLEAN-001
+tw_auto_closure_loop_code_review_status: passed_no_findings
+tw_auto_closure_loop_code_review_id: CE-CODE-REVIEW-2026-05-05-TW-AUTO-CLOSURE-LOOP-CLEAN-001
+tw_auto_closure_loop_code_review_scope: plugins/traceweaver-core/skills/tw-auto/SKILL.md
+tw_auto_closure_loop_code_review_coverage: main_thread_review_only_no_reviewer_subagents
+tw_auto_closure_loop_requirement_accepted_scope: reviewed_candidate_requirement_and_static_skill_note_for_fixture_planning_only_no_runtime_project_writes_or_publication_until_fixture_runtime_proof
+tw_auto_closure_loop_requirement_held_scope: autonomous task/plan closure-loop behavior, automatic review-fix repair, human-decision pause behavior for unclear/contradictory/missing requirements, project-level trace writes, controlled publication, clean CE replacement, enforcing behavior, release/package/upstream readiness, R31, and unconstrained host support
+tw_skill_behavior_fixture_status: active_host_tw_code_doc_wrapper_file_access_observation_recorded_code_review_passed_authority_doc_review_passed
+tw_skill_behavior_fixture_scope: REQ-TW-049, REQ-TW-050, REQ-TW-055, REQ-TW-056, ART-TW-045, TRACE-TW-031, ATP-TW-015, RESULT-TW-015, VER-TW-040
+tw_skill_behavior_fixture_script: scripts/traceweaver-smoke-tw-skill-behavior
+tw_skill_behavior_fixture_script_hash_sha256: 7a508162c9f919f0aa3938d2de24ade5ddebe1f4178647c9250a9bd5f1883307
+tw_skill_behavior_fixture_root: fixtures/tw-skill-behavior/
+tw_skill_behavior_fixture_aggregate_sha256: e0e9e3c2e7ab22ddc4e9d59dfb9b519a3da1ce8bb22532d87ecc9722a68ece51
+tw_skill_behavior_fixture_result: tw_skill_behavior_smoke=pass; tw_code_review_traceability_preflight=pass; tw_code_review_structured_finding_preservation=pass; tw_code_review_blocked_trace_fixture=pass; tw_doc_review_requirements_preflight=pass; tw_doc_review_trace_hash_status_preflight=pass; tw_doc_review_stale_authority_fixture=pass; tw_auto_review_routing=pass; tw_auto_closure_loop_contract=pass; tw_auto_human_decision_pause_fixtures=pass; tw_traceability_check_structured_contract_static=pass; active_host_tw_traceability_check_structured_runtime=pass_constrained_fixture_structured_finding; active_host_tw_code_review_wrapper_runtime=held_prompt_satisfied_file_access_observation; active_host_tw_doc_review_wrapper_runtime=held_prompt_satisfied_file_access_observation
+tw_skill_behavior_fixture_prior_code_review_id: CE-CODE-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-HARNESS-CLEAN-001
+tw_skill_behavior_fixture_code_review_status: passed_no_findings
+tw_skill_behavior_fixture_code_review_id: CE-CODE-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-CLEAN-001
+tw_skill_behavior_fixture_code_review_scope: scripts/traceweaver-smoke-tw-skill-behavior
+tw_skill_behavior_fixture_code_review_coverage: main_thread_review_only_no_reviewer_subagents
+tw_skill_behavior_fixture_authority_doc_review_status: passed_no_findings_after_wrapper_observation_code_review
+tw_skill_behavior_fixture_authority_doc_review_id: CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-AUTHORITY-CLEAN-001
+tw_skill_behavior_fixture_authority_doc_review_coverage: main_thread_review_only_no_reviewer_subagents
+tw_skill_behavior_fixture_active_host_repo_tw_traceability_check_hash: 8cb10c0f9f2968d4eba6904acdff01a3a1d05fac8af2c98b35adcf3749702bb7
+tw_skill_behavior_fixture_active_host_observed_tw_traceability_check_hash: 8cb10c0f9f2968d4eba6904acdff01a3a1d05fac8af2c98b35adcf3749702bb7
+tw_skill_behavior_fixture_active_host_repo_structured_ref_hash: e2b3eba34c000369f0edcc2d3e8fb5349ff247ae3822f33788563dfe3b521bdb
+tw_skill_behavior_fixture_active_host_observed_structured_ref_hash: e2b3eba34c000369f0edcc2d3e8fb5349ff247ae3822f33788563dfe3b521bdb
+tw_skill_behavior_fixture_active_host_repo_tw_code_review_hash: 09fe45ab22639d46bcc6eb1af15b70c82daccc8a92f5e061301514e26ea716b4
+tw_skill_behavior_fixture_active_host_observed_tw_code_review_hash: 09fe45ab22639d46bcc6eb1af15b70c82daccc8a92f5e061301514e26ea716b4
+tw_skill_behavior_fixture_active_host_repo_tw_doc_review_hash: 49b0a74963ecdac8730c6f3622fff8b8c7507490b6eb7225917670b22e1aa2c0
+tw_skill_behavior_fixture_active_host_observed_tw_doc_review_hash: 49b0a74963ecdac8730c6f3622fff8b8c7507490b6eb7225917670b22e1aa2c0
+tw_skill_behavior_fixture_active_host_backup: /Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260505T235311Z-tw-skill-behavior-runtime
+tw_skill_behavior_fixture_active_host_artifact_dir: /var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/traceweaver-tw-skill-behavior.RISByM
+tw_skill_behavior_fixture_active_host_exec_exit_code: 0
+tw_skill_behavior_fixture_active_host_tw_code_review_exec_exit_code: 0
+tw_skill_behavior_fixture_active_host_tw_doc_review_exec_exit_code: 0
+tw_skill_behavior_fixture_accepted_scope: reviewed_static_fixture_evidence_plus_constrained_active_host_tw_traceability_check_structured_runtime; reviewed active-host tw-code-review/tw-doc-review prompt-satisfied file-access observations recorded with code review and authority doc review passed as limitation evidence
+tw_skill_behavior_fixture_held_scope: successful CE code/doc review delegation on clean wrapper inputs; tw-auto autonomous closure-loop behavior, automatic review-fix repair, human-decision pause behavior, and project-level trace writes; wrapped CE continuity runtime behavior; controlled publication, clean CE replacement, enforcing behavior, release/package/upstream readiness, R31, and unconstrained host support
+matrix_hash_sha256: 94f827c2e78ebc5ff9571a49db677207563eb8bfc5adf43d8d78ceb89d14033c
 u7_static_advisory_record: docs/validation/traceweaver-u7-static-advisory-claims.md
 u7_static_advisory_record_sha256: 1421cf235e6bf1189b0364d5f1cb4ff418b44a2b24b4738f0026c764905ab6a8
 u7_static_advisory_state: static_advisory_accepted_runtime_held
@@ -320,12 +383,12 @@ source_artifacts:
     role: Historical full-CE authority-wrapping roadmap created for CE 3.4.1; current wrapper-backlog decisions are superseded by the CE 3.5.0 source-surface refresh and must not use stale 3.4.1 source identity as current authority.
   - id: SRC-MATRIX-001
     path: traceability-matrix.md
-    sha256: 8a570a989073f8c97ee3013a691ab31d887b39c36cb551458cd720a8774b3a45
-    role: Root traceability authority recording accepted narrow U7 static/advisory claims, refreshed current-hash install smoke, approved REQ-TW-048 static/advisory source-evidence scope, U9 Units 1-10 reviewed-held evidence, constrained Unit 11 active-host tw-authority-gate runtime proof with code/doc review passed, dogfood classifier code review passed / dogfood authority doc review passed evidence, review-pending Unit 1 skill behavior audit contracts, wrapper direct-callable expansion with code review passed / authority doc review pending, candidate review-wrapper skills REQ-TW-049/050, candidate CE 3.5.0 full-surface classification REQ-TW-051, candidate TW-wrapper backlog REQ-TW-052 reviewed against CE 3.5.0, candidate controlled publication route REQ-TW-053, candidate code/test trace-anchor requirement REQ-TW-054, and candidate structured traceability-finding requirement REQ-TW-055 with runtime/publication/parity/code-anchor/structured-finding enforcement claims held.
+    sha256: 94f827c2e78ebc5ff9571a49db677207563eb8bfc5adf43d8d78ceb89d14033c
+    role: Root traceability authority recording accepted narrow U7 static/advisory claims, refreshed current-hash install smoke, approved REQ-TW-048 static/advisory source-evidence scope, U9 Units 1-10 reviewed-held evidence, constrained Unit 11 active-host tw-authority-gate runtime proof with code/doc review passed, dogfood classifier code review passed / dogfood authority doc review passed evidence, Unit 1 skill behavior audit contracts with authority doc review passed, wrapper direct-callable expansion with code review passed / authority doc review passed, candidate review-wrapper skills REQ-TW-049/050 with authority doc review passed, candidate CE 3.5.0 full-surface classification REQ-TW-051 with authority doc review passed, candidate TW-wrapper backlog REQ-TW-052 reviewed against CE 3.5.0 with authority doc review passed, candidate controlled publication route REQ-TW-053 with authority doc review passed, candidate code/test trace-anchor requirement REQ-TW-054 with authority doc review passed, REQ-TW-055 structured-finding deterministic fixture smoke patched with clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001 and authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001, candidate REQ-TW-056 tw-auto closure-loop plus human-decision pause requirement with authority doc review passed and tw-auto code review passed, TW skill behavior fixture smoke code/doc reviewed with constrained active-host tw-traceability-check structured runtime passed and authority-doc-review passed, and reviewed active-host tw-code-review/tw-doc-review prompt-satisfied file-access observations recorded with code review and authority doc review passed as limitation evidence.
   - id: SRC-VAL-005
     path: docs/validation/traceweaver-controlled-autonomy-alpha.md
-    sha256: 019394daaba33ea36c3904fe70197703202c08d81e3835454f59f162ac0ea9a4
-    role: Controlled-autonomy alpha static/install evidence with approved REQ-TW-048 static/advisory source-evidence scope, Units 1-10 reviewed-held evidence, constrained Unit 11 active-host tw-authority-gate runtime proof with code/doc review passed, reviewed dogfood audit evidence, wrapper direct-callable expansion with code review passed / authority doc review pending, candidate tw-code-review/tw-doc-review wrapper skills recorded/review pending, candidate REQ-TW-054 code/test trace-anchor requirement recorded/review pending, and candidate REQ-TW-055 structured traceability-finding requirement recorded/review pending; broader runtime/publication/code-anchor/structured-finding enforcement claims remain held.
+    sha256: c0f352a5256f4cca524a836c738643f20893a67151b2ec73ee609194d1f5ac0a
+    role: Controlled-autonomy alpha static/install evidence with approved REQ-TW-048 static/advisory source-evidence scope, Units 1-10 reviewed-held evidence, constrained Unit 11 active-host tw-authority-gate runtime proof with code/doc review passed, reviewed dogfood audit evidence, wrapper direct-callable expansion with code review passed / authority doc review passed, candidate tw-code-review/tw-doc-review wrapper skills recorded with authority doc review passed, candidate REQ-TW-054 code/test trace-anchor requirement recorded with authority doc review passed, REQ-TW-055 structured-finding deterministic fixture smoke patched with clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001 and authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001, candidate REQ-TW-056 tw-auto closure-loop plus human-decision pause requirement, TW skill behavior fixture smoke code/doc reviewed, and reviewed active-host tw-code-review/tw-doc-review prompt-satisfied file-access observations recorded with code review and authority doc review passed as limitation evidence; broader runtime/publication/code-anchor/structured-finding/closure-loop enforcement claims remain held.
   - id: SRC-VAL-006
     path: docs/validation/traceweaver-u7-static-advisory-claims.md
     sha256: 1421cf235e6bf1189b0364d5f1cb4ff418b44a2b24b4738f0026c764905ab6a8
@@ -333,23 +396,23 @@ source_artifacts:
   - id: SRC-VAL-007
     path: docs/validation/traceweaver-u9-codex-runtime-discovery.md
     sha256: 789d909d3bfaaec633bae59183cfa7728c8da1108eb5e2463698c0787a76e8c9
-    role: U9 Units 1-10 reviewed-held evidence plus constrained Unit 11 active-host tw-authority-gate runtime proof under a controlled host-reconciliation exception, wrapper direct-callable expansion with code review passed / authority doc review pending, and candidate tw-code-review/tw-doc-review visibility and materialized-hash evidence; broader runtime and publication claims remain held.
+    role: U9 Units 1-10 reviewed-held evidence plus constrained Unit 11 active-host tw-authority-gate runtime proof under a controlled host-reconciliation exception, wrapper direct-callable expansion with code review passed / authority doc review passed, and candidate tw-code-review/tw-doc-review visibility and materialized-hash evidence; broader runtime and publication claims remain held.
   - id: SRC-PLAN-004
     path: docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
     sha256: e5e091453af8e36be37f18222e8e9692ec6b5d5532b1b7670b02b7df0f0e10f5
-    role: U9 Codex runtime/discovery proof plan with Unit 11 active-host reconciled runtime proof accepted for constrained tw-authority-gate invocation, wrapper direct-callable expansion code review passed / authority doc review pending, and candidate tw-code-review/tw-doc-review visibility/routing recorded review-pending.
+    role: U9 Codex runtime/discovery proof plan with Unit 11 active-host reconciled runtime proof accepted for constrained tw-authority-gate invocation, wrapper direct-callable expansion code review passed / authority doc review passed, and candidate tw-code-review/tw-doc-review visibility/routing recorded with authority doc review passed and runtime held.
   - id: SRC-SMOKE-001
     path: scripts/traceweaver-smoke-codex-discovery
     sha256: ffd91f8fd9c1da054acdcb817ff9d74acf1e7fda869ec9f09c40baa32f08a5ce
-    role: U9 isolated Codex install/discovery smoke harness with Unit 9 registry-shape visibility, legacy-upgrade proof, review-pending wrapper direct-callable visibility expansion, and candidate tw-code-review/tw-doc-review required-skill visibility; wrapper runtime behavior and publication remain held.
+    role: U9 isolated Codex install/discovery smoke harness with Unit 9 registry-shape visibility, legacy-upgrade proof, reviewed wrapper direct-callable visibility expansion, and candidate tw-code-review/tw-doc-review required-skill visibility; wrapper runtime behavior and publication remain held.
   - id: SRC-SMOKE-004
     path: scripts/traceweaver-smoke-codex-host-registry
     sha256: e65c8a24ffb5d3192ade9f721e6a7a60b0ebb56489fce62c3646fa8d218aa224
-    role: U9 host-registry smoke extended by Unit 11, wrapper direct-callable expansion, and candidate tw-code-review/tw-doc-review required-skill visibility; wrapper behavior review pending and publication held.
+    role: U9 host-registry smoke extended by Unit 11, wrapper direct-callable expansion, and candidate tw-code-review/tw-doc-review required-skill visibility; wrapper runtime behavior and publication held.
   - id: SRC-SMOKE-005
     path: scripts/traceweaver-smoke-codex-separate-home-runtime
     sha256: a6852d5b3f90a1328723f6284f88aaedf67a579f79e0737402a52e5309507b63
-    role: U9 separate Codex home install and fresh codex exec registry probe updated for Unit 10 auth-safe no-copy mode, review-pending wrapper direct-callable visibility expansion, and candidate tw-code-review/tw-doc-review visible-skill checks; broader runtime invocation remains held.
+    role: U9 separate Codex home install and fresh codex exec registry probe updated for Unit 10 auth-safe no-copy mode, reviewed wrapper direct-callable visibility expansion, and candidate tw-code-review/tw-doc-review visible-skill checks; broader runtime invocation remains held.
   - id: SRC-PLAN-005
     path: docs/plans/2026-05-05-001-feat-traceweaver-dogfood-audit-plan.md
     sha256: aab8223fc9c4920e3f06b877e4c4a5b1a1fcdeb09f47422f020738122bd53f1d
@@ -360,12 +423,16 @@ source_artifacts:
     role: Dogfood audit evidence summarizing private raw smoke logs, manual skill-output audit, held runtime claims, and requirements gaps; classifier code review passed and authority doc review passed.
   - id: SRC-PLAN-006
     path: docs/plans/2026-05-05-002-feat-tw-skill-behavior-audit-plan.md
-    sha256: 54697b473f15afe399cf6ddb0007073cc1a34f98a7a995bd90973ad791ef5109
-    role: Review-pending TraceWeaver skill behavior audit plan using private source custody only as an internal quality oracle and public-safe TraceWeaver wording for TW, tw-code-review/tw-doc-review, wrapped CE continuity behavior contracts, CE 3.5.0 source-surface refresh/backlog review, controlled publication-route candidate routing, candidate code/test trace-anchor/dead-TDD proof planning, and candidate structured traceability-finding proof planning.
+    sha256: 9521bab520af9dcdbf9d9c5e68aff3e265a221a016c20f2f79f91786559e190d
+    role: TraceWeaver skill behavior audit plan using private source custody only as an internal quality oracle and public-safe TraceWeaver wording for TW, tw-code-review/tw-doc-review, wrapped CE continuity behavior contracts, CE 3.5.0 source-surface refresh/backlog review, controlled publication-route candidate routing, candidate code/test trace-anchor/dead-TDD proof planning, candidate structured traceability-finding proof planning, candidate tw-auto closure-loop plus human-decision pause fixture planning, TW skill behavior fixture smoke code/doc reviewed state, constrained active-host tw-traceability-check structured runtime recording with authority doc review passed, and reviewed active-host tw-code-review/tw-doc-review prompt-satisfied file-access observations with code review and authority doc review passed as limitation evidence.
   - id: SRC-VAL-009
     path: docs/validation/traceweaver-skill-behavior-audit.md
-    sha256: 57ffc4b1fed26f173e5ba59523a0c7db71c7dcdf99db464bf46a04969ff4dd67
-    role: Review-pending behavior-contract and CE 3.5.0 wrapper-backlog evidence for tw-requirements-review, tw-authority-gate, tw-traceability-check, tw-code-review, tw-doc-review, tw-grill, tw-auto, lfg, selected CE continuity skills, missing CE 3.5.0 surfaces, controlled publication-route candidate routing, candidate code/test trace-anchor/dead-TDD behavior, and candidate structured traceability-finding behavior; not runtime, scanner, enforcement, structured-finding, or publication proof.
+    sha256: c6a112e59a29b0679d9afdf65dc687ee4786d762ed12528feed723bba3764a9c
+    role: Behavior-contract and CE 3.5.0 wrapper-backlog evidence for tw-requirements-review, tw-authority-gate, tw-traceability-check, tw-code-review, tw-doc-review, tw-grill, tw-auto, lfg, selected CE continuity skills, missing CE 3.5.0 surfaces, controlled publication-route candidate routing, candidate code/test trace-anchor/dead-TDD behavior, structured traceability-finding fixture-smoke behavior patched after P1 code-review findings with clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001 and authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001, candidate tw-auto closure-loop plus human-decision pause behavior with tw-auto code review passed, TW skill behavior fixture smoke code/doc reviewed as static fixture input, constrained active-host tw-traceability-check structured runtime recording with authority doc review passed, and reviewed active-host tw-code-review/tw-doc-review prompt-satisfied file-access observations recorded with code review and authority doc review passed as limitation evidence; not scanner enforcement, successful CE review delegation, autonomous closure-loop behavior, human-decision pause runtime behavior, or publication proof until later proof passes.
+  - id: SRC-PLAN-007
+    path: docs/plans/2026-05-05-003-feat-structured-traceability-findings-plan.md
+    sha256: f93a08cef571e26e7da38c8a67ac9632f6d1f27611319cb04917793f2bcbfcb4
+    role: Structured traceability findings implementation plan with U1-U3 implemented, deterministic fixture smoke patched after P1 code-review findings, clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001, authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001, and constrained active-host runtime recorded separately in the TW skill behavior smoke with authority doc review passed.
   - id: SRC-SMOKE-006
     path: scripts/traceweaver-classify-ce-replacement
     sha256: 79acb4114d566d37842bcc86a6d7e07a55766f143b4976cda4013af38536ae73
@@ -378,6 +445,10 @@ source_artifacts:
     path: fixtures/u9-codex/
     aggregate_sha256: 3134b4f39d4856137574f35f1377eb4289b03a95fb94e82f99212b281ca423de
     role: U9 Unit 2 synthetic fixture workspaces for authority-present, missing-authority, stale-authority, weak-requirement, trace-gap, and trace-write cases; fixture-only evidence, not project authority.
+  - id: SRC-FIXTURE-002
+    path: fixtures/structured-traceability-findings/
+    aggregate_sha256: a81c5e14f6f22ecd2749fd28c730e12169873085aa542b2ed3fa41f118af4fae
+    role: Structured traceability-finding deterministic fixtures for complete trace, missing authority, stale hash, missing matrix row, missing verification, missing validation, unsupported release claim, missing code/test anchor, and dead-TDD candidate cases; fixture-only evidence, with smoke harness patched after P1 code-review findings, clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001, and authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001.
   - id: SRC-SMOKE-002
     path: scripts/traceweaver-smoke-u9-fixtures
     sha256: 0646c25d475cb5bfa33864e84f6b9167b4c2fddb4b8061612a5979a1034c1d3f
@@ -386,14 +457,26 @@ source_artifacts:
     path: scripts/traceweaver-smoke-no-publication
     sha256: 9e14b7066ed0d6d7e55f82df106dff41db8d18eb0d59be88dd5748e73f9def40
     role: U9 Unit 4 PR-helper publication-stop, lfg delegation, broader static publication-stop marker, and event-derived reviewer-capacity backpressure boundary smoke; code review and doc review passed, with host-registry/runtime claims still held.
+  - id: SRC-SMOKE-008
+    path: scripts/traceweaver-smoke-structured-findings
+    sha256: d9a4ace96d868d45425a3ebbd34924221979eb098a7f079daf11d277248cfaed
+    role: Deterministic structured traceability-finding fixture smoke; patched to verify the complete-trace positive control as one linked row and to guard the real repository authority file set. The smoke emits required P1 blocked and P2 held findings and verifies real repository authority files were unchanged; prior behavior code review returned P1 harness findings, findings are patched, clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001, authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001, and constrained active-host runtime is recorded separately as reviewed evidence.
+  - id: SRC-SMOKE-009
+    path: scripts/traceweaver-smoke-tw-skill-behavior
+    sha256: 7a508162c9f919f0aa3938d2de24ade5ddebe1f4178647c9250a9bd5f1883307
+    role: Deterministic TW skill behavior smoke covering tw-code-review traceability preflight ordering, structured finding preservation, trace-blocked code review fixture, tw-doc-review requirements and trace/hash/status preflight ordering, stale-authority doc review fixture, tw-auto routing through TW wrappers, tw-auto closure-loop contract fixtures, human-decision pause fixtures, and structured-finding static contract loading; active-host runtime pass requires undisclosed installed tw-traceability-check skill and structured-reference hash sentinels, and the extended wrapper branch requires installed tw-code-review/tw-doc-review hash sentinels. Prior smoke passed, behavior code review passed as CE-CODE-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-HARNESS-CLEAN-001, authority doc review passed as CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001, constrained active-host structured runtime passed after host reconciliation with authority doc review passed, and reviewed active-host tw-code-review/tw-doc-review prompt-satisfied file-access observations are recorded with code review and authority doc review passed as limitation evidence.
+  - id: SRC-FIXTURE-003
+    path: fixtures/tw-skill-behavior/
+    aggregate_sha256: e0e9e3c2e7ab22ddc4e9d59dfb9b519a3da1ce8bb22532d87ecc9722a68ece51
+    role: Deterministic TW skill behavior fixtures for blocked traceability before code review, stale authority before doc review, clean tw-auto task loop state, unclear requirement pause, contradictory requirement pause, active-host structured finding prompt with undisclosed installed skill/reference hash sentinels, and active-host tw-code-review/tw-doc-review wrapper prompts with installed wrapper hash sentinels; fixture-only limitation evidence with code-review-passed / authority-doc-review-passed prompt-satisfied file-access observations.
   - id: SRC-INSTALL-001
     path: src/index.ts
     sha256: d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5
     role: Repo-local installer implementation with Unit 9 registry-shape, legacy-upgrade repair, and auth-boundary harness reviewed clean; accepted static/advisory install-command claim remains limited to prior reviewed scope until refreshed Unit 9 authority doc review closes.
   - id: SRC-SKILL-001
     path: plugins/traceweaver-core/skills/tw-auto/SKILL.md
-    sha256: f8d89aa7edbb7a7d843cb39ea660ab86ada5e334fbb6c7eaa5673461aeaed73d
-    role: Advisory controlled-autonomy alpha skill surface with bounded reviewer subagent capacity management, degraded-review limitation handling, candidate review handoff routing through tw-code-review/tw-doc-review, and candidate controlled publication-route wording; review, runtime, and publication behavior remain held.
+    sha256: 3d96efca8712660a90272b3a488aa908993d59b7e082ed7a9e9c10ad406a290d
+    role: Advisory controlled-autonomy alpha skill surface with bounded reviewer subagent capacity management, degraded-review limitation handling, candidate review handoff routing through tw-code-review/tw-doc-review, candidate controlled publication-route wording, and candidate REQ-TW-056 task/plan closure-loop plus human-decision pause design note; tw-auto code review passed as `CE-CODE-REVIEW-2026-05-05-TW-AUTO-CLOSURE-LOOP-CLEAN-001`; autonomous closure-loop behavior, human-decision pause behavior, runtime, and publication behavior remain held.
   - id: SRC-SKILL-006
     path: plugins/traceweaver-core/skills/ce-work/SKILL.md
     sha256: 27220abdd867043b957a97c4a051aaab574b7c1eb098e7e5ed97bd6fdc59dfd0
@@ -408,16 +491,20 @@ source_artifacts:
     role: Approved static/advisory source-evidence intent-deepening skill with bootstrap and delta/gap modes; runtime behavior and implementation-authority claims remain held.
   - id: SRC-SKILL-007
     path: plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md
-    sha256: 8af9c304f64e63dd9f41b1064bdad03a75467b9bbe73421255f6f26b6a9c37a4
-    role: TraceWeaver traceability adapter updated with candidate structured-finding notes for REQ-TW-055; reviewer-style finding emission, file/line anchoring, Codex code-comment output, wrapper integration, and runtime behavior remain held until review and fixture proof pass.
+    sha256: 8cb10c0f9f2968d4eba6904acdff01a3a1d05fac8af2c98b35adcf3749702bb7
+    role: TraceWeaver traceability adapter updated to load the structured-finding contract and emit reviewer-style structured findings and Codex inline findings when stable anchors exist; deterministic fixture smoke was patched after P1 code-review findings, clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001, authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001 for the patched proof, and constrained active-host runtime passed after host reconciliation with authority doc review passed.
+  - id: SRC-SKILL-008
+    path: plugins/traceweaver-core/skills/tw-traceability-check/references/structured-findings.md
+    sha256: e2b3eba34c000369f0edcc2d3e8fb5349ff247ae3822f33788563dfe3b521bdb
+    role: Public structured traceability-finding contract for REQ-TW-055 covering severity, status, evidence, affected IDs, optional anchors, claim impact, remediation, pass rules, and Codex inline finding shape; deterministic fixture smoke was patched after P1 code-review findings, clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001, and authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001 for the patched proof.
   - id: SRC-SKILL-004
     path: plugins/traceweaver-core/skills/tw-code-review/SKILL.md
-    sha256: 3d0e15dc6ebd1dcf8a3f645b8529941ac5378af80f1a617e0e2c79b291051b2f
-    role: Candidate TraceWeaver code-review wrapper requiring tw-traceability-check before TraceWeaver-packaged ce-code-review; review and runtime behavior remain held.
+    sha256: 09fe45ab22639d46bcc6eb1af15b70c82daccc8a92f5e061301514e26ea716b4
+    role: Candidate TraceWeaver code-review wrapper requiring tw-traceability-check before TraceWeaver-packaged ce-code-review and preserving structured TraceWeaver findings before CE findings; patched structured-finding deterministic fixture proof has clean code review and authority doc review, while wrapper runtime behavior remains held.
   - id: SRC-SKILL-005
     path: plugins/traceweaver-core/skills/tw-doc-review/SKILL.md
-    sha256: f5cc1fa0a2276184cc9afd5fe9e5ccbc04768b11ff41fa6f526b35c27c34b8d3
-    role: Candidate TraceWeaver doc-review wrapper requiring requirements-quality and trace/hash/status preflights before TraceWeaver-packaged ce-doc-review; review and runtime behavior remain held.
+    sha256: 49b0a74963ecdac8730c6f3622fff8b8c7507490b6eb7225917670b22e1aa2c0
+    role: Candidate TraceWeaver doc-review wrapper requiring requirements-quality and trace/hash/status preflights before TraceWeaver-packaged ce-doc-review and preserving structured TraceWeaver findings before CE findings; patched structured-finding deterministic fixture proof has clean code review and authority doc review, while wrapper runtime behavior remains held.
 
 stakeholder_intent:
   - id: INTENT-TW-001
@@ -1120,8 +1207,8 @@ open_gaps:
     status: held
 
 next_recommended_steps:
-  - Rerun authority doc review on the full staged skill-behavior authority set, including candidate tw-code-review/tw-doc-review wrappers, CE 3.5.0 source-surface inventory, TW wrapper backlog, controlled publication-route wording, candidate REQ-TW-054 code/test trace-anchor requirement, candidate REQ-TW-055 structured traceability-finding requirement, updated smoke harness identities, U9 evidence, alpha evidence, matrix, and Intent Contract before treating any of those review-pending records as accepted input.
-  - After clean authority doc review, run deterministic fixture/runtime proof for tw-code-review, tw-doc-review, tw-auto review routing, wrapped CE continuity behavior, the controlled publication route, the planned code/test trace-anchor scanner plus dead-TDD fixture cases, and structured tw-traceability-check finding output.
+  - Proceed from the reviewed held active-host tw-code-review/tw-doc-review prompt-satisfied file-access limitation observations into successful CE review delegation proof.
+  - Continue from reviewed fixture evidence into successful CE review delegation on clean wrapper inputs, the controlled publication route, the planned code/test trace-anchor scanner plus dead-TDD fixture cases, and runtime closure-loop proof.
   - Keep tw-grill output as source evidence only; it does not create implementation authority.
-  - Keep tw-code-review, tw-doc-review, tw-auto, tw-grill, and the lfg compatibility alias in static/advisory/source-evidence scope until runtime behavior evidence passes.
-  - Keep CE 3.5.0 full-surface parity, TW wrapper backlog acceptance, code/test trace-anchor enforcement, structured traceability-finding emission, dead-TDD classification, clean CE replacement, enforcing mode, dynamic discovery, slash commands, autonomous commit/push/PR, U9 runtime claims, release-ready claims, and R31 held until their evidence gates pass.
+  - Keep tw-code-review and tw-doc-review beyond the reviewed held prompt-satisfied file-access limitation observations, plus tw-auto, tw-grill, and the lfg compatibility alias, in static/advisory/source-evidence scope until their own runtime behavior evidence passes.
+  - Keep CE 3.5.0 full-surface parity, TW wrapper backlog acceptance, code/test trace-anchor enforcement, structured traceability-finding emission beyond the constrained tw-traceability-check fixture, tw-auto closure-loop automation, human-decision pause behavior, dead-TDD classification, clean CE replacement, enforcing mode, dynamic discovery, slash commands, autonomous commit/push/PR, U9 runtime claims beyond the accepted constrained host proofs, release-ready claims, and R31 held until their evidence gates pass.

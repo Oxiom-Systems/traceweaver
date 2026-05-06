@@ -17,6 +17,9 @@ of only returning a prose status.
 This adapter routes to `systems-engineering-traceability`. It may also route to
 `requirements-reviewer` when the authority quality is weak or unclear.
 
+Load `references/structured-findings.md` when a check can return a traceability
+gap, blocked claim, held claim, or review finding.
+
 ## Process
 
 1. Identify the behavior, plan, PR, document, or release surface under review.
@@ -51,6 +54,8 @@ Return:
 - dark-code candidates
 - structured findings with severity, status, affected IDs, evidence, file/line
   anchors when available, claim impact, and remediation
+- Codex `::code-comment{...}` inline findings when a stable file and line range
+  exists
 - allowed claims
 - held claims
 

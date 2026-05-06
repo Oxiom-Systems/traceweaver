@@ -175,6 +175,28 @@ review completion.
     reviewed Intent Contract publication override. Report the evidence status
     and the next command, review, or human decision required.
 
+## Planned Closure Loop
+
+REQ-TW-056 candidate behavior: `tw-auto` should be the user-facing orchestrator
+for a task or plan, not another manual handoff in the
+work/review/fix/review chain. When implemented and proven, `tw-auto` should run
+the closure loop itself: authority gate, TraceWeaver-packaged `ce-work`,
+trace/matrix/evidence updates, `tw-traceability-check`, `tw-code-review`,
+`tw-doc-review`, bounded finding repair, refreshed hashes, and final clean or
+held-state reporting.
+
+`tw-auto` must not edit, reinterpret, or silently broaden requirements to keep
+the loop moving. If requirements are unclear, contradictory, incomplete,
+missing, or require a material authority change, pause the loop and ask the
+user for clarification or route to requirements review. Resume implementation
+only after the authority source, allowed scope, verification method, and
+validation question are clear.
+
+Until deterministic fixtures and runtime proof accept REQ-TW-056, treat this as
+a design note only. Do not claim autonomous closure, automatic review repair,
+project-level trace writes, publication, clean CE replacement, release
+readiness, human-decision pause behavior, or runtime parity from this note.
+
 ## Stop Conditions
 
 Stop immediately when any of these are true:
@@ -185,6 +207,8 @@ Stop immediately when any of these are true:
 - a meaningful behavior-bearing unit cannot be linked to authority and
   verification evidence;
 - behavior appears useful or logical but no approved requirement captures it;
+- requirements are unclear, contradictory, incomplete, or need a material
+  authority change before implementation can continue;
 - behavior duplicates or expands existing behavior without authority;
 - tests or approved verification fail twice for the same work cycle;
 - required reviewer personas remain pending because host agent capacity could

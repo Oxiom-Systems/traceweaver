@@ -53,6 +53,26 @@ Accepted:
 - Static/install evidence for `tw-auto`, `lfg`, `tw-grill`, and TW adapters.
 - Constrained active-host `tw-authority-gate` runtime invocation proof under the
   Unit 11 host reconciliation boundary.
+- Reviewed static skill-behavior staged-set planning input, including behavior
+  contracts, CE 3.5.0 source-surface/backlog decisions, controlled publication
+  route wording, code/test trace-anchor requirement wording, structured-finding
+  deterministic fixture evidence, and the `tw-auto` closure-loop skill note.
+- Reviewed deterministic TW skill behavior fixture evidence from
+  `scripts/traceweaver-smoke-tw-skill-behavior`, covering `tw-code-review`,
+  `tw-doc-review`, `tw-auto` wrapper routing, structured finding preservation,
+  and human-decision pause fixtures. Behavior code review and authority doc
+  review passed.
+- Constrained active-host `tw-traceability-check` structured runtime evidence:
+  host `tw-traceability-check`, `tw-code-review`, `tw-doc-review`, and
+  `tw-auto` copies were reconciled from this branch with a host backup, and the
+  runtime smoke returned the installed skill hash, installed structured
+  reference hash, and expected P1 blocked finding fields. Authority doc review
+  passed as
+  `CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-ACTIVE-HOST-RUNTIME-CLEAN-001`.
+- Held active-host `tw-code-review`/`tw-doc-review` prompt-satisfied file-access
+  observations: host wrapper hashes matched this branch and the runtime smoke
+  returned prompt-specified trace-blocked and stale-authority fields. This extension
+  has clean behavior code review and staged authority doc review passed as CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-AUTHORITY-CLEAN-001.
 
 Held:
 
@@ -62,12 +82,20 @@ Held:
   `lfg`, and `tw-grill`.
 - Wrapped CE continuity runtime behavior beyond active-surface visibility,
   including `ce-debug`, `ce-commit`, and `ce-commit-push-pr`.
+- `tw-auto` task/plan closure-loop automation, automatic review-fix repair, and
+  human-decision pause behavior when requirements are unclear, contradictory,
+  incomplete, missing, or need material authority changes.
 - Project-level trace/matrix/gap/change/exception writes.
 - Code/test trace-anchor scanner behavior, matrix code-anchor table behavior,
   `tw-code-review` enforcement, and dead-TDD classification.
 - Structured `tw-traceability-check` finding emission, severity mapping,
   file/line anchoring, Codex `::code-comment` output, and review-wrapper
   integration.
+- Active-host structured runtime beyond the constrained `tw-traceability-check`
+  fixture proof and the code-review-passed / authority-doc-review-passed reviewed held
+  `tw-code-review` /
+  `tw-doc-review` prompt-satisfied file-access observations.
+- Successful CE code/doc review delegation on clean wrapper inputs.
 - Clean CE replacement.
 - Full CE 3.5.0 plugin parity and support for unclassified CE 3.5.0
   surfaces.
@@ -93,8 +121,9 @@ Held:
    the normal path by running requirements/traceability preflights before
    delegating to CE review skills?
 6. Does `tw-auto` orchestrate TW gates and CE skills in the intended order,
-   stopping before unsupported implementation, trace-write, review, commit,
-   push, PR, release, or replacement claims?
+   absorb the work/review/fix/review loop for a task or plan, and stop before
+   unsupported implementation, trace-write, review, commit, push, PR, release,
+   or replacement claims?
 7. Do wrapped CE skills, including `ce-debug`, `ce-commit`, and
    `ce-commit-push-pr`, preserve useful CE behavior while obeying TraceWeaver
    publication-gated and held-claim constraints?
@@ -127,7 +156,7 @@ Work:
 - Use `/Users/hanneszietsman/CrypotAI/compound-engineering-plugin-main-3.5.0`
   as the current CE source surface.
 - Record the CE 3.5.0 commit, package/plugin manifest hashes, skill counts,
-  missing TraceWeaver-packaged skills, and review-pending wrapper route
+  missing TraceWeaver-packaged skills, and authority-reviewed wrapper route
   classifications.
 - Mark historical CE 3.4.1/3.4.2 records as historical or superseded for
   current wrapper-backlog decisions rather than active source authority.
@@ -263,27 +292,39 @@ Verification:
 - Structured traceability-finding behavior remains candidate-only until
   requirements/doc review, implementation, fixture proof, severity/file-anchor
   review, and wrapper integration evidence pass.
+- `tw-auto` closure-loop behavior, automatic review-fix repair, and
+  human-decision requirement-pause behavior remain candidate-only until
+  requirements/doc review, closure-loop plan, deterministic fixture proof, code
+  review, and runtime evidence pass.
 
 ## Review Gates
 
 - Run `/ce-code-review` on any changed behavior-bearing scripts or skills.
-- Run `/ce-doc-review` on the authority set before accepting audit evidence.
+- Prior Unit 1 staged-set authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-05-SKILL-BEHAVIOR-AUTHORITY-CLEAN-001`.
+- Post-harness-patch staged-set authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001`.
+- Current `tw-auto` closure-loop skill-note code review passed as
+  `CE-CODE-REVIEW-2026-05-05-TW-AUTO-CLOSURE-LOOP-CLEAN-001`.
+- Current deterministic TW skill behavior smoke passed; behavior code review
+  passed as `CE-CODE-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-HARNESS-CLEAN-001`
+  and authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001`.
+- Current constrained active-host `tw-traceability-check` structured runtime
+  proof passed after host reconciliation; authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-ACTIVE-HOST-RUNTIME-CLEAN-001`.
+- Current held active-host `tw-code-review`/`tw-doc-review`
+  prompt-satisfied file-access observations were recorded by the extended smoke;
+  behavior code review passed as
+  `CE-CODE-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-CLEAN-001`
+  and staged authority doc review passed as CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-AUTHORITY-CLEAN-001.
 - Stage reviewed authority files together with no staged/unstaged split before
   using the audit as input for new work.
 
 ## Suggested Next Command
 
-Run staged-set authority doc review before using the review-pending behavior
-contracts, CE 3.5.0 source-surface inventory, TW wrapper backlog, review-wrapper
-skills, controlled publication-route wording, or code/test trace-anchor
-requirement, or structured traceability-finding requirement as accepted input:
+Review the extended wrapper runtime smoke before accepting it:
 
 ```text
-/ce-doc-review
+/ce-code-review on scripts/traceweaver-smoke-tw-skill-behavior
 ```
-
-If clean, proceed to deterministic fixture/runtime proof for `tw-code-review`,
-`tw-doc-review`, `tw-auto` review routing, wrapped CE continuity behavior, and
-the controlled publication route, then plan the code-trace-anchor scanner and
-dead-TDD fixture proof plus structured `tw-traceability-check` finding fixtures
-as the next scoped gaps.

@@ -36,7 +36,7 @@ reviewed change, stop and report the missing authority. Do not run raw
 4. If `tw-traceability-check` returns blocked, needs revision, missing
    verification, missing validation, dark behavior, stale evidence, or an
    unsupported done/release claim, stop before accepted code review and report
-   the exact traceability blocker.
+   the exact structured traceability findings before any CE findings.
 5. Run `ce-code-review` only after the traceability check is passable or the
    remaining limitation is explicitly recorded as an approved held condition.
 6. Keep `ce-code-review` in TraceWeaver no-publication mode. It may report
@@ -53,6 +53,8 @@ Return:
 - review target
 - baseline ID/hash and authority used
 - `tw-traceability-check` result
+- structured traceability findings, preserving severity, status, affected IDs,
+  file/line anchors when available, claim impact, and remediation
 - CE code-review coverage and findings
 - verification evidence reviewed
 - validation question/path reviewed
@@ -66,3 +68,7 @@ Do not claim engineering-complete, package-ready, release-ready, upstream-ready,
 clean CE replacement, enforcing behavior, publication readiness, or PR readiness
 from `tw-code-review` unless the traceability, verification, validation, and
 publication gates have separately passed.
+
+Do not collapse structured TraceWeaver findings into prose-only summaries.
+Report them before CE code-review findings so blocked or held traceability
+claims cannot be hidden by a clean CE review.

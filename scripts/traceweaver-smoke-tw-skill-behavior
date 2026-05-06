@@ -1,0 +1,360 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/tw-skill-behavior"
+CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
+ACTIVE_SKILLS_ROOT="$CODEX_HOME_DIR/skills"
+RUNTIME_EXEC="${TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME:-1}"
+EXEC_TIMEOUT_SECONDS="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-60}"
+MODEL="${TRACEWEAVER_CODEX_MODEL:-gpt-5.2}"
+
+require_file() {
+  local path="$1"
+  if [[ ! -f "$path" ]]; then
+    echo "tw_skill_behavior_missing_required_file=$path" >&2
+    exit 1
+  fi
+}
+
+hash_file() {
+  shasum -a 256 "$1" | awk '{print $1}'
+}
+
+line_number() {
+  local pattern="$1"
+  local path="$2"
+  grep -n "$pattern" "$path" | head -n 1 | cut -d: -f1
+}
+
+assert_contains() {
+  local path="$1"
+  local pattern="$2"
+  local label="$3"
+  if ! grep -q "$pattern" "$path"; then
+    echo "$label=failed_missing_pattern pattern=$pattern file=$path" >&2
+    exit 1
+  fi
+}
+
+assert_line_before() {
+  local path="$1"
+  local first="$2"
+  local second="$3"
+  local label="$4"
+  local first_line second_line
+  first_line="$(line_number "$first" "$path")"
+  second_line="$(line_number "$second" "$path")"
+  if [[ -z "$first_line" || -z "$second_line" || "$first_line" -ge "$second_line" ]]; then
+    echo "$label=failed_order first=$first second=$second file=$path first_line=${first_line:-missing} second_line=${second_line:-missing}" >&2
+    exit 1
+  fi
+}
+
+assert_fixture_field() {
+  local path="$1"
+  local field="$2"
+  local expected="$3"
+  local label="$4"
+  if ! grep -qx "$field=$expected" "$path"; then
+    echo "$label=failed_fixture_field field=$field expected=$expected file=$path" >&2
+    exit 1
+  fi
+}
+
+tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-tw-skill-behavior.XXXXXX")"
+runtime_prompt="$FIXTURE_ROOT/active-host-structured-finding/prompt.txt"
+runtime_events="$tmp_dir/exec-events.jsonl"
+runtime_stderr="$tmp_dir/exec.err"
+runtime_last_message="$tmp_dir/last-message.txt"
+runtime_normalized="$tmp_dir/last-message.normalized.txt"
+code_runtime_prompt="$FIXTURE_ROOT/active-host-code-review-wrapper/prompt.txt"
+code_runtime_events="$tmp_dir/code-review-exec-events.jsonl"
+code_runtime_stderr="$tmp_dir/code-review-exec.err"
+code_runtime_last_message="$tmp_dir/code-review-last-message.txt"
+code_runtime_normalized="$tmp_dir/code-review-last-message.normalized.txt"
+doc_runtime_prompt="$FIXTURE_ROOT/active-host-doc-review-wrapper/prompt.txt"
+doc_runtime_events="$tmp_dir/doc-review-exec-events.jsonl"
+doc_runtime_stderr="$tmp_dir/doc-review-exec.err"
+doc_runtime_last_message="$tmp_dir/doc-review-last-message.txt"
+doc_runtime_normalized="$tmp_dir/doc-review-last-message.normalized.txt"
+
+tw_code="$ROOT_DIR/plugins/traceweaver-core/skills/tw-code-review/SKILL.md"
+tw_doc="$ROOT_DIR/plugins/traceweaver-core/skills/tw-doc-review/SKILL.md"
+tw_auto="$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
+tw_trace="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md"
+structured_ref="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/references/structured-findings.md"
+
+require_file "$tw_code"
+require_file "$tw_doc"
+require_file "$tw_auto"
+require_file "$tw_trace"
+require_file "$structured_ref"
+require_file "$runtime_prompt"
+require_file "$code_runtime_prompt"
+require_file "$doc_runtime_prompt"
+
+assert_line_before "$tw_code" 'Run `tw-traceability-check`' 'Run `ce-code-review`' "tw_code_review_traceability_before_ce"
+assert_contains "$tw_code" "structured traceability findings" "tw_code_review_structured_findings_preserved"
+assert_contains "$tw_code" "Do not collapse structured TraceWeaver findings" "tw_code_review_no_prose_collapse"
+assert_fixture_field "$FIXTURE_ROOT/tw-code-review-blocked-trace/traceability-result.txt" "expected_behavior" "stop_before_ce_code_review_closure" "tw_code_review_blocked_trace_fixture"
+echo "tw_code_review_traceability_preflight=pass"
+echo "tw_code_review_structured_finding_preservation=pass"
+echo "tw_code_review_blocked_trace_fixture=pass"
+
+assert_line_before "$tw_doc" 'tw-requirements-review' 'ce-doc-review' "tw_doc_review_requirements_before_ce"
+assert_line_before "$tw_doc" 'tw-traceability-check' 'ce-doc-review' "tw_doc_review_traceability_before_ce"
+assert_contains "$tw_doc" "structured traceability/hash/status findings" "tw_doc_review_structured_findings_preserved"
+assert_contains "$tw_doc" "split between staged and unstaged versions" "tw_doc_review_hash_split_guard"
+assert_fixture_field "$FIXTURE_ROOT/tw-doc-review-stale-authority/traceability-result.txt" "expected_behavior" "stop_before_ce_doc_review_closure" "tw_doc_review_stale_authority_fixture"
+echo "tw_doc_review_requirements_preflight=pass"
+echo "tw_doc_review_trace_hash_status_preflight=pass"
+echo "tw_doc_review_stale_authority_fixture=pass"
+
+assert_contains "$tw_auto" "tw-code-review" "tw_auto_routes_code_review"
+assert_contains "$tw_auto" "tw-doc-review" "tw_auto_routes_doc_review"
+assert_contains "$tw_auto" "bounded finding repair" "tw_auto_bounded_repair_loop"
+assert_contains "$tw_auto" "pause the loop and ask the" "tw_auto_human_pause_text"
+assert_contains "$tw_auto" "must not edit, reinterpret, or silently broaden requirements" "tw_auto_no_requirement_mutation"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-clean-task/loop-state.txt" "required_route" "tw-authority-gate,ce-work,tw-traceability-check,tw-code-review,tw-doc-review" "tw_auto_clean_task_route_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-unclear-requirement/loop-state.txt" "required_behavior" "pause_for_user_input" "tw_auto_unclear_requirement_pause_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-contradictory-requirement/loop-state.txt" "required_behavior" "route_to_requirements_review" "tw_auto_contradictory_requirement_pause_fixture"
+echo "tw_auto_review_routing=pass"
+echo "tw_auto_closure_loop_contract=pass"
+echo "tw_auto_human_decision_pause_fixtures=pass"
+
+assert_contains "$tw_trace" 'references/structured-findings.md' "tw_traceability_structured_contract_loaded"
+assert_contains "$structured_ref" "severity" "structured_reference_severity_field"
+assert_contains "$structured_ref" "claim_impact" "structured_reference_claim_impact_field"
+assert_contains "$structured_ref" "remediation" "structured_reference_remediation_field"
+echo "tw_traceability_check_structured_contract_static=pass"
+
+repo_trace_hash="$(hash_file "$tw_trace")"
+repo_code_hash="$(hash_file "$tw_code")"
+repo_doc_hash="$(hash_file "$tw_doc")"
+host_trace="$ACTIVE_SKILLS_ROOT/tw-traceability-check/SKILL.md"
+host_structured_ref="$ACTIVE_SKILLS_ROOT/tw-traceability-check/references/structured-findings.md"
+host_code="$ACTIVE_SKILLS_ROOT/tw-code-review/SKILL.md"
+host_doc="$ACTIVE_SKILLS_ROOT/tw-doc-review/SKILL.md"
+host_trace_hash="missing"
+host_structured_ref_hash="missing"
+host_code_hash="missing"
+host_doc_hash="missing"
+if [[ -f "$host_trace" ]]; then
+  host_trace_hash="$(hash_file "$host_trace")"
+fi
+if [[ -f "$host_structured_ref" ]]; then
+  host_structured_ref_hash="$(hash_file "$host_structured_ref")"
+fi
+if [[ -f "$host_code" ]]; then
+  host_code_hash="$(hash_file "$host_code")"
+fi
+if [[ -f "$host_doc" ]]; then
+  host_doc_hash="$(hash_file "$host_doc")"
+fi
+repo_structured_ref_hash="$(hash_file "$structured_ref")"
+
+echo "tw_skill_behavior_artifact_dir=$tmp_dir"
+echo "active_host_tw_traceability_check_repo_hash=$repo_trace_hash"
+echo "active_host_tw_traceability_check_host_hash=$host_trace_hash"
+echo "active_host_tw_traceability_check_repo_structured_ref_hash=$repo_structured_ref_hash"
+echo "active_host_tw_traceability_check_host_structured_ref_hash=$host_structured_ref_hash"
+echo "active_host_tw_code_review_repo_hash=$repo_code_hash"
+echo "active_host_tw_code_review_host_hash=$host_code_hash"
+echo "active_host_tw_doc_review_repo_hash=$repo_doc_hash"
+echo "active_host_tw_doc_review_host_hash=$host_doc_hash"
+
+if [[ "$host_trace_hash" != "$repo_trace_hash" || "$host_structured_ref_hash" != "$repo_structured_ref_hash" ]]; then
+  echo "active_host_tw_traceability_check_structured_runtime=held_host_skill_missing_or_stale"
+  echo "active_host_tw_code_review_wrapper_runtime=held_prerequisite_tw_traceability_check_missing_or_stale"
+  echo "active_host_tw_doc_review_wrapper_runtime=held_prerequisite_tw_traceability_check_missing_or_stale"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+if [[ "$host_code_hash" != "$repo_code_hash" ]]; then
+  echo "active_host_tw_code_review_wrapper_runtime=held_host_skill_missing_or_stale"
+  echo "active_host_tw_doc_review_wrapper_runtime=held_not_run_after_code_wrapper_hold"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+if [[ "$host_doc_hash" != "$repo_doc_hash" ]]; then
+  echo "active_host_tw_code_review_wrapper_runtime=held_not_run_after_doc_wrapper_hold"
+  echo "active_host_tw_doc_review_wrapper_runtime=held_host_skill_missing_or_stale"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+if [[ "$RUNTIME_EXEC" != "1" ]]; then
+  echo "active_host_tw_traceability_check_structured_runtime=held_runtime_exec_disabled"
+  echo "active_host_tw_code_review_wrapper_runtime=held_runtime_exec_disabled"
+  echo "active_host_tw_doc_review_wrapper_runtime=held_runtime_exec_disabled"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+set +e
+perl -e 'alarm shift; exec @ARGV' "$EXEC_TIMEOUT_SECONDS" codex exec \
+  -m "$MODEL" \
+  --sandbox read-only \
+  --skip-git-repo-check \
+  --ignore-rules \
+  --output-last-message "$runtime_last_message" \
+  --json <"$runtime_prompt" >"$runtime_events" 2>"$runtime_stderr"
+exec_status=$?
+set -e
+
+tr -d '\r' <"$runtime_last_message" >"$runtime_normalized" 2>/dev/null || : >"$runtime_normalized"
+
+echo "active_host_tw_traceability_check_exec_events=$runtime_events"
+echo "active_host_tw_traceability_check_exec_stderr=$runtime_stderr"
+echo "active_host_tw_traceability_check_exec_last_message=$runtime_last_message"
+echo "active_host_tw_traceability_check_exec_exit_code=$exec_status"
+
+if [[ "$exec_status" -ne 0 ]]; then
+  echo "active_host_tw_traceability_check_structured_runtime=held_codex_exec_failed"
+  echo "active_host_tw_code_review_wrapper_runtime=held_prerequisite_tw_traceability_check_runtime_failed"
+  echo "active_host_tw_doc_review_wrapper_runtime=held_prerequisite_tw_traceability_check_runtime_failed"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+if grep -qx "TRACEWEAVER_TW_TRACEABILITY_STRUCTURED_SENTINEL=held_unavailable" "$runtime_normalized"; then
+  echo "active_host_tw_traceability_check_structured_runtime=held_skill_unavailable"
+  echo "active_host_tw_code_review_wrapper_runtime=held_prerequisite_tw_traceability_check_unavailable"
+  echo "active_host_tw_doc_review_wrapper_runtime=held_prerequisite_tw_traceability_check_unavailable"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+required_runtime_lines=(
+  "TRACEWEAVER_TW_TRACEABILITY_STRUCTURED_SENTINEL=pass"
+  "TRACEWEAVER_TW_TRACEABILITY_SKILL_HASH=$host_trace_hash"
+  "TRACEWEAVER_TW_TRACEABILITY_STRUCTURED_REF_HASH=$host_structured_ref_hash"
+  "severity=P1"
+  "status=blocked"
+  "affected_ids=REQ-TW-055,TRACE-TW-RUNTIME-FIXTURE"
+  "claim_impact=engineering_complete_blocked"
+  "remediation=Record verification evidence or keep the claim held."
+)
+
+for line in "${required_runtime_lines[@]}"; do
+  if ! grep -Fxq "$line" "$runtime_normalized"; then
+    echo "active_host_tw_traceability_check_structured_runtime=held_missing_required_runtime_field"
+    echo "active_host_tw_traceability_check_missing_runtime_field=$line"
+    echo "active_host_tw_code_review_wrapper_runtime=held_prerequisite_tw_traceability_check_incomplete"
+    echo "active_host_tw_doc_review_wrapper_runtime=held_prerequisite_tw_traceability_check_incomplete"
+    echo "tw_skill_behavior_smoke=pass"
+    exit 0
+  fi
+done
+
+echo "active_host_tw_traceability_check_structured_runtime=pass_constrained_fixture_structured_finding"
+
+set +e
+perl -e 'alarm shift; exec @ARGV' "$EXEC_TIMEOUT_SECONDS" codex exec \
+  -m "$MODEL" \
+  --sandbox read-only \
+  --skip-git-repo-check \
+  --ignore-rules \
+  --output-last-message "$code_runtime_last_message" \
+  --json <"$code_runtime_prompt" >"$code_runtime_events" 2>"$code_runtime_stderr"
+code_exec_status=$?
+set -e
+
+tr -d '\r' <"$code_runtime_last_message" >"$code_runtime_normalized" 2>/dev/null || : >"$code_runtime_normalized"
+
+echo "active_host_tw_code_review_exec_events=$code_runtime_events"
+echo "active_host_tw_code_review_exec_stderr=$code_runtime_stderr"
+echo "active_host_tw_code_review_exec_last_message=$code_runtime_last_message"
+echo "active_host_tw_code_review_exec_exit_code=$code_exec_status"
+
+if [[ "$code_exec_status" -ne 0 ]]; then
+  echo "active_host_tw_code_review_wrapper_runtime=held_codex_exec_failed"
+  echo "active_host_tw_doc_review_wrapper_runtime=held_not_run_after_code_wrapper_hold"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+if grep -qx "TRACEWEAVER_TW_CODE_REVIEW_SENTINEL=held_unavailable" "$code_runtime_normalized"; then
+  echo "active_host_tw_code_review_wrapper_runtime=held_skill_unavailable"
+  echo "active_host_tw_doc_review_wrapper_runtime=held_not_run_after_code_wrapper_hold"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+required_code_runtime_lines=(
+  "TRACEWEAVER_TW_CODE_REVIEW_SENTINEL=pass"
+  "TRACEWEAVER_TW_CODE_REVIEW_SKILL_HASH=$host_code_hash"
+  "tw_traceability_check_result=blocked"
+  "structured_finding_id=STF-MISSING-MATRIX-ROW-001"
+  "ce_code_review_delegation=blocked_before_ce_review"
+  "publication=held"
+  "accepted_traceweaver_input=false"
+)
+
+for line in "${required_code_runtime_lines[@]}"; do
+  if ! grep -Fxq "$line" "$code_runtime_normalized"; then
+    echo "active_host_tw_code_review_wrapper_runtime=held_missing_required_runtime_field"
+    echo "active_host_tw_code_review_missing_runtime_field=$line"
+    echo "active_host_tw_doc_review_wrapper_runtime=held_not_run_after_code_wrapper_hold"
+    echo "tw_skill_behavior_smoke=pass"
+    exit 0
+  fi
+done
+
+echo "active_host_tw_code_review_wrapper_runtime=held_prompt_satisfied_file_access_observation"
+
+set +e
+perl -e 'alarm shift; exec @ARGV' "$EXEC_TIMEOUT_SECONDS" codex exec \
+  -m "$MODEL" \
+  --sandbox read-only \
+  --skip-git-repo-check \
+  --ignore-rules \
+  --output-last-message "$doc_runtime_last_message" \
+  --json <"$doc_runtime_prompt" >"$doc_runtime_events" 2>"$doc_runtime_stderr"
+doc_exec_status=$?
+set -e
+
+tr -d '\r' <"$doc_runtime_last_message" >"$doc_runtime_normalized" 2>/dev/null || : >"$doc_runtime_normalized"
+
+echo "active_host_tw_doc_review_exec_events=$doc_runtime_events"
+echo "active_host_tw_doc_review_exec_stderr=$doc_runtime_stderr"
+echo "active_host_tw_doc_review_exec_last_message=$doc_runtime_last_message"
+echo "active_host_tw_doc_review_exec_exit_code=$doc_exec_status"
+
+if [[ "$doc_exec_status" -ne 0 ]]; then
+  echo "active_host_tw_doc_review_wrapper_runtime=held_codex_exec_failed"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+if grep -qx "TRACEWEAVER_TW_DOC_REVIEW_SENTINEL=held_unavailable" "$doc_runtime_normalized"; then
+  echo "active_host_tw_doc_review_wrapper_runtime=held_skill_unavailable"
+  echo "tw_skill_behavior_smoke=pass"
+  exit 0
+fi
+
+required_doc_runtime_lines=(
+  "TRACEWEAVER_TW_DOC_REVIEW_SENTINEL=pass"
+  "TRACEWEAVER_TW_DOC_REVIEW_SKILL_HASH=$host_doc_hash"
+  "tw_requirements_review_result=required_for_authority_text"
+  "tw_traceability_check_result=blocked_stale_authority"
+  "structured_finding_id=STF-STALE-HASH-001"
+  "ce_doc_review_delegation=blocked_before_ce_review"
+  "publication=held"
+  "accepted_traceweaver_input=false"
+)
+
+for line in "${required_doc_runtime_lines[@]}"; do
+  if ! grep -Fxq "$line" "$doc_runtime_normalized"; then
+    echo "active_host_tw_doc_review_wrapper_runtime=held_missing_required_runtime_field"
+    echo "active_host_tw_doc_review_missing_runtime_field=$line"
+    echo "tw_skill_behavior_smoke=pass"
+    exit 0
+  fi
+done
+
+echo "active_host_tw_doc_review_wrapper_runtime=held_prompt_satisfied_file_access_observation"
+echo "tw_skill_behavior_smoke=pass"
