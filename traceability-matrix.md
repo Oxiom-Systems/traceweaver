@@ -408,3 +408,9 @@ per-file/per-skill and later function/class-level rows.
 2. Keep runtime invocation, automatic wrapper sequencing, commit/push/PR
    automation claims, enforcing mode, clean CE replacement, and release-ready
    claims held until their evidence gates pass.
+
+## Code Anchor Evidence
+
+| Artifact Path | Requirement | Trace | Verification | Anchor Type | Role |
+| --- | --- | --- | --- | --- | --- |
+| plugins/traceweaver-core/skills/ce-debug/SKILL.md | REQ-TW-043 | TRACE-TW-009 | VER-TW-015 | file-role | packaged-ce-debug-skill |
