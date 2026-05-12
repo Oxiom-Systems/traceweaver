@@ -8,7 +8,7 @@ trap 'rm -rf "$tmp_root"' EXIT
 json_out="$tmp_root/generated.json"
 markdown_out="$tmp_root/generated.md"
 
-ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+LC_ALL=C LANG=C ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --json-out "$json_out" \
   --markdown-out "$markdown_out"
 
@@ -248,6 +248,8 @@ cat >"$fixture_roadmap" <<'MD'
 | CE skill | Current package state | Target class | TraceWeaver treatment |
 | --- | --- | --- | --- |
 | `ce-sample` | Packaged direct CE-derived skill | wrapped | Fixture direct CE-derived skill. |
+
+Locale regression note: café roadmap text must stay readable under C locale.
 MD
 
 fixture_inventory="$tmp_root/fixture-inventory.md"
@@ -255,6 +257,23 @@ cat >"$fixture_inventory" <<'MD'
 | Path | SHA-256 | Role |
 | --- | --- | --- |
 | `skills/ce-sample/references/ce-sample-support.md` | `0000000000000000000000000000000000000000000000000000000000000000` | selected skill file |
+
+Locale regression note: café inventory text must stay readable under C locale.
+MD
+
+fixture_source_pin="$tmp_root/fixture-source-pin.md"
+cat >"$fixture_source_pin" <<'MD'
+# CE Upstream Source Inventory
+
+Record ID: `FIXTURE-CE-SOURCE-PIN`
+
+| Field | Value |
+| --- | --- |
+| Source version | `fixture-version` |
+| Source commit | `0000000000000000000000000000000000000000` |
+| Full cache aggregate fingerprint | `0000000000000000000000000000000000000000000000000000000000000000` |
+
+Locale regression note: café source-pin text must stay readable under C locale.
 MD
 
 fixture_classification_positive="$tmp_root/fixture-classification-positive.yml"
@@ -312,14 +331,17 @@ with open(path, "w", encoding="utf-8") as handle:
     yaml.safe_dump(data, handle, sort_keys=False)
 PY
 
-ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
+printf 'Existing café evidence\n' > "$tmp_root/fixture-positive.md"
+LC_ALL=C LANG=C ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --classification "$fixture_classification_positive" \
   --plugin-root "$repo_root/fixtures/ce-replacement-classifier/traceweaver" \
   --inventory "$fixture_inventory" \
+  --source-pin "$fixture_source_pin" \
   --upstream-root "$repo_root/fixtures/ce-replacement-classifier/upstream-ce" \
   --roadmap "$fixture_roadmap" \
   --json-out "$tmp_root/fixture-positive.json" \
-  --markdown-out "$tmp_root/fixture-positive.md"
+  --markdown-out "$tmp_root/fixture-positive.md" \
+  --update-evidence
 
 python3 - "$tmp_root/fixture-positive.json" <<'PY'
 import json
@@ -332,6 +354,8 @@ assert data["inventories"]["upstream_skills"] == ["ce-sample"]
 assert data["counts"]["upstream_ce_skills"] == 1
 assert data["counts"]["upstream_lfg"] == 0
 PY
+
+grep -Fq "Existing café evidence" "$tmp_root/fixture-positive.md"
 
 fixture_classification="$tmp_root/fixture-classification.yml"
 cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$fixture_classification"

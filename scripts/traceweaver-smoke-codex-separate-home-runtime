@@ -6,8 +6,10 @@ tmp_home="$(mktemp -d /tmp/traceweaver-u9-separate-home.XXXXXX)"
 codex_home="$tmp_home/.codex"
 model="${TRACEWEAVER_CODEX_MODEL:-gpt-5.2}"
 exec_timeout_seconds="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-120}"
+auth_mode="${TRACEWEAVER_CODEX_AUTH_MODE:-none}"
 auth_copy="$codex_home/auth.json"
 auth_copy_used=false
+auth_copy_requested=false
 
 mkdir -p "$codex_home"
 
@@ -17,10 +19,21 @@ cleanup_auth_copy() {
 
 trap cleanup_auth_copy EXIT
 
-if [ -f "$HOME/.codex/auth.json" ]; then
-  cp "$HOME/.codex/auth.json" "$auth_copy"
-  auth_copy_used=true
-fi
+case "$auth_mode" in
+  none)
+    ;;
+  copy)
+    auth_copy_requested=true
+    if [ -f "$HOME/.codex/auth.json" ]; then
+      cp "$HOME/.codex/auth.json" "$auth_copy"
+      auth_copy_used=true
+    fi
+    ;;
+  *)
+    echo "fresh_codex_auth_mode_error=unsupported_auth_mode_$auth_mode" >&2
+    exit 2
+    ;;
+esac
 
 prompt="$tmp_home/prompt.txt"
 last_message="$tmp_home/last-message.txt"
@@ -102,10 +115,18 @@ echo "separate_home_prompt_input=$prompt_input"
 echo "separate_home_visible_skills=$visible_skills"
 echo "separate_home_install_result=pass"
 echo "separate_home_runtime_home_isolated=true"
+echo "fresh_codex_auth_mode=$auth_mode"
 if [ "$auth_copy_used" = true ]; then
   echo "fresh_codex_auth_boundary=held_live_auth_copy_available_to_read_only_exec_until_tokenless_probe_exists"
+elif [ "$auth_copy_requested" = true ]; then
+  echo "fresh_codex_auth_boundary=held_auth_copy_requested_but_source_missing"
 else
   echo "fresh_codex_auth_boundary=pass_no_auth_copy_used"
+fi
+if [ -f "$auth_copy" ]; then
+  echo "fresh_codex_retained_auth_copy_present=true"
+else
+  echo "fresh_codex_retained_auth_copy_present=false"
 fi
 echo "fresh_codex_invocation_target=tw-authority-gate"
 echo "fresh_codex_expected_skill_hash=$expected_skill_hash"
@@ -126,8 +147,14 @@ if [ "${#missing_visible_skills[@]}" -ne 0 ]; then
 fi
 
 if [ "$exec_status" -ne 0 ]; then
-  echo "fresh_codex_reload_probe=held_codex_exec_failed"
-  echo "fresh_codex_runtime_skill_invocation=held_codex_exec_failed"
+  if [ "$auth_copy_used" = false ] && grep -Eiq "(401 Unauthorized|Missing bearer|authentication required|Unauthorized)" "$stderr_log"; then
+    echo "fresh_codex_reload_probe=held_codex_exec_auth_required_without_credential_copy"
+    echo "fresh_codex_runtime_skill_invocation=held_no_runtime_invocation_without_auth_in_isolated_codex_home"
+    echo "fresh_codex_auth_safe_runtime_observation=skills_visible_but_codex_exec_requires_auth_in_isolated_home"
+  else
+    echo "fresh_codex_reload_probe=held_codex_exec_failed"
+    echo "fresh_codex_runtime_skill_invocation=held_codex_exec_failed"
+  fi
   exit 0
 fi
 

@@ -75,7 +75,8 @@ capsules, trace records, or runtime validation evidence.
 
 - Codex only. Claude Code plugin loading and discovery are a follow-up plan.
 - Isolated Codex home first. Existing-user-home upgrade behavior stays held
-  except for already-recorded unowned direct-callable conflict behavior.
+  except for already-recorded unowned direct-callable conflict behavior and the
+  controlled Unit 11 active-host reconciliation proof described below.
 - No commit, push, PR, release, or publication automation.
 - No slash-command claim unless prompt/command files are separately added and
   proven.
@@ -83,14 +84,21 @@ capsules, trace records, or runtime validation evidence.
 - No clean CE replacement or broad familiar `ce-*` wrapper claim.
 - `tw-grill` is approved only for static/advisory source evidence; runtime
   behavior and implementation authority remain held.
-- Do not mutate the real user Codex home during proof runs.
+- Do not mutate the real user Codex home during proof runs except for Unit 11's
+  explicitly scoped active-host reconciliation. That exception requires a
+  timestamped backup of the prior active skill surface, a config backup before
+  disabling the external CE plugin, evidence that the restored or retained host
+  condition is bounded to TraceWeaver-required direct callables, and an explicit
+  hold on clean replacement, unconstrained host support, release/package claims,
+  and project-level trace writes.
 
 ### Deferred to Separate Tasks
 
 - Claude Code packaging/discovery proof.
 - Full CE 3.4.1 method-family wrapper implementation.
 - Existing-home upgrade/conflict matrix beyond direct callable unowned
-  directory protection.
+  directory protection and the controlled Unit 11 active-host reconciliation
+  proof.
 - R31 real-project validation and release/upstream readiness.
 - Runtime proof or continued hold decision for `tw-grill` behavior.
 
@@ -102,8 +110,10 @@ capsules, trace records, or runtime validation evidence.
   `REQ-BASELINE-2026-04-30-001`, canonical hash
   `6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba`,
   prior review evidence `CE-DOC-REVIEW-2026-05-02-AUTHORITY-STATE-CLEAN-001`,
-  Unit 1 through Unit 8 reviewed/held evidence, and `u9_input_status` ending in
-  `unit9_registry_shape_auth_boundary_patch_code_reviewed_doc_reviewed_held_runtime_claims_held`.
+  Unit 1 through Unit 10 reviewed/held evidence, constrained Unit 11
+  active-host runtime proof accepted after clean review, and `u9_input_status` ending
+  in
+  `unit11_active_host_reconciled_runtime_pass_code_reviewed_authority_doc_reviewed_constrained_runtime_accepted`.
   Unit 1 evidence is reviewed only as isolated install/discovery planning input.
   Unit 2 fixture smoke is reviewed only as fixture classification and
   temporary-copy trace-write input for later U9 units. Unit 3 deterministic
@@ -132,8 +142,26 @@ capsules, trace records, or runtime validation evidence.
   `CE-CODE-REVIEW-2026-05-04-U9-UNIT9-AUTH-BOUNDARY-HARNESS-CLEAN-001`;
   authority doc review passed as
   `CE-DOC-REVIEW-2026-05-04-U9-UNIT9-AUTHORITY-CLEAN-001`. Unit 9 is accepted
-  only as reviewed-held registry-shape/auth-boundary evidence; real runtime
-  invocation and release claims stay held.
+  only as reviewed-held registry-shape/auth-boundary evidence. Unit 10 has now
+  recorded an auth-safe no-copy fresh exec probe: required skills are visible in
+  a fresh isolated Codex home, no auth copy is retained, but `codex exec` fails
+  with auth required when no credential is copied into that isolated
+  `CODEX_HOME`. Unit 10 also records a current-host prompt-input and read-only
+  `codex exec` probe: the host has auth, but the active runtime reports
+  `tw-authority-gate` unavailable. The separate-home and active-host behavior
+  code reviews passed with no findings on 2026-05-05; authority doc review
+  passed as `CE-DOC-REVIEW-2026-05-05-U9-UNIT10-AUTHORITY-CLEAN-001`. Unit 10
+  is accepted only as reviewed-held auth-safe/runtime-limitation evidence, and
+  real runtime invocation and release claims stay held.
+- Unit 11 reduced the active host skill surface to `.system` plus the
+  TraceWeaver-required direct callable entries, disabled the external CE plugin
+  in host config, and reran the active-host smoke. Required skills became
+  visible and `codex exec` returned the exact `tw-authority-gate` hash sentinel.
+  Code review passed as
+  `CE-CODE-REVIEW-2026-05-05-U9-UNIT11-HOST-REGISTRY-HARNESS-CLEAN-001`;
+  authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-05-U9-UNIT11-AUTHORITY-CLEAN-001`. Unit 11 is accepted
+  only as constrained active-host `tw-authority-gate` runtime invocation proof.
 - `traceability-matrix.md` records U7 static/advisory acceptance while keeping
   U9/runtime, release, clean-replacement, enforcing, slash-command, autonomous
   publication, and `tw-grill` implementation-authority claims held.
@@ -808,6 +836,118 @@ shape in an isolated Codex home.
   only as reviewed-held registry-shape/auth-boundary evidence; runtime
   invocation remains held.
 
+- [x] **Unit 10: Auth-Safe Fresh Exec No-Copy Proof**
+
+**Goal:** Prove whether a fresh isolated Codex home can both expose
+TraceWeaver-installed skills and execute `codex exec` without copying a live
+Codex auth file into the retained temporary home.
+
+**Files:**
+
+- `scripts/traceweaver-smoke-codex-separate-home-runtime`
+- `scripts/traceweaver-smoke-codex-host-registry`
+- `docs/validation/traceweaver-u9-codex-runtime-discovery.md`
+- `docs/validation/traceweaver-controlled-autonomy-alpha.md`
+- `docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md`
+- `traceability-matrix.md`
+- `.traceweaver/intent-contract.yml`
+
+**Tasks:**
+
+- Change the separate-home runtime harness default to
+  `TRACEWEAVER_CODEX_AUTH_MODE=none`.
+- Keep `TRACEWEAVER_CODEX_AUTH_MODE=copy` only as an explicit diagnostic mode
+  for the already-held live-auth-copy boundary.
+- Record whether the fresh prompt-input registry exposes `tw-auto`, `lfg`,
+  `tw-authority-gate`, `tw-traceability-check`, `tw-requirements-review`,
+  `tw-grill`, `ce-plan`, `ce-work`, `ce-code-review`, and `ce-doc-review`.
+- Record whether `codex exec` reaches the exact skill-hash sentinel without a
+  copied auth file.
+- If tokenless isolated execution fails with auth required, hold runtime
+  invocation and record the supported-auth-path gap instead of claiming runtime
+  success.
+- Extend the host-registry smoke to record active host prompt-input visibility
+  and read-only host `codex exec` outcome without copying credentials.
+- If host `codex exec` reports `tw-authority-gate` unavailable, hold active
+  runtime invocation and record the host-reconciliation gap instead of claiming
+  runtime success.
+
+**Acceptance:**
+
+- Harness output includes `fresh_codex_auth_mode=none`,
+  `fresh_codex_auth_boundary=pass_no_auth_copy_used`,
+  `fresh_codex_retained_auth_copy_present=false`, and required-skill visibility.
+- A runtime invocation claim is accepted only if the exact skill-hash sentinel
+  is returned without copied auth.
+- If `codex exec` exits with auth required, Unit 10 is accepted only as a held
+  auth-safe limitation after authority doc review; runtime invocation remains
+  held.
+- Active-host runtime invocation is accepted only if the host `codex exec`
+  transcript returns the exact skill-hash sentinel from the installed
+  `tw-authority-gate` skill; unavailable or unclassified transcripts keep the
+  claim held.
+
+**Current Result:**
+
+- Reviewed-held: required skills were visible in the isolated
+  prompt-input registry, no auth copy was used or retained, and isolated
+  `codex exec` exited 1 with 401/missing-auth errors. The current-host probe
+  then showed missing TraceWeaver-native direct-callable files, prompt-input
+  missing required skills, and host `codex exec` returning
+  `TRACEWEAVER_SKILL_HELD=not_available`. Separate-home behavior-code review
+  passed as
+  `CE-CODE-REVIEW-2026-05-05-U9-UNIT10-AUTH-SAFE-HARNESS-CLEAN-001`;
+  active-host harness code review passed as
+  `CE-CODE-REVIEW-2026-05-05-U9-UNIT10-ACTIVE-HOST-HARNESS-CLEAN-001`;
+  authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-05-U9-UNIT10-AUTHORITY-CLEAN-001`.
+- Runtime invocation remains held pending a supported auth-safe credential path
+  or a reconciled host-home fresh session proof.
+
+- [x] **Unit 11: Active Host Reconciled Runtime Proof**
+
+**Goal:** Prove active-host `tw-authority-gate` runtime invocation after
+reconciling the host skill surface enough for TraceWeaver-required direct
+callable skills to appear in `codex debug prompt-input`.
+
+**Controlled Host-Reconciliation Exception:**
+
+- This unit is the only U9 proof step allowed to mutate the active user Codex
+  home.
+- The prior active skill surface and Codex config must be backed up before
+  reconciliation evidence is used.
+- The accepted claim, if review passes, is limited to runtime invocation under a
+  constrained host configuration: `.system` plus TraceWeaver-required direct
+  callable entries, with the external Compound Engineering plugin disabled.
+- The proof does not authorize clean replacement, arbitrary existing-host
+  upgrade support, unconstrained mixed skill surfaces, package/release claims,
+  or project-level trace/matrix/gap/change/exception writes.
+
+**Files:**
+
+- `scripts/traceweaver-smoke-codex-host-registry`
+- `docs/validation/traceweaver-u9-codex-runtime-discovery.md`
+- `docs/validation/traceweaver-controlled-autonomy-alpha.md`
+- `docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md`
+- `traceability-matrix.md`
+- `.traceweaver/intent-contract.yml`
+
+**Current Result:**
+
+- Accepted constrained runtime proof: active host skill surface was reduced to 11
+  directories, external CE plugin was disabled, required `tw-*`, `lfg`, and
+  wrapped CE direct callable skills were visible, and `codex exec` returned the
+  exact `tw-authority-gate` hash sentinel.
+- Code review passed as
+  `CE-CODE-REVIEW-2026-05-05-U9-UNIT11-HOST-REGISTRY-HARNESS-CLEAN-001` and
+  authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-05-U9-UNIT11-AUTHORITY-CLEAN-001`.
+- Accepted use is limited to constrained active-host `tw-authority-gate`
+  invocation.
+- Clean CE replacement, project-level trace writes, enforcing behavior,
+  publication, release/package/upstream readiness, R31 validation, and
+  unconstrained host configuration support remain held.
+
 ## Risks And Mitigations
 
 | Risk | Mitigation |
@@ -817,7 +957,7 @@ shape in an isolated Codex home.
 | U9 proof accidentally promotes `tw-grill` implementation authority. | Treat REQ-TW-048 as approved static/advisory source evidence only in fixtures and matrix rows unless a later requirements review and runtime evidence explicitly authorize implementation authority. |
 | Negative publication checks miss a new route. | Reuse `scripts/traceweaver-smoke-no-publication` and add stale-reset triggers for any changed publication-related skill/script. |
 | Reviewer backpressure cannot be forced deterministically. | Simulate policy classification first and keep live capacity behavior held until actual host evidence is captured. |
-| Existing user Codex home differs from isolated install. | Scope this plan to isolated install; record existing-home behavior as held except for direct-callable conflict protection. |
+| Existing user Codex home differs from isolated install. | Scope this plan to isolated install except for direct-callable conflict protection and the controlled Unit 11 active-host reconciliation proof; keep unconstrained host configuration support held. |
 
 ## Review And Acceptance Gates
 
@@ -840,7 +980,7 @@ shape in an isolated Codex home.
 
 ## Suggested Next Step
 
-Proceed to an auth-safe fresh exec/runtime proof before any real `tw-*`
-invocation claim. Keep release/runtime claims held until a passing fresh exec
-transcript exists without the copied-auth boundary or an accepted limitation
-explicitly holds that boundary.
+Run a new-project bootstrap dogfood proof using the constrained active-host
+TraceWeaver setup. Keep project-level trace writes, clean CE replacement,
+enforcing behavior, release packaging, publication, upstream readiness, R31
+validation, and unconstrained host configuration support held.
