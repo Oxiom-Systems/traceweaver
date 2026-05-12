@@ -8,6 +8,7 @@
 # Local agent workflow/cache artifacts.
 .context/
 .memsearch/
+.worktrees/
 
 # macOS Finder metadata.
 .DS_Store
