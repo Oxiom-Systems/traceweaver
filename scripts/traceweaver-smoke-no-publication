@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# TRACEWEAVER: file-role=traceweaver-no-publication-smoke; req=REQ-TW-043; trace=TRACE-TW-013; ver=VER-TW-022
+# TRACEWEAVER: verifies=VER-TW-022; req=REQ-TW-043; trace=TRACE-TW-013
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
@@ -59,18 +61,64 @@ if [ -f "$gh_marker" ]; then
   exit 1
 fi
 
-grep -Fq "direct invocation" "$repo_root/plugins/traceweaver-core/skills/ce-commit/SKILL.md"
-grep -Fq "do not stage, commit, push, or publish" "$repo_root/plugins/traceweaver-core/skills/ce-debug/SKILL.md"
-grep -Fq "unstaged alongside the other uncommitted refresh changes" "$repo_root/plugins/traceweaver-core/skills/ce-compound-refresh/SKILL.md"
-grep -Fq "posting PR comments, or resolving review threads" "$repo_root/plugins/traceweaver-core/skills/ce-resolve-pr-feedback/SKILL.md"
-grep -Fq "Do not edit project context or authority documents" "$repo_root/plugins/traceweaver-core/skills/tw-grill/SKILL.md"
-grep -Fq "Invoke \`tw-auto\` with the same arguments" "$repo_root/plugins/traceweaver-core/skills/lfg/SKILL.md"
-grep -Fq "Do not run \`ce-plan\`, \`ce-work\`, \`ce-code-review\`, \`ce-commit\`" "$repo_root/plugins/traceweaver-core/skills/lfg/SKILL.md"
-grep -Fq "Do not fall back to raw CE \`lfg\`" "$repo_root/plugins/traceweaver-core/skills/lfg/SKILL.md"
-grep -Fq "agent thread limit reached" "$repo_root/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
-grep -Fq "pending queue" "$repo_root/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
-grep -Fq "does not close U9, runtime, release, or" "$repo_root/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
-grep -Fq "required-review gates" "$repo_root/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
+require_present() {
+  local file="$1"
+  local pattern="$2"
+  if ! grep -Fq "$pattern" "$file"; then
+    echo "required_marker_missing file=$file pattern=$pattern"
+    exit 1
+  fi
+}
+
+require_absent() {
+  local file="$1"
+  local pattern="$2"
+  if grep -Fq "$pattern" "$file"; then
+    echo "forbidden_publication_marker_present file=$file pattern=$pattern"
+    exit 1
+  fi
+}
+
+ce_commit_skill="$repo_root/plugins/traceweaver-core/skills/ce-commit/SKILL.md"
+ce_debug_skill="$repo_root/plugins/traceweaver-core/skills/ce-debug/SKILL.md"
+ce_compound_refresh_skill="$repo_root/plugins/traceweaver-core/skills/ce-compound-refresh/SKILL.md"
+ce_resolve_pr_feedback_skill="$repo_root/plugins/traceweaver-core/skills/ce-resolve-pr-feedback/SKILL.md"
+tw_grill_skill="$repo_root/plugins/traceweaver-core/skills/tw-grill/SKILL.md"
+lfg_skill="$repo_root/plugins/traceweaver-core/skills/lfg/SKILL.md"
+tw_auto_skill="$repo_root/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
+
+require_present "$ce_commit_skill" "direct invocation"
+require_present "$ce_debug_skill" "stop before staging, committing, pushing, opening PRs"
+require_present "$ce_debug_skill" "#### Skill-owned branch (created in Phase 3): TraceWeaver alpha stop"
+require_present "$ce_debug_skill" "Do not stage, commit, push, open a PR, post issue/PR replies"
+require_present "$ce_debug_skill" 'draft the `/ce-compound` learning-capture handoff'
+require_absent "$ce_debug_skill" "default to commit-and-PR without prompting"
+require_absent "$ce_debug_skill" 'Run `/ce-commit-push-pr`'
+require_absent "$ce_debug_skill" 'Commit and open a PR (`/ce-commit-push-pr`)'
+require_absent "$ce_debug_skill" "commit the resulting learning doc to the same branch and push"
+
+require_present "$ce_compound_refresh_skill" "## Phase 5: TraceWeaver Alpha Stop Before Commit"
+require_present "$ce_compound_refresh_skill" "Do not stage files, create commits, create branches, push, or open PRs."
+require_present "$ce_compound_refresh_skill" "Report follow-up commit content without publishing"
+require_absent "$ce_compound_refresh_skill" "## Phase 5: Commit Changes"
+require_absent "$ce_compound_refresh_skill" "Create a branch named for what was refreshed"
+require_absent "$ce_compound_refresh_skill" "Commit as a separate commit on the current branch"
+require_absent "$ce_compound_refresh_skill" "Create a branch, commit, and open a PR"
+require_absent "$ce_compound_refresh_skill" "Commit only the compound-refresh changes"
+require_absent "$ce_compound_refresh_skill" "Amend or create a follow-up commit when"
+require_absent "$ce_compound_refresh_skill" "push the follow-up commit as well"
+require_absent "$ce_compound_refresh_skill" "committed as part of (or immediately after) the Phase 5 commit flow"
+require_absent "$ce_compound_refresh_skill" "clean up citations in the same commit"
+
+require_present "$ce_resolve_pr_feedback_skill" "posting PR comments, or resolving review threads"
+require_present "$tw_grill_skill" "Do not edit project context or authority documents"
+require_present "$lfg_skill" "Invoke \`tw-auto\` with the same arguments"
+require_present "$lfg_skill" "Do not run \`ce-plan\`, \`ce-work\`, \`ce-code-review\`, \`ce-commit\`"
+require_present "$lfg_skill" "Do not fall back to raw CE \`lfg\`"
+require_present "$tw_auto_skill" "agent thread limit reached"
+require_present "$tw_auto_skill" "pending queue"
+require_present "$tw_auto_skill" "does not close U9, runtime, release, or"
+require_present "$tw_auto_skill" "required-review gates"
 
 review_capacity=1
 intended_reviewers=(ce-coherence-reviewer ce-feasibility-reviewer ce-scope-guardian-reviewer)

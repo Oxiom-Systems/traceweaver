@@ -4,9 +4,8 @@ description: Execute work efficiently while maintaining quality and finishing fe
 argument-hint: "[Plan doc path or description of work. Blank to auto use latest plan doc]"
 ---
 
+<!-- TRACEWEAVER: file-role=packaged-skills-ce-work-skill; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
 # Work Execution Command
-
-Execute work efficiently while maintaining quality and finishing features.
 
 ## TraceWeaver Package Boundary
 
@@ -61,6 +60,8 @@ Phase 0 for every invocation:
 If any later instruction in this skill or its references conflicts with
 TraceWeaver no-publication mode, the TraceWeaver boundary wins and the
 publication step is skipped.
+
+Execute work efficiently while maintaining quality and finishing features.
 
 ## Introduction
 
@@ -347,7 +348,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
    **Note:** Incremental commits use clean conventional messages without attribution footers. The final Phase 4 commit/PR includes the full attribution.
 
-   **Parallel subagent mode:** Commit ownership is split by isolation mode (see Phase 1 Step 4):
+   **Parallel subagent mode:** In ordinary CE work, commit ownership is split by isolation mode (see Phase 1 Step 4):
    - **Worktree-isolated:** subagents may stage and commit inside their own worktree branch; the orchestrator merges those branches in dependency order after the batch.
    - **Shared-directory fallback:** subagents do not commit; the orchestrator stages and commits each unit after the entire parallel batch completes.
 

@@ -1,6 +1,6 @@
 {
   "record_id": "TWCORE-CE-REPLACEMENT-CLASSIFIER-GENERATED-2026-05-04-001",
-  "generated_at": "2026-05-04T14:34:41Z",
+  "generated_at": "2026-05-14T16:13:11Z",
   "checker_status": "passed_static_readiness",
   "traceweaver_mode": "advisory",
   "scope_mode": "current_core_with_broad_surface_held",
@@ -23,24 +23,24 @@
     ]
   },
   "source_pin": {
-    "record_id": "TWCORE-CE-SOURCE-PIN-2026-05-01-002",
-    "version": "3.4.1",
-    "commit": "d685f0794863a73ae3ca3620d2ae747510e9eaa0",
-    "aggregate_fingerprint": "6892159ad685e59230514f9e58fb7ffd06052d84da643c73ac95b787e3c60d23"
+    "record_id": "TWCORE-CE-SOURCE-PIN-2026-05-13-001",
+    "version": "3.8.1",
+    "commit": "b07aac55b5dc6d5b940a7b194497ccd6121f62a5",
+    "aggregate_fingerprint": "fb3b853793720fa228b2b8a7c6fe7267c30db61d9e97111b3f96eaa883d97b72"
   },
   "plan": "docs/plans/2026-05-04-001-feat-ce-replacement-inventory-classifier-plan.md",
   "unit0_review_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
   "counts": {
-    "upstream_ce_skills": 37,
+    "upstream_ce_skills": 36,
     "upstream_lfg": 1,
-    "packaged_traceweaver_skills": 27,
+    "packaged_traceweaver_skills": 25,
     "current_core_rows": 18,
-    "current_packaged_held_rows": 9,
-    "broad_held_rows": 16,
+    "current_packaged_held_rows": 7,
+    "broad_held_rows": 17,
     "out_of_scope_rows": 3,
     "package_support_rows": 1,
     "selected_agent_files": 49,
-    "direct_callable_skills": 27,
+    "direct_callable_skills": 25,
     "prompt_surfaces": 0,
     "command_surfaces": 0,
     "default_prompt_surfaces": 1,
@@ -48,7 +48,7 @@
     "install_metadata": 3,
     "external_dependencies": 0,
     "hidden_rows": 0,
-    "held_rows": 43,
+    "held_rows": 42,
     "prompts_or_commands": 0,
     "manifests": 3,
     "references": 18,
@@ -81,8 +81,7 @@
       "ce-release-notes",
       "ce-report-bug",
       "ce-resolve-pr-feedback",
-      "ce-session-extract",
-      "ce-session-inventory",
+      "ce-riffrec-feedback-analysis",
       "ce-sessions",
       "ce-setup",
       "ce-simplify-code",
@@ -107,8 +106,6 @@
       "ce-doc-review",
       "ce-plan",
       "ce-resolve-pr-feedback",
-      "ce-session-extract",
-      "ce-session-inventory",
       "ce-sessions",
       "ce-setup",
       "ce-test-browser",
@@ -137,7 +134,6 @@
       "skills/ce-code-review/references/diff-scope.md",
       "skills/ce-code-review/references/findings-schema.json",
       "skills/ce-code-review/references/persona-catalog.md",
-      "skills/ce-code-review/references/resolve-base.sh",
       "skills/ce-code-review/references/review-output-template.md",
       "skills/ce-code-review/references/subagent-template.md",
       "skills/ce-code-review/references/tracker-defer.md",
@@ -149,6 +145,7 @@
       "skills/ce-commit/SKILL.md",
       "skills/ce-compound-refresh/SKILL.md",
       "skills/ce-compound-refresh/assets/resolution-template.md",
+      "skills/ce-compound-refresh/references/per-action-flows.md",
       "skills/ce-compound-refresh/references/schema.yaml",
       "skills/ce-compound-refresh/references/yaml-schema.md",
       "skills/ce-compound-refresh/scripts/validate-frontmatter.py",
@@ -172,21 +169,22 @@
       "skills/ce-plan/SKILL.md",
       "skills/ce-plan/references/deepening-workflow.md",
       "skills/ce-plan/references/plan-handoff.md",
+      "skills/ce-plan/references/plan-template.md",
       "skills/ce-plan/references/synthesis-summary.md",
       "skills/ce-plan/references/universal-planning.md",
       "skills/ce-plan/references/visual-communication.md",
       "skills/ce-resolve-pr-feedback/SKILL.md",
+      "skills/ce-resolve-pr-feedback/references/full-mode.md",
+      "skills/ce-resolve-pr-feedback/references/targeted-mode.md",
       "skills/ce-resolve-pr-feedback/scripts/get-pr-comments",
       "skills/ce-resolve-pr-feedback/scripts/get-thread-for-comment",
       "skills/ce-resolve-pr-feedback/scripts/reply-to-pr-thread",
       "skills/ce-resolve-pr-feedback/scripts/resolve-pr-thread",
-      "skills/ce-session-extract/SKILL.md",
-      "skills/ce-session-extract/scripts/extract-errors.py",
-      "skills/ce-session-extract/scripts/extract-skeleton.py",
-      "skills/ce-session-inventory/SKILL.md",
-      "skills/ce-session-inventory/scripts/discover-sessions.sh",
-      "skills/ce-session-inventory/scripts/extract-metadata.py",
       "skills/ce-sessions/SKILL.md",
+      "skills/ce-sessions/scripts/discover-sessions.sh",
+      "skills/ce-sessions/scripts/extract-errors.py",
+      "skills/ce-sessions/scripts/extract-metadata.py",
+      "skills/ce-sessions/scripts/extract-skeleton.py",
       "skills/ce-setup/SKILL.md",
       "skills/ce-setup/references/config-template.yaml",
       "skills/ce-setup/scripts/check-health",
@@ -395,7 +393,6 @@
         "skills/ce-brainstorm/references/handoff.md"
       ],
       "ce-code-review": [
-        "skills/ce-code-review/references/resolve-base.sh",
         "skills/ce-code-review/references/validator-template.md",
         "skills/ce-code-review/references/tracker-defer.md",
         "skills/ce-code-review/references/walkthrough.md",
@@ -407,17 +404,13 @@
         "skills/ce-code-review/references/review-output-template.md"
       ],
       "ce-commit-push-pr": [
-        "skills/ce-commit-push-pr/references/pr-description-writing.md",
-        "skills/ce-commit-push-pr/references/branch-creation.md"
+        "skills/ce-commit-push-pr/references/pr-description-writing.md"
       ],
       "ce-commit": [
 
       ],
       "ce-compound-refresh": [
-        "skills/ce-compound-refresh/references/schema.yaml",
-        "skills/ce-compound-refresh/references/yaml-schema.md",
-        "skills/ce-compound-refresh/assets/resolution-template.md",
-        "skills/ce-compound-refresh/scripts/validate-frontmatter.py"
+        "skills/ce-compound-refresh/references/per-action-flows.md"
       ],
       "ce-compound": [
         "skills/ce-compound/references/schema.yaml",
@@ -440,26 +433,24 @@
       "ce-plan": [
         "skills/ce-plan/references/universal-planning.md",
         "skills/ce-plan/references/synthesis-summary.md",
+        "skills/ce-plan/references/plan-template.md",
         "skills/ce-plan/references/visual-communication.md",
         "skills/ce-plan/references/plan-handoff.md",
         "skills/ce-plan/references/deepening-workflow.md"
       ],
       "ce-resolve-pr-feedback": [
+        "skills/ce-resolve-pr-feedback/references/full-mode.md",
+        "skills/ce-resolve-pr-feedback/references/targeted-mode.md",
         "skills/ce-resolve-pr-feedback/scripts/get-pr-comments",
-        "skills/ce-resolve-pr-feedback/scripts/reply-to-pr-thread",
         "skills/ce-resolve-pr-feedback/scripts/get-thread-for-comment",
+        "skills/ce-resolve-pr-feedback/scripts/reply-to-pr-thread",
         "skills/ce-resolve-pr-feedback/scripts/resolve-pr-thread"
       ],
-      "ce-session-extract": [
-        "skills/ce-session-extract/scripts/extract-skeleton.py",
-        "skills/ce-session-extract/scripts/extract-errors.py"
-      ],
-      "ce-session-inventory": [
-        "skills/ce-session-inventory/scripts/discover-sessions.sh",
-        "skills/ce-session-inventory/scripts/extract-metadata.py"
-      ],
       "ce-sessions": [
-
+        "skills/ce-sessions/scripts/discover-sessions.sh",
+        "skills/ce-sessions/scripts/extract-metadata.py",
+        "skills/ce-sessions/scripts/extract-skeleton.py",
+        "skills/ce-sessions/scripts/extract-errors.py"
       ],
       "ce-setup": [
         "skills/ce-setup/scripts/check-health",
@@ -581,8 +572,8 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "b70007d3cf7ed68e64a7f581bd644a2a3e13858c8e826273dd04084cea005aab",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "2d2082e8821dd7adb535a2996d8ea0a5bbe0d718469b8ab915a8aaae3b7fc0e6",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "candidate_source_evidence",
         "class_rationale": "Brainstorming can feed TraceWeaver source evidence, but its outputs are not authority until routed through requirements review.",
@@ -601,7 +592,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves source-evidence routing and stop behavior",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "b70007d3cf7ed68e64a7f581bd644a2a3e13858c8e826273dd04084cea005aab",
+        "actual_hash": "2d2082e8821dd7adb535a2996d8ea0a5bbe0d718469b8ab915a8aaae3b7fc0e6",
         "checker_status": "present"
       },
       {
@@ -624,8 +615,8 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "51e97828c6c188850c74d9cbe8b1e7f4db6b5f88f6f9ecdafeaffdef1e2aaf11",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "dd96d54eec7f1912928619bf2b4cbefb82a13a9e00553ef9b632f062094e4640",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "planning_authority_candidate",
         "class_rationale": "Planning must preserve approved authority, traceability, verification, validation, and held-claim boundaries before work execution.",
@@ -644,7 +635,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves authority-gated planning",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "51e97828c6c188850c74d9cbe8b1e7f4db6b5f88f6f9ecdafeaffdef1e2aaf11",
+        "actual_hash": "dd96d54eec7f1912928619bf2b4cbefb82a13a9e00553ef9b632f062094e4640",
         "checker_status": "present"
       },
       {
@@ -795,8 +786,8 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "4d3a91e7025f5fdedf2e454e56ab79e2d8588680a35f7d4d4a35aee933d49b36",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "bc490d75d4a972355def18699bb01210d39b89c423eb9853a0d51eebf47f922e",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "behavior_change_execution",
         "class_rationale": "Work execution can mutate behavior and must cite approved authority, verification, validation, and trace evidence before proceeding.",
@@ -815,7 +806,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves authority-gated execution",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "4d3a91e7025f5fdedf2e454e56ab79e2d8588680a35f7d4d4a35aee933d49b36",
+        "actual_hash": "bc490d75d4a972355def18699bb01210d39b89c423eb9853a0d51eebf47f922e",
         "checker_status": "present"
       },
       {
@@ -924,8 +915,8 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "9b197bee814542328be6153afa5cf560f638eb3fe3ea94ba62c5b66129bdc246",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "0d5d82acb8986b65ba1c494f2b708c6a4f94a10a893f86501e268bb53e77b1f4",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "review_evidence",
         "class_rationale": "Document review can supply reviewer evidence, but clean review must be recorded before candidate material becomes authority.",
@@ -944,7 +935,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves stale-reset and evidence-record routing",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "9b197bee814542328be6153afa5cf560f638eb3fe3ea94ba62c5b66129bdc246",
+        "actual_hash": "0d5d82acb8986b65ba1c494f2b708c6a4f94a10a893f86501e268bb53e77b1f4",
         "checker_status": "present"
       },
       {
@@ -967,8 +958,8 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "66a1da73677a5fe2e5d3e6292872a2375c697704353799adf0eaa7b3a9f947f9",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "905c9774b254b7b9352aaeffdc80d91ec0eaadc628522d1e75160b213809ab6d",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "implementation_review",
         "class_rationale": "Code review can identify defects in implementation evidence, but cannot promote runtime, release, or clean-replacement claims by itself.",
@@ -987,7 +978,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves review scope and held-claim routing",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "66a1da73677a5fe2e5d3e6292872a2375c697704353799adf0eaa7b3a9f947f9",
+        "actual_hash": "905c9774b254b7b9352aaeffdc80d91ec0eaadc628522d1e75160b213809ab6d",
         "checker_status": "present"
       },
       {
@@ -1009,7 +1000,7 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
         "expected_hash": "a7240cf469d410b2ee46fbf24ef19cf70becaefa55549b13a0d4eaa63166a71f",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "verification_evidence",
@@ -1051,7 +1042,7 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
         "expected_hash": "27945c9e4a4c72543988698699f5d08d3a7a04d94d1ca7d49b425b9cb169a544",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "verification_evidence",
@@ -1093,8 +1084,8 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "0c07a5487a5d4f63b5552d065d7e12d67545eb846dda923b994de9c8de1d3ec3",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "62065d44ca49ce04af8332cc13a3a82795f29e5240b3ed6cc12ccfe69404081b",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "learning_record",
         "class_rationale": "Compound learning can preserve reviewed lessons, but must not convert unreviewed implementation context into authority.",
@@ -1113,7 +1104,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves learning-record authority boundaries",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "0c07a5487a5d4f63b5552d065d7e12d67545eb846dda923b994de9c8de1d3ec3",
+        "actual_hash": "62065d44ca49ce04af8332cc13a3a82795f29e5240b3ed6cc12ccfe69404081b",
         "checker_status": "present"
       },
       {
@@ -1135,8 +1126,8 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "8f1518e73314feed67847da627879bde918c95b0bfb1d800f2b0ad3b22e3395a",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "4b8b7e8eff97d63453f6e2bde428e15d7e140c5c100ba8030b526fdd66bd7dba",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "learning_record_refresh",
         "class_rationale": "Compound refresh can update learning records, but must preserve reviewed authority provenance and stale-reset behavior.",
@@ -1155,7 +1146,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves refresh provenance and stale-reset routing",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "8f1518e73314feed67847da627879bde918c95b0bfb1d800f2b0ad3b22e3395a",
+        "actual_hash": "4b8b7e8eff97d63453f6e2bde428e15d7e140c5c100ba8030b526fdd66bd7dba",
         "checker_status": "present"
       },
       {
@@ -1177,7 +1168,7 @@
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
         "expected_hash": "ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "automation_alias",
@@ -1262,7 +1253,7 @@
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
         "source_version": "traceweaver_delta",
-        "expected_hash": "7c658b4551214c7a8434b0d20aa8b32ff93b666dca8f6faa049bfb6761a2e1d0",
+        "expected_hash": "fb4b21b09db42d0b5b9a9fea3f5d3c0aa0dfda1d3fd8157df8298bb94c0def28",
         "support_closure_depth": "dependency_and_consumer",
         "side_effect_category": "routing_support",
         "class_rationale": "Skill-use support helps route packaged capabilities but must not make skills themselves authoritative.",
@@ -1281,7 +1272,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves routing support preserves authority gates",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "7c658b4551214c7a8434b0d20aa8b32ff93b666dca8f6faa049bfb6761a2e1d0",
+        "actual_hash": "fb4b21b09db42d0b5b9a9fea3f5d3c0aa0dfda1d3fd8157df8298bb94c0def28",
         "checker_status": "present"
       }
     ],
@@ -1293,8 +1284,8 @@
         "classification": "held",
         "path": "plugins/traceweaver-core/skills/ce-commit/SKILL.md",
         "blocker": "Commit behavior has publication side effects and needs authority, trace, verification, review, and release-boundary gates before direct TraceWeaver use.",
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "1ba086277e311a5f2630d2f6fc8c0bd0713b07a4a3f273949e22ea6ae893cdb2",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "18cb95e0ebc8e4e65d534e2c130fd5b8cbbfbc7d1212b73ed834784cf8e52681",
         "support_closure_depth": "dependency_and_consumer",
         "evidence_status": "runtime_held",
         "dependency_check": "dependency_and_consumer",
@@ -1308,7 +1299,7 @@
           "clean replacement"
         ],
         "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves wrapper, stop, absence, or read-only behavior and publication gates.",
-        "actual_hash": "1ba086277e311a5f2630d2f6fc8c0bd0713b07a4a3f273949e22ea6ae893cdb2",
+        "actual_hash": "18cb95e0ebc8e4e65d534e2c130fd5b8cbbfbc7d1212b73ed834784cf8e52681",
         "checker_status": "held"
       },
       {
@@ -1318,8 +1309,8 @@
         "classification": "held",
         "path": "plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md",
         "blocker": "Commit, push, and PR behavior crosses publication boundaries and needs authority, trace, verification, review, release, and human-approval gates before direct TraceWeaver use.",
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "21385f78158777fd726a3763e56f1b9a3183c4eb24bc3a374355820286fa996c",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "5a9cf1129b09590110c28195b60bc060ecb88a1b09c58826ecd48bb00a4e7dae",
         "support_closure_depth": "dependency_and_consumer",
         "evidence_status": "runtime_held",
         "dependency_check": "dependency_and_consumer",
@@ -1334,7 +1325,7 @@
           "clean replacement"
         ],
         "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves wrapper, stop, absence, or read-only behavior and publication gates.",
-        "actual_hash": "21385f78158777fd726a3763e56f1b9a3183c4eb24bc3a374355820286fa996c",
+        "actual_hash": "5a9cf1129b09590110c28195b60bc060ecb88a1b09c58826ecd48bb00a4e7dae",
         "checker_status": "held"
       },
       {
@@ -1344,8 +1335,8 @@
         "classification": "held",
         "path": "plugins/traceweaver-core/skills/ce-debug/SKILL.md",
         "blocker": "Debug and defect-resolution work can change behavior and needs a defect, requirement, gap, exception, test, and trace route before direct TraceWeaver use.",
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "6785594317d403e2aac454d07eb1545d9e1f772c1f62606b0193728e1453864e",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "dc064c94b617f6aa7555d6f54e4c4e1e50344f4c90005dc9047de12a3191142b",
         "support_closure_depth": "dependency_and_consumer",
         "evidence_status": "runtime_held",
         "dependency_check": "dependency_and_consumer",
@@ -1359,7 +1350,7 @@
           "clean replacement"
         ],
         "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves defect-source routing, test evidence, trace updates, and authority stops.",
-        "actual_hash": "6785594317d403e2aac454d07eb1545d9e1f772c1f62606b0193728e1453864e",
+        "actual_hash": "dc064c94b617f6aa7555d6f54e4c4e1e50344f4c90005dc9047de12a3191142b",
         "checker_status": "held"
       },
       {
@@ -1369,8 +1360,8 @@
         "classification": "held",
         "path": "plugins/traceweaver-core/skills/ce-resolve-pr-feedback/SKILL.md",
         "blocker": "PR feedback resolution can mutate scope, evidence, review state, and publication readiness, so it needs authority and release-boundary guards before direct TraceWeaver use.",
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "313229520b5bc240e7ae5ca644205b2b87d2f34c15d5838677133a3666539b10",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "3b6496790383db003700fe888011bb3a631716ed1ddb4d930d11a4404ea65207",
         "support_closure_depth": "dependency_and_consumer",
         "evidence_status": "runtime_held",
         "dependency_check": "dependency_and_consumer",
@@ -1385,57 +1376,7 @@
           "clean replacement"
         ],
         "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves feedback provenance, authority gates, trace updates, and held publication stops.",
-        "actual_hash": "313229520b5bc240e7ae5ca644205b2b87d2f34c15d5838677133a3666539b10",
-        "checker_status": "held"
-      },
-      {
-        "id": "CE-CURRENT-HELD-ce-session-extract",
-        "surface": "ce-session-extract",
-        "surface_type": "skill",
-        "classification": "held",
-        "path": "plugins/traceweaver-core/skills/ce-session-extract/SKILL.md",
-        "blocker": "Session extraction is source-evidence ingestion and needs privacy, provenance, retention, and authority-boundary policy before direct TraceWeaver use.",
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "05c6a86282fd8a49ffb715e2e80b81ecd80aa88c84e6528fcfb92443049c1cd5",
-        "support_closure_depth": "dependency_and_consumer",
-        "evidence_status": "runtime_held",
-        "dependency_check": "dependency_and_consumer",
-        "consumer_check": "required_before_reclassify",
-        "allowed_claims": [
-          "current packaged manual continuity only"
-        ],
-        "held_claims": [
-          "source authority",
-          "implementation authority",
-          "clean replacement"
-        ],
-        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves privacy/provenance handling and prevents session material from becoming authority without review.",
-        "actual_hash": "05c6a86282fd8a49ffb715e2e80b81ecd80aa88c84e6528fcfb92443049c1cd5",
-        "checker_status": "held"
-      },
-      {
-        "id": "CE-CURRENT-HELD-ce-session-inventory",
-        "surface": "ce-session-inventory",
-        "surface_type": "skill",
-        "classification": "held",
-        "path": "plugins/traceweaver-core/skills/ce-session-inventory/SKILL.md",
-        "blocker": "Session inventory discovers candidate source evidence and needs privacy, provenance, retention, and authority-boundary policy before direct TraceWeaver use.",
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "de08c87a9e0c500e87311734f2b22e6cb7245b935cfdbdef5cbbc7125825c08b",
-        "support_closure_depth": "dependency_and_consumer",
-        "evidence_status": "runtime_held",
-        "dependency_check": "dependency_and_consumer",
-        "consumer_check": "required_before_reclassify",
-        "allowed_claims": [
-          "current packaged manual continuity only"
-        ],
-        "held_claims": [
-          "source authority",
-          "implementation authority",
-          "clean replacement"
-        ],
-        "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves privacy/provenance handling and prevents session material from becoming authority without review.",
-        "actual_hash": "de08c87a9e0c500e87311734f2b22e6cb7245b935cfdbdef5cbbc7125825c08b",
+        "actual_hash": "3b6496790383db003700fe888011bb3a631716ed1ddb4d930d11a4404ea65207",
         "checker_status": "held"
       },
       {
@@ -1445,8 +1386,8 @@
         "classification": "held",
         "path": "plugins/traceweaver-core/skills/ce-sessions/SKILL.md",
         "blocker": "Session search can surface candidate source evidence and needs privacy, provenance, retention, and authority-boundary policy before direct TraceWeaver use.",
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "f13c6b143097e13705d521cee152672f0b599057b2c0e4fc87b7af61c61f9553",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "cee2a94d11419d204542910f4afcf78a83f23ea1c6799884f36688cc3b64bd70",
         "support_closure_depth": "dependency_and_consumer",
         "evidence_status": "runtime_held",
         "dependency_check": "dependency_and_consumer",
@@ -1460,7 +1401,7 @@
           "clean replacement"
         ],
         "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves privacy/provenance handling and prevents session material from becoming authority without review.",
-        "actual_hash": "f13c6b143097e13705d521cee152672f0b599057b2c0e4fc87b7af61c61f9553",
+        "actual_hash": "cee2a94d11419d204542910f4afcf78a83f23ea1c6799884f36688cc3b64bd70",
         "checker_status": "held"
       },
       {
@@ -1470,7 +1411,7 @@
         "classification": "held",
         "path": "plugins/traceweaver-core/skills/ce-setup/SKILL.md",
         "blocker": "Setup and health-check behavior can mutate or report environment state and needs pre/post evidence plus authority-stop rules before direct TraceWeaver use.",
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
         "expected_hash": "626696dc061455a1320559b48ef8bced72fe8b87403d3d4d55592627c99ea6ec",
         "support_closure_depth": "dependency_and_consumer",
         "evidence_status": "runtime_held",
@@ -1495,8 +1436,8 @@
         "classification": "held",
         "path": "plugins/traceweaver-core/skills/ce-worktree/SKILL.md",
         "blocker": "Worktree behavior mutates repository/workspace state and needs pre/post evidence, branch policy, and authority-stop rules before direct TraceWeaver use.",
-        "source_version": "ce_3.4.1_selected_traceweaver_package",
-        "expected_hash": "5a1d6d9babb6e24da1af1bbe630c73306adfec8a75faa1442f611cebc804edc3",
+        "source_version": "ce_3.8.1_selected_traceweaver_package",
+        "expected_hash": "bccd3015024cb040232574b9cc77a46832414266af094cb77bf844330a5c7171",
         "support_closure_depth": "dependency_and_consumer",
         "evidence_status": "runtime_held",
         "dependency_check": "dependency_and_consumer",
@@ -1510,7 +1451,7 @@
           "clean replacement"
         ],
         "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves workspace mutation boundaries, trace updates, and held publication stops.",
-        "actual_hash": "5a1d6d9babb6e24da1af1bbe630c73306adfec8a75faa1442f611cebc804edc3",
+        "actual_hash": "bccd3015024cb040232574b9cc77a46832414266af094cb77bf844330a5c7171",
         "checker_status": "held"
       }
     ],
@@ -1802,6 +1743,25 @@
           "clean replacement"
         ],
         "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove provenance, dependency closure, and defect/source-record routing.",
+        "surface_type": "skill",
+        "classification": "held",
+        "evidence_status": "package_surface_held"
+      },
+      {
+        "id": "CE-BROAD-ce-riffrec-feedback-analysis",
+        "surface": "ce-riffrec-feedback-analysis",
+        "blocker": "Feedback-analysis workflows can transform user/product feedback into candidate work and need provenance, privacy, validation, and authority-boundary review before TraceWeaver use.",
+        "dependency_check": "dependency_and_consumer",
+        "consumer_check": "required_before_reopen",
+        "allowed_claims": [
+          "broad surface named as held planning skeleton only"
+        ],
+        "held_claims": [
+          "feedback interpretation authority",
+          "implementation authority",
+          "clean replacement"
+        ],
+        "reopen_condition": "Reopen only after reviewed demand evidence or an accepted product exception names this surface and Units 1 through 4 prove feedback provenance, privacy handling, dependency closure, and authority promotion stops.",
         "surface_type": "skill",
         "classification": "held",
         "evidence_status": "package_surface_held"

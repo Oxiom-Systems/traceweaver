@@ -1,8 +1,11 @@
+<!-- TRACEWEAVER: file-role=packaged-skills-ce-doc-review-references-review-output-template-md; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
 # Document Review Output Template
 
 Use this **exact format** when presenting synthesized review findings in Interactive mode. Findings are grouped by severity, not by reviewer.
 
 **IMPORTANT:** Use pipe-delimited markdown tables (`| col | col |`). Do NOT use ASCII box-drawing characters.
+
+**IMPORTANT:** Escape literal pipe characters in table cells. Any `|` that appears inside a finding's section reference, issue description, code snippet, regex pattern, or delimited-string example must be written as `\|` so column boundaries are determined only by unescaped pipes. Unescaped pipes split the cell across columns and corrupt the row's `Reviewer`, `Confidence`, and `Tier` values.
 
 This template describes the Phase 4 interactive presentation — what the user sees before the routing question (`references/walkthrough.md`) fires. The headless-mode envelope is documented in `references/synthesis-and-presentation.md` (Phase 4 "Route Remaining Findings" section) and is separate from this template.
 
