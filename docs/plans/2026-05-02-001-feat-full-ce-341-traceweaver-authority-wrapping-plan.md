@@ -1,5 +1,5 @@
 ---
-title: Full CE 3.4.1 TraceWeaver Authority Wrapping
+title: Full CE 3.8.1 TraceWeaver Authority Wrapping
 type: roadmap
 status: active
 date: 2026-05-02
@@ -9,11 +9,11 @@ baseline_hash_sha256: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b61
 traceweaver_mode: advisory
 ---
 
-# Full CE 3.4.1 TraceWeaver Authority Wrapping
+# Full CE 3.8.1 TraceWeaver Authority Wrapping
 
 ## Overview
 
-Roadmap the full CE 3.4.1 TraceWeaver authority-wrapping program after the
+Roadmap the full CE 3.8.1 TraceWeaver authority-wrapping program after the
 narrow static/advisory alpha. This artifact authorizes Unit 0, Unit 1, and the
 Unit 2 branch selected by the Unit 1A product checkpoint only. Broad Unit 2
 wrapper architecture/policy is executable only when the checkpoint supports
@@ -120,7 +120,7 @@ intent_served:
   - INTENT-TW-007
   - INTENT-TW-008
 verification_required:
-  - full CE 3.4.1 skill inventory with hashes and support closure
+  - full CE 3.8.1 skill inventory with hashes and support closure
   - wrapper classification review
   - package manifest and install smoke
   - direct-entry bypass checks
@@ -133,7 +133,7 @@ must_not_change:
   - Do not copy protected standards text or claim IEEE/INCOSE conformance.
   - Do not let commit, push, PR, release, or update flows bypass TraceWeaver gates.
 open_assumptions:
-  - Upstream CE 3.4.1 source pin remains `d685f0794863a73ae3ca3620d2ae747510e9eaa0`.
+  - Upstream CE 3.8.1 source pin is `b07aac55b5dc6d5b940a7b194497ccd6121f62a5`.
   - Current TraceWeaver static alpha remains advisory until U9 runtime proof.
 ```
 
@@ -248,9 +248,9 @@ stop, publication-stop, bounded-loop, runtime smoke, and disconfirming evidence
 are accepted. If any of those evidence records become stale, bootstrap/alias
 target status reverts to held until revalidated.
 
-## Full CE 3.4.1 Skill Classification
+## Full CE 3.8.1 Skill Classification
 
-This table inventories the 37 upstream CE 3.4.1 `ce-*` skill directories plus
+This table inventories the 37 upstream CE 3.8.1 `ce-*` skill directories plus
 the upstream loader-visible `lfg` autopilot surface. Unit 1 must also inventory
 the whole upstream plugin behavior surface around those skills: plugin
 manifests, default prompts, prompt/slash-command registration, MCP/app connector
@@ -284,8 +284,7 @@ on `plugins/traceweaver-core/skills/` as of this plan.
 | `ce-release-notes` | Not packaged | held | Candidate wrapper after Unit 1 proves support closure and Unit 2 defines release-claim side effects; release notes must match approved U7/U9/R31 evidence and held claims. |
 | `ce-report-bug` | Not packaged | held | Hold until bug reports can create defect/source records and route to requirements, tests, and traceability gaps. |
 | `ce-resolve-pr-feedback` | Packaged direct CE-derived skill | wrapped | Wrap feedback resolution so review comments cannot authorize scope changes without approved requirements, exceptions, or change records. |
-| `ce-session-extract` | Packaged direct CE-derived skill | wrapped | Wrap session extraction as source-evidence ingestion with privacy and provenance controls. |
-| `ce-session-inventory` | Packaged direct CE-derived skill | wrapped | Wrap session inventory so retrieved context becomes cited source evidence, not implicit authority. |
+| `ce-riffrec-feedback-analysis` | Broad upstream CE skill | held | Hold feedback-analysis workflows until product demand, source provenance, artifact handling, and authority boundaries are reviewed. |
 | `ce-sessions` | Packaged direct CE-derived skill | wrapped | Wrap session search so prior discussion can inform gaps/changes but cannot override baseline authority. |
 | `ce-setup` | Packaged direct CE-derived skill | wrapped | Wrap as setup/health compatibility only after preconditions, stop conditions, and pre/post environment-mutation evidence prove it cannot close authority gates. |
 | `ce-simplify-code` | Not packaged | held | Candidate wrapper after Unit 1 proves support closure and Unit 2 defines code-mutation side effects; simplification must preserve requirement links and duplicate/dark behavior rules. |
@@ -593,7 +592,7 @@ Verification:
 - `docs/validation/traceweaver-current-ce-surface-safety.md` receives
   non-circular document-review evidence by the same review-surface rule above.
 
-### Unit 1: CE 3.4.1 Inventory And Classification Record
+### Unit 1: CE 3.8.1 Inventory And Classification Record
 
 Goal: create the authoritative inventory needed to prevent future drift between
 "selected alpha" and "full replacement" claims without committing to exhaustive
@@ -612,7 +611,7 @@ Approach:
   - **Unit 1A current/core inventory**: inventory current TraceWeaver packaged
     behavior-bearing entrypoints, core CE method surfaces, upstream `lfg`, and
     enough upstream/whole-plugin metadata to support the product checkpoint.
-  - **Unit 1B broad inventory**: inventory all 37 upstream CE 3.4.1 `ce-*` skill
+  - **Unit 1B broad inventory**: inventory all 37 upstream CE 3.8.1 `ce-*` skill
     directories and every whole-plugin behavior-bearing surface only if the
     product checkpoint returns `full_surface_supported` or records an accepted
     `product_exception`.
@@ -622,7 +621,7 @@ Approach:
 - Record the upstream acquisition procedure before hashing:
   - source package/repository identity;
   - canonical upstream URL or package identity;
-  - version/tag/commit (`3.4.1`, `d685f0794863a73ae3ca3620d2ae747510e9eaa0`);
+  - version/tag/commit (`3.8.1`, `b07aac55b5dc6d5b940a7b194497ccd6121f62a5`);
   - trusted fetch command and capture environment;
   - signed tag, release signature, or maintainer-verifiable commit evidence where
     available;
@@ -638,7 +637,7 @@ Approach:
   traceability check, review, verification/validation handoff, publication stop,
   and compound learning, plus upstream `lfg`.
 - Unit 1B, when authorized by the product checkpoint, enumerates all 37 upstream
-  CE 3.4.1 `ce-*` skill directories, the upstream loader-visible `lfg`
+  CE 3.8.1 `ce-*` skill directories, the upstream loader-visible `lfg`
   directory, and the whole-plugin behavior surface around them: manifests,
   default prompts, prompt/slash-command registrations, MCP/app connector
   declarations, install metadata, top-level references/scripts/assets, agents,
@@ -701,7 +700,7 @@ Verification:
 - Per-class evidence table defines whether the row needs full transitive
   closure, entrypoint hash only, aggregate hash, or absence proof.
 - Hash table covers every selected, wrapped, aliased, or hidden support file.
-- Whole-plugin surface table proves whether CE 3.4.1 exposes behavior-bearing
+- Whole-plugin surface table proves whether CE 3.8.1 exposes behavior-bearing
   surfaces outside the 37 `ce-*` skill directories plus upstream `lfg`; any such
   surface is classified, held, or proven absent.
 - Held/out-of-scope rows include dependency check, consumer check, CE-flow impact
@@ -786,7 +785,7 @@ Approach:
   claim is accepted. The spike must run in a disposable workspace with fake
   credentials, sanitized environment variables, isolated Codex/plugin home, no
   real remote publication targets, and provider/network access disabled where
-  the host allows it. Install TraceWeaver beside upstream CE 3.4.1, invoke exact
+  the host allows it. Install TraceWeaver beside upstream CE 3.8.1, invoke exact
   upstream CE entrypoint names, and record whether TraceWeaver can intercept,
   shadow, block, or explicitly hold those raw external paths. Pre/post mutation
   checks must prove no real project files, git state, credentials, remote URLs,
@@ -1088,8 +1087,8 @@ future work without silently changing authority.
 Illustrative future files, not authorized by this roadmap:
 
 - Create `tw-compound` or accepted aliases for `ce-compound`,
-  `ce-compound-refresh`, `ce-sessions`, `ce-session-inventory`, and
-  `ce-session-extract` after Unit 2 resolves naming.
+  `ce-compound-refresh`, `ce-sessions`, and `ce-riffrec-feedback-analysis`
+  after Unit 2 resolves naming.
 - Modify plugin manifests/default prompts.
 - Modify `traceability-matrix.md`.
 
@@ -1283,7 +1282,7 @@ Illustrative future approach:
 - Invoke every installed behavior-bearing CE entrypoint by exact name and confirm
   it delegates, stops, is absent, or is read-only support.
 - Run wrapper-equivalence smoke for each wrapped or aliased CE method against the
-  pinned CE 3.4.1 behavior contract: preserved prompt/output obligations,
+  pinned CE 3.8.1 behavior contract: preserved prompt/output obligations,
   permitted TraceWeaver authority deltas, and disallowed semantic drift. Fail or
   hold familiar-workflow and clean-replacement claims when a wrapper changes CE
   method behavior beyond the accepted authority/traceability delta.
@@ -1300,7 +1299,7 @@ Future exit criteria:
 
 - Runtime transcript or equivalent evidence for each smoke scenario.
 - Differential/regression evidence proves wrapped/aliased CE methods preserve
-  pinned CE 3.4.1 behavior except for accepted TraceWeaver authority and
+  pinned CE 3.8.1 behavior except for accepted TraceWeaver authority and
   traceability deltas.
 - Matrix and gap/change/exception records produced by the smoke.
 - `/ce-code-review` and `/ce-doc-review` clean on wrappers/evidence.
@@ -1409,7 +1408,7 @@ Future exit criteria:
   validation question, held claims, and stale-reset trigger.
 - Unit 1A inventories current TraceWeaver packaged behavior-bearing entrypoints,
   core CE method surfaces, and upstream `lfg` for the product-checkpoint evidence
-  boundary. Unit 1B inventories all 37 upstream CE 3.4.1 `ce-*` skill
+  boundary. Unit 1B inventories all 37 upstream CE 3.8.1 `ce-*` skill
   directories, upstream loader-visible `lfg`, and every whole-plugin
   behavior-bearing surface only when the product checkpoint returns
   `full_surface_supported` or an accepted `product_exception`; otherwise broad

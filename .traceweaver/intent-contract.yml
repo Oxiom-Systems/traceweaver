@@ -163,7 +163,7 @@ u9_unit3_gate_behavior_smoke_scope: scripts/traceweaver-smoke-u9-fixtures, docs/
 u9_unit3_review_required_before_input: false
 u9_input_status: u9_unit1_reviewed_for_planning_input_unit2_fixture_smoke_reviewed_for_fixture_input_unit3_gate_behavior_code_reviewed_doc_reviewed_for_fixture_input_u9_unit4_boundary_smoke_code_reviewed_doc_reviewed_for_boundary_input_u9_unit5_host_registry_filesystem_probe_reviewed_held_unit7_host_install_attempt_doc_reviewed_held_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_unit9_registry_shape_auth_boundary_patch_code_reviewed_doc_reviewed_held_unit10_auth_safe_fresh_exec_and_active_host_runtime_probes_code_reviewed_authority_doc_reviewed_reviewed_held_unit11_active_host_reconciled_runtime_pass_code_reviewed_authority_doc_reviewed_constrained_runtime_accepted
 matrix_source: traceability-matrix.md
-matrix_hash_sha256: 04f2b438a11d2bda8ed7b8e646351e9dc35b6e50747521aa24bdc04dc4fbfc24
+matrix_hash_sha256: c156fbd14830c84236271bbaedfeb068f921f1277f8443d477efc3d00d30ba6f
 u7_static_advisory_record: docs/validation/traceweaver-u7-static-advisory-claims.md
 u7_static_advisory_record_sha256: 1421cf235e6bf1189b0364d5f1cb4ff418b44a2b24b4738f0026c764905ab6a8
 u7_static_advisory_state: static_advisory_accepted_runtime_held
@@ -259,15 +259,15 @@ source_artifacts:
     role: Candidate implementation plan for tw-auto after controlled-autonomy authority promotion.
   - id: SRC-PLAN-003
     path: docs/plans/2026-05-02-001-feat-full-ce-341-traceweaver-authority-wrapping-plan.md
-    sha256: 80adcde74b5641577643b300d57620ca952995d7c1540972da18835adfb4ad10
-    role: Active full CE 3.4.1 authority-wrapping roadmap with refreshed canonical requirements baseline hash.
+    sha256: 4778109b3dedae06aedb04f785ec7873469ba60a811df8025d4ac067157b0594
+    role: Active full CE 3.8.1 authority-wrapping roadmap with refreshed canonical requirements baseline hash.
   - id: SRC-MATRIX-001
     path: traceability-matrix.md
-    sha256: 04f2b438a11d2bda8ed7b8e646351e9dc35b6e50747521aa24bdc04dc4fbfc24
-    role: Root traceability authority recording accepted narrow U7 static/advisory claims, refreshed current-hash install smoke, approved REQ-TW-048 static/advisory source-evidence scope, U9 Units 1-10 reviewed-held evidence, constrained Unit 11 active-host tw-authority-gate runtime proof with code/doc review passed, and dogfood classifier code review passed / dogfood authority doc review passed evidence while broader runtime claims remain held.
+    sha256: c156fbd14830c84236271bbaedfeb068f921f1277f8443d477efc3d00d30ba6f
+    role: Root traceability authority recording accepted narrow U7 static/advisory claims, refreshed CE 3.8.1 install/no-publication smoke, approved REQ-TW-048 static/advisory source-evidence scope, U9 Units 1-11 reviewed-held evidence, constrained Unit 11 active-host tw-authority-gate runtime proof with code/doc review passed, and dogfood classifier code review passed / dogfood authority doc review passed evidence while broader runtime claims remain held.
   - id: SRC-VAL-005
     path: docs/validation/traceweaver-controlled-autonomy-alpha.md
-    sha256: dc7367f57a05fe3b8225ccefb5b206d4d770f9200e79f015b8f7acdc91c7fd8b
+    sha256: 871bc8256cf54971f7b65b8f6938fdd92b0164374a9634c54754cea0ec1cb78a
     role: Controlled-autonomy alpha static/install evidence with approved REQ-TW-048 static/advisory source-evidence scope, Units 1-10 reviewed-held evidence, constrained Unit 11 active-host tw-authority-gate runtime proof with code/doc review passed, and reviewed dogfood audit evidence; broader runtime claims remain held.
   - id: SRC-VAL-006
     path: docs/validation/traceweaver-u7-static-advisory-claims.md
@@ -275,8 +275,8 @@ source_artifacts:
     role: U7 static/advisory claim record accepting tw-auto, lfg, README install-command, and tw-grill source-evidence static/advisory claims while recording current install smoke passed, code review passed, REQ-TW-048 amendment doc review passed, and held runtime/tw-grill implementation authority.
   - id: SRC-VAL-007
     path: docs/validation/traceweaver-u9-codex-runtime-discovery.md
-    sha256: f3f548419ae04f47e28a960f297fec101da722b8550ab3fb6d9caba3d870937f
-    role: U9 Units 1-10 reviewed-held evidence plus constrained Unit 11 active-host tw-authority-gate runtime proof under a controlled host-reconciliation exception; required skills are visible and exact tw-authority-gate sentinel returned only after active host skill-surface reduction and external CE plugin disablement; broader runtime claims remain held.
+    sha256: 244ed5134e709f7fee90052c4b1bacb53a2487f17e27c0685964854fb7ae4be2
+    role: U9 Units 1-11 reviewed-held evidence plus CE 3.8.1 refresh smoke and constrained Unit 11 active-host tw-authority-gate runtime proof under a controlled host-reconciliation exception; required skills are visible and exact tw-authority-gate sentinel returned only after active host skill-surface reduction and external CE plugin disablement; broader runtime claims remain held.
   - id: SRC-PLAN-004
     path: docs/plans/2026-05-02-003-feat-u9-codex-runtime-discovery-proof-plan.md
     sha256: 84b36f3484ab09412fb444a508b7ebb103f71749d5d03b692b94c7b52f9dfd42
@@ -307,7 +307,7 @@ source_artifacts:
     role: CE replacement classifier patched for explicit UTF-8 reads after dogfood-discovered US-ASCII locale failure; code review passed as CE-CODE-REVIEW-2026-05-05-DOGFOOD-CLASSIFIER-CLEAN-001 and dogfood authority doc review passed as CE-DOC-REVIEW-2026-05-05-DOGFOOD-AUTHORITY-CLEAN-001.
   - id: SRC-SMOKE-007
     path: scripts/traceweaver-smoke-ce-replacement-classifier
-    sha256: 47e291ee28556a3eb1bf2cd0e7fe61782f394b62b70af548a3087c9ed183583a
+    sha256: e74c9876c71d6c69d56e48ead3b9da87bae538977143e67a10af7be4463d0c0a
     role: CE replacement classifier smoke updated to cover the locale regression with LC_ALL=C LANG=C; code review passed as CE-CODE-REVIEW-2026-05-05-DOGFOOD-CLASSIFIER-CLEAN-001 and dogfood authority doc review passed as CE-DOC-REVIEW-2026-05-05-DOGFOOD-AUTHORITY-CLEAN-001.
   - id: SRC-FIXTURE-001
     path: fixtures/u9-codex/
@@ -319,8 +319,8 @@ source_artifacts:
     role: U9 Unit 2 fixture classification, temporary-copy trace/gap/change/exception/matrix write smoke, and Unit 3 deterministic gate-behavior smoke harness; Unit 3 doc review passed, missing TraceWeaver-native dependency coverage patched, code review passed, and host-registry/runtime claims remain held.
   - id: SRC-SMOKE-003
     path: scripts/traceweaver-smoke-no-publication
-    sha256: 9e14b7066ed0d6d7e55f82df106dff41db8d18eb0d59be88dd5748e73f9def40
-    role: U9 Unit 4 PR-helper publication-stop, lfg delegation, broader static publication-stop marker, and event-derived reviewer-capacity backpressure boundary smoke; code review and doc review passed, with host-registry/runtime claims still held.
+    sha256: ea5e8c9b23f03f1b4fcc05f403d48e4e3e6405e640a7a2178283dd4e942dadde
+    role: U9 Unit 4 PR-helper publication-stop, lfg delegation, broader static publication-stop marker, selected CE publication-hold marker, and event-derived reviewer-capacity backpressure boundary smoke; code review and doc review passed, with host-registry/runtime claims still held.
   - id: SRC-INSTALL-001
     path: src/index.ts
     sha256: d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5

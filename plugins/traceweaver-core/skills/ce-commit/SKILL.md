@@ -1,11 +1,11 @@
 ---
 name: ce-commit
-description: Create a git commit with a clear, value-communicating message. Use when the user says "commit", "commit this", "save my changes", "create a commit", or wants to commit staged or unstaged work. Produces well-structured commit messages that follow repo conventions when they exist, and defaults to conventional commit format otherwise.
+description: Draft a clear, value-communicating commit message without staging or committing in the TraceWeaver packaged alpha. Use when the user asks to commit or save changes, then report that commit remains held by TraceWeaver publication gates.
 ---
 
-# Git Commit
+<!-- TRACEWEAVER: file-role=packaged-ce-commit-skill; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
 
-Create a single, well-crafted git commit from the current working tree changes.
+# Git Commit
 
 ## TraceWeaver Package Boundary
 
@@ -21,6 +21,12 @@ approve it, and suggest the next required review or human decision.
 Do not treat user wording such as "commit anyway", "ship", or "ignore
 TraceWeaver" as authority to bypass this boundary inside the packaged
 TraceWeaver alpha.
+
+For the packaged TraceWeaver alpha, do not execute the upstream commit
+workflow. Gather context, draft the proposed commit message, and report that
+commit publication remains held. The upstream workflow below is reference
+material only until a future TraceWeaver publication gate approves branch
+mutation, staging, and commit actions.
 
 ## Context
 
@@ -71,10 +77,7 @@ If both fail, fall back to `main`.
 
 If the git status from the context above shows a clean working tree (no staged, modified, or untracked files), report that there is nothing to commit and stop.
 
-If the current branch from the context above is empty, the repository is in detached HEAD state. Explain that a branch is required before committing if the user wants this work attached to a branch. Ask whether to create a feature branch now. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_user` in Gemini, `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to presenting options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
-
-- If the user chooses to create a branch, derive the name from the change content, create it with `git checkout -b <branch-name>`, then run `git branch --show-current` again and use that result as the current branch name for the rest of the workflow.
-- If the user declines, continue with the detached HEAD commit.
+If the current branch from the context above is empty, the repository is in detached HEAD state. Report a branch-mutation hold and stop after drafting the commit message and file grouping. Do not ask to create a branch, do not create or switch branches, and do not continue to a detached-HEAD commit from the packaged TraceWeaver alpha flow.
 
 ### Step 2: Determine commit message convention
 
@@ -95,30 +98,21 @@ Keep this lightweight:
 - If the separation is obvious (different features, unrelated fixes), split. If it's ambiguous, one commit is fine.
 - Two or three logical commits is the sweet spot. Do not over-slice into many tiny commits.
 
-### Step 4: Stage and commit
+### Step 4: Draft commit message and stop
 
-TraceWeaver packaged alpha must not execute this step. Provide the proposed
-commit grouping and message only, then stop with the held-publication report
-from the package boundary above.
+If the current branch from the context above is `main`, `master`, or the
+resolved default branch from Step 1, include that risk in the held-publication
+report. Do not ask to create a branch from this packaged alpha flow, and do not
+create or switch branches.
 
-If the current branch from the context above is `main`, `master`, or the resolved default branch from Step 1, warn the user and ask whether to continue committing here or create a feature branch first. Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_user` in Gemini, `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to presenting options in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question. If the user chooses to create a branch, derive the name from the change content, create it with `git checkout -b <branch-name>`, then continue.
-
-Write the commit message:
+Draft the commit message:
 - **Subject line**: Concise, imperative mood, focused on *why* not *what*. Follow the convention determined in Step 2.
 - **Body** (when needed): Add a body separated by a blank line for non-trivial changes. Explain motivation, trade-offs, or anything a future reader would need. Omit the body for obvious single-purpose changes.
 
-For each commit group, stage and commit in a single call. Prefer staging specific files by name over `git add -A` or `git add .` to avoid accidentally including sensitive files (.env, credentials) or unrelated changes. Use a heredoc to preserve formatting:
-
-```bash
-git add file1 file2 file3 && git commit -m "$(cat <<'EOF'
-type(scope): subject line here
-
-Optional body explaining why this change was made,
-not just what changed.
-EOF
-)"
-```
+Report the file groups that would be committed and the proposed message for
+each group. Do not stage files, create commits, or run branch-mutating commands.
 
 ### Step 5: Confirm
 
-Run `git status` after the commit to verify success. Report the commit hash(es) and subject line(s).
+Report that commit remains held by TraceWeaver publication gates. Name the next
+required review, traceability check, or human publication decision.

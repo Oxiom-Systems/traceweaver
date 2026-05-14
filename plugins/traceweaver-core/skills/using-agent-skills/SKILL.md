@@ -3,6 +3,7 @@ name: using-agent-skills
 description: Discovers and invokes agent skills. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are discovered and invoked.
 ---
 
+<!-- TRACEWEAVER: file-role=packaged-skills-using-agent-skills-skill; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
 # Using Agent Skills
 
 ## Overview
@@ -23,7 +24,7 @@ Code review -> tw-traceability-check, then ce-code-review with publication held
 Document review -> tw-requirements-review, then ce-doc-review with publication held
 Debugging -> tw-auto or tw-authority-gate before ce-debug no-publication mode
 Browser or Xcode verification -> ce-test-browser or ce-test-xcode
-Session/source context -> ce-sessions, ce-session-inventory, or ce-session-extract as cited evidence only
+Session/source context -> ce-sessions as cited evidence only
 Commit, push, PR, release -> held in TraceWeaver alpha; stop before publication
 ```
 
@@ -190,7 +191,7 @@ Not every task needs every skill. A bug fix might only need: `ce-debug` ->
 | Plan | tw-auto / ce-plan | Decompose approved authority into bounded work |
 | Cross-cutting | systems-engineering-traceability | Candidate needs, approved authority, no-orphan gate, verification, and validation links |
 | Build | ce-work | Thin authorized slices in TraceWeaver no-publication mode |
-| Context | ce-sessions / ce-session-inventory / ce-session-extract | Source/session context as cited evidence only |
+| Context | ce-sessions | Source/session context as cited evidence only |
 | Verify | ce-test-browser / ce-test-xcode | Runtime verification when applicable |
 | Verify | ce-debug | Reproduce, localize, fix, and guard |
 | Review | ce-code-review / ce-doc-review | Review with TraceWeaver traceability checks |
