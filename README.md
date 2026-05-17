@@ -54,6 +54,31 @@ intent, proves that implementation traces back to approved requirements, and
 records gaps, risks, assumptions, and changes instead of letting them become
 hidden authority.
 
+TraceWeaver is useful when a codebase has grown faster than its memory. It helps
+answer practical engineering questions:
+
+- why does this module exist?
+- which requirement or decision does this behavior serve?
+- which test or smoke proves the behavior still works?
+- is this code still current, or did the requirement move on?
+- are two places doing the same thing for unclear reasons?
+- did an agent add plausible code that no one actually authorized?
+
+The goal is not paperwork for its own sake. The goal is a codebase where intent
+is visible enough that humans and agents can safely change it.
+
+TraceWeaver calls these common problems out explicitly:
+
+| Problem | What TraceWeaver looks for |
+|---|---|
+| Lost intent | Code, tests, or workflow behavior that no longer links back to a current stakeholder need, requirement, exception, validation question, or decision. |
+| Dark code | Behavior-bearing files or entrypoints with no approved authority anchor or matrix row. |
+| Orphaned code | Source-level anchors that are not reachable from `traceability-matrix.md` evidence. |
+| Abandoned or obsolete code | Behavior linked to stale, held, retired, superseded, or missing requirements. |
+| Duplicate or similar behavior | Multiple artifacts with similar behavior under the same or unclear authority. |
+| Anchor-only coverage | Code has a trace comment, but no verification implementation, procedure, result, or held-validation record. |
+| Dead TDD | Tests or smokes that still verify a requirement that no longer exists or is no longer approved. |
+
 TraceWeaver is intended to become a standalone plugin that can replace the
 installed Compound Engineering plugin for this workflow. It is based on the
 selected CE planning, work, review, and learning surface, but TraceWeaver adds
@@ -65,36 +90,33 @@ gap/change/exception handling.
 
 | Name | Role |
 |---|---|
-| TraceWeaver | Overall project and product identity |
-| TraceWeaver Core | Open-source method, skills, templates, and validation protocol |
-| TraceWeaver CE | Compound Engineering adapter/plugin implementation |
+| TraceWeaver Core | Open-source method, standalone alpha plugin, skills, templates, and validation protocol |
 | TraceWeaver Enterprise | Paid commercial product for larger-project governance |
 | TraceWeaver Cloud | Hosted MCP/API service |
-| TraceWeaver Connect | Connector layer for enterprise and cloud integrations |
-| `systems-engineering-traceability` | Upstream-neutral Agent Skills skill name |
-| `ce-traceability` | Compound Engineering-specific skill name |
 
 TraceWeaver Core should stay usable without the future paid layer. The paid
-layer should make the same method scalable through relationship storage,
-dashboards, governance, and integrations.
+Enterprise and Cloud products should make the same method scalable through
+relationship storage, dashboards, governance, hosted services, audit logs, and
+integrations.
 
 ## Architecture Layers
 
 | Layer | Purpose | Names |
 |---|---|---|
-| Core skills | Portable, upstream-neutral capabilities usable in any agentic workflow | Core 11 suite under `skills/`; `requirements-reviewer` and `systems-engineering-traceability` remain the current runtime-candidate subset |
-| Core lifecycle guidance | Explains how the core skills work together from idea to change control | `traceweaver-operating-model`, matrix template, requirements/V&V guide, risk/gap/change-control guide |
-| Compound Engineering adapter | Wires the core capabilities into Compound Engineering workflows, prompts, agents, and delegation | TraceWeaver CE, `ce-traceability`, `ce-traceability-reviewer`, CE hooks |
+| TraceWeaver Core method | Open-source systems-engineering workflow, requirements baseline, traceability matrix, validation protocol, and skill guidance | `requirements.md`, `traceability-matrix.md`, `.traceweaver/`, templates, references, and validation records |
+| TraceWeaver Core plugin | Standalone alpha plugin surface for Codex with TraceWeaver-owned `tw-*` wrappers and packaged CE-derived internal engines | `plugins/traceweaver-core`, `tw-auto`, `tw-plan`, `tw-work`, `tw-code-review`, `tw-doc-review`, `tw-commit-push-pr`, `lfg` |
+| TraceWeaver Enterprise and Cloud | Commercial scale-out layer for multi-repo governance, relationship storage, dashboards, hosted services, audit logs, and integrations | Future Enterprise and Cloud products |
 
 Ownership rule:
 
-- `requirements-reviewer` answers whether needs, requirements, success criteria,
-  acceptance criteria, or reframed requirements are good enough to become
-  authority.
-- `systems-engineering-traceability` answers whether meaningful behaviour traces
-  to approved authority, implementation, verification, and validation evidence.
-- TraceWeaver CE wires those Core capabilities into Compound Engineering. CE
-  wrappers must not become the source definition of the Core capabilities.
+- TraceWeaver Core defines the method and standalone plugin behavior.
+- User-facing workflow should enter through TraceWeaver-owned `tw-*` wrappers or
+  the `lfg` compatibility alias.
+- Packaged CE-derived skills are internal implementation components only. They
+  must not become the product identity, public workflow surface, or source of
+  TraceWeaver authority.
+- Enterprise and Cloud may add storage, dashboards, hosted services, connectors,
+  and governance features, but they must not be required for local Core use.
 
 ## Intent Contract
 
@@ -153,6 +175,247 @@ human-facing authority file: `requirements.md` says what is approved, while
 `traceability-matrix.md` shows how intent, requirements, artifacts,
 verification, validation, gaps, and held claims connect.
 
+## How To Use TraceWeaver Alpha
+
+### Install For Codex
+
+TraceWeaver alpha is installed from a local checkout. The current repo-local
+installer supports Codex installs only and requires `--include-skills`; that
+flag materializes the user-facing `tw-*` skills plus the packaged internal
+CE-derived implementation components.
+
+Prerequisites:
+
+- `git`
+- `bun`
+- a local TraceWeaver checkout
+
+Install or update from the latest `main`:
+
+```sh
+git clone git@github.com:Oxiom-Systems/traceweaver.git
+cd traceweaver
+git pull --ff-only origin main
+bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
+```
+
+If the checkout already exists, run only:
+
+```sh
+cd /path/to/traceweaver
+git pull --ff-only origin main
+bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
+```
+
+For this Mac/Codex host, reconcile the active direct-callable skill surface
+after installing or after pulling a newer TraceWeaver checkout:
+
+```sh
+scripts/traceweaver-reconcile-codex-host-skills
+TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-host-registry
+```
+
+Verify a fresh isolated install without relying on the active Codex home:
+
+```sh
+TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
+TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-separate-home-runtime
+```
+
+Expected install shape:
+
+- user-facing skills are `tw-*` plus the `lfg` compatibility alias;
+- raw `ce-*` skills are packaged as internal TraceWeaver implementation
+  components, not as the normal user workflow;
+- Codex model default is recorded as `gpt-5.5` with `medium` reasoning;
+- full runtime-driver invocation, release-ready status, clean replacement, and
+  unconstrained-host claims remain held.
+
+Claude packaging has a manifest with Sonnet policy recorded, but the repo-local
+installer currently supports only `--to codex`. Treat Claude install/release
+claims as held until a reviewed Claude installation path is added.
+
+### Start A Project
+
+In a consuming repository, TraceWeaver expects these authority files at the
+root:
+
+```text
+requirements.md
+traceability-matrix.md
+.traceweaver/intent-contract.yml
+```
+
+If they do not exist yet, start with source evidence and requirements review:
+
+```text
+tw-grill "stress-test this idea"    # optional, when intent is still fuzzy
+tw-brainstorm "describe the idea or problem"
+tw-requirements-review
+tw-plan
+```
+
+For normal bounded implementation work, use the TraceWeaver wrappers instead of
+raw `ce-*` commands:
+
+```text
+tw-plan "plan the approved change"
+tw-work "implement the approved plan"
+tw-code-review
+tw-doc-review
+tw-commit-push-pr
+```
+
+`tw-work` is responsible for implementation under approved authority. When the
+mapping is unambiguous, it can add coarse code trace anchors and matching Code
+Anchor Evidence rows. `tw-code-review` runs the traceability preflight before
+the packaged CE code-review engine. `tw-doc-review` reviews requirements,
+plans, matrices, Intent Contracts, and evidence records. `tw-commit-push-pr`
+is the controlled publication wrapper and must stop when authority, review,
+verification, target, credential, or held-claim checks are not clean.
+
+`tw-auto` is available as an experimental alpha workflow driver:
+
+```text
+tw-auto "implement the approved plan"
+```
+
+Use it for bounded dogfood loops where stopping is acceptable. It is intended
+to run the high-level TraceWeaver sequence:
+
+```text
+authority gate
+-> work
+-> trace-anchor authoring
+-> traceability check
+-> code/doc review
+-> record clean review or stop on a real blocker
+```
+
+Current `tw-auto` limitations are intentional:
+
+- it is experimental and may stop after one cycle with the next wrapper command;
+- it must not invent or change requirements;
+- it must stop for missing, stale, contradictory, or materially changed
+  authority;
+- it must keep commit, push, PR, release, clean replacement, and broad runtime
+  claims held unless their publication gate passes;
+- full runtime-driver invocation, release-ready status, Vestro dogfood, and
+  unconstrained-host claims remain held until later evidence accepts them.
+
+When `tw-auto` stops, treat its last line as the workflow handoff. It should
+recommend the highest-level next wrapper that can safely continue. It should
+not tell users to "fix the authority" without naming the next command or human
+decision.
+
+Common handoffs:
+
+| Situation | Use |
+|---|---|
+| Fuzzy idea or product direction | `tw-grill`, then `tw-brainstorm` |
+| Candidate requirement or acceptance criteria | `tw-requirements-review` |
+| Approved requirement needs an implementation plan | `tw-plan` |
+| Approved plan needs code/docs changed | `tw-work` |
+| Work finished and behavior-bearing files changed | `tw-code-review` |
+| Requirements, plans, matrix, Intent Contract, evidence, status, or hashes changed | `tw-doc-review` |
+| Existing repo needs dark-code or lost-intent audit | `tw-traceability-check` |
+| Bug, regression, failing test, or production incident | `tw-debug` |
+| Commit, push, or PR is requested | `tw-commit-push-pr` |
+| Learning should be captured after a solved problem | `tw-compound` |
+
+### User-Facing Skills
+
+The Codex install exposes these TraceWeaver-owned user-facing skills. Packaged
+`ce-*` skills remain internal implementation components.
+
+| Skill | Use |
+|---|---|
+| `tw-auto` | Experimental advisory workflow driver for bounded TraceWeaver loops. |
+| `lfg` | Compatibility alias that delegates to `tw-auto`. |
+| `tw-grill` | Optional intent-deepening interview before brainstorming. |
+| `tw-brainstorm` | Explore ideas as source evidence before requirements review. |
+| `tw-requirements-review` | Review requirements, acceptance criteria, and candidate authority. |
+| `tw-plan` | Plan approved work while preserving authority and traceability boundaries. |
+| `tw-authority-gate` | Check that implementation has approved authority before work starts. |
+| `tw-work` | Implement approved work, add trace anchors when unambiguous, run verification, and hand off to review. |
+| `tw-traceability-check` | Check plans, code, docs, PRs, and release evidence for authority and verification traceability. |
+| `tw-code-review` | Run traceability preflight, then code review. |
+| `tw-doc-review` | Review requirements, plans, matrices, Intent Contracts, and evidence records. |
+| `tw-debug` | Diagnose failures or production issues without bypassing authority or publication gates. |
+| `tw-test-browser` | Run browser verification as linked TraceWeaver evidence. |
+| `tw-test-xcode` | Run Xcode/iOS/macOS verification as linked TraceWeaver evidence. |
+| `tw-setup` | Diagnose or prepare the local TraceWeaver/CE-derived environment. |
+| `tw-worktree` | Create or inspect local worktrees under TraceWeaver boundaries. |
+| `tw-sessions` | Use prior session history as source evidence, not authority. |
+| `tw-resolve-pr-feedback` | Evaluate and repair PR review feedback with traceability gates. |
+| `tw-commit` | Prepare a local commit only after the controlled TraceWeaver commit gate is clean. |
+| `tw-commit-push-pr` | Commit, push, and open/update PRs only through the controlled publication gate. |
+| `tw-compound` | Capture learning without silently changing requirements. |
+| `tw-compound-refresh` | Refresh existing learning material while keeping authority changes held. |
+
+### Audit An Existing Codebase
+
+TraceWeaver can be used on an existing repository before any new feature work.
+The audit goal is to find candidate lost intent, dark behavior, obsolete code,
+or duplicate behavior so a human can decide whether to keep, trace, merge,
+rewrite, or remove it.
+
+Use the high-level skill when you want a review-style report:
+
+```text
+tw-traceability-check audit this repo for dark code, orphaned code, obsolete or abandoned behavior, duplicate or similar behavior, dead tests, missing verification, and lost intent. Report candidate findings only; do not remove or rewrite anything.
+```
+
+Use the scanner directly when you need a deterministic baseline artifact:
+
+```sh
+mkdir -p .traceweaver/audit
+plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors \
+  --root . \
+  --mode audit \
+  --markdown .traceweaver/audit/code-traceability-audit.md \
+  --jsonl .traceweaver/audit/code-traceability-audit.jsonl
+```
+
+Audit-mode findings are candidates, not automatic cleanup authority. A duplicate
+or obsolete-code finding means "review this with the owner and authority
+records," not "delete it now." Before changing code, route the decision through
+the normal TraceWeaver flow:
+
+```text
+tw-requirements-review
+tw-plan
+tw-work
+tw-code-review
+tw-doc-review
+```
+
+The current deterministic scanner is intentionally conservative. It checks
+supported source files, TraceWeaver anchors, matrix reachability, requirement
+status, verification closure, dead-TDD patterns, and token-similarity candidates.
+It does not prove full semantic equivalence across every language or call graph.
+Use it to surface suspicious areas, then use review and requirements authority
+to decide what the behavior should become.
+
+Read audit findings as routing signals:
+
+| Finding type | Normal next step |
+|---|---|
+| Dark or orphaned code | Decide whether to add authority and anchors, convert to a gap, or remove through a reviewed plan. |
+| Obsolete or abandoned behavior | Check whether the requirement is stale, retired, superseded, or still intentionally supported. |
+| Duplicate or similar behavior | Compare intent and authority before merging, deleting, or keeping both paths. |
+| Anchor-only coverage | Add or link verification implementation, procedure, result, or held-validation evidence. |
+| Dead TDD | Decide whether the test still proves a current requirement or should be retired with authority. |
+
+The safe cleanup path is still:
+
+```text
+tw-plan "classify and clean up the audit findings"
+tw-work
+tw-code-review
+tw-doc-review
+```
+
 ## Compound Engineering Workflow
 
 TraceWeaver does not replace the Compound Engineering loop. It wraps that loop
@@ -163,6 +426,7 @@ The base workflow is:
 
 ```text
 idea
+-> tw-grill when the intent needs deeper interview
 -> brainstorm
 -> TraceWeaver requirements baseline
 -> plan
@@ -180,6 +444,7 @@ captured, reviewed, and baselined.
 | CE method stage | Standalone TraceWeaver entrypoint | Purpose |
 |---|---|---|
 | `idea` | intent capture | Capture stakeholder intent. Ideas are not authority yet. |
+| grill | optional `tw-grill` | Stress-test one selected idea before brainstorming. Output is source evidence, not authority. |
 | brainstorm | `tw-brainstorm`, then `tw-requirements-review` and authority-baseline record | Explore needs, risks, options, assumptions, and gaps, then convert accepted ideas into `requirements.md`, intent IDs, requirement IDs, exceptions, validation questions, and baseline version. |
 | plan | `tw-plan`, with `tw-authority-gate` before implementation | Plan only against approved requirements or approved exceptions. Every task gets an Intent Capsule. |
 | work | `tw-work`, with `tw-traceability-check` before review | Agents implement only what their capsule authorizes. Assumptions become gaps or change requests, not code. |
@@ -190,6 +455,7 @@ The target TraceWeaver-controlled CE loop is:
 
 ```text
 idea
+-> tw-grill when the intent needs deeper interview
 -> tw-brainstorm
 -> tw-requirements-review
 -> authority-baseline record
@@ -269,13 +535,15 @@ The alpha rule is:
   delegation, static continuity testing, and reviewed upstream-drift comparison;
 - do not expose direct `ce-*` invocation as the standalone user workflow;
 - keep clean CE replacement, slash commands, enforcing mode, and dynamic
-  no-forced discovery held until U9 or a later accepted runtime proof.
+  discovery claims held until a later accepted runtime proof explicitly
+  approves them.
 
-`tw-auto` is the advisory automation path for this model. It groups CE-style
-planning, work, and review with TraceWeaver authority checks, matrix updates,
-bounded review-fix cycles, and next-step handoffs. In the alpha it must stop
-before commit, push, or PR creation; publication automation remains a later
-runtime claim.
+`tw-auto` is the experimental advisory automation path for this model. It
+groups CE-style planning, work, and review with TraceWeaver authority checks,
+matrix updates, bounded review-fix cycles, and next-step handoffs. In the alpha
+it may stop after a single cycle and report the next wrapper command. It must
+stop before commit, push, or PR creation unless the controlled publication gate
+is clean; full autonomous publication remains a later runtime claim.
 
 There are two valid blank-project starts:
 
@@ -391,8 +659,8 @@ TraceWeaver can claim clean CE replacement only when these conditions are met:
   are present after install;
 - runtime proof shows planning, work, review, verification, validation, and
   compound-learning flows operate without the installed CE plugin;
-- clean CE replacement, dynamic discovery, slash commands, and enforcing mode
-  stay held until their evidence records pass.
+- clean CE replacement, dynamic discovery, slash commands, enforcing mode, and
+  release-ready status stay held until their evidence records pass.
 
 The standalone packaging surface has static install/discovery proof for a
 CE-absent Codex home and a TW-only direct-callable host surface. That is enough
@@ -405,36 +673,38 @@ itself made every runtime handoff decision.
 
 ```mermaid
 flowchart TD
-  A["Idea / stakeholder intent"] --> B["tw-brainstorm"]
-  B --> C["tw-requirements-review"]
-  C --> D["authority-baseline record<br/>requirements.md + intent contract"]
-  D --> E["tw-plan"]
-  E --> F["tw-authority-gate<br/>advisory alpha: warn / hold / gap"]
-  F --> G["tw-work"]
-  G --> H["tw-traceability-check<br/>detect dark behavior"]
-  H --> I["tw-code-review / tw-doc-review"]
-  I --> J["verification evidence record<br/>built right"]
-  J --> K["validation evidence record<br/>built the right thing"]
-  K --> L["tw-compound"]
-  L --> M["learning-to-change-control<br/>new requirement / change / exception"]
-  M --> D
+  A["Idea / stakeholder intent"] --> B["tw-grill when needed"]
+  B --> C["tw-brainstorm"]
+  C --> D["tw-requirements-review"]
+  D --> E["authority-baseline record<br/>requirements.md + intent contract"]
+  E --> F["tw-plan"]
+  F --> G["tw-authority-gate<br/>advisory alpha: warn / hold / gap"]
+  G --> H["tw-work"]
+  H --> I["tw-traceability-check<br/>detect dark behavior"]
+  I --> J["tw-code-review / tw-doc-review"]
+  J --> K["verification evidence record<br/>built right"]
+  K --> L["validation evidence record<br/>built the right thing"]
+  L --> M["tw-compound"]
+  M --> N["learning-to-change-control<br/>new requirement / change / exception"]
+  N --> E
 
   subgraph "Current alpha"
     B
-    E
+    C
+    F
     G
-    I
-    L
+    H
+    J
+    M
   end
 
   subgraph "TraceWeaver authority layer"
-    C
     D
-    F
-    H
-    J
+    E
+    I
     K
-    M
+    L
+    N
   end
 ```
 
@@ -443,95 +713,77 @@ The operational migration is:
 | Stage | What changes | What remains held |
 |---|---|---|
 | Advisory overlay | Keep CE installed; use TraceWeaver baseline, Intent Capsules, and trace checks on every meaningful task. | CE replacement, enforcing mode, dynamic discovery claims. |
-| TraceWeaver plugin alpha | Install `plugins/traceweaver-core` with selected skills and references; use `tw-auto` or the `lfg` compatibility alias for controlled automation; record static install evidence. | Agent-backed CE parity, slash commands, clean replacement. |
-| CE-compatible runtime | Materialize selected CE workflow skills and selected agents or record explicit limitations. | Full CE replacement until runtime proof passes. |
-| Replacement proof | Run planning, work, review, verification, validation, and compound-learning smoke tests without CE installed. | Release-ready and full Core 11 claims until U9/R31 pass. |
-| TraceWeaver-first | Use the TraceWeaver plugin as the default workflow surface. | Enterprise/release/upstream claims unless separately approved. |
+| TraceWeaver plugin alpha | Install `plugins/traceweaver-core` with selected skills and references; use `tw-auto` or the `lfg` compatibility alias for controlled automation; record static install evidence. | Full runtime-driver decision binding, release-ready status, and clean replacement as release claims. |
+| Standalone package proof | Prove fresh CE-absent installs, TW-only user-facing skill surfaces, README/manifest/model-default consistency, and no-publication boundaries. | Autonomous publication, unconstrained-host support, and clean replacement as a release claim. |
+| Runtime-driver proof | Prove that `tw-auto` itself drives planning, work, trace-anchor authoring, traceability checks, code/doc review, and review recording rather than a prompt merely echoing the route. | Release-ready status until the runtime proof and publication gate both pass. |
+| TraceWeaver-first | Use the TraceWeaver plugin as the default workflow surface. | Enterprise, Cloud, release, and upstream claims unless separately approved. |
 
-## Current State
+## Alpha Status
 
-As of 2026-05-15:
+TraceWeaver Core is currently a standalone alpha plugin for Codex. It is usable
+for advisory TraceWeaver-first work, requirements and authority review,
+trace-anchor authoring, deterministic traceability scans, and controlled
+publication gates.
 
-| Area | Status | Notes |
-|---|---|---|
-| TraceWeaver Core repo | Primary project home | `git@github.com:Oxiom-Systems/traceweaver.git` |
-| Agent Skills fork | U5.5 reduced static-scope candidate | `feature/systems-engineering-traceability` branch in the Agent Skills fork at `696548694dd40ce298d77e603db069934b58f645`; selected file deltas are recorded, but dynamic no-forced runtime discovery is deferred to U6b/U9 |
-| U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
-| U5 delta inventory | `CLOSED_NO_DELTA` | No exact U5 public artifact targets remain outside the U4-promoted skill-folder paths |
-| U5.5 expanded runtime candidate | `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY` | Candidate `696548694dd40ce298d77e603db069934b58f645` has file-level delta/impact records and static requirements-quality/lifecycle-discovery evidence, including referenced requirements-reviewer files, under limitation `U55-LIMIT-STATIC-DISCOVERY-001`. Dynamic discovery, package-ready, release-ready, and upstream-ready claims remain held |
-| TraceWeaver Core plugin alpha | Standalone packaging static surface accepted; runtime-driver decision binding held | `plugins/traceweaver-core` contains plugin manifests, selected TraceWeaver wrappers, selected CE-derived internal implementation components, selected agents, skill-local references, Intent Contract/templates, `tw-auto`, optional `tw-grill`, and an `lfg` compatibility alias that delegates to `tw-auto`. The repo-local installer materializes only TraceWeaver-owned `tw-*` plus `lfg` as direct-callable user skills and keeps selected `ce-*` components internal. Fresh CE-absent install/discovery, active-host TW-only direct-callable proof, separate-home runtime-disabled smoke, model-default policy, and standalone packaging surface review have passed. Full `tw-auto` runtime-driver decision binding, publication, clean CE replacement, release/package/upstream readiness, unconstrained-host support, and R31 claims remain held |
-| Intent Contract architecture | Active file-based authority baseline and templates | Root `requirements.md`, root `traceability-matrix.md`, and `.traceweaver/intent-contract.yml` are active project authority artifacts. Packaged templates now include requirements baseline, Intent Contract, trace record, task capsule, gap/change/exception, matrix bootstrap, and controlled-autonomy policy templates. Runtime enforcement and wrapper behavior remain held until later proof |
-| Core 11 public skill folders | U4-promoted public artifacts | `skills/` contains all eleven scrubbed public-candidate skill folders; only the Light v0.1 subset has U6b alpha install-smoke evidence |
-| Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |
-| Traceability matrix template | Implementation-ready candidate | `references/traceability-matrix-template.md`; matrix is mandatory for the MVP |
-| Requirements and V&V guide | U6b alpha static loading evidence | `references/requirements-and-vv-guide.md`; packaged as a selected skill-local reference in `plugins/traceweaver-core`, but not package-ready or release accepted |
-| Risk, gap, and change-control guide | U6b alpha static loading evidence | `references/risk-gap-and-change-control-guide.md`; packaged as a selected skill-local reference in `plugins/traceweaver-core`, but not package-ready or release accepted |
-| Discovery routing | Runtime candidate evidence scope | Idea/intent lifecycle evidence is in scope as source-preservation and routing context only; `idea-refine` command wiring remains follow-up unless separately authorized. Requirements and success criteria route through `requirements-reviewer`; meaningful behavior routes through traceability as a cross-cutting hop |
-| Validation record | Refreshed through U5.5 reduced static-scope handoff | U5 representative pass applies only to `ca6ff66d46f140da72f423ea3dec819f81ef5337`; U5 delta inventory is closed no-delta; U5.5 terminal state is `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY` |
-| Controlled validation | Representative complete for U5 baseline | VRUN-001, VRUN-002, and VRUN-003 passed with human ratings recorded at `ca6ff66`, but R31 real-project validation remains open |
-| Upstream PR packaging | Blocked before release evidence | U6b now records only alpha install smoke and static selected-skill materialization; do not claim release/upstream readiness until later gates provide dynamic runtime, release, and R31 evidence |
-| TraceWeaver CE adapter | In progress | Compound Engineering adapter work is separate from the Core repo |
-| TraceWeaver CE lifecycle baseline | In progress | Baseline approval and validation are not closed yet |
+What is available now:
 
-## TraceWeaver Core MVP Bundle
+- `plugins/traceweaver-core` installs the TraceWeaver-owned `tw-*` skills and
+  the `lfg` compatibility alias as the user-facing surface.
+- selected CE-derived workflow engines are packaged as internal implementation
+  components, so users do not need an external CE plugin for the normal
+  TraceWeaver wrapper flow.
+- root `requirements.md`, root `traceability-matrix.md`, and
+  `.traceweaver/intent-contract.yml` are the file-based authority model.
+- `tw-work` can add coarse code trace anchors and matching Code Anchor Evidence
+  rows when requirement, trace, verification, role, target, and anchor level are
+  unambiguous.
+- `tw-traceability-check` supports implementation-mode checks and audit-mode
+  candidate findings for dark, obsolete, orphaned, duplicate, similar,
+  anchor-only, dead-TDD, and missing-procedure cases.
+- install/discovery, active-host registry, separate-home runtime-disabled,
+  no-publication, code-anchor, authoring, and standalone packaging smokes have
+  passed for the current alpha surface.
 
-The TraceWeaver Core MVP is not just a skill prompt. The minimum usable
-traceability capability is:
+What remains held:
 
-- `skills/requirements-reviewer/SKILL.md`
-- `skills/systems-engineering-traceability/SKILL.md`
-- `references/systems-engineering-traceability-operating-model.md`
-- `references/traceability-matrix-template.md`
-- `references/requirements-and-vv-guide.md`
-- `references/risk-gap-and-change-control-guide.md`
-- README or index discoverability updates
-- fork validation evidence from controlled scenarios
+- full `tw-auto` runtime-driver decision binding;
+- autonomous publication;
+- clean CE replacement as a release claim;
+- release-ready, package-ready, and upstream-ready claims;
+- unconstrained-host support;
+- Vestro dogfood completion;
+- automatic removal, merge, or deprecation authority for audit findings.
 
-The traceability matrix is mandatory once the skill is used. Lite mode may use a
-minimal matrix row, but it cannot skip the matrix artifact entirely.
+The practical rule is: TraceWeaver may point to suspicious code, stale intent,
+duplicate behavior, or missing verification, but a human still decides whether
+to keep, trace, merge, rewrite, deprecate, or remove it.
 
-The two companion guides are mandatory candidate guidance for the Core MVP, not
-optional extras; runtime acceptance still depends on U5.5/U6 records.
+## Evidence Trail
 
-## Upstream Packaging Boundary
+The README is the product entry point. The detailed proof trail lives in the
+controlled authority and validation files:
 
-The upstream `agent-skills` PR is a separate acceptance surface. It may be
-packaged smaller than TraceWeaver Core if required by maintainer feedback, but
-any reduction must be recorded as a scope decision. The matrix template and
-operating model remain required for a usable traceability MVP.
+| File | Purpose |
+|---|---|
+| `requirements.md` | Current TraceWeaver Core requirements baseline. |
+| `traceability-matrix.md` | Human-facing traceability and evidence matrix. |
+| `.traceweaver/intent-contract.yml` | Baseline hashes, active gates, held claims, and materialized artifact identities. |
+| `docs/plans/` | Reviewed implementation plans and scope decisions. |
+| `docs/validation/` | Review records, install/runtime observations, smoke evidence, and held-claim records. |
+| `fixtures/` | Deterministic proof fixtures for traceability, authoring, wrapper routing, publication, and audit behavior. |
+| `scripts/traceweaver-smoke-*` | Reproducible smoke checks for the current alpha behavior. |
 
-## Guidance Pipeline
+Use those files when you need to audit a claim. Do not duplicate the full
+validation history in the README.
 
-TraceWeaver uses a three-layer guidance pipeline:
+## Core Rules
 
-| Layer | Path | Git Status | Purpose |
-|---|---|---|---|
-| Private source work | `.source-materials/` | Ignored | Source cache, conversions, extraction notes, and synthesis. Not for agents. |
-| Public source of truth | `docs/distilled/` | Committed | Original TraceWeaver guidance developers review, edit, and evolve. |
-| Runtime agent bundle | `agent-skills/references/` | Committed in the Agent Skills fork | Candidate runtime copies; not package/release accepted until U5.5/U6 records close. |
-
-Agent implementations must not read from `.source-materials/`. Runtime
-references must first come from reviewed `docs/distilled/` guidance, then be
-synced into `agent-skills/references/`.
-
-When the runtime references change, the Agent Skills implementation commit must
-be refreshed, reviewed, and recorded in the validation record before that new
-runtime bundle is treated as validated.
-
-Runtime guidance is not considered synced unless the source-to-runtime mapping,
-version stamp, checksum, reviewer, review session, and implementation commit are
-recorded in the validation record.
-
-## Operating Model
-
-TraceWeaver Core uses an original, lightweight, systems-engineering-aligned
-operating model for agentic software work:
+TraceWeaver Core uses a compact systems-engineering operating model:
 
 ```text
 idea / intent
 -> stakeholder need
--> user requirement
--> system requirement
+-> reviewed requirement or approved exception
 -> design decision
 -> implementation
 -> verification
@@ -539,90 +791,23 @@ idea / intent
 -> change control
 ```
 
-The agent-facing rules are intentionally compact:
+The rules are intentionally strict:
 
-- Brainstorming creates candidate needs, assumptions, risks, and success
-  signals. It does not create implementation authority.
-- Idea refinement is part of the lifecycle. Ideas are preserved as candidate
-  needs, assumptions, risks, success/failure signals, open decisions, and
-  not-doing boundaries before they become requirements or work.
-- Planning preserves original stakeholder wording beside any agent reframe,
-  marks reframed requirements as `Draft`, and uses requirements-reviewer before
-  those requirements or success criteria can become approved authority.
-- Planning converts approved needs and reviewed draft requirements into design
-  decisions, ATP/result expectations, verification paths, and validation paths.
-- Work agents may only implement meaningful behaviour when it traces to
-  approved authority.
-- Review findings are provenance, not authority. They become authority only
-  when converted into an approved requirement change, design decision, risk
-  control, or approved traceability gap.
-- A task ID alone is not authority.
-- A bare `RISK-*` ID is not authority.
+- Brainstorming and grilling create source evidence, not implementation
+  authority.
+- Planning must preserve stakeholder intent and approved authority.
+- Work may implement meaningful behavior only when it traces to approved
+  authority.
+- Review findings are evidence, not authority, until converted into an approved
+  requirement, design decision, risk control, exception, or traceability gap.
+- A task ID, draft requirement, inferred requirement, bare risk ID, or
+  convenience argument is not enough authority by itself.
 - Verification asks whether we built it right.
 - Validation asks whether we built the right thing.
 - Missing traceability must be exposed, not invented.
 
-## Approved Authority Rule
-
-Valid approved authority means one of:
-
-- approved requirement
-- approved ADR or design decision
-- first-class approved risk control
-- approved traceability gap
-- task ID that closes directly to one of the approved authorities above
-
-The following are not valid authority by themselves:
-
-- bare task ID
-- bare stakeholder need
-- draft requirement
-- inferred requirement
-- unapproved design note
-- bare `RISK-*` ID
-- review finding
-- traceability debt item
-- implementation convenience
-
-If a link is inferred, draft, stale, ambiguous, or not approved, the behaviour
-remains orphaned until human approval resolves it.
-
-## Validation Gate
-
-TraceWeaver Core representative validation is complete for the U2-U5 baseline
-implementation slice at `ca6ff66d46f140da72f423ea3dec819f81ef5337`.
-
-Validation status:
-
-- `ca6ff66d46f140da72f423ea3dec819f81ef5337`: U2-U5 implementation slice
-  passed representative dummy validation.
-- R31 real-project validation remains open for the real feature, unclear
-  existing module, and low-risk Lite-mode scenarios.
-- U5.5 expanded runtime candidate: `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY`. Candidate
-  `696548694dd40ce298d77e603db069934b58f645` has static file-level
-  delta/impact, requirements-quality, and lifecycle-discovery evidence under
-  `U55-LIMIT-STATIC-DISCOVERY-001`.
-- Packaging status: U6b alpha install smoke passed for static loading only.
-  Dynamic discovery and real adapter invocation remain U9 or later
-  U6b-dynamic testing requirements.
-
-The validation record contains all three controlled U5 baseline runs. These are
-representative dummy runs, not R31-completing real-project validation:
-
-| Scenario | Purpose | Status |
-|---|---|---|
-| VRUN-001: New feature with document chain | Prove requirement-to-plan-to-implementation-to-results traceability | Representative pass; R31 real run still required |
-| VRUN-002: Existing module audit | Prove the skill finds dark-code candidates and missing traceability | Representative pass; R31 real run still required |
-| VRUN-003: Low-risk Lite mode | Prove Lite mode stays lightweight while still using a minimal matrix artifact | Representative pass; R31 real run still required |
-
-The validation record must compare baseline Agent Skills behaviour against the
-traceability-enabled workflow from the same starting state. It must record
-distinct value, reviewer confidence, useful findings, low-value noise, and
-workflow overhead.
-
-Current validation record:
-
-- `docs/validation/systems-engineering-traceability-fork-results.md`
+If a link is inferred, draft, stale, ambiguous, or not approved, the behavior
+remains unresolved until human approval or an explicit held state resolves it.
 
 ## Source Materials Policy
 
@@ -659,18 +844,11 @@ Canonical distilled guidance:
 | `docs/distilled/` | Public TraceWeaver source-of-truth guidance produced through controlled promotion records |
 | `docs/specs/` | Source specification for the MVP skill |
 | `docs/plans/` | Implementation and validation plans |
-| `skills/` | U4-promoted public TraceWeaver Core skill folders; not runtime/package accepted until U6 records exist |
-| `plugins/traceweaver-core/` | Installable TraceWeaver Core alpha plugin for the U6a-selected Light v0.1 runtime scope |
+| `skills/` | Historical/source skill folders retained as source evidence and development context; the standalone plugin surface lives under `plugins/traceweaver-core/` |
+| `plugins/traceweaver-core/` | Installable TraceWeaver Core standalone alpha plugin source |
 | `docs/upstream/` | Upstream issue and public-safe fork preflight records |
 | `docs/validation/` | Fork validation protocol and results |
 | `.source-materials/` | Ignored local source cache |
-
-Related implementation workspaces:
-
-| Workspace | Purpose |
-|---|---|
-| Agent Skills fork | Upstream-neutral Agent Skills candidate implementation |
-| Compound Engineering plugin workspace | TraceWeaver CE / Compound Engineering adapter work |
 
 Remote:
 
@@ -678,17 +856,22 @@ Remote:
 
 ## Near-Term Next Steps
 
-1. Treat U6b as passed only for TraceWeaver Core alpha install smoke and static
-   selected-skill materialization under `light-v0.1-authority-traceability`.
-2. Record observed no-forced runtime discovery and real adapter invocation as
-   U9 or later U6b-dynamic evidence before
-   any dynamic discovery, package-ready, release-ready, or upstream-ready claim.
-3. Complete R31 real-project validation or keep it as an explicit U7 release
-   blocker.
-4. Prepare U7 release-gate decisions and release claim records before any U8
-   upstream-neutral package, PR, or release-note surface.
-5. Continue TraceWeaver CE baseline and lifecycle integration with the Core
-   validation surface as the control point.
+1. Dogfood the standalone alpha on TraceWeaver and Vestro through the
+   user-facing `tw-*` wrappers, especially `tw-auto`, `tw-work`,
+   `tw-traceability-check`, `tw-code-review`, and `tw-doc-review`.
+2. Close or explicitly keep held the full `tw-auto` runtime-driver proof. The
+   current alpha can prove installed files, registry visibility, fixture
+   outcomes, unresolved-mapping evidence, and no-publication boundaries; it
+   still must prove that loaded `tw-auto` made the runtime handoff decisions.
+3. Add a reviewed Claude install path before claiming Claude package support.
+   The model policy is recorded, but the current repo-local installer is Codex
+   focused.
+4. Improve audit mode beyond anchors and token-similarity candidates with
+   reviewed semantic/call-graph evidence before claiming broad duplicate-code
+   or obsolete-code certainty.
+5. Keep release-ready, package-ready, upstream-ready, clean-replacement,
+   unconstrained-host, autonomous-publication, and automatic removal/deprecation
+   claims held until their own review and proof gates pass.
 
 ## Product Direction
 
