@@ -1,0 +1,7 @@
+scenario=tw_auto_post_work_code_review_continue
+work_result=tw_work_completed
+explicit_stop_after_work=false
+traceability_check_required=true
+expected_review_route=tw_traceability_check_then_tw_code_review
+manual_next_step_only=forbidden
+accepted_scope=deterministic_fixture_only_no_runtime_pass

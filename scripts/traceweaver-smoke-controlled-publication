@@ -1,0 +1,123 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=smoke-harness; req=REQ-TW-053; trace=TRACE-TW-033; ver=VER-TW-042
+# TRACEWEAVER: verifies=VER-TW-042; req=REQ-TW-053; trace=TRACE-TW-033
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/controlled-publication-route"
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-controlled-publication.XXXXXX")"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+mkdir -p "$TMP_DIR/bin"
+git_marker="$TMP_DIR/git-called"
+gh_marker="$TMP_DIR/gh-called"
+
+cat >"$TMP_DIR/bin/git" <<'SH'
+#!/usr/bin/env bash
+echo "git called: $*" >>"${TRACEWEAVER_GIT_MARKER:?}"
+exit 97
+SH
+
+cat >"$TMP_DIR/bin/gh" <<'SH'
+#!/usr/bin/env bash
+echo "gh called: $*" >>"${TRACEWEAVER_GH_MARKER:?}"
+exit 98
+SH
+
+chmod +x "$TMP_DIR/bin/git" "$TMP_DIR/bin/gh"
+export PATH="$TMP_DIR/bin:$PATH"
+export TRACEWEAVER_GIT_MARKER="$git_marker"
+export TRACEWEAVER_GH_MARKER="$gh_marker"
+
+load_fixture() {
+  local fixture="$1"
+
+  case_id=""
+  authority_status=""
+  trace_status=""
+  verification_status=""
+  review_status=""
+  authority_tree_status=""
+  staged_tree_status=""
+  target_status=""
+  credential_status=""
+  remote_status=""
+  human_confirmation=""
+  publication_mode=""
+  expected_status=""
+  expected_reason=""
+
+  # Fixture files are repository-local deterministic key/value records.
+  # shellcheck disable=SC1090
+  . "$fixture/state.txt"
+}
+
+# TRACEWEAVER: entrypoint=controlled_publication_route_decision; req=REQ-TW-053; trace=TRACE-TW-033; ver=VER-TW-042
+publication_decision() {
+  if [[ "$authority_status" != "current" ]]; then
+    echo "blocked stale_authority"
+  elif [[ "$trace_status" != "complete" ]]; then
+    echo "blocked missing_trace"
+  elif [[ "$verification_status" != "passed" ]]; then
+    echo "blocked failed_verification"
+  elif [[ "$review_status" != "clean" ]]; then
+    echo "blocked review_findings"
+  elif [[ "$authority_tree_status" != "clean" ]]; then
+    echo "blocked dirty_or_untracked_authority"
+  elif [[ "$staged_tree_status" != "coherent" ]]; then
+    echo "blocked staged_tree_incoherent"
+  elif [[ "$target_status" != "confirmed" ]]; then
+    echo "blocked target_mismatch"
+  elif [[ "$credential_status" != "verified" || "$remote_status" != "verified_no_real_remote" ]]; then
+    echo "blocked credential_remote_uncertain"
+  elif [[ "$human_confirmation" != "confirmed" ]]; then
+    echo "blocked missing_human_confirmation"
+  elif [[ "$publication_mode" != "no_real_remote_dry_run" ]]; then
+    echo "blocked real_remote_publication_held"
+  else
+    echo "allowed no_real_remote_dry_run"
+  fi
+}
+
+assert_case() {
+  local fixture_name="$1"
+  local fixture="$FIXTURE_ROOT/$fixture_name"
+  local decision status reason
+
+  if [[ ! -f "$fixture/state.txt" ]]; then
+    echo "controlled_publication_missing_fixture=$fixture_name" >&2
+    exit 1
+  fi
+
+  load_fixture "$fixture"
+  decision="$(publication_decision)"
+  status="${decision%% *}"
+  reason="${decision#* }"
+
+  if [[ "$status" != "$expected_status" || "$reason" != "$expected_reason" ]]; then
+    echo "controlled_publication_${case_id}=failed expected=${expected_status}:${expected_reason} actual=${status}:${reason}" >&2
+    exit 1
+  fi
+
+  echo "controlled_publication_${case_id}=${status} reason=${reason}"
+}
+
+assert_case stale-authority
+assert_case missing-trace
+assert_case failed-tests
+assert_case review-findings
+assert_case dirty-untracked-authority
+assert_case target-mismatch
+assert_case credential-remote-uncertainty
+assert_case clean-no-real-remote
+
+if [[ -f "$git_marker" || -f "$gh_marker" ]]; then
+  echo "controlled_publication_no_external_mutation=failed" >&2
+  [[ -f "$git_marker" ]] && cat "$git_marker" >&2
+  [[ -f "$gh_marker" ]] && cat "$gh_marker" >&2
+  exit 1
+fi
+
+echo "controlled_publication_no_external_mutation=pass"
+echo "controlled_publication_route_smoke=pass"

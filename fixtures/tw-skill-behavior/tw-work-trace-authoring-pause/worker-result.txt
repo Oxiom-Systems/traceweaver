@@ -1,0 +1,11 @@
+skill=tw-work
+case=trace-authoring-pause
+required_status=human-decision
+required_behavior=pause_without_anchor_or_requirement_mutation
+authoring_helper_failure_behavior=return_pause_to_tw_auto_without_manual_fallback
+pause_cases=ambiguous_mapping,contradictory_authority,missing_verification,stale_requirement,material_requirement_change_needed
+source_mutation=false
+matrix_mutation=false
+forbidden_behavior=edit_or_invent_requirements
+next_route=tw-auto
+affected_ids=REQ-TW-054,REQ-TW-056,REQ-TW-057

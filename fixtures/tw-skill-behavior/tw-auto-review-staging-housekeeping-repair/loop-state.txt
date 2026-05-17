@@ -1,0 +1,10 @@
+# TRACEWEAVER: file-role=review-staging-fixture; req=REQ-TW-056; trace=TRACE-TW-042; ver=VER-TW-054
+# TRACEWEAVER: verifies=VER-TW-054; req=REQ-TW-056; trace=TRACE-TW-042
+skill=tw-auto
+case=review-staging-housekeeping-repair
+finding_class=housekeeping_only
+tw_auto_behavior=repair_once_and_rerun_once
+repeat_no_progress_stop=true
+material_authority_change=false
+requirements_mutation=false
+publication_allowed=false

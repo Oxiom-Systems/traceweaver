@@ -1,0 +1,11 @@
+# TRACEWEAVER: file-role=review-staging-fixture; req=REQ-TW-056; trace=TRACE-TW-042; ver=VER-TW-054
+# TRACEWEAVER: verifies=VER-TW-054; req=REQ-TW-056; trace=TRACE-TW-042
+skill=tw-auto
+case=review-staging-clean-record
+clean_code_review=passed
+clean_doc_review=passed
+tw_auto_recording=record_once
+review_rerun_without_changes=false
+status_refresh_scope=scoped_review_gate_only
+publication_allowed=false
+runtime_claim=false

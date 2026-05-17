@@ -1,6 +1,7 @@
+<!-- TRACEWEAVER: file-role=ce-upstream-source-inventory; req=REQ-TW-017; trace=TRACE-TW-005; ver=VER-TW-009 -->
 # CE Upstream Source Inventory
 
-Record ID: `TWCORE-CE-SOURCE-PIN-2026-05-01-002`
+Record ID: `TWCORE-CE-SOURCE-PIN-2026-05-13-001`
 
 This package includes a selected Compound Engineering compatibility surface for
 TraceWeaver U6b Unit 2 static materialization.
@@ -11,13 +12,13 @@ TraceWeaver U6b Unit 2 static materialization.
 | --- | --- |
 | Source package | Compound Engineering plugin |
 | Source repository | `https://github.com/EveryInc/compound-engineering-plugin` |
-| Source version | `3.4.1` |
-| Source tags | `compound-engineering-v3.4.1`, `cli-v3.4.1` |
-| Source commit | `d685f0794863a73ae3ca3620d2ae747510e9eaa0` |
+| Source version | `3.8.1` |
+| Source tags | `compound-engineering-v3.8.1`, `cli-v3.8.1` |
+| Source commit | `b07aac55b5dc6d5b940a7b194497ccd6121f62a5` |
 | Source license | MIT, from source plugin manifest |
-| Capture date | 2026-05-01 |
-| Source basis | upstream tag fetched from GitHub plus locally installed plugin cache for the pinned version |
-| Full cache aggregate fingerprint | `6892159ad685e59230514f9e58fb7ffd06052d84da643c73ac95b787e3c60d23` |
+| Capture date | 2026-05-13 |
+| Source basis | upstream tag fetched from GitHub plus locally installed Codex plugin cache for the pinned version |
+| Full cache aggregate fingerprint | `fb3b853793720fa228b2b8a7c6fe7267c30db61d9e97111b3f96eaa883d97b72` |
 
 ## Selected File Authority
 

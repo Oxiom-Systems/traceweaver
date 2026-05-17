@@ -1,0 +1,295 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=host-reconciliation-script; req=REQ-TW-057; trace=TRACE-TW-032; ver=VER-TW-045
+# TRACEWEAVER: entrypoint=codex_host_skill_reconciler; req=REQ-TW-057; trace=TRACE-TW-032; ver=VER-TW-045
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+plugin_root="$repo_root/plugins/traceweaver-core"
+source_skills_root="$plugin_root/skills"
+codex_home_input="${CODEX_HOME:-$HOME/.codex}"
+dry_run=0
+
+usage() {
+  cat >&2 <<'USAGE'
+Usage:
+  scripts/traceweaver-reconcile-codex-host-skills [--codexHome <path>] [--dry-run]
+
+The --codexHome value may be either a Codex home root ending in .codex or the
+parent home directory expected by src/index.ts. The reconciler backs up
+unmarked or stale direct-callable skill directories before running the normal
+installer.
+USAGE
+  exit 1
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    --codexHome)
+      codex_home_input="${2:-}"
+      if [ -z "$codex_home_input" ] || [[ "$codex_home_input" == --* ]]; then
+        echo "TraceWeaver reconciler requires a path after --codexHome." >&2
+        exit 1
+      fi
+      shift 2
+      ;;
+    --dry-run)
+      dry_run=1
+      shift
+      ;;
+    -h|--help)
+      usage
+      ;;
+    *)
+      echo "Unsupported TraceWeaver reconciler argument: $1" >&2
+      usage
+      ;;
+  esac
+done
+
+if [ ! -d "$source_skills_root" ]; then
+  echo "TraceWeaver source skills directory not found: $source_skills_root" >&2
+  exit 1
+fi
+
+if [ "$(basename "$codex_home_input")" = ".codex" ]; then
+  codex_root="$codex_home_input"
+  codex_home_parent="$(dirname "$codex_home_input")"
+else
+  codex_home_parent="$codex_home_input"
+  codex_root="$codex_home_parent/.codex"
+fi
+
+skills_root="$codex_root/skills"
+backup_root="$codex_root/traceweaver-core/host-reconciliation-backups"
+timestamp="${TRACEWEAVER_RECONCILE_TIMESTAMP:-$(date -u +%Y%m%dT%H%M%SZ)}"
+backup_dir="$backup_root/$timestamp"
+
+hash_file() {
+  shasum -a 256 "$1" | awk '{print $1}'
+}
+
+is_traceweaver_marker() {
+  local marker="$1"
+  [ -f "$marker" ] || return 1
+  python3 - "$marker" <<'PY'
+import json
+import sys
+
+with open(sys.argv[1], "r", encoding="utf-8") as handle:
+    marker = json.load(handle)
+
+if marker.get("plugin") == "traceweaver-core" and marker.get("purpose") == "direct-callable-skill-copy":
+    raise SystemExit(0)
+raise SystemExit(1)
+PY
+}
+
+skill_tree_matches_source() {
+  local skill_name="$1"
+  local source_dir="$source_skills_root/$skill_name"
+  local target_dir="$skills_root/$skill_name"
+
+  [ -d "$source_dir" ] || return 1
+  [ -d "$target_dir" ] || return 1
+  python3 - "$source_dir" "$target_dir" <<'PY'
+import hashlib
+import os
+import stat
+import sys
+
+source_dir, target_dir = sys.argv[1:3]
+target_only_ignored_files = {".traceweaver-core-install.json"}
+
+def snapshot(root, ignore_files=()):
+    files = {}
+    dirs = set()
+    for dirpath, dirnames, filenames in os.walk(root):
+      for dirname in dirnames:
+        rel = os.path.relpath(os.path.join(dirpath, dirname), root)
+        dirs.add(rel)
+      for filename in filenames:
+        rel = os.path.relpath(os.path.join(dirpath, filename), root)
+        if rel in ignore_files:
+          continue
+        path = os.path.join(root, rel)
+        with open(path, "rb") as handle:
+          digest = hashlib.sha256(handle.read()).hexdigest()
+        mode = stat.S_IMODE(os.stat(path).st_mode)
+        files[rel] = (digest, mode)
+    return dirs, files
+
+source_snapshot = snapshot(source_dir)
+target_snapshot = snapshot(target_dir, target_only_ignored_files)
+raise SystemExit(0 if source_snapshot == target_snapshot else 1)
+PY
+}
+
+is_source_skill_name() {
+  local needle="$1"
+  local skill_name
+  for skill_name in "${skill_names[@]}"; do
+    if [ "$skill_name" = "$needle" ]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+skill_names=()
+while IFS= read -r skill_name; do
+  skill_names+=("$skill_name")
+done < <(find "$source_skills_root" -maxdepth 1 -mindepth 1 -type d -print0 | xargs -0 -n1 basename | sort)
+
+callable_skill_names=()
+for skill_name in "${skill_names[@]}"; do
+  case "$skill_name" in
+    tw-*|lfg)
+      callable_skill_names+=("$skill_name")
+      ;;
+  esac
+done
+
+mkdir -p "$skills_root"
+
+backed_up=()
+already_owned=()
+missing_targets=()
+removed_targets=()
+external_ce_backed_up=()
+reconcile_success=0
+
+rollback_reconciliation() {
+  local exit_code=$?
+  if [ "$dry_run" = "1" ] || [ "$reconcile_success" = "1" ] || [ "$exit_code" -eq 0 ]; then
+    return "$exit_code"
+  fi
+
+  for skill_name in "${missing_targets[@]}"; do
+    rm -rf "${skills_root:?}/$skill_name"
+  done
+
+  for skill_name in "${removed_targets[@]}"; do
+    rm -rf "${skills_root:?}/$skill_name"
+    if [ -d "$backup_dir/skills/$skill_name" ]; then
+      mv "$backup_dir/skills/$skill_name" "$skills_root/$skill_name"
+    fi
+  done
+
+  echo "traceweaver_reconcile_rollback=restored_active_skill_surface_after_failure" >&2
+  return "$exit_code"
+}
+
+trap rollback_reconciliation EXIT
+
+for skill_name in "${skill_names[@]}"; do
+  target="$skills_root/$skill_name"
+  marker="$target/.traceweaver-core-install.json"
+
+  if [ ! -e "$target" ]; then
+    missing_targets+=("$skill_name")
+    continue
+  fi
+
+  if [ ! -d "$target" ]; then
+    echo "reconcile_refused_non_directory_target=$target" >&2
+    exit 1
+  fi
+
+  if is_traceweaver_marker "$marker" && skill_tree_matches_source "$skill_name"; then
+    already_owned+=("$skill_name")
+    continue
+  fi
+
+  backed_up+=("$skill_name")
+  if [ "$dry_run" = "0" ]; then
+    mkdir -p "$backup_dir/skills"
+    if [ -e "$backup_dir/skills/$skill_name" ]; then
+      echo "reconcile_refused_existing_backup_target=$backup_dir/skills/$skill_name" >&2
+      exit 1
+    fi
+    cp -pR "$target" "$backup_dir/skills/$skill_name"
+    rm -rf "$target"
+    removed_targets+=("$skill_name")
+  fi
+done
+
+while IFS= read -r target; do
+  [ -n "$target" ] || continue
+  skill_name="$(basename "$target")"
+  if is_source_skill_name "$skill_name"; then
+    continue
+  fi
+
+  external_ce_backed_up+=("$skill_name")
+  if [ "$dry_run" = "0" ]; then
+    mkdir -p "$backup_dir/skills"
+    if [ -e "$backup_dir/skills/$skill_name" ]; then
+      echo "reconcile_refused_existing_backup_target=$backup_dir/skills/$skill_name" >&2
+      exit 1
+    fi
+    cp -pR "$target" "$backup_dir/skills/$skill_name"
+    rm -rf "$target"
+    removed_targets+=("$skill_name")
+  fi
+done < <(find "$skills_root" -maxdepth 1 -mindepth 1 -type d -name 'ce-*' 2>/dev/null | sort)
+
+echo "traceweaver_reconcile_codex_root=$codex_root"
+echo "traceweaver_reconcile_source_skills=${#skill_names[@]}"
+echo "traceweaver_reconcile_callable_skills=${#callable_skill_names[@]}"
+echo "traceweaver_reconcile_missing_targets=${missing_targets[*]:-none}"
+echo "traceweaver_reconcile_already_owned=${already_owned[*]:-none}"
+echo "traceweaver_reconcile_backed_up=${backed_up[*]:-none}"
+echo "traceweaver_reconcile_external_ce_backed_up=${external_ce_backed_up[*]:-none}"
+echo "traceweaver_reconcile_backup_dir=${backup_dir}"
+
+if [ "$dry_run" = "1" ]; then
+  echo "traceweaver_reconcile_dry_run=pass"
+  exit 0
+fi
+
+bun run "$repo_root/src/index.ts" install "$plugin_root" \
+  --to codex \
+  --include-skills \
+  --codexHome "$codex_home_parent"
+
+for skill_name in "${callable_skill_names[@]}"; do
+  target_skill="$skills_root/$skill_name/SKILL.md"
+  marker="$skills_root/$skill_name/.traceweaver-core-install.json"
+
+  if [ ! -f "$target_skill" ]; then
+    echo "reconcile_verify_missing_skill=$skill_name" >&2
+    exit 1
+  fi
+
+  if ! is_traceweaver_marker "$marker"; then
+    echo "reconcile_verify_missing_marker=$skill_name" >&2
+    exit 1
+  fi
+
+  if ! skill_tree_matches_source "$skill_name"; then
+    echo "reconcile_verify_tree_mismatch=$skill_name" >&2
+    exit 1
+  fi
+done
+
+for skill_name in "${skill_names[@]}"; do
+  case "$skill_name" in
+    tw-*|lfg)
+      continue
+      ;;
+  esac
+
+  if [ -e "$skills_root/$skill_name" ]; then
+    echo "reconcile_verify_retired_direct_callable_skill_still_present=$skill_name" >&2
+    exit 1
+  fi
+done
+
+if find "$skills_root" -maxdepth 1 -mindepth 1 -type d -name 'ce-*' -print -quit 2>/dev/null | grep -q .; then
+  echo "reconcile_verify_ce_direct_callable_skill_still_present=$(find "$skills_root" -maxdepth 1 -mindepth 1 -type d -name 'ce-*' -print -quit)" >&2
+  exit 1
+fi
+
+reconcile_success=1
+echo "traceweaver_reconcile_host_skills=pass"

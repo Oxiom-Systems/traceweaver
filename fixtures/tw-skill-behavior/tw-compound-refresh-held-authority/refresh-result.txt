@@ -1,0 +1,6 @@
+TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
+expected_behavior=delegate_to_ce_compound_refresh_under_tw_source_evidence
+ce_delegation_surface=TraceWeaver-packaged ce-compound-refresh
+authority_change=held_for_tw_doc_review
+requirements_mutation=false
+accepted_scope=deterministic_fixture_only_no_runtime_pass

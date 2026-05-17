@@ -1,0 +1,8 @@
+fixture=fake-publication-boundary
+requirement=REQ-TW-053
+trace=TRACE-TW-039
+verification=VER-TW-051
+expected_behavior=fake_git_and_gh_markers_absent
+commit=false
+push=false
+pr=false

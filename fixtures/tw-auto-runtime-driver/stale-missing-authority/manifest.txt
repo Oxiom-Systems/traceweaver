@@ -1,0 +1,7 @@
+fixture=stale-missing-authority
+requirement=REQ-TW-056
+trace=TRACE-TW-039
+verification=VER-TW-051
+expected_behavior=hold_before_runtime_driver_proof
+reason=runtime_driver_fixture_authority_must_be_complete_and_reviewed
+publication=forbidden

@@ -1,0 +1,7 @@
+scenario=tw_auto_post_work_code_review_finding_repair
+work_result=tw_work_completed
+tw_code_review_result=repairable_finding
+expected_behavior=bounded_tw_work_repair_then_rerun_tw_code_review
+max_repair_cycles=1
+no_progress_stop=true
+accepted_scope=deterministic_fixture_only_no_runtime_pass

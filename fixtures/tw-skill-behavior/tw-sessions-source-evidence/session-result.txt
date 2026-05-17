@@ -1,0 +1,6 @@
+TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
+expected_behavior=delegate_to_ce_sessions_under_tw_source_evidence
+ce_delegation_surface=TraceWeaver-packaged ce-sessions
+session_output_authority=source_evidence_only
+current_authority_override=false
+accepted_scope=deterministic_fixture_only_no_runtime_pass

@@ -1,6 +1,6 @@
 # TraceWeaver U9 Codex Runtime Discovery Evidence
 
-Status: `UNIT1_ISOLATED_CODEX_INSTALL_DISCOVERY_SMOKE_DOC_REVIEW_PASSED_UNIT2_FIXTURE_SMOKE_DOC_REVIEW_PASSED_UNIT3_GATE_BEHAVIOR_SMOKE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT4_BOUNDARY_SMOKE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT5_HOST_REGISTRY_FILESYSTEM_PROBE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT7_HOST_INSTALL_ATTEMPT_DOC_REVIEW_PASSED_UNIT8_SEPARATE_HOME_INSTALL_PASSED_FRESH_EXEC_REGISTRY_REVIEWED_HELD_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT9_REGISTRY_SHAPE_REPAIR_AUTH_BOUNDARY_PATCH_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_UNIT10_AUTH_SAFE_FRESH_EXEC_AND_ACTIVE_HOST_RUNTIME_PROBES_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_REVIEWED_HELD_UNIT11_ACTIVE_HOST_RECONCILED_RUNTIME_PASS_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_CONSTRAINED_RUNTIME_ACCEPTED_WRAPPER_DIRECT_CALLABLE_EXPANSION_RECORDED_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PENDING`
+Status: `UNIT1_ISOLATED_CODEX_INSTALL_DISCOVERY_SMOKE_DOC_REVIEW_PASSED_UNIT2_FIXTURE_SMOKE_DOC_REVIEW_PASSED_UNIT3_GATE_BEHAVIOR_SMOKE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT4_BOUNDARY_SMOKE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT5_HOST_REGISTRY_FILESYSTEM_PROBE_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT7_HOST_INSTALL_ATTEMPT_DOC_REVIEW_PASSED_UNIT8_SEPARATE_HOME_INSTALL_PASSED_FRESH_EXEC_REGISTRY_REVIEWED_HELD_CODE_REVIEW_PASSED_DOC_REVIEW_PASSED_UNIT9_REGISTRY_SHAPE_REPAIR_AUTH_BOUNDARY_PATCH_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_UNIT10_AUTH_SAFE_FRESH_EXEC_AND_ACTIVE_HOST_RUNTIME_PROBES_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_REVIEWED_HELD_UNIT11_ACTIVE_HOST_RECONCILED_RUNTIME_PASS_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_CONSTRAINED_RUNTIME_ACCEPTED_WRAPPER_DIRECT_CALLABLE_EXPANSION_RECORDED_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PENDING_UNIT12_ACTIVE_HOST_TW_AUTO_RECONCILIATION_SMOKE_PASSED_REVIEW_ROUTING_SURFACE_CURRENT_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_ACTIVE_SESSION_PROMPT_REGISTRY_PASSED_CONSTRAINED_RUNTIME_INVOCATION_PASSED_STATUS_HASH_DOC_REVIEW_PENDING_FULL_RUNTIME_DRIVER_HELD`
 
 Date/session: 2026-05-02, `ce:work`
 
@@ -119,6 +119,21 @@ and authority doc review passed as
 `CE-DOC-REVIEW-2026-05-05-U9-UNIT11-AUTHORITY-CLEAN-001`. Unit 11 is accepted
 only as constrained active-host `tw-authority-gate` runtime invocation proof.
 
+Unit 12 reconciles the active host workflow surface. After the staged
+TraceWeaver workflow and wrapper source changes, the active-host reconciler
+reran on 2026-05-07, backed up stale direct-callable `tw-auto`,
+`tw-code-review`, `tw-traceability-check`, and `tw-work` under
+`/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260507T204258Z`,
+and installed 43 TraceWeaver-marked callable skills. Fresh active-host checks
+report `codex_host_missing_skills=none`, `codex_host_stale_skills=none`,
+`codex_host_missing_skill_local_files=none`, and
+`codex_host_stale_skill_local_files=none`, with
+`active_host_tw_auto_review_routing_surface=pass_host_review_routing_skill_hashes_current`.
+Prompt input still misses several required direct-callable skills in this active
+session, so active-session callable registry completeness remains held. Full autonomous
+closure-loop behavior, project writes, Vestro dogfood, publication, clean
+replacement, release readiness, and unconstrained-host support remain held.
+
 Allowed use after refreshed Unit 8 authority review closure:
 
 - cite isolated Codex install materialization for Unit 1;
@@ -150,6 +165,14 @@ Allowed use after refreshed Unit 8 authority review closure:
   and authority doc review; the evidence is constrained to a host configuration
   with external CE plugin disabled and non-required user skills moved out of the
   active scan path;
+- cite Unit 12 active-host workflow reconciliation as current-host proof that
+  `tw-auto`, `tw-work`, `tw-code-review`, `tw-doc-review`,
+  `tw-traceability-check`, `tw-requirements-review`, `tw-authority-gate`,
+  `tw-grill`, `lfg`, and selected CE continuity skills are installed,
+  TraceWeaver-marked, source-current, and prompt-visible; use `tw-auto` for
+  requirement/code/doc review routing in this repo after this reconciliation
+  proof, with code review and scoped authority doc review for the new
+  reconciliation scripts still pending;
 - continue planning later U9 host-registry/runtime work with unconstrained host
   support, broader skill invocation including `tw-code-review`/`tw-doc-review`
   wrapper behavior, and project-level runtime write behavior explicitly held.
@@ -160,7 +183,9 @@ Held claims:
 - real fresh Codex exec skill invocation beyond the constrained Unit 11
   active-host `tw-authority-gate` sentinel proof;
 - real `tw-auto`, `lfg`, `tw-grill`, `tw-code-review`, or `tw-doc-review`
-  runtime invocation;
+  runtime invocation beyond the current-hash `tw-auto` review-routing surface,
+  constrained active-host `tw-traceability-check` structured runtime proof, and
+  reviewed held wrapper file-access observations recorded elsewhere;
 - matrix/trace/gap/change/exception write behavior outside temporary-copy
   fixture proof;
 - clean CE replacement;
@@ -173,9 +198,11 @@ Held claims:
 
 | File | SHA-256 | Role | Decision |
 | --- | --- | --- | --- |
-| `src/index.ts` | `d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5` | Repo-local Codex installer | Unit 9 registry-shape repair code review and authority doc review passed; runtime held. Packaged skills now install outside `.codex/skills`, leaving only direct callable skills as active registry surface, and owned legacy active namespaced surfaces are removed during upgrade. |
-| `scripts/traceweaver-smoke-codex-discovery` | `ffd91f8fd9c1da054acdcb817ff9d74acf1e7fda869ec9f09c40baa32f08a5ce` | Unit 1 isolated Codex install/discovery smoke harness plus Unit 4 installed `lfg` boundary check, Unit 9 registry-shape visibility/legacy-upgrade proof, wrapper direct-callable visibility expansion, and candidate `tw-code-review`/`tw-doc-review` visibility expansion | Wrapper expansion recorded/code-review-passed/authority-doc-review-pending for prior CE wrappers; candidate review wrappers recorded/review-pending: isolated smoke now expects `tw-code-review` and `tw-doc-review` as required direct callable and prompt-input visible skill sets. Runtime wrapper behavior and publication remain held. |
-| `scripts/traceweaver-smoke-codex-host-registry` | `e65c8a24ffb5d3192ade9f721e6a7a60b0ebb56489fce62c3646fa8d218aa224` | Unit 5 read-only current Codex host-home filesystem registry probe, extended by Unit 10 to capture active prompt-input and read-only host `codex exec` runtime evidence, extended by Unit 11 to print active skill-surface count plus external CE plugin state, and extended to require selected CE wrapper continuity entries plus candidate TW review wrappers | Candidate review-wrapper expansion recorded/review-pending: required direct callable lists now include `tw-code-review` and `tw-doc-review`; current host probe holds because those new direct callable entries are not installed in the active host and `tw-auto` is stale until the next host reconciliation/install. Runtime wrapper behavior, commit, push, PR, and publication claims remain held. |
+| `src/index.ts` | `ace494e9d81c0e47c384b591d0213a2dcd484b7e70efc032a5ffc92e47c836ef` | Repo-local Codex installer | Unit 9 registry-shape repair code review and authority doc review passed; runtime held. Packaged skills now install outside `.codex/skills`, leaving only direct callable skills as active registry surface, owned legacy active namespaced surfaces are removed during upgrade, and the install manifest records standalone TraceWeaver ownership with no external CE plugin dependency. |
+| `scripts/traceweaver-smoke-codex-discovery` | `b3b6506a460ab6033f86c15381c2d192db94f123137233f633da6e5daa3b7335` | Unit 1 isolated Codex install/discovery smoke harness plus Unit 4 installed `lfg` boundary check, Unit 9 registry-shape visibility/legacy-upgrade proof, wrapper direct-callable visibility expansion, candidate `tw-code-review`/`tw-doc-review` visibility expansion, wrapper-completion direct-callable coverage, and standalone CE-absent manifest checks | Wrapper completion and smoke anchors are part of the scoped trace-anchor explicit-mapping/currentness code review `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-CLEAN-001` and scoped authority doc review `TW-DOC-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-STATUS-HASH-CLEAN-001`. The latest isolated smoke passed with `standalone=true`, `externalCePluginRequired=false`, no external Compound Engineering plugin surface, and runtime wrapper behavior/publication still held. |
+| `scripts/traceweaver-smoke-codex-host-registry` | `e144dce6596f2068eb8b59bb6e5d47f3a1a92fe2e07c1bb882d65039961bde49` | Unit 5 read-only current Codex host-home filesystem registry probe, extended by Unit 10 to capture active prompt-input and read-only host `codex exec` runtime evidence, extended by Unit 11 to print active skill-surface count plus external CE plugin state, and extended to include `tw-plan` and selected CE/TW wrapper currentness | Fresh active-host probe after the Codex CLI `0.130.0` upgrade reports all required direct-callable files present/current/marked with no missing or stale skill-local files, prompt-input registry visibility passed for the required skills, runtime model default is `gpt-5.5` with medium reasoning, and constrained `tw-authority-gate` runtime invocation passed. Scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-ART-TW-059-ACTIVE-HOST-PROMPT-REGISTRY-RUNTIME-STATUS-HASH-CLEAN-001` for this proof update. Full `tw-auto` runtime-driver behavior, runtime CE delegation, commit, push, PR, publication, and clean replacement claims remain held. |
+| `scripts/traceweaver-reconcile-codex-host-skills` | `e4fb3561165b53fa9f108224ef7f4371d4a660f5b4883ec2f9b5f4ff1197dcd9` | Guarded active-host reconciliation script for TraceWeaver-owned direct-callable skill copies | Backs up touched unmarked or stale active-host skill directories, including stale TraceWeaver-marked direct-callable copies and stale nested skill-local files, before installing the staged TraceWeaver skill surface; verifies markers/source tree parity and preserves unrelated host skills. Deterministic smoke passed before active-host mutation. Active-host reconciliation succeeded after the REQ-TW-058 source changes on 2026-05-07, backing up stale direct-callable `tw-auto`, `tw-code-review`, `tw-traceability-check`, and `tw-work` under `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260507T204258Z`. Code review passed as `TW-CODE-REVIEW-2026-05-07-ACTIVE-HOST-RECONCILIATION-CLEAN-001`; nested skill-local backup repair code review passed as `TW-CODE-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-STATUS-HASH-CLEAN-001`; scoped authority doc review passed. |
+| `scripts/traceweaver-smoke-codex-host-reconciliation` | `06a583bb3c42f90c4c647fd9c983c42ebf1cb60b9fb4c2b10ee37347ee487b1e` | Temporary-host reconciliation smoke covering missing, stale marked, stale nested marked, stale unmarked, already-current, unrelated-preserved, backup, refusal, installer-failure rollback, and `tw-plan` install/marker/hash coverage | Smoke passed and printed `codex_host_reconciliation_backed_up=ce-work tw-auto tw-traceability-check`, `codex_host_reconciliation_stale_nested_backup=pass`, and `codex_host_reconciliation_smoke=pass`; code review passed as `TW-CODE-REVIEW-2026-05-07-ACTIVE-HOST-RECONCILIATION-CLEAN-001`; nested skill-local backup repair code review passed as `TW-CODE-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-STATUS-HASH-CLEAN-001`; refreshed helper/currentness code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-STATUS-HASH-CLEAN-001`. |
 | `scripts/traceweaver-smoke-codex-separate-home-runtime` | `a6852d5b3f90a1328723f6284f88aaedf67a579f79e0737402a52e5309507b63` | Unit 8 separate Codex home install plus fresh `codex exec` registry probe, updated by Unit 9 to require all required visible skills, updated by Unit 10 to default to auth-safe no-copy execution, and extended to require selected CE wrapper continuity entries plus candidate TW review wrappers in the visible-skill set | Candidate review-wrapper expansion recorded/review-pending; isolated visible-skill expectations now include `tw-code-review` and `tw-doc-review`. Runtime invocation remains limited to the existing `tw-authority-gate` sentinel path and broader wrapper behavior remains held. |
 | `scripts/traceweaver-smoke-no-publication` | `9e14b7066ed0d6d7e55f82df106dff41db8d18eb0d59be88dd5748e73f9def40` | Unit 4 PR-helper publication-stop, `lfg` delegation, and event-derived reviewer backpressure boundary smoke | Pass accepted as reviewed deterministic boundary evidence. |
 | `scripts/traceweaver-smoke-u9-fixtures` | `0646c25d475cb5bfa33864e84f6b9167b4c2fddb4b8061612a5979a1034c1d3f` | Unit 2 fixture classification, temporary-copy trace-write, and Unit 3 deterministic gate-behavior smoke harness | Unit 2 pass accepted; Unit 3 dependency-coverage patch recorded / behavior-bearing code review passed. |
@@ -639,8 +666,8 @@ exec environment.
 
 ```text
 unit9_registry_shape_repair_status=auth_boundary_patch_code_review_passed_authority_doc_review_passed_runtime_held
-unit9_installer_hash=d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5
-unit9_discovery_harness_hash=20856843b57a9dcf852c8a2b7905cac19555837884a037dc821ba7d934b362c5
+unit9_installer_hash=ace494e9d81c0e47c384b591d0213a2dcd484b7e70efc032a5ffc92e47c836ef
+unit9_discovery_harness_hash=b3b6506a460ab6033f86c15381c2d192db94f123137233f633da6e5daa3b7335
 unit9_separate_home_harness_hash=0c17c2eaba9e7f57acd8460881e0bd19b5981b3114d715ef3604edcae26661ed
 unit9_prompt_input_visibility=passed_required_traceweaver_and_wrapped_ce_skills_visible
 unit9_owned_legacy_active_surface=removed_on_upgrade
@@ -863,6 +890,35 @@ codex_host_runtime_exec_enabled=0
 real_tw_skill_runtime_invocation=held_host_runtime_exec_disabled
 review_wrapper_skills_status=recorded_review_pending
 review_wrapper_skills_accepted_scope=none_until_requirements_review_code_review_authority_doc_review_and_runtime_or_fixture_proof
+```
+
+Current Unit 12 active-host reconciliation output, refreshed after the Codex CLI
+`0.130.0` upgrade for the ART-TW-059 prompt-registry/constrained-runtime proof:
+
+```text
+codex_host_reconciliation_smoke=pass
+traceweaver_reconcile_source_skills=43
+traceweaver_reconcile_missing_targets=none
+traceweaver_reconcile_backed_up=tw-auto tw-code-review tw-traceability-check tw-work
+traceweaver_reconcile_backup_dir=/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260507T204258Z
+traceweaver_reconcile_host_skills=pass
+codex_host_active_skill_directory_count=51
+codex_host_required_skills=tw-auto tw-plan tw-brainstorm lfg tw-authority-gate tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-commit tw-commit-push-pr tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
+codex_host_missing_skills=none
+codex_host_unmarked_skills=none
+codex_host_stale_skills=none
+codex_host_missing_skill_local_files=none
+codex_host_stale_skill_local_files=none
+codex_host_prompt_input_registry_probe=pass_required_skills_visible
+host_codex_registry_discovery=pass_prompt_input_registry_required_skills_visible
+codex_host_runtime_model=gpt-5.5
+codex_host_runtime_reasoning_effort=medium
+real_tw_skill_runtime_invocation=pass_host_tw_authority_gate_skill_file_read
+active_host_tw_auto_review_routing_surface=pass_host_review_routing_skill_hashes_current
+active_host_tw_traceability_check_structured_runtime=held_runtime_exec_disabled
+active_host_tw_code_review_wrapper_runtime=held_runtime_exec_disabled
+active_host_tw_doc_review_wrapper_runtime=held_runtime_exec_disabled
+tw_skill_behavior_smoke=pass
 ```
 
 ## Document Review

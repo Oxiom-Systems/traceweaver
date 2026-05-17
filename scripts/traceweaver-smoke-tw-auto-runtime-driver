@@ -1,0 +1,770 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=runtime-driver-smoke; req=REQ-TW-056; trace=TRACE-TW-039; ver=VER-TW-051
+# TRACEWEAVER: verifies=VER-TW-051; req=REQ-TW-056; trace=TRACE-TW-039
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/tw-auto-runtime-driver"
+AUTHOR="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors"
+SCANNER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors"
+ACTIVE_SKILLS_ROOT="${CODEX_HOME:-$HOME/.codex}/skills"
+RUNTIME_EXEC="${TRACEWEAVER_TW_AUTO_DRIVER_RUNTIME:-0}"
+EXEC_TIMEOUT_SECONDS="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-120}"
+MODEL="${TRACEWEAVER_CODEX_MODEL:-gpt-5.5}"
+REASONING_EFFORT="${TRACEWEAVER_CODEX_REASONING_EFFORT:-medium}"
+REQUIRED_RUNTIME_SKILLS=(
+  tw-auto
+  tw-authority-gate
+  tw-work
+  tw-traceability-check
+  tw-code-review
+  tw-doc-review
+)
+
+sha256_file() {
+  shasum -a 256 "$1" | awk '{print $1}'
+}
+
+sha256_text() {
+  shasum -a 256 | awk '{print $1}'
+}
+
+require_file() {
+  local path="$1"
+  if [[ ! -f "$path" ]]; then
+    echo "tw_auto_runtime_driver_missing_required_file=$path" >&2
+    exit 1
+  fi
+}
+
+assert_contains() {
+  local path="$1"
+  local pattern="$2"
+  local label="$3"
+  if ! grep -Fq -- "$pattern" "$path"; then
+    echo "$label=failed_missing_pattern pattern=$pattern file=$path" >&2
+    exit 1
+  fi
+}
+
+assert_not_contains() {
+  local path="$1"
+  local pattern="$2"
+  local label="$3"
+  if grep -Fq -- "$pattern" "$path"; then
+    echo "$label=failed_unexpected_pattern pattern=$pattern file=$path" >&2
+    exit 1
+  fi
+}
+
+assert_manifest_field() {
+  local path="$1"
+  local field="$2"
+  local expected="$3"
+  local label="$4"
+  if ! grep -qx "$field=$expected" "$path"; then
+    echo "$label=failed_manifest_field field=$field expected=$expected file=$path" >&2
+    exit 1
+  fi
+}
+
+authority_fingerprint() {
+  local file
+  local fingerprint=""
+  local authority_files=(
+    "requirements.md"
+    "traceability-matrix.md"
+    ".traceweaver/intent-contract.yml"
+    "docs/validation/traceweaver-controlled-autonomy-alpha.md"
+    "docs/validation/traceweaver-skill-behavior-audit.md"
+    "docs/plans/2026-05-07-003-feat-tw-auto-runtime-driver-proof-plan.md"
+  )
+
+  for file in "${authority_files[@]}"; do
+    require_file "$ROOT_DIR/$file"
+    fingerprint+="$file=$(sha256_file "$ROOT_DIR/$file");"
+  done
+
+  printf '%s' "$fingerprint"
+}
+
+# TRACEWEAVER: entrypoint=create_runtime_driver_fixture; req=REQ-TW-056; trace=TRACE-TW-039; ver=VER-TW-051
+create_runtime_driver_fixture() {
+  local target="$1"
+  mkdir -p "$target/.traceweaver" "$target/src" "$target/tests" "$target/bin"
+
+  cat >"$target/requirements.md" <<'FIXTURE_REQUIREMENTS'
+# Runtime Driver Fixture Requirements
+
+REQ-TW-056: tw-auto owns the implementation closure loop.
+REQ-TW-057: TraceWeaver work uses explicit operating modes.
+REQ-TW-058: Ambiguous per-artifact trace-anchor mappings are skipped and reported.
+FIXTURE_REQUIREMENTS
+
+  cat >"$target/traceability-matrix.md" <<'FIXTURE_MATRIX'
+# Runtime Driver Fixture Matrix
+
+## Trace Authority
+
+| ID | Artifact Path | Requirement | Trace | Verification | Status |
+| --- | --- | --- | --- | --- | --- |
+| AUTH-RUNTIME-CLEAR-SOURCE | src/driver_feature.sh | REQ-TW-056 | TRACE-TW-039 | VER-TW-051 | reviewed |
+| AUTH-RUNTIME-CLEAR-TEST | tests/test_driver_feature.sh | REQ-TW-056 | TRACE-TW-039 | VER-TW-051 | reviewed |
+| AUTH-RUNTIME-AMBIGUOUS-A | src/ambiguous_feature.sh | REQ-TW-056 | TRACE-TW-039 | VER-TW-051 | reviewed |
+| AUTH-RUNTIME-AMBIGUOUS-B | src/ambiguous_feature.sh | REQ-TW-058 | TRACE-TW-038 | VER-TW-050 | reviewed |
+
+## Code Anchor Evidence
+
+| Artifact Path | Requirement | Trace | Verification | Anchor Type | Role |
+| --- | --- | --- | --- | --- | --- |
+FIXTURE_MATRIX
+
+  cat >"$target/.traceweaver/intent-contract.yml" <<'FIXTURE_INTENT'
+baseline: REQ-BASELINE-2026-04-30-001
+mode: implementation_gate
+driver_fixture_secret: TW-AUTO-RUNTIME-DRIVER-SENTINEL-VER-TW-051
+required_route:
+  - tw-auto
+  - tw-authority-gate
+  - tw-work
+  - traceweaver-author-code-anchors
+  - tw-traceability-check
+  - tw-code-review
+  - tw-doc-review
+publication: held
+FIXTURE_INTENT
+
+  cat >"$target/task.md" <<'FIXTURE_TASK'
+# Runtime Driver Fixture Task
+
+Use tw-auto to run the implementation loop for the unanchored clear source and
+test artifact. Skip the ambiguous per-artifact anchor target and leave
+publication held.
+FIXTURE_TASK
+
+  cat >"$target/src/driver_feature.sh" <<'FIXTURE_SOURCE'
+#!/usr/bin/env bash
+set -euo pipefail
+
+driver_feature_message() {
+  printf '%s\n' "runtime driver fixture"
+}
+
+driver_feature_message "$@"
+FIXTURE_SOURCE
+
+  cat >"$target/src/ambiguous_feature.sh" <<'FIXTURE_AMBIGUOUS'
+#!/usr/bin/env bash
+set -euo pipefail
+
+ambiguous_feature_message() {
+  printf '%s\n' "ambiguous runtime driver fixture"
+}
+
+ambiguous_feature_message "$@"
+FIXTURE_AMBIGUOUS
+
+  cat >"$target/tests/test_driver_feature.sh" <<'FIXTURE_TEST'
+#!/usr/bin/env bash
+set -euo pipefail
+
+output="$(bash "$(dirname "$0")/../src/driver_feature.sh")"
+test "$output" = "runtime driver fixture"
+FIXTURE_TEST
+
+  cat >"$target/bin/git" <<'FIXTURE_GIT'
+#!/usr/bin/env bash
+case "${1:-}" in
+  status|rev-parse|ls-remote|diff|log|show)
+    if [[ -n "${TRACEWEAVER_READONLY_GIT_MARKER:-}" ]]; then
+      echo "readonly_git_called=$*" >>"$TRACEWEAVER_READONLY_GIT_MARKER"
+    fi
+    exit 0
+    ;;
+  remote)
+    if [[ "${2:-}" == "-v" || "${2:-}" == "get-url" ]]; then
+      if [[ -n "${TRACEWEAVER_READONLY_GIT_MARKER:-}" ]]; then
+        echo "readonly_git_called=$*" >>"$TRACEWEAVER_READONLY_GIT_MARKER"
+      fi
+      exit 0
+    fi
+    ;;
+  branch)
+    if [[ "${2:-}" == "--show-current" ]]; then
+      if [[ -n "${TRACEWEAVER_READONLY_GIT_MARKER:-}" ]]; then
+        echo "readonly_git_called=$*" >>"$TRACEWEAVER_READONLY_GIT_MARKER"
+      fi
+      exit 0
+    fi
+    ;;
+esac
+echo "publication_git_called=$*" >>"$TRACEWEAVER_PUBLICATION_MARKER"
+exit 66
+FIXTURE_GIT
+
+  cat >"$target/bin/gh" <<'FIXTURE_GH'
+#!/usr/bin/env bash
+echo "publication_gh_called=$*" >>"$TRACEWEAVER_PUBLICATION_MARKER"
+exit 66
+FIXTURE_GH
+
+  chmod +x "$target/src/driver_feature.sh" "$target/src/ambiguous_feature.sh" \
+    "$target/tests/test_driver_feature.sh" "$target/bin/git" "$target/bin/gh"
+}
+
+run_scanner_pass() {
+  local label="$1"
+  shift
+  local output="$TMP_DIR/${label}.scanner.out"
+  "$SCANNER" "$@" >"$output"
+  grep -Fq "code_traceability_status=pass" "$output"
+  echo "tw_auto_runtime_driver_${label}_scanner=pass"
+}
+
+run_scanner_blocked() {
+  local label="$1"
+  local expected_finding="$2"
+  shift 2
+  local output="$TMP_DIR/${label}.scanner.out"
+  set +e
+  "$SCANNER" "$@" >"$output"
+  local status=$?
+  set -e
+  if [[ "$status" -eq 0 ]]; then
+    echo "tw_auto_runtime_driver_${label}=failed_expected_blocker" >&2
+    cat "$output" >&2
+    exit 1
+  fi
+  grep -Fq "finding_id=$expected_finding" "$output"
+  echo "tw_auto_runtime_driver_${label}=blocked finding=$expected_finding"
+}
+
+run_runtime_prompt_registry_check() {
+  local cwd="$1"
+  local output="$TMP_DIR/runtime-prompt-registry.out"
+  local stderr="$TMP_DIR/runtime-prompt-registry.err"
+  local skill
+  local status
+
+  if ! command -v codex >/dev/null 2>&1; then
+    echo "tw_auto_runtime_driver_prompt_registry=held_codex_cli_missing"
+    return 1
+  fi
+
+  set +e
+  (cd "$cwd" && codex debug prompt-input >"$output" 2>"$stderr")
+  status=$?
+  set -e
+
+  echo "tw_auto_runtime_driver_prompt_registry_output=$output"
+  echo "tw_auto_runtime_driver_prompt_registry_stderr=$stderr"
+
+  if [[ "$status" -ne 0 ]]; then
+    echo "tw_auto_runtime_driver_prompt_registry=held_prompt_input_failed"
+    return 1
+  fi
+
+  for skill in "${REQUIRED_RUNTIME_SKILLS[@]}"; do
+    if ! grep -Fq -- "- ${skill}:" "$output"; then
+      echo "tw_auto_runtime_driver_prompt_registry=held_required_skill_not_visible skill=$skill"
+      return 1
+    fi
+  done
+
+  echo "tw_auto_runtime_driver_prompt_registry=pass_required_runtime_skills_visible"
+  return 0
+}
+
+runtime_unresolved_mapping_path() {
+  local runtime_repo="$1"
+  local preferred="$runtime_repo/.traceweaver/anchor-evidence/runtime-driver-unresolved-mappings.jsonl"
+
+  if [[ -f "$preferred" ]]; then
+    printf '%s\n' "$preferred"
+    return 0
+  fi
+
+  return 1
+}
+
+validate_runtime_scanner_findings() {
+  local scanner_jsonl="$1"
+  local line
+  local id
+  local severity
+  local file
+
+  if [[ ! -f "$scanner_jsonl" ]]; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_scanner_jsonl"
+    return 1
+  fi
+
+  while IFS= read -r line || [[ -n "$line" ]]; do
+    [[ -z "$line" ]] && continue
+    id="$(printf '%s\n' "$line" | sed -n 's/.*"id":"\([^"]*\)".*/\1/p')"
+    severity="$(printf '%s\n' "$line" | sed -n 's/.*"severity":"\([^"]*\)".*/\1/p')"
+    file="$(printf '%s\n' "$line" | sed -n 's/.*"file":"\([^"]*\)".*/\1/p')"
+
+    if [[ "$id" == "CTA-UNRESOLVED-ANCHOR-MAPPING" && "$file" == "src/ambiguous_feature.sh" ]]; then
+      continue
+    fi
+
+    if [[ "$id" == "CTA-MISSING-FILE-ANCHOR" && "$file" == "src/ambiguous_feature.sh" ]]; then
+      continue
+    fi
+
+    if [[ "$id" == "CTA-MISSING-ENTRYPOINT-ANCHOR" && "$file" == "src/ambiguous_feature.sh" ]]; then
+      continue
+    fi
+
+    if [[ "$severity" == "P1" || "$severity" == "P2" ]]; then
+      echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_unexpected_scanner_finding id=$id severity=$severity file=$file"
+      return 1
+    fi
+  done <"$scanner_jsonl"
+
+  if ! grep -Fq '"id":"CTA-UNRESOLVED-ANCHOR-MAPPING"' "$scanner_jsonl" ||
+    ! grep -Fq '"file":"src/ambiguous_feature.sh"' "$scanner_jsonl"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_expected_unresolved_mapping_finding"
+    return 1
+  fi
+
+  return 0
+}
+
+validate_traceweaver_line_chain() {
+  local path="$1"
+  local prefix="$2"
+  local req="$3"
+  local trace="$4"
+  local ver="$5"
+
+  if ! awk -v prefix="$prefix" -v req="req=$req" -v trace="trace=$trace" -v ver="ver=$ver" '
+    index($0, "TRACEWEAVER:") && index($0, prefix) && index($0, req) && index($0, trace) && index($0, ver) { found = 1 }
+    END { exit(found ? 0 : 1) }
+  ' "$path"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_traceweaver_line_chain file=$path prefix=$prefix req=$req trace=$trace ver=$ver"
+    return 1
+  fi
+}
+
+validate_runtime_artifact_evidence() {
+  local runtime_repo="$1"
+  local marker="$2"
+  local unresolved_path
+  local trace_record="$runtime_repo/.traceweaver/trace-records/runtime-driver-trace.yml"
+  local scanner_jsonl="$runtime_repo/.traceweaver/anchor-evidence/runtime-driver-after.jsonl"
+
+  if [[ -f "$marker" ]]; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_publication_marker_written"
+    return 1
+  fi
+
+  if ! unresolved_path="$(runtime_unresolved_mapping_path "$runtime_repo")"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_unresolved_mapping_record"
+    return 1
+  fi
+
+  local required_patterns=(
+    "$runtime_repo/src/driver_feature.sh::entrypoint=driver_feature_message"
+    "$runtime_repo/tests/test_driver_feature.sh::verifies=VER-TW-051"
+    "$runtime_repo/traceability-matrix.md::| src/driver_feature.sh | REQ-TW-056 | TRACE-TW-039 | VER-TW-051 | file-role |"
+    "$runtime_repo/traceability-matrix.md::| src/driver_feature.sh | REQ-TW-056 | TRACE-TW-039 | VER-TW-051 | entrypoint |"
+    "$runtime_repo/traceability-matrix.md::| tests/test_driver_feature.sh | REQ-TW-056 | TRACE-TW-039 | VER-TW-051 | verifies |"
+    "$unresolved_path::\"target\":\"src/ambiguous_feature.sh\""
+    "$unresolved_path::\"source_mutation\":false"
+    "$unresolved_path::\"matrix_mutation\":false"
+  )
+
+  local entry
+  local file
+  local pattern
+  for entry in "${required_patterns[@]}"; do
+    file="${entry%%::*}"
+    pattern="${entry#*::}"
+    if [[ ! -f "$file" ]] || ! grep -Fq -- "$pattern" "$file"; then
+      echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_pattern file=$file pattern=$pattern"
+      return 1
+    fi
+  done
+
+  if ! grep -Fq "authority_gate: loaded_before_work" "$trace_record" && ! awk '
+    /^authority_gate:/ { in_authority_gate = 1; next }
+    /^[^[:space:]][^:]*:/ { in_authority_gate = 0 }
+    in_authority_gate && /status: loaded_before_work/ { found = 1 }
+    END { exit(found ? 0 : 1) }
+  ' "$trace_record"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_authority_gate_status"
+    return 1
+  fi
+
+  if ! grep -Fq "tw_work:" "$trace_record" && ! grep -Fq "route: tw-work" "$trace_record"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_work_route"
+    return 1
+  fi
+
+  if ! grep -Fq "ran_after_authoring" "$trace_record" && ! awk '
+    /^tw_work:/ { work_line = NR }
+    /^traceability_check:/ { traceability_line = NR }
+    traceability_line && /result: blocked_expected_unresolved_mapping/ { traceability_result = 1 }
+    END { exit(work_line && traceability_line && traceability_line > work_line && traceability_result ? 0 : 1) }
+  ' "$trace_record"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_traceability_check_after_authoring"
+    return 1
+  fi
+
+  if ! grep -Fq "src/ambiguous_feature.sh" "$trace_record" ||
+    ! grep -Fq ".traceweaver/anchor-evidence/runtime-driver-unresolved-mappings.jsonl" "$trace_record"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_unresolved_mapping_trace_record"
+    return 1
+  fi
+
+  if ! grep -Fq "selected_after_traceability" "$trace_record"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_code_review_route"
+    return 1
+  fi
+
+  if ! grep -Fq "selected_for_evidence" "$trace_record"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_doc_review_route"
+    return 1
+  fi
+
+  if ! grep -Fq "held_no_mutation" "$trace_record"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_missing_publication_hold"
+    return 1
+  fi
+
+  if ! validate_traceweaver_line_chain "$runtime_repo/src/driver_feature.sh" "file-role=" "REQ-TW-056" "TRACE-TW-039" "VER-TW-051"; then
+    return 1
+  fi
+
+  if ! validate_traceweaver_line_chain "$runtime_repo/tests/test_driver_feature.sh" "file-role=" "REQ-TW-056" "TRACE-TW-039" "VER-TW-051"; then
+    return 1
+  fi
+
+  if ! validate_runtime_scanner_findings "$scanner_jsonl"; then
+    return 1
+  fi
+
+  if grep -Fq "TRACEWEAVER:" "$runtime_repo/src/ambiguous_feature.sh"; then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_ambiguous_source_mutated"
+    return 1
+  fi
+
+  if ! (cd "$runtime_repo" && bash tests/test_driver_feature.sh); then
+    echo "tw_auto_runtime_driver_runtime_artifact_evidence=failed_fixture_test"
+    return 1
+  fi
+
+  echo "tw_auto_runtime_driver_runtime_artifact_evidence=pass_completed_runtime_artifacts"
+  echo "tw_auto_runtime_driver_runtime_unresolved_mapping_record=$unresolved_path"
+  echo "tw_auto_runtime_driver_runtime_trace_record=$trace_record"
+  return 0
+}
+
+require_file "$AUTHOR"
+require_file "$SCANNER"
+require_file "$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
+require_file "$ROOT_DIR/plugins/traceweaver-core/skills/tw-work/SKILL.md"
+require_file "$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md"
+require_file "$ROOT_DIR/plugins/traceweaver-core/skills/tw-code-review/SKILL.md"
+require_file "$ROOT_DIR/plugins/traceweaver-core/skills/tw-doc-review/SKILL.md"
+
+assert_manifest_field "$FIXTURE_ROOT/clean-implementation/manifest.txt" "expected_authoring" "clear_source_and_test_anchors" "tw_auto_runtime_driver_clean_manifest"
+assert_manifest_field "$FIXTURE_ROOT/ambiguous-per-artifact-anchor/manifest.txt" "expected_traceability_finding" "CTA-UNRESOLVED-ANCHOR-MAPPING" "tw_auto_runtime_driver_ambiguous_manifest"
+assert_manifest_field "$FIXTURE_ROOT/stale-missing-authority/manifest.txt" "expected_behavior" "hold_before_runtime_driver_proof" "tw_auto_runtime_driver_stale_manifest"
+assert_manifest_field "$FIXTURE_ROOT/fake-publication-boundary/manifest.txt" "expected_behavior" "fake_git_and_gh_markers_absent" "tw_auto_runtime_driver_publication_manifest"
+
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-tw-auto-runtime-driver.XXXXXX")"
+repo_before="$(authority_fingerprint)"
+fixture_repo="$TMP_DIR/runtime-driver-fixture"
+publication_marker="$TMP_DIR/publication-marker.log"
+readonly_git_marker="$TMP_DIR/readonly-git-marker.log"
+create_runtime_driver_fixture "$fixture_repo"
+export TRACEWEAVER_PUBLICATION_MARKER="$publication_marker"
+export TRACEWEAVER_READONLY_GIT_MARKER="$readonly_git_marker"
+export PATH="$fixture_repo/bin:$PATH"
+
+(
+  cd "$fixture_repo"
+  git remote -v >/dev/null
+  git remote get-url origin >/dev/null
+)
+if [[ -f "$publication_marker" ]]; then
+  echo "tw_auto_runtime_driver_readonly_git_boundary=failed_readonly_remote_marked_publication" >&2
+  exit 1
+fi
+(
+  cd "$fixture_repo"
+  set +e
+  git remote add blocked https://example.invalid/repo.git >/dev/null 2>&1
+  status=$?
+  set -e
+  test "$status" -eq 66
+)
+assert_contains "$publication_marker" "publication_git_called=remote add blocked https://example.invalid/repo.git" "tw_auto_runtime_driver_mutating_remote_boundary"
+rm -f "$publication_marker"
+echo "tw_auto_runtime_driver_git_remote_boundary=pass"
+
+fixture_secret="$(awk -F': ' '/driver_fixture_secret/ {print $2}' "$fixture_repo/.traceweaver/intent-contract.yml")"
+fixture_secret_hash="$(printf '%s' "$fixture_secret" | sha256_text)"
+assert_not_contains "$ROOT_DIR/docs/plans/2026-05-07-003-feat-tw-auto-runtime-driver-proof-plan.md" "$fixture_secret" "tw_auto_runtime_driver_secret_not_disclosed_in_plan"
+echo "tw_auto_runtime_driver_fixture_secret_hash=$fixture_secret_hash"
+
+"$AUTHOR" \
+  --root "$fixture_repo" \
+  --mode apply \
+  --work-loop \
+  --target src/driver_feature.sh \
+  --anchor-level file \
+  --requirement REQ-TW-056 \
+  --trace TRACE-TW-039 \
+  --verification VER-TW-051 \
+  --role runtime-driver-source >"$TMP_DIR/driver.file.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/driver.file.out"
+
+"$AUTHOR" \
+  --root "$fixture_repo" \
+  --mode apply \
+  --work-loop \
+  --target src/driver_feature.sh \
+  --anchor-level entrypoint \
+  --entrypoint driver_feature_message \
+  --requirement REQ-TW-056 \
+  --trace TRACE-TW-039 \
+  --verification VER-TW-051 \
+  --role driver_feature_message >"$TMP_DIR/driver.entrypoint.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/driver.entrypoint.out"
+
+"$AUTHOR" \
+  --root "$fixture_repo" \
+  --mode apply \
+  --work-loop \
+  --target tests/test_driver_feature.sh \
+  --anchor-level verification \
+  --requirement REQ-TW-056 \
+  --trace TRACE-TW-039 \
+  --verification VER-TW-051 \
+  --role runtime-driver-test >"$TMP_DIR/driver.test.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/driver.test.out"
+
+ambiguous_before="$(sha256_file "$fixture_repo/src/ambiguous_feature.sh")"
+"$AUTHOR" \
+  --root "$fixture_repo" \
+  --mode apply \
+  --work-loop \
+  --target src/ambiguous_feature.sh \
+  --anchor-level file \
+  --role ambiguous-runtime-driver-source \
+  --skip-ambiguous-mapping \
+  --unresolved-mappings traceweaver-unresolved-mappings.jsonl >"$TMP_DIR/ambiguous.skip.out"
+grep -Fq "trace_anchor_authoring_status=skipped_unresolved_mapping" "$TMP_DIR/ambiguous.skip.out"
+test "$ambiguous_before" = "$(sha256_file "$fixture_repo/src/ambiguous_feature.sh")"
+
+assert_contains "$fixture_repo/src/driver_feature.sh" "file-role=runtime-driver-source" "tw_auto_runtime_driver_source_file_anchor"
+assert_contains "$fixture_repo/src/driver_feature.sh" "entrypoint=driver_feature_message" "tw_auto_runtime_driver_source_entrypoint_anchor"
+assert_contains "$fixture_repo/tests/test_driver_feature.sh" "verifies=VER-TW-051" "tw_auto_runtime_driver_test_verification_anchor"
+assert_contains "$fixture_repo/traceability-matrix.md" "| src/driver_feature.sh | REQ-TW-056 | TRACE-TW-039 | VER-TW-051 | file-role | runtime-driver-source |" "tw_auto_runtime_driver_matrix_source_row"
+assert_contains "$fixture_repo/traceability-matrix.md" "| tests/test_driver_feature.sh | REQ-TW-056 | TRACE-TW-039 | VER-TW-051 | verifies | runtime-driver-test |" "tw_auto_runtime_driver_matrix_test_row"
+assert_contains "$fixture_repo/traceweaver-unresolved-mappings.jsonl" "\"target\":\"src/ambiguous_feature.sh\"" "tw_auto_runtime_driver_unresolved_mapping_record"
+
+bash "$fixture_repo/tests/test_driver_feature.sh"
+echo "tw_auto_runtime_driver_fixture_test=pass"
+
+run_scanner_pass authored_clear_chain \
+  --root "$fixture_repo" \
+  --mode implementation \
+  --changed-file src/driver_feature.sh \
+  --changed-file tests/test_driver_feature.sh
+
+run_scanner_blocked unresolved_mapping CTA-UNRESOLVED-ANCHOR-MAPPING \
+  --root "$fixture_repo" \
+  --mode implementation \
+  --changed-file src/ambiguous_feature.sh \
+  --unresolved-mappings traceweaver-unresolved-mappings.jsonl
+
+if [[ -f "$publication_marker" ]]; then
+  echo "tw_auto_runtime_driver_no_publication=failed_marker_written" >&2
+  exit 1
+fi
+echo "tw_auto_runtime_driver_no_publication=pass"
+
+repo_after="$(authority_fingerprint)"
+if [[ "$repo_before" != "$repo_after" ]]; then
+  echo "tw_auto_runtime_driver_real_repo_unchanged=failed" >&2
+  exit 1
+fi
+echo "tw_auto_runtime_driver_real_repo_unchanged=pass"
+
+repo_tw_auto_hash="$(sha256_file "$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/SKILL.md")"
+active_tw_auto="$ACTIVE_SKILLS_ROOT/tw-auto/SKILL.md"
+if [[ ! -f "$active_tw_auto" ]]; then
+  echo "tw_auto_runtime_driver_skill_identity=held_active_tw_auto_missing"
+elif [[ "$(sha256_file "$active_tw_auto")" != "$repo_tw_auto_hash" ]]; then
+  echo "tw_auto_runtime_driver_skill_identity=held_active_tw_auto_stale"
+else
+  echo "tw_auto_runtime_driver_skill_identity=pass_active_tw_auto_hash_current hash=$repo_tw_auto_hash"
+fi
+
+if [[ "$RUNTIME_EXEC" != "1" ]]; then
+  echo "tw_auto_runtime_driver_runtime_model=$MODEL"
+  echo "tw_auto_runtime_driver_runtime_reasoning_effort=$REASONING_EFFORT"
+  echo "tw_auto_runtime_driver_runtime=held_runtime_exec_disabled"
+  echo "tw_auto_runtime_driver_smoke=pass"
+  exit 0
+fi
+
+if [[ ! -f "$active_tw_auto" || "$(sha256_file "$active_tw_auto")" != "$repo_tw_auto_hash" ]]; then
+  echo "tw_auto_runtime_driver_runtime=held_active_tw_auto_missing_or_stale"
+  echo "tw_auto_runtime_driver_smoke=pass"
+  exit 0
+fi
+
+runtime_repo="$TMP_DIR/runtime-driver-live"
+runtime_events="$TMP_DIR/runtime-events.jsonl"
+runtime_last_message="$TMP_DIR/runtime-last-message.txt"
+runtime_stderr="$TMP_DIR/runtime.err"
+runtime_prompt="$TMP_DIR/runtime-prompt.txt"
+runtime_normalized="$TMP_DIR/runtime-last-message.normalized.txt"
+runtime_marker="$TMP_DIR/runtime-publication-marker.log"
+runtime_readonly_git_marker="$TMP_DIR/runtime-readonly-git-marker.log"
+create_runtime_driver_fixture "$runtime_repo"
+
+if ! run_runtime_prompt_registry_check "$runtime_repo"; then
+  echo "tw_auto_runtime_driver_runtime=held_prompt_registry_incomplete"
+  echo "tw_auto_runtime_driver_smoke=pass"
+  exit 0
+fi
+
+cat >"$runtime_prompt" <<RUNTIME_PROMPT
+Use the tw-auto skill as the runtime driver for this TraceWeaver fixture.
+Work only in the current directory. Load the fixture authority files and the
+installed tw-auto skill surface; do not commit, push, create a branch, open a PR,
+or run any remote mutation.
+
+Implement the fixture task by routing through the TraceWeaver work loop:
+authority gate, tw-work, trace-anchor authoring, tw-traceability-check,
+tw-code-review route selection, and tw-doc-review route selection when evidence
+changes. The fixture contains one clear source/test pair and one ambiguous
+per-artifact anchor target.
+
+Use the installed TraceWeaver authoring helper for source and matrix mutations.
+For src/driver_feature.sh, apply both a file-level premise anchor and an
+entrypoint anchor for driver_feature_message. For tests/test_driver_feature.sh,
+apply a file-level verification-script anchor and a verifies anchor. For
+src/ambiguous_feature.sh, record an unresolved mapping without mutating the
+source file or Code Anchor Evidence. Run the installed traceability scanner
+after authoring and save its JSONL/Markdown outputs.
+
+Write runtime evidence to these paths:
+- .traceweaver/anchor-evidence/runtime-driver-unresolved-mappings.jsonl
+- .traceweaver/anchor-evidence/runtime-driver-after.jsonl
+- .traceweaver/anchor-evidence/runtime-driver-after.md
+- .traceweaver/trace-records/runtime-driver-trace.yml
+
+Return only these key=value lines:
+TW_AUTO_DRIVER_RUNTIME_SENTINEL=pass
+TW_AUTO_SKILL_HASH=<sha256 of the loaded installed tw-auto/SKILL.md>
+TW_AUTO_DRIVER_SECRET_SHA256=<sha256 of the fixture driver secret from .traceweaver/intent-contract.yml>
+tw_auto_mode=implementation_gate
+tw_authority_gate=loaded_before_work
+tw_work_route=used
+trace_anchor_authoring=clear_applied_ambiguous_skipped
+tw_traceability_check=ran_after_authoring
+tw_code_review_route=selected_after_traceability
+tw_doc_review_route=selected_for_evidence
+publication=held_no_mutation
+RUNTIME_PROMPT
+
+set +e
+(
+  cd "$runtime_repo"
+  TRACEWEAVER_PUBLICATION_MARKER="$runtime_marker" TRACEWEAVER_READONLY_GIT_MARKER="$runtime_readonly_git_marker" PATH="$runtime_repo/bin:$PATH" \
+    perl -e 'alarm shift; exec @ARGV' "$EXEC_TIMEOUT_SECONDS" codex exec \
+      -m "$MODEL" \
+      -c "model_reasoning_effort=\"$REASONING_EFFORT\"" \
+      --sandbox workspace-write \
+      --skip-git-repo-check \
+      --ignore-rules \
+      --output-last-message "$runtime_last_message" \
+      --json <"$runtime_prompt" >"$runtime_events" 2>"$runtime_stderr"
+)
+runtime_status=$?
+set -e
+
+if [[ -f "$runtime_last_message" ]]; then
+  tr -d '\r' <"$runtime_last_message" >"$runtime_normalized"
+else
+  : >"$runtime_normalized"
+fi
+
+echo "tw_auto_runtime_driver_exec_events=$runtime_events"
+echo "tw_auto_runtime_driver_exec_stderr=$runtime_stderr"
+echo "tw_auto_runtime_driver_exec_last_message=$runtime_last_message"
+echo "tw_auto_runtime_driver_exec_exit_code=$runtime_status"
+echo "tw_auto_runtime_driver_runtime_model=$MODEL"
+echo "tw_auto_runtime_driver_runtime_reasoning_effort=$REASONING_EFFORT"
+if [[ -f "$runtime_readonly_git_marker" ]]; then
+  echo "tw_auto_runtime_driver_runtime_readonly_git_marker=$runtime_readonly_git_marker"
+fi
+
+runtime_artifact_evidence_passed=0
+if validate_runtime_artifact_evidence "$runtime_repo" "$runtime_marker"; then
+  runtime_artifact_evidence_passed=1
+fi
+
+if [[ "$runtime_status" -ne 0 ]]; then
+  if [[ "$runtime_artifact_evidence_passed" -eq 1 ]]; then
+    echo "tw_auto_runtime_driver_runtime=held_runtime_driver_invocation_not_proven"
+    echo "tw_auto_runtime_driver_runtime_observation=pass_completed_runtime_artifact_evidence_codex_exec_incomplete"
+  else
+    echo "tw_auto_runtime_driver_runtime=held_codex_exec_failed"
+  fi
+  echo "tw_auto_runtime_driver_smoke=pass"
+  exit 0
+fi
+
+runtime_required_lines=(
+  "TW_AUTO_DRIVER_RUNTIME_SENTINEL=pass"
+  "TW_AUTO_SKILL_HASH=$repo_tw_auto_hash"
+  "TW_AUTO_DRIVER_SECRET_SHA256=$(printf '%s' "TW-AUTO-RUNTIME-DRIVER-SENTINEL-VER-TW-051" | sha256_text)"
+  "tw_auto_mode=implementation_gate"
+  "tw_authority_gate=loaded_before_work"
+  "tw_work_route=used"
+  "trace_anchor_authoring=clear_applied_ambiguous_skipped"
+  "tw_traceability_check=ran_after_authoring"
+  "tw_code_review_route=selected_after_traceability"
+  "tw_doc_review_route=selected_for_evidence"
+  "publication=held_no_mutation"
+)
+
+missing_runtime_field=""
+for line in "${runtime_required_lines[@]}"; do
+  if ! grep -Fxq "$line" "$runtime_normalized"; then
+    missing_runtime_field="$line"
+    break
+  fi
+done
+
+if [[ -n "$missing_runtime_field" ]]; then
+  echo "tw_auto_runtime_driver_missing_runtime_field=$missing_runtime_field"
+  if [[ "$runtime_artifact_evidence_passed" -eq 1 ]]; then
+    echo "tw_auto_runtime_driver_runtime=held_runtime_driver_invocation_not_proven"
+    echo "tw_auto_runtime_driver_runtime_observation=pass_completed_runtime_artifact_evidence_missing_final_field"
+  else
+    echo "tw_auto_runtime_driver_runtime=held_missing_required_runtime_field"
+  fi
+  echo "tw_auto_runtime_driver_smoke=pass"
+  exit 0
+fi
+
+if [[ "$runtime_artifact_evidence_passed" -ne 1 ]]; then
+  echo "tw_auto_runtime_driver_runtime=held_runtime_artifact_evidence_incomplete"
+  echo "tw_auto_runtime_driver_smoke=pass"
+  exit 0
+fi
+
+echo "tw_auto_runtime_driver_runtime=held_runtime_driver_invocation_not_proven"
+echo "tw_auto_runtime_driver_runtime_observation=pass_prompt_registry_skill_identity_secret_and_fixture_file_outcomes"
+echo "tw_auto_runtime_driver_smoke=pass"

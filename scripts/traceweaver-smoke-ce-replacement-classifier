@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# TRACEWEAVER: file-role=ce-replacement-classifier-smoke-verification; req=REQ-TW-014; trace=TRACE-TW-019; ver=VER-TW-028
+# TRACEWEAVER: verifies=VER-TW-028; req=REQ-TW-014; trace=TRACE-TW-019
+# TRACEWEAVER: file-role=ce-replacement-classifier-smoke; req=REQ-TW-014; trace=TRACE-TW-019; ver=VER-TW-028
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_root="$(mktemp -d)"
 trap 'rm -rf "$tmp_root"' EXIT
@@ -22,20 +25,20 @@ with open(path, "r", encoding="utf-8") as handle:
 
 assert data["checker_status"] == "passed_static_readiness"
 assert data["scope_mode"] == "current_core_with_broad_surface_held"
-assert data["counts"]["packaged_traceweaver_skills"] == 27
-assert data["counts"]["upstream_ce_skills"] == 37
+assert data["counts"]["packaged_traceweaver_skills"] == 25
+assert data["counts"]["upstream_ce_skills"] == 36
 assert data["counts"]["upstream_lfg"] == 1
 assert data["counts"]["current_core_rows"] == 18
-assert data["counts"]["current_packaged_held_rows"] == 9
+assert data["counts"]["current_packaged_held_rows"] == 7
 assert data["counts"]["package_support_rows"] == 1
-assert data["counts"]["broad_held_rows"] == 16
+assert data["counts"]["broad_held_rows"] == 17
 assert data["counts"]["out_of_scope_rows"] == 3
 assert data["counts"]["default_prompt_surfaces"] == 1
 assert data["counts"]["mcp_app_connectors"] == 0
 assert data["counts"]["install_metadata"] == 3
 assert data["counts"]["external_dependencies"] == 0
 assert data["counts"]["hidden_rows"] == 0
-assert data["counts"]["held_rows"] == 43
+assert data["counts"]["held_rows"] == 42
 assert data["counts"]["unclassified_rows"] == 0
 assert data["inventories"]["default_prompt_surfaces"][0]["key"] == "interface.defaultPrompt"
 

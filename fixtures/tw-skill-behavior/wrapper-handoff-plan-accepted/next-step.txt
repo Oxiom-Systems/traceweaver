@@ -1,0 +1,6 @@
+TRACEWEAVER: file-role=wrapper-handoff-fixture; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059
+flow=accepted_plan
+forbidden_next=standalone_tw_requirements_review
+expected_next_wrapper=tw-work
+next_command_executable=true
+held_claims=publication,runtime,release

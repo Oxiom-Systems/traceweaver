@@ -1,0 +1,14 @@
+case_id=review_findings
+authority_status=current
+trace_status=complete
+verification_status=passed
+review_status=blocking_findings
+authority_tree_status=clean
+staged_tree_status=coherent
+target_status=confirmed
+credential_status=verified
+remote_status=verified_no_real_remote
+human_confirmation=confirmed
+publication_mode=no_real_remote_dry_run
+expected_status=blocked
+expected_reason=review_findings

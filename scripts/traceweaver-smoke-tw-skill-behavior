@@ -1,13 +1,26 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-052; trace=TRACE-TW-037; ver=VER-TW-047
+# TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
+# TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-049; trace=TRACE-TW-031; ver=VER-TW-040
+# TRACEWEAVER: verifies=VER-TW-040; req=REQ-TW-049; trace=TRACE-TW-031
+# TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-056; trace=TRACE-TW-042; ver=VER-TW-054
+# TRACEWEAVER: verifies=VER-TW-054; req=REQ-TW-056; trace=TRACE-TW-042
+# TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-056; trace=TRACE-TW-045; ver=VER-TW-057
+# TRACEWEAVER: verifies=VER-TW-057; req=REQ-TW-056; trace=TRACE-TW-045
+# TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059
+# TRACEWEAVER: verifies=VER-TW-059; req=REQ-TW-056; trace=TRACE-TW-046
+
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/tw-skill-behavior"
 CODEX_HOME_DIR="${CODEX_HOME:-$HOME/.codex}"
 ACTIVE_SKILLS_ROOT="$CODEX_HOME_DIR/skills"
+PACKAGED_SKILLS_ROOT="$CODEX_HOME_DIR/traceweaver-core/skills"
 RUNTIME_EXEC="${TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME:-1}"
 EXEC_TIMEOUT_SECONDS="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-60}"
-MODEL="${TRACEWEAVER_CODEX_MODEL:-gpt-5.2}"
+MODEL="${TRACEWEAVER_CODEX_MODEL:-gpt-5.5}"
+REASONING_EFFORT="${TRACEWEAVER_CODEX_REASONING_EFFORT:-medium}"
 
 require_file() {
   local path="$1"
@@ -31,7 +44,7 @@ assert_contains() {
   local path="$1"
   local pattern="$2"
   local label="$3"
-  if ! grep -q "$pattern" "$path"; then
+  if ! grep -q -- "$pattern" "$path"; then
     echo "$label=failed_missing_pattern pattern=$pattern file=$path" >&2
     exit 1
   fi
@@ -82,69 +95,643 @@ doc_runtime_normalized="$tmp_dir/doc-review-last-message.normalized.txt"
 tw_code="$ROOT_DIR/plugins/traceweaver-core/skills/tw-code-review/SKILL.md"
 tw_doc="$ROOT_DIR/plugins/traceweaver-core/skills/tw-doc-review/SKILL.md"
 tw_auto="$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
+wrapper_handoff_policy="$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/references/traceweaver-wrapper-handoff-discipline.md"
+tw_plan="$ROOT_DIR/plugins/traceweaver-core/skills/tw-plan/SKILL.md"
+tw_authority_gate="$ROOT_DIR/plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md"
+tw_requirements_review="$ROOT_DIR/plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md"
+tw_work="$ROOT_DIR/plugins/traceweaver-core/skills/tw-work/SKILL.md"
+tw_debug="$ROOT_DIR/plugins/traceweaver-core/skills/tw-debug/SKILL.md"
+tw_commit="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit/SKILL.md"
+tw_commit_push_pr="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md"
 tw_trace="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md"
+tw_grill="$ROOT_DIR/plugins/traceweaver-core/skills/tw-grill/SKILL.md"
+tw_brainstorm="$ROOT_DIR/plugins/traceweaver-core/skills/tw-brainstorm/SKILL.md"
+tw_compound="$ROOT_DIR/plugins/traceweaver-core/skills/tw-compound/SKILL.md"
+tw_compound_refresh="$ROOT_DIR/plugins/traceweaver-core/skills/tw-compound-refresh/SKILL.md"
+tw_resolve_pr_feedback="$ROOT_DIR/plugins/traceweaver-core/skills/tw-resolve-pr-feedback/SKILL.md"
+tw_sessions="$ROOT_DIR/plugins/traceweaver-core/skills/tw-sessions/SKILL.md"
+tw_test_browser="$ROOT_DIR/plugins/traceweaver-core/skills/tw-test-browser/SKILL.md"
+tw_test_xcode="$ROOT_DIR/plugins/traceweaver-core/skills/tw-test-xcode/SKILL.md"
+tw_setup="$ROOT_DIR/plugins/traceweaver-core/skills/tw-setup/SKILL.md"
+tw_worktree="$ROOT_DIR/plugins/traceweaver-core/skills/tw-worktree/SKILL.md"
+lfg_skill="$ROOT_DIR/plugins/traceweaver-core/skills/lfg/SKILL.md"
+requirements_reviewer="$ROOT_DIR/plugins/traceweaver-core/skills/requirements-reviewer/SKILL.md"
+systems_traceability="$ROOT_DIR/plugins/traceweaver-core/skills/systems-engineering-traceability/SKILL.md"
 structured_ref="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/references/structured-findings.md"
+code_anchor_scanner="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors"
+code_anchor_author="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors"
+ce_code="$ROOT_DIR/plugins/traceweaver-core/skills/ce-code-review/SKILL.md"
+ce_doc="$ROOT_DIR/plugins/traceweaver-core/skills/ce-doc-review/SKILL.md"
+ce_plan="$ROOT_DIR/plugins/traceweaver-core/skills/ce-plan/SKILL.md"
+ce_work="$ROOT_DIR/plugins/traceweaver-core/skills/ce-work/SKILL.md"
+ce_debug="$ROOT_DIR/plugins/traceweaver-core/skills/ce-debug/SKILL.md"
+ce_commit="$ROOT_DIR/plugins/traceweaver-core/skills/ce-commit/SKILL.md"
+ce_commit_push_pr="$ROOT_DIR/plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md"
+ce_brainstorm="$ROOT_DIR/plugins/traceweaver-core/skills/ce-brainstorm/SKILL.md"
+ce_compound="$ROOT_DIR/plugins/traceweaver-core/skills/ce-compound/SKILL.md"
+ce_compound_refresh="$ROOT_DIR/plugins/traceweaver-core/skills/ce-compound-refresh/SKILL.md"
+ce_resolve_pr_feedback="$ROOT_DIR/plugins/traceweaver-core/skills/ce-resolve-pr-feedback/SKILL.md"
+ce_sessions="$ROOT_DIR/plugins/traceweaver-core/skills/ce-sessions/SKILL.md"
+ce_sessions_inventory_helper="$ROOT_DIR/plugins/traceweaver-core/skills/ce-sessions/scripts/discover-sessions.sh"
+ce_sessions_extract_helper="$ROOT_DIR/plugins/traceweaver-core/skills/ce-sessions/scripts/extract-skeleton.py"
+ce_test_browser="$ROOT_DIR/plugins/traceweaver-core/skills/ce-test-browser/SKILL.md"
+ce_test_xcode="$ROOT_DIR/plugins/traceweaver-core/skills/ce-test-xcode/SKILL.md"
+ce_setup="$ROOT_DIR/plugins/traceweaver-core/skills/ce-setup/SKILL.md"
+ce_worktree="$ROOT_DIR/plugins/traceweaver-core/skills/ce-worktree/SKILL.md"
 
 require_file "$tw_code"
 require_file "$tw_doc"
 require_file "$tw_auto"
+require_file "$wrapper_handoff_policy"
+require_file "$tw_plan"
+require_file "$tw_authority_gate"
+require_file "$tw_requirements_review"
+require_file "$tw_work"
+require_file "$tw_debug"
+require_file "$tw_commit"
+require_file "$tw_commit_push_pr"
 require_file "$tw_trace"
+require_file "$tw_grill"
+require_file "$tw_brainstorm"
+require_file "$tw_compound"
+require_file "$tw_compound_refresh"
+require_file "$tw_resolve_pr_feedback"
+require_file "$tw_sessions"
+require_file "$tw_test_browser"
+require_file "$tw_test_xcode"
+require_file "$tw_setup"
+require_file "$tw_worktree"
+require_file "$lfg_skill"
+require_file "$requirements_reviewer"
+require_file "$systems_traceability"
 require_file "$structured_ref"
+require_file "$code_anchor_scanner"
+require_file "$code_anchor_author"
+require_file "$ce_code"
+require_file "$ce_doc"
+require_file "$ce_plan"
+require_file "$ce_work"
+require_file "$ce_debug"
+require_file "$ce_commit"
+require_file "$ce_commit_push_pr"
+require_file "$ce_brainstorm"
+require_file "$ce_compound"
+require_file "$ce_compound_refresh"
+require_file "$ce_resolve_pr_feedback"
+require_file "$ce_sessions"
+require_file "$ce_sessions_inventory_helper"
+require_file "$ce_sessions_extract_helper"
+require_file "$ce_test_browser"
+require_file "$ce_test_xcode"
+require_file "$ce_setup"
+require_file "$ce_worktree"
 require_file "$runtime_prompt"
 require_file "$code_runtime_prompt"
 require_file "$doc_runtime_prompt"
 
 assert_line_before "$tw_code" 'Run `tw-traceability-check`' 'Run `ce-code-review`' "tw_code_review_traceability_before_ce"
+assert_contains "$tw_code" 'Run `ce-code-review` only after the traceability check is passable' "tw_code_review_passable_preflight_before_ce"
 assert_contains "$tw_code" "structured traceability findings" "tw_code_review_structured_findings_preserved"
 assert_contains "$tw_code" "Do not collapse structured TraceWeaver findings" "tw_code_review_no_prose_collapse"
+assert_contains "$ce_code" "name: ce-code-review" "tw_code_review_packaged_ce_skill_name"
+assert_contains "$ce_code" "TraceWeaver Package Boundary" "tw_code_review_packaged_ce_boundary"
+assert_contains "$ce_code" "must stop before branch publication" "tw_code_review_packaged_ce_no_publication_boundary"
 assert_fixture_field "$FIXTURE_ROOT/tw-code-review-blocked-trace/traceability-result.txt" "expected_behavior" "stop_before_ce_code_review_closure" "tw_code_review_blocked_trace_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-code-review-clean-delegation/traceability-result.txt" "tw_traceability_check_result" "pass" "tw_code_review_clean_traceability_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-code-review-clean-delegation/traceability-result.txt" "expected_behavior" "delegate_to_ce_code_review_under_tw_no_publication" "tw_code_review_clean_ce_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-code-review-clean-delegation/traceability-result.txt" "ce_delegation_surface" "TraceWeaver-packaged ce-code-review" "tw_code_review_ce_surface_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-code-review-clean-delegation/traceability-result.txt" "accepted_scope" "deterministic_fixture_only_no_runtime_pass" "tw_code_review_clean_scope_fixture"
 echo "tw_code_review_traceability_preflight=pass"
 echo "tw_code_review_structured_finding_preservation=pass"
 echo "tw_code_review_blocked_trace_fixture=pass"
+echo "tw_code_review_packaged_ce_surface=pass hash=$(hash_file "$ce_code")"
+echo "tw_code_review_clean_ce_delegation_fixture=pass"
 
 assert_line_before "$tw_doc" 'tw-requirements-review' 'ce-doc-review' "tw_doc_review_requirements_before_ce"
 assert_line_before "$tw_doc" 'tw-traceability-check' 'ce-doc-review' "tw_doc_review_traceability_before_ce"
+assert_contains "$tw_doc" 'Run `ce-doc-review` only after' "tw_doc_review_passable_preflight_before_ce"
+assert_contains "$tw_doc" "preflight is passable" "tw_doc_review_passable_preflight_text"
 assert_contains "$tw_doc" "structured traceability/hash/status findings" "tw_doc_review_structured_findings_preserved"
 assert_contains "$tw_doc" "split between staged and unstaged versions" "tw_doc_review_hash_split_guard"
+assert_contains "$ce_doc" "name: ce-doc-review" "tw_doc_review_packaged_ce_skill_name"
+assert_contains "$ce_doc" "Review requirements or plan documents" "tw_doc_review_packaged_ce_behavior_surface"
 assert_fixture_field "$FIXTURE_ROOT/tw-doc-review-stale-authority/traceability-result.txt" "expected_behavior" "stop_before_ce_doc_review_closure" "tw_doc_review_stale_authority_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-doc-review-clean-delegation/authority-result.txt" "tw_requirements_review_result" "pass" "tw_doc_review_clean_requirements_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-doc-review-clean-delegation/authority-result.txt" "tw_traceability_check_result" "pass" "tw_doc_review_clean_traceability_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-doc-review-clean-delegation/authority-result.txt" "expected_behavior" "delegate_to_ce_doc_review_under_tw_no_publication" "tw_doc_review_clean_ce_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-doc-review-clean-delegation/authority-result.txt" "ce_delegation_surface" "TraceWeaver-packaged ce-doc-review" "tw_doc_review_ce_surface_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-doc-review-clean-delegation/authority-result.txt" "accepted_scope" "deterministic_fixture_only_no_runtime_pass" "tw_doc_review_clean_scope_fixture"
 echo "tw_doc_review_requirements_preflight=pass"
 echo "tw_doc_review_trace_hash_status_preflight=pass"
 echo "tw_doc_review_stale_authority_fixture=pass"
+echo "tw_doc_review_packaged_ce_surface=pass hash=$(hash_file "$ce_doc")"
+echo "tw_doc_review_clean_ce_delegation_fixture=pass"
 
+assert_contains "$tw_plan" 'TraceWeaver-packaged `ce-plan`' "tw_plan_delegates_packaged_ce_plan"
+assert_contains "$tw_plan" "requirements.md" "tw_plan_loads_requirements"
+assert_contains "$tw_plan" "traceability-matrix.md" "tw_plan_loads_matrix"
+assert_contains "$tw_plan" ".traceweaver/intent-contract.yml" "tw_plan_loads_intent_contract"
+assert_contains "$tw_plan" "tw-requirements-review" "tw_plan_requirements_review_route"
+assert_contains "$tw_plan" "Requirements-Quality Preflight" "tw_plan_requirements_quality_preflight_section"
+assert_contains "$tw_plan" "Before it delegates to the" "tw_plan_preflight_before_ce_plan"
+assert_contains "$tw_plan" "accepted requirements-review evidence" "tw_plan_accepted_requirements_review_evidence"
+assert_contains "$tw_plan" 'ce-plan` must not run' "tw_plan_blocks_ce_plan_when_preflight_unsatisfied"
+assert_contains "$tw_plan" "must not approve them" "tw_plan_no_requirement_approval"
+assert_contains "$tw_plan" "no-publication mode" "tw_plan_no_publication_mode"
+assert_contains "$tw_plan" "Status/hash wording repairs are housekeeping" "tw_plan_gate_discipline"
+assert_contains "$ce_plan" "name: ce-plan" "tw_plan_packaged_ce_plan_skill_name"
+assert_contains "$ce_plan" "TraceWeaver Package Boundary" "tw_plan_packaged_ce_plan_boundary"
+assert_fixture_field "$FIXTURE_ROOT/tw-plan-clean-delegation/plan-result.txt" "expected_behavior" "delegate_to_ce_plan_under_tw_no_publication" "tw_plan_clean_ce_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-plan-clean-delegation/plan-result.txt" "requirements_quality_preflight" "accepted_unchanged_requirements_cited" "tw_plan_clean_requirements_preflight_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-plan-clean-delegation/plan-result.txt" "requirements_quality_preflight_before_ce_plan" "true" "tw_plan_clean_preflight_before_ce_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-plan-clean-delegation/plan-result.txt" "ce_delegation_surface" "TraceWeaver-packaged ce-plan" "tw_plan_ce_surface_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-plan-clean-delegation/plan-result.txt" "accepted_scope" "deterministic_fixture_only_no_runtime_pass" "tw_plan_clean_scope_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-plan-unclear-requirements/plan-result.txt" "required_behavior" "pause_or_route_to_tw_requirements_review" "tw_plan_unclear_requirements_pause_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-plan-unclear-requirements/plan-result.txt" "requirements_quality_preflight" "blocked_unclear_requirements" "tw_plan_unclear_requirements_preflight_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-plan-unclear-requirements/plan-result.txt" "requirements_quality_preflight_before_ce_plan" "true" "tw_plan_unclear_preflight_before_ce_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-plan-unclear-requirements/plan-result.txt" "ce_plan_invocation" "false" "tw_plan_pause_before_ce_fixture"
+echo "tw_plan_packaged_ce_delegation_fixture=pass"
+echo "tw_plan_human_decision_pause_fixture=pass"
+
+assert_contains "$tw_auto" "tw-plan" "tw_auto_routes_plan_wrapper"
 assert_contains "$tw_auto" "tw-code-review" "tw_auto_routes_code_review"
 assert_contains "$tw_auto" "tw-doc-review" "tw_auto_routes_doc_review"
+assert_contains "$tw_auto" "tw-work" "tw_auto_routes_implementation_worker"
+assert_contains "$tw_auto" "tw-debug" "tw_auto_routes_debug_wrapper"
+assert_contains "$tw_auto" "tw-commit" "tw_auto_routes_commit_wrapper"
+assert_contains "$tw_auto" "tw-commit-push-pr" "tw_auto_routes_commit_push_pr_wrapper"
+assert_contains "$tw_auto" "tw-brainstorm" "tw_auto_routes_brainstorm_wrapper"
+assert_contains "$tw_auto" "tw-sessions" "tw_auto_routes_sessions_wrapper"
+assert_contains "$tw_auto" "tw-test-browser" "tw_auto_routes_browser_test_wrapper"
+assert_contains "$tw_auto" "tw-test-xcode" "tw_auto_routes_xcode_test_wrapper"
+assert_contains "$tw_auto" "tw-resolve-pr-feedback" "tw_auto_routes_pr_feedback_wrapper"
+assert_contains "$tw_auto" "tw-setup" "tw_auto_routes_setup_wrapper"
+assert_contains "$tw_auto" "tw-worktree" "tw_auto_routes_worktree_wrapper"
 assert_contains "$tw_auto" "bounded finding repair" "tw_auto_bounded_repair_loop"
 assert_contains "$tw_auto" "pause the loop and ask the" "tw_auto_human_pause_text"
 assert_contains "$tw_auto" "must not edit, reinterpret, or silently broaden requirements" "tw_auto_no_requirement_mutation"
-assert_fixture_field "$FIXTURE_ROOT/tw-auto-clean-task/loop-state.txt" "required_route" "tw-authority-gate,ce-work,tw-traceability-check,tw-code-review,tw-doc-review" "tw_auto_clean_task_route_fixture"
+assert_contains "$tw_auto" "skip per-artifact ambiguous anchor writes" "tw_auto_non_blocking_anchor_skip"
+assert_contains "$tw_auto" "CTA-UNRESOLVED-ANCHOR-MAPPING" "tw_auto_unresolved_mapping_finding"
+assert_contains "$tw_auto" "Review-Staging Closure Loop" "tw_auto_review_staging_closure_loop_section"
+assert_contains "$tw_auto" "Artifact-identity blockers" "tw_auto_detects_split_review_identity"
+assert_contains "$tw_auto" "exact scoped file list" "tw_auto_exact_review_stage_scope"
+assert_contains "$tw_auto" "records the clean review once" "tw_auto_records_clean_review_once"
+assert_contains "$tw_auto" "housekeeping-only" "tw_auto_housekeeping_repair_once"
+assert_contains "$tw_auto" "must not review-stage around real blockers" "tw_auto_real_blockers_not_staged_around"
+assert_contains "$tw_auto" "Post-Work Review Closure" "tw_auto_post_work_review_closure_section"
+assert_contains "$tw_auto" "successful \`tw-work\` return as a transition" "tw_auto_treats_tw_work_as_transition"
+assert_contains "$tw_auto" "continue after" "tw_auto_continues_after_tw_work"
+assert_contains "$tw_auto" "Run or require \`tw-traceability-check\`" "tw_auto_post_work_runs_traceability_check"
+assert_contains "$tw_auto" "Run \`tw-code-review\`" "tw_auto_post_work_runs_code_review"
+assert_contains "$tw_auto" "Run scoped \`tw-doc-review\` only when" "tw_auto_post_work_scoped_doc_review"
+assert_contains "$tw_auto" "explicit stop override" "tw_auto_post_work_explicit_stop_override"
+assert_contains "$tw_auto" "reports review as held" "tw_auto_post_work_stop_keeps_review_held"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-clean-task/loop-state.txt" "required_route" "tw-brainstorm,tw-plan,tw-authority-gate,tw-work,ce-work,traceweaver-check-code-anchors,traceweaver-author-code-anchors,traceability-matrix,tw-traceability-check,tw-code-review,tw-doc-review,tw-sessions,tw-test-browser,tw-test-xcode,tw-compound,tw-compound-refresh,tw-resolve-pr-feedback,tw-setup,tw-worktree" "tw_auto_clean_task_route_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-unclear-requirement/loop-state.txt" "required_behavior" "pause_for_user_input" "tw_auto_unclear_requirement_pause_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-contradictory-requirement/loop-state.txt" "required_behavior" "route_to_requirements_review" "tw_auto_contradictory_requirement_pause_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-non-blocking-anchor-ambiguity/loop-state.txt" "tw_work_behavior" "skip_ambiguous_anchor_continue_clear_work" "tw_auto_non_blocking_anchor_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-non-blocking-anchor-ambiguity/loop-state.txt" "structured_finding" "CTA-UNRESOLVED-ANCHOR-MAPPING" "tw_auto_unresolved_mapping_finding_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-non-blocking-anchor-ambiguity/loop-state.txt" "completion_claim" "false" "tw_auto_unresolved_mapping_no_completion_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-authority-ambiguity-pause/loop-state.txt" "required_behavior" "pause_before_tw_work" "tw_auto_authority_ambiguity_pause_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-review-staging-split-scope/loop-state.txt" "tw_auto_behavior" "route_to_tw_work_review_staging" "tw_auto_review_staging_split_scope_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-review-staging-split-scope/loop-state.txt" "review_stage_scope" "exact_scoped_file_list" "tw_auto_review_staging_exact_scope_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-review-staging-untracked-plan/loop-state.txt" "review_acceptance_before_stage" "blocked" "tw_auto_review_staging_untracked_before_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-review-staging-untracked-plan/loop-state.txt" "tw_auto_behavior" "include_plan_in_exact_review_stage_scope" "tw_auto_review_staging_untracked_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-review-staging-clean-record/loop-state.txt" "tw_auto_recording" "record_once" "tw_auto_review_staging_clean_record_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-review-staging-clean-record/loop-state.txt" "review_rerun_without_changes" "false" "tw_auto_review_staging_no_repeat_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-review-staging-housekeeping-repair/loop-state.txt" "tw_auto_behavior" "repair_once_and_rerun_once" "tw_auto_review_staging_housekeeping_repair_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-review-staging-real-blocker-stop/loop-state.txt" "tw_auto_behavior" "stop_without_review_staging" "tw_auto_review_staging_real_blocker_stop_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-code-review-continue/loop-state.txt" "work_result" "tw_work_completed" "tw_auto_post_work_completed_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-code-review-continue/loop-state.txt" "explicit_stop_after_work" "false" "tw_auto_post_work_no_explicit_stop_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-code-review-continue/loop-state.txt" "expected_review_route" "tw_traceability_check_then_tw_code_review" "tw_auto_post_work_code_review_route_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-code-review-continue/loop-state.txt" "manual_next_step_only" "forbidden" "tw_auto_post_work_no_manual_handoff_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-doc-review-needed/loop-state.txt" "authority_status_hash_files_changed" "true" "tw_auto_post_work_doc_review_changed_docs_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-doc-review-needed/loop-state.txt" "expected_review_sequence" "tw_traceability_check_then_tw_code_review_then_scoped_tw_doc_review" "tw_auto_post_work_doc_review_sequence_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-doc-review-needed/loop-state.txt" "doc_review_scope" "scoped_status_hash_only" "tw_auto_post_work_doc_review_scope_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-explicit-stop/loop-state.txt" "user_requested_stop_after_work" "true" "tw_auto_post_work_explicit_stop_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-explicit-stop/loop-state.txt" "expected_behavior" "stop_after_tw_work_with_review_held" "tw_auto_post_work_stop_review_held_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-explicit-stop/loop-state.txt" "done_claim" "false" "tw_auto_post_work_stop_no_done_claim_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-code-review-finding-repair/loop-state.txt" "tw_code_review_result" "repairable_finding" "tw_auto_post_work_repairable_review_finding_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-code-review-finding-repair/loop-state.txt" "expected_behavior" "bounded_tw_work_repair_then_rerun_tw_code_review" "tw_auto_post_work_bounded_repair_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-code-review-finding-repair/loop-state.txt" "max_repair_cycles" "1" "tw_auto_post_work_repair_cycle_limit_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-authority-blocker-stop/loop-state.txt" "work_result" "tw_work_authority_blocked" "tw_auto_post_work_authority_blocker_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-authority-blocker-stop/loop-state.txt" "expected_behavior" "stop_before_traceability_check_code_review_and_review_staging" "tw_auto_post_work_blocker_stop_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-authority-blocker-stop/loop-state.txt" "route" "tw_requirements_review_or_human_decision" "tw_auto_post_work_blocker_route_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-vestro-transcript/loop-state.txt" "observed_regression" "stopped_after_tw_work_with_manual_tw_code_review_next_step" "tw_auto_post_work_vestro_regression_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-vestro-transcript/loop-state.txt" "expected_behavior" "continue_to_tw_traceability_check_and_tw_code_review" "tw_auto_post_work_vestro_expected_behavior_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-vestro-transcript/loop-state.txt" "manual_next_step_only" "forbidden" "tw_auto_post_work_vestro_manual_handoff_forbidden_fixture"
+assert_contains "$wrapper_handoff_policy" "Highest-Level Next Wrapper Rule" "wrapper_handoff_policy_highest_level_rule"
+assert_contains "$wrapper_handoff_policy" "Embedded Gate Contract" "wrapper_handoff_policy_embedded_gate_contract"
+assert_contains "$tw_auto" "Highest-Level Handoff Discipline" "tw_auto_handoff_discipline_section"
+assert_contains "$tw_plan" "Highest-Level Handoff Discipline" "tw_plan_handoff_discipline_section"
+assert_contains "$tw_work" "Highest-Level Handoff Discipline" "tw_work_handoff_discipline_section"
+assert_contains "$tw_code" "Highest-Level Handoff Discipline" "tw_code_review_handoff_discipline_section"
+assert_contains "$tw_doc" "Highest-Level Handoff Discipline" "tw_doc_review_handoff_discipline_section"
+assert_contains "$tw_debug" "Highest-Level Handoff Discipline" "tw_debug_handoff_discipline_section"
+assert_contains "$tw_requirements_review" "Highest-Level Handoff Discipline" "tw_requirements_review_handoff_discipline_section"
+assert_contains "$tw_authority_gate" "Highest-Level Handoff Discipline" "tw_authority_gate_handoff_discipline_section"
+assert_contains "$tw_trace" "Highest-Level Handoff Discipline" "tw_traceability_handoff_discipline_section"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-debug-fix/next-step.txt" "flow" "normal_debug_fix" "wrapper_handoff_debug_flow_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-debug-fix/next-step.txt" "forbidden_next" "standalone_tw_authority_gate" "wrapper_handoff_debug_forbidden_lower_gate_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-debug-fix/next-step.txt" "expected_next_wrapper" "tw-auto" "wrapper_handoff_debug_next_wrapper_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-debug-fix/next-step.txt" "next_command_executable" "true" "wrapper_handoff_debug_executable_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-plan-accepted/next-step.txt" "flow" "accepted_plan" "wrapper_handoff_plan_flow_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-plan-accepted/next-step.txt" "forbidden_next" "standalone_tw_requirements_review" "wrapper_handoff_plan_forbidden_lower_gate_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-plan-accepted/next-step.txt" "expected_next_wrapper" "tw-work" "wrapper_handoff_plan_next_wrapper_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-plan-accepted/next-step.txt" "next_command_executable" "true" "wrapper_handoff_plan_executable_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-work-complete/next-step.txt" "flow" "work_complete" "wrapper_handoff_work_flow_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-work-complete/next-step.txt" "forbidden_next" "standalone_tw_traceability_check" "wrapper_handoff_work_forbidden_lower_gate_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-work-complete/next-step.txt" "expected_next_wrapper" "tw-code-review" "wrapper_handoff_work_next_wrapper_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-work-complete/next-step.txt" "next_command_executable" "true" "wrapper_handoff_work_executable_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-code-review-clean/next-step.txt" "flow" "code_review_clean" "wrapper_handoff_code_review_flow_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-code-review-clean/next-step.txt" "forbidden_next" "repeat_tw_code_review" "wrapper_handoff_code_review_forbidden_repeat_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-code-review-clean/next-step.txt" "expected_next_wrapper" "tw-work_record_or_scoped_tw-doc-review" "wrapper_handoff_code_review_next_wrapper_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-code-review-clean/next-step.txt" "next_command_executable" "true" "wrapper_handoff_code_review_executable_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-doc-review-clean/next-step.txt" "flow" "doc_review_clean" "wrapper_handoff_doc_review_flow_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-doc-review-clean/next-step.txt" "forbidden_next" "broad_tw_doc_review" "wrapper_handoff_doc_review_forbidden_broad_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-doc-review-clean/next-step.txt" "expected_next_wrapper" "tw-work_record" "wrapper_handoff_doc_review_next_wrapper_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-doc-review-clean/next-step.txt" "next_command_executable" "true" "wrapper_handoff_doc_review_executable_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-standalone-exceptions/next-step.txt" "diagnostic_tw_authority_gate" "allowed" "wrapper_handoff_authority_gate_exception_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-standalone-exceptions/next-step.txt" "audit_tw_traceability_check" "allowed" "wrapper_handoff_traceability_exception_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-standalone-exceptions/next-step.txt" "baseline_tw_requirements_review" "allowed" "wrapper_handoff_requirements_exception_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-standalone-exceptions/next-step.txt" "exception_reason_required" "true" "wrapper_handoff_exception_reason_fixture"
+echo "wrapper_handoff_discipline=pass"
+echo "lower_gate_suggestions_normal_flow=0"
+echo "standalone_lower_gate_exception_cases=pass"
+echo "next_command_executable=pass"
 echo "tw_auto_review_routing=pass"
 echo "tw_auto_closure_loop_contract=pass"
 echo "tw_auto_human_decision_pause_fixtures=pass"
+echo "tw_auto_non_blocking_anchor_ambiguity_fixture=pass"
+echo "tw_auto_review_staging_closure_loop_fixture=pass"
+echo "tw_auto_post_work_review_closure_fixture=pass"
+
+skill_file_total="$(find "$ROOT_DIR/plugins/traceweaver-core/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d '[:space:]')"
+anchored_skill_total="$(grep -Rsl '<!-- TRACEWEAVER: .*file-role=.*req=.*trace=.*ver=' "$ROOT_DIR/plugins/traceweaver-core/skills"/*/SKILL.md | wc -l | tr -d '[:space:]')"
+imported_ce_unanchored_total=0
+for ce_skill in "$ROOT_DIR"/plugins/traceweaver-core/skills/ce-*/SKILL.md; do
+  if ! grep -q '<!-- TRACEWEAVER: .*file-role=.*req=.*trace=.*ver=' "$ce_skill"; then
+    imported_ce_unanchored_total=$((imported_ce_unanchored_total + 1))
+  fi
+done
+if [[ "$skill_file_total" != "41" ]]; then
+  echo "traceweaver_skill_file_total=failed expected=41 actual=$skill_file_total" >&2
+  exit 1
+fi
+if [[ "$anchored_skill_total" != "38" ]]; then
+  echo "traceweaver_skill_file_anchored=failed expected=38 actual=$anchored_skill_total" >&2
+  exit 1
+fi
+assert_contains "$tw_authority_gate" "file-role=authority-gate-wrapper-skill" "tw_authority_gate_file_role_anchor"
+assert_contains "$tw_doc" "file-role=review-wrapper-skill" "tw_doc_review_file_role_anchor"
+assert_contains "$tw_code" "file-role=review-wrapper-skill" "tw_code_review_file_role_anchor"
+assert_contains "$tw_work" "file-role=implementation-worker-skill" "tw_work_file_role_anchor"
+assert_contains "$tw_grill" "file-role=intent-deepening-source-evidence-skill" "tw_grill_file_role_anchor"
+assert_contains "$tw_auto" "file-role=workflow-skill" "tw_auto_file_role_anchor"
+assert_contains "$tw_requirements_review" "file-role=requirements-review-wrapper-skill" "tw_requirements_review_file_role_anchor"
+assert_contains "$lfg_skill" "file-role=tw-auto-compatibility-alias-skill" "lfg_file_role_anchor"
+assert_contains "$requirements_reviewer" "file-role=core-requirements-quality-skill" "requirements_reviewer_file_role_anchor"
+assert_contains "$systems_traceability" "file-role=core-traceability-method-skill" "systems_traceability_file_role_anchor"
+assert_contains "$lfg_skill" "compatibility alias" "lfg_alias_identity_text"
+assert_contains "$lfg_skill" "Invoke \`tw-auto\` with the same arguments" "lfg_delegates_to_tw_auto"
+assert_contains "$lfg_skill" "Do not fall back to raw CE \`lfg\`" "lfg_no_raw_ce_fallback"
+echo "traceweaver_skill_file_total=$skill_file_total"
+echo "traceweaver_skill_file_anchored=$anchored_skill_total"
+echo "traceweaver_owned_anchor_status=pass"
+echo "traceweaver_imported_ce_inline_anchor_status=held_imported_components missing_inline_anchors=$imported_ce_unanchored_total"
+echo "traceweaver_lfg_alias_classification=alias_to_tw_auto"
+
+assert_contains "$tw_commit" "tw-authority-gate" "tw_commit_authority_gate"
+assert_contains "$tw_commit" "tw-traceability-check" "tw_commit_traceability_check"
+assert_contains "$tw_commit" "tw-code-review" "tw_commit_code_review_gate"
+assert_contains "$tw_commit" "tw-doc-review" "tw_commit_doc_review_gate"
+assert_contains "$tw_commit" "controlled TraceWeaver publication route" "tw_commit_publication_route"
+assert_contains "$tw_commit" 'delegate to the TraceWeaver-packaged `ce-commit`' "tw_commit_delegates_packaged_ce_commit"
+assert_contains "$tw_commit" "Do not stage files" "tw_commit_no_stage_boundary"
+assert_contains "$tw_commit_push_pr" "tw-authority-gate" "tw_commit_push_pr_authority_gate"
+assert_contains "$tw_commit_push_pr" "tw-traceability-check" "tw_commit_push_pr_traceability_check"
+assert_contains "$tw_commit_push_pr" "tw-code-review" "tw_commit_push_pr_code_review_gate"
+assert_contains "$tw_commit_push_pr" "tw-doc-review" "tw_commit_push_pr_doc_review_gate"
+assert_contains "$tw_commit_push_pr" "controlled publication route" "tw_commit_push_pr_publication_route"
+assert_contains "$tw_commit_push_pr" 'delegate to the TraceWeaver-packaged `ce-commit-push-pr`' "tw_commit_push_pr_delegates_packaged_ce_pr"
+assert_contains "$tw_commit_push_pr" 'Do not run `git add`' "tw_commit_push_pr_no_git_mutation_boundary"
+assert_contains "$ce_commit" "TraceWeaver Package Boundary" "tw_commit_packaged_ce_commit_boundary"
+assert_contains "$ce_commit_push_pr" "TraceWeaver Package Boundary" "tw_commit_push_pr_packaged_ce_pr_boundary"
+echo "tw_commit_publication_wrapper_static=pass"
+echo "tw_commit_push_pr_publication_wrapper_static=pass"
+
+assert_contains "$tw_debug" 'TraceWeaver-packaged `ce-debug`' "tw_debug_delegates_packaged_ce_debug"
+assert_contains "$tw_debug" "tw-authority-gate" "tw_debug_authority_gate"
+assert_contains "$tw_debug" "tw-traceability-check" "tw_debug_traceability_check"
+assert_contains "$tw_debug" "no-publication mode" "tw_debug_no_publication_mode"
+assert_contains "$tw_debug" "must not stage, commit, push, open PRs" "tw_debug_no_publication_boundary"
+assert_contains "$ce_debug" "name: ce-debug" "tw_debug_packaged_ce_debug_skill_name"
+assert_contains "$ce_debug" "TraceWeaver Package Boundary" "tw_debug_packaged_ce_debug_boundary"
+assert_fixture_field "$FIXTURE_ROOT/tw-debug-delegation/debug-result.txt" "expected_behavior" "delegate_to_ce_debug_under_tw_no_publication" "tw_debug_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-debug-delegation/debug-result.txt" "ce_delegation_surface" "TraceWeaver-packaged ce-debug" "tw_debug_ce_surface_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-debug-delegation/debug-result.txt" "accepted_scope" "deterministic_fixture_only_no_runtime_pass" "tw_debug_scope_fixture"
+echo "tw_debug_ce_delegation_fixture=pass"
+
+assert_contains "$tw_brainstorm" 'TraceWeaver-packaged `ce-brainstorm`' "tw_brainstorm_delegates_packaged_ce"
+assert_contains "$tw_brainstorm" "source evidence" "tw_brainstorm_source_evidence_boundary"
+assert_contains "$tw_brainstorm" "tw-requirements-review" "tw_brainstorm_requirements_review_handoff"
+assert_contains "$ce_brainstorm" "name: ce-brainstorm" "tw_brainstorm_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-brainstorm-source-evidence/brainstorm-result.txt" "expected_behavior" "delegate_to_ce_brainstorm_under_tw_source_evidence" "tw_brainstorm_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-brainstorm-source-evidence/brainstorm-result.txt" "ce_delegation_surface" "TraceWeaver-packaged ce-brainstorm" "tw_brainstorm_ce_surface_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-brainstorm-source-evidence/brainstorm-result.txt" "source_evidence_only" "true" "tw_brainstorm_source_evidence_fixture"
+echo "tw_brainstorm_packaged_ce_delegation_fixture=pass"
+
+assert_contains "$tw_compound" 'TraceWeaver-packaged `ce-compound`' "tw_compound_delegates_packaged_ce"
+assert_contains "$tw_compound" "source evidence" "tw_compound_source_evidence_boundary"
+assert_contains "$tw_compound" "Do not approve" "tw_compound_no_authority_mutation"
+assert_contains "$ce_compound" "name: ce-compound" "tw_compound_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-compound-source-evidence/compound-result.txt" "expected_behavior" "delegate_to_ce_compound_under_tw_source_evidence" "tw_compound_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-compound-source-evidence/compound-result.txt" "ce_delegation_surface" "TraceWeaver-packaged ce-compound" "tw_compound_ce_surface_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-compound-source-evidence/compound-result.txt" "requirements_mutation" "false" "tw_compound_no_requirement_mutation_fixture"
+echo "tw_compound_packaged_ce_delegation_fixture=pass"
+
+assert_contains "$tw_compound_refresh" 'TraceWeaver-packaged `ce-compound-refresh`' "tw_compound_refresh_delegates_packaged_ce"
+assert_contains "$tw_compound_refresh" "source evidence" "tw_compound_refresh_source_evidence_boundary"
+assert_contains "$tw_compound_refresh" "requirements change" "tw_compound_refresh_authority_change_pause"
+assert_contains "$ce_compound_refresh" "name: ce-compound-refresh" "tw_compound_refresh_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-compound-refresh-held-authority/refresh-result.txt" "expected_behavior" "delegate_to_ce_compound_refresh_under_tw_source_evidence" "tw_compound_refresh_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-compound-refresh-held-authority/refresh-result.txt" "authority_change" "held_for_tw_doc_review" "tw_compound_refresh_authority_held_fixture"
+echo "tw_compound_refresh_packaged_ce_delegation_fixture=pass"
+
+assert_contains "$tw_resolve_pr_feedback" 'ce-resolve-pr-feedback' "tw_resolve_pr_feedback_delegates_packaged_ce"
+assert_contains "$tw_resolve_pr_feedback" "remote-mutation authority" "tw_resolve_pr_feedback_no_remote_authority"
+assert_contains "$tw_resolve_pr_feedback" "tw-commit-push-pr" "tw_resolve_pr_feedback_publication_handoff"
+assert_contains "$ce_resolve_pr_feedback" "name: ce-resolve-pr-feedback" "tw_resolve_pr_feedback_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-resolve-pr-feedback-local-repair/feedback-result.txt" "expected_behavior" "delegate_to_ce_resolve_pr_feedback_under_tw_local_repair" "tw_resolve_pr_feedback_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-resolve-pr-feedback-local-repair/feedback-result.txt" "remote_mutation" "held" "tw_resolve_pr_feedback_remote_held_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-resolve-pr-feedback-local-repair/feedback-result.txt" "publication" "held" "tw_resolve_pr_feedback_publication_held_fixture"
+echo "tw_resolve_pr_feedback_packaged_ce_delegation_fixture=pass"
+
+assert_contains "$tw_sessions" 'TraceWeaver-packaged `ce-sessions`' "tw_sessions_delegates_packaged_ce"
+assert_contains "$tw_sessions" "hidden/internal" "tw_sessions_hidden_internal_helpers"
+assert_contains "$tw_sessions" "ce-session-inventory" "tw_sessions_inventory_helper"
+assert_contains "$tw_sessions" "ce-session-extract" "tw_sessions_extract_helper"
+assert_contains "$ce_sessions" "name: ce-sessions" "tw_sessions_packaged_ce_skill_name"
+assert_contains "$ce_sessions_inventory_helper" "TRACEWEAVER: file-role=packaged-skills-ce-sessions-scripts-discover-sessions-sh" "tw_sessions_inventory_helper_packaged_script"
+assert_contains "$ce_sessions_extract_helper" "TRACEWEAVER: file-role=packaged-skills-ce-sessions-scripts-extract-skeleton-py" "tw_sessions_extract_helper_packaged_script"
+assert_fixture_field "$FIXTURE_ROOT/tw-sessions-source-evidence/session-result.txt" "expected_behavior" "delegate_to_ce_sessions_under_tw_source_evidence" "tw_sessions_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-sessions-hidden-helpers/helper-result.txt" "direct_callable_wrappers" "false" "tw_sessions_hidden_helpers_not_direct_fixture"
+echo "tw_sessions_packaged_ce_delegation_fixture=pass"
+echo "tw_sessions_hidden_session_helpers=pass"
+
+assert_contains "$tw_test_browser" 'TraceWeaver-packaged `ce-test-browser`' "tw_test_browser_delegates_packaged_ce"
+assert_contains "$tw_test_browser" "requirement, trace, and verification IDs" "tw_test_browser_requires_ids"
+assert_contains "$tw_test_browser" "exploratory or held" "tw_test_browser_unlinked_held"
+assert_contains "$ce_test_browser" "name: ce-test-browser" "tw_test_browser_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-test-browser-verification-evidence/browser-result.txt" "expected_behavior" "delegate_to_ce_test_browser_under_tw_verification_evidence" "tw_test_browser_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-test-browser-verification-evidence/browser-result.txt" "requires_ids" "requirement,trace,verification" "tw_test_browser_requires_ids_fixture"
+echo "tw_test_browser_verification_fixture=pass"
+
+assert_contains "$tw_test_xcode" 'TraceWeaver-packaged `ce-test-xcode`' "tw_test_xcode_delegates_packaged_ce"
+assert_contains "$tw_test_xcode" "requirement, trace, and verification IDs" "tw_test_xcode_requires_ids"
+assert_contains "$tw_test_xcode" "exploratory or held" "tw_test_xcode_unlinked_held"
+assert_contains "$ce_test_xcode" "name: ce-test-xcode" "tw_test_xcode_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-test-xcode-verification-evidence/xcode-result.txt" "expected_behavior" "delegate_to_ce_test_xcode_under_tw_verification_evidence" "tw_test_xcode_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-test-xcode-verification-evidence/xcode-result.txt" "requires_ids" "requirement,trace,verification" "tw_test_xcode_requires_ids_fixture"
+echo "tw_test_xcode_verification_fixture=pass"
+
+assert_contains "$tw_setup" 'TraceWeaver-packaged `ce-setup`' "tw_setup_delegates_packaged_ce"
+assert_contains "$tw_setup" "read-only diagnostics" "tw_setup_read_only_default"
+assert_contains "$tw_setup" "explicit user confirmation" "tw_setup_host_mutation_confirmation"
+assert_contains "$ce_setup" "name: ce-setup" "tw_setup_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-setup-local-diagnostic/setup-result.txt" "expected_behavior" "delegate_to_ce_setup_under_tw_local_diagnostic" "tw_setup_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-setup-local-diagnostic/setup-result.txt" "host_mutation" "explicit_or_held" "tw_setup_host_mutation_fixture"
+echo "tw_setup_packaged_ce_delegation_fixture=pass"
+
+assert_contains "$tw_worktree" 'TraceWeaver-packaged `ce-worktree`' "tw_worktree_delegates_packaged_ce"
+assert_contains "$tw_worktree" "local-only" "tw_worktree_local_only"
+assert_contains "$tw_worktree" "Do not commit, push, open PRs" "tw_worktree_no_publication_boundary"
+assert_contains "$ce_worktree" "name: ce-worktree" "tw_worktree_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-worktree-local-only/worktree-result.txt" "expected_behavior" "delegate_to_ce_worktree_under_tw_local_only" "tw_worktree_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-worktree-local-only/worktree-result.txt" "remote_mutation" "held" "tw_worktree_remote_held_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-worktree-local-only/worktree-result.txt" "publication" "held" "tw_worktree_publication_held_fixture"
+echo "tw_worktree_packaged_ce_delegation_fixture=pass"
+echo "tw_wrapper_completion_publication_boundary=pass"
+
+assert_contains "$tw_work" "TraceWeaver-packaged" "tw_work_uses_packaged_ce_work"
+assert_contains "$tw_work" "Authority-Gate Preflight" "tw_work_authority_gate_preflight_section"
+assert_contains "$tw_work" "Immediately before it delegates" "tw_work_preflight_immediately_before_ce_work"
+assert_contains "$tw_work" 'stop before packaged `ce-work`' "tw_work_blocks_ce_work_when_authority_unsatisfied"
+assert_contains "$tw_work" "authority-gate result must be explicit" "tw_work_authority_gate_result_explicit"
+assert_contains "$tw_work" "trace-anchor authoring" "tw_work_trace_anchor_authoring"
+assert_contains "$tw_work" "Automatic Trace-Anchor Authoring Loop" "tw_work_automatic_authoring_loop"
+assert_contains "$tw_work" "newly created untracked files" "tw_work_changed_scope_includes_untracked"
+assert_contains "$tw_work" "traceweaver-author-code-anchors" "tw_work_authoring_helper_contract"
+assert_contains "$tw_work" "traceweaver-check-code-anchors" "tw_work_scanner_contract"
+assert_contains "$tw_work" "--mode apply" "tw_work_authoring_helper_apply_mode"
+assert_contains "$tw_work" "--work-loop" "tw_work_authoring_helper_work_loop_gate"
+assert_contains "$tw_work" "If the helper returns" "tw_work_authoring_helper_pause_boundary"
+assert_contains "$tw_work" "--skip-ambiguous-mapping" "tw_work_authoring_helper_skip_ambiguous"
+assert_contains "$tw_work" "skipped_unresolved_mapping" "tw_work_unresolved_mapping_status"
+assert_contains "$tw_work" "matrix Code Anchor Evidence" "tw_work_matrix_evidence"
+assert_contains "$tw_work" "helper writes the source anchor" "tw_work_source_matrix_transaction"
+assert_contains "$tw_work" "Rerun" "tw_work_scanner_rerun_required"
+assert_contains "$tw_work" "Review-staging does not allow commits" "tw_work_review_staging_not_publication_boundary"
+assert_contains "$tw_work" "only files it changed" "tw_work_review_staging_scoped_files"
+assert_contains "$tw_work" "Include all changed implementation files, verification artifacts" "tw_work_review_staging_handoff_scope"
+assert_contains "$tw_work" "passes a work-package ID, review route, and exact scoped file list" "tw_work_accepts_tw_auto_review_stage_handoff"
+assert_contains "$tw_work" "returns the staged path list" "tw_work_returns_review_stage_result"
+assert_contains "$ce_work" "tw-work" "ce_work_routes_back_to_tw_work"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "required_route" "tw-authority-gate,ce-work,traceweaver-check-code-anchors,traceweaver-author-code-anchors,traceweaver-check-code-anchors,tw-auto" "tw_work_clean_authoring_route_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "authority_gate_preflight" "pass" "tw_work_clean_authority_gate_preflight_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "authority_gate_preflight_before_ce_work" "true" "tw_work_clean_authority_gate_before_ce_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "trace_anchor_authoring" "applied_under_work_loop" "tw_work_clean_authoring_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "authoring_helper_mode" "apply" "tw_work_clean_authoring_helper_mode_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "authoring_helper_requires_work_loop" "true" "tw_work_clean_authoring_work_loop_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "changed_file_scope" "behavior_files_plus_linked_tests_fixtures_smokes_including_untracked" "tw_work_clean_changed_scope_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "code_anchor_insertion" "file_role_and_entrypoint" "tw_work_clean_code_anchor_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "test_anchor_insertion" "verification_anchor" "tw_work_clean_test_anchor_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "matrix_code_anchor_evidence" "updated" "tw_work_clean_matrix_evidence_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "source_and_matrix_transaction" "required" "tw_work_clean_transaction_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "scanner_after_authoring" "pass" "tw_work_clean_scanner_after_authoring_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "review_staging_handoff" "changed_code,changed_tests,traceability-matrix.md,verification_evidence" "tw_work_clean_review_staging_handoff_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-skip-ambiguous/worker-result.txt" "required_behavior" "skip_ambiguous_anchor_continue_clear_work" "tw_work_skip_ambiguous_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-skip-ambiguous/worker-result.txt" "ambiguous_anchor_authoring" "skipped_unresolved_mapping" "tw_work_skip_ambiguous_status_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-skip-ambiguous/worker-result.txt" "structured_finding" "CTA-UNRESOLVED-ANCHOR-MAPPING" "tw_work_skip_ambiguous_finding_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-skip-ambiguous/worker-result.txt" "review_acceptance" "blocked_until_mapping_resolved_or_held" "tw_work_skip_ambiguous_blocks_review_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "required_behavior" "pause_without_anchor_or_requirement_mutation" "tw_work_pause_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "authoring_helper_failure_behavior" "return_pause_to_tw_auto_without_manual_fallback" "tw_work_pause_helper_failure_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "pause_cases" "ambiguous_mapping,contradictory_authority,missing_verification,stale_requirement,material_requirement_change_needed" "tw_work_pause_cases_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "source_mutation" "false" "tw_work_pause_no_source_mutation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "matrix_mutation" "false" "tw_work_pause_no_matrix_mutation_fixture"
+echo "tw_work_trace_authoring_worker=pass"
+echo "tw_work_human_decision_pause_fixture=pass"
 
 assert_contains "$tw_trace" 'references/structured-findings.md' "tw_traceability_structured_contract_loaded"
+assert_contains "$tw_trace" "CTA-UNRESOLVED-ANCHOR-MAPPING" "tw_traceability_unresolved_mapping_gate"
 assert_contains "$structured_ref" "severity" "structured_reference_severity_field"
 assert_contains "$structured_ref" "claim_impact" "structured_reference_claim_impact_field"
 assert_contains "$structured_ref" "remediation" "structured_reference_remediation_field"
 echo "tw_traceability_check_structured_contract_static=pass"
 
 repo_trace_hash="$(hash_file "$tw_trace")"
+repo_auto_hash="$(hash_file "$tw_auto")"
+repo_plan_hash="$(hash_file "$tw_plan")"
+repo_authority_gate_hash="$(hash_file "$tw_authority_gate")"
+repo_work_hash="$(hash_file "$tw_work")"
+repo_debug_hash="$(hash_file "$tw_debug")"
+repo_commit_hash="$(hash_file "$tw_commit")"
+repo_commit_push_pr_hash="$(hash_file "$tw_commit_push_pr")"
 repo_code_hash="$(hash_file "$tw_code")"
 repo_doc_hash="$(hash_file "$tw_doc")"
+repo_brainstorm_hash="$(hash_file "$tw_brainstorm")"
+repo_compound_hash="$(hash_file "$tw_compound")"
+repo_compound_refresh_hash="$(hash_file "$tw_compound_refresh")"
+repo_resolve_pr_feedback_hash="$(hash_file "$tw_resolve_pr_feedback")"
+repo_sessions_hash="$(hash_file "$tw_sessions")"
+repo_test_browser_hash="$(hash_file "$tw_test_browser")"
+repo_test_xcode_hash="$(hash_file "$tw_test_xcode")"
+repo_setup_hash="$(hash_file "$tw_setup")"
+repo_worktree_hash="$(hash_file "$tw_worktree")"
+repo_code_anchor_scanner_hash="$(hash_file "$code_anchor_scanner")"
+repo_code_anchor_author_hash="$(hash_file "$code_anchor_author")"
+repo_ce_plan_hash="$(hash_file "$ce_plan")"
+repo_ce_work_hash="$(hash_file "$ce_work")"
+repo_ce_code_hash="$(hash_file "$ce_code")"
+repo_ce_doc_hash="$(hash_file "$ce_doc")"
+repo_ce_brainstorm_hash="$(hash_file "$ce_brainstorm")"
+repo_ce_compound_hash="$(hash_file "$ce_compound")"
+repo_ce_compound_refresh_hash="$(hash_file "$ce_compound_refresh")"
+repo_ce_resolve_pr_feedback_hash="$(hash_file "$ce_resolve_pr_feedback")"
+repo_ce_sessions_hash="$(hash_file "$ce_sessions")"
+repo_ce_test_browser_hash="$(hash_file "$ce_test_browser")"
+repo_ce_test_xcode_hash="$(hash_file "$ce_test_xcode")"
+repo_ce_setup_hash="$(hash_file "$ce_setup")"
+repo_ce_worktree_hash="$(hash_file "$ce_worktree")"
+host_auto="$ACTIVE_SKILLS_ROOT/tw-auto/SKILL.md"
+host_plan="$ACTIVE_SKILLS_ROOT/tw-plan/SKILL.md"
+host_authority_gate="$ACTIVE_SKILLS_ROOT/tw-authority-gate/SKILL.md"
+host_work="$ACTIVE_SKILLS_ROOT/tw-work/SKILL.md"
+host_debug="$ACTIVE_SKILLS_ROOT/tw-debug/SKILL.md"
+host_commit="$ACTIVE_SKILLS_ROOT/tw-commit/SKILL.md"
+host_commit_push_pr="$ACTIVE_SKILLS_ROOT/tw-commit-push-pr/SKILL.md"
 host_trace="$ACTIVE_SKILLS_ROOT/tw-traceability-check/SKILL.md"
+host_brainstorm="$ACTIVE_SKILLS_ROOT/tw-brainstorm/SKILL.md"
+host_compound="$ACTIVE_SKILLS_ROOT/tw-compound/SKILL.md"
+host_compound_refresh="$ACTIVE_SKILLS_ROOT/tw-compound-refresh/SKILL.md"
+host_resolve_pr_feedback="$ACTIVE_SKILLS_ROOT/tw-resolve-pr-feedback/SKILL.md"
+host_sessions="$ACTIVE_SKILLS_ROOT/tw-sessions/SKILL.md"
+host_test_browser="$ACTIVE_SKILLS_ROOT/tw-test-browser/SKILL.md"
+host_test_xcode="$ACTIVE_SKILLS_ROOT/tw-test-xcode/SKILL.md"
+host_setup="$ACTIVE_SKILLS_ROOT/tw-setup/SKILL.md"
+host_worktree="$ACTIVE_SKILLS_ROOT/tw-worktree/SKILL.md"
 host_structured_ref="$ACTIVE_SKILLS_ROOT/tw-traceability-check/references/structured-findings.md"
+host_code_anchor_scanner="$ACTIVE_SKILLS_ROOT/tw-traceability-check/scripts/traceweaver-check-code-anchors"
+host_code_anchor_author="$ACTIVE_SKILLS_ROOT/tw-traceability-check/scripts/traceweaver-author-code-anchors"
 host_code="$ACTIVE_SKILLS_ROOT/tw-code-review/SKILL.md"
 host_doc="$ACTIVE_SKILLS_ROOT/tw-doc-review/SKILL.md"
+host_ce_plan="$PACKAGED_SKILLS_ROOT/ce-plan/SKILL.md"
+host_ce_work="$PACKAGED_SKILLS_ROOT/ce-work/SKILL.md"
+host_ce_code="$PACKAGED_SKILLS_ROOT/ce-code-review/SKILL.md"
+host_ce_doc="$PACKAGED_SKILLS_ROOT/ce-doc-review/SKILL.md"
+host_ce_brainstorm="$PACKAGED_SKILLS_ROOT/ce-brainstorm/SKILL.md"
+host_ce_compound="$PACKAGED_SKILLS_ROOT/ce-compound/SKILL.md"
+host_ce_compound_refresh="$PACKAGED_SKILLS_ROOT/ce-compound-refresh/SKILL.md"
+host_ce_resolve_pr_feedback="$PACKAGED_SKILLS_ROOT/ce-resolve-pr-feedback/SKILL.md"
+host_ce_sessions="$PACKAGED_SKILLS_ROOT/ce-sessions/SKILL.md"
+host_ce_test_browser="$PACKAGED_SKILLS_ROOT/ce-test-browser/SKILL.md"
+host_ce_test_xcode="$PACKAGED_SKILLS_ROOT/ce-test-xcode/SKILL.md"
+host_ce_setup="$PACKAGED_SKILLS_ROOT/ce-setup/SKILL.md"
+host_ce_worktree="$PACKAGED_SKILLS_ROOT/ce-worktree/SKILL.md"
+host_auto_hash="missing"
+host_plan_hash="missing"
+host_authority_gate_hash="missing"
+host_work_hash="missing"
+host_debug_hash="missing"
+host_commit_hash="missing"
+host_commit_push_pr_hash="missing"
 host_trace_hash="missing"
+host_brainstorm_hash="missing"
+host_compound_hash="missing"
+host_compound_refresh_hash="missing"
+host_resolve_pr_feedback_hash="missing"
+host_sessions_hash="missing"
+host_test_browser_hash="missing"
+host_test_xcode_hash="missing"
+host_setup_hash="missing"
+host_worktree_hash="missing"
 host_structured_ref_hash="missing"
+host_code_anchor_scanner_hash="missing"
+host_code_anchor_author_hash="missing"
 host_code_hash="missing"
 host_doc_hash="missing"
+host_ce_plan_hash="missing"
+host_ce_work_hash="missing"
+host_ce_code_hash="missing"
+host_ce_doc_hash="missing"
+host_ce_brainstorm_hash="missing"
+host_ce_compound_hash="missing"
+host_ce_compound_refresh_hash="missing"
+host_ce_resolve_pr_feedback_hash="missing"
+host_ce_sessions_hash="missing"
+host_ce_test_browser_hash="missing"
+host_ce_test_xcode_hash="missing"
+host_ce_setup_hash="missing"
+host_ce_worktree_hash="missing"
+if [[ -f "$host_auto" ]]; then
+  host_auto_hash="$(hash_file "$host_auto")"
+fi
+if [[ -f "$host_plan" ]]; then
+  host_plan_hash="$(hash_file "$host_plan")"
+fi
+if [[ -f "$host_authority_gate" ]]; then
+  host_authority_gate_hash="$(hash_file "$host_authority_gate")"
+fi
+if [[ -f "$host_work" ]]; then
+  host_work_hash="$(hash_file "$host_work")"
+fi
+if [[ -f "$host_debug" ]]; then
+  host_debug_hash="$(hash_file "$host_debug")"
+fi
+if [[ -f "$host_commit" ]]; then
+  host_commit_hash="$(hash_file "$host_commit")"
+fi
+if [[ -f "$host_commit_push_pr" ]]; then
+  host_commit_push_pr_hash="$(hash_file "$host_commit_push_pr")"
+fi
 if [[ -f "$host_trace" ]]; then
   host_trace_hash="$(hash_file "$host_trace")"
 fi
+if [[ -f "$host_brainstorm" ]]; then
+  host_brainstorm_hash="$(hash_file "$host_brainstorm")"
+fi
+if [[ -f "$host_compound" ]]; then
+  host_compound_hash="$(hash_file "$host_compound")"
+fi
+if [[ -f "$host_compound_refresh" ]]; then
+  host_compound_refresh_hash="$(hash_file "$host_compound_refresh")"
+fi
+if [[ -f "$host_resolve_pr_feedback" ]]; then
+  host_resolve_pr_feedback_hash="$(hash_file "$host_resolve_pr_feedback")"
+fi
+if [[ -f "$host_sessions" ]]; then
+  host_sessions_hash="$(hash_file "$host_sessions")"
+fi
+if [[ -f "$host_test_browser" ]]; then
+  host_test_browser_hash="$(hash_file "$host_test_browser")"
+fi
+if [[ -f "$host_test_xcode" ]]; then
+  host_test_xcode_hash="$(hash_file "$host_test_xcode")"
+fi
+if [[ -f "$host_setup" ]]; then
+  host_setup_hash="$(hash_file "$host_setup")"
+fi
+if [[ -f "$host_worktree" ]]; then
+  host_worktree_hash="$(hash_file "$host_worktree")"
+fi
 if [[ -f "$host_structured_ref" ]]; then
   host_structured_ref_hash="$(hash_file "$host_structured_ref")"
+fi
+if [[ -f "$host_code_anchor_scanner" ]]; then
+  host_code_anchor_scanner_hash="$(hash_file "$host_code_anchor_scanner")"
+fi
+if [[ -f "$host_code_anchor_author" ]]; then
+  host_code_anchor_author_hash="$(hash_file "$host_code_anchor_author")"
 fi
 if [[ -f "$host_code" ]]; then
   host_code_hash="$(hash_file "$host_code")"
@@ -152,17 +739,175 @@ fi
 if [[ -f "$host_doc" ]]; then
   host_doc_hash="$(hash_file "$host_doc")"
 fi
+if [[ -f "$host_ce_plan" ]]; then
+  host_ce_plan_hash="$(hash_file "$host_ce_plan")"
+fi
+if [[ -f "$host_ce_work" ]]; then
+  host_ce_work_hash="$(hash_file "$host_ce_work")"
+fi
+if [[ -f "$host_ce_code" ]]; then
+  host_ce_code_hash="$(hash_file "$host_ce_code")"
+fi
+if [[ -f "$host_ce_doc" ]]; then
+  host_ce_doc_hash="$(hash_file "$host_ce_doc")"
+fi
+if [[ -f "$host_ce_brainstorm" ]]; then
+  host_ce_brainstorm_hash="$(hash_file "$host_ce_brainstorm")"
+fi
+if [[ -f "$host_ce_compound" ]]; then
+  host_ce_compound_hash="$(hash_file "$host_ce_compound")"
+fi
+if [[ -f "$host_ce_compound_refresh" ]]; then
+  host_ce_compound_refresh_hash="$(hash_file "$host_ce_compound_refresh")"
+fi
+if [[ -f "$host_ce_resolve_pr_feedback" ]]; then
+  host_ce_resolve_pr_feedback_hash="$(hash_file "$host_ce_resolve_pr_feedback")"
+fi
+if [[ -f "$host_ce_sessions" ]]; then
+  host_ce_sessions_hash="$(hash_file "$host_ce_sessions")"
+fi
+if [[ -f "$host_ce_test_browser" ]]; then
+  host_ce_test_browser_hash="$(hash_file "$host_ce_test_browser")"
+fi
+if [[ -f "$host_ce_test_xcode" ]]; then
+  host_ce_test_xcode_hash="$(hash_file "$host_ce_test_xcode")"
+fi
+if [[ -f "$host_ce_setup" ]]; then
+  host_ce_setup_hash="$(hash_file "$host_ce_setup")"
+fi
+if [[ -f "$host_ce_worktree" ]]; then
+  host_ce_worktree_hash="$(hash_file "$host_ce_worktree")"
+fi
 repo_structured_ref_hash="$(hash_file "$structured_ref")"
 
+active_host_review_routing_hashes_current() {
+  [[ "$host_auto_hash" == "$repo_auto_hash" &&
+     "$host_plan_hash" == "$repo_plan_hash" &&
+     "$host_authority_gate_hash" == "$repo_authority_gate_hash" &&
+     "$host_work_hash" == "$repo_work_hash" &&
+     "$host_trace_hash" == "$repo_trace_hash" &&
+     "$host_structured_ref_hash" == "$repo_structured_ref_hash" &&
+     "$host_code_anchor_scanner_hash" == "$repo_code_anchor_scanner_hash" &&
+     "$host_code_anchor_author_hash" == "$repo_code_anchor_author_hash" &&
+     "$host_code_hash" == "$repo_code_hash" &&
+     "$host_doc_hash" == "$repo_doc_hash" &&
+     "$host_brainstorm_hash" == "$repo_brainstorm_hash" &&
+     "$host_compound_hash" == "$repo_compound_hash" &&
+     "$host_compound_refresh_hash" == "$repo_compound_refresh_hash" &&
+     "$host_resolve_pr_feedback_hash" == "$repo_resolve_pr_feedback_hash" &&
+     "$host_sessions_hash" == "$repo_sessions_hash" &&
+     "$host_test_browser_hash" == "$repo_test_browser_hash" &&
+     "$host_test_xcode_hash" == "$repo_test_xcode_hash" &&
+     "$host_setup_hash" == "$repo_setup_hash" &&
+     "$host_worktree_hash" == "$repo_worktree_hash" &&
+     "$host_ce_plan_hash" == "$repo_ce_plan_hash" &&
+     "$host_ce_work_hash" == "$repo_ce_work_hash" &&
+     "$host_ce_code_hash" == "$repo_ce_code_hash" &&
+     "$host_ce_doc_hash" == "$repo_ce_doc_hash" &&
+     "$host_ce_brainstorm_hash" == "$repo_ce_brainstorm_hash" &&
+     "$host_ce_compound_hash" == "$repo_ce_compound_hash" &&
+     "$host_ce_compound_refresh_hash" == "$repo_ce_compound_refresh_hash" &&
+     "$host_ce_resolve_pr_feedback_hash" == "$repo_ce_resolve_pr_feedback_hash" &&
+     "$host_ce_sessions_hash" == "$repo_ce_sessions_hash" &&
+     "$host_ce_test_browser_hash" == "$repo_ce_test_browser_hash" &&
+     "$host_ce_test_xcode_hash" == "$repo_ce_test_xcode_hash" &&
+     "$host_ce_setup_hash" == "$repo_ce_setup_hash" &&
+     "$host_ce_worktree_hash" == "$repo_ce_worktree_hash" ]]
+}
+
+authority_gate_control_hash="$host_authority_gate_hash"
+host_authority_gate_hash="stale-control"
+if active_host_review_routing_hashes_current; then
+  echo "active_host_tw_auto_review_routing_dependency_control=failed_stale_authority_gate_not_detected" >&2
+  exit 1
+fi
+host_authority_gate_hash="$authority_gate_control_hash"
+
 echo "tw_skill_behavior_artifact_dir=$tmp_dir"
+echo "active_host_tw_auto_repo_hash=$repo_auto_hash"
+echo "active_host_tw_auto_host_hash=$host_auto_hash"
+echo "active_host_tw_plan_repo_hash=$repo_plan_hash"
+echo "active_host_tw_plan_host_hash=$host_plan_hash"
+echo "active_host_tw_authority_gate_repo_hash=$repo_authority_gate_hash"
+echo "active_host_tw_authority_gate_host_hash=$host_authority_gate_hash"
+echo "active_host_tw_work_repo_hash=$repo_work_hash"
+echo "active_host_tw_work_host_hash=$host_work_hash"
+echo "active_host_tw_debug_repo_hash=$repo_debug_hash"
+echo "active_host_tw_debug_host_hash=$host_debug_hash"
+echo "active_host_tw_commit_repo_hash=$repo_commit_hash"
+echo "active_host_tw_commit_host_hash=$host_commit_hash"
+echo "active_host_tw_commit_push_pr_repo_hash=$repo_commit_push_pr_hash"
+echo "active_host_tw_commit_push_pr_host_hash=$host_commit_push_pr_hash"
 echo "active_host_tw_traceability_check_repo_hash=$repo_trace_hash"
 echo "active_host_tw_traceability_check_host_hash=$host_trace_hash"
 echo "active_host_tw_traceability_check_repo_structured_ref_hash=$repo_structured_ref_hash"
 echo "active_host_tw_traceability_check_host_structured_ref_hash=$host_structured_ref_hash"
+echo "active_host_tw_traceability_check_repo_scanner_hash=$repo_code_anchor_scanner_hash"
+echo "active_host_tw_traceability_check_host_scanner_hash=$host_code_anchor_scanner_hash"
+echo "active_host_tw_traceability_check_repo_author_hash=$repo_code_anchor_author_hash"
+echo "active_host_tw_traceability_check_host_author_hash=$host_code_anchor_author_hash"
 echo "active_host_tw_code_review_repo_hash=$repo_code_hash"
 echo "active_host_tw_code_review_host_hash=$host_code_hash"
 echo "active_host_tw_doc_review_repo_hash=$repo_doc_hash"
 echo "active_host_tw_doc_review_host_hash=$host_doc_hash"
+echo "active_host_tw_brainstorm_repo_hash=$repo_brainstorm_hash"
+echo "active_host_tw_brainstorm_host_hash=$host_brainstorm_hash"
+echo "active_host_tw_compound_repo_hash=$repo_compound_hash"
+echo "active_host_tw_compound_host_hash=$host_compound_hash"
+echo "active_host_tw_compound_refresh_repo_hash=$repo_compound_refresh_hash"
+echo "active_host_tw_compound_refresh_host_hash=$host_compound_refresh_hash"
+echo "active_host_tw_resolve_pr_feedback_repo_hash=$repo_resolve_pr_feedback_hash"
+echo "active_host_tw_resolve_pr_feedback_host_hash=$host_resolve_pr_feedback_hash"
+echo "active_host_tw_sessions_repo_hash=$repo_sessions_hash"
+echo "active_host_tw_sessions_host_hash=$host_sessions_hash"
+echo "active_host_tw_test_browser_repo_hash=$repo_test_browser_hash"
+echo "active_host_tw_test_browser_host_hash=$host_test_browser_hash"
+echo "active_host_tw_test_xcode_repo_hash=$repo_test_xcode_hash"
+echo "active_host_tw_test_xcode_host_hash=$host_test_xcode_hash"
+echo "active_host_tw_setup_repo_hash=$repo_setup_hash"
+echo "active_host_tw_setup_host_hash=$host_setup_hash"
+echo "active_host_tw_worktree_repo_hash=$repo_worktree_hash"
+echo "active_host_tw_worktree_host_hash=$host_worktree_hash"
+echo "active_host_ce_plan_repo_hash=$repo_ce_plan_hash"
+echo "active_host_ce_plan_host_hash=$host_ce_plan_hash"
+echo "active_host_ce_work_repo_hash=$repo_ce_work_hash"
+echo "active_host_ce_work_host_hash=$host_ce_work_hash"
+echo "active_host_ce_code_review_repo_hash=$repo_ce_code_hash"
+echo "active_host_ce_code_review_host_hash=$host_ce_code_hash"
+echo "active_host_ce_doc_review_repo_hash=$repo_ce_doc_hash"
+echo "active_host_ce_doc_review_host_hash=$host_ce_doc_hash"
+echo "active_host_ce_brainstorm_repo_hash=$repo_ce_brainstorm_hash"
+echo "active_host_ce_brainstorm_host_hash=$host_ce_brainstorm_hash"
+echo "active_host_ce_compound_repo_hash=$repo_ce_compound_hash"
+echo "active_host_ce_compound_host_hash=$host_ce_compound_hash"
+echo "active_host_ce_compound_refresh_repo_hash=$repo_ce_compound_refresh_hash"
+echo "active_host_ce_compound_refresh_host_hash=$host_ce_compound_refresh_hash"
+echo "active_host_ce_resolve_pr_feedback_repo_hash=$repo_ce_resolve_pr_feedback_hash"
+echo "active_host_ce_resolve_pr_feedback_host_hash=$host_ce_resolve_pr_feedback_hash"
+echo "active_host_ce_sessions_repo_hash=$repo_ce_sessions_hash"
+echo "active_host_ce_sessions_host_hash=$host_ce_sessions_hash"
+echo "active_host_ce_test_browser_repo_hash=$repo_ce_test_browser_hash"
+echo "active_host_ce_test_browser_host_hash=$host_ce_test_browser_hash"
+echo "active_host_ce_test_xcode_repo_hash=$repo_ce_test_xcode_hash"
+echo "active_host_ce_test_xcode_host_hash=$host_ce_test_xcode_hash"
+echo "active_host_ce_setup_repo_hash=$repo_ce_setup_hash"
+echo "active_host_ce_setup_host_hash=$host_ce_setup_hash"
+echo "active_host_ce_worktree_repo_hash=$repo_ce_worktree_hash"
+echo "active_host_ce_worktree_host_hash=$host_ce_worktree_hash"
+echo "active_host_tw_auto_review_routing_dependency_control=pass_stale_authority_gate_detected"
+
+if ! active_host_review_routing_hashes_current; then
+  echo "active_host_tw_auto_review_routing_surface=held_required_review_routing_skill_missing_or_stale"
+else
+  echo "active_host_tw_auto_review_routing_surface=pass_host_review_routing_skill_hashes_current"
+fi
+
+if [[ "$host_commit_hash" != "$repo_commit_hash" ||
+      "$host_commit_push_pr_hash" != "$repo_commit_push_pr_hash" ]]; then
+  echo "active_host_tw_publication_wrapper_surface=held_publication_wrapper_skill_missing_or_stale"
+else
+  echo "active_host_tw_publication_wrapper_surface=pass_host_publication_wrapper_skill_hashes_current"
+fi
 
 if [[ "$host_trace_hash" != "$repo_trace_hash" || "$host_structured_ref_hash" != "$repo_structured_ref_hash" ]]; then
   echo "active_host_tw_traceability_check_structured_runtime=held_host_skill_missing_or_stale"
@@ -187,6 +932,8 @@ if [[ "$host_doc_hash" != "$repo_doc_hash" ]]; then
 fi
 
 if [[ "$RUNTIME_EXEC" != "1" ]]; then
+  echo "tw_skill_behavior_runtime_model=$MODEL"
+  echo "tw_skill_behavior_runtime_reasoning_effort=$REASONING_EFFORT"
   echo "active_host_tw_traceability_check_structured_runtime=held_runtime_exec_disabled"
   echo "active_host_tw_code_review_wrapper_runtime=held_runtime_exec_disabled"
   echo "active_host_tw_doc_review_wrapper_runtime=held_runtime_exec_disabled"
@@ -197,6 +944,7 @@ fi
 set +e
 perl -e 'alarm shift; exec @ARGV' "$EXEC_TIMEOUT_SECONDS" codex exec \
   -m "$MODEL" \
+  -c "model_reasoning_effort=\"$REASONING_EFFORT\"" \
   --sandbox read-only \
   --skip-git-repo-check \
   --ignore-rules \
@@ -255,6 +1003,7 @@ echo "active_host_tw_traceability_check_structured_runtime=pass_constrained_fixt
 set +e
 perl -e 'alarm shift; exec @ARGV' "$EXEC_TIMEOUT_SECONDS" codex exec \
   -m "$MODEL" \
+  -c "model_reasoning_effort=\"$REASONING_EFFORT\"" \
   --sandbox read-only \
   --skip-git-repo-check \
   --ignore-rules \
@@ -309,6 +1058,7 @@ echo "active_host_tw_code_review_wrapper_runtime=held_prompt_satisfied_file_acce
 set +e
 perl -e 'alarm shift; exec @ARGV' "$EXEC_TIMEOUT_SECONDS" codex exec \
   -m "$MODEL" \
+  -c "model_reasoning_effort=\"$REASONING_EFFORT\"" \
   --sandbox read-only \
   --skip-git-repo-check \
   --ignore-rules \

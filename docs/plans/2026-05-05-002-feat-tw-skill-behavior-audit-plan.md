@@ -73,21 +73,28 @@ Accepted:
   observations: host wrapper hashes matched this branch and the runtime smoke
   returned prompt-specified trace-blocked and stale-authority fields. This extension
   has clean behavior code review and staged authority doc review passed as CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-AUTHORITY-CLEAN-001.
+- `tw-debug` wrapper static fixture and active-surface hash proof: the
+  deterministic TW skill behavior smoke reports `tw_debug_ce_delegation_fixture=pass`
+  and current active-host `tw-debug` hashes. Scoped `tw-code-review` passed as
+  `TW-CODE-REVIEW-2026-05-06-TW-DEBUG-WRAPPER-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-06-TW-DEBUG-STATUS-HASH-CLEAN-001`.
 
 Held:
 
 - Real TW skill runtime invocation beyond the constrained Unit 11
   `tw-authority-gate` sentinel proof, including `tw-requirements-review`,
-  `tw-traceability-check`, `tw-code-review`, `tw-doc-review`, `tw-auto`,
+  `tw-traceability-check`, `tw-code-review`, `tw-doc-review`, `tw-debug`, `tw-auto`,
   `lfg`, and `tw-grill`.
 - Wrapped CE continuity runtime behavior beyond active-surface visibility,
   including `ce-debug`, `ce-commit`, and `ce-commit-push-pr`.
+- `tw-debug` runtime debug behavior beyond the static fixture/hash proof.
 - `tw-auto` task/plan closure-loop automation, automatic review-fix repair, and
   human-decision pause behavior when requirements are unclear, contradictory,
   incomplete, missing, or need material authority changes.
-- Project-level trace/matrix/gap/change/exception writes.
-- Code/test trace-anchor scanner behavior, matrix code-anchor table behavior,
-  `tw-code-review` enforcement, and dead-TDD classification.
+- Project-level trace/matrix/gap/change/exception writes outside the reviewed
+  narrow TraceWeaver project-write allowance.
+- Runtime code/test trace-anchor enforcement and dead-TDD classification beyond
+  reviewed static scanner, authoring, Code Anchor Evidence, and TDD-chain code
+  review evidence.
 - Structured `tw-traceability-check` finding emission, severity mapping,
   file/line anchoring, Codex `::code-comment` output, and review-wrapper
   integration.
@@ -95,7 +102,9 @@ Held:
   fixture proof and the code-review-passed / authority-doc-review-passed reviewed held
   `tw-code-review` /
   `tw-doc-review` prompt-satisfied file-access observations.
-- Successful CE code/doc review delegation on clean wrapper inputs.
+- Deterministic clean CE code/doc review delegation fixtures are recorded with
+  code review and scoped authority doc review passed as reviewed static fixture
+  evidence only; actual runtime CE delegation remains held.
 - Clean CE replacement.
 - Full CE 3.5.0 plugin parity and support for unclassified CE 3.5.0
   surfaces.
@@ -276,9 +285,9 @@ Work:
   - metrics dashboard;
   - automatic Mermaid generation;
   - code-level requirement annotations;
-  - code/test trace anchors and dead-TDD detection;
-  - structured traceability findings;
-  - project-level trace writes;
+- code/test trace anchors and dead-TDD detection;
+- structured traceability findings;
+- project-level trace writes;
   - active `tw-auto` runtime invocation;
   - CE plugin replacement readiness.
 
@@ -318,13 +327,22 @@ Verification:
   behavior code review passed as
   `CE-CODE-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-CLEAN-001`
   and staged authority doc review passed as CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-AUTHORITY-CLEAN-001.
+- Current clean CE delegation fixture extension code review passed as
+  `CE-CODE-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-CLEAN-DELEGATION-CLEAN-001`;
+  scoped authority doc review passed as
+  `CE-DOC-REVIEW-2026-05-06-SCOPED-STATUS-HASH-AUTHORITY-CLEAN-001`.
+- Current `tw-debug` wrapper static fixture code review passed as
+  `TW-CODE-REVIEW-2026-05-06-TW-DEBUG-WRAPPER-CLEAN-001`; scoped authority doc review passed as
+  `TW-DOC-REVIEW-2026-05-06-TW-DEBUG-STATUS-HASH-CLEAN-001`.
 - Stage reviewed authority files together with no staged/unstaged split before
   using the audit as input for new work.
 
 ## Suggested Next Command
 
-Review the extended wrapper runtime smoke before accepting it:
+The `tw-debug` clean code-review status/hash update is recorded with scoped
+authority doc review passed. Proceed from the reviewed static fixture and
+scanner evidence into wrapper integration/runtime proof:
 
 ```text
-/ce-code-review on scripts/traceweaver-smoke-tw-skill-behavior
+/tw-code-review or /tw-debug runtime proof for runtime CE debug delegation, keeping publication held.
 ```

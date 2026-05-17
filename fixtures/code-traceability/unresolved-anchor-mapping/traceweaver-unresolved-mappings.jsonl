@@ -1,0 +1,1 @@
+{"target":"src/ambiguous_feature.sh","reason":"ambiguous_per_artifact_anchor_mapping","missing_fields":["single_authority_mapping"],"candidate_requirements":["REQ-CTA-UNRESOLVED"],"candidate_traces":["TRACE-CTA-UNRESOLVED"],"candidate_verifications":["VER-CTA-UNRESOLVED"],"anchor_level":"file","role":"fixture-source","source_mutation":false,"matrix_mutation":false}

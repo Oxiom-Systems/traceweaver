@@ -1,0 +1,10 @@
+skill=tw-doc-review
+case=clean-authority-delegates-to-ce-doc-review
+required_status=passable
+tw_requirements_review_result=pass
+tw_traceability_check_result=pass
+expected_behavior=delegate_to_ce_doc_review_under_tw_no_publication
+ce_delegation_surface=TraceWeaver-packaged ce-doc-review
+forbidden_behavior=skip_tw_requirements_or_traceability_checks_or_publish
+accepted_scope=deterministic_fixture_only_no_runtime_pass
+affected_ids=REQ-TW-050,REQ-TW-055

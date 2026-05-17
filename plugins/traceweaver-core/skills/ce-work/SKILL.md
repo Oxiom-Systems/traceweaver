@@ -4,6 +4,8 @@ description: Execute work efficiently while maintaining quality and finishing fe
 argument-hint: "[Plan doc path or description of work. Blank to auto use latest plan doc]"
 ---
 
+<!-- TRACEWEAVER: file-role=manual-continuity-worker-skill; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044 -->
+
 # Work Execution Command
 
 Execute work efficiently while maintaining quality and finishing features.
@@ -17,12 +19,15 @@ a TraceWeaver-authority-enforced workflow, and it cannot close TraceWeaver
 authority, traceability, verification, validation, commit, push, or PR gates
 without the controlled TraceWeaver publication route passing.
 
-For TraceWeaver-controlled implementation, use `tw-auto` or explicitly run the
-TraceWeaver sequence first:
+For TraceWeaver-controlled implementation, use `tw-auto`, which routes the
+implementation phase through `tw-work`. Direct `ce-work` is only the underlying
+compatibility worker and should not be the user-facing TraceWeaver work-loop
+surface. If manually composing the sequence, run:
 
 ```text
 tw-authority-gate
--> ce-work
+-> tw-work
+-> ce-work no-publication implementation engine
 -> tw-traceability-check
 -> ce-code-review / ce-doc-review
 ```
@@ -60,8 +65,9 @@ route:
 - do not allow subagents to stage, commit, push, or publish during
   implementation, even in isolated worktrees;
 - after implementation, tests, trace updates, and review handoff are complete,
-  return control to `tw-auto` with changed files, verification evidence, matrix
-  status, open gaps, held claims, and the next required review or human decision.
+  return control to `tw-work` or `tw-auto` with changed files, verification
+  evidence, matrix status, open gaps, held claims, and the next required review
+  or human decision.
 
 If any later instruction in this skill or its references conflicts with
 TraceWeaver publication-gated mode, the TraceWeaver boundary wins and the

@@ -1,0 +1,427 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=trace-anchor-authoring-helper; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044
+
+require "fileutils"
+require "json"
+require "optparse"
+require "pathname"
+
+options = {
+  root: Dir.pwd,
+  mode: "propose",
+  anchor_level: "file",
+  target: nil,
+  matrix: "traceability-matrix.md",
+  requirement: nil,
+  trace: nil,
+  verification: nil,
+  role: nil,
+  entrypoint: nil,
+  unresolved_mappings: nil,
+  reason: nil,
+  work_loop: false,
+  skip_ambiguous_mapping: false,
+  helper_exception: false,
+  generated_exception: false
+}
+
+OptionParser.new do |opts|
+  opts.on("--root PATH") { |value| options[:root] = value }
+  opts.on("--mode MODE") { |value| options[:mode] = value }
+  opts.on("--target PATH") { |value| options[:target] = value.sub(%r{\A\./}, "") }
+  opts.on("--matrix PATH") { |value| options[:matrix] = value }
+  opts.on("--anchor-level LEVEL") { |value| options[:anchor_level] = value }
+  opts.on("--requirement ID") { |value| options[:requirement] = value }
+  opts.on("--trace ID") { |value| options[:trace] = value }
+  opts.on("--verification ID") { |value| options[:verification] = value }
+  opts.on("--role ROLE") { |value| options[:role] = value }
+  opts.on("--entrypoint NAME") { |value| options[:entrypoint] = value }
+  opts.on("--unresolved-mappings PATH") { |value| options[:unresolved_mappings] = value }
+  opts.on("--reason TEXT") { |value| options[:reason] = value }
+  opts.on("--work-loop") { options[:work_loop] = true }
+  opts.on("--skip-ambiguous-mapping") { options[:skip_ambiguous_mapping] = true }
+  opts.on("--helper-exception-approved") { options[:helper_exception] = true }
+  opts.on("--generated-exception") { options[:generated_exception] = true }
+end.parse!
+
+root = Pathname.new(options[:root]).expand_path
+mode = options[:mode]
+target = options[:target]
+
+unless %w[propose apply].include?(mode)
+  warn "trace_anchor_authoring_invalid_mode=#{mode}"
+  exit 2
+end
+
+unless target
+  warn "trace_anchor_authoring_missing_target=true"
+  exit 2
+end
+
+def unsafe_relative_path?(path)
+  candidate = Pathname.new(path)
+  candidate.absolute? || candidate.each_filename.any? { |part| part == ".." }
+end
+
+def path_inside_root?(path, root)
+  path_string = path.to_s
+  root_string = root.to_s
+  path_string == root_string || path_string.start_with?("#{root_string}/")
+end
+
+def write_path_inside_root?(path, root)
+  expanded = path.expand_path
+  return false unless path_inside_root?(expanded, root)
+  return path_inside_root?(expanded.realpath, root) if expanded.exist?
+
+  existing_parent = expanded.dirname
+  existing_parent = existing_parent.parent until existing_parent.exist? || existing_parent == root.parent
+  existing_parent.exist? && path_inside_root?(existing_parent.realpath, root)
+end
+
+if unsafe_relative_path?(target) || unsafe_relative_path?(options[:matrix]) ||
+   (options[:unresolved_mappings] && unsafe_relative_path?(options[:unresolved_mappings]))
+  warn "trace_anchor_authoring_path_outside_root=true"
+  exit 2
+end
+
+unless root.directory?
+  warn "trace_anchor_authoring_missing_required_file=true"
+  exit 2
+end
+
+root = root.realpath
+target_path = root.join(target)
+matrix_path = root.join(options[:matrix])
+requirements_path = root.join("requirements.md")
+unresolved_mappings_path = options[:unresolved_mappings] && root.join(options[:unresolved_mappings])
+
+unless target_path.file? && requirements_path.file? && matrix_path.file?
+  warn "trace_anchor_authoring_missing_required_file=true"
+  exit 2
+end
+
+target_path = target_path.realpath
+requirements_path = requirements_path.realpath
+matrix_path = matrix_path.realpath
+
+paths_to_check = [target_path, requirements_path, matrix_path]
+unless paths_to_check.all? { |path| path_inside_root?(path, root) } &&
+       (!unresolved_mappings_path || write_path_inside_root?(unresolved_mappings_path, root))
+  warn "trace_anchor_authoring_path_outside_root=true"
+  exit 2
+end
+options[:unresolved_mappings] = unresolved_mappings_path.expand_path.to_s if unresolved_mappings_path
+
+requirements_text = requirements_path.read
+matrix_text = matrix_path.read
+target_text = target_path.read
+
+def pause(reason)
+  puts "trace_anchor_authoring_status=pause"
+  puts "trace_anchor_authoring_reason=#{reason}"
+  puts "trace_anchor_authoring_file_changed=false"
+  puts "trace_anchor_authoring_matrix_changed=false"
+  exit 1
+end
+
+def skip_unresolved_mapping(options:, target:, reason:, candidate_rows:)
+  unresolved_path = options[:unresolved_mappings]
+  unless unresolved_path
+    pause(reason)
+  end
+
+  FileUtils.mkdir_p(File.dirname(unresolved_path))
+  candidate_ids = candidate_rows.flat_map { |row| row.scan(/\b(?:REQ|TRACE|VER)-[A-Z0-9]+-[A-Z0-9-]+\b/) }
+  record = {
+    target: target,
+    reason: reason,
+    missing_fields: ["single_authority_mapping"],
+    candidate_requirements: candidate_ids.select { |id| id.start_with?("REQ-") }.uniq,
+    candidate_traces: candidate_ids.select { |id| id.start_with?("TRACE-") }.uniq,
+    candidate_verifications: candidate_ids.select { |id| id.start_with?("VER-") }.uniq,
+    anchor_level: options[:anchor_level],
+    role: options[:role],
+    source_mutation: false,
+    matrix_mutation: false
+  }
+  File.open(unresolved_path, "a") { |file| file.puts(JSON.generate(record)) }
+
+  puts "trace_anchor_authoring_status=skipped_unresolved_mapping"
+  puts "trace_anchor_authoring_reason=#{reason}"
+  puts "trace_anchor_authoring_target=#{target}"
+  puts "trace_anchor_authoring_unresolved_mappings=#{unresolved_path}"
+  puts "trace_anchor_authoring_file_changed=false"
+  puts "trace_anchor_authoring_matrix_changed=false"
+  exit 0
+end
+
+def shell_comment?(path)
+  path.match?(/\.(sh|bash|rb|py)$/)
+end
+
+def comment_line(path, body)
+  if path.end_with?(".md")
+    "<!-- #{body} -->"
+  elsif path.match?(/\.(yml|yaml)$/)
+    "# #{body}"
+  elsif path.end_with?(".json")
+    pause("json_anchor_requires_structured_field")
+  elsif path.match?(/\.(ts|tsx|js|mjs|cjs)$/)
+    "// #{body}"
+  else
+    "#{shell_comment?(path) ? "#" : "#"} #{body}"
+  end
+end
+
+def insert_after_header(text, anchor)
+  lines = text.lines
+  insert_at = 0
+  insert_at = 1 if lines.first&.start_with?("#!")
+  while insert_at < lines.length && lines[insert_at].match?(/\A\s*(set -euo pipefail|# frozen_string_literal: true)\s*\z/)
+    insert_at += 1
+  end
+  insert_at += 1 while insert_at < lines.length && lines[insert_at].strip.empty?
+  lines.insert(insert_at, "#{anchor}\n")
+  lines.join
+end
+
+def insert_before_entrypoint(text, anchor, entrypoint)
+  lines = text.lines
+  pattern =
+    if entrypoint
+      /^\s*(#{Regexp.escape(entrypoint)}\(\)\s*\{|function\s+#{Regexp.escape(entrypoint)}\b|(?:async\s+)?def\s+#{Regexp.escape(entrypoint)}\b|export\s+function\s+#{Regexp.escape(entrypoint)}\b)/
+    else
+      /^\s*([A-Za-z0-9_:-]+\(\)\s*\{|function\s+[A-Za-z0-9_:-]+|(?:async\s+)?def\s+[A-Za-z0-9_:-]+|export\s+function\s+[A-Za-z0-9_:-]+)/
+    end
+  index = lines.find_index { |line| line.match?(pattern) }
+  pause("entrypoint_not_found") unless index
+  lines.insert(index, "#{anchor}\n")
+  lines.join
+end
+
+def matrix_rows(matrix_text)
+  matrix_text.lines.select { |line| line.start_with?("|") }
+end
+
+def cells(row)
+  row.split("|").map(&:strip).reject(&:empty?)
+end
+
+def table_data_row?(row)
+  row.start_with?("|") && cells(row).any? && !cells(row).all? { |cell| cell.match?(/\A-+\z/) }
+end
+
+def code_anchor_evidence_section?(line)
+  line.strip == "## Code Anchor Evidence"
+end
+
+def matrix_authority_rows(matrix_text)
+  in_code_anchor_evidence = false
+  matrix_text.lines.each_with_object([]) do |line, rows|
+    stripped = line.strip
+    if code_anchor_evidence_section?(line)
+      in_code_anchor_evidence = true
+      next rows
+    elsif in_code_anchor_evidence && stripped.start_with?("## ")
+      in_code_anchor_evidence = false
+    end
+
+    next rows if in_code_anchor_evidence || !table_data_row?(line)
+
+    rows << line
+  end
+end
+
+def row_has_id?(row, id)
+  row.match?(/\b#{Regexp.escape(id)}\b/)
+end
+
+def authority_status(row_cells)
+  if row_cells.first.to_s.start_with?("TRACE-") && row_cells.length >= 13
+    row_cells[-2].to_s
+  else
+    row_cells.last.to_s
+  end
+end
+
+def approved_authority_row?(row)
+  row_cells = cells(row)
+  status = authority_status(row_cells).downcase
+  return false if status.match?(/\b(stale|pending|candidate|blocked|failed|rejected|unreviewed)\b/)
+
+  status.match?(/\b(approved|reviewed|accepted|passed)\b/)
+end
+
+def reviewed_authority_trace_rows(matrix_text, requirement, trace)
+  matrix_authority_rows(matrix_text).select do |row|
+    approved_authority_row?(row) && row_has_id?(row, requirement) && row_has_id?(row, trace)
+  end
+end
+
+def find_matrix_candidates(matrix_text, target)
+  matrix_rows(matrix_text).select { |row| row.include?(target) }
+end
+
+def first_id(text, prefix)
+  text[/\b#{prefix}-[A-Z0-9]+-[A-Z0-9-]+\b/]
+end
+
+def matrix_text_with_anchor_row(matrix_text, matrix_row)
+  section_header = "## Code Anchor Evidence"
+  table_header = "| Artifact Path | Requirement | Trace | Verification | Anchor Type | Role |\n"
+  table_separator = "| --- | --- | --- | --- | --- | --- |\n"
+
+  unless matrix_text.include?(section_header)
+    return "#{matrix_text.rstrip}\n\n#{section_header}\n\n#{table_header}#{table_separator}#{matrix_row}\n"
+  end
+
+  lines = matrix_text.lines
+  section_start = lines.find_index { |line| line.strip == section_header }
+  unless section_start
+    return "#{matrix_text.rstrip}\n\n#{section_header}\n\n#{table_header}#{table_separator}#{matrix_row}\n"
+  end
+
+  section_end = lines.each_index.find { |index| index > section_start && lines[index].start_with?("## ") } || lines.length
+  canonical_table_start = (section_start...section_end).find do |index|
+    lines[index].strip == table_header.strip &&
+      index + 1 < section_end &&
+      lines[index + 1].strip == table_separator.strip
+  end
+
+  if canonical_table_start
+    insert_at = canonical_table_start + 2
+    insert_at += 1 while insert_at < section_end && lines[insert_at].start_with?("|")
+    lines.insert(insert_at, "#{matrix_row}\n")
+  else
+    insert_at = section_start + 1
+    lines.insert(insert_at, "\n", table_header, table_separator, "#{matrix_row}\n")
+  end
+
+  lines.join
+end
+
+candidate_rows = find_matrix_candidates(matrix_text, target)
+explicit_mapping = options[:requirement] && options[:trace] && options[:verification]
+if candidate_rows.length > 1 && !explicit_mapping
+  candidate_keys = candidate_rows.map { |row| [first_id(row, "REQ"), first_id(row, "TRACE"), first_id(row, "VER")] }.uniq
+  if candidate_keys.length > 1
+    if options[:skip_ambiguous_mapping]
+      skip_unresolved_mapping(
+        options: options,
+        target: target,
+        reason: "ambiguous_per_artifact_anchor_mapping",
+        candidate_rows: candidate_rows
+      )
+    end
+    pause("ambiguous_authority_mapping")
+  end
+end
+
+candidate_row = candidate_rows.first
+requirement = options[:requirement] || (candidate_row && first_id(candidate_row, "REQ"))
+trace = options[:trace] || (candidate_row && first_id(candidate_row, "TRACE"))
+verification = options[:verification] || (candidate_row && first_id(candidate_row, "VER"))
+role = options[:role] || "trace-anchor-target"
+reason = options[:reason] || "TraceWeaver reviewed hierarchy maps this artifact to #{requirement || "unknown requirement"}."
+
+pause("missing_requirement_mapping") unless requirement
+pause("missing_trace_mapping") unless trace
+pause("missing_verification_mapping") unless verification
+pause("requirement_absent_from_authority") unless requirements_text.include?(requirement)
+authority_trace_rows = reviewed_authority_trace_rows(matrix_text, requirement, trace)
+pause("trace_absent_from_matrix") if authority_trace_rows.empty?
+pause("verification_absent_from_matrix") unless authority_trace_rows.any? { |row| row_has_id?(row, verification) }
+
+existing_requirements = target_text.scan(/\bREQ-[A-Z0-9]+-[A-Z0-9-]+\b/).uniq
+conflicts = existing_requirements.reject { |id| id == requirement }
+pause("conflicting_existing_anchor") if conflicts.any? && !(explicit_mapping && options[:anchor_level] == "verification")
+
+if options[:anchor_level] == "helper" && !options[:helper_exception]
+  pause("helper_anchor_requires_approved_exception")
+end
+
+if options[:generated_exception]
+  matrix_has_exception = matrix_rows(matrix_text).any? do |row|
+    row.include?(target) && cells(row).map(&:downcase).include?("exception")
+  end
+  pause("generated_exception_not_approved") unless matrix_has_exception
+end
+
+if mode == "apply" && !options[:work_loop]
+  puts "trace_anchor_authoring_status=refused"
+  puts "trace_anchor_authoring_reason=apply_requires_traceweaver_work_loop"
+  puts "trace_anchor_authoring_file_changed=false"
+  puts "trace_anchor_authoring_matrix_changed=false"
+  exit 1
+end
+
+anchor_type =
+  if options[:generated_exception]
+    "exception"
+  elsif options[:anchor_level] == "entrypoint"
+    "entrypoint"
+  elsif options[:anchor_level] == "verification"
+    "verifies"
+  else
+    "file-role"
+  end
+
+anchor_body =
+  case anchor_type
+  when "exception"
+    "TRACEWEAVER: exception=generated; req=#{requirement}; trace=#{trace}; ver=#{verification}; reason=#{reason}"
+  when "entrypoint"
+    "TRACEWEAVER: entrypoint=#{options[:entrypoint] || role}; req=#{requirement}; trace=#{trace}; ver=#{verification}"
+  when "verifies"
+    "TRACEWEAVER: file-role=#{role}; req=#{requirement}; trace=#{trace}; ver=#{verification}\n" \
+      "#{comment_line(target, "TRACEWEAVER: verifies=#{verification}; req=#{requirement}; trace=#{trace}")}"
+  else
+    "TRACEWEAVER: file-role=#{role}; req=#{requirement}; trace=#{trace}; ver=#{verification}"
+  end
+
+anchor_comment = comment_line(target, anchor_body)
+matrix_row = "| #{target} | #{requirement} | #{trace} | #{verification} | #{anchor_type} | #{role} |"
+
+file_needs_change =
+  if anchor_type == "verifies"
+    !target_text.include?("verifies=#{verification}")
+  elsif anchor_type == "entrypoint"
+    !target_text.include?("entrypoint=#{options[:entrypoint] || role}")
+  elsif anchor_type == "exception"
+    !target_text.include?("exception=generated")
+  else
+    !target_text.include?("file-role=#{role}")
+  end
+matrix_needs_change = !matrix_text.include?(target) || !matrix_text.include?(matrix_row)
+
+if mode == "apply"
+  new_target_text =
+    if file_needs_change
+      if anchor_type == "entrypoint"
+        insert_before_entrypoint(target_text, anchor_comment, options[:entrypoint])
+      else
+        insert_after_header(target_text, anchor_comment)
+      end
+    else
+      target_text
+    end
+  target_path.write(new_target_text)
+
+  if matrix_needs_change
+    matrix_path.write(matrix_text_with_anchor_row(matrix_text, matrix_row))
+  end
+end
+
+puts "trace_anchor_authoring_status=#{mode == "apply" ? "applied" : "proposed"}"
+puts "trace_anchor_authoring_target=#{target}"
+puts "trace_anchor_authoring_anchor_type=#{anchor_type}"
+puts "trace_anchor_authoring_requirement=#{requirement}"
+puts "trace_anchor_authoring_trace=#{trace}"
+puts "trace_anchor_authoring_verification=#{verification}"
+puts "trace_anchor_authoring_anchor=#{anchor_comment.lines.map(&:strip).join(" | ")}"
+puts "trace_anchor_authoring_matrix_row=#{matrix_row}"
+puts "trace_anchor_authoring_file_changed=#{mode == "apply" && file_needs_change}"
+puts "trace_anchor_authoring_matrix_changed=#{mode == "apply" && matrix_needs_change}"
+puts "trace_anchor_authoring_reason=#{reason}"

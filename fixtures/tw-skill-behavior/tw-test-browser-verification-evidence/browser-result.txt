@@ -1,0 +1,6 @@
+TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
+expected_behavior=delegate_to_ce_test_browser_under_tw_verification_evidence
+ce_delegation_surface=TraceWeaver-packaged ce-test-browser
+requires_ids=requirement,trace,verification
+unlinked_evidence=held_or_exploratory
+accepted_scope=deterministic_fixture_only_no_runtime_pass

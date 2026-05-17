@@ -3,6 +3,9 @@ name: tw-doc-review
 description: TraceWeaver-controlled document review wrapper. Use when reviewing requirements, plans, matrices, Intent Contracts, validation records, evidence records, or authority documents that may become TraceWeaver implementation authority.
 ---
 
+<!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-050; trace=TRACE-TW-023; ver=VER-TW-032 -->
+<!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
+
 # TraceWeaver Document Review
 
 ## Purpose
@@ -19,6 +22,10 @@ Before review, load and cite:
 - `requirements.md` when present
 - `traceability-matrix.md` when present
 - `.traceweaver/intent-contract.yml` when present
+- skill-local `references/traceweaver-operating-modes.md`
+- skill-local `references/trace-anchor-authoring.md` when the document review
+  concerns code-anchor hierarchy, authoring policy, or matrix Code Anchor
+  Evidence updates
 - relevant validation, gap, change, exception, task, or trace records for the
   document being reviewed
 
@@ -31,25 +38,44 @@ authority until the authority files exist and review passes.
 1. Identify the document type: requirements, plan, matrix, Intent Contract,
    validation record, evidence record, release note, or other authority-adjacent
    document.
-2. If the document contains requirements, acceptance criteria, planning
+2. Classify the review target using the operating-mode policy. Treat unrelated
+   historical wording drift as non-blocking debt unless it changes accepted
+   scope, pending gate, held claims, runtime/publication claims, artifact
+   identity, or material authority.
+3. If the document contains requirements, acceptance criteria, planning
    statements, authority claims, held-claim changes, or validation questions,
    run `tw-requirements-review` before CE document review.
-3. If the document changes a matrix, Intent Contract, validation/evidence record,
+4. If the document changes a matrix, Intent Contract, validation/evidence record,
    status field, hash, review scope, accepted scope, or held claim, run
    `tw-traceability-check` or require an explicit trace/matrix consistency check
    before accepting the document as TraceWeaver input.
-4. Run `ce-doc-review` only after the requirement-quality and authority/trace
+5. Run `ce-doc-review` only after the requirement-quality and authority/trace
    preflight is passable, or after remaining limits are explicitly recorded as
    held conditions.
-5. Keep `ce-doc-review` in TraceWeaver no-publication mode. It may report
+6. Keep `ce-doc-review` in TraceWeaver no-publication mode. It may report
    findings and policy-allowed local fixes, but it must not stage, commit, push,
    open PRs, update PRs, or claim release/clean-replacement readiness.
-6. Report structured traceability/hash/status findings before CE document-review
+7. Report structured traceability/hash/status findings before CE document-review
    findings. Preserve severity, status, affected IDs, file/line anchors when
    available, claim impact, and remediation.
-7. Report document-review findings together with requirement-quality status,
+8. Report document-review findings together with requirement-quality status,
    traceability/hash/status consistency, accepted scope, held claims, and the
    next required command or human decision.
+
+## Highest-Level Handoff Discipline
+
+`tw-doc-review` owns requirements-review and trace/hash/status consistency
+checks for document authority review. Do not return standalone
+`tw-requirements-review` or `tw-traceability-check` as the normal next user
+command when those checks are embedded in the document review path.
+
+If the document review is clean, recommend `/tw-work record ...` for the clean
+review state and scoped status/hash refresh. If the document is blocked by
+requirements quality or authority identity, recommend the highest-level wrapper
+that can repair it, normally `/tw-work ...` for an accepted authority patch or
+`/tw-auto ...` for a multi-step loop. Recommend standalone lower gates only for
+explicit diagnostics, audit, baseline-authority review, or a human-decision
+pause where no higher wrapper can proceed.
 
 ## Output
 
@@ -64,7 +90,7 @@ Return:
 - CE document-review coverage and findings
 - accepted scope and held claims
 - whether the document may be used as accepted TraceWeaver input
-- next required command, review, or human decision
+- highest-level next TraceWeaver wrapper command, review, or human decision
 
 ## Gate
 

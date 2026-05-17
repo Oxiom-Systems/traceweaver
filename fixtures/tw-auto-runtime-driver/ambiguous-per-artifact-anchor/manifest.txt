@@ -1,0 +1,7 @@
+fixture=ambiguous-per-artifact-anchor
+requirement=REQ-TW-058
+trace=TRACE-TW-039
+verification=VER-TW-051
+expected_authoring=skip_ambiguous_target_and_record_unresolved_mapping
+expected_traceability_finding=CTA-UNRESOLVED-ANCHOR-MAPPING
+publication=forbidden

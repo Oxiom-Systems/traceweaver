@@ -1,0 +1,7 @@
+scenario=tw_auto_post_work_explicit_stop
+user_requested_stop_after_work=true
+work_result=tw_work_completed
+expected_behavior=stop_after_tw_work_with_review_held
+done_claim=false
+review_required_before_publication=true
+accepted_scope=deterministic_fixture_only_no_runtime_pass

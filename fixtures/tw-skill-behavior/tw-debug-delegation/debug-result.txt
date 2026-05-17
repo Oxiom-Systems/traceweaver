@@ -1,0 +1,9 @@
+skill=tw-debug
+case=debug-delegation
+required_route=tw-authority-gate,ce-debug,tw-traceability-check,tw-auto
+ce_delegation_surface=TraceWeaver-packaged ce-debug
+expected_behavior=delegate_to_ce_debug_under_tw_no_publication
+publication=held_until_controlled_publication_route
+next_review=tw-code-review_when_code_changed
+accepted_scope=deterministic_fixture_only_no_runtime_pass
+affected_ids=REQ-TW-043,REQ-TW-052

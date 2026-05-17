@@ -1,0 +1,688 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=code-anchor-scanner; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
+# TRACEWEAVER: file-role=semantic-audit-scanner; req=REQ-TW-063; trace=TRACE-TW-044; ver=VER-TW-056
+
+require "fileutils"
+require "json"
+require "optparse"
+require "pathname"
+require "set"
+require "shellwords"
+
+options = {
+  root: Dir.pwd,
+  mode: "implementation",
+  changed_files: [],
+  unresolved_mappings: nil,
+  jsonl: nil,
+  markdown: nil
+}
+
+OptionParser.new do |opts|
+  opts.on("--root PATH") { |value| options[:root] = value }
+  opts.on("--mode MODE") { |value| options[:mode] = value }
+  opts.on("--changed-file PATH") { |value| options[:changed_files] << value }
+  opts.on("--changed-files PATH") do |value|
+    File.readlines(value, chomp: true).each do |line|
+      next if line.strip.empty?
+
+      options[:changed_files] << line.strip
+    end
+  end
+  opts.on("--unresolved-mappings PATH") { |value| options[:unresolved_mappings] = value }
+  opts.on("--jsonl PATH") { |value| options[:jsonl] = value }
+  opts.on("--markdown PATH") { |value| options[:markdown] = value }
+end.parse!
+
+root = Pathname.new(options[:root]).expand_path
+mode = options[:mode]
+unless %w[implementation audit].include?(mode)
+  warn "code_traceability_invalid_mode=#{mode}"
+  exit 2
+end
+
+requirements_path = root.join("requirements.md")
+matrix_path = root.join("traceability-matrix.md")
+
+unless requirements_path.file? && matrix_path.file?
+  warn "code_traceability_missing_authority=requirements_or_matrix"
+  exit 2
+end
+
+root = root.realpath
+requirements_path = root.join("requirements.md")
+matrix_path = root.join("traceability-matrix.md")
+
+requirements_text = requirements_path.read
+matrix_text = matrix_path.read
+known_requirements = requirements_text.scan(/\bREQ-[A-Z0-9]+-[A-Z0-9-]+\b/).uniq
+
+def repo_relative(root, path)
+  Pathname.new(path).expand_path.relative_path_from(root).to_s
+end
+
+def unsafe_relative_path?(path)
+  candidate = Pathname.new(path)
+  candidate.absolute? || candidate.each_filename.any? { |part| part == ".." }
+end
+
+def path_inside_root?(path, root)
+  path_string = path.to_s
+  root_string = root.to_s
+  path_string == root_string || path_string.start_with?("#{root_string}/")
+end
+
+def behavior_bearing?(relative)
+  return false if relative.start_with?(".git/")
+  return false if relative == "requirements.md"
+  return false if relative == "traceability-matrix.md"
+  return false if relative == ".traceweaver/intent-contract.yml"
+  return false if relative.end_with?(".png", ".jpg", ".jpeg", ".gif", ".pdf")
+  return true if relative.start_with?("scripts/")
+  return true if relative.include?("/scripts/")
+
+  relative.match?(/\.(sh|bash|rb|py|ts|tsx|js|mjs|cjs|md|yml|yaml|json)$/)
+end
+
+def authority_record?(relative)
+  return true if relative == "README.md"
+  return true if relative.start_with?(".traceweaver/")
+  return true if relative.start_with?("docs/brainstorms/")
+  return true if relative.start_with?("docs/distilled/")
+  return true if relative.start_with?("docs/plans/")
+  return true if relative.start_with?("docs/specs/")
+  return true if relative.start_with?("docs/validation/")
+
+  false
+end
+
+def implementation_target?(relative)
+  return false if relative.start_with?("fixtures/code-traceability/")
+  return false if relative.start_with?("fixtures/code-trace-authoring/")
+  return false if relative.start_with?("fixtures/systems-engineering-audit-closure/")
+
+  behavior_bearing?(relative) && !authority_record?(relative)
+end
+
+def test_or_fixture?(relative)
+  relative.include?("/test") ||
+    relative.include?("tests/") ||
+    relative.include?("fixtures/") ||
+    relative.start_with?("scripts/traceweaver-smoke")
+end
+
+def source_like?(relative)
+  !test_or_fixture?(relative)
+end
+
+def source_code_like?(relative)
+  source_like?(relative) && relative.match?(/\.(sh|bash|rb|py|ts|tsx|js|mjs|cjs)$/)
+end
+
+def contains_entrypoint?(text)
+  text.match?(/^\s*(function\s+[A-Za-z0-9_:-]+|[A-Za-z0-9_:-]+\(\)\s*\{|export\s+function\s+[A-Za-z0-9_:-]+|def\s+[A-Za-z0-9_:-]+)/)
+end
+
+# TRACEWEAVER: entrypoint=code_anchor_scan_orchestrator; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
+
+def line_for(text, pattern)
+  text.lines.find_index { |line| line.match?(pattern) }.then { |index| index ? index + 1 : 1 }
+end
+
+def approved_generated_exception?(matrix_text, relative)
+  matrix_text.lines.any? do |line|
+    next false unless line.include?(relative)
+
+    line.split("|").map { |cell| cell.strip.downcase }.include?("exception")
+  end
+end
+
+def requirement_status(requirements_text, requirement)
+  requirements_text.lines.each do |line|
+    next unless line.include?(requirement)
+
+    cells = line.split("|").map { |cell| cell.strip.downcase }
+    return "stale" if cells.any? { |cell| cell.match?(/\b(stale|superseded|obsolete|retired)\b/) }
+    return "held" if cells.any? { |cell| cell.match?(/\bheld\b/) }
+    return "approved" if cells.any? { |cell| cell.match?(/\b(approved|passed|accepted)\b/) }
+  end
+
+  "unknown"
+end
+
+def matrix_rows_for_path(matrix_text, relative)
+  matrix_text.lines.select { |line| line.include?(relative) && line.include?("|") }
+end
+
+def normalized_behavior_body(text)
+  text.lines
+      .reject { |line| line.match?(/TRACEWEAVER:|^\s*(#|\/\/|<!--)/) }
+      .join("\n")
+      .downcase
+      .gsub(/[^a-z0-9_]+/, " ")
+      .split
+      .reject { |token| token.length < 3 || %w[function return const local echo true false].include?(token) }
+end
+
+def jaccard(left, right)
+  left_set = left.to_set
+  right_set = right.to_set
+  return 0.0 if left_set.empty? || right_set.empty?
+
+  (left_set & right_set).length.to_f / (left_set | right_set).length
+end
+
+unsafe_changed_files = []
+targets =
+  if mode == "audit"
+    Dir.chdir(root) do
+      Dir.glob("**/*", File::FNM_DOTMATCH)
+         .reject { |path| File.directory?(path) || path.start_with?(".git/") }
+         .select { |path| behavior_bearing?(path) }
+    end
+  elsif options[:changed_files].any?
+    requested = options[:changed_files].map { |path| path.sub(%r{\A\./}, "") }
+    unsafe_changed_files = requested.select { |path| unsafe_relative_path?(path) }
+    requested.reject { |path| unsafe_relative_path?(path) }.select { |path| implementation_target?(path) }
+  else
+    names = Dir.chdir(root) do
+      `git diff --name-only --cached -- .; git diff --name-only -- .; git ls-files --others --exclude-standard`
+    end
+    names.lines.map(&:strip).reject(&:empty?).uniq.select { |path| implementation_target?(path) }
+  end
+
+findings = []
+
+emit = lambda do |id:, severity:, status:, title:, evidence:, affected_ids:, file: nil, start: nil, claim_impact:, remediation:, **extra|
+  finding = {
+    id: id,
+    severity: severity,
+    status: status,
+    title: title,
+    evidence: evidence,
+    affected_ids: affected_ids,
+    claim_impact: claim_impact,
+    remediation: remediation
+  }
+  finding.merge!(extra)
+  if file
+    finding[:file] = file
+    finding[:start] = start || 1
+    finding[:end] = start || 1
+  end
+  findings << finding
+end
+
+audit_records = []
+
+unsafe_changed_files.each do |relative|
+  emit.call(
+    id: "CTA-UNSAFE-CHANGED-FILE-PATH",
+    severity: "P1",
+    status: "blocked",
+    title: "Changed-file path is outside the project root",
+    evidence: "#{relative} is absolute or contains traversal.",
+    affected_ids: ["REQ-TW-054"],
+    file: relative,
+    start: 1,
+    claim_impact: "code_traceability_pass_blocked",
+    remediation: "Pass project-relative changed-file paths under the repository root."
+  )
+end
+
+targets.each do |relative|
+  expanded_path = root.join(relative).expand_path
+  unless path_inside_root?(expanded_path, root)
+    emit.call(
+      id: "CTA-UNSAFE-CHANGED-FILE-PATH",
+      severity: "P1",
+      status: "blocked",
+      title: "Changed-file path is outside the project root",
+      evidence: "#{relative} resolves outside the project root.",
+      affected_ids: ["REQ-TW-054"],
+      file: relative,
+      start: 1,
+      claim_impact: "code_traceability_pass_blocked",
+      remediation: "Pass project-relative changed-file paths under the repository root."
+    )
+    next
+  end
+
+  path = expanded_path.file? ? expanded_path.realpath : expanded_path
+  unless path_inside_root?(path, root)
+    emit.call(
+      id: "CTA-UNSAFE-CHANGED-FILE-PATH",
+      severity: "P1",
+      status: "blocked",
+      title: "Changed-file path is outside the project root",
+      evidence: "#{relative} resolves outside the project root.",
+      affected_ids: ["REQ-TW-054"],
+      file: relative,
+      start: 1,
+      claim_impact: "code_traceability_pass_blocked",
+      remediation: "Pass project-relative changed-file paths under the repository root."
+    )
+    next
+  end
+  next unless path.file?
+
+  text = path.read
+  generated_exception_line = text.lines.find_index do |line|
+    line.match?(/^\s*(#|<!--|\/\/).*TRACEWEAVER:\s*.*exception=generated/)
+  end
+  if generated_exception_line
+    unless approved_generated_exception?(matrix_text, relative)
+      emit.call(
+        id: "CTA-UNAPPROVED-EXCEPTION",
+        severity: "P1",
+        status: "blocked",
+        title: "Generated-file exception is not approved by authority",
+        evidence: "#{relative} declares a generated exception without a matching matrix exception record.",
+        affected_ids: ["REQ-TW-054"],
+        file: relative,
+        start: generated_exception_line + 1,
+        claim_impact: "exception_traceability_blocked",
+        remediation: "Add a matrix or approved exception record linking the generated file, requirement ID, and exception status."
+      )
+    end
+    next
+  end
+
+  file_anchor = text.match?(/TRACEWEAVER:\s*[^#\n]*file-role=/)
+  entrypoint_anchor = text.match?(/TRACEWEAVER:\s*[^#\n]*entrypoint=/)
+  verification_anchor = text.match?(/TRACEWEAVER:\s*[^#\n]*verifies=VER-[A-Z0-9]+-[A-Z0-9-]+/)
+  referenced_requirements = text.scan(/\bREQ-[A-Z0-9]+-[A-Z0-9-]+\b/).uniq
+  referenced_verifications = text.scan(/\bVER-[A-Z0-9]+-[A-Z0-9-]+\b/).uniq
+  matrix_rows = matrix_rows_for_path(matrix_text, relative)
+
+  if mode == "audit" && source_code_like?(relative)
+    audit_records << {
+      relative: relative,
+      text: text,
+      file_anchor: file_anchor,
+      entrypoint_anchor: entrypoint_anchor,
+      referenced_requirements: referenced_requirements,
+      referenced_verifications: referenced_verifications,
+      matrix_rows: matrix_rows,
+      tokens: normalized_behavior_body(text)
+    }
+  end
+
+  unless file_anchor
+    emit.call(
+      id: "CTA-MISSING-FILE-ANCHOR",
+      severity: "P1",
+      status: "blocked",
+      title: "Behavior-bearing file lacks file-level trace anchor",
+      evidence: "#{relative} has no TRACEWEAVER file-role anchor.",
+      affected_ids: ["REQ-TW-054"],
+      file: relative,
+      start: 1,
+      claim_impact: "code_traceability_pass_blocked",
+      remediation: "Add a file-level TRACEWEAVER anchor or an approved exception."
+    )
+  end
+
+  if source_like?(relative) && contains_entrypoint?(text) && !entrypoint_anchor
+    emit.call(
+      id: "CTA-MISSING-ENTRYPOINT-ANCHOR",
+      severity: "P2",
+      status: "needs-revision",
+      title: "High-level entrypoint lacks trace anchor",
+      evidence: "#{relative} defines behavior but has no TRACEWEAVER entrypoint anchor.",
+      affected_ids: ["REQ-TW-054"],
+      file: relative,
+      start: line_for(text, /^\s*(function\s+|[A-Za-z0-9_:-]+\(\)\s*\{|export\s+function|def\s+)/),
+      claim_impact: "entrypoint_traceability_blocked",
+      remediation: "Add a nearby TRACEWEAVER entrypoint anchor naming the requirement and verification IDs."
+    )
+  end
+
+  if test_or_fixture?(relative) && !verification_anchor
+    emit.call(
+      id: "CTA-MISSING-TEST-VERIFICATION",
+      severity: "P1",
+      status: "blocked",
+      title: "Verification artifact lacks verification anchor",
+      evidence: "#{relative} is a test, fixture, or smoke without a TRACEWEAVER verifies anchor.",
+      affected_ids: ["REQ-TW-054"],
+      file: relative,
+      start: 1,
+      claim_impact: "verification_traceability_blocked",
+      remediation: "Add a TRACEWEAVER verifies anchor naming the verification and requirement IDs."
+    )
+  end
+
+  referenced_requirements.each do |requirement|
+    next if known_requirements.include?(requirement)
+
+    if test_or_fixture?(relative)
+      emit.call(
+        id: "CTA-DEAD-TDD",
+        severity: "P2",
+        status: "held",
+        title: "Verification artifact references missing requirement",
+        evidence: "#{relative} references #{requirement}, which is absent from requirements.md.",
+        affected_ids: [requirement, "REQ-TW-054"],
+        file: relative,
+        start: line_for(text, /#{Regexp.escape(requirement)}/),
+        claim_impact: "dead_tdd_classification_held",
+        remediation: "Restore the requirement, update the test anchor, or classify the test as removal/debt."
+      )
+    else
+      emit.call(
+        id: "CTA-STALE-REQUIREMENT",
+        severity: "P1",
+        status: "blocked",
+        title: "Code references requirement absent from authority",
+        evidence: "#{relative} references #{requirement}, which is absent from requirements.md.",
+        affected_ids: [requirement, "REQ-TW-054"],
+        file: relative,
+        start: line_for(text, /#{Regexp.escape(requirement)}/),
+        claim_impact: "authority_traceability_blocked",
+        remediation: "Use an approved requirement ID or route the behavior to requirements review."
+      )
+    end
+  end
+
+  unless matrix_text.include?(relative)
+    emit.call(
+      id: "CTA-MISSING-MATRIX-PATH",
+      severity: "P1",
+      status: "blocked",
+      title: "Behavior-bearing file has no matrix path",
+      evidence: "#{relative} is not linked from traceability-matrix.md.",
+      affected_ids: (referenced_requirements + ["REQ-TW-054"]).uniq,
+      file: relative,
+      start: 1,
+      claim_impact: "matrix_traceability_blocked",
+      remediation: "Add a matrix row linking the file path, requirement IDs, trace ID, and verification evidence."
+    )
+  end
+
+  referenced_verifications.each do |verification|
+    next if matrix_text.include?(verification)
+
+    emit.call(
+      id: "CTA-MISSING-MATRIX-VERIFICATION",
+      severity: "P1",
+      status: "blocked",
+      title: "Verification ID is absent from matrix",
+      evidence: "#{relative} references #{verification}, which is absent from traceability-matrix.md.",
+      affected_ids: [verification, "REQ-TW-054"],
+      file: relative,
+      start: line_for(text, /#{Regexp.escape(verification)}/),
+      claim_impact: "verification_traceability_blocked",
+      remediation: "Add the verification ID to the matrix row for this artifact."
+    )
+  end
+end
+
+if mode == "audit"
+  audit_records.each do |record|
+    relative = record[:relative]
+    referenced_requirements = record[:referenced_requirements]
+    matrix_rows = record[:matrix_rows]
+
+    unless record[:file_anchor]
+      emit.call(
+        id: "TW-AUDIT-DARK-BEHAVIOR",
+        severity: "P1",
+        status: "candidate",
+        title: "Behavior has no current requirement authority anchor",
+        evidence: "#{relative} is behavior-bearing source without a file-level TraceWeaver anchor.",
+        affected_ids: (referenced_requirements + ["REQ-TW-063"]).uniq,
+        file: relative,
+        start: 1,
+        claim_impact: "semantic_audit_candidate_only",
+        remediation: "Create or link reviewed authority, record an approved exception, or classify the behavior as removal/deprecation candidate.",
+        evidence_source: "whole_repo_audit_file_anchor_scan",
+        confidence: "high",
+        supported_scope: "source files with supported comment syntax and TraceWeaver anchors",
+        known_limitation: "Candidate finding only; not automatic removal authority."
+      )
+    end
+
+    referenced_requirements.each do |requirement|
+      next unless %w[stale held].include?(requirement_status(requirements_text, requirement))
+
+      emit.call(
+        id: "TW-AUDIT-OBSOLETE-BEHAVIOR",
+        severity: "P1",
+        status: "candidate",
+        title: "Behavior links to stale or held authority",
+        evidence: "#{relative} references #{requirement}, whose requirements row is #{requirement_status(requirements_text, requirement)}.",
+        affected_ids: [requirement, "REQ-TW-063"],
+        file: relative,
+        start: line_for(record[:text], /#{Regexp.escape(requirement)}/),
+        claim_impact: "semantic_audit_candidate_only",
+        remediation: "Review whether the behavior should be kept, merged, deprecated, removed, or linked to current authority.",
+        evidence_source: "requirements_status_and_source_anchor_scan",
+        confidence: "medium",
+        supported_scope: "requirements rows with explicit stale/held/superseded/obsolete/retired status text",
+        known_limitation: "Authority text outside requirements.md may require human interpretation."
+      )
+    end
+
+    if record[:file_anchor] && matrix_rows.none? { |line| line.match?(/\bVER-[A-Z0-9]+-[A-Z0-9-]+\b/) }
+      emit.call(
+        id: "TW-AUDIT-ANCHOR-ONLY-COVERAGE",
+        severity: "P1",
+        status: "candidate",
+        title: "Behavior has an anchor but no verification closure",
+        evidence: "#{relative} has a TraceWeaver anchor but no linked VER-* row in Code Anchor Evidence.",
+        affected_ids: (referenced_requirements + ["REQ-TW-062", "REQ-TW-063"]).uniq,
+        file: relative,
+        start: 1,
+        claim_impact: "done_or_release_claim_blocked",
+        remediation: "Add verification implementation/procedure/result evidence or record an approved held-validation/held-verification state.",
+        evidence_source: "code_anchor_evidence_matrix_scan",
+        confidence: "high",
+        supported_scope: "Code Anchor Evidence rows with explicit artifact paths and VER-* identifiers",
+        known_limitation: "Does not infer verification from unrelated prose."
+      )
+    end
+
+    if record[:file_anchor] && matrix_rows.empty?
+      emit.call(
+        id: "TW-AUDIT-ORPHANED-BEHAVIOR",
+        severity: "P1",
+        status: "candidate",
+        title: "Anchored behavior is not reachable from matrix evidence",
+        evidence: "#{relative} has source-level TraceWeaver metadata but no matrix row for the artifact.",
+        affected_ids: (referenced_requirements + ["REQ-TW-063"]).uniq,
+        file: relative,
+        start: 1,
+        claim_impact: "semantic_audit_candidate_only",
+        remediation: "Link the behavior to Code Anchor Evidence and verification, or review it as orphaned/deprecation candidate.",
+        evidence_source: "source_anchor_and_matrix_path_scan",
+        confidence: "medium",
+        supported_scope: "behavior-bearing source files and matrix artifact-path rows",
+        known_limitation: "Does not build a full call graph for every language."
+      )
+    end
+  end
+
+  grouped = audit_records.select { |record| record[:file_anchor] && record[:tokens].any? }
+                         .group_by { |record| record[:referenced_requirements].first || "unlinked" }
+  grouped.each_value do |records|
+    records.combination(2) do |left, right|
+      similarity = jaccard(left[:tokens], right[:tokens])
+      next if similarity < 0.55
+
+      duplicate = left[:tokens] == right[:tokens]
+      emit.call(
+        id: duplicate ? "TW-AUDIT-DUPLICATE-BEHAVIOR" : "TW-AUDIT-SIMILAR-BEHAVIOR",
+        severity: duplicate ? "P2" : "P2",
+        status: "candidate",
+        title: duplicate ? "Two behavior artifacts appear duplicated" : "Two behavior artifacts appear behaviorally similar",
+        evidence: "#{left[:relative]} and #{right[:relative]} share token similarity #{format('%.2f', similarity)}.",
+        affected_ids: (left[:referenced_requirements] + right[:referenced_requirements] + ["REQ-TW-063"]).uniq,
+        file: right[:relative],
+        start: 1,
+        claim_impact: "semantic_audit_candidate_only",
+        remediation: "Review whether the behavior should be kept separate, merged, deprecated, or linked to distinct authority.",
+        evidence_source: "same_requirement_token_similarity_scan",
+        confidence: duplicate ? "high" : "medium",
+        supported_scope: "textual source files with TraceWeaver requirement anchors",
+        known_limitation: "Token similarity is a heuristic and requires human decision before merge or removal."
+      )
+    end
+  end
+
+  matrix_text.lines.each_with_index do |line, index|
+    next unless line.include?("|") && line.match?(/\bREQ-[A-Z0-9]+-[A-Z0-9-]+\b/)
+
+    requirement_ids = line.scan(/\bREQ-[A-Z0-9]+-[A-Z0-9-]+\b/).uniq
+    lowered = line.downcase
+    if lowered.match?(/missing[_ -]verification[_ -]procedure|verification procedure:\s*(missing|none|pending)/)
+      emit.call(
+        id: "TW-AUDIT-MISSING-VERIFICATION-PROCEDURE",
+        severity: "P1",
+        status: "blocked",
+        title: "Requirement closure lacks verification procedure",
+        evidence: "Matrix row #{index + 1} records missing verification procedure.",
+        affected_ids: (requirement_ids + ["REQ-TW-062"]).uniq,
+        start: index + 1,
+        claim_impact: "requirement_done_claim_blocked",
+        remediation: "Record the exact verification procedure/command and expected output before claiming closure.",
+        evidence_source: "requirement_closure_matrix_scan",
+        confidence: "high",
+        supported_scope: "matrix rows with explicit closure procedure fields or missing-procedure markers",
+        known_limitation: "Does not infer procedures from free-form external documents."
+      )
+    end
+    if lowered.match?(/missing[_ -]validation[_ -]procedure|validation procedure:\s*(missing|none|pending)/)
+      emit.call(
+        id: "TW-AUDIT-MISSING-VALIDATION-PROCEDURE",
+        severity: "P1",
+        status: "blocked",
+        title: "Requirement closure lacks validation procedure",
+        evidence: "Matrix row #{index + 1} records missing validation procedure.",
+        affected_ids: (requirement_ids + ["REQ-TW-062"]).uniq,
+        start: index + 1,
+        claim_impact: "requirement_done_or_release_claim_blocked",
+        remediation: "Record validation procedure/evidence or an approved held-validation record with owner, evidence location, and closure boundary.",
+        evidence_source: "requirement_closure_matrix_scan",
+        confidence: "high",
+        supported_scope: "matrix rows with explicit closure procedure fields or missing-procedure markers",
+        known_limitation: "Does not validate external operational evidence in this static fixture mode."
+      )
+    end
+  end
+end
+
+if options[:unresolved_mappings]
+  if unsafe_relative_path?(options[:unresolved_mappings])
+    emit.call(
+      id: "CTA-UNSAFE-UNRESOLVED-MAPPINGS-PATH",
+      severity: "P1",
+      status: "blocked",
+      title: "Unresolved mapping path is outside the project root",
+      evidence: "#{options[:unresolved_mappings]} is absolute or contains traversal.",
+      affected_ids: ["REQ-TW-058"],
+      claim_impact: "traceability_complete_review_publication_blocked",
+      remediation: "Pass a project-relative unresolved mapping JSONL path under the repository root."
+    )
+  else
+    unresolved_path = root.join(options[:unresolved_mappings]).expand_path
+    if !path_inside_root?(unresolved_path, root) ||
+       (unresolved_path.exist? && !path_inside_root?(unresolved_path.realpath, root))
+      emit.call(
+        id: "CTA-UNSAFE-UNRESOLVED-MAPPINGS-PATH",
+        severity: "P1",
+        status: "blocked",
+        title: "Unresolved mapping path is outside the project root",
+        evidence: "#{options[:unresolved_mappings]} resolves outside the project root.",
+        affected_ids: ["REQ-TW-058"],
+        claim_impact: "traceability_complete_review_publication_blocked",
+        remediation: "Pass a project-relative unresolved mapping JSONL path under the repository root."
+      )
+      unresolved_path = nil
+    end
+  end
+  if unresolved_path && unresolved_path.file?
+    unresolved_path.each_line.with_index(1) do |line, line_number|
+      next if line.strip.empty?
+
+      record = JSON.parse(line)
+      relative = record.fetch("target", "unknown")
+      affected_ids = Array(record["candidate_requirements"]) +
+                     Array(record["candidate_traces"]) +
+                     Array(record["candidate_verifications"]) +
+                     ["REQ-TW-058"]
+      missing_fields = Array(record["missing_fields"])
+      reason = record["reason"] || "ambiguous_per_artifact_anchor_mapping"
+      emit.call(
+        id: "CTA-UNRESOLVED-ANCHOR-MAPPING",
+        severity: "P1",
+        status: "blocked",
+        title: "Trace-anchor mapping remains unresolved",
+        evidence: "#{relative} was skipped by tw-work because #{reason}; missing_fields=#{missing_fields.join(",")}.",
+        affected_ids: affected_ids.uniq,
+        file: relative,
+        start: record["line"] || line_number,
+        claim_impact: "traceability_complete_review_publication_blocked",
+        remediation: "Resolve the requirement, trace, verification, role, target, and anchor-level mapping or record an approved held condition before review or publication can pass."
+      )
+    rescue JSON::ParserError
+      emit.call(
+        id: "CTA-INVALID-UNRESOLVED-MAPPING-RECORD",
+        severity: "P1",
+        status: "blocked",
+        title: "Unresolved mapping record is not valid JSON",
+        evidence: "#{options[:unresolved_mappings]}:#{line_number} is not valid JSON.",
+        affected_ids: ["REQ-TW-058"],
+        claim_impact: "traceability_complete_review_publication_blocked",
+        remediation: "Write unresolved mapping records as JSONL with target, reason, and missing_fields fields."
+      )
+    end
+  else
+    emit.call(
+      id: "CTA-MISSING-UNRESOLVED-MAPPINGS-FILE",
+      severity: "P1",
+      status: "blocked",
+      title: "Unresolved mapping file is missing",
+      evidence: "#{options[:unresolved_mappings]} was requested but does not exist.",
+      affected_ids: ["REQ-TW-058"],
+      claim_impact: "traceability_complete_review_publication_blocked",
+      remediation: "Provide the unresolved mapping JSONL emitted by tw-work or remove the option when no mappings were skipped."
+    )
+  end
+end
+
+if options[:jsonl]
+  FileUtils.mkdir_p(File.dirname(options[:jsonl]))
+  File.open(options[:jsonl], "w") { |file| findings.each { |finding| file.puts(JSON.generate(finding)) } }
+end
+
+if options[:markdown]
+  FileUtils.mkdir_p(File.dirname(options[:markdown]))
+  File.open(options[:markdown], "w") do |file|
+    file.puts "# Code Traceability Findings"
+    file.puts
+    findings.each do |finding|
+      file.puts "## #{finding[:id]}"
+      file.puts
+      finding.each do |key, value|
+        file.puts "- #{key}: #{Array(value).join(", ")}"
+      end
+      file.puts
+    end
+  end
+end
+
+status = findings.empty? ? "pass" : "blocked"
+puts "code_traceability_status=#{status}"
+puts "code_traceability_mode=#{mode}"
+puts "code_traceability_targets=#{targets.join(",")}"
+puts "code_traceability_findings=#{findings.length}"
+puts "code_traceability_jsonl=#{options[:jsonl]}" if options[:jsonl]
+puts "code_traceability_markdown=#{options[:markdown]}" if options[:markdown]
+findings.each do |finding|
+  location = finding[:file] ? " file=#{finding[:file]} line=#{finding[:start]}" : ""
+  puts "finding_id=#{finding[:id]} severity=#{finding[:severity]} status=#{finding[:status]}#{location}"
+end
+
+exit(findings.empty? ? 0 : 1)

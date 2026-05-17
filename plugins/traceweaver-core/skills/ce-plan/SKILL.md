@@ -4,6 +4,8 @@ description: "Create structured plans for any multi-step task -- software featur
 argument-hint: "[optional: feature description, requirements doc path, plan path to deepen, or any task to plan]"
 ---
 
+<!-- TRACEWEAVER: file-role=packaged-ce-planning-engine; req=REQ-TW-052; trace=TRACE-TW-036; ver=VER-TW-046 -->
+
 # Create Technical Plan
 
 **Note: The current year is 2026.** Use this when dating plans and searching for recent documentation.
@@ -14,13 +16,15 @@ When this `ce-plan` skill is installed by the TraceWeaver plugin, direct
 invocation is a legacy/manual-continuity surface. It is not, by itself, a
 TraceWeaver-authority-enforced workflow.
 
-For TraceWeaver-controlled planning, use `tw-auto` or explicitly run the
-TraceWeaver sequence first:
+For TraceWeaver-controlled planning, use `tw-auto` or `tw-plan`. `tw-plan`
+loads TraceWeaver authority and delegates back to this packaged `ce-plan` engine
+only after requirements and traceability context are plan-ready. If running the
+manual sequence explicitly, run:
 
 ```text
 tw-requirements-review
 -> authority-baseline record
--> ce-plan
+-> tw-plan
 -> tw-authority-gate
 ```
 

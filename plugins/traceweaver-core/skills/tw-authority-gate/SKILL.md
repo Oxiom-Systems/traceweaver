@@ -3,6 +3,10 @@ name: tw-authority-gate
 description: TraceWeaver adapter for checking whether planned implementation work has approved authority before build work starts. Use before ce-work, implementation, or task execution on meaningful behavior.
 ---
 
+<!-- TRACEWEAVER: file-role=authority-gate-wrapper-skill; req=REQ-TW-041; trace=TRACE-TW-020; ver=VER-TW-029 -->
+<!-- TRACEWEAVER: file-role=systems-engineering-prompt-contract-skill; req=REQ-TW-061; trace=TRACE-TW-044; ver=VER-TW-056 -->
+<!-- TRACEWEAVER: file-role=authority-gate-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
+
 # TraceWeaver Authority Gate
 
 ## Purpose
@@ -16,6 +20,22 @@ This adapter routes to `requirements-reviewer` when authority quality is
 unclear and to `systems-engineering-traceability` when the authority chain must
 be checked.
 
+## Required Inputs
+
+Before returning an authority decision, load and cite:
+
+- `requirements.md`
+- `traceability-matrix.md`
+- `.traceweaver/intent-contract.yml`
+- the planned task, plan, changed-file scope, or requested behavior
+- the claimed requirement IDs, trace IDs, verification target, validation
+  question, baseline ID/hash, and must-not-change boundaries
+
+Use the TraceWeaver-packaged `requirements-reviewer` and
+`systems-engineering-traceability` skills as the distilled
+systems-engineering knowledge source for requirement quality, authority,
+traceability, verification, validation, gaps, and held claims.
+
 ## Process
 
 1. Identify the planned behavior or implementation task.
@@ -28,6 +48,17 @@ be checked.
    to approved authority and planned verification/validation evidence.
 5. Return `Proceed`, `Reduce scope`, `Revise`, `Human decision`, or `Blocked`.
 
+## Highest-Level Handoff Discipline
+
+`tw-authority-gate` is a standalone lower gate only for explicit authority
+diagnostics or baseline-authority review. In normal implementation flow,
+`tw-work` and `tw-auto` own this gate before packaged `ce-work` runs.
+
+When the gate passes, recommend `/tw-work ...` or `/tw-auto ...` as the next
+user-facing command rather than asking the user to run more lower gates. When it
+blocks, return the exact authority decision needed and the highest-level wrapper
+that can record or repair it, if one can proceed safely.
+
 ## Output
 
 Return:
@@ -38,7 +69,7 @@ Return:
 - missing evidence
 - allowed implementation scope
 - blocked claims
-- next required action
+- highest-level next TraceWeaver wrapper command or exact human decision
 
 ## Gate
 

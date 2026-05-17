@@ -1,0 +1,6 @@
+TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
+expected_behavior=delegate_to_ce_brainstorm_under_tw_source_evidence
+ce_delegation_surface=TraceWeaver-packaged ce-brainstorm
+source_evidence_only=true
+next_route=tw-requirements-review
+accepted_scope=deterministic_fixture_only_no_runtime_pass

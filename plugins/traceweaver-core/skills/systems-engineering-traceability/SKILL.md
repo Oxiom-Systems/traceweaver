@@ -3,6 +3,8 @@ name: systems-engineering-traceability
 description: Maintains traceability for agent-generated behavior from idea and stakeholder need through requirement, design, implementation, verification, and validation. Use when refining ideas that may become work, starting or changing meaningful behavior, reviewing unclear code, auditing agent output, planning verification, preparing release evidence, or when code lacks a clear requirement, test, validation path, or owner.
 ---
 
+<!-- TRACEWEAVER: file-role=core-traceability-method-skill; req=REQ-TW-010; trace=TRACE-TW-041; ver=VER-TW-053 -->
+
 # Systems Engineering Traceability
 
 ## Overview
@@ -106,14 +108,14 @@ IF-001     Interface requirement
 RISK-001   Risk control
 ADR-001    Architecture decision
 TASK-001   Implementation task
-VER-001    Verification evidence
+ VER-001    Verification evidence
 VAL-001    Validation evidence
 TD-001     Traceability debt
 GAP-001    Approved traceability gap
 DEC-001    Human decision
 ```
 
-Use feature-scoped IDs when they improve readability, such as `SREQ-AUTH-001` or `VER-BILLING-002`. Do not force long namespaces onto small changes.
+Use feature-scoped IDs when they improve readability, such as `SREQ-AUTH-001` or a feature-scoped `VER-*` verification ID. Do not force long namespaces onto small changes.
 
 ### 4. Apply Lifecycle Checkpoints
 
