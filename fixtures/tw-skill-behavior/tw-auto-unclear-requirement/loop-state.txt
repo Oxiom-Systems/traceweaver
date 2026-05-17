@@ -1,0 +1,6 @@
+skill=tw-auto
+case=unclear-requirement-pause
+required_status=human-decision
+required_behavior=pause_for_user_input
+forbidden_behavior=edit_or_invent_requirements
+affected_ids=REQ-TW-035,REQ-TW-056

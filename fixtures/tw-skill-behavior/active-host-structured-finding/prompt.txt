@@ -1,0 +1,27 @@
+Use the tw-traceability-check skill on this bounded fixture.
+
+Fixture fact:
+- Requirement REQ-TW-055 exists.
+- The claimed trace row is missing verification evidence.
+
+You may run read-only shell commands only to hash the installed
+tw-traceability-check SKILL.md file and its installed structured-findings.md
+reference. Do not edit files.
+
+Return exactly these structured fields if the skill is available, replacing
+SKILL_HASH with the SHA-256 of the installed tw-traceability-check SKILL.md file
+you inspected and REF_HASH with the SHA-256 of its installed
+structured-findings.md reference:
+
+TRACEWEAVER_TW_TRACEABILITY_STRUCTURED_SENTINEL=pass
+TRACEWEAVER_TW_TRACEABILITY_SKILL_HASH=SKILL_HASH
+TRACEWEAVER_TW_TRACEABILITY_STRUCTURED_REF_HASH=REF_HASH
+severity=P1
+status=blocked
+affected_ids=REQ-TW-055,TRACE-TW-RUNTIME-FIXTURE
+claim_impact=engineering_complete_blocked
+remediation=Record verification evidence or keep the claim held.
+
+If the skill is unavailable, return:
+
+TRACEWEAVER_TW_TRACEABILITY_STRUCTURED_SENTINEL=held_unavailable

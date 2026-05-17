@@ -1,0 +1,6 @@
+TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
+expected_behavior=delegate_to_ce_worktree_under_tw_local_only
+ce_delegation_surface=TraceWeaver-packaged ce-worktree
+remote_mutation=held
+publication=held
+accepted_scope=deterministic_fixture_only_no_runtime_pass

@@ -1,0 +1,6 @@
+skill=tw-doc-review
+case=stale-authority-before-ce-doc-review
+required_status=blocked
+required_finding=STF-STALE-HASH-001
+expected_behavior=stop_before_ce_doc_review_closure
+affected_ids=REQ-TW-050,REQ-TW-055

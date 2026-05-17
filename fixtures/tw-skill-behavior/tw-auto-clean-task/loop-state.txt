@@ -1,0 +1,6 @@
+skill=tw-auto
+case=clean-task-closure
+required_route=tw-brainstorm,tw-plan,tw-authority-gate,tw-work,ce-work,traceweaver-check-code-anchors,traceweaver-author-code-anchors,traceability-matrix,tw-traceability-check,tw-code-review,tw-doc-review,tw-sessions,tw-test-browser,tw-test-xcode,tw-compound,tw-compound-refresh,tw-resolve-pr-feedback,tw-setup,tw-worktree
+required_stop=clean_accepted_state_or_explicit_held_state
+publication=held_until_controlled_publication_route
+affected_ids=REQ-TW-056

@@ -3,6 +3,8 @@ name: requirements-reviewer
 description: Reviews requirement quality and approval readiness for planning, specs, PRDs, traceability matrices, acceptance criteria, and document reviews. Use when deciding whether a need, requirement, user story, constraint, or acceptance criterion is good enough to become approved implementation authority, or when requirements need classification, rewrite guidance, verification/validation mapping, or structured quality findings.
 ---
 
+<!-- TRACEWEAVER: file-role=core-requirements-quality-skill; req=REQ-TW-010; trace=TRACE-TW-041; ver=VER-TW-053 -->
+
 # Requirements Reviewer
 
 ## Overview

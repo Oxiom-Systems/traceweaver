@@ -1,0 +1,658 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=smoke-harness; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044
+# TRACEWEAVER: verifies=VER-TW-044; req=REQ-TW-054; trace=TRACE-TW-035
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/code-trace-authoring"
+AUTHOR="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors"
+SCANNER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors"
+
+fixture_req() {
+  printf 'REQ-AUTH-%s' "$1"
+}
+
+fixture_trace() {
+  printf 'TRACE-AUTH-%s' "$1"
+}
+
+fixture_ver() {
+  printf 'VER-AUTH-%s' "$1"
+}
+
+sha256_file() {
+  shasum -a 256 "$1" | awk '{print $1}'
+}
+
+authority_fingerprint() {
+  local file
+  local fingerprint=""
+  local authority_files=(
+    "requirements.md"
+    "traceability-matrix.md"
+    ".traceweaver/intent-contract.yml"
+    "docs/validation/traceweaver-controlled-autonomy-alpha.md"
+    "docs/validation/traceweaver-skill-behavior-audit.md"
+    "docs/plans/2026-05-06-002-core-code-trace-anchor-hierarchy-plan.md"
+  )
+
+  for file in "${authority_files[@]}"; do
+    if [[ ! -f "$ROOT_DIR/$file" ]]; then
+      echo "trace_anchor_authoring_missing_required_file=$file" >&2
+      exit 1
+    fi
+    fingerprint+="$file=$(sha256_file "$ROOT_DIR/$file");"
+  done
+
+  printf '%s' "$fingerprint"
+}
+
+copy_fixture() {
+  local name="$1"
+  local dest="$TMP_DIR/$name"
+  cp -R "$FIXTURE_ROOT/$name" "$dest"
+  printf '%s' "$dest"
+}
+
+run_pause() {
+  local label="$1"
+  local expected_reason="$2"
+  shift 2
+  local output="$TMP_DIR/${label}.out"
+  set +e
+  "$AUTHOR" "$@" >"$output"
+  local status=$?
+  set -e
+  if [[ "$status" -eq 0 ]]; then
+    echo "trace_anchor_authoring_${label}=failed_expected_pause" >&2
+    cat "$output" >&2
+    exit 1
+  fi
+  grep -Fq "trace_anchor_authoring_status=pause" "$output"
+  grep -Fq "trace_anchor_authoring_reason=$expected_reason" "$output"
+  echo "trace_anchor_authoring_${label}=pause reason=$expected_reason"
+}
+
+run_refused() {
+  local label="$1"
+  shift
+  local output="$TMP_DIR/${label}.out"
+  set +e
+  "$AUTHOR" "$@" >"$output"
+  local status=$?
+  set -e
+  if [[ "$status" -eq 0 ]]; then
+    echo "trace_anchor_authoring_${label}=failed_expected_refusal" >&2
+    cat "$output" >&2
+    exit 1
+  fi
+  grep -Fq "trace_anchor_authoring_status=refused" "$output"
+  grep -Fq "trace_anchor_authoring_reason=apply_requires_traceweaver_work_loop" "$output"
+  echo "trace_anchor_authoring_${label}=refused reason=apply_requires_traceweaver_work_loop"
+}
+
+run_scanner_pass() {
+  local label="$1"
+  shift
+  local output="$TMP_DIR/${label}.scanner.out"
+  "$SCANNER" "$@" >"$output"
+  grep -Fq "code_traceability_status=pass" "$output"
+  echo "trace_anchor_authoring_${label}_scanner=pass"
+}
+
+# TRACEWEAVER: entrypoint=trace_anchor_authoring_smoke; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044
+
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-code-trace-authoring.XXXXXX")"
+repo_before="$(authority_fingerprint)"
+
+code_dir="$(copy_fixture unambiguous-code-anchor)"
+code_before="$(sha256_file "$code_dir/src/feature.sh")"
+matrix_before="$(sha256_file "$code_dir/traceability-matrix.md")"
+"$AUTHOR" \
+  --root "$code_dir" \
+  --mode propose \
+  --target src/feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req CODE)" \
+  --trace "$(fixture_trace CODE)" \
+  --verification "$(fixture_ver CODE)" \
+  --role fixture-source >"$TMP_DIR/code.propose.out"
+grep -Fq "trace_anchor_authoring_status=proposed" "$TMP_DIR/code.propose.out"
+if [[ "$code_before" != "$(sha256_file "$code_dir/src/feature.sh")" || "$matrix_before" != "$(sha256_file "$code_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_proposal_only=failed_changed_files" >&2
+  exit 1
+fi
+echo "trace_anchor_authoring_proposal_only=pass"
+
+run_refused apply_without_work_loop \
+  --root "$code_dir" \
+  --mode apply \
+  --target src/feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req CODE)" \
+  --trace "$(fixture_trace CODE)" \
+  --verification "$(fixture_ver CODE)" \
+  --role fixture-source
+
+outside_dir="$TMP_DIR/outside-boundary"
+mkdir -p "$outside_dir/root" "$outside_dir/outside"
+printf '%s\n' "$(fixture_req OUTSIDE)" >"$outside_dir/root/requirements.md"
+printf '%s\n' "$(fixture_trace OUTSIDE)" "$(fixture_ver OUTSIDE)" >"$outside_dir/root/traceability-matrix.md"
+printf '%s\n' '#!/usr/bin/env bash' 'echo outside' >"$outside_dir/outside/feature.sh"
+set +e
+"$AUTHOR" \
+  --root "$outside_dir/root" \
+  --mode apply \
+  --work-loop \
+  --target ../outside/feature.sh \
+  --requirement "$(fixture_req OUTSIDE)" \
+  --trace "$(fixture_trace OUTSIDE)" \
+  --verification "$(fixture_ver OUTSIDE)" \
+  --role outside-target >"$TMP_DIR/outside-boundary.out" 2>"$TMP_DIR/outside-boundary.err"
+outside_status=$?
+set -e
+if [[ "$outside_status" -eq 0 ]]; then
+  echo "trace_anchor_authoring_outside_root_boundary=failed_expected_reject" >&2
+  exit 1
+fi
+grep -Fq "trace_anchor_authoring_path_outside_root=true" "$TMP_DIR/outside-boundary.err"
+if grep -Fq "TRACEWEAVER:" "$outside_dir/outside/feature.sh"; then
+  echo "trace_anchor_authoring_outside_root_boundary=failed_mutated_outside_target" >&2
+  exit 1
+fi
+echo "trace_anchor_authoring_outside_root_boundary=pass"
+
+"$AUTHOR" \
+  --root "$code_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req CODE)" \
+  --trace "$(fixture_trace CODE)" \
+  --verification "$(fixture_ver CODE)" \
+  --role fixture-source >"$TMP_DIR/code.file.apply.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/code.file.apply.out"
+"$AUTHOR" \
+  --root "$code_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level entrypoint \
+  --entrypoint feature_message \
+  --requirement "$(fixture_req CODE)" \
+  --trace "$(fixture_trace CODE)" \
+  --verification "$(fixture_ver CODE)" \
+  --role feature_message >"$TMP_DIR/code.entrypoint.apply.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/code.entrypoint.apply.out"
+grep -Fq "entrypoint=feature_message" "$code_dir/src/feature.sh"
+if grep -Fq "private_helper" "$TMP_DIR/code.entrypoint.apply.out"; then
+  echo "trace_anchor_authoring_helper_sprawl=failed_private_helper_anchor" >&2
+  exit 1
+fi
+run_scanner_pass unambiguous_code_anchor \
+  --root "$code_dir" \
+  --mode implementation \
+  --changed-file src/feature.sh
+
+test_dir="$(copy_fixture unambiguous-test-anchor)"
+"$AUTHOR" \
+  --root "$test_dir" \
+  --mode apply \
+  --work-loop \
+  --target tests/test_feature.sh \
+  --anchor-level verification \
+  --requirement "$(fixture_req TEST)" \
+  --trace "$(fixture_trace TEST)" \
+  --verification "$(fixture_ver TEST)" \
+  --role fixture-test >"$TMP_DIR/test.apply.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/test.apply.out"
+grep -Fq "verifies=$(fixture_ver TEST)" "$test_dir/tests/test_feature.sh"
+run_scanner_pass unambiguous_test_anchor \
+  --root "$test_dir" \
+  --mode implementation \
+  --changed-file tests/test_feature.sh
+
+non_blocking_dir="$(copy_fixture non-blocking-ambiguous-anchor)"
+unresolved_record="$non_blocking_dir/traceweaver-unresolved-mappings.jsonl"
+ambiguous_before="$(sha256_file "$non_blocking_dir/src/ambiguous_feature.sh")"
+non_blocking_matrix_before="$(sha256_file "$non_blocking_dir/traceability-matrix.md")"
+"$AUTHOR" \
+  --root "$non_blocking_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/clear_feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req NBA-CLEAR)" \
+  --trace "$(fixture_trace NBA-CLEAR)" \
+  --verification "$(fixture_ver NBA-CLEAR)" \
+  --role clear-fixture-source >"$TMP_DIR/non-blocking-clear-file.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/non-blocking-clear-file.out"
+"$AUTHOR" \
+  --root "$non_blocking_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/clear_feature.sh \
+  --anchor-level entrypoint \
+  --entrypoint clear_feature_message \
+  --requirement "$(fixture_req NBA-CLEAR)" \
+  --trace "$(fixture_trace NBA-CLEAR)" \
+  --verification "$(fixture_ver NBA-CLEAR)" \
+  --role clear_feature_message >"$TMP_DIR/non-blocking-clear-entrypoint.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/non-blocking-clear-entrypoint.out"
+"$AUTHOR" \
+  --root "$non_blocking_dir" \
+  --mode apply \
+  --work-loop \
+  --target tests/test_clear_feature.sh \
+  --anchor-level verification \
+  --requirement "$(fixture_req NBA-CLEAR)" \
+  --trace "$(fixture_trace NBA-CLEAR)" \
+  --verification "$(fixture_ver NBA-CLEAR)" \
+  --role clear-fixture-test >"$TMP_DIR/non-blocking-clear-test.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/non-blocking-clear-test.out"
+"$AUTHOR" \
+  --root "$non_blocking_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/ambiguous_feature.sh \
+  --anchor-level file \
+  --unresolved-mappings traceweaver-unresolved-mappings.jsonl \
+  --skip-ambiguous-mapping >"$TMP_DIR/non-blocking-ambiguous.out"
+grep -Fq "trace_anchor_authoring_status=skipped_unresolved_mapping" "$TMP_DIR/non-blocking-ambiguous.out"
+grep -Fq '"target":"src/ambiguous_feature.sh"' "$unresolved_record"
+if [[ "$ambiguous_before" != "$(sha256_file "$non_blocking_dir/src/ambiguous_feature.sh")" ]]; then
+  echo "trace_anchor_authoring_non_blocking_ambiguous=failed_mutated_ambiguous_target" >&2
+  exit 1
+fi
+if [[ "$non_blocking_matrix_before" == "$(sha256_file "$non_blocking_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_non_blocking_ambiguous=failed_clear_matrix_not_updated" >&2
+  exit 1
+fi
+set +e
+"$SCANNER" \
+  --root "$non_blocking_dir" \
+  --mode implementation \
+  --changed-file src/clear_feature.sh \
+  --changed-file tests/test_clear_feature.sh \
+  --unresolved-mappings traceweaver-unresolved-mappings.jsonl >"$TMP_DIR/non-blocking-scanner.out"
+non_blocking_scanner_status=$?
+set -e
+if [[ "$non_blocking_scanner_status" -eq 0 ]]; then
+  echo "trace_anchor_authoring_non_blocking_ambiguous=failed_expected_scanner_block" >&2
+  cat "$TMP_DIR/non-blocking-scanner.out" >&2
+  exit 1
+fi
+grep -Fq "finding_id=CTA-UNRESOLVED-ANCHOR-MAPPING" "$TMP_DIR/non-blocking-scanner.out"
+echo "trace_anchor_authoring_non_blocking_ambiguous=pass"
+
+symlink_unresolved_dir="$(copy_fixture non-blocking-ambiguous-anchor)"
+mkdir -p "$TMP_DIR/outside-unresolved"
+ln -s "$TMP_DIR/outside-unresolved" "$symlink_unresolved_dir/outside-link"
+set +e
+"$AUTHOR" \
+  --root "$symlink_unresolved_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/ambiguous_feature.sh \
+  --anchor-level file \
+  --unresolved-mappings outside-link/unresolved.jsonl \
+  --skip-ambiguous-mapping >"$TMP_DIR/non-blocking-symlink-unresolved.out" 2>"$TMP_DIR/non-blocking-symlink-unresolved.err"
+symlink_unresolved_status=$?
+set -e
+if [[ "$symlink_unresolved_status" -eq 0 ]]; then
+  echo "trace_anchor_authoring_unresolved_mapping_symlink_boundary=failed_expected_reject" >&2
+  exit 1
+fi
+grep -Fq "trace_anchor_authoring_path_outside_root=true" "$TMP_DIR/non-blocking-symlink-unresolved.err"
+if [[ -e "$TMP_DIR/outside-unresolved/unresolved.jsonl" ]]; then
+  echo "trace_anchor_authoring_unresolved_mapping_symlink_boundary=failed_outside_write" >&2
+  exit 1
+fi
+echo "trace_anchor_authoring_unresolved_mapping_symlink_boundary=pass"
+
+yaml_json_dir="$TMP_DIR/yaml-json-anchor-format"
+mkdir -p "$yaml_json_dir/config"
+printf '%s\n' "$(fixture_req YAML)" "$(fixture_req JSON)" >"$yaml_json_dir/requirements.md"
+yaml_trace="$(fixture_trace YAML)"
+yaml_ver="$(fixture_ver YAML)"
+json_trace="$(fixture_trace JSON)"
+json_ver="$(fixture_ver JSON)"
+cat >"$yaml_json_dir/traceability-matrix.md" <<MATRIX
+# Fixture Matrix
+
+| Trace | Verification ID | Requirement | Validation Question | Status |
+| --- | --- | --- | --- | --- |
+| $yaml_trace | $yaml_ver | $(fixture_req YAML) | Can YAML anchors preserve parseable YAML comments? | reviewed |
+| $json_trace | $json_ver | $(fixture_req JSON) | Can JSON anchor writes pause instead of corrupting commentless JSON? | reviewed |
+MATRIX
+printf '%s\n' 'enabled: true' 'mode: fixture' >"$yaml_json_dir/config/settings.yml"
+printf '%s\n' '{"enabled":true,"mode":"fixture"}' >"$yaml_json_dir/config/manifest.json"
+json_before="$(sha256_file "$yaml_json_dir/config/manifest.json")"
+"$AUTHOR" \
+  --root "$yaml_json_dir" \
+  --mode apply \
+  --work-loop \
+  --target config/settings.yml \
+  --anchor-level file \
+  --requirement "$(fixture_req YAML)" \
+  --trace "$yaml_trace" \
+  --verification "$yaml_ver" \
+  --role fixture-yaml-config >"$TMP_DIR/yaml-anchor-format.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/yaml-anchor-format.out"
+grep -Fq "# TRACEWEAVER: file-role=fixture-yaml-config" "$yaml_json_dir/config/settings.yml"
+ruby -e 'require "yaml"; YAML.load_file(ARGV.fetch(0))' "$yaml_json_dir/config/settings.yml"
+set +e
+"$AUTHOR" \
+  --root "$yaml_json_dir" \
+  --mode apply \
+  --work-loop \
+  --target config/manifest.json \
+  --anchor-level file \
+  --requirement "$(fixture_req JSON)" \
+  --trace "$json_trace" \
+  --verification "$json_ver" \
+  --role fixture-json-config >"$TMP_DIR/json-anchor-format.out"
+json_status=$?
+set -e
+if [[ "$json_status" -eq 0 ]]; then
+  echo "trace_anchor_authoring_json_anchor_format=failed_expected_pause" >&2
+  exit 1
+fi
+grep -Fq "trace_anchor_authoring_reason=json_anchor_requires_structured_field" "$TMP_DIR/json-anchor-format.out"
+if [[ "$json_before" != "$(sha256_file "$yaml_json_dir/config/manifest.json")" ]]; then
+  echo "trace_anchor_authoring_json_anchor_format=failed_mutated_json" >&2
+  exit 1
+fi
+ruby -rjson -e 'JSON.parse(File.read(ARGV.fetch(0)))' "$yaml_json_dir/config/manifest.json"
+echo "trace_anchor_authoring_yaml_json_anchor_format=pass"
+
+explicit_verification_dir="$TMP_DIR/explicit-verification-existing-anchor"
+mkdir -p "$explicit_verification_dir/scripts"
+printf '%s\n' "$(fixture_req EXISTING)" "$(fixture_req EXPLICIT)" >"$explicit_verification_dir/requirements.md"
+cat >"$explicit_verification_dir/traceability-matrix.md" <<MATRIX
+# Fixture Matrix
+
+| Trace | Verification ID | Requirement | Validation Question | Status |
+| --- | --- | --- | --- | --- |
+| $(fixture_trace EXISTING) | $(fixture_ver EXISTING) | $(fixture_req EXISTING) | Can existing smoke anchors remain stable? | reviewed |
+| $(fixture_trace EXPLICIT) | $(fixture_ver EXPLICIT) | $(fixture_req EXPLICIT) | Can explicit verification anchors be added to files with prior anchors? | reviewed |
+
+## Code Anchor Evidence
+
+| Artifact Path | Requirement | Trace | Verification | Anchor Type | Role |
+| --- | --- | --- | --- | --- | --- |
+| scripts/wrapper-smoke | $(fixture_req EXISTING) | $(fixture_trace EXISTING) | $(fixture_ver EXISTING) | verifies | old-smoke-role |
+| scripts/wrapper-smoke | $(fixture_req EXPLICIT) | $(fixture_trace EXPLICIT) | $(fixture_ver EXPLICIT) | verifies | wrapper-completion-smoke |
+MATRIX
+cat >"$explicit_verification_dir/scripts/wrapper-smoke" <<SMOKE
+#!/usr/bin/env bash
+# TRACEWEAVER: file-role=old-smoke-role; req=$(fixture_req EXISTING); trace=$(fixture_trace EXISTING); ver=$(fixture_ver EXISTING)
+# TRACEWEAVER: verifies=$(fixture_ver EXISTING); req=$(fixture_req EXISTING); trace=$(fixture_trace EXISTING)
+echo ok
+SMOKE
+"$AUTHOR" \
+  --root "$explicit_verification_dir" \
+  --mode apply \
+  --work-loop \
+  --target scripts/wrapper-smoke \
+  --anchor-level verification \
+  --requirement "$(fixture_req EXPLICIT)" \
+  --trace "$(fixture_trace EXPLICIT)" \
+  --verification "$(fixture_ver EXPLICIT)" \
+  --role wrapper-completion-smoke >"$TMP_DIR/explicit-verification-existing-anchor.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/explicit-verification-existing-anchor.out"
+grep -Fq "verifies=$(fixture_ver EXPLICIT)" "$explicit_verification_dir/scripts/wrapper-smoke"
+echo "trace_anchor_authoring_explicit_verification_existing_anchor=pass"
+
+matrix_section_dir="$TMP_DIR/matrix-section-boundary"
+mkdir -p "$matrix_section_dir/src"
+printf '%s\n' "$(fixture_req MATRIX)" >"$matrix_section_dir/requirements.md"
+matrix_trace="$(fixture_trace MATRIX)"
+matrix_ver="$(fixture_ver MATRIX)"
+cat >"$matrix_section_dir/traceability-matrix.md" <<MATRIX
+# Fixture Matrix
+
+| Trace | Verification ID | Requirement | Validation Question | Status |
+| --- | --- | --- | --- | --- |
+| $matrix_trace | $matrix_ver | $(fixture_req MATRIX) | Can Code Anchor Evidence rows stay inside their section? | reviewed |
+
+## Code Anchor Evidence
+
+| Artifact Path | Requirement | Trace | Verification | Anchor Type | Role |
+| --- | --- | --- | --- | --- | --- |
+
+## Later Table
+
+| Name | Value |
+| --- | --- |
+| existing | row |
+MATRIX
+printf '%s\n' '#!/usr/bin/env bash' 'feature_message() { echo ok; }' >"$matrix_section_dir/src/feature.sh"
+"$AUTHOR" \
+  --root "$matrix_section_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req MATRIX)" \
+  --trace "$(fixture_trace MATRIX)" \
+  --verification "$(fixture_ver MATRIX)" \
+  --role fixture-source >"$TMP_DIR/matrix-section-boundary.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/matrix-section-boundary.out"
+matrix_row_line="$(grep -n '^| src/feature.sh |' "$matrix_section_dir/traceability-matrix.md" | cut -d: -f1)"
+later_section_line="$(grep -n '^## Later Table$' "$matrix_section_dir/traceability-matrix.md" | cut -d: -f1)"
+if [[ -z "$matrix_row_line" || -z "$later_section_line" || "$matrix_row_line" -ge "$later_section_line" ]]; then
+  echo "trace_anchor_authoring_matrix_section_boundary=failed_wrong_section" >&2
+  exit 1
+fi
+echo "trace_anchor_authoring_matrix_section_boundary=pass"
+
+malformed_matrix_dir="$TMP_DIR/malformed-matrix-section"
+mkdir -p "$malformed_matrix_dir/src"
+printf '%s\n' "$(fixture_req MALFORMED)" >"$malformed_matrix_dir/requirements.md"
+malformed_trace="$(fixture_trace MALFORMED)"
+malformed_ver="$(fixture_ver MALFORMED)"
+cat >"$malformed_matrix_dir/traceability-matrix.md" <<MATRIX
+# Fixture Matrix
+
+| Trace | Verification ID | Requirement | Validation Question | Status |
+| --- | --- | --- | --- | --- |
+| $malformed_trace | $malformed_ver | $(fixture_req MALFORMED) | Can malformed Code Anchor Evidence sections be repaired without using wrong tables? | reviewed |
+
+## Code Anchor Evidence
+
+| Wrong | Table |
+| --- | --- |
+| existing | row |
+MATRIX
+printf '%s\n' '#!/usr/bin/env bash' 'feature_message() { echo ok; }' >"$malformed_matrix_dir/src/feature.sh"
+"$AUTHOR" \
+  --root "$malformed_matrix_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req MALFORMED)" \
+  --trace "$(fixture_trace MALFORMED)" \
+  --verification "$(fixture_ver MALFORMED)" \
+  --role fixture-source >"$TMP_DIR/malformed-matrix-section.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/malformed-matrix-section.out"
+canonical_header_line="$(grep -n '^| Artifact Path | Requirement | Trace | Verification | Anchor Type | Role |$' "$malformed_matrix_dir/traceability-matrix.md" | cut -d: -f1)"
+malformed_row_line="$(grep -n '^| Wrong | Table |$' "$malformed_matrix_dir/traceability-matrix.md" | cut -d: -f1)"
+malformed_anchor_line="$(grep -n '^| src/feature.sh |' "$malformed_matrix_dir/traceability-matrix.md" | cut -d: -f1)"
+if [[ -z "$canonical_header_line" || -z "$malformed_row_line" || -z "$malformed_anchor_line" || "$malformed_anchor_line" -ge "$malformed_row_line" ]]; then
+  echo "trace_anchor_authoring_malformed_matrix_section=failed_canonical_table_creation" >&2
+  exit 1
+fi
+echo "trace_anchor_authoring_malformed_matrix_section=pass"
+
+trace_table_status_dir="$TMP_DIR/trace-table-status-column"
+mkdir -p "$trace_table_status_dir/src"
+printf '%s\n' "$(fixture_req TRACE-TABLE)" >"$trace_table_status_dir/requirements.md"
+trace_table_trace="$(fixture_trace TRACE-TABLE)"
+trace_table_ver="$(fixture_ver TRACE-TABLE)"
+cat >"$trace_table_status_dir/traceability-matrix.md" <<MATRIX
+# Fixture Matrix
+
+## Traceability Matrix
+
+| Trace ID | Owner | Need | Requirement | Authority | Design / ADR | Risk Control | Plan / Task | Implementation | Verification | Validation | Status | Gap / Debt |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| $trace_table_trace | Fixture Owner | NEED-AUTH-TRACE-TABLE | $(fixture_req TRACE-TABLE) | Accepted static fixture authority | Fixture design | EXC-AUTH-TRACE-TABLE | Fixture task | ART-AUTH-TRACE-TABLE | $trace_table_ver | VAL-AUTH-TRACE-TABLE | Static proof passed; runtime held | Runtime remains held outside this static fixture |
+MATRIX
+printf '%s\n' '#!/usr/bin/env bash' 'feature_message() { echo ok; }' >"$trace_table_status_dir/src/feature.sh"
+"$AUTHOR" \
+  --root "$trace_table_status_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req TRACE-TABLE)" \
+  --trace "$trace_table_trace" \
+  --verification "$trace_table_ver" \
+  --role fixture-source >"$TMP_DIR/trace-table-status-column.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/trace-table-status-column.out"
+grep -Fq "TRACEWEAVER: file-role=fixture-source" "$trace_table_status_dir/src/feature.sh"
+echo "trace_anchor_authoring_trace_table_status_column=pass"
+
+ambiguous_dir="$(copy_fixture ambiguous-requirement-pause)"
+ambiguous_before="$(sha256_file "$ambiguous_dir/src/feature.sh")"
+run_pause ambiguous_requirement ambiguous_authority_mapping \
+  --root "$ambiguous_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh
+[[ "$ambiguous_before" == "$(sha256_file "$ambiguous_dir/src/feature.sh")" ]]
+
+missing_ver_dir="$(copy_fixture missing-verification-pause)"
+run_pause missing_verification missing_verification_mapping \
+  --root "$missing_ver_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh
+
+missing_trace_dir="$(copy_fixture missing-trace-pause)"
+missing_trace_before="$(sha256_file "$missing_trace_dir/src/feature.sh")"
+missing_trace_matrix_before="$(sha256_file "$missing_trace_dir/traceability-matrix.md")"
+run_pause missing_trace trace_absent_from_matrix \
+  --root "$missing_trace_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req MISSING-TRACE)" \
+  --trace "$(fixture_trace MISSING-TRACE)" \
+  --verification "$(fixture_ver MISSING-TRACE)" \
+  --role fixture-source
+if [[ "$missing_trace_before" != "$(sha256_file "$missing_trace_dir/src/feature.sh")" ||
+      "$missing_trace_matrix_before" != "$(sha256_file "$missing_trace_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_missing_trace=failed_mutated_files" >&2
+  exit 1
+fi
+
+prose_trace_dir="$(copy_fixture prose-trace-pause)"
+prose_trace_before="$(sha256_file "$prose_trace_dir/src/feature.sh")"
+prose_trace_matrix_before="$(sha256_file "$prose_trace_dir/traceability-matrix.md")"
+run_pause prose_trace trace_absent_from_matrix \
+  --root "$prose_trace_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req PROSE)" \
+  --trace "$(fixture_trace PROSE)" \
+  --verification "$(fixture_ver PROSE)" \
+  --role fixture-source
+if [[ "$prose_trace_before" != "$(sha256_file "$prose_trace_dir/src/feature.sh")" ||
+      "$prose_trace_matrix_before" != "$(sha256_file "$prose_trace_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_prose_trace=failed_mutated_files" >&2
+  exit 1
+fi
+
+held_stale_dir="$(copy_fixture held-stale-trace-pause)"
+held_before="$(sha256_file "$held_stale_dir/src/held_feature.sh")"
+stale_before="$(sha256_file "$held_stale_dir/src/stale_feature.sh")"
+held_stale_matrix_before="$(sha256_file "$held_stale_dir/traceability-matrix.md")"
+run_pause held_trace trace_absent_from_matrix \
+  --root "$held_stale_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/held_feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req HELD)" \
+  --trace "$(fixture_trace HELD)" \
+  --verification "$(fixture_ver HELD)" \
+  --role fixture-source
+run_pause stale_trace trace_absent_from_matrix \
+  --root "$held_stale_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/stale_feature.sh \
+  --anchor-level file \
+  --requirement "$(fixture_req STALE)" \
+  --trace "$(fixture_trace STALE)" \
+  --verification "$(fixture_ver STALE)" \
+  --role fixture-source
+if [[ "$held_before" != "$(sha256_file "$held_stale_dir/src/held_feature.sh")" ||
+      "$stale_before" != "$(sha256_file "$held_stale_dir/src/stale_feature.sh")" ||
+      "$held_stale_matrix_before" != "$(sha256_file "$held_stale_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_held_stale_trace=failed_mutated_files" >&2
+  exit 1
+fi
+
+conflict_dir="$(copy_fixture contradictory-authority-pause)"
+conflict_before="$(sha256_file "$conflict_dir/src/feature.sh")"
+run_pause contradictory_authority conflicting_existing_anchor \
+  --root "$conflict_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --requirement "$(fixture_req CONFLICT)" \
+  --trace "$(fixture_trace CONFLICT)" \
+  --verification "$(fixture_ver CONFLICT)" \
+  --role fixture-source
+[[ "$conflict_before" == "$(sha256_file "$conflict_dir/src/feature.sh")" ]]
+
+generated_dir="$(copy_fixture generated-exception)"
+"$AUTHOR" \
+  --root "$generated_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/generated.sh \
+  --generated-exception \
+  --requirement "$(fixture_req GENERATED)" \
+  --trace "$(fixture_trace GENERATED)" \
+  --verification "$(fixture_ver GENERATED)" \
+  --role generated-fixture \
+  --reason generated-fixture-output >"$TMP_DIR/generated.apply.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/generated.apply.out"
+run_scanner_pass generated_exception \
+  --root "$generated_dir" \
+  --mode implementation \
+  --changed-file src/generated.sh
+
+helper_dir="$(copy_fixture helper-density)"
+helper_before="$(sha256_file "$helper_dir/src/feature.sh")"
+run_pause helper_density helper_anchor_requires_approved_exception \
+  --root "$helper_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level helper \
+  --requirement "$(fixture_req HELPER)" \
+  --trace "$(fixture_trace HELPER)" \
+  --verification "$(fixture_ver HELPER)" \
+  --role private_helper
+[[ "$helper_before" == "$(sha256_file "$helper_dir/src/feature.sh")" ]]
+
+repo_after="$(authority_fingerprint)"
+if [[ "$repo_before" != "$repo_after" ]]; then
+  echo "trace_anchor_authoring_real_repo_unchanged=failed" >&2
+  exit 1
+fi
+
+echo "trace_anchor_authoring_real_repo_unchanged=pass"
+echo "trace_anchor_authoring_artifacts=$TMP_DIR"
+echo "trace_anchor_authoring_smoke=pass"

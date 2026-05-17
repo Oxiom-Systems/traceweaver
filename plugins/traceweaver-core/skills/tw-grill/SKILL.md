@@ -4,6 +4,9 @@ description: Optional TraceWeaver intent-deepening interview after ideation and 
 argument-hint: "[selected idea, plan, design, or source artifact]"
 ---
 
+<!-- TRACEWEAVER: file-role=intent-deepening-source-evidence-skill; req=REQ-TW-048; trace=TRACE-TW-009; ver=VER-TW-018 -->
+<!-- TRACEWEAVER: file-role=systems-engineering-prompt-contract-skill; req=REQ-TW-061; trace=TRACE-TW-044; ver=VER-TW-056 -->
+
 # TraceWeaver Grill
 
 ## Purpose
@@ -46,6 +49,24 @@ If the interview discovers missing authority, route it to one of:
 - rejected assumption.
 
 Do not proceed to implementation from `tw-grill`.
+
+## Required Inputs
+
+Before interviewing, load and cite the available authority context:
+
+- selected idea, plan, design, source artifact, or user problem statement
+- `requirements.md` when present
+- `traceability-matrix.md` when present
+- `.traceweaver/intent-contract.yml` when present
+- relevant `.traceweaver/` gaps, changes, exceptions, tasks, trace records, or
+  validation evidence
+- `references/upstream-notice.md`
+
+If authority files are absent, stay in bootstrap source-evidence mode. If they
+exist, use them to narrow questions to deltas, gaps, assumptions, validation
+questions, and decision branches. `tw-grill` may use TraceWeaver-packaged
+requirements and systems-engineering skills as distilled knowledge sources, but
+it must not approve requirements.
 
 ## Workflow Position
 

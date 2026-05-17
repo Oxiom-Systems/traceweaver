@@ -1,0 +1,6 @@
+required_behavior=pause_before_tw_work
+pause_reason=unclear_task_authority
+tw_work_invocation=false
+source_mutation=false
+matrix_mutation=false
+required_next_step=human_input_or_tw_requirements_review

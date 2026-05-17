@@ -17,6 +17,25 @@
     "agentic-workflow",
     "compound-engineering"
   ],
+  "modelDefaults": {
+    "codex": {
+      "model": "gpt-5.5",
+      "reasoningEffort": "medium",
+      "enforcement": "traceweaver_policy_and_smoke_default",
+      "overrideEnvironment": {
+        "model": "TRACEWEAVER_CODEX_MODEL",
+        "reasoningEffort": "TRACEWEAVER_CODEX_REASONING_EFFORT"
+      }
+    },
+    "claude": {
+      "model": "sonnet",
+      "enforcement": "policy_recorded_runtime_enforcement_held"
+    },
+    "importedCeComponentBodyPolicy": "no_model_default_edits_without_reviewed_overlay_fork_record"
+  },
+  "traceweaver": {
+    "anchor": "TRACEWEAVER: file-role=model-default-codex-plugin-manifest; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055"
+  },
   "skills": "./skills/",
   "interface": {
     "displayName": "TraceWeaver Core",
@@ -36,7 +55,8 @@
             "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
       "Use the tw-traceability-check skill during plan, code, document, or release-evidence review.",
       "Use the tw-auto skill for advisory controlled autonomy; it preserves the CE-style loop while adding authority, traceability, verification, validation, and dark-behavior controls.",
-      "The packaged lfg name delegates to tw-auto and must stop before commit, push, or PR creation in this alpha."
+      "The packaged lfg name delegates to tw-auto and must stop before commit, push, or PR creation in this alpha.",
+      "TraceWeaver Codex packaging defaults to gpt-5.5 with medium reasoning; Claude packaging defaults to Sonnet where the platform surface supports it. Runtime enforcement claims remain held until proven."
     ],
     "screenshots": []
   }

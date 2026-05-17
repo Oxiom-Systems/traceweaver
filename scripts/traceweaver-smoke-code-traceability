@@ -1,0 +1,139 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=smoke-harness; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
+# TRACEWEAVER: verifies=VER-TW-041; req=REQ-TW-054; trace=TRACE-TW-032
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/code-traceability"
+SCANNER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors"
+
+sha256_file() {
+  shasum -a 256 "$1" | awk '{print $1}'
+}
+
+authority_fingerprint() {
+  local file
+  local fingerprint=""
+  local authority_files=(
+    "requirements.md"
+    "traceability-matrix.md"
+    ".traceweaver/intent-contract.yml"
+    "docs/validation/traceweaver-controlled-autonomy-alpha.md"
+    "docs/validation/traceweaver-skill-behavior-audit.md"
+  )
+
+  for file in "${authority_files[@]}"; do
+    if [[ ! -f "$ROOT_DIR/$file" ]]; then
+      echo "code_traceability_missing_required_file=$file" >&2
+      exit 1
+    fi
+    fingerprint+="$file=$(sha256_file "$ROOT_DIR/$file");"
+  done
+
+  printf '%s' "$fingerprint"
+}
+
+run_pass() {
+  local label="$1"
+  shift
+  local output="$TMP_DIR/${label}.out"
+  "$SCANNER" "$@" >"$output"
+  grep -Fq "code_traceability_status=pass" "$output"
+  echo "code_traceability_${label}=pass"
+}
+
+run_blocked() {
+  local label="$1"
+  local expected_finding="$2"
+  shift 2
+  local output="$TMP_DIR/${label}.out"
+  set +e
+  "$SCANNER" "$@" >"$output"
+  local status=$?
+  set -e
+  if [[ "$status" -eq 0 ]]; then
+    echo "code_traceability_${label}=failed_expected_blocker" >&2
+    cat "$output" >&2
+    exit 1
+  fi
+  grep -Fq "finding_id=$expected_finding" "$output"
+  echo "code_traceability_${label}=blocked finding=$expected_finding"
+}
+
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-code-traceability.XXXXXX")"
+repo_before="$(authority_fingerprint)"
+
+# TRACEWEAVER: entrypoint=complete_fixture_positive_control; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
+run_pass complete_anchor_chain \
+  --root "$FIXTURE_ROOT/complete-anchor-chain" \
+  --mode implementation \
+  --changed-file src/feature.sh \
+  --changed-file tests/test_feature.sh \
+  --jsonl "$TMP_DIR/complete.jsonl" \
+  --markdown "$TMP_DIR/complete.md"
+
+run_blocked missing_file_anchor CTA-MISSING-FILE-ANCHOR \
+  --root "$FIXTURE_ROOT/missing-file-anchor" \
+  --mode implementation \
+  --changed-file src/feature.sh
+
+run_blocked missing_function_anchor CTA-MISSING-ENTRYPOINT-ANCHOR \
+  --root "$FIXTURE_ROOT/missing-function-anchor" \
+  --mode implementation \
+  --changed-file src/feature.sh
+
+run_blocked missing_test_verification CTA-MISSING-TEST-VERIFICATION \
+  --root "$FIXTURE_ROOT/missing-test-verification" \
+  --mode implementation \
+  --changed-file tests/test_feature.sh
+
+run_blocked stale_requirement_id CTA-STALE-REQUIREMENT \
+  --root "$FIXTURE_ROOT/stale-requirement-id" \
+  --mode implementation \
+  --changed-file src/feature.sh
+
+run_blocked dead_tdd CTA-DEAD-TDD \
+  --root "$FIXTURE_ROOT/dead-tdd" \
+  --mode implementation \
+  --changed-file tests/test_removed_requirement.sh
+
+run_pass generated_file_exception \
+  --root "$FIXTURE_ROOT/generated-file-exception" \
+  --mode implementation \
+  --changed-file src/generated.sh
+
+run_blocked unapproved_generated_exception CTA-UNAPPROVED-EXCEPTION \
+  --root "$FIXTURE_ROOT/unapproved-generated-exception" \
+  --mode implementation \
+  --changed-file src/generated.sh
+
+run_pass changed_file_scope_ignores_untouched_debt \
+  --root "$FIXTURE_ROOT/baseline-debt" \
+  --mode implementation \
+  --changed-file src/good.sh
+
+run_blocked audit_mode_reports_baseline_debt CTA-MISSING-FILE-ANCHOR \
+  --root "$FIXTURE_ROOT/baseline-debt" \
+  --mode audit
+
+run_blocked unresolved_anchor_mapping CTA-UNRESOLVED-ANCHOR-MAPPING \
+  --root "$FIXTURE_ROOT/unresolved-anchor-mapping" \
+  --mode implementation \
+  --changed-file src/feature.sh \
+  --unresolved-mappings traceweaver-unresolved-mappings.jsonl
+
+run_blocked unsafe_changed_file_path CTA-UNSAFE-CHANGED-FILE-PATH \
+  --root "$FIXTURE_ROOT/complete-anchor-chain" \
+  --mode implementation \
+  --changed-file ../outside/feature.sh
+
+repo_after="$(authority_fingerprint)"
+if [[ "$repo_before" != "$repo_after" ]]; then
+  echo "code_traceability_real_repo_unchanged=failed" >&2
+  exit 1
+fi
+
+echo "code_traceability_real_repo_unchanged=pass"
+echo "code_traceability_artifacts=$TMP_DIR"
+echo "code_traceability_smoke=pass"

@@ -1,0 +1,7 @@
+fixture=clean-implementation
+requirement=REQ-TW-056
+trace=TRACE-TW-039
+verification=VER-TW-051
+expected_authoring=clear_source_and_test_anchors
+expected_review_route=tw-code-review_then_tw-doc-review
+publication=forbidden

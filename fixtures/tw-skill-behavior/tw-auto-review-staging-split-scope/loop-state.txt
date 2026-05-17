@@ -1,0 +1,13 @@
+# TRACEWEAVER: file-role=review-staging-fixture; req=REQ-TW-056; trace=TRACE-TW-042; ver=VER-TW-054
+# TRACEWEAVER: verifies=VER-TW-054; req=REQ-TW-056; trace=TRACE-TW-042
+skill=tw-auto
+case=review-staging-split-scope
+split_identity=staged_unstaged_mismatch
+implementation_status=pass
+traceability_status=pass
+tw_auto_behavior=route_to_tw_work_review_staging
+review_stage_scope=exact_scoped_file_list
+review_route=tw-code-review,tw-doc-review
+unrelated_files_staged=false
+publication_allowed=false
+runtime_claim=false

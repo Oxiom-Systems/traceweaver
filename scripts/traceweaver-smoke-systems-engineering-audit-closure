@@ -1,0 +1,361 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=systems-engineering-audit-closure-smoke; req=REQ-TW-061; trace=TRACE-TW-044; ver=VER-TW-056
+# TRACEWEAVER: file-role=systems-engineering-audit-closure-smoke; req=REQ-TW-062; trace=TRACE-TW-044; ver=VER-TW-056
+# TRACEWEAVER: file-role=systems-engineering-audit-closure-smoke; req=REQ-TW-063; trace=TRACE-TW-044; ver=VER-TW-056
+# TRACEWEAVER: verifies=VER-TW-056; req=REQ-TW-061; trace=TRACE-TW-044
+# TRACEWEAVER: verifies=VER-TW-056; req=REQ-TW-062; trace=TRACE-TW-044
+# TRACEWEAVER: verifies=VER-TW-056; req=REQ-TW-063; trace=TRACE-TW-044
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCANNER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors"
+CONTRACT="$ROOT_DIR/plugins/traceweaver-core/references/traceweaver-systems-engineering-audit-closure.md"
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-systems-engineering-audit.XXXXXX")"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+AUDIT_REQ_PREFIX="REQ-AUDIT"
+AUDIT_TRACE_PREFIX="TRACE-AUDIT"
+AUDIT_VER_PREFIX="VER-AUDIT"
+CLEAN_REQ="${AUDIT_REQ_PREFIX}-001"
+CLEAN_TRACE="${AUDIT_TRACE_PREFIX}-001"
+CLEAN_VER="${AUDIT_VER_PREFIX}-001"
+CLEAN_VAL="VAL-AUDIT-001"
+APPROVED_REQ="${AUDIT_REQ_PREFIX}-APPROVED"
+APPROVED_TRACE="${AUDIT_TRACE_PREFIX}-APPROVED"
+APPROVED_VER="${AUDIT_VER_PREFIX}-APPROVED"
+STALE_REQ="${AUDIT_REQ_PREFIX}-STALE"
+STALE_TRACE="${AUDIT_TRACE_PREFIX}-STALE"
+STALE_VER="${AUDIT_VER_PREFIX}-STALE"
+
+require_file() {
+  local path="$1"
+  if [[ ! -f "$path" ]]; then
+    echo "systems_engineering_audit_missing_file=$path" >&2
+    exit 1
+  fi
+}
+
+assert_contains() {
+  local path="$1"
+  local pattern="$2"
+  local label="$3"
+  if ! grep -Eq "$pattern" "$path"; then
+    echo "$label=failed_missing_pattern pattern=$pattern file=$path" >&2
+    exit 1
+  fi
+}
+
+assert_not_contains() {
+  local path="$1"
+  local pattern="$2"
+  local label="$3"
+  if grep -Eq "$pattern" "$path"; then
+    echo "$label=failed_unexpected_pattern pattern=$pattern file=$path" >&2
+    exit 1
+  fi
+}
+
+assert_finding() {
+  local jsonl="$1"
+  local finding_id="$2"
+  if ! grep -Fq "\"id\":\"$finding_id\"" "$jsonl"; then
+    echo "systems_engineering_audit_missing_finding=$finding_id" >&2
+    cat "$jsonl" >&2
+    exit 1
+  fi
+}
+
+replace_fixture_tokens() {
+  local root="$1"
+  while IFS= read -r -d '' path; do
+    CLEAN_REQ="$CLEAN_REQ" \
+    CLEAN_TRACE="$CLEAN_TRACE" \
+    CLEAN_VER="$CLEAN_VER" \
+    CLEAN_VAL="$CLEAN_VAL" \
+    APPROVED_REQ="$APPROVED_REQ" \
+    APPROVED_TRACE="$APPROVED_TRACE" \
+    APPROVED_VER="$APPROVED_VER" \
+    STALE_REQ="$STALE_REQ" \
+    STALE_TRACE="$STALE_TRACE" \
+    STALE_VER="$STALE_VER" \
+      ruby -0pi -e '
+        {
+          "__CLEAN_REQ__" => ENV.fetch("CLEAN_REQ"),
+          "__CLEAN_TRACE__" => ENV.fetch("CLEAN_TRACE"),
+          "__CLEAN_VER__" => ENV.fetch("CLEAN_VER"),
+          "__CLEAN_VAL__" => ENV.fetch("CLEAN_VAL"),
+          "__APPROVED_REQ__" => ENV.fetch("APPROVED_REQ"),
+          "__APPROVED_TRACE__" => ENV.fetch("APPROVED_TRACE"),
+          "__APPROVED_VER__" => ENV.fetch("APPROVED_VER"),
+          "__STALE_REQ__" => ENV.fetch("STALE_REQ"),
+          "__STALE_TRACE__" => ENV.fetch("STALE_TRACE"),
+          "__STALE_VER__" => ENV.fetch("STALE_VER")
+        }.each { |token, value| $_ = $_.gsub(token, value) }
+      ' "$path"
+  done < <(find "$root" -type f -print0)
+}
+
+require_file "$SCANNER"
+require_file "$CONTRACT"
+assert_contains "$CONTRACT" "User-Facing Skill Prompt Contract" "systems_engineering_contract_prompt_section"
+assert_contains "$CONTRACT" "Requirement Closure Contract" "systems_engineering_contract_closure_section"
+assert_contains "$CONTRACT" "Semantic Audit Mode Contract" "systems_engineering_contract_audit_section"
+echo "systems_engineering_audit_closure_contract=pass"
+
+check_skill_contract() {
+  local skill_file="$1"
+  local skill_name
+  skill_name="$(basename "$(dirname "$skill_file")")"
+
+  assert_contains "$skill_file" "^## Purpose" "skill_prompt_contract_${skill_name}_purpose"
+  assert_contains "$skill_file" "^## (Required Inputs|Required Authority Inputs)" "skill_prompt_contract_${skill_name}_required_inputs"
+  assert_contains "$skill_file" "(requirements\\.md|authority bootstrap|source evidence)" "skill_prompt_contract_${skill_name}_authority_inputs"
+  assert_contains "$skill_file" "(traceability-matrix\\.md|authority bootstrap|source evidence)" "skill_prompt_contract_${skill_name}_matrix_context"
+  assert_contains "$skill_file" "(\\.traceweaver/intent-contract\\.yml|authority bootstrap|source evidence)" "skill_prompt_contract_${skill_name}_intent_context"
+  assert_contains "$skill_file" "(references/|systems-engineering-traceability|requirements-reviewer|TraceWeaver-packaged)" "skill_prompt_contract_${skill_name}_knowledge_access"
+  assert_contains "$skill_file" "^## (Workflow|Process|Controlled Publication Route|Operating Rules|Mode Detection)" "skill_prompt_contract_${skill_name}_workflow"
+  assert_contains "$skill_file" "^## Output" "skill_prompt_contract_${skill_name}_output"
+}
+
+tw_skill_count=0
+for skill_file in "$ROOT_DIR"/plugins/traceweaver-core/skills/tw-*/SKILL.md; do
+  check_skill_contract "$skill_file"
+  tw_skill_count=$((tw_skill_count + 1))
+done
+
+if [[ "$tw_skill_count" -lt 20 ]]; then
+  echo "systems_engineering_tw_skill_inventory=failed expected_at_least=20 actual=$tw_skill_count" >&2
+  exit 1
+fi
+echo "systems_engineering_tw_skill_prompt_contract=pass count=$tw_skill_count"
+
+negative_skill="$TMP_DIR/missing-knowledge/SKILL.md"
+mkdir -p "$(dirname "$negative_skill")"
+cat >"$negative_skill" <<'NEG'
+---
+name: tw-negative
+description: Broken fixture.
+---
+
+# Negative
+
+## Purpose
+
+Broken fixture.
+
+## Required Inputs
+
+- requirements.md
+- traceability-matrix.md
+- .traceweaver/intent-contract.yml
+
+## Workflow
+
+1. Run.
+
+## Output
+
+Return status.
+NEG
+
+if grep -Eq "(references/|systems-engineering-traceability|requirements-reviewer|TraceWeaver-packaged)" "$negative_skill"; then
+  echo "systems_engineering_negative_missing_knowledge=failed_expected_block" >&2
+  exit 1
+fi
+echo "systems_engineering_negative_missing_knowledge=blocked"
+
+make_clean_fixture() {
+  local root="$1"
+  mkdir -p "$root/src" "$root/tests"
+  cat >"$root/requirements.md" <<'REQ'
+# Requirements
+
+| ID | Requirement | Status |
+| --- | --- | --- |
+| __CLEAN_REQ__ | Clean audited behavior has implementation, verification, and validation procedure. | approved |
+REQ
+  cat >"$root/traceability-matrix.md" <<'MAT'
+# Matrix
+
+## Code Anchor Evidence
+
+| Artifact Path | Requirement | Trace | Verification | Anchor Type | Role |
+| --- | --- | --- | --- | --- | --- |
+| src/clean.sh | __CLEAN_REQ__ | __CLEAN_TRACE__ | __CLEAN_VER__ | file-role; entrypoint | clean-audit-source |
+| tests/test_clean.sh | __CLEAN_REQ__ | __CLEAN_TRACE__ | __CLEAN_VER__ | file-role; verifies | clean-audit-verification |
+
+## Requirement Closure Evidence
+
+| Requirement | Implementation | Verification Procedure | Verification Result | Validation Procedure | Validation Evidence |
+| --- | --- | --- | --- | --- | --- |
+| __CLEAN_REQ__ | src/clean.sh | run tests/test_clean.sh | pass | inspect user-visible result | __CLEAN_VAL__ |
+MAT
+  cat >"$root/src/clean.sh" <<'SRC'
+# TRACEWEAVER: file-role=fixture-clean-source; req=__CLEAN_REQ__; trace=__CLEAN_TRACE__; ver=__CLEAN_VER__
+# TRACEWEAVER: entrypoint=clean_behavior; req=__CLEAN_REQ__; trace=__CLEAN_TRACE__; ver=__CLEAN_VER__
+clean_behavior() {
+  printf 'clean\n'
+}
+SRC
+  cat >"$root/tests/test_clean.sh" <<'TEST'
+# TRACEWEAVER: file-role=fixture-clean-test; req=__CLEAN_REQ__; trace=__CLEAN_TRACE__; ver=__CLEAN_VER__
+# TRACEWEAVER: verifies=__CLEAN_VER__; req=__CLEAN_REQ__; trace=__CLEAN_TRACE__
+clean_behavior_test() {
+  test "$(printf 'clean')" = "clean"
+}
+TEST
+}
+
+make_audit_fixture() {
+  local root="$1"
+  mkdir -p "$root/src"
+  cat >"$root/requirements.md" <<'REQ'
+# Requirements
+
+| ID | Requirement | Status |
+| --- | --- | --- |
+| __APPROVED_REQ__ | Current behavior authority. | approved |
+| __STALE_REQ__ | Superseded behavior authority. | stale |
+REQ
+  cat >"$root/traceability-matrix.md" <<'MAT'
+# Matrix
+
+## Code Anchor Evidence
+
+| Artifact Path | Requirement | Trace | Verification | Anchor Type | Role |
+| --- | --- | --- | --- | --- | --- |
+| src/obsolete.sh | __STALE_REQ__ | __STALE_TRACE__ | __STALE_VER__ | file-role; entrypoint | obsolete-source |
+| src/anchor_only.sh | __APPROVED_REQ__ | __APPROVED_TRACE__ | missing | file-role; entrypoint | anchor-only-source |
+| src/duplicate_one.sh | __APPROVED_REQ__ | __APPROVED_TRACE__ | __APPROVED_VER__ | file-role; entrypoint | duplicate-source |
+| src/duplicate_two.sh | __APPROVED_REQ__ | __APPROVED_TRACE__ | __APPROVED_VER__ | file-role; entrypoint | duplicate-source |
+| src/similar_a.sh | __APPROVED_REQ__ | __APPROVED_TRACE__ | __APPROVED_VER__ | file-role; entrypoint | similar-source |
+| src/similar_b.sh | __APPROVED_REQ__ | __APPROVED_TRACE__ | __APPROVED_VER__ | file-role; entrypoint | similar-source |
+
+## Requirement Closure Evidence
+
+| Requirement | Implementation | Verification Procedure | Verification Result | Validation Procedure | Validation Evidence |
+| --- | --- | --- | --- | --- | --- |
+| __APPROVED_REQ__ | src/anchor_only.sh | verification procedure: missing | pending | inspect result | pending |
+| __APPROVED_REQ__ | src/similar_a.sh | run semantic fixture | pass | validation procedure: missing | pending |
+MAT
+  cat >"$root/src/dark.sh" <<'SRC'
+dark_behavior() {
+  printf 'dark feature\n'
+}
+SRC
+  cat >"$root/src/obsolete.sh" <<'SRC'
+# TRACEWEAVER: file-role=fixture-obsolete-source; req=__STALE_REQ__; trace=__STALE_TRACE__; ver=__STALE_VER__
+# TRACEWEAVER: entrypoint=obsolete_behavior; req=__STALE_REQ__; trace=__STALE_TRACE__; ver=__STALE_VER__
+obsolete_behavior() {
+  printf 'old feature\n'
+}
+SRC
+  cat >"$root/src/orphaned.sh" <<'SRC'
+# TRACEWEAVER: file-role=fixture-orphan-source; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+# TRACEWEAVER: entrypoint=orphaned_behavior; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+orphaned_behavior() {
+  printf 'orphaned feature\n'
+}
+SRC
+  cat >"$root/src/anchor_only.sh" <<'SRC'
+# TRACEWEAVER: file-role=fixture-anchor-only-source; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+# TRACEWEAVER: entrypoint=anchor_only_behavior; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+anchor_only_behavior() {
+  printf 'anchor only\n'
+}
+SRC
+  cat >"$root/src/duplicate_one.sh" <<'SRC'
+# TRACEWEAVER: file-role=fixture-duplicate-source; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+# TRACEWEAVER: entrypoint=duplicate_one; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+duplicate_one() {
+  amount=42
+  status="ready"
+  printf "%s:%s\n" "$amount" "$status"
+}
+SRC
+  cat >"$root/src/duplicate_two.sh" <<'SRC'
+# TRACEWEAVER: file-role=fixture-duplicate-source; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+# TRACEWEAVER: entrypoint=duplicate_one; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+duplicate_one() {
+  amount=42
+  status="ready"
+  printf "%s:%s\n" "$amount" "$status"
+}
+SRC
+  cat >"$root/src/similar_a.sh" <<'SRC'
+# TRACEWEAVER: file-role=fixture-similar-source; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+# TRACEWEAVER: entrypoint=similar_alpha; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+similar_alpha() {
+  order_state="ready"
+  fill_count=3
+  risk_limit="standard"
+  settlement_mode="paper"
+  retry_policy="bounded"
+  printf "order %s %s %s %s %s\n" "$order_state" "$fill_count" "$risk_limit" "$settlement_mode" "$retry_policy"
+}
+SRC
+  cat >"$root/src/similar_b.sh" <<'SRC'
+# TRACEWEAVER: file-role=fixture-similar-source; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+# TRACEWEAVER: entrypoint=similar_beta; req=__APPROVED_REQ__; trace=__APPROVED_TRACE__; ver=__APPROVED_VER__
+similar_beta() {
+  order_state="waiting"
+  fill_count=4
+  risk_limit="standard"
+  settlement_mode="paper"
+  retry_policy="bounded"
+  printf "order %s %s %s %s %s\n" "$order_state" "$fill_count" "$risk_limit" "$settlement_mode" "$retry_policy"
+}
+SRC
+}
+
+clean_root="$TMP_DIR/clean"
+audit_root="$TMP_DIR/audit"
+make_clean_fixture "$clean_root"
+make_audit_fixture "$audit_root"
+replace_fixture_tokens "$clean_root"
+replace_fixture_tokens "$audit_root"
+
+"$SCANNER" --root "$clean_root" --mode audit --jsonl "$TMP_DIR/clean.jsonl" --markdown "$TMP_DIR/clean.md" >"$TMP_DIR/clean.out"
+grep -Fq "code_traceability_status=pass" "$TMP_DIR/clean.out"
+echo "systems_engineering_requirement_closure_clean_fixture=pass"
+
+set +e
+"$SCANNER" --root "$audit_root" --mode audit --jsonl "$TMP_DIR/audit.jsonl" --markdown "$TMP_DIR/audit.md" >"$TMP_DIR/audit.out"
+audit_status=$?
+set -e
+if [[ "$audit_status" -eq 0 ]]; then
+  echo "systems_engineering_semantic_audit_fixture=failed_expected_block" >&2
+  cat "$TMP_DIR/audit.out" >&2
+  exit 1
+fi
+
+assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-DARK-BEHAVIOR"
+assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-OBSOLETE-BEHAVIOR"
+assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-ORPHANED-BEHAVIOR"
+assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-DUPLICATE-BEHAVIOR"
+assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-SIMILAR-BEHAVIOR"
+assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-ANCHOR-ONLY-COVERAGE"
+assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-MISSING-VERIFICATION-PROCEDURE"
+assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-MISSING-VALIDATION-PROCEDURE"
+
+python3 - "$TMP_DIR/audit.jsonl" <<'PY'
+import json
+import sys
+
+required = {"evidence_source", "confidence", "supported_scope", "known_limitation"}
+for line_number, line in enumerate(open(sys.argv[1], encoding="utf-8"), 1):
+    if not line.strip():
+        continue
+    finding = json.loads(line)
+    if finding["id"].startswith("TW-AUDIT-"):
+        missing = sorted(required - set(finding))
+        if missing:
+            raise SystemExit(f"semantic_audit_metadata_missing line={line_number} missing={','.join(missing)}")
+PY
+
+assert_contains "$TMP_DIR/audit.md" "Candidate finding only; not automatic removal authority" "systems_engineering_audit_no_auto_removal_boundary"
+echo "systems_engineering_semantic_audit_fixture=pass"
+echo "systems_engineering_semantic_audit_metadata=pass"
+echo "systems_engineering_audit_artifacts=$TMP_DIR"
+echo "systems_engineering_audit_closure_smoke=pass"

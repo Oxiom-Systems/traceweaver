@@ -3,7 +3,8 @@ name: using-agent-skills
 description: Discovers and invokes agent skills. Use when starting a session or when you need to discover which skill applies to the current task. This is the meta-skill that governs how all other skills are discovered and invoked.
 ---
 
-<!-- TRACEWEAVER: file-role=packaged-skills-using-agent-skills-skill; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
+<!-- TRACEWEAVER: file-role=skill-routing-surface; req=REQ-TW-043; trace=TRACE-TW-033; ver=VER-TW-042 -->
+
 # Using Agent Skills
 
 ## Overview
@@ -15,25 +16,35 @@ Agent Skills is a collection of engineering workflow skills organized by develop
 When a task arrives, identify the development phase and apply the corresponding skill:
 
 ```text
-Vague idea or need refinement -> ce-brainstorm as source evidence, then tw-requirements-review
+Vague idea or need refinement -> tw-brainstorm as source evidence, then tw-requirements-review
 Intent deepening after ideation -> tw-grill as source evidence, then tw-requirements-review
 New project, feature, or change -> tw-auto
+Planning approved TraceWeaver work -> tw-plan
 Reviewed plan with approved authority -> tw-auto, or tw-authority-gate before any delegated CE work
 Trace or requirement check -> tw-traceability-check, tw-requirements-review, requirements-reviewer
-Code review -> tw-traceability-check, then ce-code-review with publication held
-Document review -> tw-requirements-review, then ce-doc-review with publication held
-Debugging -> tw-auto or tw-authority-gate before ce-debug no-publication mode
-Browser or Xcode verification -> ce-test-browser or ce-test-xcode
-Session/source context -> ce-sessions as cited evidence only
-Commit, push, PR, release -> held in TraceWeaver alpha; stop before publication
+Code review -> tw-code-review
+Document review -> tw-doc-review
+Debugging -> tw-debug
+Browser or Xcode verification -> tw-test-browser or tw-test-xcode
+Session/source context -> tw-sessions as cited source evidence only; ce-session-inventory and ce-session-extract stay hidden/internal helpers
+Learning capture or refresh -> tw-compound or tw-compound-refresh as source evidence
+PR feedback repair -> tw-resolve-pr-feedback for local repair; remote mutation and publication stay held
+Setup diagnostics -> tw-setup
+Local worktree setup -> tw-worktree
+Commit intent -> tw-commit
+Push, PR, or PR-description intent -> tw-commit-push-pr
+Release -> held in TraceWeaver alpha; stop before publication
 ```
 
 Direct `ce-*` entrypoints in the TraceWeaver package are legacy/manual-continuity
-surfaces until a wrapper is accepted. Do not select raw `ce-plan`, `ce-work`,
-`ce-debug`, `ce-code-review`, `ce-doc-review`, or publication-capable CE skills as
-the first step for TraceWeaver-controlled work. Start from `tw-auto` or a
-TraceWeaver gate, then treat any CE skill as delegated work under the Intent
-Contract, requirements baseline, traceability matrix, and alpha publication hold.
+surfaces unless a TraceWeaver wrapper delegates to them. Do not select raw
+`ce-brainstorm`, `ce-plan`, `ce-work`, `ce-debug`, `ce-code-review`,
+`ce-doc-review`, `ce-test-browser`, `ce-test-xcode`, `ce-sessions`,
+`ce-compound`, `ce-compound-refresh`, `ce-resolve-pr-feedback`, `ce-setup`,
+`ce-worktree`, or publication-capable CE skills as the first step for
+TraceWeaver-controlled work. Start from `tw-auto` or a TraceWeaver wrapper/gate,
+then treat any CE skill as delegated work under the Intent Contract,
+requirements baseline, traceability matrix, and alpha publication hold.
 
 ## Cross-Cutting Traceability Rule
 
@@ -157,7 +168,7 @@ These are the subtle errors that look like productivity but create problems:
 
 2. **Skills are workflows, not suggestions.** Follow the steps in order. Don't skip verification steps.
 
-3. **Multiple skills can apply.** A TraceWeaver-controlled feature implementation might involve `ce-brainstorm` -> `tw-grill` -> `systems-engineering-traceability` -> `tw-auto` -> `tw-authority-gate` -> `ce-work` in no-publication mode -> `tw-traceability-check` -> `ce-code-review` / `ce-doc-review` in sequence.
+3. **Multiple skills can apply.** A TraceWeaver-controlled feature implementation might involve `ce-brainstorm` -> `tw-grill` -> `systems-engineering-traceability` -> `tw-auto` -> `tw-plan` -> `tw-authority-gate` -> `tw-work` in no-publication mode -> `tw-traceability-check` -> `tw-code-review` / `tw-doc-review` in sequence.
 
 4. **When in doubt, start with authority.** If the task is non-trivial and there is no accepted requirement, Intent Contract, or traceability row, begin with `tw-auto` bootstrap or `tw-requirements-review`.
 
@@ -166,44 +177,55 @@ These are the subtle errors that look like productivity but create problems:
 For a complete feature, the typical skill sequence is:
 
 ```text
-1. ce-brainstorm or tw-grill -> Refine ideas and preserve source evidence
+1. tw-brainstorm or tw-grill -> Refine ideas and preserve source evidence
 2. systems-engineering-traceability -> Preserve candidate needs, authority, V&V, and no-orphan links
 3. tw-requirements-review or requirements-reviewer -> Improve requirement quality
-4. tw-auto or ce-plan guarded by TraceWeaver authority -> Define and plan work
+4. tw-auto or tw-plan guarded by TraceWeaver authority -> Define and plan work
 5. tw-authority-gate -> Confirm approved authority before implementation
-6. ce-work no-publication mode -> Build the authorized slice
-7. ce-test-browser or ce-test-xcode -> Verify runtime behavior when applicable
+6. tw-work -> Build the authorized slice in no-publication mode
+7. tw-test-browser or tw-test-xcode -> Verify runtime behavior when applicable
 8. tw-traceability-check -> Prove trace links and dark-behavior handling
-9. ce-code-review or ce-doc-review -> Review before closure
+9. tw-code-review or tw-doc-review -> Review before closure
 10. publication -> held in TraceWeaver alpha until later gates approve it
 ```
 
-Not every task needs every skill. A bug fix might only need: `ce-debug` ->
-`tw-authority-gate` -> `ce-work` no-publication mode ->
-`tw-traceability-check` -> `ce-code-review`.
+Not every task needs every skill. A bug fix might only need: `tw-debug` ->
+`tw-work` no-publication mode when a local fix is authorized ->
+`tw-traceability-check` -> `tw-code-review`.
 
 ## Quick Reference
 
 | Phase | Skill | One-Line Summary |
 |-------|-------|-----------------|
-| Define | ce-brainstorm / tw-grill | Refine ideas, challenge assumptions, and preserve source evidence |
+| Define | tw-brainstorm / tw-grill | Refine ideas, challenge assumptions, and preserve source evidence |
 | Define | tw-requirements-review / requirements-reviewer | Requirements and acceptance criteria before code |
-| Plan | tw-auto / ce-plan | Decompose approved authority into bounded work |
+| Plan | tw-auto / tw-plan | Decompose approved authority into bounded work |
 | Cross-cutting | systems-engineering-traceability | Candidate needs, approved authority, no-orphan gate, verification, and validation links |
-| Build | ce-work | Thin authorized slices in TraceWeaver no-publication mode |
-| Context | ce-sessions | Source/session context as cited evidence only |
-| Verify | ce-test-browser / ce-test-xcode | Runtime verification when applicable |
-| Verify | ce-debug | Reproduce, localize, fix, and guard |
-| Review | ce-code-review / ce-doc-review | Review with TraceWeaver traceability checks |
-| Ship | held | Commit, push, PR, release, and clean-replacement claims remain held in alpha |
+| Build | tw-work | Thin authorized slices in TraceWeaver no-publication mode |
+| Context | tw-sessions | Source/session context as cited evidence only; hidden CE inventory/extract helpers stay internal |
+| Verify | tw-test-browser / tw-test-xcode | Runtime verification when applicable |
+| Learning | tw-compound / tw-compound-refresh | Capture or refresh learning as source evidence |
+| PR feedback | tw-resolve-pr-feedback | Local review-feedback repair under TraceWeaver gates |
+| Setup | tw-setup / tw-worktree | Local setup and worktree preparation without publication |
+| Verify | tw-debug | Reproduce, localize, fix, and guard through the TraceWeaver debug wrapper |
+| Review | tw-code-review / tw-doc-review | Review with TraceWeaver traceability checks |
+| Ship | tw-commit / tw-commit-push-pr | TraceWeaver-owned publication wrappers; real mutation remains gated |
 
 ## Routing Examples
 
 | Situation | Skills to consider |
 |---|---|
-| Vague product, project, workflow, or feature idea | `ce-brainstorm`, `tw-grill`, `systems-engineering-traceability` |
-| New feature or changed behavior | `tw-auto`, `ce-plan`, `tw-authority-gate`, `systems-engineering-traceability` |
-| Implementation work | `ce-work` no-publication mode, `tw-traceability-check`, `systems-engineering-traceability` |
-| Code review | `ce-code-review`, `tw-traceability-check`, `systems-engineering-traceability` |
-| Unclear code or dark code | `systems-engineering-traceability`, `tw-traceability-check`, `ce-code-review` |
-| Release or shipping | Held in TraceWeaver alpha; record the publication gate or future wrapper-plan requirement |
+| Vague product, project, workflow, or feature idea | `tw-brainstorm`, `tw-grill`, `systems-engineering-traceability` |
+| New feature or changed behavior | `tw-auto`, `tw-plan`, `tw-authority-gate`, `systems-engineering-traceability` |
+| Implementation work | `tw-work`, `tw-traceability-check`, `systems-engineering-traceability` |
+| Debugging or failing tests | `tw-debug`, `tw-traceability-check`, `systems-engineering-traceability` |
+| Code review | `tw-code-review`, `tw-traceability-check`, `systems-engineering-traceability` |
+| Unclear code or dark code | `systems-engineering-traceability`, `tw-traceability-check`, `tw-code-review` |
+| Commit request | `tw-commit` |
+| Push, PR, or PR description request | `tw-commit-push-pr` |
+| Release or shipping | `tw-commit-push-pr` for PR publication intent; release claims remain held until a reviewed release gate exists |
+| Browser or Xcode verification | `tw-test-browser`, `tw-test-xcode`, `tw-traceability-check` |
+| Prior session context | `tw-sessions`; hidden `ce-session-inventory` / `ce-session-extract` helper primitives only through `tw-sessions` |
+| Learning capture or refresh | `tw-compound`, `tw-compound-refresh` |
+| PR feedback repair | `tw-resolve-pr-feedback`, then `tw-code-review` / `tw-doc-review` |
+| Local setup or worktree prep | `tw-setup`, `tw-worktree` |

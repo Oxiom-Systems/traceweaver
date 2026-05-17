@@ -1,6 +1,8 @@
 # TraceWeaver Controlled Autonomy Alpha Evidence
 
-Status: `STATIC_MATERIALIZED_STATIC_CHECKS_INSTALL_SMOKE_CODE_REVIEW_PASSED_REQ_TW_048_AMENDMENT_DOC_REVIEW_PASSED_U9_UNITS_1_THROUGH_10_REVIEWED_HELD_U9_UNIT11_ACTIVE_HOST_RECONCILED_RUNTIME_PASS_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_CONSTRAINED_RUNTIME_ACCEPTED_DOGFOOD_CLASSIFIER_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED`
+Status: `STATIC_MATERIALIZED_STATIC_CHECKS_INSTALL_SMOKE_CODE_REVIEW_PASSED_REQ_TW_048_AMENDMENT_DOC_REVIEW_PASSED_U9_UNITS_1_THROUGH_10_REVIEWED_HELD_U9_UNIT11_ACTIVE_HOST_RECONCILED_RUNTIME_PASS_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_CONSTRAINED_RUNTIME_ACCEPTED_DOGFOOD_CLASSIFIER_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_WRAPPER_DIRECT_CALLABLE_EXPANSION_RECORDED_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_REVIEW_WRAPPER_SKILLS_RECORDED_AUTHORITY_DOC_REVIEW_PASSED_RUNTIME_HELD_CE_350_SKILL_SURFACE_INVENTORY_SOURCE_REFRESHED_AUTHORITY_DOC_REVIEW_PASSED_PARITY_HELD_TW_WRAPPER_BACKLOG_REVIEWED_AGAINST_CE_350_AUTHORITY_DOC_REVIEW_PASSED_PER_WRAPPER_PROOF_PENDING_CONTROLLED_PUBLICATION_GATE_RECORDED_AUTHORITY_DOC_REVIEW_PASSED_BEHAVIOR_HELD_CONTROLLED_PUBLICATION_ROUTE_FIXTURE_SMOKE_PASSED_CODE_REVIEW_PENDING_AUTHORITY_DOC_REVIEW_PENDING_CODE_TEST_TRACE_ANCHOR_REQUIREMENT_PRIOR_AUTHORITY_DOC_REVIEW_PASSED_CODE_TRACE_ANCHOR_HIERARCHY_CORRECTION_AUTHORITY_DOC_REVIEW_PASSED_AUTHORING_PROJECT_WRITE_ALLOWANCE_OPEN_AUTHORITY_DOC_REVIEW_PASSED_TRACE_ANCHOR_EXPLICIT_MAPPING_ACTIVE_HOST_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_TRACE_ANCHOR_TDD_CHAIN_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PENDING_REQ_TW_058_NON_BLOCKING_TRACE_ANCHOR_AMBIGUITY_REQUIREMENTS_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_FIXTURE_SMOKE_PASSED_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_RUNTIME_HELD_STRUCTURED_TRACEABILITY_FINDINGS_FIXTURE_SMOKE_PATCH_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_RUNTIME_HELD_TW_AUTO_CLOSURE_LOOP_REQUIREMENT_RECORDED_AUTHORITY_DOC_REVIEW_PASSED_TW_AUTO_CODE_REVIEW_PASSED_BEHAVIOR_HELD_TW_SKILL_BEHAVIOR_FIXTURE_SMOKE_PASSED_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_ACTIVE_HOST_TW_TRACEABILITY_CHECK_STRUCTURED_RUNTIME_PASSED_AUTHORITY_DOC_REVIEW_PASSED_CLEAN_CE_DELEGATION_FIXTURE_RECORDED_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_CODE_TRACEABILITY_SCANNER_FIXTURE_SMOKE_PASSED_INSTALL_DISCOVERY_PASSED_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_TRACE_ANCHOR_AUTHORING_FIXTURE_SMOKE_PASSED_CODE_REVIEW_PASSED_NARROW_TRACEWEAVER_PROJECT_WRITE_ALLOWANCE_OPEN_AUTHORITY_DOC_REVIEW_PASSED_ACTIVE_HOST_TW_AUTO_RECONCILIATION_SMOKE_PASSED_REVIEW_ROUTING_SURFACE_CURRENT_CODE_REVIEW_PASSED_NESTED_SKILL_BACKUP_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_ACTIVE_SESSION_PROMPT_REGISTRY_PASSED_CONSTRAINED_RUNTIME_INVOCATION_PASSED_STATUS_HASH_DOC_REVIEW_PENDING_FULL_RUNTIME_DRIVER_HELD_TW_DEBUG_WRAPPER_STATIC_FIXTURE_CODE_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_ANCHOR_ALIAS_CLARITY_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_TW_AUTO_RUNTIME_DRIVER_FIXTURE_SMOKE_PASSED_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_BOUNDARY_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_RUNTIME_HELD_TW_AUTO_REVIEW_STAGING_CLOSURE_LOOP_FIXTURE_SMOKE_PASSED_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_RUNTIME_HELD_TW_AUTO_POST_WORK_REVIEW_CLOSURE_FIXTURE_SMOKE_PASSED_ACTIVE_HOST_CURRENTNESS_REFRESHED_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_RUNTIME_HELD_RUNTIME_CE_DELEGATION_HELD_PUBLICATION_HELD_REQ_TW_059_IMPORTED_CE_COMPONENT_BOUNDARY_REQUIREMENTS_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_BEHAVIOR_HELD_REQ_TW_060_MODEL_DEFAULT_POLICY_REQUIREMENTS_REVIEW_PASSED_AUTHORITY_DOC_REVIEW_PASSED_IMPLEMENTATION_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_RUNTIME_ENFORCEMENT_HELD_REQ_TW_061_063_SYSTEMS_ENGINEERING_AUDIT_CLOSURE_FIXTURE_SMOKE_PASSED_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_ACTIVE_HOST_CURRENTNESS_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_RUNTIME_HELD_TW_AUTO_RUNTIME_HARNESS_VALIDATOR_PUBLICATION_BOUNDARY_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PENDING_RUNTIME_HELD_STANDALONE_PACKAGING_SURFACE_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_PACKAGE_RELEASE_README_BOUNDARY_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_WRAPPER_HANDOFF_DISCIPLINE_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_ACTIVE_HOST_CURRENTNESS_CODE_REVIEW_PASSED_STATUS_HASH_DOC_REVIEW_PASSED_RUNTIME_HELD
+
+Current scoped status: `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001` passed for the wrapper handoff active-host currentness/status-hash update after scoped code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` passed for the packaged CE-engine host-path repair in the TW skill behavior smoke, the 2026-05-16 active-host reconciliation evidence, host registry smoke, and ART-TW-060 / TRACE-TW-046 / ATP-TW-030 / RESULT-TW-030 / VER-TW-059 proof rows. Active-host filesystem/hash and prompt-registry currentness passed. Runtime-driver decision binding, publication, Vestro, package/release/upstream, clean replacement, R31, and unconstrained-host claims remain held.
 
 Date/session: 2026-05-01, `ce:work`, branch
 `codex/traceweaver-u6-unblock-next`
@@ -11,8 +13,15 @@ Baseline:
 
 - baseline ID: `REQ-BASELINE-2026-04-30-001`
 - baseline hash:
-  `6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba`
-- authority source: `requirements.md`, REQ-TW-033 through REQ-TW-048
+  `9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3`
+- authority source: `requirements.md`, REQ-TW-033 through REQ-TW-048, plus
+  authority-doc-reviewed candidate REQ-TW-049 through REQ-TW-059 within held
+  behavior boundaries, REQ-TW-060 as reviewed static authority input, and
+  REQ-TW-061 through REQ-TW-063 as requirements-review-passed,
+  plan-doc-review-passed, status-hash-doc-review-passed planning input,
+  deterministic fixture implementation code-review-passed with status/hash doc
+  review passed, and active-host filesystem/hash currentness recorded with
+  active-session prompt-registry and constrained `tw-authority-gate` runtime passed; fake git remote boundary code review passed with status/hash doc review passed as `TW-DOC-REVIEW-2026-05-13-TW-AUTO-RUNTIME-DRIVER-BOUNDARY-STATUS-HASH-CLEAN-001`; `tw-worktree` wrapper/runtime-harness scoped code review passed as `TW-CODE-REVIEW-2026-05-13-TW-WORKTREE-RUNTIME-HARNESS-CLEAN-001`, active-host reconciliation reran at `20260513T100303Z`, and status/hash doc review passed as `TW-DOC-REVIEW-2026-05-13-TW-WORKTREE-RUNTIME-HARNESS-STATUS-HASH-CLEAN-001`; runtime harness validator/publication-boundary scoped code review passed as `TW-CODE-REVIEW-2026-05-14-TW-AUTO-RUNTIME-HARNESS-VALIDATOR-PUBLICATION-BOUNDARY-CLEAN-001`; standalone packaging surface scoped code review passed as `TW-CODE-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-CLEAN-001` with status/hash doc review passed as `TW-DOC-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-STATUS-HASH-CLEAN-001`; full `tw-auto` runtime-driver held
 - Intent Contract: `.traceweaver/intent-contract.yml`
 - matrix authority: `traceability-matrix.md`
 
@@ -39,37 +48,245 @@ Allowed use:
 - cite the reviewed Unit 11 evidence only as constrained active-host
   `tw-authority-gate` runtime invocation proof under the recorded host
   reconciliation exception;
+- use the prior skill-behavior staged-set review as reviewed static planning
+  input for CE 3.5.0 source-surface/backlog decisions, controlled publication
+  route wording, code/test trace-anchor requirement wording, and the `tw-auto`
+  closure-loop skill note;
+- use the patched structured-finding deterministic fixture evidence as reviewed
+  static planning input after clean code review and refreshed authority doc
+  review;
+- use the deterministic TW skill behavior fixture smoke as reviewed static
+  fixture input after clean behavior code review and authority doc review;
+- use the active-host `tw-traceability-check` structured runtime pass as
+  constrained reviewed evidence after authority doc review
+  `CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-ACTIVE-HOST-RUNTIME-CLEAN-001`;
+- use the active-host `tw-code-review`/`tw-doc-review` prompt-satisfied
+  file-access observations as reviewed limitation evidence after clean behavior
+  code review and staged authority doc review; the clean CE delegation fixture
+  extension has clean code review and scoped authority doc review passed as
+  reviewed static fixture evidence only;
+- use the REQ-TW-061 through REQ-TW-063 systems-engineering audit closure
+  deterministic static fixtures as code-review-passed implementation input
+  `TW-CODE-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-CLEAN-001`
+  with status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-STATUS-HASH-CLEAN-001`
+  after requirements review
+  `TW-REQ-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLEAN-001`
+  and plan doc review
+  `TW-DOC-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-PLAN-CLEAN-001`.
+  The fixture smoke passed for prompt/knowledge contracts, requirement-closure
+  evidence, semantic audit candidate findings, and audit metadata. The
+  2026-05-12 `tw-auto` dogfood reconciliation refreshed active-host
+  filesystem/hash currentness for this source change. Runtime invocation,
+  active-session prompt-registry completeness, Vestro dogfood, semantic audit
+  completeness, publication, package/release readiness, clean replacement,
+  automatic removal/merge/deprecation authority, and unsupported-surface clean
+  claims remain held until separate proof closes them;
+- use the code-traceability scanner fixture smoke as implementation evidence for
+  changed-file trace-anchor scanning and audit/baseline debt reporting. The
+  isolated install/discovery smoke proved the skill-local operating-mode policy,
+  code-anchor contract, and scanner are present in packaged and direct-callable
+  skill roots, with scoped code review and scoped authority doc review passed
+  as `CE-DOC-REVIEW-2026-05-06-SCOPED-STATUS-HASH-AUTHORITY-CLEAN-001`.
+  Wrapper integration, active-host scanner behavior, and publication claims
+  remain held;
+- use the REQ-TW-054 code trace anchor hierarchy correction as reviewed
+  planning input after scoped authority doc review
+  `CE-DOC-REVIEW-2026-05-06-REQ-TW-054-HIERARCHY-CLEAN-001`. The correction
+  defines module/file premise anchors, behavior-entrypoint anchors, verification
+  anchors, helper/subfunction anchors by exception only, TraceWeaver work-loop
+  authoring only for unambiguous mapping, and human-decision pauses for unclear
+  authority. It does not accept authoring fixtures, project writes, active-host
+  behavior, publication, Vestro use, clean replacement, or release claims;
+- use the deterministic REQ-TW-054 trace-anchor authoring contract/helper
+  fixture smoke as code-reviewed implementation evidence after scoped
+  `tw-code-review`
+  `TW-CODE-REVIEW-2026-05-06-TRACE-ANCHOR-AUTHORING-CLEAN-001`. The narrow
+  TraceWeaver project-write allowance is open only for unambiguous coarse
+  source anchors and matching matrix Code Anchor Evidence at module/file
+  premise, behavior-entrypoint, and tests/fixtures/smokes-with-verification-ID
+  levels. Scoped authority doc review passed as
+  `TW-DOC-REVIEW-2026-05-06-REQ-TW-054-AUTHORING-ALLOWANCE-CLEAN-001`.
+  The full changed-file REQ -> TRACE -> ART -> VER/TDD chain code review passed
+  as `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-TDD-CHAIN-CLEAN-001`; status/hash
+  doc review for that record is pending.
+  The current smoke passed proposal-only mode,
+  work-loop-gated apply, outside-root write refusal, unambiguous code/test
+  anchor writes, explicit verification anchors on files with existing older
+  anchors, canonical Code Anchor Evidence table writes with
+  malformed-section repair,
+  ambiguity/missing-verification/conflict pauses, generated exception approval,
+  helper-density guard, scanner pass, and real-repo unchanged guard. Active-host
+  behavior, wrapper enforcement, Vestro, publication, clean replacement,
+  broad project writes outside this TraceWeaver worktree, and release claims
+  remain held;
+- use the controlled publication-route deterministic fixture smoke as
+  implementation evidence only after code review and authority doc review pass.
+  The current smoke blocks stale authority, missing trace, failed tests, review
+  findings, dirty/untracked authority, target mismatch, credential/remote
+  uncertainty, and allows only the clean verified no-real-remote dry-run
+  fixture. Real staging, commit, push, PR, credentials, remotes, and active-host
+  publication remain held;
+- use the active-host reconciliation fixture as reviewed static safety evidence.
+  The 2026-05-08 active-host reconciliation reran after the anchor/alias
+  skill-surface changes, backed up stale direct-callable surfaces under
+  `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260508T071905Z`
+  and
+  `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260508T072200Z`.
+  The 2026-05-08 review-staging closure-loop reconciliation then backed up stale
+  `tw-auto` and `tw-work` under
+  `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260508T080656Z`
+  and the verification-ID example repair backed up
+  `systems-engineering-traceability` under
+  `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260508T082634Z`
+  before refreshing the direct-callable filesystem/current-hash evidence. The
+  2026-05-12 `tw-auto` dogfood reconciliation for the REQ-TW-061 through
+  REQ-TW-063 source changes backed up stale `ce-debug`, `tw-authority-gate`,
+  `tw-grill`, `tw-requirements-review`, and `tw-traceability-check` under
+  `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260512T162740Z`.
+  The 2026-05-12 ART-TW-059 post-work closure reconciliation then backed up
+  stale `tw-auto` under
+  `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260512T204814Z`.
+  Fresh host-registry smoke reports no missing, unmarked, stale, missing
+  skill-local, or stale skill-local files, and latest review-routing smoke
+  reports
+  `active_host_tw_auto_review_routing_surface=pass_host_review_routing_skill_hashes_current`
+  with matching repo/host `tw-auto` hash
+  `875b916081eddb707a1d610d7701b67f75b56936abd27fc85a7d78cbcd79ca19`.
+  After the Codex CLI `0.130.0` upgrade, fresh host-registry smoke reports
+  `codex_host_prompt_input_registry_probe=pass_required_skills_visible`,
+  `host_codex_registry_discovery=pass_prompt_input_registry_required_skills_visible`,
+  and
+  `real_tw_skill_runtime_invocation=pass_host_tw_authority_gate_skill_file_read`.
+  Scoped status/hash doc review for this runtime-proof update passed as `TW-DOC-REVIEW-2026-05-12-ART-TW-059-ACTIVE-HOST-PROMPT-REGISTRY-RUNTIME-STATUS-HASH-CLEAN-001`. Full
+  `tw-auto` runtime-driver behavior remains held. Scoped
+  `tw-code-review` passed for the review-routing dependency control as
+  `TW-CODE-REVIEW-2026-05-07-TW-PLAN-ROUTING-SURFACE-CLEAN-001`; scoped
+  authority doc review passed for the routing-surface status/hash update as
+  `TW-DOC-REVIEW-2026-05-07-TW-PLAN-ROUTING-SURFACE-STATUS-HASH-CLEAN-001`;
+  scoped `tw-code-review` passed for the explicit-mapping helper patch,
+  wrapper-completion smoke anchors, Code Anchor Evidence rows, and refreshed
+  active-host evidence as
+  `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-CLEAN-001`;
+  active-host runtime invocation beyond constrained `tw-authority-gate` remains
+  held;
+- use the TraceWeaver-owned skill anchor and alias clarity implementation as
+  scoped static evidence after clean `tw-code-review`
+  `TW-CODE-REVIEW-2026-05-08-ANCHOR-ALIAS-CURRENTNESS-CLEAN-001`. The proof
+  covers the `tw-authority-gate`, `tw-requirements-review`, `tw-grill`,
+  `tw-auto`, `lfg`, `requirements-reviewer`, and
+  `systems-engineering-traceability` file-role anchors, Code Anchor Evidence
+  rows, inventory smoke output, `lfg` alias-to-`tw-auto` classification, and
+  active-host filesystem/currentness refresh. Scoped status/hash doc review is
+  pending; runtime invocation, CE body edits, clean replacement, publication,
+  package-ready, release-ready, upstream-ready, Vestro, and R31 remain held;
+- use the `tw-debug` static CE-delegation fixture and active-surface hash
+  evidence as code-reviewed implementation evidence after scoped
+  `tw-code-review`
+  `TW-CODE-REVIEW-2026-05-06-TW-DEBUG-WRAPPER-CLEAN-001`. Scoped authority doc review passed as
+  `TW-DOC-REVIEW-2026-05-06-TW-DEBUG-STATUS-HASH-CLEAN-001`; runtime CE debug delegation, active-session
+  prompt-registry completeness, publication, clean replacement, and autonomous
+  debug/fix behavior remain held;
+- use REQ-TW-059 as reviewed static authority input for the imported CE
+  component boundary only after scoped authority doc review
+  `TW-DOC-REVIEW-2026-05-08-REQ-TW-059-IMPORTED-CE-COMPONENT-BOUNDARY-CLEAN-001`.
+  REQ-TW-059 records that packaged CE-derived skills are imported
+  implementation components, user-facing
+  workflow enters through TraceWeaver-owned wrappers or approved aliases, and
+  direct CE component body edits require a reviewed overlay/fork record with
+  upstream identity, reason, scope, hashes, regression proof, and refresh or
+  removal condition. No CE-derived component body edits are authorized by this
+  record;
+- use REQ-TW-060 as reviewed static authority input for model-default policy. Codex defaults to `gpt-5.5` with `medium`
+  reasoning, Claude defaults to Sonnet where supported, and model-default policy
+  must live in TraceWeaver-owned packaging, installer, manifest, wrapper policy,
+  or documentation surfaces rather than imported CE-derived component bodies.
+  Implementation code review passed as
+  `TW-CODE-REVIEW-2026-05-12-REQ-TW-060-MODEL-DEFAULT-IMPLEMENTATION-CLEAN-001`;
+  isolated install/discovery and active-host filesystem smoke evidence record
+  the policy reference and default arguments, with scoped status/hash doc review
+  passed as
+  `TW-DOC-REVIEW-2026-05-12-REQ-TW-060-MODEL-DEFAULT-IMPLEMENTATION-STATUS-HASH-CLEAN-001`
+  and runtime enforcement held.
+  Package/release proof and runtime-enforcement claims remain held;
 - this record does not support broad runtime, release, clean-replacement,
   enforcing, slash-command, unconstrained host-support, or autonomous
   publication claims.
 
+CE source-surface refresh:
+
+- current CE source worktree:
+  `/Users/hanneszietsman/CrypotAI/compound-engineering-plugin-main-3.5.0`;
+- current CE source commit:
+  `1f3c6466e4eb4e1b584c658953dfb1ca98dd3335`;
+- current CE source version: `3.5.0`;
+- current source surface: 38 `ce-*` skill directories plus upstream `lfg`;
+- wrapper backlog status: source refreshed and reviewed against CE 3.5.0 as
+  authority-doc-reviewed candidate planning evidence only;
+- historical CE 3.4.1 inventory remains U6b planning evidence and must not be
+  used for current full-surface parity or clean-replacement claims.
+
 Held claims:
 
 - real `tw-auto` runtime invocation;
+- accepted `tw-auto` task/plan closure-loop automation, automatic review-fix
+  repair, or human-decision pause behavior for unclear/contradictory/missing
+  requirements;
 - real `lfg` alias runtime invocation;
 - real `tw-grill` runtime invocation;
+- real `tw-code-review` or `tw-doc-review` runtime invocation beyond the
+  code-review-passed / authority-doc-review-passed reviewed held prompt-satisfied
+  file-access observations, including
+  runtime CE review delegation on clean wrapper inputs;
+- real `tw-debug` runtime invocation or CE debug delegation beyond the
+  code-review-passed static fixture/hash evidence;
+- active-host structured traceability-finding runtime behavior beyond the
+  constrained reviewed `tw-traceability-check` fixture proof;
+- active-host TW skill behavior runtime beyond the reviewed held
+  `tw-code-review`/`tw-doc-review` prompt-satisfied file-access observations
+  and the current-hash `tw-auto` review-routing surface, including `tw-auto`
+  closure-loop orchestration;
 - full CE-method wrapper sequencing;
 - runtime dark-behavior detection for duplicate or logical-but-uncaptured code;
 - clean CE replacement;
+- full CE 3.5.0 plugin parity or support for unclassified CE 3.5.0 surfaces;
 - runtime-equivalent CE workflow behavior;
 - slash-command or prompt availability;
 - enforcing authority gate behavior;
-- autonomous commit, push, or PR publication;
+- autonomous commit, push, or PR publication beyond the deterministic
+  no-real-remote fixture smoke;
 - release-ready, package-ready, or upstream-ready status.
 
 ## Materialized Files
 
 | File | SHA-256 | Role | Decision |
 | --- | --- | --- | --- |
-| `src/index.ts` | `d0e45b8fcce859e2483867c6d0cdbde683595fe91684e295b40714fe4282ead5` | Repository-local self-contained Codex installer for the README command; installs selected skills, selected CE agents, plugin-level references, and direct callable skill copies without overwriting unowned global skill directories; Unit 9 registry-shape, legacy-upgrade cleanup, and auth-boundary harness code-reviewed | Static materialized; Unit 9 behavior code review and authority doc review passed; runtime held. |
-| `plugins/traceweaver-core/skills/tw-auto/SKILL.md` | `a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3` | Advisory controlled-autonomy skill with TraceWeaver-packaged dependency resolution, privacy bootstrap gate, no-publication work handoff, and reviewer subagent capacity/backpressure handling | Static materialized; current code review passed; prior authority-state doc review passed; runtime held. |
-| `plugins/traceweaver-core/skills/lfg/SKILL.md` | `ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083` | TraceWeaver compatibility alias for `tw-auto` | Static materialized; runtime held. |
-| `plugins/traceweaver-core/skills/tw-grill/SKILL.md` | `666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90` | Optional post-ideation intent-deepening skill with bootstrap and delta/gap modes | Static materialized; refreshed isolated install smoke passed; REQ-TW-048 amendment doc review passed; runtime held; context mutation held to source evidence only. |
-| `plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md` | `93d78f160ee5dd78bd7ebf5dd9cff28e9c1ec3b8f5bfe2b25474b11512e475e3` | TraceWeaver authority-gate skill | Static materialized; runtime held. |
-| `plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md` | `f45459c1144646ece057f882da5eb730ff223ec725c19041d59cc3e3c9b7c4e1` | TraceWeaver requirements-review skill | Static materialized; runtime held. |
-| `plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md` | `c2ac0332032b577e1749bb7990b01b6875f33d81bbec31de31f52d742250b943` | TraceWeaver traceability-check skill | Static materialized; runtime held. |
-| `plugins/traceweaver-core/skills/requirements-reviewer/SKILL.md` | `1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d` | Requirements review support skill | Static materialized; runtime held. |
-| `plugins/traceweaver-core/skills/systems-engineering-traceability/SKILL.md` | `e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282` | Systems-engineering traceability support skill | Static materialized; runtime held. |
+| `src/index.ts` | `a52cfba16707aa310e5a6c61c8ea85e7e7fc38f7e1da5460111a235b6882ec00` | Repository-local self-contained Codex installer for the README command; installs packaged TraceWeaver-owned skills internally, exposes only `tw-*` and `lfg` as user-facing direct-callable skills, rejects unowned direct `ce-*` skill directories before standalone install writes, records standalone TraceWeaver ownership and no external CE plugin dependency in the install manifest, and emits model-default policy metadata | Static materialized; fresh CE-absent install/discovery smoke passed; unowned direct `ce-work` conflict fixture blocks before install and preserves the external file; standalone packaging surface code review passed as `TW-CODE-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-STATUS-HASH-CLEAN-001`; runtime, publication, release/package, and clean replacement held. |
+| `scripts/traceweaver-smoke-codex-discovery` | `dd846620d64a8c81ffa433377e39d6bae0b80b56ad70f1e1367933a5223a1294` | Isolated fresh CODEX_HOME install/discovery smoke for standalone TraceWeaver packaging, TW-only direct-callable skill surface, internal packaged CE-derived engines, model-default policy, skill-local file hashes, and installer conflict controls | Passed with 41 packaged skills, 22 direct-callable `tw-*`/`lfg` skills, no external CE plugin dependency, no direct `ce-*` callable surface, and unowned direct `ce-work` conflict refusal; scoped standalone packaging code review passed as `TW-CODE-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-STATUS-HASH-CLEAN-001`. |
+| `plugins/traceweaver-core/skills/tw-auto/SKILL.md` | `875b916081eddb707a1d610d7701b67f75b56936abd27fc85a7d78cbcd79ca19` | Advisory controlled-autonomy skill with TraceWeaver-packaged dependency resolution, `tw-plan` routing, privacy bootstrap gate, publication-gated work handoff, reviewer subagent capacity/backpressure handling, review-wrapper routing through `tw-code-review`/`tw-doc-review`, `tw-work`, and `tw-debug`, controlled publication-route wording, REQ-TW-056 task/plan closure-loop plus human-decision pause design note, non-blocking trace-anchor ambiguity routing, review-staging closure-loop instructions, skill-local operating-mode policy loading, and refreshed TraceWeaver file-role anchor | Static materialized; `tw-plan` routing fixture smoke passed; non-blocking trace-anchor ambiguity fixture smoke passed with code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-AUTHORITY-STATUS-AWARE-CLEAN-001` and status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-REQ-TW-058-IMPLEMENTATION-STATUS-HASH-CLEAN-001`; anchor/alias file-role and alias clarity code review passed as `TW-CODE-REVIEW-2026-05-08-ANCHOR-ALIAS-CURRENTNESS-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ANCHOR-ALIAS-STATUS-HASH-CLEAN-001`; review-staging closure-loop fixture implementation code review passed as `TW-CODE-REVIEW-2026-05-08-TW-AUTO-REVIEW-STAGING-CLOSURE-LOOP-CLEAN-001` with status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-TW-AUTO-REVIEW-STAGING-CLOSURE-LOOP-STATUS-HASH-CLEAN-001`; post-work review closure static fixture code review passed as `TW-CODE-REVIEW-2026-05-12-TW-AUTO-POST-WORK-CLOSURE-CLEAN-001` with status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-TW-AUTO-POST-WORK-CLOSURE-STATUS-HASH-CLEAN-001`; active-host installed hash is current after the 2026-05-12 ART-TW-059 reconciliation rerun; autonomous runtime closure, runtime automatic repair, human-decision pause behavior, debug runtime delegation, and publication behavior held; wrapper handoff discipline scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/tw-auto/references/traceweaver-wrapper-handoff-discipline.md` | `95db1bda56c2764f3ac5b4bcac012a2a1321a3b646525d6c428007dd9681767b` | Skill-local wrapper handoff discipline policy for highest-level next wrapper recommendations and embedded lower-gate exception handling | Static materialized; deterministic wrapper handoff smoke passed; scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/tw-plan/SKILL.md` | `ef540c9540bbd33ad0c5efd29695837bde3adfe2911e84ded825c4bf6766b8cb` | TraceWeaver planning wrapper that loads authority, routes unclear requirements to `tw-requirements-review`, delegates to packaged `ce-plan`, and preserves no-publication/gate-discipline boundaries | Static materialized; deterministic fixture smoke proves CE planning delegation and unclear-requirement pause; active-host installed hash is current after the 2026-05-08 reconciliation reruns; active-session prompt-registry completeness now passes in the ART-TW-059 Codex CLI `0.130.0` host-registry proof with scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-ART-TW-059-ACTIVE-HOST-PROMPT-REGISTRY-RUNTIME-STATUS-HASH-CLEAN-001`; full runtime-driver behavior remains held; wrapper handoff discipline scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/tw-plan/references/traceweaver-operating-modes.md` | `2136c71ff249ac763c06a41b61b6503c755d0b96405b98eb06c984d76d8b743b` | Skill-local operating-mode policy for `tw-plan` planning, authority-baseline routing, implementation-gate planning, and anti-churn gate discipline | Static materialized; isolated install/discovery proof passed; active-host installed hash is current after the 2026-05-08 reconciliation reruns. |
+| `plugins/traceweaver-core/skills/tw-work/SKILL.md` | `77414a8fa5531dd98b875849ba434667d4d46a256af4b31ccfb35c10aa3fda15` | TraceWeaver implementation worker facade used by `tw-auto` before review; owns authority-visible implementation, trace-anchor authoring, unresolved mapping recording, matrix Code Anchor Evidence handoff, verification evidence, scoped review-staging for coherent review identity, explicit `tw-auto` review-staging handoff results, and no-publication return to `tw-auto` while using TraceWeaver-packaged `ce-work` as the underlying coding engine | Static materialized; deterministic behavior smoke proves `tw-auto` routes through `tw-work` and fixture states cover clean authoring, non-blocking ambiguous anchor skips, unresolved mapping reporting, human-decision pause, and review-staging closure-loop handoff boundaries; active-host installed hash is current after the 2026-05-08 reconciliation rerun; narrow TraceWeaver project-write allowance remains limited to unambiguous coarse anchors and matching matrix evidence; wrapper handoff discipline scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/tw-debug/SKILL.md` | `9e8008b666b89f2838029acf5e7ca447c9bb3191a770be7a24b129f3050477ec` | TraceWeaver debug wrapper that preserves CE debugging mechanics under authority, traceability, verification, and no-publication controls | Static materialized; deterministic `tw_debug_ce_delegation_fixture=pass`; active-host repo and host hashes match; scoped code review passed as `TW-CODE-REVIEW-2026-05-06-TW-DEBUG-WRAPPER-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-06-TW-DEBUG-STATUS-HASH-CLEAN-001`; runtime CE debug delegation and autonomous debug/fix behavior remain held; wrapper handoff discipline scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/lfg/SKILL.md` | `3ccfd7a6430686fe479fa19929659cde5a915d54552f3a336c70e87ef66bcecb` | TraceWeaver compatibility alias for `tw-auto`, now carrying an explicit TraceWeaver file-role anchor and no-raw-CE fallback boundary | Static materialized; deterministic inventory smoke classifies `lfg` as `alias_to_tw_auto`; scoped anchor/alias code review passed as `TW-CODE-REVIEW-2026-05-08-ANCHOR-ALIAS-CURRENTNESS-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ANCHOR-ALIAS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/tw-grill/SKILL.md` | `4cdaf10ee1363464f81b2f569a5f78639f35631bb55e6e628bc6608fb7d693b1` | Optional post-ideation intent-deepening skill with bootstrap and delta/gap modes plus TraceWeaver file-role anchor | Static materialized; refreshed isolated install smoke passed; REQ-TW-048 amendment doc review passed; scoped anchor/alias code review passed as `TW-CODE-REVIEW-2026-05-08-ANCHOR-ALIAS-CURRENTNESS-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ANCHOR-ALIAS-STATUS-HASH-CLEAN-001`; runtime held; context mutation held to source evidence only. |
+| `plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md` | `e1ac6f7f46188ff29f054e150aa9861b3cd199bd80f69c203aaa9372cd97f42c` | TraceWeaver authority-gate skill with coarse file-role anchor | Static materialized; scoped anchor/alias code review passed as `TW-CODE-REVIEW-2026-05-08-ANCHOR-ALIAS-CURRENTNESS-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ANCHOR-ALIAS-STATUS-HASH-CLEAN-001`; runtime held; wrapper handoff discipline scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md` | `6a26475158f663721a0cfc69bd2ad25f1e97f6d236edbcfc8212a16f48336b3c` | TraceWeaver requirements-review skill with coarse file-role anchor | Static materialized; scoped anchor/alias code review passed as `TW-CODE-REVIEW-2026-05-08-ANCHOR-ALIAS-CURRENTNESS-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ANCHOR-ALIAS-STATUS-HASH-CLEAN-001`; runtime held; wrapper handoff discipline scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md` | `b7c35f651da67697bc3b4421174534422ff1995319a4341cc5d69912540d41c6` | TraceWeaver traceability-check skill with structured-finding contract loading for REQ-TW-055, code-anchor scanner/operating-mode loading for REQ-TW-054/REQ-TW-057, and unresolved per-artifact anchor mapping findings for REQ-TW-058 | Static materialized; deterministic structured-finding fixture smoke patched after P1 code-review findings; clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001; authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001; constrained active-host structured finding runtime passed after host reconciliation and authority doc review passed as CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-ACTIVE-HOST-RUNTIME-CLEAN-001; current code-anchor scanner fixture and isolated install/discovery proof pass with scoped code review and authority doc review passed; REQ-TW-058 non-blocking ambiguity fixture smoke passed with code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-AUTHORITY-STATUS-AWARE-CLEAN-001` and status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-REQ-TW-058-IMPLEMENTATION-STATUS-HASH-CLEAN-001`, while active-host reload and wrapper integration remain held; wrapper handoff discipline scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/tw-traceability-check/references/structured-findings.md` | `e2b3eba34c000369f0edcc2d3e8fb5349ff247ae3822f33788563dfe3b521bdb` | Public structured traceability-finding contract for severity, status, evidence, affected IDs, anchors, claim impact, remediation, and Codex inline finding shape | Static materialized; deterministic fixture smoke patched after P1 code-review findings; clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001; authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001; constrained active-host structured finding runtime passed after host reconciliation and authority doc review passed as CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-ACTIVE-HOST-RUNTIME-CLEAN-001. |
+| `plugins/traceweaver-core/skills/tw-traceability-check/references/code-trace-anchor-contract.md` | `b7e4c31bfbac87bb55a4c3d79989ed3b089529fbe1b0409fbd00c75b3f8449c3` | Public code/test trace-anchor contract for REQ-TW-054, REQ-TW-057, and REQ-TW-058 unresolved mapping findings | Code-traceability fixture smoke passed, including the non-blocking unresolved mapping blocker; isolated install/discovery proof passed; prior code review and scoped authority doc review passed; REQ-TW-058 fixture implementation code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-AUTHORITY-STATUS-AWARE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-REQ-TW-058-IMPLEMENTATION-STATUS-HASH-CLEAN-001`; wrapper integration held. |
+| `plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors` | `460589fd333c4424e6983e72468ee0eff80e4da1102e995af88ef502df1f538a` | Skill-local deterministic code-anchor scanner with unresolved mapping JSONL blocker support and unsafe changed-file path rejection | Code-traceability fixture smoke passed, including `CTA-UNRESOLVED-ANCHOR-MAPPING` and `CTA-UNSAFE-CHANGED-FILE-PATH`; changed-file self-scan passed for the new scanner/smoke/reference files; isolated install/discovery proof passed; prior code review and scoped authority doc review passed; REQ-TW-058 fixture implementation code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-AUTHORITY-STATUS-AWARE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-REQ-TW-058-IMPLEMENTATION-STATUS-HASH-CLEAN-001`; active-host runtime and wrapper enforcement held. |
+| `plugins/traceweaver-core/skills/*/references/traceweaver-operating-modes.md` | `7f3b937e1032425b840d608fc01f76b51b674b612e1e1031467d0dfc5c4a67e5` | Skill-local operating-mode policy for callable `tw-traceability-check`, `tw-code-review`, `tw-doc-review`, and `tw-auto` copies, including Review-Staging Mode separated from Publication Mode | Isolated install/discovery proof passed for packaged and direct-callable skill roots; code review and scoped authority doc review passed for the prior implementation-gate policy; review-staging correction status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-TW-PLAN-ROUTING-SURFACE-STATUS-HASH-CLEAN-001`; runtime behavior held. |
+| `plugins/traceweaver-core/skills/*/references/trace-anchor-authoring.md` | `7cbe325e9e6b2e81ca5a63a7f7b06a143f0b45a9d58e8e68eef0d99ecbf037d0` | Aggregate skill-local trace-anchor authoring contracts for callable `tw-traceability-check`, `tw-code-review`, `tw-doc-review`, `tw-work`, and `tw-auto` copies | Authoring fixture smoke and isolated install/discovery proof passed; scoped code review passed as `TW-CODE-REVIEW-2026-05-06-TRACE-ANCHOR-AUTHORING-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-06-REQ-TW-054-AUTHORING-ALLOWANCE-CLEAN-001`; full changed-file trace-anchor/TDD chain code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-TDD-CHAIN-CLEAN-001` with status/hash doc review pending; REQ-TW-058 non-blocking ambiguous trace-anchor authoring requirements review and authority doc review passed as `TW-DOC-REVIEW-2026-05-07-REQ-TW-058-NON-BLOCKING-TRACE-ANCHOR-AUTHORITY-CLEAN-001`; non-blocking ambiguity fixture smoke passed with code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-AUTHORITY-STATUS-AWARE-CLEAN-001` and status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-REQ-TW-058-IMPLEMENTATION-STATUS-HASH-CLEAN-001`; narrow TraceWeaver project-write allowance open for unambiguous coarse anchors; runtime behavior held. |
+| `plugins/traceweaver-core/skills/tw-work/references/trace-anchor-authoring.md` | `e5888acfab8b2b81022fa828b9310bb66c297e20437a78b4d896bfff46c6abf8` | Skill-local authoring policy for `tw-work` implementation mode | Isolated install/discovery proof passed; non-blocking ambiguous anchor skip semantics added; runtime behavior held. |
+| `plugins/traceweaver-core/skills/tw-work/references/traceweaver-operating-modes.md` | `a336faa5264b4d632b0c5c45420149693e4de746e521f2d23a519983727b2a46` | Skill-local operating-mode policy for `tw-work` implementation and bounded Review-Staging Mode | Isolated install/discovery proof passed for the prior implementation-mode policy; review-staging correction status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-TW-PLAN-ROUTING-SURFACE-STATUS-HASH-CLEAN-001`; runtime behavior held. |
+| `plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors` | `678f1e8842aee743e1f6e0eced61512090c6811f3c22120ed70a71916994cd91` | Skill-local deterministic trace-anchor authoring helper with non-blocking ambiguous mapping skip support, status-aware row-based explicit trace-authority checks, Traceability Matrix status-column parsing, root-bounded unresolved output, YAML-safe comments, and JSON pause support | Fixture smoke passed for proposal/apply controls, outside-root write refusal, unambiguous source anchor writes, explicit verification anchors on files with existing older anchors, canonical Code Anchor Evidence table writes with malformed-section repair, Traceability Matrix status-column parsing with runtime-held notes, pause/refusal cases including missing trace authority, prose-only TRACE/VER non-authority mentions, and held/stale matrix authority rows, generated exception approval, helper-density guard, non-blocking ambiguous skip to unresolved JSONL, symlinked unresolved-output refusal, YAML parse-preserving comments, JSON target pause without mutation, and scanner blocker output; scoped code review passed as `TW-CODE-REVIEW-2026-05-06-TRACE-ANCHOR-AUTHORING-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-06-REQ-TW-054-AUTHORING-ALLOWANCE-CLEAN-001`; active-host helper hash is current after the 2026-05-08 reconciliation reruns; scoped explicit-mapping/currentness code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-CLEAN-001`; status-aware held/stale authority-row code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-AUTHORITY-STATUS-AWARE-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-STATUS-HASH-CLEAN-001`; REQ-TW-058 status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-REQ-TW-058-IMPLEMENTATION-STATUS-HASH-CLEAN-001`; narrow TraceWeaver project-write allowance open for unambiguous coarse anchors. |
+| `scripts/traceweaver-smoke-code-trace-authoring` | `475b9d56de9553f6a46bf1eb6fbe8534c869bcb1a1cb6dd59189c646f4ac2f98` | Deterministic REQ-TW-054/REQ-TW-058 trace-anchor authoring fixture smoke | Passed for proposal-only mode, work-loop-gated apply, outside-root write refusal, code/test anchors, explicit verification anchors on files with existing older anchors, section-bounded and malformed-section Code Anchor Evidence insertion, Traceability Matrix status-column parsing with runtime-held notes, human-decision pause cases including missing trace authority, prose-only TRACE/VER non-authority mentions, and held/stale matrix authority rows, generated exception approval, helper-density guard, non-blocking ambiguous skip with unresolved JSONL, symlinked unresolved-output refusal, YAML/JSON anchor-format controls, scanner pass/blocker checks, and real-repo unchanged guard; scoped code review passed as `TW-CODE-REVIEW-2026-05-06-TRACE-ANCHOR-AUTHORING-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-06-REQ-TW-054-AUTHORING-ALLOWANCE-CLEAN-001`; scoped explicit-mapping/currentness code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-STATUS-HASH-CLEAN-001`; REQ-TW-058 fixture implementation code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-AUTHORITY-STATUS-AWARE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-REQ-TW-058-IMPLEMENTATION-STATUS-HASH-CLEAN-001`; narrow TraceWeaver project-write allowance open for unambiguous coarse anchors. |
+| `fixtures/code-trace-authoring/` | `6915c30fbdcff6e30d7b0190f1bf577150d4a5b9b7cfe7f770e829b4009e11e9` | Deterministic trace-anchor authoring fixtures, including non-blocking ambiguous mapping controls, missing trace authority pause, prose-only TRACE/VER non-authority pause, and held/stale matrix authority row pause | Fixture-only evidence with status-aware held/stale authority-row code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-AUTHORITY-STATUS-AWARE-CLEAN-001` and status/hash doc review passed as `TW-DOC-REVIEW-2026-05-07-REQ-TW-058-IMPLEMENTATION-STATUS-HASH-CLEAN-001`; not project-write proof. |
+| `plugins/traceweaver-core/skills/tw-code-review/SKILL.md` | `949f4832a0cb5668c6b9f6bbb502d52b5dff2c58677372c0923a2f37de58fb10` | Candidate TraceWeaver code-review wrapper that preserves structured `tw-traceability-check` findings before CE code review and loads operating-mode policy before code-anchor preflight | Patched structured-finding deterministic fixture proof has clean code review and authority doc review; active-host prompt-satisfied file-access observation recorded with clean code review passed and authority doc review passed as CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-AUTHORITY-CLEAN-001; clean CE delegation fixture extension has clean code review passed as CE-CODE-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-CLEAN-DELEGATION-CLEAN-001 and scoped authority doc review passed as CE-DOC-REVIEW-2026-05-06-SCOPED-STATUS-HASH-AUTHORITY-CLEAN-001; `CTA-UNRESOLVED-ANCHOR-MAPPING` blocks accepted code review until resolved or explicitly held; runtime CE review delegation remains held; wrapper handoff discipline scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/tw-doc-review/SKILL.md` | `4856af149ee03224dd23872dd8e49ba5bb75c484bf251e378252733d3c0af86e` | Candidate TraceWeaver doc-review wrapper that preserves structured requirements/trace/hash/status findings before CE doc review and loads operating-mode policy for scoped review debt | Patched structured-finding deterministic fixture proof has clean code review and authority doc review; active-host prompt-satisfied file-access observation recorded with clean code review passed and authority doc review passed as CE-DOC-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-WRAPPER-OBSERVATION-AUTHORITY-CLEAN-001; clean CE delegation fixture extension has clean code review passed as CE-CODE-REVIEW-2026-05-06-TW-SKILL-BEHAVIOR-CLEAN-DELEGATION-CLEAN-001 and scoped authority doc review passed as CE-DOC-REVIEW-2026-05-06-SCOPED-STATUS-HASH-AUTHORITY-CLEAN-001; runtime CE review delegation remains held; wrapper handoff discipline scoped code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness passed after 2026-05-16 reconciliation with code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/requirements-reviewer/SKILL.md` | `39ca78a8f8c14b62e07c97369b7f5d723ea7ab664aba63bb733ce04d93d1c309` | Requirements review support skill with core requirements-quality file-role anchor | Static materialized; deterministic inventory smoke covers TraceWeaver-facing anchor presence; scoped anchor/alias code review passed as `TW-CODE-REVIEW-2026-05-08-ANCHOR-ALIAS-CURRENTNESS-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ANCHOR-ALIAS-STATUS-HASH-CLEAN-001`; runtime held. |
+| `plugins/traceweaver-core/skills/systems-engineering-traceability/SKILL.md` | `cdf2f0e7867de3e8014be24bdf62e7ea717d781e5402dc13d18dc5b41f937f50` | Systems-engineering traceability support skill with core traceability-method file-role anchor | Static materialized; deterministic inventory smoke covers TraceWeaver-facing anchor presence; concrete fake `VER-*` example avoided so code-anchor scanning does not invent verification authority; scoped anchor/alias code review passed as `TW-CODE-REVIEW-2026-05-08-ANCHOR-ALIAS-CURRENTNESS-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ANCHOR-ALIAS-STATUS-HASH-CLEAN-001`; runtime held. |
 | `plugins/traceweaver-core/skills/tw-grill/references/upstream-notice.md` | `091702e556151a6eb6718a42159692adfc3925d3501951c45249ade1c46aea90` | Skill-local upstream attribution and source pin | Static materialized. |
 | `plugins/traceweaver-core/skills/tw-auto/references/requirements-baseline-template.md` | `a0f413dfa8eb8223a6d171ca5f8ee58147255820a164cd392b7773039780aeda` | Skill-local requirements baseline template for first-run authority bootstrap | Static materialized. |
 | `plugins/traceweaver-core/skills/tw-auto/references/intent-contract-template.yml` | `ffe85511b70a8e0e676a41dd6ba4073b7603f64400a0c46b180afb0fe62436b2` | Skill-local Intent Contract template for first-run authority bootstrap | Static materialized. |
@@ -92,21 +309,30 @@ Held claims:
 | `plugins/traceweaver-core/references/automation-loop-state-template.yml` | `5f9d64772162a5a67121876a0473f9c8afb63763e92d3a17fb3f69af8c247c8b` | Loop-state trace template | Static materialized. |
 | `plugins/traceweaver-core/references/traceability-matrix-bootstrap-template.md` | `3986a0d2c999fdfcceddcc650f5d98dec6fc5f7119df5cdc04865e670fa56aa1` | Generic consuming-project matrix bootstrap template | Static materialized. |
 | `plugins/traceweaver-core/references/traceweaver-runtime-policy.md` | `40d116e05e808c89c7c918920299def3dafd1fd54ee97b0436843535f5bf77a6` | Runtime/advisory policy, updated for `tw-auto` and `lfg` alias | Static materialized. |
-| `plugins/traceweaver-core/.codex-plugin/plugin.json` | `28602d1303a022e54d1f03dc9d37edc8e7b15ac35f756cb8419b3bd938c81068` | Codex plugin metadata with `interface.defaultPrompt` prompt-like publication surface | Static materialized; default prompt hygiene-scanned. |
-| `plugins/traceweaver-core/.claude-plugin/plugin.json` | `b385631dda16f32b0d296e4968a8462a69c9a110f060b064852a160704b37e10` | Claude compatibility metadata | Static materialized. |
+| `plugins/traceweaver-core/references/traceweaver-model-defaults.md` | `cf696d6c9cd483cd958752231cd67db41d32b750a703f645ed9943a6cb34158d` | TraceWeaver-owned model default policy reference for Codex `gpt-5.5` with `medium` reasoning, Claude Sonnet policy, user overrides, and no CE-derived body edits for model defaults | Static materialized; source/host reference hash current after active-host reconciliation; REQ-TW-060 implementation code review passed as `TW-CODE-REVIEW-2026-05-12-REQ-TW-060-MODEL-DEFAULT-IMPLEMENTATION-CLEAN-001`; runtime enforcement held. |
+| `plugins/traceweaver-core/.codex-plugin/plugin.json` | `d6c22c30925a2621903bb6b4a33f69c11e381b1f12c47c46c48a2f40413fbcac` | Codex plugin metadata with `interface.defaultPrompt` prompt-like publication surface and TraceWeaver-owned model default metadata for Codex `gpt-5.5` with `medium` reasoning | Static materialized; default prompt hygiene-scanned; REQ-TW-060 implementation code review passed as `TW-CODE-REVIEW-2026-05-12-REQ-TW-060-MODEL-DEFAULT-IMPLEMENTATION-CLEAN-001`. |
+| `plugins/traceweaver-core/.claude-plugin/plugin.json` | `a9b85a8644ecb9c11d0f8d7354cd8adf59e1c8c1f03c6c69e20750c4c5328e8f` | Claude compatibility metadata with TraceWeaver-owned Sonnet model-default policy metadata where supported | Static materialized; REQ-TW-060 implementation code review passed as `TW-CODE-REVIEW-2026-05-12-REQ-TW-060-MODEL-DEFAULT-IMPLEMENTATION-CLEAN-001`. |
 | `plugins/traceweaver-core/.cursor-plugin/plugin.json` | `299e322e2bb0da05bc4894a32afc73e7a1e2f7fe62e68a84e0cd1a293ac1e242` | Cursor compatibility metadata | Static materialized. |
-| `plugins/traceweaver-core/README.md` | `16f2ccff86f9666a74b190a49d3937e9d9000a1b99e50ebcd1d004cbb52c4af9` | Plugin user docs | Static updated; review pending. |
+| `plugins/traceweaver-core/README.md` | `037cb747737e2b220b3fce1edbf0db46d10b7b7aee44583e35098403b961f43d` | Plugin user docs for standalone TW-only direct-callable workflow and internal packaged CE-derived implementation components | Static updated; scoped standalone packaging code review passed as `TW-CODE-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-STATUS-HASH-CLEAN-001`; package/release README boundary cleanup passed code review as `TW-CODE-REVIEW-2026-05-16-PACKAGE-RELEASE-README-BOUNDARY-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-PACKAGE-RELEASE-README-BOUNDARY-STATUS-HASH-CLEAN-001`; package/release and clean replacement claims remain held. |
 | `plugins/traceweaver-core/AGENTS.md` | `5f65f83096d8fb2ea859a85440e4e55bb468fda9245ebed8dda13ebb62fd2635` | Plugin-local agent instructions | Static updated; review pending. |
-| `plugins/traceweaver-core/skills/ce-plan/SKILL.md` | `dd96d54eec7f1912928619bf2b4cbefb82a13a9e00553ef9b632f062094e4640` | CE-derived planning skill with TraceWeaver package-boundary primer, refreshed from CE 3.8.1, no `ce-proof` route in alpha, and draft-only issue handoff | Legacy/manual-continuity only until wrapped; runtime held. |
-| `plugins/traceweaver-core/skills/ce-work/SKILL.md` | `bc490d75d4a972355def18699bb01210d39b89c423eb9853a0d51eebf47f922e` | CE-derived work skill with TraceWeaver package-boundary primer refreshed from CE 3.8.1 and no-publication mode, including direct and parallel-flow publication stops | Legacy/manual-continuity only until wrapped; runtime held. |
-| `plugins/traceweaver-core/skills/ce-code-review/SKILL.md` | `905c9774b254b7b9352aaeffdc80d91ec0eaadc628522d1e75160b213809ab6d` | CE-derived code-review skill refreshed from CE 3.8.1 with TraceWeaver publication hold | Legacy/manual-continuity review only until wrapped; publication held. |
+| `plugins/traceweaver-core/skills/ce-plan/SKILL.md` | `0b2812bb8a76bc54425f372de524744f7689299587e6cdbdd118ae93b2110401` | CE-derived planning skill with TraceWeaver package-boundary primer directing TraceWeaver-controlled planning through `tw-plan`; no `ce-proof` route in alpha, and draft-only issue handoff | Packaged planning engine under `tw-plan`; direct raw invocation remains legacy/manual-continuity only and runtime held. |
+| `plugins/traceweaver-core/skills/ce-work/SKILL.md` | `8edbf9257eb844bd4bb37a5a83665d5e3c30498a7e51ee9c0f03b6a08d4eefb6` | CE-derived work skill with TraceWeaver package-boundary primer and publication-gated mode, including direct and parallel-flow publication stops unless the controlled TraceWeaver publication route authorizes the exact action | Legacy/manual-continuity only until wrapped; runtime and publication behavior held. |
+| `plugins/traceweaver-core/skills/ce-code-review/SKILL.md` | `905c9774b254b7b9352aaeffdc80d91ec0eaadc628522d1e75160b213809ab6d` | CE-derived code-review skill with TraceWeaver publication hold | Legacy/manual-continuity review only until wrapped; publication held. |
 | `plugins/traceweaver-core/skills/ce-brainstorm/references/handoff.md` | `710d2c48567a4a57aa5e8aec6e70d3ad4089e201a95f3396bf0a16af052b8d76` | CE-derived brainstorm handoff patched to prefer TraceWeaver requirements authority before planning/work | Legacy/manual-continuity CE handoffs explicitly marked. |
-| `plugins/traceweaver-core/skills/using-agent-skills/SKILL.md` | `fb4b21b09db42d0b5b9a9fea3f5d3c0aa0dfda1d3fd8157df8298bb94c0def28` | Meta-routing table for TraceWeaver-controlled work, refreshed for CE 3.8.1 session-surface consolidation | Routes new work to `tw-auto` or TraceWeaver gates before raw CE skills. |
-| `README.md` | `5bdb8c035a1fb7c2a1503b241adc94cf9fb226926f7f95f8d242ad89fdff97b2` | Root product docs | Static updated; review pending. |
-| `traceability-matrix.md` | `c156fbd14830c84236271bbaedfeb068f921f1277f8443d477efc3d00d30ba6f` | Root traceability authority | Updated with behavior-bearing `tw-auto`, `lfg`, approved source-evidence `tw-grill`, direct callable install checks, no-publication smoke coverage, behavior-level verification gap, reviewer subagent capacity/backpressure coverage, code-review-passed/prior-doc-review-passed alpha evidence state, canonical baseline hash refresh, accepted narrow U7 static-advisory claim boundary, refreshed CE 3.8.1 install-smoke evidence, REQ-TW-048 amendment doc review passed, U9 Units 1-11 reviewed-held evidence, constrained Unit 11 active-host `tw-authority-gate` runtime proof with code/doc review passed, and dogfood classifier code-review-passed / authority-doc-review-passed evidence while broader runtime claims remain held. |
-| `scripts/traceweaver-smoke-codex-host-registry` | `5e2a89b0e44b171f6d0589d4092620d22410ec77388f2ecd1ab0c3b09a0aa636` | Read-only current Codex host-home filesystem, prompt-input, and active-host runtime probe, extended to print active skill-surface count and external CE plugin state | Unit 11 constrained runtime proof accepted under constrained active host setup: 11 active skill directories, external CE plugin disabled, all required direct callable files present/marked/current, prompt-input visibility passed, and `codex exec` returned the exact `tw-authority-gate` hash sentinel. Code review and authority doc review passed; broader runtime claims remain held. |
-| `scripts/traceweaver-smoke-codex-separate-home-runtime` | `af6414475e1d8b0cb60649412e0a9c6c4e1901d452016a92cc8c0ef56955a659` | Separate Codex home install plus fresh exec registry probe, updated to require every Unit 9 required skill in the visible-skill list, hold live-auth-copy runtime results, and default Unit 10 to no-copy auth-safe probing | Unit 10 records required skills visible without copying auth, no retained auth copy, and isolated `codex exec` auth-required; separate-home behavior code review passed, authority doc review passed for reviewed-held limitation evidence only, and runtime acceptance remains held. |
-| `scripts/traceweaver-smoke-no-publication` | `ea5e8c9b23f03f1b4fcc05f403d48e4e3e6405e640a7a2178283dd4e942dadde` | Negative smoke for alpha publication hold on executable PR support scripts, env-var bypass attempts, selected CE static skill stop markers, `lfg` delegation, and event-derived reviewer backpressure classification | Pass accepted for deterministic Unit 4 boundary scope; full skill runtime invocation remains held. |
+| `plugins/traceweaver-core/skills/using-agent-skills/SKILL.md` | `2c595a5570318f568da914e9477e91e618e7974deaa0e0d50485ae07cb794f42` | Meta-routing table for TraceWeaver-controlled work | Routes new work to `tw-auto`, planning to `tw-plan`, and review/debug/publication to TraceWeaver wrappers before raw CE skills. |
+| `README.md` | `d81952bc5e4bd899382e318ae6abd35440da9da21abd57697bfb295284118d7c` | Root product docs | Static updated; package/release README boundary cleanup passed code review as `TW-CODE-REVIEW-2026-05-16-PACKAGE-RELEASE-README-BOUNDARY-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-PACKAGE-RELEASE-README-BOUNDARY-STATUS-HASH-CLEAN-001`. |
+| `traceability-matrix.md` | `c8e221e6eef1ff04e3cc00eac1791d79d7893ad987f7cb799972217900eec6d0` | Root traceability authority | Updated with package/release README boundary cleanup code review passed as `TW-CODE-REVIEW-2026-05-16-PACKAGE-RELEASE-README-BOUNDARY-CLEAN-001`, scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-PACKAGE-RELEASE-README-BOUNDARY-STATUS-HASH-CLEAN-001`, wrapper handoff discipline code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`, scoped wrapper handoff status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`, active-host currentness code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001`, status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`, standalone marketplace manifest Code Anchor Evidence added for the alpha package publication surface, and held full runtime-driver decision binding, publication, Vestro dogfood, release/package/upstream readiness, clean replacement, R31, unconstrained-host support, and CE body edits without reviewed overlay/fork records. |
+| `docs/plans/2026-05-12-002-feat-traceweaver-systems-engineering-audit-closure-plan.md` | `1053d34e1fcbbefc7bf6b53bbaaa1fed95cea8d240e940d8727d80d3a8780306` | Systems-engineering audit closure plan for REQ-TW-061 through REQ-TW-063 | Requirements review, plan doc review, and status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-STATUS-HASH-CLEAN-001`; deterministic fixture smoke passed; scoped code review passed as `TW-CODE-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-STATUS-HASH-CLEAN-001`; 2026-05-12 active-host filesystem/hash currentness passed with status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-REQ-TW-061-063-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; ART-TW-059 prompt-registry/constrained-runtime proof now passes with scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-ART-TW-059-ACTIVE-HOST-PROMPT-REGISTRY-RUNTIME-STATUS-HASH-CLEAN-001`; semantic audit completeness, Vestro, publication, package/release, clean replacement, and automatic removal/merge/deprecation authority remain held. |
+| `plugins/traceweaver-core/references/traceweaver-systems-engineering-audit-closure.md` | `32bc23cc80de5317d4bb22d487aac97b1938f19374295bd2b66d44d675576842` | Systems-engineering audit closure reference contract | Defines the packaged prompt/knowledge, requirement-closure, and semantic audit-mode contract for REQ-TW-061 through REQ-TW-063; deterministic fixture smoke passed; scoped code review passed as `TW-CODE-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-STATUS-HASH-CLEAN-001`. |
+| `scripts/traceweaver-smoke-systems-engineering-audit-closure` | `b89144232ea44044762364fa6648e4c00923545200cfbc177c3330cf8f2cb3a7` | Systems-engineering audit closure deterministic smoke | Proves prompt/knowledge contracts, negative missing-knowledge handling, clean requirement closure, bounded semantic audit findings, and audit metadata; scoped code review passed as `TW-CODE-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-CLEAN-001` with status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-STATUS-HASH-CLEAN-001`. |
+| `scripts/traceweaver-smoke-controlled-publication` | `075cc7ceaf6cbf3cb7b63f6a1c06b57a44eccf990895a0a98568e430fb7d5371` | Deterministic controlled publication-route fixture smoke for REQ-TW-053 | Fixture smoke passed for stale authority, missing trace, failed tests, review findings, dirty/untracked authority, target mismatch, credential/remote uncertainty, clean no-real-remote dry-run allow, and no external mutation; code review and authority doc review pending; real publication held. |
+| `fixtures/controlled-publication-route/` | `5e3187b24cb59b78a6252f2a174ab7224f31c94caea3a67714f8275a80cd310c` | Controlled publication-route deterministic fixture set | Fixture-only state records for blocked publication cases and the clean verified no-real-remote dry-run allow case; not project authority and not real remote proof. |
+| `scripts/traceweaver-smoke-codex-host-registry` | `02c04f715d537fddeeea5c8d1c7c42d8a1d92b8018f0e98e7c76ce4dad6b2be6` | Read-only current Codex host-home filesystem, prompt-input, active-host runtime probe, TW-only direct-callable surface check, and model-default source/host policy-reference currentness check | Fresh active-host probe reports required `tw-*`/`lfg` skills visible, no direct CE-derived callable skills, `gpt-5.5` medium runtime defaults, current model-default source/host hashes, and runtime exec disabled for this scoped proof. Full `tw-auto` runtime-driver behavior, publication, and clean replacement remain held. |
+| `scripts/traceweaver-reconcile-codex-host-skills` | `3b33cddbfd91240165a0dd7355ca80b98647606a3f3f3f92a420ebe37773cc05` | Guarded active-host reconciliation script for required TraceWeaver direct-callable skills and removal/backup of non-TW direct CE callable surfaces | Deterministic temporary-host reconciliation smoke passed before active-host mutation, backs up stale TraceWeaver-marked direct-callable copies plus stale nested skill-local files before reinstall, rolls back installer/verification failure, installs the TW-only direct-callable surface, and preserves CE-derived engines as internal packaged components; scoped standalone packaging code review passed as `TW-CODE-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-STATUS-HASH-CLEAN-001`. |
+| `scripts/traceweaver-smoke-codex-host-reconciliation` | `06a583bb3c42f90c4c647fd9c983c42ebf1cb60b9fb4c2b10ee37347ee487b1e` | Temporary Codex home reconciliation fixture smoke for missing, stale marked, stale nested marked, stale unmarked, already-current, backup, unrelated-preserved, refusal, installer-failure rollback, and `tw-plan` install/marker/hash coverage | Smoke passed and printed `codex_host_reconciliation_backed_up=ce-work tw-auto tw-traceability-check`, `codex_host_reconciliation_stale_nested_backup=pass`, and `codex_host_reconciliation_failure_atomicity=pass`; code review passed as `TW-CODE-REVIEW-2026-05-07-ACTIVE-HOST-RECONCILIATION-CLEAN-001`; nested skill-local backup repair code review passed as `TW-CODE-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-STATUS-HASH-CLEAN-001`; refreshed active-host evidence and helper currentness code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-STATUS-HASH-CLEAN-001`. |
+| `scripts/traceweaver-smoke-codex-separate-home-runtime` | `6579d2a0638803e8715a8a0a0446c2a891a7736cbbd38696f807eae88f9d03ae` | Separate Codex home install plus fresh exec registry probe, updated for TW-only direct-callable skills, no direct CE-derived callable surface, no auth-copy boundary, and runtime-disabled model-default observation | Fresh separate-home install passes, required TW skills are visible, direct CE-derived callable surface is absent, runtime execution remains held at the isolated auth boundary, and scoped standalone packaging code review passed as `TW-CODE-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-14-STANDALONE-PACKAGING-SURFACE-STATUS-HASH-CLEAN-001`. |
+| `scripts/traceweaver-smoke-no-publication` | `9e14b7066ed0d6d7e55f82df106dff41db8d18eb0d59be88dd5748e73f9def40` | Negative smoke for alpha publication hold on executable PR support scripts, env-var bypass attempts, static skill stop markers, `lfg` delegation, and event-derived reviewer backpressure classification | Pass accepted for deterministic Unit 4 boundary scope; full skill runtime invocation remains held. |
+| `scripts/traceweaver-smoke-structured-findings` | `d9a4ace96d868d45425a3ebbd34924221979eb098a7f079daf11d277248cfaed` | Deterministic structured traceability-finding fixture smoke for REQ-TW-055 | Fixture smoke patched to verify the complete-trace positive control as one linked row and guard the real repository authority file set; clean behavior code-review passed as CE-CODE-REVIEW-2026-05-06-STRUCTURED-FINDINGS-HARNESS-CLEAN-001; authority doc-review passed as CE-DOC-REVIEW-2026-05-06-SKILL-BEHAVIOR-STAGED-AUTHORITY-CLEAN-001; constrained active-host runtime is recorded separately in the TW skill behavior smoke and authority doc review passed. |
 | `docs/brainstorms/2026-05-01-traceweaver-ce-method-authority-correction.md` | `2ad22c4fde83fff9fcc996c59706d1665897ef1d69f78267bc3afdfb5ca327ff` | Pinned source record for CE-method wrapping and anti-drift correction | Source evidence recorded; review pending. |
 | `docs/brainstorms/2026-05-01-traceweaver-grill-intent-deepening-requirements.md` | `63bc4ba5677ef411569f1663620a7ef4a0f7afefff654f11fc853c5f7e323c33` | Pinned source record for post-ideation intent deepening, bootstrap mode, and delta/gap mode | Source evidence recorded; review pending. |
 
@@ -210,7 +436,7 @@ finding_patched=P1 README install command must be copy-runnable from this repo
 finding_patched=P1 install evidence must use the real documented command or a repo-local wrapper
 finding_patched=P1 direct ce-work remains legacy/manual-continuity unless wrapped
 finding_patched=P1 direct ce-plan remains legacy/manual-continuity unless wrapped
-finding_patched=P2 full CE 3.8.1 authority wrapping is future scope, not this static alpha
+finding_patched=P2 historical full-CE authority wrapping is future scope, not this static alpha; current wrapper backlog uses CE 3.5.0 source-surface refresh
 finding_patched=P1 tw-auto path could reach raw CE publication through ce-work
 finding_patched=P1 installer shim depended on mutable CE source checkout
 finding_patched=P2 missing include-skills guard allowed partial installs
@@ -404,7 +630,7 @@ u9_unit10_authority_review_coverage=main_thread_review_only_no_reviewer_subagent
 u9_unit10_accepted_scope=reviewed held auth-safe separate-home fresh exec and active-host runtime limitation evidence only
 u9_unit11_active_host_reconciled_runtime_probe=constrained_runtime_pass_accepted_code_review_passed_authority_doc_review_passed
 u9_unit11_runtime_condition=active host skill surface reduced to TraceWeaver-required entries and external CE plugin disabled
-u9_unit11_host_registry_harness_hash=5e2a89b0e44b171f6d0589d4092620d22410ec77388f2ecd1ab0c3b09a0aa636
+u9_unit11_host_registry_harness_hash_at_review=5e2a89b0e44b171f6d0589d4092620d22410ec77388f2ecd1ab0c3b09a0aa636
 u9_unit11_host_registry_discovery=pass_prompt_input_registry_required_skills_visible
 u9_unit11_real_tw_skill_runtime_invocation=pass_host_tw_authority_gate_skill_file_read
 u9_unit11_code_review_gate=passed_no_findings
@@ -412,14 +638,40 @@ u9_unit11_code_review_id=CE-CODE-REVIEW-2026-05-05-U9-UNIT11-HOST-REGISTRY-HARNE
 u9_unit11_authority_review_gate=passed_no_findings
 u9_unit11_authority_review_id=CE-DOC-REVIEW-2026-05-05-U9-UNIT11-AUTHORITY-CLEAN-001
 u9_unit11_accepted_scope=constrained active-host tw-authority-gate runtime invocation proof only
+wrapper_direct_callable_expansion_status=recorded_code_review_passed_authority_doc_review_passed_runtime_held
+wrapper_direct_callable_expansion_scope=ce-debug, ce-commit, ce-commit-push-pr active direct callable visibility only
+wrapper_direct_callable_expansion_discovery_harness_current_hash=ffd91f8fd9c1da054acdcb817ff9d74acf1e7fda869ec9f09c40baa32f08a5ce
+wrapper_direct_callable_expansion_host_registry_hash_at_code_review=4b044132409c9e2ffbe9814c638b511c32aa2f8b5a51a980bf184ea1d733796c
+wrapper_direct_callable_expansion_separate_home_hash_at_code_review=a3e512bd5f23dbefe1cafa9e14808d7681213eb2603751e90a40a8a7ce71e464
+review_wrapper_skills_host_registry_current_hash=e144dce6596f2068eb8b59bb6e5d47f3a1a92fe2e07c1bb882d65039961bde49
+review_wrapper_skills_separate_home_current_hash=a6852d5b3f90a1328723f6284f88aaedf67a579f79e0737402a52e5309507b63
+wrapper_direct_callable_expansion_code_review_status=passed_no_findings
+wrapper_direct_callable_expansion_code_review_id=CE-CODE-REVIEW-2026-05-05-WRAPPER-DIRECT-CALLABLE-CLEAN-001
+wrapper_direct_callable_expansion_code_review_scope=scripts/traceweaver-smoke-codex-discovery, scripts/traceweaver-smoke-codex-host-registry, scripts/traceweaver-smoke-codex-separate-home-runtime
+wrapper_direct_callable_expansion_code_review_coverage=main_thread_review_only_no_reviewer_subagents
+wrapper_direct_callable_expansion_authority_doc_review_status=passed_no_findings
+wrapper_direct_callable_expansion_authority_doc_review_id=CE-DOC-REVIEW-2026-05-05-SKILL-BEHAVIOR-AUTHORITY-CLEAN-001
+wrapper_direct_callable_expansion_authority_doc_review_coverage=main_thread_review_only_no_reviewer_subagents
+wrapper_direct_callable_expansion_accepted_scope=reviewed_static_visibility_and_planning_input_only_runtime_publication_held
+wrapper_direct_callable_expansion_held_scope=ce-debug runtime behavior, ce-commit commit behavior, ce-commit-push-pr push/PR behavior, autonomous publication, clean CE replacement, project-level trace writes, enforcing behavior, release/package/upstream readiness, R31 validation, and unconstrained host support
 dogfood_audit_status=classifier_code_review_passed_authority_doc_review_passed_runtime_claims_held
 dogfood_classifier_code_review_id=CE-CODE-REVIEW-2026-05-05-DOGFOOD-CLASSIFIER-CLEAN-001
 dogfood_authority_doc_review_id=CE-DOC-REVIEW-2026-05-05-DOGFOOD-AUTHORITY-CLEAN-001
 dogfood_authority_doc_review_scope=.traceweaver/intent-contract.yml, traceability-matrix.md, docs/validation/traceweaver-controlled-autonomy-alpha.md, docs/plans/2026-05-05-001-feat-traceweaver-dogfood-audit-plan.md, docs/validation/traceweaver-dogfood-audit.md, scripts/traceweaver-classify-ce-replacement, scripts/traceweaver-smoke-ce-replacement-classifier
 dogfood_accepted_scope=reviewed manual/advisory dogfood input only
-dogfood_held_scope=unconstrained host configuration support, real tw-auto/lfg/tw-grill runtime invocation, project-level runtime trace writes, automatic Mermaid generation, code-level annotation mandate, clean CE replacement, enforcing behavior, publication, release-ready, package-ready, upstream-ready, and R31 validation status
+dogfood_held_scope=unconstrained host configuration support, real TW skill runtime invocation beyond the constrained Unit 11 tw-authority-gate sentinel proof, constrained reviewed tw-traceability-check structured proof, reviewed held tw-code-review/tw-doc-review prompt-satisfied file-access limitation observations, and code-reviewed static tw-debug wrapper/hash evidence including tw-requirements-review, runtime CE review/debug delegation on clean wrapper inputs, tw-auto, lfg, and tw-grill, wrapped CE continuity runtime behavior beyond active-surface visibility including ce-debug, ce-commit, and ce-commit-push-pr, project-level runtime trace writes, automatic Mermaid generation, code-level annotation mandate, clean CE replacement, enforcing behavior, publication, release-ready, package-ready, upstream-ready, and R31 validation status
 u9_unit10_code_review_coverage=main_thread_review_only_no_reviewer_subagents
-remaining_runtime_gate=tw_auto_lfg_tw_grill_runtime_invocation_project_level_trace_write_behavior_clean_replacement_enforcing_publication_release_r31_and_unconstrained_host_support_held
+remaining_runtime_gate=tw_requirements_review_successful_tw_code_review_tw_doc_review_ce_delegation_tw_auto_lfg_tw_grill_runtime_invocation_wrapped_ce_debug_ce_commit_ce_commit_push_pr_runtime_behavior_project_level_trace_write_behavior_clean_replacement_enforcing_publication_release_r31_and_unconstrained_host_support_held
+ce_skill_surface_inventory_status=ce_350_source_surface_refreshed_authority_doc_review_passed_parity_held
+ce_skill_surface_inventory_source_commit=1f3c6466e4eb4e1b584c658953dfb1ca98dd3335
+skill_behavior_authority_doc_review_status=passed_no_findings
+skill_behavior_authority_doc_review_id=CE-DOC-REVIEW-2026-05-05-SKILL-BEHAVIOR-AUTHORITY-CLEAN-001
+skill_behavior_authority_doc_review_coverage=main_thread_review_only_no_reviewer_subagents
+tw_auto_closure_loop_code_review_status=passed_no_findings
+tw_auto_closure_loop_code_review_id=CE-CODE-REVIEW-2026-05-05-TW-AUTO-CLOSURE-LOOP-CLEAN-001
+tw_auto_closure_loop_code_review_scope=plugins/traceweaver-core/skills/tw-auto/SKILL.md
+tw_auto_closure_loop_code_review_coverage=main_thread_review_only_no_reviewer_subagents
+ce_skill_surface_inventory_held_scope=full CE plugin parity, clean replacement, support for unclassified CE 3.5.0 surfaces, runtime wrapper behavior, publication, release/package/upstream readiness, R31 validation, and unconstrained host support
 ```
 
 ## Install Smoke Evidence
@@ -554,7 +806,23 @@ enforcing mode, or release readiness before later gates approve those claims.
 
 ## Suggested Next Step
 
-Run a new-project bootstrap dogfood proof using the constrained active-host
-TraceWeaver setup. Keep project-level trace writes, clean CE replacement,
-enforcing mode, publication, release packaging, upstream readiness, R31
-validation, and unconstrained host configuration support held.
+Use the clean scoped trace-anchor explicit-mapping/active-host status-hash
+doc review as reviewed static/filesystem/hash evidence, then move to
+fresh-session prompt-registry proof or dogfood `tw-auto`. The active-host
+reconciliation code review passed as
+`TW-CODE-REVIEW-2026-05-07-ACTIVE-HOST-RECONCILIATION-CLEAN-001`; the scoped
+routing-surface dependency-control code review passed as
+`TW-CODE-REVIEW-2026-05-07-TW-PLAN-ROUTING-SURFACE-CLEAN-001`; scoped
+authority doc review passed as
+`TW-DOC-REVIEW-2026-05-07-TW-PLAN-ROUTING-SURFACE-STATUS-HASH-CLEAN-001`; and
+the trace-anchor explicit-mapping/currentness code review passed as
+`TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-CLEAN-001`.
+The nested skill-local backup repair code review passed as
+`TW-CODE-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-CLEAN-001`.
+The scoped status/hash doc review passed as
+`TW-DOC-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-STATUS-HASH-CLEAN-001`.
+Keep project-level trace writes, code-anchor authoring/enforcement, autonomous
+closure-loop repair, human-decision pause behavior for unclear/contradictory
+requirements, clean CE replacement, enforcing mode, publication, release
+packaging, upstream readiness, R31 validation, and unconstrained host
+configuration support held until separately proven.

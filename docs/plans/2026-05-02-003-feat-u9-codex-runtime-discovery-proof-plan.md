@@ -290,8 +290,8 @@ TraceWeaver-packaged callable skill surface and references.
   <TEMP_CODEX_HOME>`.
 - Verify direct callable skill directories exist for `tw-auto`, `lfg`,
   `tw-authority-gate`, `tw-traceability-check`, `tw-requirements-review`,
-  `tw-grill`, and every `tw-auto` required dependency: `ce-plan`, `ce-work`,
-  `ce-code-review`, and `ce-doc-review`.
+  `tw-code-review`, `tw-doc-review`, `tw-grill`, and every `tw-auto` required
+  dependency: `ce-plan`, `ce-work`, `ce-code-review`, and `ce-doc-review`.
 - Verify packaged TraceWeaver copies exist under
   `.codex/traceweaver-core/skills/`, outside the active Codex skill scan path.
 - Verify direct callable copies contain `.traceweaver-core-install.json` and
@@ -303,7 +303,8 @@ TraceWeaver-packaged callable skill surface and references.
 - Add a host-level Codex discovery checkpoint after install. A fresh Codex
   session, host reload, or equivalent Codex-supported discovery path must show
   `tw-auto`, `lfg`, `tw-authority-gate`, `tw-traceability-check`,
-  `tw-requirements-review`, `tw-grill`, `ce-plan`, `ce-work`,
+  `tw-requirements-review`, `tw-code-review`, `tw-doc-review`, `tw-grill`,
+  `ce-plan`, `ce-work`,
   `ce-code-review`, and `ce-doc-review` as callable TraceWeaver-packaged
   entries. If this cannot be automated, capture manual Codex transcript
   evidence and keep runtime-discoverable claims held until that evidence exists.
@@ -860,7 +861,8 @@ Codex auth file into the retained temporary home.
   for the already-held live-auth-copy boundary.
 - Record whether the fresh prompt-input registry exposes `tw-auto`, `lfg`,
   `tw-authority-gate`, `tw-traceability-check`, `tw-requirements-review`,
-  `tw-grill`, `ce-plan`, `ce-work`, `ce-code-review`, and `ce-doc-review`.
+  `tw-code-review`, `tw-doc-review`, `tw-grill`, `ce-plan`, `ce-work`,
+  `ce-code-review`, and `ce-doc-review`.
 - Record whether `codex exec` reaches the exact skill-hash sentinel without a
   copied auth file.
 - If tokenless isolated execution fails with auth required, hold runtime
@@ -944,9 +946,55 @@ callable skills to appear in `codex debug prompt-input`.
   `CE-DOC-REVIEW-2026-05-05-U9-UNIT11-AUTHORITY-CLEAN-001`.
 - Accepted use is limited to constrained active-host `tw-authority-gate`
   invocation.
+- Follow-on wrapper expansion has been recorded but is not yet accepted: the
+  required active direct-callable set now includes `ce-debug`, `ce-commit`, and
+  `ce-commit-push-pr`; isolated and host visibility smokes passed and the
+  existing `tw-authority-gate` sentinel still passed. Behavior code review
+  passed; authority doc review is pending.
+- Candidate review-wrapper skill expansion has also been recorded but is not yet
+  accepted: `tw-code-review` and `tw-doc-review` are materialized as
+  direct-callable skill files, `tw-auto` now routes review handoffs through them,
+  and visibility smokes require them. Requirements review, code review,
+  authority doc review, deterministic fixture proof, and runtime behavior proof
+  remain pending.
 - Clean CE replacement, project-level trace writes, enforcing behavior,
   publication, release/package/upstream readiness, R31 validation, and
   unconstrained host configuration support remain held.
+
+### Wrapper Direct Callable Expansion Review Gate
+
+**Files:**
+
+- `scripts/traceweaver-smoke-codex-discovery`
+- `scripts/traceweaver-smoke-codex-host-registry`
+- `scripts/traceweaver-smoke-codex-separate-home-runtime`
+- `docs/validation/traceweaver-u9-codex-runtime-discovery.md`
+- `docs/validation/traceweaver-controlled-autonomy-alpha.md`
+- `docs/plans/2026-05-05-002-feat-tw-skill-behavior-audit-plan.md`
+- `docs/validation/traceweaver-skill-behavior-audit.md`
+- `traceability-matrix.md`
+- `.traceweaver/intent-contract.yml`
+
+**Current Result:**
+
+- Required direct-callable visibility now includes `ce-debug`, `ce-commit`, and
+  `ce-commit-push-pr` as TraceWeaver-packaged wrappers.
+- Candidate review-wrapper visibility now includes `tw-code-review` and
+  `tw-doc-review`; their accepted behavior remains review-pending and held.
+- Active host wrapper expansion backup:
+  `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260505T132921Z-wrapper-expansion`.
+- Current host direct-callable expectations have been expanded by candidate
+  review wrappers; rerun host smoke before treating the current active directory
+  counts as evidence for the new set.
+- Previously, current host had 14 active skill directories including `.system`; all 13
+  required direct callables are TraceWeaver-marked, current, and visible through
+  prompt-input with the external CE plugin disabled.
+- Existing constrained `tw-authority-gate` sentinel still passes.
+- Behavior code review passed as
+  `CE-CODE-REVIEW-2026-05-05-WRAPPER-DIRECT-CALLABLE-CLEAN-001`; authority doc
+  review is pending.
+- Wrapper runtime behavior, commit, push, PR, publication, clean replacement,
+  and broader runtime claims remain held.
 
 ## Risks And Mitigations
 

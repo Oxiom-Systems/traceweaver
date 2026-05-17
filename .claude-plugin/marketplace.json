@@ -1,0 +1,36 @@
+{
+  "name": "traceweaver",
+  "owner": {
+    "name": "Oxiom Systems",
+    "url": "https://github.com/Oxiom-Systems"
+  },
+  "metadata": {
+    "description": "TraceWeaver alpha plugin marketplace — systems-engineering authority and traceability controls for agentic engineering.",
+    "version": "0.1.0-alpha.0"
+  },
+  "traceweaver": {
+    "anchor": "TRACEWEAVER: file-role=standalone-plugin-marketplace-manifest; req=REQ-TW-041; trace=TRACE-TW-038; ver=VER-TW-058"
+  },
+  "plugins": [
+    {
+      "name": "traceweaver-core",
+      "description": "Authority, requirements, and traceability controls for agentic engineering. Repackages the selected Compound Engineering method with systems-engineering authority: requirement quality review, no-orphan traceability checks, root requirements and matrix bootstrap, advisory controlled automation, and dark-behavior routing before planning, implementation, review, and release claims.",
+      "author": {
+        "name": "Oxiom Systems",
+        "url": "https://github.com/Oxiom-Systems"
+      },
+      "homepage": "https://github.com/Oxiom-Systems/traceweaver",
+      "repository": "https://github.com/Oxiom-Systems/traceweaver",
+      "license": "MIT",
+      "tags": [
+        "traceweaver",
+        "systems-engineering",
+        "requirements",
+        "traceability",
+        "agentic-workflow",
+        "compound-engineering"
+      ],
+      "source": "./plugins/traceweaver-core"
+    }
+  ]
+}

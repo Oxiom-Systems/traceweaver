@@ -177,36 +177,39 @@ The important control point is between `brainstorm` and `plan`: ideas stop being
 loose context and become controlled requirements authority only after they are
 captured, reviewed, and baselined.
 
-| CE stage | TraceWeaver control step | Purpose |
+| CE method stage | Standalone TraceWeaver entrypoint | Purpose |
 |---|---|---|
 | `idea` | intent capture | Capture stakeholder intent. Ideas are not authority yet. |
-| `ce-brainstorm` | `tw-requirements-review`, then authority-baseline record | Explore needs, risks, options, assumptions, and gaps, then convert accepted ideas into `requirements.md`, intent IDs, requirement IDs, exceptions, validation questions, and baseline version. |
-| `ce-plan` | `tw-authority-gate` | Plan only against approved requirements or approved exceptions. Every task gets an Intent Capsule. |
-| `ce-work` | `tw-traceability-check` | Agents implement only what their capsule authorizes. Assumptions become gaps or change requests, not code. |
-| `ce-code-review` / `ce-doc-review` | verification evidence record, then validation evidence record | Check what changed, what requirement authorized it, what verifies it, and whether it still satisfies the stakeholder validation question. |
-| `ce-compound` | learning-to-change-control handoff | Record lessons and patterns without silently changing authority. New learning creates proposed requirements or change records when needed. |
+| brainstorm | `tw-brainstorm`, then `tw-requirements-review` and authority-baseline record | Explore needs, risks, options, assumptions, and gaps, then convert accepted ideas into `requirements.md`, intent IDs, requirement IDs, exceptions, validation questions, and baseline version. |
+| plan | `tw-plan`, with `tw-authority-gate` before implementation | Plan only against approved requirements or approved exceptions. Every task gets an Intent Capsule. |
+| work | `tw-work`, with `tw-traceability-check` before review | Agents implement only what their capsule authorizes. Assumptions become gaps or change requests, not code. |
+| review | `tw-code-review` / `tw-doc-review` | Check what changed, what requirement authorized it, what verifies it, and whether it still satisfies the stakeholder validation question. |
+| compound learning | `tw-compound` | Record lessons and patterns without silently changing authority. New learning creates proposed requirements or change records when needed. |
 
 The target TraceWeaver-controlled CE loop is:
 
 ```text
 idea
--> ce-brainstorm
+-> tw-brainstorm
 -> tw-requirements-review
 -> authority-baseline record
--> ce-plan
+-> tw-plan
 -> tw-authority-gate
--> ce-work
+-> tw-work
 -> tw-traceability-check
--> ce-code-review / ce-doc-review
+-> tw-code-review / tw-doc-review
 -> verification evidence record
 -> validation evidence record
--> ce-compound
+-> tw-compound
 ```
 
-In the current alpha, this is a workflow architecture and documentation
-baseline. Runtime wrappers, clean CE replacement behavior, slash-command
-surfaces, and dynamic discovery remain held until the relevant U6b-dynamic, U7,
-or U9 evidence records approve them.
+In the current alpha, the standalone TraceWeaver package installs the selected
+`tw-*` wrappers and the approved `lfg` compatibility alias as the user-facing
+surface. Selected `ce-*` components are packaged internally for wrapper
+delegation, not exposed as the normal user workflow. Full `tw-auto`
+runtime-driver decision binding, clean CE replacement behavior, slash-command
+surfaces, release-ready status, and unconstrained-host support remain held until
+their own evidence records approve them.
 
 TraceWeaver is strongest at five handoffs:
 
@@ -218,7 +221,7 @@ TraceWeaver is strongest at five handoffs:
 5. During `compound`: preserve learning without silently rewriting the baseline.
 
 Every TraceWeaver task should end with suggested next steps. The handoff should
-name the next CE command, TraceWeaver gate, evidence record, or held condition so
+name the next TraceWeaver command, evidence record, or held condition so
 contributors do not have to reconstruct the workflow state from validation
 history.
 
@@ -235,17 +238,17 @@ The user-facing controlled workflow is:
 idea
 -> ideation source
 -> tw-grill
--> ce-brainstorm
+-> tw-brainstorm
 -> tw-requirements-review
 -> authority-baseline record
--> ce-plan
+-> tw-plan
 -> tw-authority-gate
--> ce-work
+-> tw-work
 -> tw-traceability-check
--> ce-code-review / ce-doc-review
+-> tw-code-review / tw-doc-review
 -> verification evidence record
 -> validation evidence record
--> ce-compound
+-> tw-compound
 ```
 
 The alpha rule is:
@@ -262,8 +265,9 @@ The alpha rule is:
 - create `tw-auto` as the TraceWeaver-controlled autonomy surface;
 - make packaged `lfg` a compatibility alias that delegates to `tw-auto` so the
   familiar autonomous entrypoint cannot bypass TraceWeaver authority;
-- keep direct `ce-*` invocation as legacy/manual-continuity only until wrapper
-  sequencing is materialized and runtime-proven;
+- keep selected `ce-*` bodies as internal implementation components for wrapper
+  delegation, static continuity testing, and reviewed upstream-drift comparison;
+- do not expose direct `ce-*` invocation as the standalone user workflow;
 - keep clean CE replacement, slash commands, enforcing mode, and dynamic
   no-forced discovery held until U9 or a later accepted runtime proof.
 
@@ -280,7 +284,7 @@ intent-first path:
 idea
 -> ideation source
 -> tw-grill
--> ce-brainstorm
+-> tw-brainstorm
 -> tw-requirements-review
 -> accepted requirements baseline
 -> tw-auto
@@ -303,7 +307,7 @@ implementation. Missing authority starts a baseline conversation; it does not
 authorize code.
 
 `tw-grill` is an optional source-evidence step between ideation and
-`ce-brainstorm`. It stress-tests one selected idea, inspects repo context instead
+`tw-brainstorm`. It stress-tests one selected idea, inspects repo context instead
 of asking when the answer is discoverable, and gives a recommended answer for
 each user-facing question. Its output is not authority until reviewed into
 `requirements.md`. In this alpha, `ce:ideate` is optional external CE context,
@@ -360,9 +364,10 @@ behavior.
 
 ## Fast Path To TraceWeaver-First Use
 
-The fastest useful path is not to wait for full CE replacement. Use TraceWeaver
-first as an advisory authority layer while CE remains the execution engine, then
-replace CE only after the selected CE-compatible workflow surface is proven.
+The fastest useful path is not to wait for full runtime-driver or clean
+replacement proof. Use TraceWeaver first as the advisory user-facing workflow
+surface while selected CE-derived components remain internal implementation
+engines behind the `tw-*` wrappers.
 
 Immediate advisory use:
 
@@ -372,10 +377,11 @@ Immediate advisory use:
    requirement IDs or exceptions, verification method, and validation question.
 4. Treat missing authority as a warning, gap, proposed requirement, change
    request, exception, or held claim.
-5. Keep using CE commands for execution until TraceWeaver proves the replacement
-   surface.
+5. Use `tw-auto`, `tw-plan`, `tw-work`, `tw-code-review`, and `tw-doc-review`
+   for user-facing workflow; do not route normal standalone work through raw
+   `ce-*` commands.
 
-TraceWeaver can replace the CE plugin only when these conditions are met:
+TraceWeaver can claim clean CE replacement only when these conditions are met:
 
 - selected CE workflow skill names are materialized in `plugins/traceweaver-core`;
 - selected CE agent files are materialized or explicitly held with degradation
@@ -388,19 +394,28 @@ TraceWeaver can replace the CE plugin only when these conditions are met:
 - clean CE replacement, dynamic discovery, slash commands, and enforcing mode
   stay held until their evidence records pass.
 
+The standalone packaging surface has static install/discovery proof for a
+CE-absent Codex home and a TW-only direct-callable host surface. That is enough
+to use the package as an alpha advisory workflow surface, but it is not a
+release-ready or clean-replacement claim. The full runtime-driver proof remains
+held because the current opt-in runtime harness proves prompt-registry
+visibility, installed skill identity, controlled fixture outcomes, unresolved
+mapping evidence, and no-publication boundaries, but not that loaded `tw-auto`
+itself made every runtime handoff decision.
+
 ```mermaid
 flowchart TD
-  A["Idea / stakeholder intent"] --> B["ce-brainstorm"]
+  A["Idea / stakeholder intent"] --> B["tw-brainstorm"]
   B --> C["tw-requirements-review"]
   C --> D["authority-baseline record<br/>requirements.md + intent contract"]
-  D --> E["ce-plan"]
+  D --> E["tw-plan"]
   E --> F["tw-authority-gate<br/>advisory alpha: warn / hold / gap"]
-  F --> G["ce-work"]
+  F --> G["tw-work"]
   G --> H["tw-traceability-check<br/>detect dark behavior"]
-  H --> I["ce-code-review / ce-doc-review"]
+  H --> I["tw-code-review / tw-doc-review"]
   I --> J["verification evidence record<br/>built right"]
   J --> K["validation evidence record<br/>built the right thing"]
-  K --> L["ce-compound"]
+  K --> L["tw-compound"]
   L --> M["learning-to-change-control<br/>new requirement / change / exception"]
   M --> D
 
@@ -435,7 +450,7 @@ The operational migration is:
 
 ## Current State
 
-As of 2026-05-01:
+As of 2026-05-15:
 
 | Area | Status | Notes |
 |---|---|---|
@@ -444,7 +459,7 @@ As of 2026-05-01:
 | U5 validation baseline commit | `ca6ff66` | `docs: align skill tree count` |
 | U5 delta inventory | `CLOSED_NO_DELTA` | No exact U5 public artifact targets remain outside the U4-promoted skill-folder paths |
 | U5.5 expanded runtime candidate | `REDUCED_FOR_U6A_STATIC_SCOPE_ONLY` | Candidate `696548694dd40ce298d77e603db069934b58f645` has file-level delta/impact records and static requirements-quality/lifecycle-discovery evidence, including referenced requirements-reviewer files, under limitation `U55-LIMIT-STATIC-DISCOVERY-001`. Dynamic discovery, package-ready, release-ready, and upstream-ready claims remain held |
-| TraceWeaver Core plugin alpha | U6b Unit 2 static materialization accepted; controlled-autonomy package scope in review | `plugins/traceweaver-core` contains plugin manifests, selected Light v0.1 runtime skills, selected CE-compatible skills and agents, skill-local selected references, Intent Contract/templates, `tw-auto`, optional `tw-grill`, and an `lfg` compatibility alias that delegates to `tw-auto`. The repo-local README install command now materializes the selected skills and 49 selected CE agent TOML files with `--include-skills`; `tw-auto`/`lfg`/`tw-grill` static install smoke has passed. Review refresh, dynamic discovery, real invocation transcript, clean CE replacement, package-ready, release-ready, upstream-ready, and R31 claims remain held |
+| TraceWeaver Core plugin alpha | Standalone packaging static surface accepted; runtime-driver decision binding held | `plugins/traceweaver-core` contains plugin manifests, selected TraceWeaver wrappers, selected CE-derived internal implementation components, selected agents, skill-local references, Intent Contract/templates, `tw-auto`, optional `tw-grill`, and an `lfg` compatibility alias that delegates to `tw-auto`. The repo-local installer materializes only TraceWeaver-owned `tw-*` plus `lfg` as direct-callable user skills and keeps selected `ce-*` components internal. Fresh CE-absent install/discovery, active-host TW-only direct-callable proof, separate-home runtime-disabled smoke, model-default policy, and standalone packaging surface review have passed. Full `tw-auto` runtime-driver decision binding, publication, clean CE replacement, release/package/upstream readiness, unconstrained-host support, and R31 claims remain held |
 | Intent Contract architecture | Active file-based authority baseline and templates | Root `requirements.md`, root `traceability-matrix.md`, and `.traceweaver/intent-contract.yml` are active project authority artifacts. Packaged templates now include requirements baseline, Intent Contract, trace record, task capsule, gap/change/exception, matrix bootstrap, and controlled-autonomy policy templates. Runtime enforcement and wrapper behavior remain held until later proof |
 | Core 11 public skill folders | U4-promoted public artifacts | `skills/` contains all eleven scrubbed public-candidate skill folders; only the Light v0.1 subset has U6b alpha install-smoke evidence |
 | Operating model reference | Implementation-ready candidate | `references/systems-engineering-traceability-operating-model.md` |

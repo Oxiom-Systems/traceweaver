@@ -1,0 +1,9 @@
+required_route=tw-authority-gate,tw-work,traceweaver-check-code-anchors,traceweaver-author-code-anchors,traceweaver-check-code-anchors,tw-traceability-check,tw-code-review
+tw_work_behavior=skip_ambiguous_anchor_continue_clear_work
+clear_anchor_authoring=applied
+ambiguous_anchor_authoring=skipped_unresolved_mapping
+traceability_result=blocked_structured_finding
+structured_finding=CTA-UNRESOLVED-ANCHOR-MAPPING
+loop_state=held_traceability_blocked
+completion_claim=false
+publication_claim=false

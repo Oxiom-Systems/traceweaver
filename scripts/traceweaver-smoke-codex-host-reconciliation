@@ -1,0 +1,225 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=host-reconciliation-smoke; req=REQ-TW-052; trace=TRACE-TW-037; ver=VER-TW-047
+# TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
+# TRACEWEAVER: file-role=host-reconciliation-smoke; req=REQ-TW-057; trace=TRACE-TW-032; ver=VER-TW-045
+# TRACEWEAVER: verifies=VER-TW-045; req=REQ-TW-057; trace=TRACE-TW-032
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+tmp_root="$(mktemp -d)"
+trap 'rm -rf "$tmp_root"' EXIT
+
+hash_file() {
+  shasum -a 256 "$1" | awk '{print $1}'
+}
+
+assert_file() {
+  if [ ! -f "$1" ]; then
+    echo "missing_file=$1"
+    exit 1
+  fi
+}
+
+assert_dir() {
+  if [ ! -d "$1" ]; then
+    echo "missing_directory=$1"
+    exit 1
+  fi
+}
+
+assert_not_exists() {
+  if [ -e "$1" ]; then
+    echo "unexpected_path=$1"
+    exit 1
+  fi
+}
+
+assert_hash_match() {
+  local source="$1"
+  local target="$2"
+  local label="$3"
+  if [ "$(hash_file "$source")" != "$(hash_file "$target")" ]; then
+    echo "${label}=failed source=$(hash_file "$source") target=$(hash_file "$target")"
+    exit 1
+  fi
+}
+
+assert_marker() {
+  local marker="$1"
+  local expected_skill="$2"
+  python3 - "$marker" "$expected_skill" <<'PY'
+import json
+import sys
+
+marker_path, expected_skill = sys.argv[1], sys.argv[2]
+with open(marker_path, "r", encoding="utf-8") as handle:
+    marker = json.load(handle)
+expected = {
+    "plugin": "traceweaver-core",
+    "skill": expected_skill,
+    "purpose": "direct-callable-skill-copy",
+}
+for key, value in expected.items():
+    if marker.get(key) != value:
+        raise SystemExit(f"marker_{key}=failed expected={value} actual={marker.get(key)}")
+PY
+}
+
+codex_home="$tmp_root/codex-home"
+skills_root="$codex_home/.codex/skills"
+mkdir -p "$skills_root"
+
+mkdir -p "$skills_root/ce-work"
+printf '%s\n' "stale unmarked ce-work" >"$skills_root/ce-work/SKILL.md"
+
+mkdir -p "$skills_root/tw-auto"
+printf '%s\n' "stale marked tw-auto" >"$skills_root/tw-auto/SKILL.md"
+cat >"$skills_root/tw-auto/.traceweaver-core-install.json" <<'JSON'
+{
+  "plugin": "traceweaver-core",
+  "skill": "tw-auto",
+  "purpose": "direct-callable-skill-copy",
+  "installer": "fixture"
+}
+JSON
+
+mkdir -p "$skills_root/tw-authority-gate"
+cp "$repo_root/plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md" "$skills_root/tw-authority-gate/SKILL.md"
+cat >"$skills_root/tw-authority-gate/.traceweaver-core-install.json" <<'JSON'
+{
+  "plugin": "traceweaver-core",
+  "skill": "tw-authority-gate",
+  "purpose": "direct-callable-skill-copy",
+  "installer": "fixture"
+}
+JSON
+
+mkdir -p "$skills_root/tw-traceability-check"
+cp -pR "$repo_root/plugins/traceweaver-core/skills/tw-traceability-check/." "$skills_root/tw-traceability-check/"
+cat >"$skills_root/tw-traceability-check/.traceweaver-core-install.json" <<'JSON'
+{
+  "plugin": "traceweaver-core",
+  "skill": "tw-traceability-check",
+  "purpose": "direct-callable-skill-copy",
+  "installer": "fixture"
+}
+JSON
+printf '%s\n' "# stale nested helper edit" >>"$skills_root/tw-traceability-check/scripts/traceweaver-author-code-anchors"
+stale_nested_helper_hash="$(hash_file "$skills_root/tw-traceability-check/scripts/traceweaver-author-code-anchors")"
+
+mkdir -p "$skills_root/unrelated-local-skill"
+printf '%s\n' "local unrelated skill" >"$skills_root/unrelated-local-skill/SKILL.md"
+
+reconcile_output="$tmp_root/reconcile.out"
+TRACEWEAVER_RECONCILE_TIMESTAMP=20260506T000000Z \
+  "$repo_root/scripts/traceweaver-reconcile-codex-host-skills" \
+  --codexHome "$codex_home" >"$reconcile_output"
+
+backup_dir="$codex_home/.codex/traceweaver-core/host-reconciliation-backups/20260506T000000Z"
+
+assert_dir "$backup_dir/skills/ce-work"
+assert_file "$backup_dir/skills/ce-work/SKILL.md"
+assert_dir "$backup_dir/skills/tw-auto"
+assert_file "$backup_dir/skills/tw-auto/SKILL.md"
+assert_dir "$backup_dir/skills/tw-traceability-check"
+assert_file "$backup_dir/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors"
+if [ "$stale_nested_helper_hash" != "$(hash_file "$backup_dir/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors")" ]; then
+  echo "codex_host_reconciliation_stale_nested_backup=failed"
+  exit 1
+fi
+assert_file "$skills_root/unrelated-local-skill/SKILL.md"
+assert_file "$skills_root/tw-plan/SKILL.md"
+assert_file "$skills_root/tw-work/SKILL.md"
+assert_file "$skills_root/tw-commit/SKILL.md"
+assert_file "$skills_root/tw-commit-push-pr/SKILL.md"
+for skill_name in \
+  tw-brainstorm \
+  tw-compound \
+  tw-compound-refresh \
+  tw-resolve-pr-feedback \
+  tw-sessions \
+  tw-test-browser \
+  tw-test-xcode \
+  tw-setup \
+  tw-worktree
+do
+  assert_file "$skills_root/$skill_name/SKILL.md"
+  assert_marker "$skills_root/$skill_name/.traceweaver-core-install.json" "$skill_name"
+  assert_hash_match "$repo_root/plugins/traceweaver-core/skills/$skill_name/SKILL.md" "$skills_root/$skill_name/SKILL.md" "${skill_name}_hash"
+done
+assert_not_exists "$skills_root/tw-session-inventory"
+assert_not_exists "$skills_root/tw-session-extract"
+assert_marker "$skills_root/tw-plan/.traceweaver-core-install.json" "tw-plan"
+assert_marker "$skills_root/tw-work/.traceweaver-core-install.json" "tw-work"
+assert_marker "$skills_root/tw-commit/.traceweaver-core-install.json" "tw-commit"
+assert_marker "$skills_root/tw-commit-push-pr/.traceweaver-core-install.json" "tw-commit-push-pr"
+assert_marker "$skills_root/ce-work/.traceweaver-core-install.json" "ce-work"
+assert_marker "$skills_root/tw-auto/.traceweaver-core-install.json" "tw-auto"
+assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-plan/SKILL.md" "$skills_root/tw-plan/SKILL.md" "tw_plan_hash"
+assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-work/SKILL.md" "$skills_root/tw-work/SKILL.md" "tw_work_hash"
+assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-commit/SKILL.md" "$skills_root/tw-commit/SKILL.md" "tw_commit_hash"
+assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md" "$skills_root/tw-commit-push-pr/SKILL.md" "tw_commit_push_pr_hash"
+assert_hash_match "$repo_root/plugins/traceweaver-core/skills/ce-work/SKILL.md" "$skills_root/ce-work/SKILL.md" "ce_work_hash"
+assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-auto/SKILL.md" "$skills_root/tw-auto/SKILL.md" "tw_auto_hash"
+assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md" "$skills_root/tw-authority-gate/SKILL.md" "tw_authority_gate_hash"
+assert_hash_match \
+  "$repo_root/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors" \
+  "$skills_root/tw-traceability-check/scripts/traceweaver-author-code-anchors" \
+  "tw_traceability_check_author_helper_hash"
+
+refusal_home="$tmp_root/refusal-home"
+mkdir -p "$refusal_home/.codex/skills"
+printf '%s\n' "not a directory" >"$refusal_home/.codex/skills/tw-work"
+
+set +e
+"$repo_root/scripts/traceweaver-reconcile-codex-host-skills" --codexHome "$refusal_home" >"$tmp_root/refusal.out" 2>"$tmp_root/refusal.err"
+refusal_status=$?
+set -e
+
+if [ "$refusal_status" -eq 0 ]; then
+  echo "reconcile_refusal_case=failed_expected_nonzero"
+  exit 1
+fi
+
+assert_file "$refusal_home/.codex/skills/tw-work"
+assert_not_exists "$refusal_home/.codex/skills/ce-work"
+
+failure_home="$tmp_root/failure-home"
+failure_skills="$failure_home/.codex/skills"
+mkdir -p "$failure_skills/ce-work"
+printf '%s\n' "stale unmarked ce-work before failed install" >"$failure_skills/ce-work/SKILL.md"
+pre_failure_hash="$(hash_file "$failure_skills/ce-work/SKILL.md")"
+
+set +e
+PATH="/usr/bin:/bin" TRACEWEAVER_RECONCILE_TIMESTAMP=20260506TFAILTESTZ \
+  "$repo_root/scripts/traceweaver-reconcile-codex-host-skills" \
+  --codexHome "$failure_home" >"$tmp_root/failure.out" 2>"$tmp_root/failure.err"
+failure_status=$?
+set -e
+
+if [ "$failure_status" -eq 0 ]; then
+  echo "reconcile_failure_atomicity=failed_expected_nonzero"
+  exit 1
+fi
+
+assert_file "$failure_skills/ce-work/SKILL.md"
+if [ "$pre_failure_hash" != "$(hash_file "$failure_skills/ce-work/SKILL.md")" ]; then
+  echo "reconcile_failure_atomicity=failed_original_skill_not_restored"
+  exit 1
+fi
+assert_not_exists "$failure_skills/tw-work"
+if ! grep -q "traceweaver_reconcile_rollback=restored_active_skill_surface_after_failure" "$tmp_root/failure.err"; then
+  echo "reconcile_failure_atomicity=failed_missing_rollback_marker"
+  exit 1
+fi
+
+echo "codex_host_reconciliation_backup_dir=$backup_dir"
+echo "codex_host_reconciliation_backed_up=ce-work tw-auto tw-traceability-check"
+echo "codex_host_reconciliation_stale_nested_backup=pass"
+echo "codex_host_reconciliation_unrelated_skill_preserved=pass"
+echo "codex_host_reconciliation_wrapper_completion=pass"
+echo "codex_host_reconciliation_hidden_session_helpers=pass"
+echo "codex_host_reconciliation_refusal_case=pass"
+echo "codex_host_reconciliation_failure_atomicity=pass"
+echo "codex_host_reconciliation_smoke=pass"

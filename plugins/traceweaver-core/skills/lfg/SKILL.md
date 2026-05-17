@@ -5,6 +5,8 @@ argument-hint: "[feature description]"
 disable-model-invocation: true
 ---
 
+<!-- TRACEWEAVER: file-role=tw-auto-compatibility-alias-skill; req=REQ-TW-034; trace=TRACE-TW-021; ver=VER-TW-030 -->
+
 # LFG Compatibility Alias
 
 This installed TraceWeaver `lfg` entrypoint is not the raw Compound Engineering

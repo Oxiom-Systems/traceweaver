@@ -1,0 +1,10 @@
+# TRACEWEAVER: file-role=review-staging-fixture; req=REQ-TW-056; trace=TRACE-TW-042; ver=VER-TW-054
+# TRACEWEAVER: verifies=VER-TW-054; req=REQ-TW-056; trace=TRACE-TW-042
+skill=tw-auto
+case=review-staging-untracked-plan
+untracked_artifact=docs/plans/current-reviewed-plan.md
+review_acceptance_before_stage=blocked
+tw_auto_behavior=include_plan_in_exact_review_stage_scope
+review_acceptance_after_stage=allowed_for_scoped_review
+authority_change=false
+publication_allowed=false

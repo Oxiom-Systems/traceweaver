@@ -1,5 +1,7 @@
 #!/usr/bin/env bun
 
+// TRACEWEAVER: file-role=codex-installer; req=REQ-TW-016; trace=TRACE-TW-010; ver=VER-TW-019
+// TRACEWEAVER: file-role=model-default-installer-policy; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055
 import {
   cpSync,
   existsSync,
@@ -14,6 +16,22 @@ import { homedir } from "node:os";
 import { basename, isAbsolute, join, resolve } from "node:path";
 
 const callableMarkerFile = ".traceweaver-core-install.json";
+const modelDefaults = {
+  codex: {
+    model: "gpt-5.5",
+    reasoningEffort: "medium",
+    enforcement: "traceweaver_policy_and_smoke_default",
+    overrideEnvironment: {
+      model: "TRACEWEAVER_CODEX_MODEL",
+      reasoningEffort: "TRACEWEAVER_CODEX_REASONING_EFFORT",
+    },
+  },
+  claude: {
+    model: "sonnet",
+    enforcement: "policy_recorded_runtime_enforcement_held",
+  },
+  importedCeComponentBodyPolicy: "no_model_default_edits_without_reviewed_overlay_fork_record",
+} as const;
 
 type InstallOptions = {
   pluginRoot: string;
@@ -173,6 +191,8 @@ function renderCodexAgentToml(agent: ParsedAgent): string {
   ].join("\n");
 }
 
+// TRACEWEAVER: entrypoint=installCodexSkills; req=REQ-TW-016; trace=TRACE-TW-010; ver=VER-TW-019
+// TRACEWEAVER: entrypoint=installCodexSkills; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055
 function installCodexSkills(options: InstallOptions): void {
   assertTraceWeaverPlugin(options.pluginRoot);
 
@@ -190,6 +210,8 @@ function installCodexSkills(options: InstallOptions): void {
   const installedSkills = readdirSync(sourceSkillsRoot)
     .filter((entry) => statSync(join(sourceSkillsRoot, entry)).isDirectory())
     .sort();
+  const callableSkills = installedSkills.filter(isUserCallableSkill);
+  const internalPackagedSkills = installedSkills.filter((skillName) => !isUserCallableSkill(skillName));
   const installedAgents = readdirSync(sourceAgentsRoot)
     .filter((entry) => entry.endsWith(".agent.md") && statSync(join(sourceAgentsRoot, entry)).isFile())
     .map((entry) => entry.replace(/\.agent\.md$/, ".toml"))
@@ -199,7 +221,8 @@ function installCodexSkills(options: InstallOptions): void {
     : [];
 
   const legacyActiveSurfaceStatus = removeLegacyActiveSkillSurface(legacyActiveSkillsRoot, manifestPath);
-  assertCallableTargetsAvailable(targetCallableSkillsRoot, installedSkills);
+  assertCallableTargetsAvailable(targetCallableSkillsRoot, callableSkills);
+  assertNoUnownedCeCallableTargets(targetCallableSkillsRoot);
 
   mkdirSync(targetPackagedSkillsRoot, { recursive: true });
   rmSync(targetPackagedSkillsRoot, { force: true, recursive: true });
@@ -209,10 +232,17 @@ function installCodexSkills(options: InstallOptions): void {
   rmSync(targetAgentsRoot, { force: true, recursive: true });
   mkdirSync(targetAgentsRoot, { recursive: true });
 
+  const retiredCallableSkills = removeRetiredCallableSkillTargets(targetCallableSkillsRoot, installedSkills, callableSkills);
+
   for (const skillName of installedSkills) {
     cpSync(join(sourceSkillsRoot, skillName), join(targetPackagedSkillsRoot, skillName), {
       recursive: true,
     });
+
+    if (!isUserCallableSkill(skillName)) {
+      continue;
+    }
+
     const callableTarget = join(targetCallableSkillsRoot, skillName);
     rmSync(callableTarget, { force: true, recursive: true });
     cpSync(join(sourceSkillsRoot, skillName), callableTarget, { recursive: true });
@@ -239,12 +269,17 @@ function installCodexSkills(options: InstallOptions): void {
         source: options.pluginRoot,
         target: options.target,
         includeSkills: options.includeSkills,
+        standalone: true,
+        externalCePluginRequired: false,
+        ceDerivedComponentsOwner: "traceweaver-core",
         skills: installedSkills,
-        callableSkills: installedSkills,
+        callableSkills,
+        internalPackagedSkills,
         packagedSkillsRoot: targetPackagedSkillsRoot,
         callableSkillsRoot: targetCallableSkillsRoot,
         agents: installedAgents,
         references: installedReferences,
+        modelDefaults,
         prompts: [],
         promptFiles: [],
         installer: basename(import.meta.path),
@@ -255,16 +290,73 @@ function installCodexSkills(options: InstallOptions): void {
   );
 
   console.log(`installed_skill_directory_count=${installedSkills.length}`);
-  console.log(`installed_callable_skill_directory_count=${installedSkills.length}`);
+  console.log(`installed_callable_skill_directory_count=${callableSkills.length}`);
+  console.log(`installed_internal_packaged_skill_directory_count=${internalPackagedSkills.length}`);
   console.log(`installed_agent_toml_count=${installedAgents.length}`);
   console.log(`installed_reference_file_count=${installedReferences.length}`);
   console.log(`installed_manifest=${manifestPath}`);
+  console.log(`installed_model_default_codex_model=${modelDefaults.codex.model}`);
+  console.log(`installed_model_default_codex_reasoning_effort=${modelDefaults.codex.reasoningEffort}`);
+  console.log(`installed_model_default_claude_model=${modelDefaults.claude.model}`);
+  console.log(`installed_model_default_claude_enforcement=${modelDefaults.claude.enforcement}`);
   console.log("installed_manifest_prompts=0");
   console.log(`installed_packaged_skills_root=${targetPackagedSkillsRoot}`);
   console.log(`installed_callable_skills_root=${targetCallableSkillsRoot}`);
+  console.log(`retired_direct_callable_skills=${retiredCallableSkills.length > 0 ? retiredCallableSkills.join(" ") : "none"}`);
   console.log(`legacy_active_namespaced_skill_surface=${legacyActiveSurfaceStatus}`);
   console.log(`installed_agents_root=${targetAgentsRoot}`);
   console.log(`installed_references_root=${targetReferencesRoot}`);
+}
+
+function isUserCallableSkill(skillName: string): boolean {
+  return skillName.startsWith("tw-") || skillName === "lfg";
+}
+
+function removeRetiredCallableSkillTargets(
+  targetCallableSkillsRoot: string,
+  installedSkills: string[],
+  callableSkills: string[],
+): string[] {
+  const callableSkillSet = new Set(callableSkills);
+  const retiredSkills: string[] = [];
+
+  for (const skillName of installedSkills) {
+    if (callableSkillSet.has(skillName)) continue;
+
+    const target = join(targetCallableSkillsRoot, skillName);
+    if (!existsSync(target)) continue;
+
+    if (!isTraceWeaverCallableTarget(target)) {
+      continue;
+    }
+
+    rmSync(target, { force: true, recursive: true });
+    retiredSkills.push(skillName);
+  }
+
+  return retiredSkills.sort();
+}
+
+function assertNoUnownedCeCallableTargets(targetCallableSkillsRoot: string): void {
+  if (!existsSync(targetCallableSkillsRoot)) return;
+
+  const conflicts = readdirSync(targetCallableSkillsRoot)
+    .filter((entry) => entry.startsWith("ce-"))
+    .map((entry) => join(targetCallableSkillsRoot, entry))
+    .filter((target) => existsSync(target) && statSync(target).isDirectory() && !isTraceWeaverCallableTarget(target));
+
+  if (conflicts.length === 0) return;
+
+  console.error(
+    [
+      "TraceWeaver standalone installer found existing direct ce-* skill directories.",
+      "Standalone TraceWeaver exposes tw-* and lfg user-facing skills only.",
+      "Run scripts/traceweaver-reconcile-codex-host-skills to back up/remove external CE callables,",
+      "or install into an isolated --codexHome:",
+      ...conflicts.map((target) => `  - ${target}`),
+    ].join("\n"),
+  );
+  process.exit(1);
 }
 
 function removeLegacyActiveSkillSurface(legacyActiveSkillsRoot: string, manifestPath: string): "absent" | "removed_owned_upgrade" {

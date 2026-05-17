@@ -1,5 +1,7 @@
 # TraceWeaver Core Plugin
 
+<!-- TRACEWEAVER: file-role=plugin-readme; req=REQ-TW-052; trace=TRACE-TW-036; ver=VER-TW-046 -->
+
 TraceWeaver Core adds systems-engineering authority control to agentic software
 work. This alpha plugin wires requirement quality, traceability checks, and
 selected CE-compatible workflow surfaces into planning, implementation, and
@@ -41,6 +43,16 @@ Included skills:
 - `tw-authority-gate`
 - `tw-traceability-check`
 - `tw-auto`
+- `tw-plan`
+- `tw-brainstorm`
+- `tw-compound`
+- `tw-compound-refresh`
+- `tw-resolve-pr-feedback`
+- `tw-sessions`
+- `tw-test-browser`
+- `tw-test-xcode`
+- `tw-setup`
+- `tw-worktree`
 - selected CE-compatible workflow skills, including `ce-brainstorm`,
   `ce-plan`, `ce-work`, `ce-code-review`, `ce-doc-review`, `ce-compound`,
   `ce-resolve-pr-feedback`, `ce-commit`, `ce-commit-push-pr`,
@@ -85,12 +97,38 @@ Not included yet:
 - clean CE replacement proof
 - R31 release validation
 
+## Standalone Packaging Boundary
+
+This alpha can be installed and tested as a standalone TraceWeaver package
+without the external Compound Engineering plugin. The accepted standalone proof
+covers:
+
+- fresh CE-absent Codex install/discovery;
+- TW-only direct-callable user skill surface;
+- selected CE-derived skills packaged as internal implementation components;
+- unowned direct `ce-*` callable conflict rejection before install writes;
+- active-host filesystem/hash currentness for the reviewed surface;
+- runtime-disabled separate-home smoke and model-default policy checks.
+
+This does not approve package-ready, release-ready, upstream-ready, clean
+replacement, unconstrained-host, or full runtime-driver claims. The opt-in
+runtime harness currently proves prompt-registry visibility, installed skill
+identity, controlled fixture outcomes, unresolved-mapping evidence, and
+no-publication boundaries. It still holds the stronger claim that loaded
+`tw-auto` itself drove every runtime handoff decision.
+
+Before any public package/release claim, rerun the standalone install smokes,
+review the staged package surface, complete or explicitly hold R31/Vestro
+dogfood evidence, and keep full runtime-driver invocation held unless a later
+reviewed proof binds runtime handoff decisions to the loaded `tw-auto` skill
+identity.
+
 ## Skill Entry Points
 
 - `tw-requirements-review` checks whether candidate
   requirements are good enough to become implementation authority.
 - `tw-grill` optionally stress-tests one selected idea after ideation and before
-  `ce-brainstorm`; it produces source evidence only, not approved authority.
+  `tw-brainstorm`; it produces source evidence only, not approved authority.
   `ce:ideate` is optional external CE context in this alpha, not a packaged
   TraceWeaver skill.
 - `tw-authority-gate` checks whether planned work has approved
@@ -100,6 +138,21 @@ Not included yet:
 - `tw-auto` runs the advisory controlled-autonomy loop: CE-compatible
   plan/work/review sequencing plus TraceWeaver authority, traceability,
   verification, matrix-update, and next-step controls.
+- `tw-plan` wraps the packaged `ce-plan` planning engine with TraceWeaver
+  authority, requirements-quality, traceability, and no-publication controls.
+- `tw-brainstorm` wraps packaged `ce-brainstorm` so vague ideas and requirement
+  source material enter TraceWeaver as source evidence before
+  `tw-requirements-review`.
+- `tw-compound` and `tw-compound-refresh` wrap packaged CE learning capture and
+  refresh workflows as source evidence, not authority rewrites.
+- `tw-sessions` wraps packaged `ce-sessions`; packaged `ce-session-inventory`
+  and `ce-session-extract` remain hidden/internal helpers under that route, not
+  direct-callable `tw-*` surfaces.
+- `tw-test-browser` and `tw-test-xcode` wrap packaged verification engines and
+  require requirement/trace/verification context for gate-closing evidence.
+- `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree` wrap local repair,
+  setup, and worktree workflows while remote mutation and publication stay
+  routed through controlled TraceWeaver gates.
 - `lfg` is packaged as a compatibility alias for `tw-auto`, not as raw CE
   autopilot.
 
@@ -111,9 +164,11 @@ proves they install.
 push, or PR creation in this alpha and report the next review, evidence, or
 human authority step.
 
-The selected CE-compatible skills are installed as skill directories. They are
-packaged for static alpha continuity testing only; runtime-equivalent CE
-replacement and agent-backed behavior remain held until U9 or later runtime
+The selected CE-compatible skills are packaged under TraceWeaver's internal
+plugin skill store for wrapper delegation. They are not installed as the normal
+user-facing direct-callable surface in standalone Codex installs. Users should
+enter through the `tw-*` wrappers or the approved `lfg` alias. Runtime-equivalent
+CE replacement and agent-backed behavior remain held until U9 or later runtime
 proof.
 
 ## CE Static Continuity Rule
@@ -123,6 +178,13 @@ Engineering workflow surface. Selected `ce-*` skills are packaged as
 CE-compatible implementation components, while TraceWeaver entrypoints provide
 the authority, traceability, verification, validation, and next-step control
 layer.
+
+The standalone package does not require the external Compound Engineering
+plugin to be installed. The selected CE-derived skills in this package are
+TraceWeaver-owned implementation components and are installed from
+`plugins/traceweaver-core/skills/` into TraceWeaver's packaged internal skill
+store. Standalone Codex installs expose only TraceWeaver wrappers and approved
+TraceWeaver aliases as direct-callable user skills.
 
 The product goal is to repackage the CE method with TraceWeaver authority, not
 to ask users to manually juggle unrelated CE and TraceWeaver skills. The simple
@@ -141,17 +203,17 @@ change, exception, accepted risk, or clarification.
 The controlled alpha path is:
 
 ```text
-ce-brainstorm
+tw-brainstorm
 -> tw-requirements-review
 -> authority-baseline record
--> ce-plan
+-> tw-plan
 -> tw-authority-gate
--> ce-work
+-> tw-work
 -> tw-traceability-check
--> ce-code-review / ce-doc-review
+-> tw-code-review / tw-doc-review
 -> verification evidence record
 -> validation evidence record
--> ce-compound
+-> tw-compound
 ```
 
 `authority-baseline`, `verification`, and `validation` are record outputs in
@@ -159,10 +221,18 @@ this alpha, not installed `tw-*` skills or slash commands. A later unit may add
 dedicated skills for those steps, but they must be separately materialized and
 proven before the README can advertise them as callable entry points.
 
-Direct `ce-*` invocation remains legacy/manual-continuity only. It can be useful
-for static continuity testing or scoped manual work, but it does not by itself
-close TraceWeaver authority, traceability, verification, or validation gates.
-Automatic wrappers for every selected `ce-*` entrypoint remain future work.
+Direct `ce-*` invocation is not a standalone TraceWeaver user workflow. Selected
+`ce-*` skills remain packaged as internal implementation engines for wrapper
+delegation, static continuity testing, and reviewed upstream-drift comparison,
+but they do not by themselves close TraceWeaver authority, traceability,
+verification, or validation gates. TraceWeaver wrappers are provided for the
+selected packaged CE continuity entrypoints users are expected to call directly:
+`tw-brainstorm`, `tw-plan`, `tw-work`, `tw-debug`, `tw-code-review`,
+`tw-doc-review`, `tw-commit`, `tw-commit-push-pr`, `tw-compound`,
+`tw-compound-refresh`, `tw-sessions`, `tw-test-browser`, `tw-test-xcode`,
+`tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree`. Packaged
+`ce-session-inventory` and `ce-session-extract` stay hidden/internal under
+`tw-sessions`.
 Runtime-equivalent CE replacement, agent-backed behavior, slash commands, and
 enforcing mode remain held until U9 or a later accepted runtime proof.
 
@@ -179,7 +249,7 @@ intent-first path:
 idea
 -> ideation source
 -> tw-grill
--> ce-brainstorm
+-> tw-brainstorm
 -> tw-requirements-review
 -> accepted requirements baseline
 -> tw-auto

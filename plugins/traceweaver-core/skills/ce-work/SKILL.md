@@ -4,23 +4,30 @@ description: Execute work efficiently while maintaining quality and finishing fe
 argument-hint: "[Plan doc path or description of work. Blank to auto use latest plan doc]"
 ---
 
-<!-- TRACEWEAVER: file-role=packaged-skills-ce-work-skill; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
+<!-- TRACEWEAVER: file-role=manual-continuity-worker-skill; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044 -->
+
 # Work Execution Command
+
+Execute work efficiently while maintaining quality and finishing features.
 
 ## TraceWeaver Package Boundary
 
 When this `ce-work` skill is installed by the TraceWeaver plugin, direct
 invocation is a legacy/manual-continuity surface and must still run in
-TraceWeaver no-publication mode for the current alpha. It is not, by itself, a
-TraceWeaver-authority-enforced workflow, and it cannot close TraceWeaver
-authority, traceability, verification, validation, commit, push, or PR gates.
+TraceWeaver publication-gated mode for the current alpha. It is not, by itself,
+a TraceWeaver-authority-enforced workflow, and it cannot close TraceWeaver
+authority, traceability, verification, validation, commit, push, or PR gates
+without the controlled TraceWeaver publication route passing.
 
-For TraceWeaver-controlled implementation, use `tw-auto` or explicitly run the
-TraceWeaver sequence first:
+For TraceWeaver-controlled implementation, use `tw-auto`, which routes the
+implementation phase through `tw-work`. Direct `ce-work` is only the underlying
+compatibility worker and should not be the user-facing TraceWeaver work-loop
+surface. If manually composing the sequence, run:
 
 ```text
 tw-authority-gate
--> ce-work
+-> tw-work
+-> ce-work no-publication implementation engine
 -> tw-traceability-check
 -> ce-code-review / ce-doc-review
 ```
@@ -33,15 +40,17 @@ exception, accepted-risk candidate, or clarification record. Do not treat a plan
 bare prompt, task ID, or agent interpretation as authority by itself.
 
 If the user explicitly asks for legacy/manual CE work anyway, proceed only in
-no-publication mode. State in the output that the work does not close
+publication-gated mode. State in the output that the work does not close
 TraceWeaver authority, traceability, verification, validation, commit, push, or
 PR gates until `tw-authority-gate`, matrix updates, `tw-traceability-check`, and
-a future approved publication gate run.
+the controlled TraceWeaver publication route pass.
 
-### TraceWeaver Controlled No-Publication Mode
+### TraceWeaver Controlled Publication-Gated Mode
 
-When this skill is installed by TraceWeaver, enter no-publication mode before
-Phase 0 for every invocation:
+When this skill is installed by TraceWeaver, enter publication-gated mode before
+Phase 0 for every invocation. The implementation phase remains non-publishing;
+publication can only happen later through the controlled TraceWeaver publication
+route:
 
 - keep the authority capsule, approved requirements/exceptions, validation
   question, verification target, and matrix-update requirement visible while
@@ -50,18 +59,20 @@ Phase 0 for every invocation:
 - update trace evidence or report the exact trace gap before claiming completion;
 - do not stage files, create commits, push, open PRs, create issues, update plan
   status to `completed`, or load `ce-commit`, `ce-commit-push-pr`, or Phase 4
-  shipping instructions;
-- do not allow subagents to stage, commit, push, or publish, even in isolated
-  worktrees;
+  shipping instructions unless the controlled TraceWeaver publication route
+  authorizes that specific target after authority, traceability, verification,
+  review, staged-tree, credential, and remote-boundary checks pass;
+- do not allow subagents to stage, commit, push, or publish during
+  implementation, even in isolated worktrees;
 - after implementation, tests, trace updates, and review handoff are complete,
-  return control to `tw-auto` with changed files, verification evidence, matrix
-  status, open gaps, held claims, and the next required review or human decision.
+  return control to `tw-work` or `tw-auto` with changed files, verification
+  evidence, matrix status, open gaps, held claims, and the next required review
+  or human decision.
 
 If any later instruction in this skill or its references conflicts with
-TraceWeaver no-publication mode, the TraceWeaver boundary wins and the
-publication step is skipped.
-
-Execute work efficiently while maintaining quality and finishing features.
+TraceWeaver publication-gated mode, the TraceWeaver boundary wins and the
+publication step is skipped unless the controlled publication route has already
+authorized it.
 
 ## Introduction
 
@@ -112,7 +123,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
    - If anything is unclear or ambiguous, ask clarifying questions now
    - If clarifying questions were needed above, get user approval on the resolved answers. If no clarifications were needed, proceed without a separate approval step — plan scope is the plan's authority, not something to renegotiate
    - **Do not skip this** - better to ask questions now than build the wrong thing
-   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker. The only plan mutation during ordinary CE work is the final `status: active → completed` flip at shipping (see `references/shipping-workflow.md` Phase 4 Step 2). In TraceWeaver no-publication mode, do not perform that status flip; report the proposed status update back to `tw-auto` instead. Legacy plans may contain `- [ ]` / `- [x]` marks on unit headings — ignore them as state; per-unit completion is determined during execution by reading the current file state.
+   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker. The only plan mutation during ordinary CE work is the final `status: active → completed` flip at shipping (see `references/shipping-workflow.md` Phase 4 Step 2). In TraceWeaver publication-gated mode, do not perform that status flip during implementation; report the proposed status update back to `tw-auto` or the publication gate instead. Legacy plans may contain `- [ ]` / `- [x]` marks on unit headings — ignore them as state; per-unit completion is determined during execution by reading the current file state.
 
 2. **Setup Environment**
 
@@ -212,8 +223,8 @@ Determine how to proceed based on what was provided in `<input_document>`.
    **Shared-directory fallback constraints** — apply only when worktree isolation is unavailable:
    - Instruct each subagent: "Do not stage files (`git add`), create commits, or run the project test suite. The orchestrator handles testing, staging, and committing after all parallel units complete."
    - These constraints prevent git index contention and test interference between concurrent subagents.
-   - With worktree isolation active, omit these constraints — subagents may stage, commit, and run their unit's tests within their own worktree branch unless TraceWeaver no-publication mode is active.
-   - In TraceWeaver no-publication mode, subagents must not stage, commit, push, publish, create issues, or open PRs in any isolation mode.
+   - With worktree isolation active, omit these constraints — subagents may stage, commit, and run their unit's tests within their own worktree branch unless TraceWeaver publication-gated mode is active.
+   - In TraceWeaver publication-gated mode, subagents must not stage, commit, push, publish, create issues, or open PRs in any isolation mode unless the controlled TraceWeaver publication route explicitly authorizes that target.
 
    **Permission mode:** Omit the `mode` parameter when dispatching subagents so the user's configured permission settings apply. Do not pass `mode: "auto"` — it overrides user-level settings like `bypassPermissions`.
 
@@ -225,7 +236,8 @@ Determine how to proceed based on what was provided in `<input_document>`.
    5. Dispatch the next unit
 
    **After all parallel subagents in a batch complete (worktree-isolated mode):**
-   - In TraceWeaver no-publication mode, do not use this merge/commit flow.
+   - In TraceWeaver publication-gated mode, do not use this merge/commit flow
+     during implementation.
      Instead, wait for every subagent, collect each worktree diff, changed-file
      list, verification result, trace/matrix status, and open gap, then return
      that evidence to `tw-auto` or the TraceWeaver controller. Do not stage,
@@ -243,7 +255,8 @@ Determine how to proceed based on what was provided in `<input_document>`.
    7. Dispatch the next batch of independent units, or the next dependent unit.
 
    **After all parallel subagents in a batch complete (shared-directory fallback):**
-   - In TraceWeaver no-publication mode, do not use this staging/commit flow.
+   - In TraceWeaver publication-gated mode, do not use this staging/commit flow
+     during implementation.
      Instead, wait for every subagent, cross-check file collisions, collect the
      combined diff, changed-file list, verification results, trace/matrix status,
      and open gaps, then return that evidence to `tw-auto` or the TraceWeaver
@@ -314,7 +327,8 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
 2. **Incremental Commits**
 
-   In TraceWeaver no-publication mode, skip this section entirely. Record the
+   In TraceWeaver publication-gated mode, skip this section during
+   implementation. Record the
    completed logical unit, changed files, verification evidence, trace update,
    and next review/human decision for `tw-auto`; do not stage or commit.
 
@@ -348,7 +362,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
    **Note:** Incremental commits use clean conventional messages without attribution footers. The final Phase 4 commit/PR includes the full attribution.
 
-   **Parallel subagent mode:** In ordinary CE work, commit ownership is split by isolation mode (see Phase 1 Step 4):
+   **Parallel subagent mode:** Commit ownership is split by isolation mode (see Phase 1 Step 4):
    - **Worktree-isolated:** subagents may stage and commit inside their own worktree branch; the orchestrator merges those branches in dependency order after the batch.
    - **Shared-directory fallback:** subagents do not commit; the orchestrator stages and commits each unit after the entire parallel batch completes.
 
@@ -398,10 +412,13 @@ When all Phase 2 tasks are complete and execution transitions to quality check
 in ordinary CE work, you must read `references/shipping-workflow.md` for the
 full shipping workflow. Do not skip this.
 
-In TraceWeaver no-publication mode, do not read or execute
-`references/shipping-workflow.md`. Instead run the relevant verification and
-review handoff, update or report required trace evidence, and return control to
-`tw-auto` with the stop reason and suggested next step.
+In TraceWeaver publication-gated mode, do not read or execute
+`references/shipping-workflow.md` during implementation. Instead run the
+relevant verification and review handoff, update or report required trace
+evidence, and return control to `tw-auto` with the stop reason and suggested
+next step. The controlled TraceWeaver publication route may load the relevant
+publication wrapper after authority, traceability, verification, review,
+staged-tree, credential, remote-boundary, and target-confirmation checks pass.
 
 ## Key Principles
 

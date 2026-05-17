@@ -1,0 +1,294 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/structured-traceability-findings"
+
+sha256_file() {
+  shasum -a 256 "$1" | awk '{print $1}'
+}
+
+authority_fingerprint() {
+  local file
+  local fingerprint=""
+  local authority_files=(
+    "requirements.md"
+    "traceability-matrix.md"
+    ".traceweaver/intent-contract.yml"
+    "docs/validation/traceweaver-controlled-autonomy-alpha.md"
+    "docs/validation/traceweaver-skill-behavior-audit.md"
+    "docs/plans/2026-05-05-003-feat-structured-traceability-findings-plan.md"
+  )
+
+  for file in "${authority_files[@]}"; do
+    require_file "$ROOT_DIR/$file"
+    fingerprint+="$file=$(sha256_file "$ROOT_DIR/$file");"
+  done
+
+  printf '%s' "$fingerprint"
+}
+
+line_for() {
+  local pattern="$1"
+  local path="$2"
+  grep -n "$pattern" "$path" | head -n 1 | cut -d: -f1
+}
+
+require_file() {
+  local path="$1"
+  if [[ ! -f "$path" ]]; then
+    echo "structured_findings_missing_required_file=$path" >&2
+    exit 1
+  fi
+}
+
+tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-structured-findings.XXXXXX")"
+findings_tsv="$tmp_dir/findings.tsv"
+findings_jsonl="$tmp_dir/structured-findings.jsonl"
+findings_md="$tmp_dir/structured-findings.md"
+: >"$findings_tsv"
+
+emit_finding() {
+  local id="$1"
+  local severity="$2"
+  local status="$3"
+  local title="$4"
+  local evidence="$5"
+  local affected_ids="$6"
+  local file="${7:-}"
+  local start="${8:-}"
+  local end="${9:-}"
+  local claim_impact="${10}"
+  local remediation="${11}"
+
+  printf '%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
+    "$id" "$severity" "$status" "$title" "$evidence" "$affected_ids" \
+    "$file" "$start" "$end" "$claim_impact" "$remediation" >>"$findings_tsv"
+}
+
+count_findings() {
+  local pattern="$1"
+  grep -c "$pattern" "$findings_tsv" || true
+}
+
+repo_before="$(authority_fingerprint)"
+
+complete_dir="$FIXTURE_ROOT/complete-trace"
+require_file "$complete_dir/requirements.md"
+require_file "$complete_dir/traceability-matrix.md"
+require_file "$complete_dir/.traceweaver/intent-contract.yml"
+complete_req_row="| REQ-STF-COMPLETE | The fixture behavior must have a complete trace chain. | VER-STF-COMPLETE | Does structured traceability pass when authority, verification, and validation exist? | approved |"
+complete_matrix_row="| TRACE-STF-COMPLETE | REQ-STF-COMPLETE | ART-STF-COMPLETE | VER-STF-COMPLETE | Does structured traceability pass when authority, verification, and validation exist? | pass |"
+if grep -Fxq "$complete_req_row" "$complete_dir/requirements.md" \
+  && grep -Fxq "$complete_matrix_row" "$complete_dir/traceability-matrix.md" \
+  && grep -q "^baseline_hash_sha256: fixture_complete_trace$" "$complete_dir/.traceweaver/intent-contract.yml" \
+  && grep -q "^matrix_hash_sha256: fixture_complete_trace$" "$complete_dir/.traceweaver/intent-contract.yml"; then
+  echo "structured_findings_complete_trace=pass"
+else
+  echo "structured_findings_complete_trace=failed_missing_complete_chain" >&2
+  exit 1
+fi
+
+missing_dir="$FIXTURE_ROOT/missing-authority"
+if [[ -e "$missing_dir/requirements.md" || -e "$missing_dir/traceability-matrix.md" || -e "$missing_dir/.traceweaver/intent-contract.yml" ]]; then
+  echo "structured_findings_missing_authority_fixture_unexpected_authority=present" >&2
+  exit 1
+fi
+emit_finding \
+  "STF-MISSING-AUTHORITY-001" "P1" "blocked" \
+  "Missing TraceWeaver authority files" \
+  "requirements.md, traceability-matrix.md, and .traceweaver/intent-contract.yml are absent from the fixture." \
+  "REQ-TW-005,REQ-TW-008,REQ-TW-055" "" "" "" \
+  "implementation_authority_blocked" \
+  "Create or select approved authority files before treating the work as traceable."
+echo "structured_findings_missing_authority=blocked finding=STF-MISSING-AUTHORITY-001"
+
+stale_dir="$FIXTURE_ROOT/stale-hash"
+require_file "$stale_dir/traceability-matrix.md"
+require_file "$stale_dir/.traceweaver/intent-contract.yml"
+declared_matrix_hash="$(awk -F': ' '/matrix_hash_sha256:/ {print $2}' "$stale_dir/.traceweaver/intent-contract.yml")"
+actual_matrix_hash="$(sha256_file "$stale_dir/traceability-matrix.md")"
+if [[ "$declared_matrix_hash" == "$actual_matrix_hash" ]]; then
+  echo "structured_findings_stale_hash_fixture_unexpected_hash_match=$actual_matrix_hash" >&2
+  exit 1
+fi
+emit_finding \
+  "STF-STALE-HASH-001" "P1" "blocked" \
+  "Intent Contract cites stale matrix hash" \
+  "Declared matrix hash does not match fixture traceability-matrix.md." \
+  "REQ-STF-STALE,TRACE-STF-STALE,REQ-TW-055" \
+  "fixtures/structured-traceability-findings/stale-hash/.traceweaver/intent-contract.yml" \
+  "2" "2" "authority_snapshot_blocked" \
+  "Refresh the matrix hash or mark the evidence stale before accepting the trace."
+echo "structured_findings_stale_hash=blocked finding=STF-STALE-HASH-001"
+
+missing_row_dir="$FIXTURE_ROOT/missing-matrix-row"
+missing_row_req="$missing_row_dir/requirements.md"
+missing_row_matrix="$missing_row_dir/traceability-matrix.md"
+require_file "$missing_row_req"
+require_file "$missing_row_matrix"
+if grep -q "REQ-STF-MISSING-ROW" "$missing_row_matrix"; then
+  echo "structured_findings_missing_matrix_row_fixture_unexpected_trace=present" >&2
+  exit 1
+fi
+missing_row_line="$(line_for "REQ-STF-MISSING-ROW" "$missing_row_req")"
+emit_finding \
+  "STF-MISSING-MATRIX-ROW-001" "P1" "blocked" \
+  "Requirement has no matrix trace row" \
+  "REQ-STF-MISSING-ROW appears in requirements.md but has no traceability-matrix.md row." \
+  "REQ-STF-MISSING-ROW,REQ-TW-008,REQ-TW-055" \
+  "fixtures/structured-traceability-findings/missing-matrix-row/requirements.md" \
+  "$missing_row_line" "$missing_row_line" "traceability_pass_blocked" \
+  "Add a matrix row linking the requirement to artifact, verification, and validation evidence."
+echo "structured_findings_missing_matrix_row=blocked finding=STF-MISSING-MATRIX-ROW-001"
+
+missing_ver_matrix="$FIXTURE_ROOT/missing-verification/traceability-matrix.md"
+require_file "$missing_ver_matrix"
+missing_ver_line="$(line_for "MISSING_VERIFICATION" "$missing_ver_matrix")"
+emit_finding \
+  "STF-MISSING-VERIFICATION-001" "P1" "blocked" \
+  "Trace row lacks verification evidence" \
+  "TRACE-STF-MISSING-VER uses MISSING_VERIFICATION instead of a verification evidence id." \
+  "REQ-STF-MISSING-VER,TRACE-STF-MISSING-VER,REQ-TW-055" \
+  "fixtures/structured-traceability-findings/missing-verification/traceability-matrix.md" \
+  "$missing_ver_line" "$missing_ver_line" "engineering_complete_blocked" \
+  "Record verification evidence or an approved verification gap before accepting the trace."
+echo "structured_findings_missing_verification=blocked finding=STF-MISSING-VERIFICATION-001"
+
+missing_val_matrix="$FIXTURE_ROOT/missing-validation/traceability-matrix.md"
+require_file "$missing_val_matrix"
+missing_val_line="$(line_for "MISSING_VALIDATION" "$missing_val_matrix")"
+emit_finding \
+  "STF-MISSING-VALIDATION-001" "P1" "blocked" \
+  "Trace row lacks validation question" \
+  "TRACE-STF-MISSING-VAL uses MISSING_VALIDATION instead of a validation question." \
+  "REQ-STF-MISSING-VAL,TRACE-STF-MISSING-VAL,REQ-TW-055" \
+  "fixtures/structured-traceability-findings/missing-validation/traceability-matrix.md" \
+  "$missing_val_line" "$missing_val_line" "validation_claim_blocked" \
+  "Add a validation question/path or record an approved validation gap."
+echo "structured_findings_missing_validation=blocked finding=STF-MISSING-VALIDATION-001"
+
+release_claim="$FIXTURE_ROOT/unsupported-release/release-claim.md"
+require_file "$release_claim"
+release_line="$(line_for "release_ready_claim: true" "$release_claim")"
+emit_finding \
+  "STF-UNSUPPORTED-RELEASE-001" "P1" "blocked" \
+  "Release-ready claim lacks evidence" \
+  "release_ready_claim is true while verification and validation are missing." \
+  "REQ-STF-RELEASE,REQ-TW-022,REQ-TW-055" \
+  "fixtures/structured-traceability-findings/unsupported-release/release-claim.md" \
+  "$release_line" "$release_line" "release_ready_blocked" \
+  "Remove the release-ready claim or add reviewed verification and validation evidence."
+echo "structured_findings_unsupported_release=blocked finding=STF-UNSUPPORTED-RELEASE-001"
+
+missing_anchor_file="$FIXTURE_ROOT/missing-anchor/src/feature.sh"
+require_file "$missing_anchor_file"
+if grep -q "REQ-STF-" "$missing_anchor_file"; then
+  echo "structured_findings_missing_anchor_fixture_unexpected_anchor=present" >&2
+  exit 1
+fi
+emit_finding \
+  "STF-MISSING-ANCHOR-001" "P2" "held" \
+  "Behavior-bearing file lacks trace anchor" \
+  "feature.sh contains behavior but no REQ-STF anchor." \
+  "REQ-TW-054,REQ-TW-055" \
+  "fixtures/structured-traceability-findings/missing-anchor/src/feature.sh" \
+  "4" "4" "code_anchor_enforcement_held" \
+  "Add a file-level requirement anchor or record an approved exception."
+echo "structured_findings_missing_anchor=held finding=STF-MISSING-ANCHOR-001"
+
+dead_tdd_file="$FIXTURE_ROOT/dead-tdd/tests/test_removed_requirement.sh"
+require_file "$dead_tdd_file"
+dead_tdd_line="$(line_for "REQ-STF-REMOVED" "$dead_tdd_file")"
+emit_finding \
+  "STF-DEAD-TDD-001" "P2" "held" \
+  "Test references missing requirement" \
+  "test_removed_requirement.sh references REQ-STF-REMOVED, which is absent from fixture authority." \
+  "REQ-STF-REMOVED,VER-STF-REMOVED,REQ-TW-054,REQ-TW-055" \
+  "fixtures/structured-traceability-findings/dead-tdd/tests/test_removed_requirement.sh" \
+  "$dead_tdd_line" "$dead_tdd_line" "dead_tdd_classification_held" \
+  "Restore the requirement, update the test anchor, or classify the test as removal/debt."
+echo "structured_findings_dead_tdd=held finding=STF-DEAD-TDD-001"
+
+ruby -e '
+  require "json"
+  path = ARGV.fetch(0)
+  File.foreach(path) do |line|
+    id, severity, status, title, evidence, affected_ids, file, start_line, end_line, claim_impact, remediation = line.chomp.split("\t", -1)
+    finding = {
+      id: id,
+      severity: severity,
+      status: status,
+      title: title,
+      evidence: evidence,
+      affected_ids: affected_ids.split(","),
+      claim_impact: claim_impact,
+      remediation: remediation
+    }
+    unless file.nil? || file.empty?
+      finding[:file] = file
+      finding[:start] = start_line.to_i unless start_line.nil? || start_line.empty?
+      finding[:end] = end_line.to_i unless end_line.nil? || end_line.empty?
+    end
+    puts JSON.generate(finding)
+  end
+' "$findings_tsv" >"$findings_jsonl"
+
+{
+  echo "# Structured Traceability Findings Smoke"
+  echo
+  while IFS=$'\t' read -r id severity status title evidence affected_ids file start end claim_impact remediation; do
+    echo "## $id"
+    echo
+    echo "- severity: $severity"
+    echo "- status: $status"
+    echo "- title: $title"
+    echo "- evidence: $evidence"
+    echo "- affected_ids: $affected_ids"
+    if [[ -n "$file" ]]; then
+      echo "- file: $file"
+      echo "- line: $start"
+    fi
+    echo "- claim_impact: $claim_impact"
+    echo "- remediation: $remediation"
+    echo
+  done <"$findings_tsv"
+} >"$findings_md"
+
+required_findings=(
+  "STF-MISSING-AUTHORITY-001"
+  "STF-STALE-HASH-001"
+  "STF-MISSING-MATRIX-ROW-001"
+  "STF-MISSING-VERIFICATION-001"
+  "STF-MISSING-VALIDATION-001"
+  "STF-UNSUPPORTED-RELEASE-001"
+  "STF-MISSING-ANCHOR-001"
+  "STF-DEAD-TDD-001"
+)
+
+for finding_id in "${required_findings[@]}"; do
+  if [[ "$(count_findings "^$finding_id"$'\t')" -ne 1 ]]; then
+    echo "structured_findings_missing_expected_finding=$finding_id" >&2
+    exit 1
+  fi
+done
+
+if grep -q $'\tP1\tpass\t' "$findings_tsv"; then
+  echo "structured_findings_unexpected_p1_pass=true" >&2
+  exit 1
+fi
+
+repo_after="$(authority_fingerprint)"
+if [[ "$repo_before" != "$repo_after" ]]; then
+  echo "structured_findings_real_authority_changed=before:$repo_before after:$repo_after" >&2
+  exit 1
+fi
+
+echo "structured_findings_jsonl=$findings_jsonl"
+echo "structured_findings_markdown=$findings_md"
+echo "structured_findings_artifact_dir=$tmp_dir"
+echo "structured_findings_total=$(wc -l < "$findings_tsv" | tr -d ' ')"
+echo "structured_findings_p1_blockers=$(grep -c $'\tP1\tblocked\t' "$findings_tsv" || true)"
+echo "structured_findings_p2_held=$(grep -c $'\tP2\theld\t' "$findings_tsv" || true)"
+echo "structured_findings_real_repo_unchanged=pass"
+echo "structured_findings_smoke=pass"

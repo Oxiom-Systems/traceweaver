@@ -1,0 +1,9 @@
+# TRACEWEAVER: file-role=review-staging-fixture; req=REQ-TW-056; trace=TRACE-TW-042; ver=VER-TW-054
+# TRACEWEAVER: verifies=VER-TW-054; req=REQ-TW-056; trace=TRACE-TW-042
+skill=tw-auto
+case=review-staging-real-blocker-stop
+blocking_conditions=unclear_requirements,contradictory_authority,runtime_publication_overclaim,unsafe_code,failed_verification,unresolved_traceability
+tw_auto_behavior=stop_without_review_staging
+requirements_mutation=false
+publication_allowed=false
+runtime_claim=false

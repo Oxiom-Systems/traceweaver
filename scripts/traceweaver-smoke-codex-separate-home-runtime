@@ -1,10 +1,17 @@
 #!/usr/bin/env bash
+# TRACEWEAVER: file-role=separate-home-runtime-smoke; verifies=VER-TW-025; req=REQ-TW-016; trace=TRACE-TW-016; ver=VER-TW-025
+# TRACEWEAVER: file-role=model-default-separate-home-runtime-smoke; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055
+# TRACEWEAVER: verifies=VER-TW-055; req=REQ-TW-060; trace=TRACE-TW-043
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_home="$(mktemp -d /tmp/traceweaver-u9-separate-home.XXXXXX)"
 codex_home="$tmp_home/.codex"
-model="${TRACEWEAVER_CODEX_MODEL:-gpt-5.2}"
+expected_codex_model="gpt-5.5"
+expected_codex_reasoning_effort="medium"
+expected_claude_model="sonnet"
+model="${TRACEWEAVER_CODEX_MODEL:-gpt-5.5}"
+reasoning_effort="${TRACEWEAVER_CODEX_REASONING_EFFORT:-medium}"
 exec_timeout_seconds="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-120}"
 auth_mode="${TRACEWEAVER_CODEX_AUTH_MODE:-none}"
 auth_copy="$codex_home/auth.json"
@@ -48,12 +55,25 @@ required_visible_skills=(
   tw-authority-gate
   tw-traceability-check
   tw-requirements-review
+  tw-code-review
+  tw-doc-review
   tw-grill
-  ce-plan
-  ce-work
-  ce-code-review
-  ce-doc-review
 )
+
+json_query() {
+  python3 - "$1" "$2" <<'PY'
+import json
+import sys
+
+path = sys.argv[1]
+query = sys.argv[2].split(".")
+with open(path, "r", encoding="utf-8") as handle:
+    value = json.load(handle)
+for part in query:
+    value = value[part]
+print(value)
+PY
+}
 
 cat >"$prompt" <<'EOF'
 Use the tw-authority-gate skill. You may run read-only shell commands only to
@@ -76,9 +96,10 @@ bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" 
   --include-skills \
   --codexHome "$tmp_home" >"$install_log"
 
+manifest="$codex_home/traceweaver-core/install-manifest.json"
 expected_skill_hash="$(shasum -a 256 "$codex_home/skills/tw-authority-gate/SKILL.md" | awk '{print $1}')"
 HOME="$tmp_home" CODEX_HOME="$codex_home" codex debug prompt-input \
-  "Use the tw-authority-gate skill." >"$prompt_input"
+  "Use TraceWeaver required direct skills: tw-authority-gate tw-auto lfg tw-traceability-check tw-requirements-review tw-code-review tw-doc-review tw-grill." >"$prompt_input"
 jq -r '.. | strings' "$prompt_input" | perl -ne 'print "$1\n" if /^- ([A-Za-z0-9_.:-]+): /' >"$visible_skills"
 
 missing_visible_skills=()
@@ -92,6 +113,7 @@ set +e
 HOME="$tmp_home" CODEX_HOME="$codex_home" perl -e 'alarm shift; exec @ARGV' "$exec_timeout_seconds" codex exec \
   --ignore-user-config \
   -m "$model" \
+  -c "model_reasoning_effort=\"$reasoning_effort\"" \
   --sandbox read-only \
   --skip-git-repo-check \
   --ignore-rules \
@@ -116,6 +138,23 @@ echo "separate_home_visible_skills=$visible_skills"
 echo "separate_home_install_result=pass"
 echo "separate_home_runtime_home_isolated=true"
 echo "fresh_codex_auth_mode=$auth_mode"
+echo "fresh_codex_runtime_model=$model"
+echo "fresh_codex_runtime_reasoning_effort=$reasoning_effort"
+echo "fresh_codex_model_default_policy_codex_model=$(json_query "$manifest" modelDefaults.codex.model)"
+echo "fresh_codex_model_default_policy_codex_reasoning_effort=$(json_query "$manifest" modelDefaults.codex.reasoningEffort)"
+echo "fresh_codex_model_default_policy_claude_model=$(json_query "$manifest" modelDefaults.claude.model)"
+if [ "$(json_query "$manifest" modelDefaults.codex.model)" = "$expected_codex_model" ] \
+  && [ "$(json_query "$manifest" modelDefaults.codex.reasoningEffort)" = "$expected_codex_reasoning_effort" ] \
+  && [ "$(json_query "$manifest" modelDefaults.claude.model)" = "$expected_claude_model" ]; then
+  echo "fresh_codex_model_default_manifest=pass"
+else
+  echo "fresh_codex_model_default_manifest=held_mismatch"
+fi
+if [ "$model" = "$expected_codex_model" ] && [ "$reasoning_effort" = "$expected_codex_reasoning_effort" ]; then
+  echo "fresh_codex_runtime_model_default_match=pass_default_runtime_args"
+else
+  echo "fresh_codex_runtime_model_default_match=pass_explicit_override_runtime_args"
+fi
 if [ "$auth_copy_used" = true ]; then
   echo "fresh_codex_auth_boundary=held_live_auth_copy_available_to_read_only_exec_until_tokenless_probe_exists"
 elif [ "$auth_copy_requested" = true ]; then
@@ -132,6 +171,12 @@ echo "fresh_codex_invocation_target=tw-authority-gate"
 echo "fresh_codex_expected_skill_hash=$expected_skill_hash"
 echo "fresh_codex_exec_exit_code=$exec_status"
 echo "fresh_codex_tw_authority_gate_visible=$(grep -qx 'tw-authority-gate' "$visible_skills" && echo true || echo false)"
+if find "$codex_home/skills" -maxdepth 1 -mindepth 1 -type d -name 'ce-*' -print -quit | grep -q .; then
+  echo "fresh_codex_ce_derived_direct_callable_surface=failed"
+  exit 1
+else
+  echo "fresh_codex_ce_derived_direct_callable_surface=absent"
+fi
 if [ "${#missing_visible_skills[@]}" -eq 0 ]; then
   echo "fresh_codex_required_skills_visible=true"
 else
