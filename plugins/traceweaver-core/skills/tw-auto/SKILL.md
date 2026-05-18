@@ -291,6 +291,15 @@ must:
 6. Record a clean scoped doc review once when it passes, then stop clean or
    continue to the next already-approved gate.
 
+For a `tw-auto`-owned run, those review steps are internal continuation steps,
+not user handoffs. If authority remains clear and the next required action is
+`tw-traceability-check`, `tw-code-review`, or scoped `tw-doc-review`, `tw-auto`
+must run or require that wrapper as part of the current loop and must not end
+with only "run /tw-code-review" or "run /tw-doc-review" as the user-facing next
+step. Returning a manual lower-review next step after successful `tw-work`, or
+after a clean code review when scoped document review is already required, is a
+post-work closure regression unless one of the stop conditions below applies.
+
 The explicit stop override is narrow. If the user says "run only through
 tw-work", "stop after implementation", "do not review", or equivalent,
 `tw-auto` stops after `tw-work`, reports review as held, and must not claim
@@ -381,6 +390,14 @@ to the next approved wrapper step instead of stopping with that command as a
 manual instruction. When `tw-work` completes, `tw-auto` continues to
 `tw-traceability-check`, `tw-code-review`, and scoped `tw-doc-review` when the
 changed files require those reviews.
+
+In `tw-auto` output, a lower review wrapper may be named as executed,
+internally required, held, or blocked, but not as the sole next manual command
+when the loop itself can still continue. If the loop cannot continue, the output
+must name the concrete blocker: unclear or changed authority, unresolved P0/P1
+traceability or review findings, failed verification, missing wrapper
+availability, reviewer-capacity backpressure, explicit stop-after-work, or a
+publication/remote-mutation boundary.
 
 Normal next commands must be the highest-level executable wrapper:
 

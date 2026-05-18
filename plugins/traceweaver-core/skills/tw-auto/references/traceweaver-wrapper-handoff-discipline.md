@@ -36,6 +36,28 @@ lower gates for normal flow. They may be standalone next commands only when:
 
 When a lower gate is the next command, the output must say why it is standalone.
 
+## Tw-Auto Internal Continuation Rule
+
+<!-- TRACEWEAVER: file-role=wrapper-handoff-discipline-policy; req=REQ-TW-056; trace=TRACE-TW-045; ver=VER-TW-057 -->
+
+When `tw-auto` owns the active run, embedded gates and reviews are internal loop
+steps. After successful `tw-work`, `tw-auto` must continue through
+`tw-traceability-check`, scoped `tw-code-review`, and scoped `tw-doc-review`
+when the changed package requires them. It must not stop with a manual
+`/tw-code-review` or `/tw-doc-review` handoff unless a concrete stop condition
+prevents the higher-level loop from continuing.
+
+The same applies after a clean code review: if scoped document review is already
+required for current requirements, matrix, Intent Contract, status, hash, or
+review-result changes, `tw-auto` continues into that scoped doc review instead
+of handing the user a lower-review command.
+
+If `tw-auto` cannot continue, the output must name the blocker rather than
+presenting the lower wrapper as routine manual work. Valid blockers include
+unclear or changed authority, failed verification, unresolved P0/P1 findings,
+missing wrapper availability, reviewer-capacity backpressure, an explicit
+stop-after-work instruction, or a publication/remote-mutation boundary.
+
 ## Embedded Gate Contract
 
 - `tw-plan` owns requirements-quality preflight before packaged `ce-plan`.

@@ -1,3 +1,5 @@
+<!-- TRACEWEAVER: file-role=controlled-autonomy-policy; req=REQ-TW-056; trace=TRACE-TW-045; ver=VER-TW-057 -->
+
 # TraceWeaver Controlled Autonomy Policy
 
 Status: alpha advisory policy
@@ -147,8 +149,16 @@ The following remain held:
 
 Every `tw-auto` outcome must end with exactly one recommended next step:
 
-- continue with another bounded cycle;
-- run a named CE/TW review gate;
+- continue internally with another bounded cycle;
+- run an embedded TraceWeaver review gate only when `tw-auto` can execute it as
+  part of the current loop;
 - create or update a gap/change/exception/clarification;
 - request a human authority decision;
 - stop before commit/push/PR with required evidence named.
+
+Do not present `/tw-code-review`, `/tw-doc-review`, or
+`/tw-traceability-check` as the sole manual next command after successful
+`tw-work` when authority is clear and `tw-auto` can continue. Those lower
+wrappers are valid standalone next steps only for explicit diagnostics, audits,
+baseline reviews, missing-wrapper degradation, reviewer-capacity holds, or a
+human authority decision that blocks the higher-level loop.
