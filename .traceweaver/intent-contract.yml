@@ -68,6 +68,18 @@ req_tw_065_test_first_client_workflow_status_hash_doc_review_id: TW-DOC-REVIEW-2
 req_tw_065_test_first_client_workflow_status_hash_doc_review_scope: requirements.md, .traceweaver/intent-contract.yml, traceability-matrix.md, README.md, plugins/traceweaver-core/README.md, plugins/traceweaver-core/skills/tw-auto/SKILL.md, plugins/traceweaver-core/skills/tw-work/SKILL.md, plugins/traceweaver-core/skills/tw-code-review/SKILL.md, plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md, scripts/traceweaver-smoke-tw-skill-behavior, fixtures/tw-skill-behavior/tw-work-test-first-*, fixtures/tw-skill-behavior/tw-auto-test-first-closure/loop-state.txt
 req_tw_065_test_first_client_workflow_status_hash_doc_review_coverage: main_thread_scoped_tw_doc_review_no_reviewer_subagents
 req_tw_065_test_first_client_workflow_held_scope: requirements review, active-host currentness, Vestro/R31 dogfood, runtime enforcement, publication, package/release/upstream readiness, clean replacement, unconstrained-host support
+req_tw_066_system_acceptance_closure_scope: REQ-TW-066, ART-TW-063, TRACE-TW-049, ATP-TW-033, RESULT-TW-033, VER-TW-062, VAL-TW-012
+req_tw_066_system_acceptance_closure_status: requirements_review_recorded_candidate_planning_input_authority_status_patch_implemented_doc_review_passed_runtime_held
+req_tw_066_system_acceptance_closure_allowed_use: candidate_reviewed_planning_input_for_system_acceptance_pack_only
+req_tw_066_system_acceptance_closure_requirements_review_status: revise_before_approval
+req_tw_066_system_acceptance_closure_requirements_review_id: TW-REQ-REVIEW-2026-05-18-SYSTEM-ACCEPTANCE-CLOSURE-001
+req_tw_066_system_acceptance_closure_requirements_review_scope: system acceptance closure requirement, GitHub issue #18, user correction 2026-05-18
+req_tw_066_system_acceptance_closure_issue: https://github.com/Oxiom-Systems/traceweaver/issues/18
+req_tw_066_system_acceptance_closure_verification_summary: acceptance pack fields and matrix proof chain added for functional acceptance, non-functional acceptance, disposition, owner, evidence location, next trigger, and held-validation fallback
+req_tw_066_system_acceptance_closure_doc_review_status: passed_no_findings
+req_tw_066_system_acceptance_closure_doc_review_id: TW-DOC-REVIEW-2026-05-18-REQ-TW-066-SYSTEM-ACCEPTANCE-CLOSURE-AUTHORITY-STATUS-CLEAN-001
+req_tw_066_system_acceptance_closure_doc_review_scope: requirements.md, .traceweaver/intent-contract.yml, traceability-matrix.md, docs/plans/2026-05-18-001-feat-system-acceptance-closure-plan.md, docs/validation/traceweaver-system-acceptance-plan.md, docs/validation/traceweaver-system-acceptance-results.md
+req_tw_066_system_acceptance_closure_held_scope: runtime enforcement, retrospective broad validation, publication, package/release/upstream readiness, clean replacement, Vestro dogfood, R31, autonomous publication
 wrapper_handoff_discipline_scope: REQ-TW-052, REQ-TW-056, REQ-TW-057, REQ-TW-061, ART-TW-060, TRACE-TW-046, ATP-TW-030, RESULT-TW-030, VER-TW-059
 wrapper_handoff_discipline_status: deterministic_static_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held
 wrapper_handoff_discipline_allowed_use: reviewed_static_implementation_input_status_hash_doc_review_passed
@@ -1668,6 +1680,35 @@ candidate_requirements:
         id: TW-DOC-REVIEW-2026-05-18-REQ-TW-064-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001
         coverage: main_thread_scoped_tw_doc_review_no_reviewer_subagents
     held_scope: runtime invocation, publication, package/release/upstream readiness, clean replacement, Vestro dogfood, R31, unconstrained-host support, CE-derived component body edits without reviewed overlay/fork record
+  - id: REQ-TW-066
+    status: requirements_review_recorded_candidate_planning_input_authority_status_patch_implemented_doc_review_passed_runtime_held
+    authority_scope:
+      - requirements.md
+      - traceability-matrix.md
+      - .traceweaver/intent-contract.yml
+      - docs/plans/2026-05-18-001-feat-system-acceptance-closure-plan.md
+      - docs/validation/traceweaver-system-acceptance-plan.md
+      - docs/validation/traceweaver-system-acceptance-results.md
+    allowed_use: candidate_reviewed_planning_input_for_system_acceptance_pack_only
+    proof_chain:
+      artifact: ART-TW-063
+      trace: TRACE-TW-049
+      acceptance_test: ATP-TW-033
+      result: RESULT-TW-033
+      verification: VER-TW-062
+      validation: VAL-TW-012
+    requirements_review:
+      status: revise_before_approval
+      id: TW-REQ-REVIEW-2026-05-18-SYSTEM-ACCEPTANCE-CLOSURE-001
+      issue: https://github.com/Oxiom-Systems/traceweaver/issues/18#issuecomment-4482578161
+    authority_doc_review:
+      status: passed_no_findings
+      id: TW-DOC-REVIEW-2026-05-18-REQ-TW-066-SYSTEM-ACCEPTANCE-CLOSURE-AUTHORITY-STATUS-CLEAN-001
+      coverage: main_thread_scoped_tw_doc_review_no_reviewer_subagents
+    implementation:
+      status: authority_status_patch_implemented_doc_review_passed
+      verification: rg REQ-TW-066/ART-TW-063/TRACE-TW-049/ATP-TW-033/RESULT-TW-033/VER-TW-062/VAL-TW-012 across authority and validation docs; YAML parse; git diff check
+    held_scope: runtime enforcement, retrospective broad validation, publication, package/release/upstream readiness, clean replacement, Vestro dogfood, R31, autonomous publication
   - id: REQ-TW-061
     status: systems_engineering_skill_knowledge_requirement_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held
     authority_scope:
