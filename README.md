@@ -646,6 +646,16 @@ it may stop after a single cycle and report the next wrapper command. It must
 stop before commit, push, or PR creation unless the controlled publication gate
 is clean; full autonomous publication remains a later runtime claim.
 
+TraceWeaver wraps the selected Compound Engineering surface instead of trying to
+land these changes upstream. The upstream Compound Engineering README's
+[About Contributions](https://github.com/EveryInc/compound-engineering-plugin#about-contributions)
+section says issues and illustrative PRs are welcome, but external PRs are not
+merged directly; the maintainer independently decides whether and how to address
+them after Claude or Codex review. A TraceWeaver wrapper therefore keeps the CE
+method available while giving Oxiom Systems a separate authority, traceability,
+verification, validation, and release-claim boundary without turning upstream CE
+into a stakeholder in TraceWeaver's product decisions.
+
 There are two valid blank-project starts. Use `tw-auto` when you want the
 automation path; use the narrower wrappers when you want to follow each gate
 manually:
