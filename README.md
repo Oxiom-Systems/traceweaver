@@ -86,6 +86,36 @@ the controlling authority layer: Intent Contract, requirements baseline,
 traceability matrix, verification evidence, validation questions, and explicit
 gap/change/exception handling.
 
+## Systems Engineering Foundations
+
+TraceWeaver is an agentic-software adaptation of established systems
+engineering practice, not a new replacement for that discipline. Its workflow is
+grounded in the same core controls used by systems engineering standards and
+handbooks:
+
+- INCOSE systems-engineering guidance and handbook practice around stakeholder
+  needs, requirements, architecture/design traceability, verification,
+  validation, risk, and lifecycle evidence;
+- lifecycle control from stakeholder need through requirements, design,
+  implementation, verification, validation, and change control, aligned with the
+  intent of ISO/IEC/IEEE 15288-style systems lifecycle practice;
+- requirements quality, traceability, acceptance criteria, and requirements
+  baseline management, aligned with ISO/IEC/IEEE 29148-style requirements
+  engineering practice;
+- explicit verification and validation separation: verification asks whether
+  the implementation satisfies the specified requirement, while validation asks
+  whether the delivered behavior satisfies the stakeholder intent;
+- change, gap, exception, risk, and evidence records so unresolved ambiguity is
+  controlled rather than converted into hidden implementation authority;
+- end-to-end traceability so reviewers can move from intent to requirement,
+  artifact, test, result, validation question, and release decision without
+  relying on agent memory.
+
+TraceWeaver does not claim certification, endorsement, or full compliance with
+INCOSE or any formal standard. It translates their useful control ideas into a
+lightweight, file-based workflow that coding agents and human reviewers can
+actually use in a normal repository.
+
 ## Naming Model
 
 | Name | Role |
