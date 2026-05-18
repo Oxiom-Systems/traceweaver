@@ -252,9 +252,25 @@ TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
 TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-separate-home-runtime
 ```
 
+Enable native subagent support for review workflows by confirming the selected
+TraceWeaver reviewer agents were installed into the Codex agent root:
+
+```sh
+test -d "$HOME/.codex/agents/traceweaver-core"
+find "$HOME/.codex/agents/traceweaver-core" -name '*.toml' | wc -l
+```
+
+If the agent directory is missing, rerun the installer with `--include-skills`.
+If the active Codex runtime does not expose native subagent tools, TraceWeaver
+review wrappers should continue in the main thread and report that reviewer
+parallelism is unavailable instead of treating missing subagents as authority.
+
 Expected install shape:
 
 - user-facing skills are `tw-*` plus the `lfg` compatibility alias;
+- selected reviewer agents are installed under
+  `$HOME/.codex/agents/traceweaver-core` for Codex runtimes that expose native
+  subagent tools;
 - raw `ce-*` skills are packaged as internal TraceWeaver implementation
   components, not as the normal user workflow;
 - Codex model default is recorded as `gpt-5.5` with `medium` reasoning;
