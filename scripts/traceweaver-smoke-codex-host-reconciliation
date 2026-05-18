@@ -134,6 +134,8 @@ assert_file "$skills_root/tw-work/SKILL.md"
 assert_file "$skills_root/tw-commit/SKILL.md"
 assert_file "$skills_root/tw-commit-push-pr/SKILL.md"
 for skill_name in \
+  tw-strategy \
+  tw-ideate \
   tw-brainstorm \
   tw-compound \
   tw-compound-refresh \
@@ -150,17 +152,16 @@ do
 done
 assert_not_exists "$skills_root/tw-session-inventory"
 assert_not_exists "$skills_root/tw-session-extract"
+assert_not_exists "$skills_root/ce-work"
 assert_marker "$skills_root/tw-plan/.traceweaver-core-install.json" "tw-plan"
 assert_marker "$skills_root/tw-work/.traceweaver-core-install.json" "tw-work"
 assert_marker "$skills_root/tw-commit/.traceweaver-core-install.json" "tw-commit"
 assert_marker "$skills_root/tw-commit-push-pr/.traceweaver-core-install.json" "tw-commit-push-pr"
-assert_marker "$skills_root/ce-work/.traceweaver-core-install.json" "ce-work"
 assert_marker "$skills_root/tw-auto/.traceweaver-core-install.json" "tw-auto"
 assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-plan/SKILL.md" "$skills_root/tw-plan/SKILL.md" "tw_plan_hash"
 assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-work/SKILL.md" "$skills_root/tw-work/SKILL.md" "tw_work_hash"
 assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-commit/SKILL.md" "$skills_root/tw-commit/SKILL.md" "tw_commit_hash"
 assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md" "$skills_root/tw-commit-push-pr/SKILL.md" "tw_commit_push_pr_hash"
-assert_hash_match "$repo_root/plugins/traceweaver-core/skills/ce-work/SKILL.md" "$skills_root/ce-work/SKILL.md" "ce_work_hash"
 assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-auto/SKILL.md" "$skills_root/tw-auto/SKILL.md" "tw_auto_hash"
 assert_hash_match "$repo_root/plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md" "$skills_root/tw-authority-gate/SKILL.md" "tw_authority_gate_hash"
 assert_hash_match \

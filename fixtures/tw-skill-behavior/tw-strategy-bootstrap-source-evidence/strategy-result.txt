@@ -1,0 +1,7 @@
+TRACEWEAVER: verifies=VER-TW-060; req=REQ-TW-064; trace=TRACE-TW-047
+expected_behavior=delegate_to_ce_strategy_under_tw_source_evidence
+ce_delegation_surface=TraceWeaver-packaged ce-strategy
+source_evidence_only=true
+authority_files_missing=bootstrap_source_evidence
+implementation_authority=false
+next_handoff=tw-ideate_or_tw-brainstorm_or_tw-requirements-review

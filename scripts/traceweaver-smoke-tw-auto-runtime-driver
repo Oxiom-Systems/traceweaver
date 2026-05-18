@@ -663,6 +663,38 @@ Write runtime evidence to these paths:
 - .traceweaver/anchor-evidence/runtime-driver-after.md
 - .traceweaver/trace-records/runtime-driver-trace.yml
 
+The trace record is the proof artifact. It must bind the wrapper decisions to
+the loaded TraceWeaver route, not only repeat them in the final response. Write
+at least this YAML shape to .traceweaver/trace-records/runtime-driver-trace.yml:
+
+authority_gate:
+  status: loaded_before_work
+  requirement: REQ-TW-056
+  trace: TRACE-TW-039
+  verification: VER-TW-051
+  allowed_scope:
+    - src/driver_feature.sh
+    - tests/test_driver_feature.sh
+    - src/ambiguous_feature.sh
+tw_work:
+  route: tw-work
+  status: used
+trace_anchor_authoring:
+  status: clear_applied_ambiguous_skipped
+  unresolved_mapping: .traceweaver/anchor-evidence/runtime-driver-unresolved-mappings.jsonl
+traceability_check:
+  status: ran_after_authoring
+  result: blocked_expected_unresolved_mapping
+code_review:
+  route: selected_after_traceability
+doc_review:
+  route: selected_for_evidence
+publication:
+  status: held_no_mutation
+
+Return the final key=value lines only after that trace record is written with
+the same authority_gate, work, traceability, review, and publication decisions.
+
 Return only these key=value lines:
 TW_AUTO_DRIVER_RUNTIME_SENTINEL=pass
 TW_AUTO_SKILL_HASH=<sha256 of the loaded installed tw-auto/SKILL.md>

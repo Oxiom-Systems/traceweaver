@@ -246,17 +246,52 @@ traceability-matrix.md
 .traceweaver/intent-contract.yml
 ```
 
-If they do not exist yet, start with source evidence and requirements review:
+If you want TraceWeaver to drive the flow instead of stepping through each gate
+manually, start with `tw-auto`:
 
 ```text
+tw-auto "describe the work, idea, bug, audit, or improvement"
+```
+
+`tw-auto` is the automation front door. It can route the request to the highest
+safe wrapper: intent deepening, brainstorming, requirements review, planning,
+work, traceability checks, review, or publication. Use the lower wrappers
+directly when you want to follow the flow manually or deliberately run one gate.
+
+TraceWeaver exposes `tw-strategy` and `tw-ideate` as source-evidence wrappers.
+Use `tw-strategy` to create or refresh `STRATEGY.md` as grounding for target
+problem, approach, persona, metrics, and tracks. Use `tw-ideate` when you want
+ranked ideas before choosing one to grill or brainstorm. There is no separate
+`tw-ideas` command. `STRATEGY.md` and ideation artifacts are upstream context,
+not implementation authority. Once `requirements.md` and
+`.traceweaver/intent-contract.yml` exist, approved requirements, approved
+exceptions, and the Intent Contract control what may be implemented.
+
+If the authority files do not exist yet, `tw-auto` should enter bootstrap mode:
+
+```text
+tw-auto "bootstrap TraceWeaver authority for this project"
+```
+
+The manual narrow path is available when you explicitly want to step through the
+early gates yourself:
+
+```text
+tw-strategy "capture product direction"  # optional, source evidence only
+tw-ideate "generate options"             # optional, source evidence only
 tw-grill "stress-test this idea"    # optional, when intent is still fuzzy
 tw-brainstorm "describe the idea or problem"
 tw-requirements-review
 tw-plan
 ```
 
-For normal bounded implementation work, use the TraceWeaver wrappers instead of
-raw `ce-*` commands:
+For normal bounded implementation work with approved authority, choose either
+the automation path or the manual wrapper path. Use TraceWeaver wrappers instead
+of raw `ce-*` commands:
+
+```text
+tw-auto "implement the approved plan"
+```
 
 ```text
 tw-plan "plan the approved change"
@@ -274,13 +309,8 @@ plans, matrices, Intent Contracts, and evidence records. `tw-commit-push-pr`
 is the controlled publication wrapper and must stop when authority, review,
 verification, target, credential, or held-claim checks are not clean.
 
-`tw-auto` is available as an experimental alpha workflow driver:
-
-```text
-tw-auto "implement the approved plan"
-```
-
-Use it for bounded dogfood loops where stopping is acceptable. It is intended
+`tw-auto` remains experimental. Use it for bounded dogfood loops where stopping
+is acceptable. It is intended
 to run the high-level TraceWeaver sequence:
 
 ```text
@@ -312,6 +342,9 @@ Common handoffs:
 
 | Situation | Use |
 |---|---|
+| Unsure where to start | `tw-auto "describe the goal"` |
+| Product direction or `STRATEGY.md` needs to ground the work | `tw-strategy`, or `tw-auto` when you want the automated route |
+| Need generated/ranked ideas before choosing one | `tw-ideate`, then `tw-grill` or `tw-brainstorm` |
 | Fuzzy idea or product direction | `tw-grill`, then `tw-brainstorm` |
 | Candidate requirement or acceptance criteria | `tw-requirements-review` |
 | Approved requirement needs an implementation plan | `tw-plan` |
@@ -332,6 +365,8 @@ The Codex install exposes these TraceWeaver-owned user-facing skills. Packaged
 |---|---|
 | `tw-auto` | Experimental advisory workflow driver for bounded TraceWeaver loops. |
 | `lfg` | Compatibility alias that delegates to `tw-auto`. |
+| `tw-strategy` | Capture or update `STRATEGY.md` as source-evidence grounding. |
+| `tw-ideate` | Generate and rank ideas as source evidence before grilling, brainstorming, or requirements review. |
 | `tw-grill` | Optional intent-deepening interview before brainstorming. |
 | `tw-brainstorm` | Explore ideas as source evidence before requirements review. |
 | `tw-requirements-review` | Review requirements, acceptance criteria, and candidate authority. |
@@ -426,6 +461,8 @@ The base workflow is:
 
 ```text
 idea
+-> tw-strategy when product direction needs grounding
+-> tw-ideate when options need generation and critique
 -> tw-grill when the intent needs deeper interview
 -> brainstorm
 -> TraceWeaver requirements baseline
@@ -443,7 +480,7 @@ captured, reviewed, and baselined.
 
 | CE method stage | Standalone TraceWeaver entrypoint | Purpose |
 |---|---|---|
-| `idea` | intent capture | Capture stakeholder intent. Ideas are not authority yet. |
+| `idea` | `tw-strategy` / `tw-ideate` / intent capture | Capture strategy grounding and candidate ideas. Ideas are not authority yet. |
 | grill | optional `tw-grill` | Stress-test one selected idea before brainstorming. Output is source evidence, not authority. |
 | brainstorm | `tw-brainstorm`, then `tw-requirements-review` and authority-baseline record | Explore needs, risks, options, assumptions, and gaps, then convert accepted ideas into `requirements.md`, intent IDs, requirement IDs, exceptions, validation questions, and baseline version. |
 | plan | `tw-plan`, with `tw-authority-gate` before implementation | Plan only against approved requirements or approved exceptions. Every task gets an Intent Capsule. |
@@ -455,6 +492,8 @@ The target TraceWeaver-controlled CE loop is:
 
 ```text
 idea
+-> tw-strategy
+-> tw-ideate
 -> tw-grill when the intent needs deeper interview
 -> tw-brainstorm
 -> tw-requirements-review
@@ -502,6 +541,7 @@ The user-facing controlled workflow is:
 
 ```text
 idea
+-> tw-strategy
 -> ideation source
 -> tw-grill
 -> tw-brainstorm
@@ -545,11 +585,15 @@ it may stop after a single cycle and report the next wrapper command. It must
 stop before commit, push, or PR creation unless the controlled publication gate
 is clean; full autonomous publication remains a later runtime claim.
 
-There are two valid blank-project starts:
+There are two valid blank-project starts. Use `tw-auto` when you want the
+automation path; use the narrower wrappers when you want to follow each gate
+manually:
 
 ```text
 intent-first path:
 idea
+-> tw-strategy when direction is unclear
+-> tw-ideate when options are needed
 -> ideation source
 -> tw-grill
 -> tw-brainstorm
@@ -567,19 +611,29 @@ tw-auto "build X"
 -> stop for tw-requirements-review
 ```
 
-`tw-auto` does not automatically run idea generation or `tw-grill`. When a new
+`tw-auto` may route strategy or idea-generation requests through `tw-strategy`
+and `tw-ideate` before brainstorming. It should skip them for an approved
+implementation plan that does not ask for upstream source evidence. When a new
 project has no TraceWeaver authority files yet, it bootstraps draft
 `requirements.md`, `traceability-matrix.md`, and
 `.traceweaver/intent-contract.yml`, then stops for requirements review before
 implementation. Missing authority starts a baseline conversation; it does not
 authorize code.
 
+`STRATEGY.md`, when present, is grounding for ideation, brainstorming, and
+planning. It may describe the product's target problem, approach, persona,
+metrics, and tracks, but it is not the authoritative work source once
+`requirements.md` and `.traceweaver/intent-contract.yml` exist. If strategy and
+requirements disagree, `tw-auto` should stop or route to requirements review
+instead of implementing from strategy text.
+
 `tw-grill` is an optional source-evidence step between ideation and
 `tw-brainstorm`. It stress-tests one selected idea, inspects repo context instead
 of asking when the answer is discoverable, and gives a recommended answer for
 each user-facing question. Its output is not authority until reviewed into
-`requirements.md`. In this alpha, `ce:ideate` is optional external CE context,
-not a packaged TraceWeaver skill.
+`requirements.md`. `tw-ideate` is the packaged TraceWeaver route for generated
+ideas; raw `ce-ideate` and `ce-strategy` are internal implementation
+components, not user-facing workflow.
 
 ## CE Method With TraceWeaver Authority
 

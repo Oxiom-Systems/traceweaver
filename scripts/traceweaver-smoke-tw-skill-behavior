@@ -11,6 +11,8 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-057; req=REQ-TW-056; trace=TRACE-TW-045
 # TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059
 # TRACEWEAVER: verifies=VER-TW-059; req=REQ-TW-056; trace=TRACE-TW-046
+# TRACEWEAVER: file-role=strategy-ideation-wrapper-smoke; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060
+# TRACEWEAVER: verifies=VER-TW-060; req=REQ-TW-064; trace=TRACE-TW-047
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/tw-skill-behavior"
@@ -95,6 +97,8 @@ doc_runtime_normalized="$tmp_dir/doc-review-last-message.normalized.txt"
 tw_code="$ROOT_DIR/plugins/traceweaver-core/skills/tw-code-review/SKILL.md"
 tw_doc="$ROOT_DIR/plugins/traceweaver-core/skills/tw-doc-review/SKILL.md"
 tw_auto="$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
+tw_strategy="$ROOT_DIR/plugins/traceweaver-core/skills/tw-strategy/SKILL.md"
+tw_ideate="$ROOT_DIR/plugins/traceweaver-core/skills/tw-ideate/SKILL.md"
 wrapper_handoff_policy="$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/references/traceweaver-wrapper-handoff-discipline.md"
 tw_plan="$ROOT_DIR/plugins/traceweaver-core/skills/tw-plan/SKILL.md"
 tw_authority_gate="$ROOT_DIR/plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md"
@@ -122,6 +126,8 @@ code_anchor_scanner="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-c
 code_anchor_author="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors"
 ce_code="$ROOT_DIR/plugins/traceweaver-core/skills/ce-code-review/SKILL.md"
 ce_doc="$ROOT_DIR/plugins/traceweaver-core/skills/ce-doc-review/SKILL.md"
+ce_strategy="$ROOT_DIR/plugins/traceweaver-core/skills/ce-strategy/SKILL.md"
+ce_ideate="$ROOT_DIR/plugins/traceweaver-core/skills/ce-ideate/SKILL.md"
 ce_plan="$ROOT_DIR/plugins/traceweaver-core/skills/ce-plan/SKILL.md"
 ce_work="$ROOT_DIR/plugins/traceweaver-core/skills/ce-work/SKILL.md"
 ce_debug="$ROOT_DIR/plugins/traceweaver-core/skills/ce-debug/SKILL.md"
@@ -142,6 +148,8 @@ ce_worktree="$ROOT_DIR/plugins/traceweaver-core/skills/ce-worktree/SKILL.md"
 require_file "$tw_code"
 require_file "$tw_doc"
 require_file "$tw_auto"
+require_file "$tw_strategy"
+require_file "$tw_ideate"
 require_file "$wrapper_handoff_policy"
 require_file "$tw_plan"
 require_file "$tw_authority_gate"
@@ -169,6 +177,8 @@ require_file "$code_anchor_scanner"
 require_file "$code_anchor_author"
 require_file "$ce_code"
 require_file "$ce_doc"
+require_file "$ce_strategy"
+require_file "$ce_ideate"
 require_file "$ce_plan"
 require_file "$ce_work"
 require_file "$ce_debug"
@@ -254,6 +264,8 @@ echo "tw_plan_packaged_ce_delegation_fixture=pass"
 echo "tw_plan_human_decision_pause_fixture=pass"
 
 assert_contains "$tw_auto" "tw-plan" "tw_auto_routes_plan_wrapper"
+assert_contains "$tw_auto" "tw-strategy" "tw_auto_routes_strategy_wrapper"
+assert_contains "$tw_auto" "tw-ideate" "tw_auto_routes_ideation_wrapper"
 assert_contains "$tw_auto" "tw-code-review" "tw_auto_routes_code_review"
 assert_contains "$tw_auto" "tw-doc-review" "tw_auto_routes_doc_review"
 assert_contains "$tw_auto" "tw-work" "tw_auto_routes_implementation_worker"
@@ -320,6 +332,10 @@ assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-authority-blocker-stop/loo
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-vestro-transcript/loop-state.txt" "observed_regression" "stopped_after_tw_work_with_manual_tw_code_review_next_step" "tw_auto_post_work_vestro_regression_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-vestro-transcript/loop-state.txt" "expected_behavior" "continue_to_tw_traceability_check_and_tw_code_review" "tw_auto_post_work_vestro_expected_behavior_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-post-work-vestro-transcript/loop-state.txt" "manual_next_step_only" "forbidden" "tw_auto_post_work_vestro_manual_handoff_forbidden_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-strategy-ideation-routing/loop-state.txt" "strategy_request_route" "tw-strategy_before_tw-brainstorm" "tw_auto_strategy_route_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-strategy-ideation-routing/loop-state.txt" "ideation_request_route" "tw-ideate_before_tw-grill_or_tw-brainstorm" "tw_auto_ideation_route_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-strategy-ideation-routing/loop-state.txt" "approved_implementation_route" "skip_tw-strategy_and_tw-ideate" "tw_auto_skip_source_routes_for_approved_work_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-strategy-ideation-routing/loop-state.txt" "manual_ce_strategy_or_ce_ideate" "forbidden" "tw_auto_no_raw_ce_strategy_ideate_fixture"
 assert_contains "$wrapper_handoff_policy" "Highest-Level Next Wrapper Rule" "wrapper_handoff_policy_highest_level_rule"
 assert_contains "$wrapper_handoff_policy" "Embedded Gate Contract" "wrapper_handoff_policy_embedded_gate_contract"
 assert_contains "$tw_auto" "Highest-Level Handoff Discipline" "tw_auto_handoff_discipline_section"
@@ -365,6 +381,7 @@ echo "tw_auto_human_decision_pause_fixtures=pass"
 echo "tw_auto_non_blocking_anchor_ambiguity_fixture=pass"
 echo "tw_auto_review_staging_closure_loop_fixture=pass"
 echo "tw_auto_post_work_review_closure_fixture=pass"
+echo "tw_auto_strategy_ideation_routing_fixture=pass"
 
 skill_file_total="$(find "$ROOT_DIR/plugins/traceweaver-core/skills" -mindepth 2 -maxdepth 2 -name SKILL.md | wc -l | tr -d '[:space:]')"
 anchored_skill_total="$(grep -Rsl '<!-- TRACEWEAVER: .*file-role=.*req=.*trace=.*ver=' "$ROOT_DIR/plugins/traceweaver-core/skills"/*/SKILL.md | wc -l | tr -d '[:space:]')"
@@ -374,12 +391,12 @@ for ce_skill in "$ROOT_DIR"/plugins/traceweaver-core/skills/ce-*/SKILL.md; do
     imported_ce_unanchored_total=$((imported_ce_unanchored_total + 1))
   fi
 done
-if [[ "$skill_file_total" != "41" ]]; then
-  echo "traceweaver_skill_file_total=failed expected=41 actual=$skill_file_total" >&2
+if [[ "$skill_file_total" != "45" ]]; then
+  echo "traceweaver_skill_file_total=failed expected=45 actual=$skill_file_total" >&2
   exit 1
 fi
-if [[ "$anchored_skill_total" != "38" ]]; then
-  echo "traceweaver_skill_file_anchored=failed expected=38 actual=$anchored_skill_total" >&2
+if [[ "$anchored_skill_total" != "40" ]]; then
+  echo "traceweaver_skill_file_anchored=failed expected=40 actual=$anchored_skill_total" >&2
   exit 1
 fi
 assert_contains "$tw_authority_gate" "file-role=authority-gate-wrapper-skill" "tw_authority_gate_file_role_anchor"
@@ -387,6 +404,8 @@ assert_contains "$tw_doc" "file-role=review-wrapper-skill" "tw_doc_review_file_r
 assert_contains "$tw_code" "file-role=review-wrapper-skill" "tw_code_review_file_role_anchor"
 assert_contains "$tw_work" "file-role=implementation-worker-skill" "tw_work_file_role_anchor"
 assert_contains "$tw_grill" "file-role=intent-deepening-source-evidence-skill" "tw_grill_file_role_anchor"
+assert_contains "$tw_strategy" "file-role=strategy-source-evidence-wrapper-skill" "tw_strategy_file_role_anchor"
+assert_contains "$tw_ideate" "file-role=ideation-source-evidence-wrapper-skill" "tw_ideate_file_role_anchor"
 assert_contains "$tw_auto" "file-role=workflow-skill" "tw_auto_file_role_anchor"
 assert_contains "$tw_requirements_review" "file-role=requirements-review-wrapper-skill" "tw_requirements_review_file_role_anchor"
 assert_contains "$lfg_skill" "file-role=tw-auto-compatibility-alias-skill" "lfg_file_role_anchor"
@@ -440,6 +459,33 @@ assert_fixture_field "$FIXTURE_ROOT/tw-brainstorm-source-evidence/brainstorm-res
 assert_fixture_field "$FIXTURE_ROOT/tw-brainstorm-source-evidence/brainstorm-result.txt" "ce_delegation_surface" "TraceWeaver-packaged ce-brainstorm" "tw_brainstorm_ce_surface_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-brainstorm-source-evidence/brainstorm-result.txt" "source_evidence_only" "true" "tw_brainstorm_source_evidence_fixture"
 echo "tw_brainstorm_packaged_ce_delegation_fixture=pass"
+
+assert_contains "$tw_strategy" 'TraceWeaver-packaged `ce-strategy`' "tw_strategy_delegates_packaged_ce"
+assert_contains "$tw_strategy" "source evidence" "tw_strategy_source_evidence_boundary"
+assert_contains "$tw_strategy" "STRATEGY.md" "tw_strategy_strategy_doc_grounding"
+assert_contains "$tw_strategy" "tw-requirements-review" "tw_strategy_requirements_review_handoff"
+assert_contains "$ce_strategy" "name: ce-strategy" "tw_strategy_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-strategy-bootstrap-source-evidence/strategy-result.txt" "expected_behavior" "delegate_to_ce_strategy_under_tw_source_evidence" "tw_strategy_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-strategy-bootstrap-source-evidence/strategy-result.txt" "ce_delegation_surface" "TraceWeaver-packaged ce-strategy" "tw_strategy_ce_surface_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-strategy-bootstrap-source-evidence/strategy-result.txt" "source_evidence_only" "true" "tw_strategy_source_evidence_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-strategy-conflict-candidate-change/strategy-result.txt" "expected_behavior" "classify_conflict_as_candidate_change" "tw_strategy_conflict_candidate_change_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-strategy-conflict-candidate-change/strategy-result.txt" "baseline_mutation" "false" "tw_strategy_conflict_no_baseline_mutation_fixture"
+echo "tw_strategy_packaged_ce_delegation_fixture=pass"
+
+assert_contains "$tw_ideate" 'TraceWeaver-packaged `ce-ideate`' "tw_ideate_delegates_packaged_ce"
+assert_contains "$tw_ideate" "source evidence" "tw_ideate_source_evidence_boundary"
+assert_contains "$tw_ideate" "STRATEGY.md" "tw_ideate_strategy_doc_grounding"
+assert_contains "$tw_ideate" "tw-requirements-review" "tw_ideate_requirements_review_handoff"
+assert_contains "$ce_ideate" "name: ce-ideate" "tw_ideate_packaged_ce_skill_name"
+assert_fixture_field "$FIXTURE_ROOT/tw-ideate-ranked-source-evidence/ideate-result.txt" "expected_behavior" "delegate_to_ce_ideate_under_tw_source_evidence" "tw_ideate_delegation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-ideate-ranked-source-evidence/ideate-result.txt" "ce_delegation_surface" "TraceWeaver-packaged ce-ideate" "tw_ideate_ce_surface_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-ideate-ranked-source-evidence/ideate-result.txt" "ranked_ideas" "true" "tw_ideate_ranked_ideas_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-ideate-requirements-conflict/ideate-result.txt" "expected_behavior" "route_to_tw-requirements-review" "tw_ideate_conflict_requirements_review_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-ideate-requirements-conflict/ideate-result.txt" "implementation_authority" "false" "tw_ideate_conflict_no_implementation_authority_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-strategy-ideate-no-publication/publication-result.txt" "expected_behavior" "no_publication" "tw_strategy_ideate_no_publication_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-strategy-ideate-no-publication/publication-result.txt" "release" "false" "tw_strategy_ideate_no_release_fixture"
+echo "tw_ideate_packaged_ce_delegation_fixture=pass"
+echo "tw_strategy_ideate_source_evidence_boundary=pass"
 
 assert_contains "$tw_compound" 'TraceWeaver-packaged `ce-compound`' "tw_compound_delegates_packaged_ce"
 assert_contains "$tw_compound" "source evidence" "tw_compound_source_evidence_boundary"
@@ -564,6 +610,7 @@ echo "tw_work_human_decision_pause_fixture=pass"
 
 assert_contains "$tw_trace" 'references/structured-findings.md' "tw_traceability_structured_contract_loaded"
 assert_contains "$tw_trace" "CTA-UNRESOLVED-ANCHOR-MAPPING" "tw_traceability_unresolved_mapping_gate"
+assert_contains "$code_anchor_scanner" "plugins/traceweaver-core/skills/ce-" "tw_traceability_imported_ce_body_scan_boundary"
 assert_contains "$structured_ref" "severity" "structured_reference_severity_field"
 assert_contains "$structured_ref" "claim_impact" "structured_reference_claim_impact_field"
 assert_contains "$structured_ref" "remediation" "structured_reference_remediation_field"
@@ -571,6 +618,8 @@ echo "tw_traceability_check_structured_contract_static=pass"
 
 repo_trace_hash="$(hash_file "$tw_trace")"
 repo_auto_hash="$(hash_file "$tw_auto")"
+repo_strategy_hash="$(hash_file "$tw_strategy")"
+repo_ideate_hash="$(hash_file "$tw_ideate")"
 repo_plan_hash="$(hash_file "$tw_plan")"
 repo_authority_gate_hash="$(hash_file "$tw_authority_gate")"
 repo_work_hash="$(hash_file "$tw_work")"
@@ -594,6 +643,8 @@ repo_ce_plan_hash="$(hash_file "$ce_plan")"
 repo_ce_work_hash="$(hash_file "$ce_work")"
 repo_ce_code_hash="$(hash_file "$ce_code")"
 repo_ce_doc_hash="$(hash_file "$ce_doc")"
+repo_ce_strategy_hash="$(hash_file "$ce_strategy")"
+repo_ce_ideate_hash="$(hash_file "$ce_ideate")"
 repo_ce_brainstorm_hash="$(hash_file "$ce_brainstorm")"
 repo_ce_compound_hash="$(hash_file "$ce_compound")"
 repo_ce_compound_refresh_hash="$(hash_file "$ce_compound_refresh")"
@@ -604,6 +655,8 @@ repo_ce_test_xcode_hash="$(hash_file "$ce_test_xcode")"
 repo_ce_setup_hash="$(hash_file "$ce_setup")"
 repo_ce_worktree_hash="$(hash_file "$ce_worktree")"
 host_auto="$ACTIVE_SKILLS_ROOT/tw-auto/SKILL.md"
+host_strategy="$ACTIVE_SKILLS_ROOT/tw-strategy/SKILL.md"
+host_ideate="$ACTIVE_SKILLS_ROOT/tw-ideate/SKILL.md"
 host_plan="$ACTIVE_SKILLS_ROOT/tw-plan/SKILL.md"
 host_authority_gate="$ACTIVE_SKILLS_ROOT/tw-authority-gate/SKILL.md"
 host_work="$ACTIVE_SKILLS_ROOT/tw-work/SKILL.md"
@@ -629,6 +682,8 @@ host_ce_plan="$PACKAGED_SKILLS_ROOT/ce-plan/SKILL.md"
 host_ce_work="$PACKAGED_SKILLS_ROOT/ce-work/SKILL.md"
 host_ce_code="$PACKAGED_SKILLS_ROOT/ce-code-review/SKILL.md"
 host_ce_doc="$PACKAGED_SKILLS_ROOT/ce-doc-review/SKILL.md"
+host_ce_strategy="$PACKAGED_SKILLS_ROOT/ce-strategy/SKILL.md"
+host_ce_ideate="$PACKAGED_SKILLS_ROOT/ce-ideate/SKILL.md"
 host_ce_brainstorm="$PACKAGED_SKILLS_ROOT/ce-brainstorm/SKILL.md"
 host_ce_compound="$PACKAGED_SKILLS_ROOT/ce-compound/SKILL.md"
 host_ce_compound_refresh="$PACKAGED_SKILLS_ROOT/ce-compound-refresh/SKILL.md"
@@ -639,6 +694,8 @@ host_ce_test_xcode="$PACKAGED_SKILLS_ROOT/ce-test-xcode/SKILL.md"
 host_ce_setup="$PACKAGED_SKILLS_ROOT/ce-setup/SKILL.md"
 host_ce_worktree="$PACKAGED_SKILLS_ROOT/ce-worktree/SKILL.md"
 host_auto_hash="missing"
+host_strategy_hash="missing"
+host_ideate_hash="missing"
 host_plan_hash="missing"
 host_authority_gate_hash="missing"
 host_work_hash="missing"
@@ -664,6 +721,8 @@ host_ce_plan_hash="missing"
 host_ce_work_hash="missing"
 host_ce_code_hash="missing"
 host_ce_doc_hash="missing"
+host_ce_strategy_hash="missing"
+host_ce_ideate_hash="missing"
 host_ce_brainstorm_hash="missing"
 host_ce_compound_hash="missing"
 host_ce_compound_refresh_hash="missing"
@@ -675,6 +734,12 @@ host_ce_setup_hash="missing"
 host_ce_worktree_hash="missing"
 if [[ -f "$host_auto" ]]; then
   host_auto_hash="$(hash_file "$host_auto")"
+fi
+if [[ -f "$host_strategy" ]]; then
+  host_strategy_hash="$(hash_file "$host_strategy")"
+fi
+if [[ -f "$host_ideate" ]]; then
+  host_ideate_hash="$(hash_file "$host_ideate")"
 fi
 if [[ -f "$host_plan" ]]; then
   host_plan_hash="$(hash_file "$host_plan")"
@@ -751,6 +816,12 @@ fi
 if [[ -f "$host_ce_doc" ]]; then
   host_ce_doc_hash="$(hash_file "$host_ce_doc")"
 fi
+if [[ -f "$host_ce_strategy" ]]; then
+  host_ce_strategy_hash="$(hash_file "$host_ce_strategy")"
+fi
+if [[ -f "$host_ce_ideate" ]]; then
+  host_ce_ideate_hash="$(hash_file "$host_ce_ideate")"
+fi
 if [[ -f "$host_ce_brainstorm" ]]; then
   host_ce_brainstorm_hash="$(hash_file "$host_ce_brainstorm")"
 fi
@@ -782,6 +853,8 @@ repo_structured_ref_hash="$(hash_file "$structured_ref")"
 
 active_host_review_routing_hashes_current() {
   [[ "$host_auto_hash" == "$repo_auto_hash" &&
+     "$host_strategy_hash" == "$repo_strategy_hash" &&
+     "$host_ideate_hash" == "$repo_ideate_hash" &&
      "$host_plan_hash" == "$repo_plan_hash" &&
      "$host_authority_gate_hash" == "$repo_authority_gate_hash" &&
      "$host_work_hash" == "$repo_work_hash" &&
@@ -804,6 +877,8 @@ active_host_review_routing_hashes_current() {
      "$host_ce_work_hash" == "$repo_ce_work_hash" &&
      "$host_ce_code_hash" == "$repo_ce_code_hash" &&
      "$host_ce_doc_hash" == "$repo_ce_doc_hash" &&
+     "$host_ce_strategy_hash" == "$repo_ce_strategy_hash" &&
+     "$host_ce_ideate_hash" == "$repo_ce_ideate_hash" &&
      "$host_ce_brainstorm_hash" == "$repo_ce_brainstorm_hash" &&
      "$host_ce_compound_hash" == "$repo_ce_compound_hash" &&
      "$host_ce_compound_refresh_hash" == "$repo_ce_compound_refresh_hash" &&
@@ -826,6 +901,10 @@ host_authority_gate_hash="$authority_gate_control_hash"
 echo "tw_skill_behavior_artifact_dir=$tmp_dir"
 echo "active_host_tw_auto_repo_hash=$repo_auto_hash"
 echo "active_host_tw_auto_host_hash=$host_auto_hash"
+echo "active_host_tw_strategy_repo_hash=$repo_strategy_hash"
+echo "active_host_tw_strategy_host_hash=$host_strategy_hash"
+echo "active_host_tw_ideate_repo_hash=$repo_ideate_hash"
+echo "active_host_tw_ideate_host_hash=$host_ideate_hash"
 echo "active_host_tw_plan_repo_hash=$repo_plan_hash"
 echo "active_host_tw_plan_host_hash=$host_plan_hash"
 echo "active_host_tw_authority_gate_repo_hash=$repo_authority_gate_hash"
@@ -876,6 +955,10 @@ echo "active_host_ce_code_review_repo_hash=$repo_ce_code_hash"
 echo "active_host_ce_code_review_host_hash=$host_ce_code_hash"
 echo "active_host_ce_doc_review_repo_hash=$repo_ce_doc_hash"
 echo "active_host_ce_doc_review_host_hash=$host_ce_doc_hash"
+echo "active_host_ce_strategy_repo_hash=$repo_ce_strategy_hash"
+echo "active_host_ce_strategy_host_hash=$host_ce_strategy_hash"
+echo "active_host_ce_ideate_repo_hash=$repo_ce_ideate_hash"
+echo "active_host_ce_ideate_host_hash=$host_ce_ideate_hash"
 echo "active_host_ce_brainstorm_repo_hash=$repo_ce_brainstorm_hash"
 echo "active_host_ce_brainstorm_host_hash=$host_ce_brainstorm_hash"
 echo "active_host_ce_compound_repo_hash=$repo_ce_compound_hash"
