@@ -7,6 +7,7 @@ argument-hint: "[approved task or plan path]"
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-057; trace=TRACE-TW-042; ver=VER-TW-054 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059 -->
+<!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 
 # TraceWeaver Work
 
@@ -17,7 +18,7 @@ TraceWeaver implementation facade that `tw-auto` calls instead of raw `ce-work`.
 It keeps the familiar CE worker as the underlying coding engine, but adds the
 TraceWeaver responsibilities that must happen during implementation: authority
 visibility, trace-anchor authoring, verification evidence, matrix evidence, and
-no-publication handoff back to `tw-auto`.
+test-first/no-publication handoff back to `tw-auto`.
 
 Use `tw-work` for behavior-bearing code, scripts, skill instructions, fixtures,
 smokes, manifests, runtime harnesses, and validation artifacts. Do not use it to
@@ -58,35 +59,64 @@ packaged `ce-work` in no-publication mode. Packaged `ce-work` remains the coding
 engine only; it does not approve authority, traceability, review completion, or
 publication.
 
+## Test-First Evidence Gate
+
+For behavior-bearing changes in client repositories, `tw-work` must establish
+test-first evidence before implementation starts:
+
+- identify, create, or update a requirement-linked test, fixture, smoke, or
+  equivalent executable verification artifact for the intended behavior;
+- record the expected failing/current-failing evidence, or the concrete reason
+  the verification would fail against the current behavior when a live failing
+  run is unsafe or impractical;
+- link the verification artifact to the requirement, trace ID, and verification
+  ID in the matrix before claiming implementation closure;
+- after implementation, rerun the same focused verification and record the
+  passing result.
+
+Do not fake TDD evidence for pure documentation, mechanical formatting,
+generated, vendored, or no-behavior refactor changes. Record a scoped
+not-applicable decision for those cases. Non-test or post-implementation-only
+verification is allowed only when the approved requirement permits it or an
+approved gap/exception records owner, scope, reason, review condition, and next
+step.
+
 ## Workflow
 
 1. Confirm the run is Implementation Gate Mode. If it is Authority Baseline Mode
    or Publication Mode, return control to `tw-auto` with that classification.
 2. Run the authority-gate preflight above before implementation.
-3. Invoke the TraceWeaver-packaged `ce-work` implementation flow in
+3. Establish the test-first evidence gate for behavior-bearing changes. If
+   requirement-linked failing/current-failing verification evidence, a valid
+   not-applicable decision, or an approved non-test/post-implementation
+   verification exception is absent, stop before mutation and return control to
+   `tw-auto`.
+4. Invoke the TraceWeaver-packaged `ce-work` implementation flow in
    no-publication mode with the approved authority capsule, verification target,
    changed-file scope, and matrix-update requirement.
-4. Build the changed-file scope from behavior-bearing files plus linked
+5. Build the changed-file scope from behavior-bearing files plus linked
    tests/fixtures/smokes, including newly created untracked files. Keep authority
    docs out of the code-anchor scanner unless they are explicitly part of the
    implementation review scope.
-5. Run the skill-local code-anchor scanner from `tw-traceability-check` on that
+6. Run the skill-local code-anchor scanner from `tw-traceability-check` on that
    changed-file scope before review.
-6. Run the automatic trace-anchor authoring loop below for scanner findings
+7. Run the automatic trace-anchor authoring loop below for scanner findings
    where the mapping is unambiguous. When only a per-artifact anchor mapping is
    ambiguous, skip that one anchor mutation, record an unresolved mapping
    candidate, and keep applying unrelated clear anchors. This is a mandatory
    `tw-work` work-loop step, not a manual follow-up for the user.
-7. Rerun the scanner after authoring with any unresolved mapping records. If the
+8. Rerun the scanner after authoring with any unresolved mapping records. If the
    scanner remains blocked, stop with the structured traceability finding and
    return control to `tw-auto`.
-8. Run the required verification commands for the implemented slice.
-9. When implementation, verification, scanner, and trace/matrix updates are
+9. Run the required verification commands for the implemented slice, including
+   the same focused test-first verification artifact established before
+   implementation.
+10. When implementation, verification, scanner, and trace/matrix updates are
    complete, `tw-work` may perform review-staging for an explicit scoped file
    list that belongs to this work item. Review-staging is allowed only to make
    `tw-code-review` / `tw-doc-review` artifact identity coherent. It is not
    publication authority.
-10. Return control to `tw-auto` with changed files, staged files when
+11. Return control to `tw-auto` with changed files, staged files when
    review-staging was used, verification evidence, source-anchor changes,
    matrix evidence changes, open gaps, held claims, and the next review command.
 
@@ -98,6 +128,9 @@ publication.
   carries requirement-level behavior or a reviewed finding requires it.
 - Write source anchors and matrix Code Anchor Evidence together, or accept
   neither as complete.
+- Treat test-first verification artifacts as first-class verification anchors for
+  behavior-bearing changes. Tests added only after implementation may close the
+  work only when an approved exception explains why test-first was not practical.
 - Pause without mutation when task authority, requirement meaning, verification
   authority, accepted scope, or material authority is unclear, contradictory,
   incomplete, stale, missing, or implies a requirements change. When only one

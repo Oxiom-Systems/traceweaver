@@ -1,0 +1,8 @@
+work_package=behavior_bearing_client_change
+requirement=REQ-TW-065
+test_first_evidence=missing
+expected_behavior=stop_before_mutation
+ce_work_invocation=blocked
+structured_finding=CTA-MISSING-TEST-FIRST-EVIDENCE
+review_acceptance=blocked
+publication=held

@@ -140,10 +140,11 @@ identity.
 - `tw-authority-gate` checks whether planned work has approved
   authority before implementation starts.
 - `tw-traceability-check` checks whether behavior traces to
-  approved authority, implementation, verification, and validation evidence.
+  approved authority, implementation, test-first verification, and validation
+  evidence.
 - `tw-auto` runs the advisory controlled-autonomy loop: CE-compatible
   plan/work/review sequencing plus TraceWeaver authority, traceability,
-  verification, matrix-update, and next-step controls.
+  test-first verification, matrix-update, and next-step controls.
 - `tw-plan` wraps the packaged `ce-plan` planning engine with TraceWeaver
   authority, requirements-quality, traceability, and no-publication controls.
 - `tw-brainstorm` wraps packaged `ce-brainstorm` so vague ideas and requirement
@@ -216,6 +217,7 @@ tw-strategy when product direction needs grounding
 -> authority-baseline record
 -> tw-plan
 -> tw-authority-gate
+-> test-first verification evidence
 -> tw-work
 -> tw-traceability-check
 -> tw-code-review / tw-doc-review

@@ -6,6 +6,7 @@ description: TraceWeaver adapter for checking whether plans, code, PRs, docs, or
 <!-- TRACEWEAVER: file-role=traceability-skill; req=REQ-TW-055; trace=TRACE-TW-028; ver=VER-TW-037 -->
 <!-- TRACEWEAVER: file-role=semantic-audit-traceability-skill; req=REQ-TW-063; trace=TRACE-TW-044; ver=VER-TW-056 -->
 <!-- TRACEWEAVER: file-role=traceability-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
+<!-- TRACEWEAVER: file-role=traceability-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 
 # TraceWeaver Traceability Check
 
@@ -76,7 +77,13 @@ gap, blocked claim, held claim, or review finding.
    unresolved mapping JSONL records, stale requirement IDs, dead-TDD candidates,
    missing matrix paths, and missing verification anchors as structured
    TraceWeaver findings.
-5. If an anchor can be authored from unambiguous reviewed authority, return the
+5. For behavior-bearing client implementation, require requirement-linked
+   test-first evidence unless the matrix records a scoped not-applicable decision
+   or an approved non-test/post-implementation verification exception. Missing
+   failing/current-failing evidence is a structured TraceWeaver finding that
+   blocks traceability-complete, review acceptance, done, publication, and
+   release claims. Report this as `CTA-MISSING-TEST-FIRST-EVIDENCE`.
+6. If an anchor can be authored from unambiguous reviewed authority, return the
    authoring proposal or route to the work loop. If only a per-artifact anchor
    mapping is ambiguous, report the unresolved mapping finding and block
    traceability-complete, review acceptance, done, publication, and release
@@ -84,17 +91,17 @@ gap, blocked claim, held claim, or review finding.
    verification authority, accepted scope, or material authority is ambiguous,
    contradictory, incomplete, missing, or stale, return a human-decision pause
    instead of inventing anchors.
-6. Use `requirements-reviewer` if the requirement itself is ambiguous,
+7. Use `requirements-reviewer` if the requirement itself is ambiguous,
    unverifiable, unapproved, or source-free.
-7. Emit structured findings for traceability failures. Include severity,
+8. Emit structured findings for traceability failures. Include severity,
    status, title, evidence, affected requirement/trace/evidence IDs, file path
    and line range when available, blocked/allowed/held claim impact, and
    concrete remediation.
-8. In Codex contexts with a concrete file/line anchor, use
+9. In Codex contexts with a concrete file/line anchor, use
    `::code-comment{...}` for findings that should appear inline. Use normal
    Markdown findings when the issue is cross-file, artifact-level, or lacks a
    stable line anchor.
-9. Record the overall result as `Pass`, `Needs revision`, `Blocked`,
+10. Record the overall result as `Pass`, `Needs revision`, `Blocked`,
    `Approved gap required`, or `Human decision`.
 
 ## Highest-Level Handoff Discipline
@@ -118,6 +125,7 @@ Return:
 - traceability status
 - authority chain
 - implementation links
+- test-first evidence status
 - verification status
 - validation status
 - gaps and risks
@@ -137,8 +145,8 @@ upstream-ready status when behavior lacks approved authority, implementation
 links, verification evidence, or a validation path.
 
 Do not mark traceability as passed while any P0/P1 blocker, unapproved held
-claim, missing authority, stale matrix/hash, missing verification/validation
-path, dark behavior, missing code/test anchor, dead-TDD candidate, or
-unsupported done/release claim remains unresolved. A
+claim, missing authority, stale matrix/hash, missing test-first evidence,
+missing verification/validation path, dark behavior, missing code/test anchor,
+dead-TDD candidate, or unsupported done/release claim remains unresolved. A
 `CTA-UNRESOLVED-ANCHOR-MAPPING` finding is a P1 traceability blocker until the
 mapping is resolved or explicitly held by reviewed authority.

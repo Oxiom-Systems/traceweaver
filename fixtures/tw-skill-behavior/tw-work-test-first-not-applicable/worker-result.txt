@@ -1,0 +1,8 @@
+work_package=pure_documentation_or_mechanical_change
+requirement=REQ-TW-065
+test_first_evidence=not_applicable
+not_applicable_decision=scoped_no_behavior_change
+expected_behavior=allow_without_fake_tdd
+ce_work_invocation=allowed_if_authority_gate_passes
+post_implementation_verification=scoped_doc_or_diff_check
+publication=held

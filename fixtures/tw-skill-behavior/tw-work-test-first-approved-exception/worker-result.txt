@@ -1,0 +1,8 @@
+work_package=behavior_bearing_client_change
+requirement=REQ-TW-065
+test_first_evidence=approved_exception
+exception_record=owner_scope_reason_review_condition_next_step
+expected_behavior=allow_post_implementation_or_non_test_verification
+ce_work_invocation=allowed_if_authority_gate_passes
+post_implementation_verification=required
+publication=held
