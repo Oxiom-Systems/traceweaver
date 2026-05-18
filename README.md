@@ -48,6 +48,11 @@ In practice, a behavior-bearing skill, workflow wrapper, command, script,
 function, method, or class cannot be treated as done until the traceability
 matrix names the requirement or approved exception that authorizes it, the
 implementation location, and the verification evidence that proves it.
+For client implementation work, TraceWeaver requires test-first evidence by
+default: a requirement-linked test, fixture, smoke, or equivalent executable
+verification artifact must be identified, created, or updated before behavior is
+changed, then rerun after implementation and linked back to the matrix. Approved
+exceptions are required for non-test or post-implementation-only verification.
 
 In simple terms: TraceWeaver keeps agentic development aligned to the original
 intent, proves that implementation traces back to approved requirements, and
@@ -433,8 +438,8 @@ The Codex install exposes these TraceWeaver-owned user-facing skills. Packaged
 | `tw-requirements-review` | Review requirements, acceptance criteria, and candidate authority. |
 | `tw-plan` | Plan approved work while preserving authority and traceability boundaries. |
 | `tw-authority-gate` | Check that implementation has approved authority before work starts. |
-| `tw-work` | Implement approved work, add trace anchors when unambiguous, run verification, and hand off to review. |
-| `tw-traceability-check` | Check plans, code, docs, PRs, and release evidence for authority and verification traceability. |
+| `tw-work` | Implement approved work after test-first evidence, add trace anchors when unambiguous, run verification, and hand off to review. |
+| `tw-traceability-check` | Check plans, code, docs, PRs, and release evidence for authority, test-first evidence, and verification traceability. |
 | `tw-code-review` | Run traceability preflight, then code review. |
 | `tw-doc-review` | Review requirements, plans, matrices, Intent Contracts, and evidence records. |
 | `tw-debug` | Diagnose failures or production issues without bypassing authority or publication gates. |

@@ -1,0 +1,9 @@
+work_package=behavior_bearing_client_change
+requirement=REQ-TW-065
+test_first_evidence=requirement_linked_failing_current_failing_artifact
+pre_mutation_evidence=recorded
+ce_work_invocation=allowed_if_authority_gate_passes
+post_implementation_verification=same_artifact_passed
+matrix_link=required
+review_acceptance=allowed_after_traceability_and_code_review
+publication=held

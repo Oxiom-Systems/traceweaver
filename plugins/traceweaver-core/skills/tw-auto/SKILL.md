@@ -10,6 +10,7 @@ disable-model-invocation: true
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-045; ver=VER-TW-057 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=strategy-ideation-orchestrator; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
+<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 
 # TraceWeaver Auto
 
@@ -199,13 +200,17 @@ review completion.
    owner for authority visibility, trace-anchor authoring, verification,
    matrix-evidence updates, and no-publication handoff. Pass the authority
    capsule, verification target, matrix-update requirement, changed-file scope,
-   and the explicit instruction that `tw-work` must run automatic trace-anchor
-   authoring before review: scanner on changed behavior-bearing files and linked
+   and the explicit instruction that `tw-work` must establish test-first
+   evidence, a scoped not-applicable decision, or approved exception evidence
+   before behavior mutation, then run automatic trace-anchor authoring before
+   review: scanner on changed behavior-bearing files and linked
    tests/fixtures/smokes, helper-applied source anchors plus matching Code
-   Anchor Evidence rows for unambiguous mappings, scanner rerun, verification,
-   and review-staging of only the completed work/evidence scope needed for
-   coherent `tw-code-review` / `tw-doc-review` handoff. Neither `tw-work` nor
-   its underlying `ce-work` step may create commits, push, open PRs, update plan
+   Anchor Evidence rows for unambiguous mappings, scanner rerun, focused
+   verification that makes the same test-first artifact pass or records the
+   approved exception/not-applicable evidence, and review-staging of only the
+   completed work/evidence scope needed for coherent `tw-code-review` /
+   `tw-doc-review` handoff. Neither `tw-work` nor its
+   underlying `ce-work` step may create commits, push, open PRs, update plan
    status to completed, or load `ce-commit`, `ce-commit-push-pr`, or Phase 4
    shipping unless the controlled TraceWeaver publication route authorizes that
    specific publication target.
@@ -261,11 +266,12 @@ review completion.
     when requirements, authority, validation intent, release claims, or
     publication policy changed; normal code publication does not need a new
     requirements gate when approved authority is unchanged. The publication
-    route must prove matrix/trace coherence, verification evidence,
-    blocking-review closure, staged-tree identity, explicit target,
-    credential/remote boundary, and human confirmation for that target or a
-    reviewed Intent Contract publication override. Report the evidence status
-    and the next command, review, or human decision required.
+    route must prove matrix/trace coherence, test-first verification evidence,
+    a scoped not-applicable decision, or an approved non-test/post-implementation
+    verification exception; blocking-review closure; staged-tree identity;
+    explicit target; credential/remote boundary; and human confirmation for that
+    target or a reviewed Intent Contract publication override. Report the
+    evidence status and the next command, review, or human decision required.
 
 ## Post-Work Review Closure
 
@@ -274,9 +280,10 @@ terminal state. In the normal task/plan flow, `tw-auto` continues from
 `tw-work` into post-work review closure without asking the user to manually run
 the next wrapper command.
 
-After `tw-work` returns changed files, verification evidence, trace-anchor
-authoring status, matrix evidence changes, or review-staging output, `tw-auto`
-must:
+After `tw-work` returns changed files, test-first verification evidence, scoped
+not-applicable evidence, approved exception evidence, post-implementation
+verification evidence, trace-anchor authoring status, matrix evidence changes,
+or review-staging output, `tw-auto` must:
 
 1. Run or require `tw-traceability-check` on the exact changed work package.
 2. Run `tw-code-review` when behavior-bearing code, skills, scripts, fixtures,
@@ -422,14 +429,18 @@ Stop immediately when any of these are true:
 - stakeholder intent or validation question is missing;
 - required authority files cannot be found or bootstrapped;
 - a meaningful behavior-bearing unit cannot be linked to authority and
-  verification evidence, except that a per-artifact trace-anchor mapping
-  ambiguity may be skipped by `tw-work` and surfaced by `tw-traceability-check`
-  as a blocking unresolved-mapping finding;
+  verification evidence, including test-first evidence for behavior-bearing
+  client changes, except that a per-artifact trace-anchor mapping ambiguity may
+  be skipped by `tw-work` and surfaced by `tw-traceability-check` as a blocking
+  unresolved-mapping finding;
 - behavior appears useful or logical but no approved requirement captures it;
 - requirements are unclear, contradictory, incomplete, or need a material
   authority change before implementation can continue;
 - behavior duplicates or expands existing behavior without authority;
 - tests or approved verification fail twice for the same work cycle;
+- behavior-bearing client implementation lacks requirement-linked
+  failing/current-failing test-first evidence, a scoped not-applicable decision,
+  or an approved non-test/post-implementation verification exception;
 - required reviewer personas remain pending because host agent capacity could
   not be freed;
 - P0/P1 review findings remain open;
@@ -457,7 +468,7 @@ Always return:
 - authority status;
 - matrix status;
 - implementation files changed or proposed;
-- verification evidence and result;
+- test-first evidence, verification evidence, and result;
 - review coverage, including completed reviewers, pending reviewers, skipped
   reviewers, capacity backpressure, and any degraded main-thread fallback;
 - validation question carried forward;

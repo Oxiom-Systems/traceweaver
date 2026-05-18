@@ -1,0 +1,7 @@
+work_package=behavior_bearing_client_change
+requirement=REQ-TW-065
+tw_auto_passes_test_first_gate_to_tw_work=true
+missing_test_first_result=stop_before_tw_work_mutation
+valid_test_first_result=continue_to_tw_traceability_check_and_tw_code_review
+doc_status_hash_changes=route_to_tw_doc_review
+publication=held

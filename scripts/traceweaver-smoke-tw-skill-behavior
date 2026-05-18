@@ -13,6 +13,8 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-059; req=REQ-TW-056; trace=TRACE-TW-046
 # TRACEWEAVER: file-role=strategy-ideation-wrapper-smoke; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060
 # TRACEWEAVER: verifies=VER-TW-060; req=REQ-TW-064; trace=TRACE-TW-047
+# TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061
+# TRACEWEAVER: verifies=VER-TW-061; req=REQ-TW-065; trace=TRACE-TW-048
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/tw-skill-behavior"
@@ -590,6 +592,14 @@ assert_contains "$tw_work" "only files it changed" "tw_work_review_staging_scope
 assert_contains "$tw_work" "Include all changed implementation files, verification artifacts" "tw_work_review_staging_handoff_scope"
 assert_contains "$tw_work" "passes a work-package ID, review route, and exact scoped file list" "tw_work_accepts_tw_auto_review_stage_handoff"
 assert_contains "$tw_work" "returns the staged path list" "tw_work_returns_review_stage_result"
+assert_contains "$tw_work" "Test-First Evidence Gate" "tw_work_test_first_gate_section"
+assert_contains "$tw_work" "expected failing/current-failing evidence" "tw_work_test_first_expected_failure_required"
+assert_contains "$tw_work" "not-applicable decision" "tw_work_test_first_not_applicable_allowed"
+assert_contains "$tw_work" "approved non-test/post-implementation" "tw_work_test_first_exception_allowed"
+assert_contains "$tw_work" "stop before mutation" "tw_work_test_first_missing_blocks_mutation"
+assert_contains "$tw_work" "same focused test-first verification artifact" "tw_work_test_first_same_artifact_post_implementation"
+assert_contains "$tw_auto" "must establish test-first" "tw_auto_passes_test_first_gate_to_worker"
+assert_contains "$tw_auto" "before behavior mutation" "tw_auto_blocks_mutation_until_test_first_gate"
 assert_contains "$ce_work" "tw-work" "ce_work_routes_back_to_tw_work"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "required_route" "tw-authority-gate,ce-work,traceweaver-check-code-anchors,traceweaver-author-code-anchors,traceweaver-check-code-anchors,tw-auto" "tw_work_clean_authoring_route_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "authority_gate_preflight" "pass" "tw_work_clean_authority_gate_preflight_fixture"
@@ -613,11 +623,25 @@ assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "pause_cases" "ambiguous_mapping,contradictory_authority,missing_verification,stale_requirement,material_requirement_change_needed" "tw_work_pause_cases_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "source_mutation" "false" "tw_work_pause_no_source_mutation_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "matrix_mutation" "false" "tw_work_pause_no_matrix_mutation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-missing/worker-result.txt" "test_first_evidence" "missing" "tw_work_test_first_missing_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-missing/worker-result.txt" "expected_behavior" "stop_before_mutation" "tw_work_test_first_missing_stop_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-missing/worker-result.txt" "structured_finding" "CTA-MISSING-TEST-FIRST-EVIDENCE" "tw_work_test_first_missing_finding_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-pass/worker-result.txt" "test_first_evidence" "requirement_linked_failing_current_failing_artifact" "tw_work_test_first_pass_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-pass/worker-result.txt" "post_implementation_verification" "same_artifact_passed" "tw_work_test_first_post_implementation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-not-applicable/worker-result.txt" "test_first_evidence" "not_applicable" "tw_work_test_first_not_applicable_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-not-applicable/worker-result.txt" "not_applicable_decision" "scoped_no_behavior_change" "tw_work_test_first_not_applicable_decision_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-approved-exception/worker-result.txt" "test_first_evidence" "approved_exception" "tw_work_test_first_exception_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-approved-exception/worker-result.txt" "exception_record" "owner_scope_reason_review_condition_next_step" "tw_work_test_first_exception_record_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-test-first-closure/loop-state.txt" "tw_auto_passes_test_first_gate_to_tw_work" "true" "tw_auto_test_first_handoff_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-test-first-closure/loop-state.txt" "missing_test_first_result" "stop_before_tw_work_mutation" "tw_auto_test_first_missing_stop_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-test-first-closure/loop-state.txt" "valid_test_first_result" "continue_to_tw_traceability_check_and_tw_code_review" "tw_auto_test_first_valid_continue_fixture"
 echo "tw_work_trace_authoring_worker=pass"
 echo "tw_work_human_decision_pause_fixture=pass"
+echo "tw_work_test_first_evidence_gate=pass"
 
 assert_contains "$tw_trace" 'references/structured-findings.md' "tw_traceability_structured_contract_loaded"
 assert_contains "$tw_trace" "CTA-UNRESOLVED-ANCHOR-MAPPING" "tw_traceability_unresolved_mapping_gate"
+assert_contains "$tw_trace" "CTA-MISSING-TEST-FIRST-EVIDENCE" "tw_traceability_test_first_missing_finding_gate"
 assert_contains "$code_anchor_scanner" "plugins/traceweaver-core/skills/ce-" "tw_traceability_imported_ce_body_scan_boundary"
 assert_contains "$structured_ref" "severity" "structured_reference_severity_field"
 assert_contains "$structured_ref" "claim_impact" "structured_reference_claim_impact_field"

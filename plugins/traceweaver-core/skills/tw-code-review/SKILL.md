@@ -5,6 +5,7 @@ description: TraceWeaver-controlled code review wrapper. Use when reviewing code
 
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-049; trace=TRACE-TW-023; ver=VER-TW-032 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
+<!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 
 # TraceWeaver Code Review
 
@@ -35,7 +36,8 @@ reviewed change, stop and report the missing authority. Do not run raw
 1. Identify the code, script, skill, manifest, runtime harness, or
    behavior-bearing diff under review.
 2. Identify the claimed requirement, authority source, implementation links,
-   verification evidence, validation question, and held claims.
+   test-first evidence, verification evidence, validation question, and held
+   claims.
 3. Classify the review target using the operating-mode policy. In
    Implementation Gate Mode, pass the changed behavior-bearing files plus
    linked tests, fixtures, and smokes to `tw-traceability-check` for code-anchor
@@ -43,9 +45,10 @@ reviewed change, stop and report the missing authority. Do not run raw
    publication or release claims depend on it.
 4. Run `tw-traceability-check` on the review target before CE review.
 5. If `tw-traceability-check` returns blocked, needs revision, missing
-   verification, missing validation, dark behavior, stale evidence, or an
-   unsupported done/release claim, stop before accepted code review and report
-   the exact structured traceability findings before any CE findings.
+   test-first evidence, missing verification, missing validation, dark behavior,
+   stale evidence, or an unsupported done/release claim, stop before accepted
+   code review and report the exact structured traceability findings before any
+   CE findings.
 6. If the only blocker is missing code/test anchors with unambiguous reviewed
    authority, report the trace-anchor authoring path and route back to
    `tw-work` through `tw-auto`. If the blocker is
@@ -59,9 +62,9 @@ reviewed change, stop and report the missing authority. Do not run raw
 8. Keep `ce-code-review` in TraceWeaver no-publication mode. It may report
    findings and policy-allowed local fixes, but it must not stage, commit, push,
    open PRs, update PRs, or claim release/clean-replacement readiness.
-9. Report code-review findings together with the traceability result, verification
-   evidence, validation path, held claims, and next required review or human
-   decision.
+9. Report code-review findings together with the traceability result, test-first
+   evidence, verification evidence, validation path, held claims, and next
+   required review or human decision.
 
 ## Highest-Level Handoff Discipline
 
@@ -86,6 +89,7 @@ Return:
 - structured traceability findings, preserving severity, status, affected IDs,
   file/line anchors when available, claim impact, and remediation
 - CE code-review coverage and findings
+- test-first evidence reviewed, or approved not-applicable/exception status
 - verification evidence reviewed
 - validation question/path reviewed
 - open gaps, dark behavior, held claims, and unsupported claims
