@@ -265,6 +265,21 @@ Claude packaging has a manifest with Sonnet policy recorded, but the repo-local
 installer currently supports only `--to codex`. Treat Claude install/release
 claims as held until a reviewed Claude installation path is added.
 
+### Recommended Environment Tools
+
+TraceWeaver Core is the workflow plugin. The tools below are recommended so
+other contributors have an environment where TraceWeaver works well. They help
+with task state, session recall, and compatibility context; they do not replace
+TraceWeaver authority files and they do not approve implementation by
+themselves.
+
+| Tool | Why it helps a TraceWeaver project |
+|---|---|
+| TraceWeaver Core plugin | Provides the normal `tw-*` workflow, including `tw-auto`, `tw-plan`, `tw-work`, reviews, traceability checks, and controlled publication. |
+| Beads (`bd`) | Keeps dependency-aware issue state, blockers, ownership, and ready work visible when a repository opts in with `.beads/`. Requirements authority still lives in `requirements.md`, `traceability-matrix.md`, and `.traceweaver/intent-contract.yml`. |
+| MemSearch / `memory-recall` | Provides semantic recall over past agent sessions. Recalled sessions are context and source evidence; anything authoritative still needs the normal TraceWeaver requirements and traceability gates. |
+| Compound Engineering plugin or source checkout | Provides upstream compatibility context while TraceWeaver is alpha. The normal user path should still enter through TraceWeaver-owned `tw-*` wrappers; direct `ce-*` use does not close TraceWeaver authority, traceability, verification, or validation gates. |
+
 ### Start A Project
 
 In a consuming repository, TraceWeaver expects these authority files at the
