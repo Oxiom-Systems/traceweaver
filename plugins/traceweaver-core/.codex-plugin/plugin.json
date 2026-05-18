@@ -34,7 +34,8 @@
     "importedCeComponentBodyPolicy": "no_model_default_edits_without_reviewed_overlay_fork_record"
   },
   "traceweaver": {
-    "anchor": "TRACEWEAVER: file-role=model-default-codex-plugin-manifest; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055"
+    "anchor": "TRACEWEAVER: file-role=model-default-codex-plugin-manifest; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055",
+    "strategyIdeationAnchor": "TRACEWEAVER: file-role=strategy-ideation-codex-plugin-prompt; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060"
   },
   "skills": "./skills/",
   "interface": {
@@ -51,6 +52,8 @@
     "websiteURL": "https://github.com/Oxiom-Systems/traceweaver",
     "defaultPrompt": [
             "Use the tw-requirements-review skill for requirements or planning authority review.",
+            "Use the tw-strategy skill for STRATEGY.md grounding as source evidence only; strategy does not override requirements or the Intent Contract.",
+            "Use the tw-ideate skill for generated/ranked ideas as source evidence only before grilling, brainstorming, or requirements review.",
             "Use the tw-grill skill after ideation and before brainstorming when one selected idea needs deeper interview; its output is source evidence, not authority.",
             "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
       "Use the tw-traceability-check skill during plan, code, document, or release-evidence review.",

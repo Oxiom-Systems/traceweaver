@@ -9,6 +9,7 @@ disable-model-invocation: true
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-042; ver=VER-TW-054 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-045; ver=VER-TW-057 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059 -->
+<!-- TRACEWEAVER: file-role=strategy-ideation-orchestrator; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
 
 # TraceWeaver Auto
 
@@ -86,6 +87,8 @@ a plugin-scoped or namespaced entry.
 
 Required resolutions:
 
+- `tw-strategy`
+- `tw-ideate`
 - `tw-brainstorm`
 - `tw-plan`
 - `tw-authority-gate`
@@ -119,8 +122,10 @@ loads authority and requirements are plan-ready. `tw-auto` must not invoke raw
 `ce-plan` directly as the planning wrapper.
 
 Source-evidence, learning, session, verification, setup, worktree, and PR
-feedback routes must also use TraceWeaver wrappers. `tw-brainstorm` delegates
-to packaged `ce-brainstorm` as source evidence; `tw-compound` and
+feedback routes must also use TraceWeaver wrappers. `tw-strategy` and
+`tw-ideate` delegate to packaged CE-derived strategy and ideation engines as
+source evidence only; `tw-brainstorm` delegates to packaged `ce-brainstorm` as
+source evidence; `tw-compound` and
 `tw-compound-refresh` delegate to packaged learning engines without approving
 authority changes; `tw-sessions` delegates to packaged `ce-sessions` and may
 use hidden/internal packaged `ce-session-inventory` and `ce-session-extract`
@@ -168,20 +173,26 @@ review completion.
    incomplete, missing, or require material authority change.
 4. Confirm the current baseline ID, baseline hash, requirements authority, and
    Intent Contract authority.
-5. Run or create the planning step using the resolved TraceWeaver planning
+5. When the request is about product direction, strategy, possible ideas,
+   idea generation, ranking, critique, or an existing `STRATEGY.md`, route first
+   through `tw-strategy` and/or `tw-ideate` as source evidence before
+   `tw-brainstorm` or requirements review. Skip these source-evidence wrappers
+   when the request already names an approved implementation plan or accepted
+   requirement and does not ask for strategy or ideation.
+6. Run or create the planning step using the resolved TraceWeaver planning
    wrapper (`tw-plan`) and keep the plan bounded to approved authority. The
    wrapper may delegate to packaged `ce-plan` only after TraceWeaver authority
    and requirements-quality preflight pass or are explicitly held.
-6. When the request needs ideation, session history, learning capture, PR
+7. When the request needs brainstorming, session history, learning capture, PR
    feedback repair, setup, worktree creation, browser verification, or Xcode
    verification, route through `tw-brainstorm`, `tw-sessions`, `tw-compound`,
    `tw-compound-refresh`, `tw-resolve-pr-feedback`, `tw-setup`, `tw-worktree`,
    `tw-test-browser`, or `tw-test-xcode` instead of raw CE skills.
-7. Run the resolved `tw-authority-gate` before implementation.
-8. If authority is missing, stop and create a gap, change, exception candidate,
+8. Run the resolved `tw-authority-gate` before implementation.
+9. If authority is missing, stop and create a gap, change, exception candidate,
    accepted-risk candidate, or clarification record. Do not implement from an
    assumption.
-9. Run implementation using the resolved TraceWeaver implementation worker
+10. Run implementation using the resolved TraceWeaver implementation worker
    (`tw-work`) only in TraceWeaver controlled publication-gated mode and only
    while authority remains clear. `tw-work` may invoke the TraceWeaver-packaged
    `ce-work` coding engine, but `tw-auto` must treat `tw-work` as the work-loop
@@ -198,7 +209,7 @@ review completion.
    status to completed, or load `ce-commit`, `ce-commit-push-pr`, or Phase 4
    shipping unless the controlled TraceWeaver publication route authorizes that
    specific publication target.
-10. For changed behavior-bearing implementation or verification artifacts, run
+11. For changed behavior-bearing implementation or verification artifacts, run
    trace-anchor authoring as part of the work loop: scan changed files, propose
    anchors and Code Anchor Evidence rows, apply only unambiguous mappings in an
    authorized work-loop context, skip per-artifact ambiguous anchor writes while
@@ -209,13 +220,13 @@ review completion.
    change. Unresolved per-artifact mapping findings must block
    traceability-complete, review acceptance, done, publication, and release
    claims until resolved or explicitly held.
-11. After each meaningful work cycle, update:
+12. After each meaningful work cycle, update:
    - `.traceweaver/trace-records/<task-or-run-id>-trace.yml`
    - `traceability-matrix.md`
    - loop-state evidence shaped by the skill-local
      `references/automation-loop-state-template.yml` when a run record is
      created
-12. Unless the user explicitly asked to stop after `tw-work`, continue after
+13. Unless the user explicitly asked to stop after `tw-work`, continue after
    the `tw-work` handoff and run the resolved `tw-traceability-check` before
    claiming work/review completion.
 13. Run the resolved relevant TraceWeaver review wrapper:

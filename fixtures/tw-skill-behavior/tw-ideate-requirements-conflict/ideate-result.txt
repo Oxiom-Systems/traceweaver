@@ -1,0 +1,6 @@
+TRACEWEAVER: verifies=VER-TW-060; req=REQ-TW-064; trace=TRACE-TW-047
+expected_behavior=route_to_tw-requirements-review
+ce_delegation_surface=TraceWeaver-packaged ce-ideate
+source_evidence_only=true
+requirements_conflict=candidate_change_not_implementation_authority
+implementation_authority=false

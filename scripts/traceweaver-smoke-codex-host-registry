@@ -55,6 +55,8 @@ compound_engineering_plugin_enabled() {
 
 required_direct_skills=(
   tw-auto
+  tw-strategy
+  tw-ideate
   tw-plan
   tw-brainstorm
   lfg
@@ -80,6 +82,8 @@ required_direct_skills=(
 
 traceweaver_native_skills=(
   tw-auto
+  tw-strategy
+  tw-ideate
   tw-plan
   tw-brainstorm
   tw-authority-gate
@@ -107,6 +111,8 @@ required_skill_local_files=(
   "tw-code-review/references/traceweaver-operating-modes.md"
   "tw-doc-review/references/traceweaver-operating-modes.md"
   "tw-auto/references/traceweaver-operating-modes.md"
+  "tw-strategy/references/traceweaver-operating-modes.md"
+  "tw-ideate/references/traceweaver-operating-modes.md"
   "tw-plan/references/traceweaver-operating-modes.md"
   "tw-work/references/traceweaver-operating-modes.md"
   "tw-brainstorm/references/traceweaver-operating-modes.md"
@@ -228,7 +234,7 @@ TRACEWEAVER_SKILL_HELD=not_available
 EOF
 
 set +e
-codex debug prompt-input "Use TraceWeaver required direct skills: tw-authority-gate tw-auto tw-plan tw-brainstorm lfg tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-commit tw-commit-push-pr tw-grill." >"$prompt_input" 2>"$runtime_tmp/prompt-input.err"
+codex debug prompt-input "Use TraceWeaver required direct skills: tw-authority-gate tw-auto tw-strategy tw-ideate tw-plan tw-brainstorm lfg tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-commit tw-commit-push-pr tw-grill." >"$prompt_input" 2>"$runtime_tmp/prompt-input.err"
 prompt_input_status=$?
 set -e
 

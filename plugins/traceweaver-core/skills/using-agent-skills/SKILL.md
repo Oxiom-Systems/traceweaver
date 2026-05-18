@@ -4,6 +4,7 @@ description: Discovers and invokes agent skills. Use when starting a session or 
 ---
 
 <!-- TRACEWEAVER: file-role=skill-routing-surface; req=REQ-TW-043; trace=TRACE-TW-033; ver=VER-TW-042 -->
+<!-- TRACEWEAVER: file-role=strategy-ideation-routing-surface; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
 
 # Using Agent Skills
 
@@ -16,6 +17,8 @@ Agent Skills is a collection of engineering workflow skills organized by develop
 When a task arrives, identify the development phase and apply the corresponding skill:
 
 ```text
+Product direction or STRATEGY.md grounding -> tw-strategy as source evidence, then tw-ideate, tw-brainstorm, or tw-requirements-review
+Idea generation, ranked options, or critique -> tw-ideate as source evidence, then tw-grill, tw-brainstorm, or tw-requirements-review
 Vague idea or need refinement -> tw-brainstorm as source evidence, then tw-requirements-review
 Intent deepening after ideation -> tw-grill as source evidence, then tw-requirements-review
 New project, feature, or change -> tw-auto
@@ -39,7 +42,7 @@ Release -> held in TraceWeaver alpha; stop before publication
 Direct `ce-*` entrypoints in the TraceWeaver package are legacy/manual-continuity
 surfaces unless a TraceWeaver wrapper delegates to them. Do not select raw
 `ce-brainstorm`, `ce-plan`, `ce-work`, `ce-debug`, `ce-code-review`,
-`ce-doc-review`, `ce-test-browser`, `ce-test-xcode`, `ce-sessions`,
+`ce-doc-review`, `ce-strategy`, `ce-ideate`, `ce-test-browser`, `ce-test-xcode`, `ce-sessions`,
 `ce-compound`, `ce-compound-refresh`, `ce-resolve-pr-feedback`, `ce-setup`,
 `ce-worktree`, or publication-capable CE skills as the first step for
 TraceWeaver-controlled work. Start from `tw-auto` or a TraceWeaver wrapper/gate,
@@ -71,7 +74,8 @@ Do not require it for formatting-only, spelling-only, or comment-only changes th
 
 If meaningful behavior is involved, traceability is a hop, not an optional extra.
 
-Ideas are lifecycle inputs, not authority. When `ce-brainstorm` or `tw-grill`
+Ideas are lifecycle inputs, not authority. When `tw-strategy`, `tw-ideate`,
+`ce-brainstorm`, or `tw-grill`
 produces a concept that may become work, preserve it as candidate needs,
 assumptions, risks, success/failure signals, open decisions, and not-doing
 boundaries. Do not let an idea, brainstorm note, roadmap thought, or review
@@ -177,16 +181,17 @@ These are the subtle errors that look like productivity but create problems:
 For a complete feature, the typical skill sequence is:
 
 ```text
-1. tw-brainstorm or tw-grill -> Refine ideas and preserve source evidence
-2. systems-engineering-traceability -> Preserve candidate needs, authority, V&V, and no-orphan links
-3. tw-requirements-review or requirements-reviewer -> Improve requirement quality
-4. tw-auto or tw-plan guarded by TraceWeaver authority -> Define and plan work
-5. tw-authority-gate -> Confirm approved authority before implementation
-6. tw-work -> Build the authorized slice in no-publication mode
-7. tw-test-browser or tw-test-xcode -> Verify runtime behavior when applicable
-8. tw-traceability-check -> Prove trace links and dark-behavior handling
-9. tw-code-review or tw-doc-review -> Review before closure
-10. publication -> held in TraceWeaver alpha until later gates approve it
+1. tw-strategy or tw-ideate when direction or options are needed -> Source evidence only
+2. tw-brainstorm or tw-grill -> Refine ideas and preserve source evidence
+3. systems-engineering-traceability -> Preserve candidate needs, authority, V&V, and no-orphan links
+4. tw-requirements-review or requirements-reviewer -> Improve requirement quality
+5. tw-auto or tw-plan guarded by TraceWeaver authority -> Define and plan work
+6. tw-authority-gate -> Confirm approved authority before implementation
+7. tw-work -> Build the authorized slice in no-publication mode
+8. tw-test-browser or tw-test-xcode -> Verify runtime behavior when applicable
+9. tw-traceability-check -> Prove trace links and dark-behavior handling
+10. tw-code-review or tw-doc-review -> Review before closure
+11. publication -> held in TraceWeaver alpha until later gates approve it
 ```
 
 Not every task needs every skill. A bug fix might only need: `tw-debug` ->
@@ -197,6 +202,7 @@ Not every task needs every skill. A bug fix might only need: `tw-debug` ->
 
 | Phase | Skill | One-Line Summary |
 |-------|-------|-----------------|
+| Define | tw-strategy / tw-ideate | Capture strategy grounding and ranked ideas as source evidence |
 | Define | tw-brainstorm / tw-grill | Refine ideas, challenge assumptions, and preserve source evidence |
 | Define | tw-requirements-review / requirements-reviewer | Requirements and acceptance criteria before code |
 | Plan | tw-auto / tw-plan | Decompose approved authority into bounded work |
@@ -215,6 +221,7 @@ Not every task needs every skill. A bug fix might only need: `tw-debug` ->
 
 | Situation | Skills to consider |
 |---|---|
+| Product direction, STRATEGY.md, or broad option generation | `tw-strategy`, `tw-ideate`, `systems-engineering-traceability` |
 | Vague product, project, workflow, or feature idea | `tw-brainstorm`, `tw-grill`, `systems-engineering-traceability` |
 | New feature or changed behavior | `tw-auto`, `tw-plan`, `tw-authority-gate`, `systems-engineering-traceability` |
 | Implementation work | `tw-work`, `tw-traceability-check`, `systems-engineering-traceability` |

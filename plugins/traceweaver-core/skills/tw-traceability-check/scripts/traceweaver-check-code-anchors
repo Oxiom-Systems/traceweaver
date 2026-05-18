@@ -2,6 +2,7 @@
 # frozen_string_literal: true
 # TRACEWEAVER: file-role=code-anchor-scanner; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
 # TRACEWEAVER: file-role=semantic-audit-scanner; req=REQ-TW-063; trace=TRACE-TW-044; ver=VER-TW-056
+# TRACEWEAVER: file-role=imported-ce-component-boundary-scanner; req=REQ-TW-059; trace=TRACE-TW-040; ver=VER-TW-052
 
 require "fileutils"
 require "json"
@@ -101,6 +102,7 @@ def implementation_target?(relative)
   return false if relative.start_with?("fixtures/code-traceability/")
   return false if relative.start_with?("fixtures/code-trace-authoring/")
   return false if relative.start_with?("fixtures/systems-engineering-audit-closure/")
+  return false if relative.start_with?("plugins/traceweaver-core/skills/ce-")
 
   behavior_bearing?(relative) && !authority_record?(relative)
 end

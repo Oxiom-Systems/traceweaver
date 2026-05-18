@@ -1,0 +1,7 @@
+# TRACEWEAVER: file-role=strategy-ideation-routing-fixture; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060
+# TRACEWEAVER: verifies=VER-TW-060; req=REQ-TW-064; trace=TRACE-TW-047
+strategy_request_route=tw-strategy_before_tw-brainstorm
+ideation_request_route=tw-ideate_before_tw-grill_or_tw-brainstorm
+approved_implementation_route=skip_tw-strategy_and_tw-ideate
+source_evidence_boundary=required
+manual_ce_strategy_or_ce_ideate=forbidden

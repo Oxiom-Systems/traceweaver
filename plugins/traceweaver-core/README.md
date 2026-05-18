@@ -1,6 +1,7 @@
 # TraceWeaver Core Plugin
 
 <!-- TRACEWEAVER: file-role=plugin-readme; req=REQ-TW-052; trace=TRACE-TW-036; ver=VER-TW-046 -->
+<!-- TRACEWEAVER: file-role=strategy-ideation-plugin-readme; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
 
 TraceWeaver Core adds systems-engineering authority control to agentic software
 work. This alpha plugin wires requirement quality, traceability checks, and
@@ -39,6 +40,8 @@ Included skills:
 - `systems-engineering-traceability`
 - `using-agent-skills` selected routing context
 - `tw-requirements-review`
+- `tw-strategy`
+- `tw-ideate`
 - `tw-grill`
 - `tw-authority-gate`
 - `tw-traceability-check`
@@ -53,7 +56,8 @@ Included skills:
 - `tw-test-xcode`
 - `tw-setup`
 - `tw-worktree`
-- selected CE-compatible workflow skills, including `ce-brainstorm`,
+- selected CE-compatible workflow skills, including `ce-strategy`,
+  `ce-ideate`, `ce-brainstorm`,
   `ce-plan`, `ce-work`, `ce-code-review`, `ce-doc-review`, `ce-compound`,
   `ce-resolve-pr-feedback`, `ce-commit`, `ce-commit-push-pr`,
   `ce-compound-refresh`, `ce-sessions`, `ce-session-inventory`,
@@ -127,10 +131,12 @@ identity.
 
 - `tw-requirements-review` checks whether candidate
   requirements are good enough to become implementation authority.
+- `tw-strategy` wraps packaged `ce-strategy` so `STRATEGY.md` remains
+  grounding and source evidence, not implementation authority.
+- `tw-ideate` wraps packaged `ce-ideate` so generated and ranked ideas remain
+  source evidence before grilling, brainstorming, or requirements review.
 - `tw-grill` optionally stress-tests one selected idea after ideation and before
   `tw-brainstorm`; it produces source evidence only, not approved authority.
-  `ce:ideate` is optional external CE context in this alpha, not a packaged
-  TraceWeaver skill.
 - `tw-authority-gate` checks whether planned work has approved
   authority before implementation starts.
 - `tw-traceability-check` checks whether behavior traces to
@@ -203,7 +209,9 @@ change, exception, accepted risk, or clarification.
 The controlled alpha path is:
 
 ```text
-tw-brainstorm
+tw-strategy when product direction needs grounding
+-> tw-ideate when options need generation and critique
+-> tw-brainstorm
 -> tw-requirements-review
 -> authority-baseline record
 -> tw-plan
@@ -227,7 +235,7 @@ delegation, static continuity testing, and reviewed upstream-drift comparison,
 but they do not by themselves close TraceWeaver authority, traceability,
 verification, or validation gates. TraceWeaver wrappers are provided for the
 selected packaged CE continuity entrypoints users are expected to call directly:
-`tw-brainstorm`, `tw-plan`, `tw-work`, `tw-debug`, `tw-code-review`,
+`tw-strategy`, `tw-ideate`, `tw-brainstorm`, `tw-plan`, `tw-work`, `tw-debug`, `tw-code-review`,
 `tw-doc-review`, `tw-commit`, `tw-commit-push-pr`, `tw-compound`,
 `tw-compound-refresh`, `tw-sessions`, `tw-test-browser`, `tw-test-xcode`,
 `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree`. Packaged
@@ -247,6 +255,8 @@ There are two valid blank-project starts:
 ```text
 intent-first path:
 idea
+-> tw-strategy when product direction needs grounding
+-> tw-ideate when options are needed
 -> ideation source
 -> tw-grill
 -> tw-brainstorm
@@ -264,8 +274,11 @@ tw-auto "build X"
 -> stop for tw-requirements-review
 ```
 
-`tw-auto` does not automatically run idea generation or `tw-grill`. If a
-consuming project has no TraceWeaver authority files yet, it bootstraps draft
+`tw-auto` may route strategy or idea-generation requests through `tw-strategy`
+and `tw-ideate` before brainstorming. It should skip those source-evidence
+wrappers for approved implementation plans that do not ask for upstream
+strategy or ideation. If a consuming project has no TraceWeaver authority files
+yet, it bootstraps draft
 `requirements.md`, root `traceability-matrix.md`, and
 `.traceweaver/intent-contract.yml` from packaged templates, then stops for
 `tw-requirements-review` and human baseline review before implementation.
