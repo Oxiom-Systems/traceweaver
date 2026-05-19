@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=traceability-view-smoke; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+# TRACEWEAVER: verifies=VER-TW-064; req=REQ-TW-067; trace=TRACE-TW-051
+"$ROOT_DIR/scripts/traceweaver-generate-traceability-views" --root "$ROOT_DIR" --out "$TMP_DIR" >/dev/null
+
+diff -u "$ROOT_DIR/docs/generated/traceability-dashboard.md" "$TMP_DIR/traceability-dashboard.md"
+diff -u "$ROOT_DIR/docs/generated/traceability-data.json" "$TMP_DIR/traceability-data.json"
+diff -u "$ROOT_DIR/docs/generated/traceability-graph.mmd" "$TMP_DIR/traceability-graph.mmd"
+
+echo "traceability_generated_views_smoke=pass"
+echo "traceability_generated_views_compared=traceability-dashboard.md,traceability-data.json,traceability-graph.mmd"

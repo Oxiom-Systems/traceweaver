@@ -228,6 +228,17 @@ options[:files].each do |input_path|
 
   structured = data["structured_acceptance"]
   unless structured.is_a?(Hash)
+    emit.call(
+      id: "ACCEPTANCE-MALFORMED-STRUCTURED-ACCEPTANCE",
+      severity: "P1",
+      status: "blocked",
+      title: "structured_acceptance is not a mapping",
+      evidence: "structured_acceptance=#{structured.class}",
+      affected_ids: affected_ids,
+      file: relative,
+      claim_impact: "Requirement closure cannot be accepted when structured acceptance evidence is not parseable as fields.",
+      remediation: "Replace structured_acceptance with a mapping containing the required acceptance evidence fields."
+    )
     next
   end
 

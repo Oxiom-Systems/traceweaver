@@ -1,0 +1,319 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=traceability-view-generator; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064
+
+require "digest"
+require "date"
+require "fileutils"
+require "json"
+require "optparse"
+require "yaml"
+
+options = {
+  root: Dir.pwd,
+  out: nil
+}
+
+OptionParser.new do |opts|
+  opts.banner = "Usage: traceweaver-generate-traceability-views [--root PATH] [--out PATH]"
+
+  opts.on("--root PATH", "Repository root") { |value| options[:root] = value }
+  opts.on("--out PATH", "Output directory") { |value| options[:out] = value }
+end.parse!
+
+root = File.expand_path(options[:root])
+out_dir = File.expand_path(options[:out] || File.join(root, "docs", "generated"))
+
+MATRIX_PATH = "traceability-matrix.md"
+REQUIREMENTS_PATH = "requirements.md"
+INTENT_PATH = ".traceweaver/intent-contract.yml"
+VALIDATION_GLOB = File.join("docs", "validation", "**", "*.md")
+
+def read_file(root, path)
+  File.read(File.join(root, path), encoding: "UTF-8")
+end
+
+def sha256(root, path)
+  Digest::SHA256.file(File.join(root, path)).hexdigest
+end
+
+def markdown_rows(markdown)
+  sections = Hash.new { |hash, key| hash[key] = [] }
+  current_section = nil
+  pending_header = nil
+
+  markdown.each_line do |line|
+    if (match = line.match(/^##\s+(.+?)\s*$/))
+      current_section = match[1]
+      pending_header = nil
+      next
+    end
+
+    next unless current_section
+    next unless line.start_with?("|")
+
+    cells = line.strip.sub(/^\|/, "").sub(/\|$/, "").split("|").map(&:strip)
+    next if cells.all? { |cell| cell.match?(/\A:?-{3,}:?\z/) }
+
+    if pending_header.nil?
+      pending_header = cells
+      next
+    end
+
+    row = {}
+    pending_header.each_with_index do |header, index|
+      row[header] = cells[index] || ""
+    end
+    sections[current_section] << row
+  end
+
+  sections
+end
+
+def frontmatter_for(markdown)
+  return nil unless markdown.start_with?("---\n")
+
+  _, yaml_text, = markdown.split(/^---\s*$/, 3)
+  return nil unless yaml_text
+
+  YAML.safe_load(yaml_text, permitted_classes: [Date], aliases: false)
+rescue Psych::SyntaxError
+  nil
+end
+
+def id_number(id)
+  id.to_s.scan(/\d+/).last.to_i
+end
+
+def split_ids(value)
+  value.to_s.split(/;|,|\band\b|<br\s*\/?>/i).map(&:strip).reject(&:empty?)
+end
+
+def table_by_id(rows, id_key)
+  rows.each_with_object({}) do |row, acc|
+    id = row[id_key].to_s.strip
+    acc[id] = row unless id.empty?
+  end
+end
+
+def first_cell(row, *keys)
+  keys.each do |key|
+    value = row[key]
+    return value unless value.nil?
+  end
+  nil
+end
+
+def compact(value, fallback = "Unrecorded")
+  cleaned = value.to_s.gsub(/\s+/, " ").strip
+  cleaned.empty? ? fallback : cleaned
+end
+
+def truncate(value, length = 150)
+  text = compact(value, "")
+  text.length > length ? "#{text[0, length - 3]}..." : text
+end
+
+# TRACEWEAVER: entrypoint=traceability_view_generate_orchestrator; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064
+matrix_markdown = read_file(root, MATRIX_PATH)
+tables = markdown_rows(matrix_markdown)
+
+requirements = tables.fetch("Requirements", [])
+traces = tables.fetch("Traceability Matrix", [])
+atps = tables.fetch("ATP Entries", [])
+results = tables.fetch("Result Records", [])
+verification = tables.fetch("Verification Evidence", [])
+validation = tables.fetch("Validation Evidence", [])
+code_anchors = tables.fetch("Code Anchor Evidence", [])
+
+acceptance_results = Dir.glob(File.join(root, VALIDATION_GLOB)).sort.map do |path|
+  relative = path.delete_prefix("#{root}/")
+  metadata = frontmatter_for(File.read(path, encoding: "UTF-8"))
+  next unless metadata && metadata["record_type"] == "traceweaver_acceptance_result"
+
+  next {
+    "path" => relative,
+    "result_id" => metadata["result_id"],
+    "requirement_id" => metadata["requirement_id"],
+    "status" => metadata["status"],
+    "final_disposition" => metadata.dig("structured_acceptance", "final_disposition"),
+    "owner" => metadata["owner"],
+    "next_trigger" => metadata.dig("structured_acceptance", "next_trigger")
+  }
+end.compact
+
+source_paths = [
+  MATRIX_PATH,
+  REQUIREMENTS_PATH,
+  INTENT_PATH,
+  *acceptance_results.map { |row| row["path"] }
+].uniq
+
+source_hashes = source_paths.map do |path|
+  {
+    "path" => path,
+    "sha256" => sha256(root, path)
+  }
+end
+
+trace_by_requirement = Hash.new { |hash, key| hash[key] = [] }
+traces.each do |trace|
+  split_ids(first_cell(trace, "Requirements", "Requirement")).grep(/\AREQ-TW-\d+\z/).each do |req_id|
+    trace_by_requirement[req_id] << trace["Trace ID"]
+  end
+end
+
+requirement_rows = requirements.map do |row|
+  req_id = row["ID"]
+  {
+    "id" => req_id,
+    "type" => row["Type"],
+    "summary" => row["Requirement Summary"],
+    "source_need" => row["Source Need / Parent"],
+    "verification_method" => row["Verification Method"],
+    "validation_path" => row["Validation Path"],
+    "owner" => row["Owner"],
+    "status" => row["Status"],
+    "trace_ids" => trace_by_requirement[req_id]
+  }
+end
+
+trace_rows = traces.map do |row|
+  {
+    "id" => row["Trace ID"],
+    "owner" => row["Owner"],
+    "needs" => first_cell(row, "Needs", "Need"),
+    "requirements" => first_cell(row, "Requirements", "Requirement"),
+    "artifact" => first_cell(row, "Artifact / Implementation", "Implementation"),
+    "verification" => row["Verification"],
+    "validation" => row["Validation"],
+    "status" => row["Status"],
+    "next_step" => first_cell(row, "Next Step / Debt", "Gap / Debt")
+  }
+end
+
+data = {
+  "schema_version" => 1,
+  "source_of_truth" => MATRIX_PATH,
+  "generated_view_status" => "read_only_derived",
+  "generated_from" => source_hashes,
+  "row_counts" => {
+    "requirements" => requirement_rows.length,
+    "trace_rows" => trace_rows.length,
+    "atp_entries" => atps.length,
+    "result_records" => results.length,
+    "verification_records" => verification.length,
+    "validation_records" => validation.length,
+    "code_anchor_records" => code_anchors.length,
+    "structured_acceptance_results" => acceptance_results.length
+  },
+  "requirements" => requirement_rows,
+  "traces" => trace_rows,
+  "atp_entries" => atps,
+  "result_records" => results,
+  "verification_evidence" => verification,
+  "validation_evidence" => validation,
+  "code_anchor_evidence" => code_anchors,
+  "structured_acceptance_results" => acceptance_results
+}
+
+latest_requirements = requirement_rows.sort_by { |row| id_number(row["id"]) }.last(12).reverse
+latest_traces = trace_rows.sort_by { |row| id_number(row["id"]) }.last(12).reverse
+open_or_held_traces = trace_rows.select { |row| "#{row["status"]} #{row["next_step"]}".match?(/held|pending|open|partial/i) }
+latest_validation = validation.sort_by { |row| id_number(row["ID"]) }.last(8).reverse
+
+dashboard = +"<!-- TRACEWEAVER: exception=generated; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064 -->\n"
+dashboard << "<!-- Generated by scripts/traceweaver-generate-traceability-views. Do not edit directly. -->\n\n"
+dashboard << "# Traceability Dashboard\n\n"
+dashboard << "Source of truth: `#{MATRIX_PATH}`. This file is a read-only derived view; if it disagrees with the matrix, update the matrix and regenerate.\n\n"
+dashboard << "## Source Hashes\n\n"
+dashboard << "| Source | SHA-256 |\n| --- | --- |\n"
+source_hashes.each do |source|
+  dashboard << "| `#{source["path"]}` | `#{source["sha256"]}` |\n"
+end
+
+dashboard << "\n## Coverage Counts\n\n"
+dashboard << "| View | Count |\n| --- | ---: |\n"
+data["row_counts"].each do |label, count|
+  dashboard << "| #{label.tr("_", " ")} | #{count} |\n"
+end
+
+dashboard << "\n## Latest Requirements\n\n"
+dashboard << "| Requirement | Status | Validation | Trace Rows |\n| --- | --- | --- | --- |\n"
+latest_requirements.each do |row|
+  dashboard << "| #{row["id"]} | #{compact(row["status"])} | #{compact(row["validation_path"])} | #{row["trace_ids"].join("; ")} |\n"
+end
+
+dashboard << "\n## Latest Trace Rows\n\n"
+dashboard << "| Trace | Requirements | Artifact | Verification | Validation | Status |\n| --- | --- | --- | --- | --- | --- |\n"
+latest_traces.each do |row|
+  dashboard << "| #{row["id"]} | #{truncate(row["requirements"], 80)} | #{truncate(row["artifact"], 90)} | #{truncate(row["verification"], 60)} | #{truncate(row["validation"], 60)} | #{truncate(row["status"], 100)} |\n"
+end
+
+dashboard << "\n## Open Or Held Trace Rows\n\n"
+dashboard << "| Trace | Requirements | Status | Next Step / Debt |\n| --- | --- | --- | --- |\n"
+open_or_held_traces.sort_by { |row| id_number(row["id"]) }.last(12).reverse.each do |row|
+  dashboard << "| #{row["id"]} | #{truncate(row["requirements"], 80)} | #{truncate(row["status"], 110)} | #{truncate(row["next_step"], 130)} |\n"
+end
+
+dashboard << "\n## Structured Acceptance Results\n\n"
+dashboard << "| Result | Requirement | Disposition | Owner | Next Trigger |\n| --- | --- | --- | --- | --- |\n"
+acceptance_results.each do |row|
+  dashboard << "| #{row["result_id"]} | #{row["requirement_id"]} | #{compact(row["final_disposition"])} | #{compact(row["owner"])} | #{truncate(row["next_trigger"], 120)} |\n"
+end
+
+dashboard << "\n## Latest Validation Records\n\n"
+dashboard << "| Validation | Source Need | Result | Evidence |\n| --- | --- | --- | --- |\n"
+latest_validation.each do |row|
+  dashboard << "| #{row["ID"]} | #{truncate(row["Source Need"], 70)} | #{truncate(row["Result"], 100)} | #{truncate(row["Evidence Path"], 110)} |\n"
+end
+
+def mermaid_id(prefix, value)
+  "#{prefix}_#{value.to_s.gsub(/[^A-Za-z0-9]+/, "_").gsub(/\A_+|_+\z/, "")}"
+end
+
+mermaid = +"%% TRACEWEAVER: exception=generated; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064\n"
+mermaid << "%% Generated by scripts/traceweaver-generate-traceability-views. Do not edit directly.\n"
+mermaid << "flowchart LR\n"
+mermaid << "  matrix[\"traceability-matrix.md (authority)\"]\n"
+mermaid << "  reqdoc[\"requirements.md\"]\n"
+mermaid << "  intent[\".traceweaver/intent-contract.yml\"]\n"
+mermaid << "  dashboard[\"docs/generated/traceability-dashboard.md\"]\n"
+mermaid << "  json[\"docs/generated/traceability-data.json\"]\n"
+mermaid << "  graph[\"docs/generated/traceability-graph.mmd\"]\n"
+mermaid << "  smoke[\"scripts/traceweaver-smoke-traceability-generated-views\"]\n"
+mermaid << "  reqdoc --> matrix\n"
+mermaid << "  intent --> matrix\n"
+mermaid << "  matrix --> dashboard\n"
+mermaid << "  matrix --> json\n"
+mermaid << "  matrix --> graph\n"
+mermaid << "  smoke --> dashboard\n"
+mermaid << "  smoke --> json\n"
+mermaid << "  smoke --> graph\n"
+mermaid << "\n  subgraph Latest_Trace_Rows[\"Latest trace rows from authority matrix\"]\n"
+
+latest_traces.reverse.each do |trace|
+  trace_id = mermaid_id("trace", trace["id"])
+  mermaid << "    #{trace_id}[\"#{trace["id"]}\"]\n"
+  split_ids(trace["requirements"]).grep(/\AREQ-TW-\d+\z/).each do |req_id|
+    req_node = mermaid_id("req", req_id)
+    mermaid << "    #{req_node}[\"#{req_id}\"] --> #{trace_id}\n"
+  end
+
+  verification_node = mermaid_id("ver", trace["verification"])
+  validation_node = mermaid_id("val", trace["validation"])
+  mermaid << "    #{trace_id} --> #{verification_node}[\"#{trace["verification"]}\"]\n" unless trace["verification"].to_s.empty?
+  mermaid << "    #{trace_id} --> #{validation_node}[\"#{trace["validation"]}\"]\n" unless trace["validation"].to_s.empty?
+end
+
+mermaid << "  end\n"
+
+FileUtils.mkdir_p(out_dir)
+File.write(File.join(out_dir, "traceability-data.json"), "#{JSON.pretty_generate(data)}\n")
+File.write(File.join(out_dir, "traceability-dashboard.md"), dashboard)
+File.write(File.join(out_dir, "traceability-graph.mmd"), mermaid)
+
+puts "traceability_generated_views=pass"
+puts "traceability_generated_views_out=#{out_dir}"
+puts "traceability_generated_views_sources=#{source_paths.join(",")}"
