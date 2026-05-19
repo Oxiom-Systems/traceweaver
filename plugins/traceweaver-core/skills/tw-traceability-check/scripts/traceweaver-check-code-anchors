@@ -271,7 +271,8 @@ targets.each do |relative|
 
   text = path.read
   generated_exception_line = text.lines.find_index do |line|
-    line.match?(/^\s*(#|<!--|\/\/).*TRACEWEAVER:\s*.*exception=generated/)
+    line.match?(/^\s*(#|<!--|\/\/).*TRACEWEAVER:\s*.*exception=generated/) ||
+      line.match?(/^\s*"traceweaver_anchor"\s*:\s*"TRACEWEAVER:\s*.*exception=generated/)
   end
   if generated_exception_line
     unless approved_generated_exception?(matrix_text, relative)
