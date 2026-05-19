@@ -1,0 +1,6 @@
+closure_claim_detected=true
+requirement_id=missing
+owner=Oxiom Systems
+expected_behavior=stop_with_held_validation_record_requirement
+complete_wording_allowed=false
+held_validation_fields=owner,missing_fields,blocked_claim,closure_boundary,evidence_location,next_trigger

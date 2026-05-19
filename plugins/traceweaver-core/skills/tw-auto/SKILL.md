@@ -11,6 +11,7 @@ disable-model-invocation: true
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=strategy-ideation-orchestrator; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
+<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
 
 # TraceWeaver Auto
 
@@ -202,7 +203,9 @@ review completion.
    capsule, verification target, matrix-update requirement, changed-file scope,
    and the explicit instruction that `tw-work` must establish test-first
    evidence, a scoped not-applicable decision, or approved exception evidence
-   before behavior mutation, then run automatic trace-anchor authoring before
+   before behavior mutation, detect requirement closure claims and route them
+   through structured acceptance evidence or held-validation records before
+   complete/done wording, then run automatic trace-anchor authoring before
    review: scanner on changed behavior-bearing files and linked
    tests/fixtures/smokes, helper-applied source anchors plus matching Code
    Anchor Evidence rows for unambiguous mappings, scanner rerun, focused
@@ -282,10 +285,14 @@ the next wrapper command.
 
 After `tw-work` returns changed files, test-first verification evidence, scoped
 not-applicable evidence, approved exception evidence, post-implementation
-verification evidence, trace-anchor authoring status, matrix evidence changes,
-or review-staging output, `tw-auto` must:
+verification evidence, structured acceptance result status, trace-anchor
+authoring status, matrix evidence changes, or review-staging output, `tw-auto`
+must:
 
 1. Run or require `tw-traceability-check` on the exact changed work package.
+   When a closure claim is present, this includes running or requiring the
+   structured acceptance result checker before accepting complete, done, or
+   accepted wording.
 2. Run `tw-code-review` when behavior-bearing code, skills, scripts, fixtures,
    tests, manifests, runtime harnesses, or validation surfaces changed.
 3. Route repairable code-review findings through one bounded `tw-work` repair
@@ -316,11 +323,39 @@ runtime-equivalent, or clean replacement.
 `tw-auto` must stop instead of continuing post-work closure when `tw-work`
 reports unclear, missing, contradictory, incomplete, stale, or changed
 authority; unresolved P0/P1 traceability findings that need human authority;
-failed verification that is not repairable within the bounded cycle; reviewer
+failed verification that is not repairable within the bounded cycle; missing or
+invalid structured acceptance evidence for a closure claim; reviewer
 capacity or missing skill availability that prevents trustworthy review; or any
 next action that would commit, branch, push, open/update a PR, deploy, release,
 mutate a remote, or publish. Those actions remain controlled publication route
 work only.
+
+## Closure-Claim Validation Loop
+
+`tw-auto` treats closure claims as part of the normal TraceWeaver closure loop,
+not as a prose status update. It must detect claims in user requests, plans,
+worker output, review summaries, matrix/status updates, and PR/release wording
+that say a requirement, task, implementation, review, PR, or release is
+`complete`, `closed`, `done`, `accepted`, in `closure`, or `requirement
+satisfied`.
+
+When a closure claim is detected, `tw-auto` must:
+
+1. pass the claim and known requirement/need/trace/ATP/result/verification/
+   validation IDs to `tw-work`;
+2. require an existing structured acceptance result that passes
+   `traceweaver-check-acceptance-results`, or let `tw-work` scaffold a
+   validation result template plus matrix-row proposal when authority is clear;
+3. stop with a held-validation record requirement when owner, requirement ID,
+   evidence location, closure boundary, or next trigger are missing;
+4. continue through `tw-traceability-check`, `tw-code-review` for code-like
+   changes, and scoped `tw-doc-review` for authority/status/hash/evidence docs;
+5. refuse complete/done/accepted wording while the checker reports structured
+   acceptance findings or held-validation fields are incomplete.
+
+This is static/advisory fixture behavior until a later runtime or dogfood slice
+reviews live artifact creation. Arbitrary new-project runtime artifact creation,
+release claims, publication, and enforcement remain held.
 
 ## Planned Closure Loop
 
@@ -441,6 +476,10 @@ Stop immediately when any of these are true:
 - behavior-bearing client implementation lacks requirement-linked
   failing/current-failing test-first evidence, a scoped not-applicable decision,
   or an approved non-test/post-implementation verification exception;
+- a closure claim lacks a passing structured acceptance result, a scaffolded
+  validation result template with matrix proposal under clear authority, or a
+  complete held-validation record with owner, boundary, evidence location, and
+  next trigger;
 - required reviewer personas remain pending because host agent capacity could
   not be freed;
 - P0/P1 review findings remain open;
@@ -469,6 +508,7 @@ Always return:
 - matrix status;
 - implementation files changed or proposed;
 - test-first evidence, verification evidence, and result;
+- structured acceptance evidence status when closure claims are detected;
 - review coverage, including completed reviewers, pending reviewers, skipped
   reviewers, capacity backpressure, and any degraded main-thread fallback;
 - validation question carried forward;

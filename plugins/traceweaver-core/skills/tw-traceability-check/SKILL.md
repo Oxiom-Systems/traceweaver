@@ -7,6 +7,7 @@ description: TraceWeaver adapter for checking whether plans, code, PRs, docs, or
 <!-- TRACEWEAVER: file-role=semantic-audit-traceability-skill; req=REQ-TW-063; trace=TRACE-TW-044; ver=VER-TW-056 -->
 <!-- TRACEWEAVER: file-role=traceability-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=traceability-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
+<!-- TRACEWEAVER: file-role=traceability-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
 
 # TraceWeaver Traceability Check
 
@@ -64,6 +65,15 @@ accepted proof is fixture-only until project-write gates pass.
 Load `references/structured-findings.md` when a check can return a traceability
 gap, blocked claim, held claim, or review finding.
 
+Run the skill-local `scripts/traceweaver-check-acceptance-results` checker on
+validation result artifacts and requirement closure claims. A closure claim may
+continue only when the linked result artifact has
+`record_type: traceweaver_acceptance_result` frontmatter, a complete
+`structured_acceptance` object, valid functional acceptance evidence,
+applicable non-functional evidence or not-applicable rationale, owner, evidence
+location, next trigger, and either a pass disposition or a complete
+held-validation boundary.
+
 ## Process
 
 1. Identify the behavior, plan, PR, document, or release surface under review.
@@ -83,7 +93,17 @@ gap, blocked claim, held claim, or review finding.
    failing/current-failing evidence is a structured TraceWeaver finding that
    blocks traceability-complete, review acceptance, done, publication, and
    release claims. Report this as `CTA-MISSING-TEST-FIRST-EVIDENCE`.
-6. If an anchor can be authored from unambiguous reviewed authority, return the
+6. For requirement closure claims, run
+   `traceweaver-check-acceptance-results` against the linked validation result
+   artifact before allowing traceability-complete, done, accepted, release, or
+   publication wording. Missing frontmatter, malformed YAML, missing functional
+   evidence, missing applicable non-functional evidence, invalid disposition,
+   incomplete owner/evidence location/next trigger, or incomplete
+   held-validation fields are P1 structured blockers such as
+   `ACCEPTANCE-MISSING-FRONTMATTER`,
+   `ACCEPTANCE-MISSING-FUNCTIONAL-EVIDENCE`, and
+   `ACCEPTANCE-INCOMPLETE-HELD-VALIDATION`.
+7. If an anchor can be authored from unambiguous reviewed authority, return the
    authoring proposal or route to the work loop. If only a per-artifact anchor
    mapping is ambiguous, report the unresolved mapping finding and block
    traceability-complete, review acceptance, done, publication, and release
@@ -91,17 +111,17 @@ gap, blocked claim, held claim, or review finding.
    verification authority, accepted scope, or material authority is ambiguous,
    contradictory, incomplete, missing, or stale, return a human-decision pause
    instead of inventing anchors.
-7. Use `requirements-reviewer` if the requirement itself is ambiguous,
+8. Use `requirements-reviewer` if the requirement itself is ambiguous,
    unverifiable, unapproved, or source-free.
-8. Emit structured findings for traceability failures. Include severity,
+9. Emit structured findings for traceability failures. Include severity,
    status, title, evidence, affected requirement/trace/evidence IDs, file path
    and line range when available, blocked/allowed/held claim impact, and
    concrete remediation.
-9. In Codex contexts with a concrete file/line anchor, use
+10. In Codex contexts with a concrete file/line anchor, use
    `::code-comment{...}` for findings that should appear inline. Use normal
    Markdown findings when the issue is cross-file, artifact-level, or lacks a
    stable line anchor.
-10. Record the overall result as `Pass`, `Needs revision`, `Blocked`,
+11. Record the overall result as `Pass`, `Needs revision`, `Blocked`,
    `Approved gap required`, or `Human decision`.
 
 ## Highest-Level Handoff Discipline
@@ -126,6 +146,7 @@ Return:
 - authority chain
 - implementation links
 - test-first evidence status
+- structured acceptance result status for closure claims
 - verification status
 - validation status
 - gaps and risks
@@ -150,3 +171,9 @@ missing verification/validation path, dark behavior, missing code/test anchor,
 dead-TDD candidate, or unsupported done/release claim remains unresolved. A
 `CTA-UNRESOLVED-ANCHOR-MAPPING` finding is a P1 traceability blocker until the
 mapping is resolved or explicitly held by reviewed authority.
+
+Do not mark a requirement closure claim as passed, accepted, complete, done, or
+traceability-complete while `traceweaver-check-acceptance-results` reports any
+P1 structured acceptance finding. A complete held-validation record may bound a
+partial, held, or failed result, but it does not authorize pass or release
+wording.

@@ -1,0 +1,5 @@
+closure_claim_detected=true
+authority_to_scaffold=true
+expected_behavior=create_validation_result_template_and_matrix_row_proposal
+template_location=docs/validation/
+runtime_artifact_creation=held

@@ -15,6 +15,8 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-060; req=REQ-TW-064; trace=TRACE-TW-047
 # TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061
 # TRACEWEAVER: verifies=VER-TW-061; req=REQ-TW-065; trace=TRACE-TW-048
+# TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063
+# TRACEWEAVER: verifies=VER-TW-063; req=REQ-TW-066; trace=TRACE-TW-050
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/tw-skill-behavior"
@@ -635,9 +637,28 @@ assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-approved-exception/worker
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-test-first-closure/loop-state.txt" "tw_auto_passes_test_first_gate_to_tw_work" "true" "tw_auto_test_first_handoff_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-test-first-closure/loop-state.txt" "missing_test_first_result" "stop_before_tw_work_mutation" "tw_auto_test_first_missing_stop_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-test-first-closure/loop-state.txt" "valid_test_first_result" "continue_to_tw_traceability_check_and_tw_code_review" "tw_auto_test_first_valid_continue_fixture"
+assert_contains "$tw_trace" "traceweaver-check-acceptance-results" "tw_traceability_acceptance_result_checker"
+assert_contains "$tw_trace" "ACCEPTANCE-MISSING-FUNCTIONAL-EVIDENCE" "tw_traceability_acceptance_missing_functional_gate"
+assert_contains "$tw_trace" "ACCEPTANCE-INCOMPLETE-HELD-VALIDATION" "tw_traceability_acceptance_held_validation_gate"
+assert_contains "$tw_work" "Closure-Claim Validation Gate" "tw_work_closure_claim_validation_gate_section"
+assert_contains "$tw_work" "create a validation result template" "tw_work_acceptance_template_creation"
+assert_contains "$tw_work" "stop with a held-validation record requirement" "tw_work_held_validation_stop"
+assert_contains "$tw_auto" "Closure-Claim Validation Loop" "tw_auto_closure_claim_validation_loop_section"
+assert_contains "$tw_auto" "structured acceptance result checker" "tw_auto_acceptance_checker_required"
+assert_contains "$tw_auto" "refuse complete/done/accepted wording" "tw_auto_blocks_done_without_acceptance"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-acceptance-existing-valid/worker-result.txt" "structured_acceptance_result" "pass" "tw_work_acceptance_existing_valid_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-acceptance-existing-valid/worker-result.txt" "expected_behavior" "continue_to_traceability_and_review" "tw_work_acceptance_existing_continue_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-acceptance-template/worker-result.txt" "expected_behavior" "create_validation_result_template_and_matrix_row_proposal" "tw_work_acceptance_template_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-acceptance-template/worker-result.txt" "runtime_artifact_creation" "held" "tw_work_acceptance_template_runtime_held_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-acceptance-held/worker-result.txt" "expected_behavior" "stop_with_held_validation_record_requirement" "tw_work_acceptance_held_stop_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-acceptance-held/worker-result.txt" "complete_wording_allowed" "false" "tw_work_acceptance_no_complete_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-acceptance-closure/loop-state.txt" "tw_auto_behavior" "route_to_tw_work_then_tw_traceability_check_then_scoped_review" "tw_auto_acceptance_closure_route_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-acceptance-closure/loop-state.txt" "invalid_structured_acceptance_result" "block_complete_done_wording" "tw_auto_acceptance_invalid_blocks_done_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-acceptance-closure/loop-state.txt" "runtime_artifact_creation" "held" "tw_auto_acceptance_runtime_held_fixture"
 echo "tw_work_trace_authoring_worker=pass"
 echo "tw_work_human_decision_pause_fixture=pass"
 echo "tw_work_test_first_evidence_gate=pass"
+echo "tw_acceptance_closure_claim_routing=pass"
 
 assert_contains "$tw_trace" 'references/structured-findings.md' "tw_traceability_structured_contract_loaded"
 assert_contains "$tw_trace" "CTA-UNRESOLVED-ANCHOR-MAPPING" "tw_traceability_unresolved_mapping_gate"
