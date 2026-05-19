@@ -1,19 +1,20 @@
 {
   "schema_version": 1,
+  "traceweaver_anchor": "TRACEWEAVER: exception=generated; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064",
   "source_of_truth": "traceability-matrix.md",
   "generated_view_status": "read_only_derived",
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "d65bafbe7c0d6919f628595d1ba6b05e3f65b8052be3d9cde0da224877094f8b"
+      "sha256": "14182fc6362b1c35721474ee98f69d3054b92d810932ac86ea15405cfa9a3c61"
     },
     {
       "path": "requirements.md",
-      "sha256": "fdc9289191751eb2b09e32ca7e26969e116a0bc97e891899c82be6fa958dd828"
+      "sha256": "e511c1c60836d294a52142e5210dc7e0f3f279a1fbf22acd927e1bf1312c5a37"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "9a5a0a6f7526cf5bcfb4718e226f8fe9d8f67166978b652decce641493ca7f11"
+      "sha256": "6cff5055826f707f443bde86af52b9c54f9c2c79209edd6f43217298f26b88ab"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -1058,7 +1059,7 @@
       "verification_method": "Generator smoke / generated-artifact diff / implementation-mode code-anchor scan / scoped review",
       "validation_path": "VAL-TW-013",
       "owner": "Oxiom Systems",
-      "status": "Candidate requirement recorded / static generator implementation added / smoke passed / code review passed / status-hash doc review passed / runtime and publication held",
+      "status": "Candidate requirement recorded / static generator implementation added / JSON scanability repair verification passed / code review passed / status-hash doc review passed / runtime and publication held",
       "trace_ids": [
         "TRACE-TW-051"
       ]
@@ -1601,7 +1602,7 @@
       "artifact": "ART-TW-065",
       "verification": "VER-TW-064",
       "validation": "VAL-TW-013",
-      "status": "Static implementation added; generator smoke passed; code review passed; status-hash doc review passed",
+      "status": "Static implementation added; generator smoke passed; JSON scanability repair verification passed; code review passed; status-hash doc review passed",
       "next_step": "Generated views are navigation aids only; no runtime enforcement, arbitrary-project automatic artifact creation, publication, release/package/upstream readiness, clean replacement, Vestro/R31 dogfood, or autonomous-publication claim is accepted"
     }
   ],
@@ -1901,7 +1902,7 @@
       "Setup / Context": "`scripts/traceweaver-generate-traceability-views`; `scripts/traceweaver-smoke-traceability-generated-views`; `requirements.md`; `traceability-matrix.md`; `.traceweaver/intent-contract.yml`; structured acceptance result frontmatter.",
       "Expected Result": "Generator parses matrix tables and structured acceptance result frontmatter, emits deterministic Markdown/Mermaid/JSON derived artifacts, and the smoke fails if committed generated views drift from authority files.",
       "Owner": "Oxiom Systems",
-      "Status": "Static implementation added / smoke passed / code review passed / status-hash doc review passed / runtime held"
+      "Status": "Static implementation added / JSON scanability repair verification passed / code review passed / status-hash doc review passed / runtime held"
     }
   ],
   "result_records": [
@@ -2199,7 +2200,7 @@
       "ATP / Method": "ATP-TW-035",
       "Tested Ref / Context": "Static traceability generated-view implementation",
       "Evidence Artifact": "`scripts/traceweaver-generate-traceability-views`; `scripts/traceweaver-smoke-traceability-generated-views`; `docs/generated/traceability-dashboard.md`; `docs/generated/traceability-graph.mmd`; `docs/generated/traceability-data.json`; `traceability-matrix.md`; `requirements.md`; `.traceweaver/intent-contract.yml`",
-      "Result": "Static generator and drift smoke added. Generated views are derived navigation aids and declare generated status. Generator smoke, acceptance-result smoke, implementation-mode code-anchor scan, scoped code review, and status-hash doc review passed. Runtime enforcement, arbitrary-project automatic artifact creation, publication, release/package/upstream readiness, clean replacement, and Vestro/R31 dogfood remain held.",
+      "Result": "Static generator and drift smoke added. Generated views are derived navigation aids and declare generated status. JSON scanability repair added a JSON-compatible generated-exception marker plus scanner recognition and smoke coverage. Scoped code review passed as `TW-CODE-REVIEW-2026-05-19-REQ-TW-067-GENERATED-TRACEABILITY-VIEWS-CLEAN-001`; status-hash doc review passed as `TW-DOC-REVIEW-2026-05-19-REQ-TW-067-GENERATED-TRACEABILITY-VIEWS-STATUS-HASH-CLEAN-001`. Runtime enforcement, arbitrary-project automatic artifact creation, publication, release/package/upstream readiness, clean replacement, and Vestro/R31 dogfood remain held.",
       "Date / Session": "2026-05-19"
     }
   ],
@@ -2859,10 +2860,10 @@
       "Method": "Static generated traceability view drift proof",
       "Procedure / Command": "`scripts/traceweaver-generate-traceability-views --root .`; `scripts/traceweaver-smoke-traceability-generated-views`; implementation-mode code-anchor scan; `git diff --check`",
       "Tested Ref": "Generator, generated Markdown/Mermaid/JSON artifacts, drift smoke, matrix proof-chain rows, structured acceptance result frontmatter",
-      "Result": "Generator parses existing structured fields first, writes deterministic derived artifacts, and drift smoke compares regenerated output with committed generated views.",
+      "Result": "Generator parses existing structured fields first, writes deterministic derived artifacts, drift smoke compares regenerated output with committed generated views, and generated JSON is recognized as an approved generated exception by the implementation-mode scanner.",
       "Evidence Path": "`scripts/traceweaver-generate-traceability-views`; `scripts/traceweaver-smoke-traceability-generated-views`; `docs/generated/traceability-dashboard.md`; `docs/generated/traceability-graph.mmd`; `docs/generated/traceability-data.json`; `traceability-matrix.md`",
       "Date / Session": "2026-05-19",
-      "Notes": "Generator smoke, acceptance-result smoke, implementation-mode code-anchor scan, scoped code review, and status-hash doc review passed as `TW-CODE-REVIEW-2026-05-19-REQ-TW-067-GENERATED-TRACEABILITY-VIEWS-CLEAN-001` and `TW-DOC-REVIEW-2026-05-19-REQ-TW-067-GENERATED-TRACEABILITY-VIEWS-STATUS-HASH-CLEAN-001`. Static generator implementation only; runtime enforcement, automatic arbitrary-project artifact creation, publication, package/release/upstream readiness, clean replacement, Vestro/R31 dogfood, and autonomous publication remain held."
+      "Notes": "JSON scanability repair verification passed; scoped code review passed as `TW-CODE-REVIEW-2026-05-19-REQ-TW-067-GENERATED-TRACEABILITY-VIEWS-CLEAN-001`; status-hash doc review passed as `TW-DOC-REVIEW-2026-05-19-REQ-TW-067-GENERATED-TRACEABILITY-VIEWS-STATUS-HASH-CLEAN-001`. Static generator implementation only; runtime enforcement, automatic arbitrary-project artifact creation, publication, package/release/upstream readiness, clean replacement, Vestro/R31 dogfood, and autonomous publication remain held."
     },
     {
       "ID": "VER-TW-056",
@@ -3027,9 +3028,9 @@
       "Stakeholder / Representative": "Oxiom Systems",
       "Acceptance Signal": "Reviewer can start with generated dashboard or Mermaid graph, reach the linked matrix rows and evidence records, and see derived-view status clearly.",
       "Evidence Path": "`docs/generated/traceability-dashboard.md`; `docs/generated/traceability-graph.mmd`; `docs/generated/traceability-data.json`; `traceability-matrix.md`",
-      "Result": "Planned / static implementation added",
+      "Result": "Planned / static implementation added / JSON scanability repair verification passed / code review passed / status-hash doc review passed",
       "Owner": "Oxiom Systems",
-      "Deferred Trigger / Notes": "Needs scoped review and later dogfood; generated views remain derived and runtime enforcement remains held."
+      "Deferred Trigger / Notes": "Needs later dogfood; generated views remain derived and runtime enforcement remains held."
     }
   ],
   "code_anchor_evidence": [

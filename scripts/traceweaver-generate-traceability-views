@@ -195,6 +195,7 @@ end
 
 data = {
   "schema_version" => 1,
+  "traceweaver_anchor" => "TRACEWEAVER: exception=generated; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064",
   "source_of_truth" => MATRIX_PATH,
   "generated_view_status" => "read_only_derived",
   "generated_from" => source_hashes,
