@@ -8,6 +8,7 @@ argument-hint: "[approved task or plan path]"
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-057; trace=TRACE-TW-042; ver=VER-TW-054 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
+<!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
 
 # TraceWeaver Work
 
@@ -81,6 +82,37 @@ verification is allowed only when the approved requirement permits it or an
 approved gap/exception records owner, scope, reason, review condition, and next
 step.
 
+## Closure-Claim Validation Gate
+
+When `tw-work` sees a requirement closure claim in task text, plan output,
+worker result text, review summaries, or proposed matrix/status updates, it must
+route the claim through FAT/ATP-style structured acceptance evidence before
+allowing any complete/done/accepted wording.
+
+Closure-claim phrases include `complete`, `closed`, `done`, `accepted`,
+`closure`, `requirement satisfied`, and explicit requirement-status updates.
+For each detected claim, identify the requirement ID, stakeholder need ID,
+trace ID, ATP/result/verification/validation IDs, owner, evidence locations, and
+current baseline or artifact version when known.
+
+If a linked structured acceptance result already exists, run
+`tw-traceability-check`'s `traceweaver-check-acceptance-results` helper. A pass
+allows the work loop to continue to normal traceability and review. A blocked
+result stops done/closure wording and returns the structured finding.
+
+If enough reviewed authority exists to scaffold evidence but no result artifact
+exists, create a validation result template under `docs/validation/` and propose
+matching `traceability-matrix.md` rows for the artifact, trace, ATP, result,
+verification, validation, and Code Anchor Evidence where applicable. This
+static/advisory template creation is not a runtime enforcement claim.
+
+If the closure claim lacks enough authority to scaffold safely, stop with a
+held-validation record requirement. The stop must name the owner, missing
+fields, blocked closure claim, closure boundary, evidence location to create,
+and next trigger.
+This is a stop with a held-validation record requirement before any
+complete/done/accepted wording.
+
 ## Workflow
 
 1. Confirm the run is Implementation Gate Mode. If it is Authority Baseline Mode
@@ -91,32 +123,36 @@ step.
    not-applicable decision, or an approved non-test/post-implementation
    verification exception is absent, stop before mutation and return control to
    `tw-auto`.
-4. Invoke the TraceWeaver-packaged `ce-work` implementation flow in
+4. Apply the closure-claim validation gate when the work package claims a
+   requirement, task, PR, or implementation is complete, accepted, closed, or
+   done. Missing or invalid structured acceptance evidence blocks completion
+   wording even if implementation verification passed.
+5. Invoke the TraceWeaver-packaged `ce-work` implementation flow in
    no-publication mode with the approved authority capsule, verification target,
    changed-file scope, and matrix-update requirement.
-5. Build the changed-file scope from behavior-bearing files plus linked
+6. Build the changed-file scope from behavior-bearing files plus linked
    tests/fixtures/smokes, including newly created untracked files. Keep authority
    docs out of the code-anchor scanner unless they are explicitly part of the
    implementation review scope.
-6. Run the skill-local code-anchor scanner from `tw-traceability-check` on that
+7. Run the skill-local code-anchor scanner from `tw-traceability-check` on that
    changed-file scope before review.
-7. Run the automatic trace-anchor authoring loop below for scanner findings
+8. Run the automatic trace-anchor authoring loop below for scanner findings
    where the mapping is unambiguous. When only a per-artifact anchor mapping is
    ambiguous, skip that one anchor mutation, record an unresolved mapping
    candidate, and keep applying unrelated clear anchors. This is a mandatory
    `tw-work` work-loop step, not a manual follow-up for the user.
-8. Rerun the scanner after authoring with any unresolved mapping records. If the
+9. Rerun the scanner after authoring with any unresolved mapping records. If the
    scanner remains blocked, stop with the structured traceability finding and
    return control to `tw-auto`.
-9. Run the required verification commands for the implemented slice, including
+10. Run the required verification commands for the implemented slice, including
    the same focused test-first verification artifact established before
    implementation.
-10. When implementation, verification, scanner, and trace/matrix updates are
+11. When implementation, verification, scanner, and trace/matrix updates are
    complete, `tw-work` may perform review-staging for an explicit scoped file
    list that belongs to this work item. Review-staging is allowed only to make
    `tw-code-review` / `tw-doc-review` artifact identity coherent. It is not
    publication authority.
-11. Return control to `tw-auto` with changed files, staged files when
+12. Return control to `tw-auto` with changed files, staged files when
    review-staging was used, verification evidence, source-anchor changes,
    matrix evidence changes, open gaps, held claims, and the next review command.
 
@@ -266,6 +302,7 @@ Return:
 - trace-anchor authoring status
 - matrix Code Anchor Evidence status
 - verification commands and results
+- structured acceptance result status when a closure claim was detected
 - scanner result after implementation
 - staged files, when review-staging was used
 - open traceability findings or held claims

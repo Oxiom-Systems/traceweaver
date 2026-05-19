@@ -1,0 +1,5 @@
+closure_claim_detected=true
+structured_acceptance_result=pass
+expected_behavior=continue_to_traceability_and_review
+complete_wording_allowed=true
+accepted_scope=deterministic_fixture_only_no_runtime_pass

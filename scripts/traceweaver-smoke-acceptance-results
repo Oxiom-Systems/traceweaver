@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=acceptance-result-smoke; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063
+# TRACEWEAVER: verifies=VER-TW-063; req=REQ-TW-066; trace=TRACE-TW-050
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+CHECKER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-acceptance-results"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/acceptance-results"
+
+require_file() {
+  local path="$1"
+  if [[ ! -f "$path" ]]; then
+    echo "acceptance_result_smoke_missing_required_file=$path" >&2
+    exit 1
+  fi
+}
+
+assert_contains() {
+  local text="$1"
+  local expected="$2"
+  local label="$3"
+  if [[ "$text" != *"$expected"* ]]; then
+    echo "$label=failed_missing_pattern pattern=$expected" >&2
+    echo "$text" >&2
+    exit 1
+  fi
+}
+
+expect_pass() {
+  local path="$1"
+  local output
+  output="$("$CHECKER" --root "$ROOT_DIR" --file "$path")"
+  assert_contains "$output" "acceptance_result_status=pass" "acceptance_result_expected_pass"
+  assert_contains "$output" "acceptance_result_findings=0" "acceptance_result_expected_zero_findings"
+}
+
+expect_blocked() {
+  local path="$1"
+  local finding="$2"
+  local output status
+  set +e
+  output="$("$CHECKER" --root "$ROOT_DIR" --file "$path" 2>&1)"
+  status=$?
+  set -e
+  if [[ "$status" -eq 0 ]]; then
+    echo "acceptance_result_expected_blocked=failed file=$path" >&2
+    echo "$output" >&2
+    exit 1
+  fi
+  assert_contains "$output" "acceptance_result_status=blocked" "acceptance_result_expected_blocked_status"
+  assert_contains "$output" "$finding" "acceptance_result_expected_finding"
+}
+
+require_file "$CHECKER"
+require_file "$FIXTURE_ROOT/pass-valid.md"
+require_file "$FIXTURE_ROOT/partial-held-valid.md"
+require_file "$FIXTURE_ROOT/held-valid.md"
+require_file "$FIXTURE_ROOT/missing-functional.md"
+require_file "$FIXTURE_ROOT/nfr-present-missing-evidence.md"
+require_file "$FIXTURE_ROOT/nfr-not-applicable-missing-rationale.md"
+require_file "$FIXTURE_ROOT/invalid-disposition.md"
+require_file "$FIXTURE_ROOT/missing-owner.md"
+
+expect_pass "$FIXTURE_ROOT/pass-valid.md"
+expect_pass "$FIXTURE_ROOT/partial-held-valid.md"
+expect_pass "$FIXTURE_ROOT/held-valid.md"
+expect_blocked "$FIXTURE_ROOT/missing-functional.md" "ACCEPTANCE-MISSING-FUNCTIONAL-EVIDENCE"
+expect_blocked "$FIXTURE_ROOT/nfr-present-missing-evidence.md" "ACCEPTANCE-MISSING-NONFUNCTIONAL-EVIDENCE"
+expect_blocked "$FIXTURE_ROOT/nfr-not-applicable-missing-rationale.md" "ACCEPTANCE-MISSING-NONFUNCTIONAL-RATIONALE"
+expect_blocked "$FIXTURE_ROOT/invalid-disposition.md" "ACCEPTANCE-INVALID-DISPOSITION"
+expect_blocked "$FIXTURE_ROOT/missing-owner.md" "ACCEPTANCE-MISSING-REQUIRED-FIELD"
+
+echo "acceptance_result_smoke=pass"
+echo "acceptance_result_checker_valid_fixtures=pass"
+echo "acceptance_result_checker_invalid_fixtures=pass"

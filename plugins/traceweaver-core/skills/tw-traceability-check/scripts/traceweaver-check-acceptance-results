@@ -1,0 +1,397 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=acceptance-result-checker; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063
+# TRACEWEAVER: entrypoint=acceptance_result_check_orchestrator; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063
+
+require "json"
+require "optparse"
+require "pathname"
+require "yaml"
+
+options = {
+  root: Dir.pwd,
+  files: [],
+  jsonl: nil,
+  markdown: nil
+}
+
+OptionParser.new do |opts|
+  opts.on("--root PATH") { |value| options[:root] = value }
+  opts.on("--file PATH") { |value| options[:files] << value }
+  opts.on("--files PATH") do |value|
+    File.readlines(value, chomp: true).each do |line|
+      next if line.strip.empty?
+
+      options[:files] << line.strip
+    end
+  end
+  opts.on("--jsonl PATH") { |value| options[:jsonl] = value }
+  opts.on("--markdown PATH") { |value| options[:markdown] = value }
+end.parse!
+
+if options[:files].empty?
+  warn "acceptance_result_missing_files=true"
+  exit 2
+end
+
+root = Pathname.new(options[:root]).expand_path
+unless root.directory?
+  warn "acceptance_result_invalid_root=#{root}"
+  exit 2
+end
+root = root.realpath
+
+ALLOWED_DISPOSITIONS = %w[pass partial held fail].freeze
+ALLOWED_EVIDENCE_STATUSES = %w[present not_applicable held missing].freeze
+REQUIRED_TOP_LEVEL_FIELDS = %w[
+  record_type
+  schema_version
+  result_id
+  requirement_id
+  need_ids
+  linked_trace_id
+  linked_atp_id
+  linked_result_id
+  linked_verification_id
+  linked_validation_id
+  owner
+  date
+  status
+  structured_acceptance
+].freeze
+REQUIRED_STRUCTURED_FIELDS = %w[
+  closure_claim
+  functional_acceptance_evidence
+  non_functional_acceptance_evidence
+  tested_baseline_or_artifact_version
+  observed_result
+  final_disposition
+  evidence_location
+  next_trigger
+].freeze
+REQUIRED_HELD_FIELDS = %w[
+  owner
+  reason
+  evidence_location
+  closure_boundary
+  next_trigger
+].freeze
+
+findings = []
+
+def repo_relative(root, path)
+  Pathname.new(path).expand_path.relative_path_from(root).to_s
+end
+
+def present?(value)
+  case value
+  when nil
+    false
+  when String
+    !value.strip.empty?
+  when Array
+    value.any? { |item| present?(item) }
+  when Hash
+    !value.empty?
+  else
+    true
+  end
+end
+
+def frontmatter(text)
+  match = text.match(/\A---\s*\n(?<yaml>.*?)\n---\s*(?:\n|\z)/m)
+  match && match[:yaml]
+end
+
+emit = lambda do |id:, severity:, status:, title:, evidence:, affected_ids:, file:, claim_impact:, remediation:, start: 1|
+  findings << {
+    id: id,
+    severity: severity,
+    status: status,
+    title: title,
+    evidence: evidence,
+    affected_ids: affected_ids,
+    file: file,
+    start: start,
+    end: start,
+    claim_impact: claim_impact,
+    remediation: remediation
+  }
+end
+
+options[:files].each do |input_path|
+  candidate = Pathname.new(input_path)
+  path = candidate.absolute? ? candidate : root.join(candidate)
+  unless path.file?
+    emit.call(
+      id: "ACCEPTANCE-MISSING-FILE",
+      severity: "P1",
+      status: "blocked",
+      title: "Acceptance result file is missing",
+      evidence: input_path,
+      affected_ids: [],
+      file: input_path,
+      claim_impact: "Requirement closure cannot be accepted without an acceptance result artifact.",
+      remediation: "Create the validation result artifact or record a held-validation requirement with owner and next trigger."
+    )
+    next
+  end
+
+  relative = repo_relative(root, path)
+  text = path.read
+  yaml_text = frontmatter(text)
+  unless yaml_text
+    emit.call(
+      id: "ACCEPTANCE-MISSING-FRONTMATTER",
+      severity: "P1",
+      status: "blocked",
+      title: "Acceptance result lacks YAML frontmatter",
+      evidence: "No leading YAML frontmatter block found.",
+      affected_ids: [],
+      file: relative,
+      claim_impact: "Prose-only validation records cannot satisfy deterministic closure checks.",
+      remediation: "Add traceweaver_acceptance_result frontmatter with structured_acceptance fields."
+    )
+    next
+  end
+
+  begin
+    data = YAML.safe_load(yaml_text, permitted_classes: [], aliases: false)
+  rescue Psych::Exception => e
+    emit.call(
+      id: "ACCEPTANCE-MALFORMED-FRONTMATTER",
+      severity: "P1",
+      status: "blocked",
+      title: "Acceptance result frontmatter is malformed",
+      evidence: e.message,
+      affected_ids: [],
+      file: relative,
+      claim_impact: "Malformed structured evidence cannot support a closure claim.",
+      remediation: "Repair the YAML frontmatter. Quote date-like values."
+    )
+    next
+  end
+
+  unless data.is_a?(Hash)
+    emit.call(
+      id: "ACCEPTANCE-MALFORMED-FRONTMATTER",
+      severity: "P1",
+      status: "blocked",
+      title: "Acceptance result frontmatter is not a mapping",
+      evidence: data.class.to_s,
+      affected_ids: [],
+      file: relative,
+      claim_impact: "Structured closure checks require a top-level mapping.",
+      remediation: "Use the documented traceweaver_acceptance_result schema."
+    )
+    next
+  end
+
+  affected_ids = [
+    data["requirement_id"],
+    data["linked_trace_id"],
+    data["linked_atp_id"],
+    data["linked_result_id"],
+    data["linked_verification_id"],
+    data["linked_validation_id"]
+  ].compact
+
+  if data["record_type"] != "traceweaver_acceptance_result"
+    emit.call(
+      id: "ACCEPTANCE-INVALID-RECORD-TYPE",
+      severity: "P1",
+      status: "blocked",
+      title: "Acceptance result has invalid record_type",
+      evidence: "record_type=#{data['record_type'].inspect}",
+      affected_ids: affected_ids,
+      file: relative,
+      claim_impact: "The artifact is not typed as a TraceWeaver acceptance result.",
+      remediation: "Set record_type to traceweaver_acceptance_result."
+    )
+  end
+
+  REQUIRED_TOP_LEVEL_FIELDS.each do |field|
+    next if present?(data[field])
+
+    emit.call(
+      id: "ACCEPTANCE-MISSING-REQUIRED-FIELD",
+      severity: "P1",
+      status: "blocked",
+      title: "Acceptance result is missing a required field",
+      evidence: "missing=#{field}",
+      affected_ids: affected_ids,
+      file: relative,
+      claim_impact: "Requirement closure lacks required acceptance metadata.",
+      remediation: "Populate the missing top-level field before claiming closure."
+    )
+  end
+
+  structured = data["structured_acceptance"]
+  unless structured.is_a?(Hash)
+    next
+  end
+
+  REQUIRED_STRUCTURED_FIELDS.each do |field|
+    next if present?(structured[field])
+
+    emit.call(
+      id: "ACCEPTANCE-MISSING-STRUCTURED-FIELD",
+      severity: "P1",
+      status: "blocked",
+      title: "structured_acceptance is missing a required field",
+      evidence: "missing=#{field}",
+      affected_ids: affected_ids,
+      file: relative,
+      claim_impact: "Requirement closure lacks required FAT/ATP-style evidence metadata.",
+      remediation: "Populate the missing structured_acceptance field or record a held-validation boundary."
+    )
+  end
+
+  final_disposition = structured["final_disposition"]
+  unless ALLOWED_DISPOSITIONS.include?(final_disposition)
+    emit.call(
+      id: "ACCEPTANCE-INVALID-DISPOSITION",
+      severity: "P1",
+      status: "blocked",
+      title: "Acceptance result has invalid final disposition",
+      evidence: "final_disposition=#{final_disposition.inspect}",
+      affected_ids: affected_ids,
+      file: relative,
+      claim_impact: "Closure disposition cannot be interpreted deterministically.",
+      remediation: "Use pass, partial, held, or fail."
+    )
+  end
+
+  functional = structured["functional_acceptance_evidence"]
+  nonfunctional = structured["non_functional_acceptance_evidence"]
+
+  [
+    ["functional_acceptance_evidence", functional],
+    ["non_functional_acceptance_evidence", nonfunctional]
+  ].each do |label, evidence_block|
+    next unless evidence_block.is_a?(Hash)
+
+    status_value = evidence_block["status"]
+    unless ALLOWED_EVIDENCE_STATUSES.include?(status_value)
+      emit.call(
+        id: "ACCEPTANCE-INVALID-EVIDENCE-STATUS",
+        severity: "P1",
+        status: "blocked",
+        title: "Acceptance evidence has invalid status",
+        evidence: "#{label}.status=#{status_value.inspect}",
+        affected_ids: affected_ids,
+        file: relative,
+        claim_impact: "Evidence status cannot be interpreted deterministically.",
+        remediation: "Use present, not_applicable, held, or missing."
+      )
+    end
+  end
+
+  if final_disposition == "pass"
+    unless functional.is_a?(Hash) && functional["status"] == "present" && present?(functional["evidence"])
+      emit.call(
+        id: "ACCEPTANCE-MISSING-FUNCTIONAL-EVIDENCE",
+        severity: "P1",
+        status: "blocked",
+        title: "Passing closure lacks functional acceptance evidence",
+        evidence: "functional_acceptance_evidence must be present with evidence.",
+        affected_ids: affected_ids,
+        file: relative,
+        claim_impact: "A pass disposition cannot be accepted without FAT/ATP-style functional proof.",
+        remediation: "Add functional acceptance evidence or change disposition and complete held-validation fields."
+      )
+    end
+
+    nfr_pass_evidence =
+      nonfunctional.is_a?(Hash) &&
+      (
+        (nonfunctional["status"] == "present" && present?(nonfunctional["evidence"])) ||
+        nonfunctional["status"] == "not_applicable"
+      )
+
+    unless nfr_pass_evidence
+      emit.call(
+        id: "ACCEPTANCE-MISSING-NONFUNCTIONAL-EVIDENCE",
+        severity: "P1",
+        status: "blocked",
+        title: "Passing closure lacks applicable non-functional evidence",
+        evidence: "non_functional_acceptance_evidence.status must be present with evidence or not_applicable.",
+        affected_ids: affected_ids,
+        file: relative,
+        claim_impact: "A pass disposition cannot be accepted without NFR evidence or a scoped not-applicable rationale.",
+        remediation: "Add non-functional evidence or mark not_applicable with rationale."
+      )
+    end
+  end
+
+  if nonfunctional.is_a?(Hash) && nonfunctional["status"] == "not_applicable" && !present?(nonfunctional["rationale"])
+    emit.call(
+      id: "ACCEPTANCE-MISSING-NONFUNCTIONAL-RATIONALE",
+      severity: "P1",
+      status: "blocked",
+      title: "Non-functional not_applicable lacks rationale",
+      evidence: "non_functional_acceptance_evidence.status=not_applicable",
+      affected_ids: affected_ids,
+      file: relative,
+      claim_impact: "NFR evidence cannot be omitted without a scoped rationale.",
+      remediation: "Add non_functional_acceptance_evidence.rationale."
+    )
+  end
+
+  held_validation = structured["held_validation"]
+  held_required = held_validation.is_a?(Hash) && held_validation["required"] == true
+  incomplete_evidence =
+    [functional, nonfunctional].any? do |block|
+      block.is_a?(Hash) && %w[held missing].include?(block["status"])
+    end
+
+  if held_required || final_disposition != "pass" || incomplete_evidence
+    missing_held =
+      unless held_validation.is_a?(Hash)
+        REQUIRED_HELD_FIELDS
+      else
+        REQUIRED_HELD_FIELDS.reject { |field| present?(held_validation[field]) }
+      end
+
+    unless missing_held.empty?
+      emit.call(
+        id: "ACCEPTANCE-INCOMPLETE-HELD-VALIDATION",
+        severity: "P1",
+        status: "blocked",
+        title: "Held-validation record is incomplete",
+        evidence: "missing=#{missing_held.join(',')}",
+        affected_ids: affected_ids,
+        file: relative,
+        claim_impact: "Partial, held, failed, or incomplete-evidence closure cannot be accepted without owner, boundary, and next trigger.",
+        remediation: "Complete held_validation.owner, reason, evidence_location, closure_boundary, and next_trigger."
+      )
+    end
+  end
+end
+
+if options[:jsonl]
+  File.open(root.join(options[:jsonl]), "w") do |file|
+    findings.each { |finding| file.puts(JSON.generate(finding)) }
+  end
+end
+
+if options[:markdown]
+  File.open(root.join(options[:markdown]), "w") do |file|
+    file.puts("# Acceptance Result Findings")
+    file.puts
+    if findings.empty?
+      file.puts("No findings.")
+    else
+      findings.each do |finding|
+        file.puts("- #{finding[:severity]} #{finding[:id]} #{finding[:file]}: #{finding[:title]}")
+      end
+    end
+  end
+end
+
+status = findings.empty? ? "pass" : "blocked"
+puts "acceptance_result_status=#{status}"
+puts "acceptance_result_findings=#{findings.length}"
+findings.each { |finding| puts "acceptance_result_finding=#{finding[:id]} file=#{finding[:file]}" }
+
+exit(findings.empty? ? 0 : 1)

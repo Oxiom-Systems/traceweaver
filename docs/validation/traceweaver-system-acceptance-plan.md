@@ -1,5 +1,8 @@
 # TraceWeaver System Acceptance Closure Plan
 
+<!-- TRACEWEAVER: file-role=system-acceptance-plan; req=REQ-TW-066; trace=TRACE-TW-049; ver=VER-TW-062 -->
+<!-- TRACEWEAVER: file-role=structured-system-acceptance-plan; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
+
 Plan ID: SAP-TW-001
 Linked requirement: REQ-TW-066
 Linked ATP: ATP-TW-033
@@ -27,6 +30,47 @@ Every requirement closure record must include:
 | `owner` | yes | Person or organization responsible for the closure decision. |
 | `evidence_location` | yes | File, issue, log, test result, validation record, or evidence URL. |
 | `next_trigger` | yes | Next event that reopens or advances the closure. |
+
+## Structured Result Frontmatter
+
+Every system acceptance result must include YAML frontmatter with
+`record_type: traceweaver_acceptance_result` and a `structured_acceptance`
+object. The YAML block is the parseable source of truth for deterministic
+traceability checks; the Markdown body remains the reviewer-readable copy.
+
+Required top-level fields:
+
+- `record_type`
+- `schema_version`
+- `result_id`
+- `requirement_id`
+- `need_ids`
+- `linked_trace_id`
+- `linked_atp_id`
+- `linked_result_id`
+- `linked_verification_id`
+- `linked_validation_id`
+- `owner`
+- `date`
+- `status`
+- `structured_acceptance`
+
+Required `structured_acceptance` fields:
+
+- `closure_claim`
+- `functional_acceptance_evidence`
+- `non_functional_acceptance_evidence`
+- `tested_baseline_or_artifact_version`
+- `observed_result`
+- `final_disposition`
+- `evidence_location`
+- `next_trigger`
+- `held_validation` when evidence is partial, held, failed, missing, or marked
+  as held-validation required
+
+Allowed evidence status values are `present`, `not_applicable`, `held`, and
+`missing`. A `not_applicable` non-functional evidence status must include a
+scoped rationale.
 
 ## Held-Validation Record
 
