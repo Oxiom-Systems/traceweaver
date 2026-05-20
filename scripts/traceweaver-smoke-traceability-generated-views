@@ -11,6 +11,20 @@ SCANNER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts
 # TRACEWEAVER: verifies=VER-TW-064; req=REQ-TW-067; trace=TRACE-TW-051
 "$ROOT_DIR/scripts/traceweaver-generate-traceability-views" --root "$ROOT_DIR" --out "$TMP_DIR" >/dev/null
 
+ruby -rjson -e '
+  data = JSON.parse(File.read(File.join(ARGV.fetch(0), "traceability-data.json")))
+  req_ids = data.fetch("requirements").map { |row| row.fetch("id") }
+  abort "REQ-TW-057 missing from generated requirements" unless req_ids.include?("REQ-TW-057")
+
+  coverage = data.fetch("structured_acceptance_coverage")
+  abort "structured acceptance coverage count mismatch" unless coverage.length == req_ids.length
+  abort "structured acceptance non-closed count missing" unless data.fetch("row_counts").fetch("structured_acceptance_non_closed_requirements") >= data.fetch("row_counts").fetch("structured_acceptance_missing_requirements")
+  coverage_by_req = coverage.to_h { |row| [row.fetch("requirement_id"), row] }
+  abort "REQ-TW-066 acceptance coverage missing" unless coverage_by_req.fetch("REQ-TW-066").fetch("structured_acceptance_result_ids").any?
+  abort "REQ-TW-067 missing acceptance gap" unless coverage_by_req.fetch("REQ-TW-067").fetch("coverage_status") == "missing_structured_acceptance_result"
+  abort "REQ-TW-067 missing acceptance next trigger" unless coverage_by_req.fetch("REQ-TW-067").fetch("next_triggers").any?
+' "$TMP_DIR"
+
 diff -u "$ROOT_DIR/docs/generated/traceability-dashboard.md" "$TMP_DIR/traceability-dashboard.md"
 diff -u "$ROOT_DIR/docs/generated/traceability-data.json" "$TMP_DIR/traceability-data.json"
 diff -u "$ROOT_DIR/docs/generated/traceability-graph.mmd" "$TMP_DIR/traceability-graph.mmd"

@@ -179,6 +179,39 @@ requirement_rows = requirements.map do |row|
   }
 end
 
+acceptance_results_by_requirement = acceptance_results.group_by { |row| row["requirement_id"] }
+structured_acceptance_coverage = requirement_rows.map do |row|
+  linked_results = acceptance_results_by_requirement.fetch(row["id"], [])
+  dispositions = linked_results.map { |result| result["final_disposition"] }.compact.uniq
+  coverage_status =
+    if linked_results.empty?
+      "missing_structured_acceptance_result"
+    elsif dispositions.include?("fail")
+      "acceptance_failed"
+    elsif dispositions.include?("partial")
+      "acceptance_partial"
+    elsif dispositions.include?("held")
+      "acceptance_held"
+    elsif dispositions.include?("pass")
+      "acceptance_passed"
+    else
+      "acceptance_result_present_without_disposition"
+    end
+
+  {
+    "requirement_id" => row["id"],
+    "coverage_status" => coverage_status,
+    "structured_acceptance_result_ids" => linked_results.map { |result| result["result_id"] },
+    "final_dispositions" => dispositions,
+    "owners" => linked_results.map { |result| result["owner"] }.compact.uniq,
+    "next_triggers" => if linked_results.empty?
+      ["Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."]
+    else
+      linked_results.map { |result| result["next_trigger"] }.compact.uniq
+    end
+  }
+end
+
 trace_rows = traces.map do |row|
   {
     "id" => row["Trace ID"],
@@ -207,7 +240,10 @@ data = {
     "verification_records" => verification.length,
     "validation_records" => validation.length,
     "code_anchor_records" => code_anchors.length,
-    "structured_acceptance_results" => acceptance_results.length
+    "structured_acceptance_results" => acceptance_results.length,
+    "structured_acceptance_coverage" => structured_acceptance_coverage.length,
+    "structured_acceptance_missing_requirements" => structured_acceptance_coverage.count { |row| row["coverage_status"] == "missing_structured_acceptance_result" },
+    "structured_acceptance_non_closed_requirements" => structured_acceptance_coverage.count { |row| row["coverage_status"] != "acceptance_passed" }
   },
   "requirements" => requirement_rows,
   "traces" => trace_rows,
@@ -216,7 +252,8 @@ data = {
   "verification_evidence" => verification,
   "validation_evidence" => validation,
   "code_anchor_evidence" => code_anchors,
-  "structured_acceptance_results" => acceptance_results
+  "structured_acceptance_results" => acceptance_results,
+  "structured_acceptance_coverage" => structured_acceptance_coverage
 }
 
 latest_requirements = requirement_rows.sort_by { |row| id_number(row["id"]) }.last(12).reverse
@@ -262,6 +299,12 @@ dashboard << "\n## Structured Acceptance Results\n\n"
 dashboard << "| Result | Requirement | Disposition | Owner | Next Trigger |\n| --- | --- | --- | --- | --- |\n"
 acceptance_results.each do |row|
   dashboard << "| #{row["result_id"]} | #{row["requirement_id"]} | #{compact(row["final_disposition"])} | #{compact(row["owner"])} | #{truncate(row["next_trigger"], 120)} |\n"
+end
+
+dashboard << "\n## Structured Acceptance Coverage Gaps\n\n"
+dashboard << "| Requirement | Coverage Status | Next Trigger |\n| --- | --- | --- |\n"
+structured_acceptance_coverage.select { |row| row["coverage_status"] != "acceptance_passed" }.sort_by { |row| id_number(row["requirement_id"]) }.last(20).reverse.each do |row|
+  dashboard << "| #{row["requirement_id"]} | #{row["coverage_status"]} | #{truncate(row["next_triggers"].join("; "), 120)} |\n"
 end
 
 dashboard << "\n## Latest Validation Records\n\n"

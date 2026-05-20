@@ -296,7 +296,7 @@ themselves.
 
 | Tool | Why it helps a TraceWeaver project |
 |---|---|
-| TraceWeaver Core plugin | Provides the normal `tw-*` workflow, including `tw-auto`, `tw-plan`, `tw-work`, reviews, traceability checks, and controlled publication. |
+| TraceWeaver Core plugin | Provides the normal `tw-*` workflow, including `tw-auto`, `tw-plan`, `tw-work`, audits, reviews, traceability checks, and controlled publication. |
 | Beads (`bd`) | Keeps dependency-aware issue state, blockers, ownership, and ready work visible when a repository opts in with `.beads/`. Requirements authority still lives in `requirements.md`, `traceability-matrix.md`, and `.traceweaver/intent-contract.yml`. |
 | MemSearch / `memory-recall` | Provides semantic recall over past agent sessions. Recalled sessions are context and source evidence; anything authoritative still needs the normal TraceWeaver requirements and traceability gates. |
 | Compound Engineering plugin or source checkout | Provides upstream compatibility context while TraceWeaver is alpha. The normal user path should still enter through TraceWeaver-owned `tw-*` wrappers; direct `ce-*` use does not close TraceWeaver authority, traceability, verification, or validation gates. |
@@ -417,7 +417,7 @@ Common handoffs:
 | Approved plan needs code/docs changed | `tw-work` |
 | Work finished and behavior-bearing files changed | `tw-code-review` |
 | Requirements, plans, matrix, Intent Contract, evidence, status, or hashes changed | `tw-doc-review` |
-| Existing repo needs dark-code or lost-intent audit | `tw-traceability-check` |
+| Existing repo needs traces, requirements, verification, validation, dark-code, or lost-intent audit | `tw-audit` |
 | Bug, regression, failing test, or production incident | `tw-debug` |
 | Commit, push, or PR is requested | `tw-commit-push-pr` |
 | Learning should be captured after a solved problem | `tw-compound` |
@@ -439,6 +439,7 @@ The Codex install exposes these TraceWeaver-owned user-facing skills. Packaged
 | `tw-plan` | Plan approved work while preserving authority and traceability boundaries. |
 | `tw-authority-gate` | Check that implementation has approved authority before work starts. |
 | `tw-work` | Implement approved work after test-first evidence, add trace anchors when unambiguous, run verification, and hand off to review. |
+| `tw-audit` | Audit a project or branch for authority, traces, verification, validation, acceptance evidence, generated-view drift, and candidate dark behavior. |
 | `tw-traceability-check` | Check plans, code, docs, PRs, and release evidence for authority, test-first evidence, and verification traceability. |
 | `tw-code-review` | Run traceability preflight, then code review. |
 | `tw-doc-review` | Review requirements, plans, matrices, Intent Contracts, and evidence records. |
@@ -461,7 +462,14 @@ The audit goal is to find candidate lost intent, dark behavior, obsolete code,
 or duplicate behavior so a human can decide whether to keep, trace, merge,
 rewrite, or remove it.
 
-Use the high-level skill when you want a review-style report:
+Use the high-level skill when you want a project-level audit report:
+
+```text
+tw-audit "audit this project for requirement authority, code traces, verification evidence, validation or acceptance evidence, generated traceability view drift, dark code, orphaned code, obsolete or abandoned behavior, duplicate or similar behavior, dead tests, missing verification, and lost intent. Report candidate findings only; do not remove or rewrite anything."
+```
+
+Use the lower traceability diagnostic directly when you only want the scanner
+and structured traceability findings:
 
 ```text
 tw-traceability-check audit this repo for dark code, orphaned code, obsolete or abandoned behavior, duplicate or similar behavior, dead tests, missing verification, and lost intent. Report candidate findings only; do not remove or rewrite anything.

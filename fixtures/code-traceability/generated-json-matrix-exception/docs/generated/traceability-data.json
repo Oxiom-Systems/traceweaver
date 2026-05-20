@@ -1,0 +1,21 @@
+{
+  "generated": true,
+  "derived_from": [
+    "requirements.md",
+    "traceability-matrix.md"
+  ],
+  "requirements": [
+    {
+      "id": "REQ-CTA-GENERATED-JSON",
+      "status": "approved"
+    },
+    {
+      "id": "REQ-TW-058-IMPLEMENTATION-STATUS-HASH-CLEAN-001",
+      "status": "derived-review-marker"
+    },
+    {
+      "id": "REQ-REVIEW-2026-05-20-CANDIDATE-STATUS",
+      "status": "derived-review-marker"
+    }
+  ]
+}

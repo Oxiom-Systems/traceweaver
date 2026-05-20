@@ -3,6 +3,7 @@ set -euo pipefail
 
 # TRACEWEAVER: file-role=smoke-harness; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
 # TRACEWEAVER: verifies=VER-TW-041; req=REQ-TW-054; trace=TRACE-TW-032
+# TRACEWEAVER: verifies=VER-TW-064; req=REQ-TW-067; trace=TRACE-TW-051
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/code-traceability"
@@ -102,6 +103,11 @@ run_pass generated_file_exception \
   --root "$FIXTURE_ROOT/generated-file-exception" \
   --mode implementation \
   --changed-file src/generated.sh
+
+run_pass generated_json_matrix_exception \
+  --root "$FIXTURE_ROOT/generated-json-matrix-exception" \
+  --mode implementation \
+  --changed-file docs/generated/traceability-data.json
 
 run_blocked unapproved_generated_exception CTA-UNAPPROVED-EXCEPTION \
   --root "$FIXTURE_ROOT/unapproved-generated-exception" \

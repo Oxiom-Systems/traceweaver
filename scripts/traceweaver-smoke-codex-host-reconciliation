@@ -5,6 +5,8 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
 # TRACEWEAVER: file-role=host-reconciliation-smoke; req=REQ-TW-057; trace=TRACE-TW-032; ver=VER-TW-045
 # TRACEWEAVER: verifies=VER-TW-045; req=REQ-TW-057; trace=TRACE-TW-032
+# TRACEWEAVER: file-role=host-reconciliation-smoke; req=REQ-TW-061; trace=TRACE-TW-052; ver=VER-TW-065
+# TRACEWEAVER: verifies=VER-TW-065; req=REQ-TW-061; trace=TRACE-TW-052
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_root="$(mktemp -d)"
@@ -137,6 +139,7 @@ for skill_name in \
   tw-strategy \
   tw-ideate \
   tw-brainstorm \
+  tw-audit \
   tw-compound \
   tw-compound-refresh \
   tw-resolve-pr-feedback \

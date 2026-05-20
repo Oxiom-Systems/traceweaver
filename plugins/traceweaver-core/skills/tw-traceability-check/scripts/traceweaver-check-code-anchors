@@ -3,6 +3,7 @@
 # TRACEWEAVER: file-role=code-anchor-scanner; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
 # TRACEWEAVER: file-role=semantic-audit-scanner; req=REQ-TW-063; trace=TRACE-TW-044; ver=VER-TW-056
 # TRACEWEAVER: file-role=imported-ce-component-boundary-scanner; req=REQ-TW-059; trace=TRACE-TW-040; ver=VER-TW-052
+# TRACEWEAVER: file-role=generated-view-scanner-boundary; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064
 
 require "fileutils"
 require "json"
@@ -193,6 +194,8 @@ targets =
     end
     names.lines.map(&:strip).reject(&:empty?).uniq.select { |path| implementation_target?(path) }
   end
+
+targets = targets.reject { |relative| approved_generated_exception?(matrix_text, relative) }
 
 findings = []
 
