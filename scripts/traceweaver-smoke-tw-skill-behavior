@@ -17,6 +17,12 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-061; req=REQ-TW-065; trace=TRACE-TW-048
 # TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063
 # TRACEWEAVER: verifies=VER-TW-063; req=REQ-TW-066; trace=TRACE-TW-050
+# TRACEWEAVER: file-role=audit-wrapper-smoke; req=REQ-TW-061; trace=TRACE-TW-052; ver=VER-TW-065
+# TRACEWEAVER: verifies=VER-TW-065; req=REQ-TW-061; trace=TRACE-TW-052
+# TRACEWEAVER: file-role=audit-wrapper-smoke; req=REQ-TW-062; trace=TRACE-TW-052; ver=VER-TW-065
+# TRACEWEAVER: verifies=VER-TW-065; req=REQ-TW-062; trace=TRACE-TW-052
+# TRACEWEAVER: file-role=audit-wrapper-smoke; req=REQ-TW-063; trace=TRACE-TW-052; ver=VER-TW-065
+# TRACEWEAVER: verifies=VER-TW-065; req=REQ-TW-063; trace=TRACE-TW-052
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/tw-skill-behavior"
@@ -111,6 +117,7 @@ tw_work="$ROOT_DIR/plugins/traceweaver-core/skills/tw-work/SKILL.md"
 tw_debug="$ROOT_DIR/plugins/traceweaver-core/skills/tw-debug/SKILL.md"
 tw_commit="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit/SKILL.md"
 tw_commit_push_pr="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md"
+tw_audit="$ROOT_DIR/plugins/traceweaver-core/skills/tw-audit/SKILL.md"
 tw_trace="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md"
 tw_grill="$ROOT_DIR/plugins/traceweaver-core/skills/tw-grill/SKILL.md"
 tw_brainstorm="$ROOT_DIR/plugins/traceweaver-core/skills/tw-brainstorm/SKILL.md"
@@ -162,6 +169,7 @@ require_file "$tw_work"
 require_file "$tw_debug"
 require_file "$tw_commit"
 require_file "$tw_commit_push_pr"
+require_file "$tw_audit"
 require_file "$tw_trace"
 require_file "$tw_grill"
 require_file "$tw_brainstorm"
@@ -241,6 +249,25 @@ echo "tw_doc_review_stale_authority_fixture=pass"
 echo "tw_doc_review_packaged_ce_surface=pass hash=$(hash_file "$ce_doc")"
 echo "tw_doc_review_clean_ce_delegation_fixture=pass"
 
+assert_contains "$tw_audit" "requirements.md" "tw_audit_loads_requirements"
+assert_contains "$tw_audit" "traceability-matrix.md" "tw_audit_loads_matrix"
+assert_contains "$tw_audit" ".traceweaver/intent-contract.yml" "tw_audit_loads_intent_contract"
+assert_contains "$tw_audit" "tw-traceability-check" "tw_audit_delegates_traceability_check"
+assert_contains "$tw_audit" "requirements-reviewer" "tw_audit_requirements_reviewer_route"
+assert_contains "$tw_audit" "systems-engineering-traceability" "tw_audit_systems_traceability_route"
+assert_contains "$tw_audit" "traceweaver-check-code-anchors" "tw_audit_code_anchor_checker"
+assert_contains "$tw_audit" "traceweaver-check-acceptance-results" "tw_audit_acceptance_checker"
+assert_contains "$tw_audit" "scripts/traceweaver-smoke-traceability-generated-views" "tw_audit_generated_view_drift_check"
+assert_contains "$tw_audit" "Do not claim traceability-complete" "tw_audit_no_completion_claims"
+assert_contains "$tw_audit" "automatic cleanup authority" "tw_audit_no_cleanup_authority"
+assert_fixture_field "$FIXTURE_ROOT/tw-audit-project-flow/audit-result.txt" "authority_inputs" "requirements.md,traceability-matrix.md,.traceweaver/intent-contract.yml" "tw_audit_authority_inputs_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-audit-project-flow/audit-result.txt" "changed_scope_route" "traceweaver-check-code-anchors_implementation_mode" "tw_audit_changed_scope_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-audit-project-flow/audit-result.txt" "whole_repo_route" "traceweaver-check-code-anchors_audit_mode" "tw_audit_whole_repo_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-audit-project-flow/audit-result.txt" "closure_route" "traceweaver-check-acceptance-results" "tw_audit_closure_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-audit-project-flow/audit-result.txt" "mutation_authority" "false" "tw_audit_no_mutation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-audit-project-flow/audit-result.txt" "publication_authority" "false" "tw_audit_no_publication_fixture"
+echo "tw_audit_project_flow_fixture=pass"
+
 assert_contains "$tw_plan" 'TraceWeaver-packaged `ce-plan`' "tw_plan_delegates_packaged_ce_plan"
 assert_contains "$tw_plan" "requirements.md" "tw_plan_loads_requirements"
 assert_contains "$tw_plan" "traceability-matrix.md" "tw_plan_loads_matrix"
@@ -268,6 +295,7 @@ echo "tw_plan_packaged_ce_delegation_fixture=pass"
 echo "tw_plan_human_decision_pause_fixture=pass"
 
 assert_contains "$tw_auto" "tw-plan" "tw_auto_routes_plan_wrapper"
+assert_contains "$tw_auto" "tw-audit" "tw_auto_routes_audit_wrapper"
 assert_contains "$tw_auto" "tw-strategy" "tw_auto_routes_strategy_wrapper"
 assert_contains "$tw_auto" "tw-ideate" "tw_auto_routes_ideation_wrapper"
 assert_contains "$tw_auto" "tw-code-review" "tw_auto_routes_code_review"
@@ -306,7 +334,7 @@ assert_contains "$tw_auto" "not user handoffs" "tw_auto_post_work_reviews_are_in
 assert_contains "$tw_auto" "post-work closure regression" "tw_auto_post_work_manual_lower_review_regression"
 assert_contains "$wrapper_handoff_policy" "Tw-Auto Internal Continuation Rule" "wrapper_handoff_tw_auto_internal_continuation_rule"
 assert_contains "$wrapper_handoff_policy" "must not stop with a manual" "wrapper_handoff_no_manual_review_handoff"
-assert_fixture_field "$FIXTURE_ROOT/tw-auto-clean-task/loop-state.txt" "required_route" "tw-brainstorm,tw-plan,tw-authority-gate,tw-work,ce-work,traceweaver-check-code-anchors,traceweaver-author-code-anchors,traceability-matrix,tw-traceability-check,tw-code-review,tw-doc-review,tw-sessions,tw-test-browser,tw-test-xcode,tw-compound,tw-compound-refresh,tw-resolve-pr-feedback,tw-setup,tw-worktree" "tw_auto_clean_task_route_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-auto-clean-task/loop-state.txt" "required_route" "tw-brainstorm,tw-audit,tw-plan,tw-authority-gate,tw-work,ce-work,traceweaver-check-code-anchors,traceweaver-author-code-anchors,traceability-matrix,tw-traceability-check,tw-code-review,tw-doc-review,tw-sessions,tw-test-browser,tw-test-xcode,tw-compound,tw-compound-refresh,tw-resolve-pr-feedback,tw-setup,tw-worktree" "tw_auto_clean_task_route_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-unclear-requirement/loop-state.txt" "required_behavior" "pause_for_user_input" "tw_auto_unclear_requirement_pause_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-contradictory-requirement/loop-state.txt" "required_behavior" "route_to_requirements_review" "tw_auto_contradictory_requirement_pause_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-auto-non-blocking-anchor-ambiguity/loop-state.txt" "tw_work_behavior" "skip_ambiguous_anchor_continue_clear_work" "tw_auto_non_blocking_anchor_fixture"
@@ -403,12 +431,12 @@ for ce_skill in "$ROOT_DIR"/plugins/traceweaver-core/skills/ce-*/SKILL.md; do
     imported_ce_unanchored_total=$((imported_ce_unanchored_total + 1))
   fi
 done
-if [[ "$skill_file_total" != "45" ]]; then
-  echo "traceweaver_skill_file_total=failed expected=45 actual=$skill_file_total" >&2
+if [[ "$skill_file_total" != "46" ]]; then
+  echo "traceweaver_skill_file_total=failed expected=46 actual=$skill_file_total" >&2
   exit 1
 fi
-if [[ "$anchored_skill_total" != "40" ]]; then
-  echo "traceweaver_skill_file_anchored=failed expected=40 actual=$anchored_skill_total" >&2
+if [[ "$anchored_skill_total" != "41" ]]; then
+  echo "traceweaver_skill_file_anchored=failed expected=41 actual=$anchored_skill_total" >&2
   exit 1
 fi
 assert_contains "$tw_authority_gate" "file-role=authority-gate-wrapper-skill" "tw_authority_gate_file_role_anchor"
@@ -679,6 +707,7 @@ repo_work_hash="$(hash_file "$tw_work")"
 repo_debug_hash="$(hash_file "$tw_debug")"
 repo_commit_hash="$(hash_file "$tw_commit")"
 repo_commit_push_pr_hash="$(hash_file "$tw_commit_push_pr")"
+repo_audit_hash="$(hash_file "$tw_audit")"
 repo_code_hash="$(hash_file "$tw_code")"
 repo_doc_hash="$(hash_file "$tw_doc")"
 repo_brainstorm_hash="$(hash_file "$tw_brainstorm")"
@@ -716,6 +745,7 @@ host_work="$ACTIVE_SKILLS_ROOT/tw-work/SKILL.md"
 host_debug="$ACTIVE_SKILLS_ROOT/tw-debug/SKILL.md"
 host_commit="$ACTIVE_SKILLS_ROOT/tw-commit/SKILL.md"
 host_commit_push_pr="$ACTIVE_SKILLS_ROOT/tw-commit-push-pr/SKILL.md"
+host_audit="$ACTIVE_SKILLS_ROOT/tw-audit/SKILL.md"
 host_trace="$ACTIVE_SKILLS_ROOT/tw-traceability-check/SKILL.md"
 host_brainstorm="$ACTIVE_SKILLS_ROOT/tw-brainstorm/SKILL.md"
 host_compound="$ACTIVE_SKILLS_ROOT/tw-compound/SKILL.md"
@@ -755,6 +785,7 @@ host_work_hash="missing"
 host_debug_hash="missing"
 host_commit_hash="missing"
 host_commit_push_pr_hash="missing"
+host_audit_hash="missing"
 host_trace_hash="missing"
 host_brainstorm_hash="missing"
 host_compound_hash="missing"
@@ -811,6 +842,9 @@ if [[ -f "$host_commit" ]]; then
 fi
 if [[ -f "$host_commit_push_pr" ]]; then
   host_commit_push_pr_hash="$(hash_file "$host_commit_push_pr")"
+fi
+if [[ -f "$host_audit" ]]; then
+  host_audit_hash="$(hash_file "$host_audit")"
 fi
 if [[ -f "$host_trace" ]]; then
   host_trace_hash="$(hash_file "$host_trace")"
@@ -910,6 +944,7 @@ active_host_review_routing_hashes_current() {
      "$host_ideate_hash" == "$repo_ideate_hash" &&
      "$host_plan_hash" == "$repo_plan_hash" &&
      "$host_authority_gate_hash" == "$repo_authority_gate_hash" &&
+     "$host_audit_hash" == "$repo_audit_hash" &&
      "$host_work_hash" == "$repo_work_hash" &&
      "$host_trace_hash" == "$repo_trace_hash" &&
      "$host_structured_ref_hash" == "$repo_structured_ref_hash" &&
@@ -970,6 +1005,8 @@ echo "active_host_tw_commit_repo_hash=$repo_commit_hash"
 echo "active_host_tw_commit_host_hash=$host_commit_hash"
 echo "active_host_tw_commit_push_pr_repo_hash=$repo_commit_push_pr_hash"
 echo "active_host_tw_commit_push_pr_host_hash=$host_commit_push_pr_hash"
+echo "active_host_tw_audit_repo_hash=$repo_audit_hash"
+echo "active_host_tw_audit_host_hash=$host_audit_hash"
 echo "active_host_tw_traceability_check_repo_hash=$repo_trace_hash"
 echo "active_host_tw_traceability_check_host_hash=$host_trace_hash"
 echo "active_host_tw_traceability_check_repo_structured_ref_hash=$repo_structured_ref_hash"

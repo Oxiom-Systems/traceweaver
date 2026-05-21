@@ -1,0 +1,10 @@
+audit_scope=whole_repo_or_changed_scope_or_closure_claim
+authority_inputs=requirements.md,traceability-matrix.md,.traceweaver/intent-contract.yml
+required_checks=authority_triad,requirements_quality,code_traceability,verification,validation_acceptance,generated_view_drift
+changed_scope_route=traceweaver-check-code-anchors_implementation_mode
+whole_repo_route=traceweaver-check-code-anchors_audit_mode
+closure_route=traceweaver-check-acceptance-results
+mutation_authority=false
+publication_authority=false
+expected_next_wrapper=tw-plan_or_tw-work_or_tw-requirements-review_or_tw-doc-review_or_human_decision
+accepted_scope=deterministic_static_fixture_only_no_runtime_pass

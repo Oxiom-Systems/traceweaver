@@ -1,0 +1,50 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-21-INVALID-UTF8-AUDIT-SCANNER-CLOSURE-001
+created_at: 2026-05-21
+owner: Oxiom Systems
+scope: invalid UTF-8 audit-mode scanner crash repair review/status closure
+requirements:
+  - REQ-TW-054
+  - REQ-TW-063
+traces:
+  - TRACE-TW-032
+  - TRACE-TW-044
+verifications:
+  - VER-TW-041
+  - VER-TW-056
+  - VER-TW-066
+validation:
+  - VAL-TW-014
+classification: uninspectable_utf8_coverage_reported_not_crashed
+repair_summary: audit mode now emits TW-AUDIT-UNINSPECTABLE-FILE as held unknown coverage for invalid UTF-8 behavior-bearing targets; implementation mode emits CTA-UNINSPECTABLE-FILE as a blocking changed-file traceability finding.
+code_review:
+  id: TW-CODE-REVIEW-2026-05-21-INVALID-UTF8-AUDIT-SCANNER-CLEAN-001
+  status: passed_no_findings
+  coverage: main_thread_scoped_tw_code_review_no_reviewer_subagents
+status_review:
+  id: TW-DOC-REVIEW-2026-05-21-INVALID-UTF8-AUDIT-SCANNER-STATUS-HASH-CLEAN-001
+  status: passed_no_findings
+  coverage: main_thread_scoped_tw_doc_review_no_reviewer_subagents
+publication_route:
+  status: authorized_for_controlled_pr_update_and_merge
+  authorized_by: explicit user request on 2026-05-21 `/tw-commit-push-pr and merge`
+  target: PR #23 from codex/tw-audit-generated-view-scanner-boundary to origin/main
+  boundary: manual TraceWeaver-controlled PR publication and merge only after current gate verification passes
+verification_evidence:
+  - ruby -c plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors
+  - bash -n scripts/traceweaver-smoke-code-traceability
+  - scripts/traceweaver-smoke-code-traceability
+  - scripts/traceweaver-smoke-systems-engineering-audit-closure
+  - plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-files <scanner-and-smoke-changed-files>
+  - scripts/traceweaver-generate-traceability-views --root .
+  - scripts/traceweaver-smoke-traceability-generated-views
+  - git diff --check
+held_claims:
+  - release_package_upstream_readiness
+  - cleanup_removal_deprecation_authority
+  - clean_replacement
+  - semantic_completeness
+  - full_vestro_audit_handover_clean_until_rerun
+  - broader_runtime_behavior
+  - active_host_currentness
+  - autonomous_publication
+next_step: run controlled tw-commit-push-pr update and merge for PR #23 only if current gates pass; release, cleanup, active-host currentness, broader runtime, full Vestro audit handover-clean, and autonomous publication remain held.

@@ -3,6 +3,7 @@
 # TRACEWEAVER: file-role=code-anchor-scanner; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
 # TRACEWEAVER: file-role=semantic-audit-scanner; req=REQ-TW-063; trace=TRACE-TW-044; ver=VER-TW-056
 # TRACEWEAVER: file-role=imported-ce-component-boundary-scanner; req=REQ-TW-059; trace=TRACE-TW-040; ver=VER-TW-052
+# TRACEWEAVER: file-role=generated-view-scanner-boundary; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064
 
 require "fileutils"
 require "json"
@@ -55,8 +56,23 @@ root = root.realpath
 requirements_path = root.join("requirements.md")
 matrix_path = root.join("traceability-matrix.md")
 
-requirements_text = requirements_path.read
-matrix_text = matrix_path.read
+def read_utf8_text(path)
+  text = File.binread(path).force_encoding(Encoding::UTF_8)
+  return [text, nil] if text.valid_encoding?
+
+  [nil, "invalid_utf8"]
+rescue SystemCallError => e
+  [nil, e.class.name]
+end
+
+requirements_text, requirements_read_error = read_utf8_text(requirements_path)
+matrix_text, matrix_read_error = read_utf8_text(matrix_path)
+if requirements_read_error || matrix_read_error
+  warn "code_traceability_unreadable_authority=requirements_or_matrix"
+  warn "code_traceability_requirements_read_error=#{requirements_read_error}" if requirements_read_error
+  warn "code_traceability_matrix_read_error=#{matrix_read_error}" if matrix_read_error
+  exit 2
+end
 known_requirements = requirements_text.scan(/\bREQ-[A-Z0-9]+-[A-Z0-9-]+\b/).uniq
 
 def repo_relative(root, path)
@@ -194,6 +210,8 @@ targets =
     names.lines.map(&:strip).reject(&:empty?).uniq.select { |path| implementation_target?(path) }
   end
 
+targets = targets.reject { |relative| approved_generated_exception?(matrix_text, relative) }
+
 findings = []
 
 emit = lambda do |id:, severity:, status:, title:, evidence:, affected_ids:, file: nil, start: nil, claim_impact:, remediation:, **extra|
@@ -269,7 +287,26 @@ targets.each do |relative|
   end
   next unless path.file?
 
-  text = path.read
+  text, read_error = read_utf8_text(path)
+  if read_error
+    emit.call(
+      id: mode == "audit" ? "TW-AUDIT-UNINSPECTABLE-FILE" : "CTA-UNINSPECTABLE-FILE",
+      severity: mode == "audit" ? "P2" : "P1",
+      status: mode == "audit" ? "held" : "blocked",
+      title: "Behavior-bearing file could not be inspected as UTF-8 text",
+      evidence: "#{relative} could not be inspected by the text scanner: #{read_error}.",
+      affected_ids: [mode == "audit" ? "REQ-TW-063" : "REQ-TW-054"],
+      file: relative,
+      start: 1,
+      claim_impact: mode == "audit" ? "audit_coverage_held_unknown" : "code_traceability_pass_blocked",
+      remediation: mode == "audit" ? "Classify the file as generated, vendored, binary, or unsupported with reviewed authority, or add a UTF-8-safe text representation before claiming whole-repo audit coverage." : "Convert the changed artifact to UTF-8 text, exclude it with a reviewed generated/vendor/binary exception, or use a supported scanner before claiming traceability pass.",
+      evidence_source: "utf8_text_read_guard",
+      confidence: "high",
+      supported_scope: "UTF-8 text files with supported TraceWeaver anchor syntax",
+      known_limitation: "Non-UTF-8 or binary artifacts are held/blocked coverage, not clean audit evidence."
+    )
+    next
+  end
   generated_exception_line = text.lines.find_index do |line|
     line.match?(/^\s*(#|<!--|\/\/).*TRACEWEAVER:\s*.*exception=generated/) ||
       line.match?(/^\s*"traceweaver_anchor"\s*:\s*"TRACEWEAVER:\s*.*exception=generated/)

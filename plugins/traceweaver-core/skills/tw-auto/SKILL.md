@@ -94,6 +94,7 @@ Required resolutions:
 - `tw-brainstorm`
 - `tw-plan`
 - `tw-authority-gate`
+- `tw-audit`
 - `tw-work`
 - `tw-traceability-check`
 - `tw-debug`
@@ -123,11 +124,13 @@ installed CE plugin, or unlisted skill name.
 loads authority and requirements are plan-ready. `tw-auto` must not invoke raw
 `ce-plan` directly as the planning wrapper.
 
-Source-evidence, learning, session, verification, setup, worktree, and PR
+Source-evidence, audit, learning, session, verification, setup, worktree, and PR
 feedback routes must also use TraceWeaver wrappers. `tw-strategy` and
 `tw-ideate` delegate to packaged CE-derived strategy and ideation engines as
 source evidence only; `tw-brainstorm` delegates to packaged `ce-brainstorm` as
-source evidence; `tw-compound` and
+source evidence; `tw-audit` delegates lower traceability, acceptance, and
+generated-view checks to TraceWeaver-owned gates and scripts without granting
+cleanup or publication authority; `tw-compound` and
 `tw-compound-refresh` delegate to packaged learning engines without approving
 authority changes; `tw-sessions` delegates to packaged `ce-sessions` and may
 use hidden/internal packaged `ce-session-inventory` and `ce-session-extract`
@@ -185,11 +188,12 @@ review completion.
    wrapper (`tw-plan`) and keep the plan bounded to approved authority. The
    wrapper may delegate to packaged `ce-plan` only after TraceWeaver authority
    and requirements-quality preflight pass or are explicitly held.
-7. When the request needs brainstorming, session history, learning capture, PR
-   feedback repair, setup, worktree creation, browser verification, or Xcode
-   verification, route through `tw-brainstorm`, `tw-sessions`, `tw-compound`,
-   `tw-compound-refresh`, `tw-resolve-pr-feedback`, `tw-setup`, `tw-worktree`,
-   `tw-test-browser`, or `tw-test-xcode` instead of raw CE skills.
+7. When the request needs brainstorming, project audit, session history,
+   learning capture, PR feedback repair, setup, worktree creation, browser
+   verification, or Xcode verification, route through `tw-brainstorm`,
+   `tw-audit`, `tw-sessions`, `tw-compound`, `tw-compound-refresh`,
+   `tw-resolve-pr-feedback`, `tw-setup`, `tw-worktree`, `tw-test-browser`, or
+   `tw-test-xcode` instead of raw CE skills.
 8. Run the resolved `tw-authority-gate` before implementation.
 9. If authority is missing, stop and create a gap, change, exception candidate,
    accepted-risk candidate, or clarification record. Do not implement from an

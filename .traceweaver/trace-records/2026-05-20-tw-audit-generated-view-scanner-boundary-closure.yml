@@ -1,0 +1,45 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-20-TW-AUDIT-GENERATED-VIEW-SCANNER-BOUNDARY-CLOSURE-001
+created_at: 2026-05-20
+owner: Oxiom Systems
+scope: generated-view scanner-boundary repair and tw-audit dogfood closure
+requirements:
+  - REQ-TW-061
+  - REQ-TW-062
+  - REQ-TW-063
+  - REQ-TW-067
+traces:
+  - TRACE-TW-051
+  - TRACE-TW-052
+verifications:
+  - VER-TW-064
+  - VER-TW-065
+validation:
+  - VAL-TW-014
+classification: generated_view_scanner_boundary_false_positive_closed
+code_review:
+  id: TW-CODE-REVIEW-2026-05-20-TW-AUDIT-GENERATED-VIEW-SCANNER-BOUNDARY-CLEAN-001
+  status: passed_no_findings
+  coverage: main_thread_scoped_tw_code_review_no_reviewer_subagents
+doc_review:
+  id: TW-DOC-REVIEW-2026-05-20-TW-AUDIT-GENERATED-VIEW-SCANNER-BOUNDARY-STATUS-HASH-CLEAN-001
+  status: passed_no_findings
+  coverage: main_thread_scoped_tw_doc_review_no_reviewer_subagents
+verification_evidence:
+  - ruby -c plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors
+  - bash -n scripts/traceweaver-smoke-code-traceability
+  - scripts/traceweaver-smoke-code-traceability
+  - plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-files .traceweaver/audit/tw-audit-dogfood-2026-05-20-changed-files.txt
+  - plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-acceptance-results --root . --file docs/validation/traceweaver-system-acceptance-results.md
+  - scripts/traceweaver-generate-traceability-views --root .
+  - scripts/traceweaver-smoke-traceability-generated-views
+  - git diff --check
+held_claims:
+  - active_host_traceability_check_scanner_currentness
+  - publication
+  - release_package_upstream_readiness
+  - cleanup_removal_merge_deprecation_authority
+  - clean_replacement
+  - semantic_completeness
+  - vestro_r31_dogfood
+  - broader_runtime_behavior
+next_step: explicit human publication intent is required before tw-commit or tw-commit-push-pr

@@ -44,6 +44,7 @@ Included skills:
 - `tw-ideate`
 - `tw-grill`
 - `tw-authority-gate`
+- `tw-audit`
 - `tw-traceability-check`
 - `tw-auto`
 - `tw-plan`
@@ -139,6 +140,10 @@ identity.
   `tw-brainstorm`; it produces source evidence only, not approved authority.
 - `tw-authority-gate` checks whether planned work has approved
   authority before implementation starts.
+- `tw-audit` audits a project, branch, or closure claim for authority, traces,
+  verification evidence, validation or acceptance evidence, generated-view
+  drift, and candidate dark behavior without granting cleanup or publication
+  authority.
 - `tw-traceability-check` checks whether behavior traces to
   approved authority, implementation, test-first verification, and validation
   evidence.

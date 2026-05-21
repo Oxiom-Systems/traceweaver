@@ -56,6 +56,7 @@
             "Use the tw-ideate skill for generated/ranked ideas as source evidence only before grilling, brainstorming, or requirements review.",
             "Use the tw-grill skill after ideation and before brainstorming when one selected idea needs deeper interview; its output is source evidence, not authority.",
             "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
+            "Use the tw-audit skill when a project or branch needs a requirements, traceability, verification, validation, acceptance, generated-view, or dark-behavior audit.",
       "Use the tw-traceability-check skill during plan, code, document, or release-evidence review.",
       "Use the tw-auto skill for advisory controlled autonomy; it preserves the CE-style loop while adding authority, traceability, verification, validation, and dark-behavior controls.",
       "The packaged lfg name delegates to tw-auto and must stop before commit, push, or PR creation in this alpha.",

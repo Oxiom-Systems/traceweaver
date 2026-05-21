@@ -3,6 +3,7 @@ set -euo pipefail
 
 # TRACEWEAVER: file-role=smoke-harness; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
 # TRACEWEAVER: verifies=VER-TW-041; req=REQ-TW-054; trace=TRACE-TW-032
+# TRACEWEAVER: verifies=VER-TW-064; req=REQ-TW-067; trace=TRACE-TW-051
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/code-traceability"
@@ -103,6 +104,11 @@ run_pass generated_file_exception \
   --mode implementation \
   --changed-file src/generated.sh
 
+run_pass generated_json_matrix_exception \
+  --root "$FIXTURE_ROOT/generated-json-matrix-exception" \
+  --mode implementation \
+  --changed-file docs/generated/traceability-data.json
+
 run_blocked unapproved_generated_exception CTA-UNAPPROVED-EXCEPTION \
   --root "$FIXTURE_ROOT/unapproved-generated-exception" \
   --mode implementation \
@@ -116,6 +122,21 @@ run_pass changed_file_scope_ignores_untouched_debt \
 run_blocked audit_mode_reports_baseline_debt CTA-MISSING-FILE-ANCHOR \
   --root "$FIXTURE_ROOT/baseline-debt" \
   --mode audit
+
+invalid_utf8_root="$TMP_DIR/invalid-utf8"
+mkdir -p "$invalid_utf8_root/src"
+cp "$FIXTURE_ROOT/baseline-debt/requirements.md" "$invalid_utf8_root/requirements.md"
+cp "$FIXTURE_ROOT/baseline-debt/traceability-matrix.md" "$invalid_utf8_root/traceability-matrix.md"
+printf 'def invalid_utf8_feature\n  "\377"\nend\n' >"$invalid_utf8_root/src/invalid_utf8.rb"
+
+run_blocked audit_mode_reports_uninspectable_file TW-AUDIT-UNINSPECTABLE-FILE \
+  --root "$invalid_utf8_root" \
+  --mode audit
+
+run_blocked implementation_mode_blocks_uninspectable_file CTA-UNINSPECTABLE-FILE \
+  --root "$invalid_utf8_root" \
+  --mode implementation \
+  --changed-file src/invalid_utf8.rb
 
 run_blocked unresolved_anchor_mapping CTA-UNRESOLVED-ANCHOR-MAPPING \
   --root "$FIXTURE_ROOT/unresolved-anchor-mapping" \

@@ -51,6 +51,7 @@ prompt_input="$tmp_home/prompt-input.json"
 visible_skills="$tmp_home/visible-skills.txt"
 required_visible_skills=(
   tw-auto
+  tw-audit
   tw-strategy
   tw-ideate
   lfg
@@ -101,7 +102,7 @@ bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" 
 manifest="$codex_home/traceweaver-core/install-manifest.json"
 expected_skill_hash="$(shasum -a 256 "$codex_home/skills/tw-authority-gate/SKILL.md" | awk '{print $1}')"
 HOME="$tmp_home" CODEX_HOME="$codex_home" codex debug prompt-input \
-  "Use TraceWeaver required direct skills: tw-authority-gate tw-auto tw-strategy tw-ideate lfg tw-traceability-check tw-requirements-review tw-code-review tw-doc-review tw-grill." >"$prompt_input"
+  "Use TraceWeaver required direct skills: tw-authority-gate tw-auto tw-audit tw-strategy tw-ideate lfg tw-traceability-check tw-requirements-review tw-code-review tw-doc-review tw-grill." >"$prompt_input"
 jq -r '.. | strings' "$prompt_input" | perl -ne 'print "$1\n" if /^- ([A-Za-z0-9_.:-]+): /' >"$visible_skills"
 
 missing_visible_skills=()

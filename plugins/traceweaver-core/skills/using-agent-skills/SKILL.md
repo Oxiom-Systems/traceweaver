@@ -24,7 +24,8 @@ Intent deepening after ideation -> tw-grill as source evidence, then tw-requirem
 New project, feature, or change -> tw-auto
 Planning approved TraceWeaver work -> tw-plan
 Reviewed plan with approved authority -> tw-auto, or tw-authority-gate before any delegated CE work
-Trace or requirement check -> tw-traceability-check, tw-requirements-review, requirements-reviewer
+Project audit for traces, requirements, verification, validation, closure, or dark behavior -> tw-audit
+Trace or requirement diagnostic -> tw-traceability-check, tw-requirements-review, requirements-reviewer
 Code review -> tw-code-review
 Document review -> tw-doc-review
 Debugging -> tw-debug
@@ -206,6 +207,7 @@ Not every task needs every skill. A bug fix might only need: `tw-debug` ->
 | Define | tw-brainstorm / tw-grill | Refine ideas, challenge assumptions, and preserve source evidence |
 | Define | tw-requirements-review / requirements-reviewer | Requirements and acceptance criteria before code |
 | Plan | tw-auto / tw-plan | Decompose approved authority into bounded work |
+| Cross-cutting | tw-audit | Project or branch audit for authority, traces, verification, validation, acceptance evidence, and candidate dark behavior |
 | Cross-cutting | systems-engineering-traceability | Candidate needs, approved authority, no-orphan gate, verification, and validation links |
 | Build | tw-work | Thin authorized slices in TraceWeaver no-publication mode |
 | Context | tw-sessions | Source/session context as cited evidence only; hidden CE inventory/extract helpers stay internal |
