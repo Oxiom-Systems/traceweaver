@@ -9,9 +9,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `af8d2d0892f7e0fa148e10b39c60064095259b3a6d91944f0300f202035fadb4` |
+| `traceability-matrix.md` | `5e9e469df6bfa8288f7cea0d468a5bc82671d3b0e59e95ece7478e9c620c7719` |
 | `requirements.md` | `e511c1c60836d294a52142e5210dc7e0f3f279a1fbf22acd927e1bf1312c5a37` |
-| `.traceweaver/intent-contract.yml` | `72b0045922131258088d85957cad9882e9b8594778030fe7ea4829756c97457d` |
+| `.traceweaver/intent-contract.yml` | `7c7ecf714f79d24565ed8dd5a97b6f470f55761fc7bfa2ad6ede99d60bbbad07` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
 
 ## Coverage Counts
@@ -22,9 +22,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | trace rows | 50 |
 | atp entries | 34 |
 | result records | 34 |
-| verification records | 64 |
+| verification records | 65 |
 | validation records | 14 |
-| code anchor records | 216 |
+| code anchor records | 223 |
 | structured acceptance results | 1 |
 | structured acceptance coverage | 67 |
 | structured acceptance missing requirements | 66 |

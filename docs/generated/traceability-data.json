@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "af8d2d0892f7e0fa148e10b39c60064095259b3a6d91944f0300f202035fadb4"
+      "sha256": "5e9e469df6bfa8288f7cea0d468a5bc82671d3b0e59e95ece7478e9c620c7719"
     },
     {
       "path": "requirements.md",
@@ -14,7 +14,7 @@
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "72b0045922131258088d85957cad9882e9b8594778030fe7ea4829756c97457d"
+      "sha256": "7c7ecf714f79d24565ed8dd5a97b6f470f55761fc7bfa2ad6ede99d60bbbad07"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -26,9 +26,9 @@
     "trace_rows": 50,
     "atp_entries": 34,
     "result_records": 34,
-    "verification_records": 64,
+    "verification_records": 65,
     "validation_records": 14,
-    "code_anchor_records": 216,
+    "code_anchor_records": 223,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 67,
     "structured_acceptance_missing_requirements": 66,
@@ -2949,6 +2949,17 @@
       "Notes": "Full Vestro audit handover-clean, active-host currentness, broader runtime behavior, automatic cleanup/removal/deprecation authority, release/package/upstream readiness, clean replacement, semantic completeness, Vestro/R31 validation, and autonomous publication remain held until separately rerun and reviewed."
     },
     {
+      "ID": "VER-TW-067",
+      "Requirement": "REQ-TW-054; REQ-TW-063",
+      "Method": "Whole-repo audit surface classification fixture and review",
+      "Procedure / Command": "`ruby -c plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors`; `ruby -c scripts/traceweaver-classify-ce-replacement`; `bash -n scripts/traceweaver-smoke-code-traceability`; `scripts/traceweaver-smoke-code-traceability`; whole-repo audit-mode scanner rerun; implementation-mode code-anchor scanner over changed behavior-bearing files; `plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-acceptance-results --root . --file docs/validation/traceweaver-system-acceptance-results.md`; generated-view regeneration and drift smoke; fixture support-surface review-stageability check; `TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior`; `git diff --check`",
+      "Tested Ref": "Audit-mode surface classifier, deterministic audit-surface fixture, scoped `.gitignore` review-stageability repair, Intent Contract active gate/scope refresh, scanner output, CE replacement classifier anchor repair, requirement-status obsolete-detector repair, plan, trace record, generated views, and Code Anchor Evidence rows",
+      "Result": "Passed for source and repair review. The deterministic fixture proves audit mode emits held surface findings for support-surface, generated-surface, worktree-debt, and source-material-debt targets while keeping real untraced product behavior blocked as a product traceability finding. Whole-repo audit now collapses support/generated/worktree/source-material findings into four held surface records and has no unclassified real-product finding remaining. Implementation-mode changed-file scan passed with zero findings; acceptance checker, systems-engineering audit closure smoke, generated-view drift smoke, fixture review-stageability check, scoped code review `TW-CODE-REVIEW-2026-05-21-AUDIT-SURFACE-CLASSIFICATION-REPAIR-CLEAN-001`, and scoped status/hash doc review `TW-DOC-REVIEW-2026-05-21-AUDIT-SURFACE-CLASSIFICATION-REPAIR-STATUS-HASH-CLEAN-001` passed.",
+      "Evidence Path": "`plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors`; `scripts/traceweaver-classify-ce-replacement`; `scripts/traceweaver-smoke-code-traceability`; `fixtures/code-traceability/audit-surface-classification/`; `.gitignore`; `.traceweaver/intent-contract.yml`; `docs/plans/2026-05-21-002-feat-whole-repo-audit-surface-classification-plan.md`; `.traceweaver/trace-records/2026-05-21-whole-repo-audit-surface-classification.yml`; `.traceweaver/audit/code-traceability-audit.*`; `.traceweaver/audit/code-traceability-check.*`; generated views",
+      "Date / Session": "2026-05-21",
+      "Notes": "Whole-repo audit remains blocked by design because non-product surfaces are held, not clean. Active-host `tw-traceability-check` scanner currentness is held until host reconciliation/install reruns after this source change. Automatic cleanup/removal/deprecation authority, release/package/upstream readiness, clean replacement, runtime enforcement, semantic completeness, Vestro/R31 validation, publication, and autonomous publication remain held."
+    },
+    {
       "ID": "VER-TW-056",
       "Requirement": "REQ-TW-061; REQ-TW-062; REQ-TW-063",
       "Method": "Systems-engineering audit closure deterministic fixture implementation",
@@ -3247,6 +3258,62 @@
       "Verification": "VER-TW-066",
       "Anchor Type": "file-role; verifies",
       "Role": "invalid-utf8-uninspectable-file-smoke"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors",
+      "Requirement": "REQ-TW-063",
+      "Trace": "TRACE-TW-044; TRACE-TW-052",
+      "Verification": "VER-TW-067",
+      "Anchor Type": "entrypoint",
+      "Role": "audit-surface-classifier"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-classify-ce-replacement",
+      "Requirement": "REQ-TW-051",
+      "Trace": "TRACE-TW-019",
+      "Verification": "VER-TW-028; VER-TW-067",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "ce-replacement-classification-driver"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-code-traceability",
+      "Requirement": "REQ-TW-063",
+      "Trace": "TRACE-TW-044; TRACE-TW-052",
+      "Verification": "VER-TW-067",
+      "Anchor Type": "verifies",
+      "Role": "audit-surface-classification-smoke"
+    },
+    {
+      "Artifact Path": "fixtures/code-traceability/audit-surface-classification/",
+      "Requirement": "REQ-TW-063",
+      "Trace": "TRACE-TW-044; TRACE-TW-052",
+      "Verification": "VER-TW-067",
+      "Anchor Type": "fixture",
+      "Role": "audit-surface-classification-fixture"
+    },
+    {
+      "Artifact Path": ".gitignore",
+      "Requirement": "REQ-TW-063",
+      "Trace": "TRACE-TW-052",
+      "Verification": "VER-TW-067",
+      "Anchor Type": "review-stageability",
+      "Role": "audit-surface-classification-fixture-unignore"
+    },
+    {
+      "Artifact Path": "docs/plans/2026-05-21-002-feat-whole-repo-audit-surface-classification-plan.md",
+      "Requirement": "REQ-TW-063",
+      "Trace": "TRACE-TW-052",
+      "Verification": "VER-TW-067",
+      "Anchor Type": "plan",
+      "Role": "whole-repo-audit-surface-classification-plan"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-05-21-whole-repo-audit-surface-classification.yml",
+      "Requirement": "REQ-TW-054; REQ-TW-063",
+      "Trace": "TRACE-TW-052",
+      "Verification": "VER-TW-067",
+      "Anchor Type": "trace-record",
+      "Role": "whole-repo-audit-surface-classification-record"
     },
     {
       "Artifact Path": "scripts/traceweaver-smoke-tw-auto-runtime-driver",
