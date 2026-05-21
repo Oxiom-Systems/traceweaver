@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "f1634a2868716df1af569e81fd61a589e46ca1ba2d1385e8ad31ac2f50dddaff"
+      "sha256": "af8d2d0892f7e0fa148e10b39c60064095259b3a6d91944f0300f202035fadb4"
     },
     {
       "path": "requirements.md",
@@ -14,7 +14,7 @@
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "4b5a0f45f16cea05cff684c3901be24e2392240d890bfe9119b3a212bee6d99d"
+      "sha256": "72b0045922131258088d85957cad9882e9b8594778030fe7ea4829756c97457d"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -26,9 +26,9 @@
     "trace_rows": 50,
     "atp_entries": 34,
     "result_records": 34,
-    "verification_records": 63,
+    "verification_records": 64,
     "validation_records": 14,
-    "code_anchor_records": 214,
+    "code_anchor_records": 216,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 67,
     "structured_acceptance_missing_requirements": 66,
@@ -2938,6 +2938,17 @@
       "Notes": "Scanner-boundary repair implemented, reviewed, and review-staged. Active-host `tw-traceability-check` scanner currentness is held after the source repair until host reconciliation reruns. Broader runtime behavior beyond narrow `tw-audit` skill-file-read proof, automatic cleanup/removal/merge/deprecation authority, publication, release/package/upstream readiness, clean replacement, semantic-completeness, Vestro/R31 dogfood, and autonomous publication remain held."
     },
     {
+      "ID": "VER-TW-066",
+      "Requirement": "REQ-TW-054; REQ-TW-063",
+      "Method": "Invalid UTF-8 audit-mode scanner crash repair fixture and review",
+      "Procedure / Command": "`ruby -c plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors`; `bash -n scripts/traceweaver-smoke-code-traceability`; `scripts/traceweaver-smoke-code-traceability`; `scripts/traceweaver-smoke-systems-engineering-audit-closure`; implementation-mode code-anchor scanner over the scanner and smoke files; `scripts/traceweaver-generate-traceability-views --root .`; `scripts/traceweaver-smoke-traceability-generated-views`; `git diff --check`",
+      "Tested Ref": "`traceweaver-check-code-anchors` UTF-8 read guard, invalid-UTF-8 smoke fixture, audit-mode structured finding output, implementation-mode changed-file blocker, generated views, and closure trace record `TW-TRACE-RECORD-2026-05-21-INVALID-UTF8-AUDIT-SCANNER-CLOSURE-001`",
+      "Result": "Passed. Whole-repo audit mode no longer crashes when a behavior-bearing target is invalid UTF-8; it emits `TW-AUDIT-UNINSPECTABLE-FILE` as held unknown coverage with evidence source, confidence, supported scope, and known limitation. Implementation mode emits `CTA-UNINSPECTABLE-FILE` and blocks changed-file traceability pass for the same unsupported surface. Scoped code review passed as `TW-CODE-REVIEW-2026-05-21-INVALID-UTF8-AUDIT-SCANNER-CLEAN-001`; scoped status-hash doc review passed as `TW-DOC-REVIEW-2026-05-21-INVALID-UTF8-AUDIT-SCANNER-STATUS-HASH-CLEAN-001`. Controlled PR #23 publication/merge is authorized by explicit 2026-05-21 `/tw-commit-push-pr and merge` request after current gates pass.",
+      "Evidence Path": "`plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors`; `scripts/traceweaver-smoke-code-traceability`; `.traceweaver/trace-records/2026-05-21-invalid-utf8-audit-scanner-closure.yml`; generated views",
+      "Date / Session": "2026-05-21",
+      "Notes": "Full Vestro audit handover-clean, active-host currentness, broader runtime behavior, automatic cleanup/removal/deprecation authority, release/package/upstream readiness, clean replacement, semantic completeness, Vestro/R31 validation, and autonomous publication remain held until separately rerun and reviewed."
+    },
+    {
       "ID": "VER-TW-056",
       "Requirement": "REQ-TW-061; REQ-TW-062; REQ-TW-063",
       "Method": "Systems-engineering audit closure deterministic fixture implementation",
@@ -3109,11 +3120,11 @@
       "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005; NEED-TW-008",
       "Scenario / Intended Use": "Users can run one TraceWeaver audit wrapper to check requirements, traces, verification, validation or acceptance evidence, generated-view drift, and candidate dark behavior before cleanup, completion, or release claims.",
       "Stakeholder / Representative": "Oxiom Systems",
-      "Acceptance Signal": "Reviewer can inspect `tw-audit` output and see the authority triad status, requirements-quality route, code/test trace status, verification evidence, validation or acceptance closure, generated-view drift, structured findings, allowed claims, held claims, and next wrapper without receiving cleanup or publication authority.",
-      "Evidence Path": "`plugins/traceweaver-core/skills/tw-audit/SKILL.md`; `traceability-matrix.md`; generated views; `.traceweaver/audit/tw-audit-dogfood-2026-05-20-*`",
-      "Result": "Dogfood audit completed; generated-view scanner-boundary repair reviewed and staged",
+      "Acceptance Signal": "Reviewer can inspect `tw-audit` output and see the authority triad status, requirements-quality route, code/test trace status, verification evidence, validation or acceptance closure, generated-view drift, structured findings, allowed claims, held claims, unsupported/uninspectable coverage, and next wrapper without receiving cleanup or publication authority from audit output itself.",
+      "Evidence Path": "`plugins/traceweaver-core/skills/tw-audit/SKILL.md`; `traceability-matrix.md`; generated views; `.traceweaver/audit/tw-audit-dogfood-2026-05-20-*`; `.traceweaver/trace-records/2026-05-21-invalid-utf8-audit-scanner-closure.yml`",
+      "Result": "Dogfood audit completed; generated-view scanner-boundary repair reviewed and staged; invalid UTF-8 audit scanner crash repair reviewed and status-recorded; controlled PR #23 publication authorized by explicit `/tw-commit-push-pr and merge` request",
       "Owner": "Oxiom Systems",
-      "Deferred Trigger / Notes": "Current-branch dogfood generated-view JSON findings are classified as scanner-boundary false positives, repaired, reviewed, and review-staged; this does not grant cleanup, publication, release/package, clean replacement, semantic-completeness, Vestro/R31 dogfood, or broader runtime claims."
+      "Deferred Trigger / Notes": "Current-branch dogfood generated-view JSON findings are classified as scanner-boundary false positives, repaired, reviewed, and review-staged. Invalid UTF-8 behavior-bearing audit targets now report held/unknown coverage instead of crashing. Controlled PR #23 publication/merge is authorized only through the current `tw-commit-push-pr` gate; full Vestro audit handover-clean, cleanup, release/package, clean replacement, semantic-completeness, Vestro/R31 validation, active-host currentness, broader runtime, and autonomous publication claims remain held."
     }
   ],
   "code_anchor_evidence": [
@@ -3220,6 +3231,22 @@
       "Verification": "VER-TW-056",
       "Anchor Type": "file-role; verifies",
       "Role": "systems-engineering-audit-install-discovery-smoke"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors",
+      "Requirement": "REQ-TW-054; REQ-TW-063",
+      "Trace": "TRACE-TW-032; TRACE-TW-044",
+      "Verification": "VER-TW-066",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "invalid-utf8-uninspectable-file-read-guard"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-code-traceability",
+      "Requirement": "REQ-TW-054; REQ-TW-063",
+      "Trace": "TRACE-TW-032; TRACE-TW-044",
+      "Verification": "VER-TW-066",
+      "Anchor Type": "file-role; verifies",
+      "Role": "invalid-utf8-uninspectable-file-smoke"
     },
     {
       "Artifact Path": "scripts/traceweaver-smoke-tw-auto-runtime-driver",

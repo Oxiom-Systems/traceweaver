@@ -9,9 +9,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `f1634a2868716df1af569e81fd61a589e46ca1ba2d1385e8ad31ac2f50dddaff` |
+| `traceability-matrix.md` | `af8d2d0892f7e0fa148e10b39c60064095259b3a6d91944f0300f202035fadb4` |
 | `requirements.md` | `e511c1c60836d294a52142e5210dc7e0f3f279a1fbf22acd927e1bf1312c5a37` |
-| `.traceweaver/intent-contract.yml` | `4b5a0f45f16cea05cff684c3901be24e2392240d890bfe9119b3a212bee6d99d` |
+| `.traceweaver/intent-contract.yml` | `72b0045922131258088d85957cad9882e9b8594778030fe7ea4829756c97457d` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
 
 ## Coverage Counts
@@ -22,9 +22,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | trace rows | 50 |
 | atp entries | 34 |
 | result records | 34 |
-| verification records | 63 |
+| verification records | 64 |
 | validation records | 14 |
-| code anchor records | 214 |
+| code anchor records | 216 |
 | structured acceptance results | 1 |
 | structured acceptance coverage | 67 |
 | structured acceptance missing requirements | 66 |
@@ -116,7 +116,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Validation | Source Need | Result | Evidence |
 | --- | --- | --- | --- |
-| VAL-TW-014 | NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Dogfood audit completed; generated-view scanner-boundary repair reviewed and staged | `plugins/traceweaver-core/skills/tw-audit/SKILL.md`; `traceability-matrix.md`; generated views; `.traceweav... |
+| VAL-TW-014 | NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Dogfood audit completed; generated-view scanner-boundary repair reviewed and staged; invalid UTF-... | `plugins/traceweaver-core/skills/tw-audit/SKILL.md`; `traceability-matrix.md`; generated views; `.traceweav... |
 | VAL-TW-013 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Static implementation added / scoped generated-inventory and acceptance-coverage repair reviewed | `docs/generated/traceability-dashboard.md`; `docs/generated/traceability-graph.mmd`; `docs/generated/tracea... |
 | VAL-TW-012 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Partial | `docs/validation/traceweaver-system-acceptance-plan.md`; `docs/validation/traceweaver-system-acceptance-res... |
 | VAL-TW-011 | NEED-TW-003; NEED-TW-004; NEED-TW-005 | Partial | task summaries; `tw-auto` static skill |
