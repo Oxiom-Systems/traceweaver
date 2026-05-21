@@ -2,6 +2,8 @@
 # encoding: UTF-8
 # frozen_string_literal: true
 
+# TRACEWEAVER: file-role=ce-replacement-classification-driver; req=REQ-TW-051; trace=TRACE-TW-019; ver=VER-TW-028
+
 require "digest"
 require "fileutils"
 require "json"
@@ -28,6 +30,8 @@ options = {
   markdown_out: DEFAULT_MARKDOWN_OUT,
   update_evidence: false
 }
+
+# TRACEWEAVER: entrypoint=ce_replacement_classification_driver; req=REQ-TW-051; trace=TRACE-TW-019; ver=VER-TW-028
 
 OptionParser.new do |parser|
   parser.banner = "Usage: scripts/traceweaver-classify-ce-replacement [options]"

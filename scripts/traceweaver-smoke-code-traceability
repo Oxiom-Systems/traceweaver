@@ -62,6 +62,28 @@ run_blocked() {
   echo "code_traceability_${label}=blocked finding=$expected_finding"
 }
 
+run_blocked_all() {
+  local label="$1"
+  local expected_findings_csv="$2"
+  shift 2
+  local output="$TMP_DIR/${label}.out"
+  local expected
+  set +e
+  "$SCANNER" "$@" >"$output"
+  local status=$?
+  set -e
+  if [[ "$status" -eq 0 ]]; then
+    echo "code_traceability_${label}=failed_expected_blocker" >&2
+    cat "$output" >&2
+    exit 1
+  fi
+  IFS=',' read -r -a expected_findings <<<"$expected_findings_csv"
+  for expected in "${expected_findings[@]}"; do
+    grep -Fq "finding_id=$expected" "$output"
+  done
+  echo "code_traceability_${label}=blocked findings=$expected_findings_csv"
+}
+
 TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-code-traceability.XXXXXX")"
 repo_before="$(authority_fingerprint)"
 
@@ -121,6 +143,11 @@ run_pass changed_file_scope_ignores_untouched_debt \
 
 run_blocked audit_mode_reports_baseline_debt CTA-MISSING-FILE-ANCHOR \
   --root "$FIXTURE_ROOT/baseline-debt" \
+  --mode audit
+
+run_blocked_all audit_mode_classifies_support_surfaces \
+  "TW-AUDIT-WORKTREE-DEBT-SURFACE,TW-AUDIT-SOURCE-MATERIAL-DEBT-SURFACE,TW-AUDIT-SUPPORT-SURFACE-HELD,TW-AUDIT-GENERATED-SURFACE-HELD,CTA-MISSING-FILE-ANCHOR" \
+  --root "$FIXTURE_ROOT/audit-surface-classification" \
   --mode audit
 
 invalid_utf8_root="$TMP_DIR/invalid-utf8"

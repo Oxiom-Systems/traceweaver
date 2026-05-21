@@ -10,6 +10,15 @@
 .memsearch/
 .worktrees/
 
+# TraceWeaver deterministic fixtures intentionally carry hidden support-surface
+# examples so review can inspect and stage them like normal evidence.
+!fixtures/code-traceability/audit-surface-classification/.source-materials/
+!fixtures/code-traceability/audit-surface-classification/.source-materials/**
+!fixtures/code-traceability/audit-surface-classification/.memsearch/
+!fixtures/code-traceability/audit-surface-classification/.memsearch/**
+!fixtures/code-traceability/audit-surface-classification/.worktrees/
+!fixtures/code-traceability/audit-surface-classification/.worktrees/**
+
 # macOS Finder metadata.
 .DS_Store
 

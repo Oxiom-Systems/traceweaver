@@ -138,6 +138,72 @@ def source_code_like?(relative)
   source_like?(relative) && relative.match?(/\.(sh|bash|rb|py|ts|tsx|js|mjs|cjs)$/)
 end
 
+# TRACEWEAVER: entrypoint=audit_surface_classifier; req=REQ-TW-063; trace=TRACE-TW-044; ver=VER-TW-067
+
+def audit_surface_class(relative)
+  return "worktree_debt" if relative.start_with?(".worktrees/")
+  return "source_material_debt" if relative.start_with?(".source-materials/")
+  return "generated_surface" if relative.start_with?("docs/generated/")
+  return "generated_surface" if relative.start_with?(".traceweaver/audit/")
+  return "support_surface" if authority_record?(relative)
+  return "support_surface" if relative.start_with?(".context/")
+  return "support_surface" if relative.start_with?(".memsearch/")
+  return "support_surface" if relative.start_with?(".beads/")
+  return "support_surface" if relative == "AGENTS.md"
+  return "support_surface" if relative.start_with?(".claude-plugin/")
+  return "support_surface" if relative.start_with?("fixtures/")
+  return "support_surface" if relative.start_with?("scripts/traceweaver-smoke-")
+  return "support_surface" if relative.start_with?("scripts/traceweaver-audit-")
+  return "support_surface" if relative.start_with?("skills/")
+  return "support_surface" if relative.start_with?("docs/reviews/")
+  return "support_surface" if relative.start_with?("docs/solutions/")
+  return "support_surface" if relative.start_with?("docs/upstream/")
+  return "support_surface" if relative.start_with?("plugins/traceweaver-core/references/")
+  return "support_surface" if relative.start_with?("plugins/traceweaver-core/.cursor-plugin/")
+  return "support_surface" if relative.start_with?("plugins/traceweaver-core/.claude-plugin/")
+  return "support_surface" if relative.start_with?("plugins/traceweaver-core/.codex-plugin/")
+  return "support_surface" if relative == "plugins/traceweaver-core/AGENTS.md"
+  return "support_surface" if relative == "plugins/traceweaver-core/README.md"
+  return "support_surface" if relative.start_with?("plugins/traceweaver-core/agents/")
+  return "support_surface" if relative.start_with?("plugins/traceweaver-core/skills/ce-")
+  return "support_surface" if relative.match?(%r{\Aplugins/traceweaver-core/skills/[^/]+/(agents|examples|references|tests)/})
+
+  nil
+end
+
+def audit_surface_finding(surface)
+  case surface
+  when "worktree_debt"
+    {
+      id: "TW-AUDIT-WORKTREE-DEBT-SURFACE",
+      title: "Worktree copy surface is held as audit debt",
+      remediation: "Audit the originating worktree or remove the stale copy through an approved cleanup decision; do not treat copied worktree findings as product behavior closure evidence.",
+      supported_scope: "Local .worktrees copies created for branch or repair work"
+    }
+  when "source_material_debt"
+    {
+      id: "TW-AUDIT-SOURCE-MATERIAL-DEBT-SURFACE",
+      title: "Source-material cache is held as provenance debt",
+      remediation: "Keep source caches private/local or record a reviewed provenance boundary before using them as product evidence; do not mutate or clean them from audit output alone.",
+      supported_scope: "Local .source-materials caches, conversion libraries, and raw source evidence"
+    }
+  when "generated_surface"
+    {
+      id: "TW-AUDIT-GENERATED-SURFACE-HELD",
+      title: "Generated evidence surface is classified separately from product behavior",
+      remediation: "Regenerate and drift-check derived artifacts, or record a generated-file exception; do not require inline product anchors in generated output.",
+      supported_scope: "Generated TraceWeaver views and audit reports"
+    }
+  else
+    {
+      id: "TW-AUDIT-SUPPORT-SURFACE-HELD",
+      title: "Support surface is classified separately from product behavior",
+      remediation: "Audit support surfaces with their owning workflow or fixture contract; do not use support-surface findings as direct product cleanup authority.",
+      supported_scope: "Authority/evidence docs, TraceWeaver references, fixtures, verification smokes, audit helpers, local memory, Beads metadata, context captures, imported CE engines, and packaged reviewer agents"
+    }
+  end
+end
+
 def contains_entrypoint?(text)
   text.match?(/^\s*(function\s+[A-Za-z0-9_:-]+|[A-Za-z0-9_:-]+\(\)\s*\{|export\s+function\s+[A-Za-z0-9_:-]+|def\s+[A-Za-z0-9_:-]+)/)
 end
@@ -158,12 +224,13 @@ end
 
 def requirement_status(requirements_text, requirement)
   requirements_text.lines.each do |line|
-    next unless line.include?(requirement)
+    next unless line.match?(/^\|\s*#{Regexp.escape(requirement)}\s*\|/)
 
-    cells = line.split("|").map { |cell| cell.strip.downcase }
-    return "stale" if cells.any? { |cell| cell.match?(/\b(stale|superseded|obsolete|retired)\b/) }
-    return "held" if cells.any? { |cell| cell.match?(/\bheld\b/) }
-    return "approved" if cells.any? { |cell| cell.match?(/\b(approved|passed|accepted)\b/) }
+    status_cell = line.split("|").map { |cell| cell.strip.downcase }.reject(&:empty?).last || ""
+    approved_status = status_cell.match?(/\b(approved|passed|accepted|candidate)\b/) || status_cell.include?("planning_input")
+    return "stale" if status_cell.match?(/\b(stale|superseded|obsolete|retired)\b/)
+    return "approved" if approved_status
+    return "held" if status_cell.match?(/\bheld\b/)
   end
 
   "unknown"
@@ -213,6 +280,7 @@ targets =
 targets = targets.reject { |relative| approved_generated_exception?(matrix_text, relative) }
 
 findings = []
+audit_surface_groups = {}
 
 emit = lambda do |id:, severity:, status:, title:, evidence:, affected_ids:, file: nil, start: nil, claim_impact:, remediation:, **extra|
   finding = {
@@ -232,6 +300,36 @@ emit = lambda do |id:, severity:, status:, title:, evidence:, affected_ids:, fil
     finding[:end] = start || 1
   end
   findings << finding
+end
+
+if mode == "audit"
+  grouped_targets = targets.group_by { |relative| audit_surface_class(relative) }
+  targets = grouped_targets.delete(nil) || []
+  audit_surface_groups = grouped_targets
+
+  audit_surface_groups.each do |surface, surface_targets|
+    detail = audit_surface_finding(surface)
+    samples = surface_targets.first(5)
+    emit.call(
+      id: detail.fetch(:id),
+      severity: "P2",
+      status: "held",
+      title: detail.fetch(:title),
+      evidence: "#{surface_targets.length} behavior-bearing audit target(s) classified as #{surface}; samples=#{samples.join(",")}.",
+      affected_ids: ["REQ-TW-063"],
+      file: samples.first,
+      start: 1,
+      claim_impact: "audit_surface_classified_held_not_product_closure",
+      remediation: detail.fetch(:remediation),
+      surface_class: surface,
+      file_count: surface_targets.length,
+      sample_files: samples,
+      evidence_source: "whole_repo_audit_surface_classifier",
+      confidence: "high",
+      supported_scope: detail.fetch(:supported_scope),
+      known_limitation: "Surface classification reduces false product-code cleanup signals; it does not prove the classified surface is clean or safe to delete."
+    )
+  end
 end
 
 audit_records = []
@@ -717,6 +815,10 @@ status = findings.empty? ? "pass" : "blocked"
 puts "code_traceability_status=#{status}"
 puts "code_traceability_mode=#{mode}"
 puts "code_traceability_targets=#{targets.join(",")}"
+if mode == "audit"
+  surface_summary = audit_surface_groups.map { |surface, paths| "#{surface}:#{paths.length}" }.join(",")
+  puts "code_traceability_audit_surfaces=#{surface_summary}"
+end
 puts "code_traceability_findings=#{findings.length}"
 puts "code_traceability_jsonl=#{options[:jsonl]}" if options[:jsonl]
 puts "code_traceability_markdown=#{options[:markdown]}" if options[:markdown]
