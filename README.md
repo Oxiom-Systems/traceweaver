@@ -9,36 +9,31 @@
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-043; trace=TRACE-TW-010; ver=VAL-TW-011 -->
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-065; trace=TRACE-TW-048; ver=VAL-TW-011 -->
 
-TraceWeaver keeps coding-agent work tied to intent, approved authority,
-verification evidence, validation questions, and explicit held claims. It is an
-open-source, file-based systems-engineering workflow for teams that want agents
-to move quickly without losing the proof behind what changed and why.
+TraceWeaver is an open-source agent workflow that keeps coding-agent work tied
+to intent, approved requirements, verification evidence, validation questions,
+and explicit held claims.
 
-Current status: TraceWeaver Core `0.1.0` is an alpha advisory plugin for Codex
-and Claude Code. It is usable for first-time authority bootstrap, requirements
-review, planning, work handoffs, traceability checks, audits, and controlled
-review flows. Runtime-driver binding, release-ready status, clean CE
-replacement, enforcing mode, slash-command support, unconstrained-host support,
-and autonomous publication remain held until their own evidence gates pass.
+Use it when you want Codex, Claude Code, or other agent tools to move quickly
+without losing the proof behind what changed and why.
 
-## Quick Start
+## Setup
 
 ### Codex
 
-After the `0.1.0` plugin release is published, add the marketplace and install
-`traceweaver-core` from the Codex plugin UI:
+After the `0.1.0` plugin release is published, add the marketplace:
 
 ```sh
 codex plugin marketplace add Oxiom-Systems/traceweaver
 ```
 
-Refresh the marketplace when a new TraceWeaver release is published:
+Install `traceweaver-core` from the Codex plugin UI. Refresh the marketplace
+when a new TraceWeaver release is published:
 
 ```sh
 codex plugin marketplace upgrade traceweaver
 ```
 
-For local alpha testing from a checkout, use the repo-local installer:
+For local alpha testing from a checkout:
 
 ```sh
 git clone git@github.com:Oxiom-Systems/traceweaver.git
@@ -61,7 +56,7 @@ TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
 TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-separate-home-runtime
 ```
 
-### Claude Code
+### Claude
 
 Add the repository marketplace:
 
@@ -88,7 +83,18 @@ Reload active plugins inside Claude Code:
 /reload-plugins
 ```
 
-### First Command
+### Cursor
+
+TraceWeaver includes a Cursor peer manifest at
+`plugins/traceweaver-core/.cursor-plugin/plugin.json`.
+
+Cursor install/update is compatibility-preview only in `0.1.0`: the manifest is
+versioned with the Codex and Claude manifests, but TraceWeaver does not yet
+claim a proven Cursor marketplace or runtime install path. Use the Codex or
+Claude setup above for supported alpha plugin use, and treat Cursor testing as
+held until a Cursor runtime validation record exists.
+
+## First Command
 
 For a new or unclear project, start with the high-level route:
 
@@ -107,6 +113,15 @@ For a specific approved change:
 ```text
 tw-auto "implement the approved plan"
 ```
+
+## Current Alpha Boundaries
+
+TraceWeaver Core `0.1.0` is an alpha advisory plugin for Codex and Claude Code.
+It is usable for first-time authority bootstrap, requirements review, planning,
+work handoffs, traceability checks, audits, and controlled review flows.
+Runtime-driver binding, release-ready status, clean CE replacement, enforcing
+mode, slash-command support, unconstrained-host support, and autonomous
+publication remain held until their own evidence gates pass.
 
 ## What TraceWeaver Gives You
 
