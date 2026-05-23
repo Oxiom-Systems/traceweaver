@@ -18,17 +18,6 @@ flowchart LR
   smoke --> graph
 
   subgraph Latest_Trace_Rows["Latest trace rows from authority matrix"]
-    trace_TRACE_TW_041["TRACE-TW-041"]
-    req_REQ_TW_010["REQ-TW-010"] --> trace_TRACE_TW_041
-    req_REQ_TW_011["REQ-TW-011"] --> trace_TRACE_TW_041
-    req_REQ_TW_034["REQ-TW-034"] --> trace_TRACE_TW_041
-    req_REQ_TW_041["REQ-TW-041"] --> trace_TRACE_TW_041
-    req_REQ_TW_048["REQ-TW-048"] --> trace_TRACE_TW_041
-    req_REQ_TW_050["REQ-TW-050"] --> trace_TRACE_TW_041
-    req_REQ_TW_052["REQ-TW-052"] --> trace_TRACE_TW_041
-    req_REQ_TW_059["REQ-TW-059"] --> trace_TRACE_TW_041
-    trace_TRACE_TW_041 --> ver_VER_TW_053["VER-TW-053"]
-    trace_TRACE_TW_041 --> val_VAL_TW_011["VAL-TW-011"]
     trace_TRACE_TW_042["TRACE-TW-042"]
     req_REQ_TW_053["REQ-TW-053"] --> trace_TRACE_TW_042
     req_REQ_TW_054["REQ-TW-054"] --> trace_TRACE_TW_042
@@ -133,4 +122,15 @@ flowchart LR
     req_REQ_TW_067["REQ-TW-067"] --> trace_TRACE_TW_052
     trace_TRACE_TW_052 --> ver_VER_TW_065["VER-TW-065"]
     trace_TRACE_TW_052 --> val_VAL_TW_014["VAL-TW-014"]
+    trace_TRACE_TW_053["TRACE-TW-053"]
+    req_REQ_TW_015["REQ-TW-015"] --> trace_TRACE_TW_053
+    req_REQ_TW_016["REQ-TW-016"] --> trace_TRACE_TW_053
+    req_REQ_TW_020["REQ-TW-020"] --> trace_TRACE_TW_053
+    req_REQ_TW_021["REQ-TW-021"] --> trace_TRACE_TW_053
+    req_REQ_TW_023["REQ-TW-023"] --> trace_TRACE_TW_053
+    req_REQ_TW_041["REQ-TW-041"] --> trace_TRACE_TW_053
+    req_REQ_TW_043["REQ-TW-043"] --> trace_TRACE_TW_053
+    req_REQ_TW_065["REQ-TW-065"] --> trace_TRACE_TW_053
+    trace_TRACE_TW_053 --> ver_VER_TW_068["VER-TW-068"]
+    trace_TRACE_TW_053 --> val_VAL_TW_015["VAL-TW-015"]
   end

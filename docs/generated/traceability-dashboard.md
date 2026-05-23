@@ -9,9 +9,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `5e9e469df6bfa8288f7cea0d468a5bc82671d3b0e59e95ece7478e9c620c7719` |
+| `traceability-matrix.md` | `21cdf7687d6d2b548ce3cbbcc58781bbd1f4a4319954aaba8686eab9db921337` |
 | `requirements.md` | `e511c1c60836d294a52142e5210dc7e0f3f279a1fbf22acd927e1bf1312c5a37` |
-| `.traceweaver/intent-contract.yml` | `7c7ecf714f79d24565ed8dd5a97b6f470f55761fc7bfa2ad6ede99d60bbbad07` |
+| `.traceweaver/intent-contract.yml` | `d52e43b2a528813fbbdf2744c68ababbe1def586ceb7f6e327725595d34ef17c` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
 
 ## Coverage Counts
@@ -19,12 +19,12 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | View | Count |
 | --- | ---: |
 | requirements | 67 |
-| trace rows | 50 |
-| atp entries | 34 |
-| result records | 34 |
-| verification records | 65 |
-| validation records | 14 |
-| code anchor records | 223 |
+| trace rows | 51 |
+| atp entries | 35 |
+| result records | 35 |
+| verification records | 66 |
+| validation records | 15 |
+| code anchor records | 234 |
 | structured acceptance results | 1 |
 | structured acceptance coverage | 67 |
 | structured acceptance missing requirements | 66 |
@@ -36,7 +36,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | --- | --- | --- | --- |
 | REQ-TW-067 | Candidate requirement recorded / static generator implementation added / JSON scanability repair verification passed / code review passed / status-hash doc review passed / runtime and publication held | VAL-TW-013 | TRACE-TW-051; TRACE-TW-052 |
 | REQ-TW-066 | Requirements review recorded / candidate planning input / authority status patch implemented / doc review passed / runtime held | VAL-TW-012 | TRACE-TW-049; TRACE-TW-050; TRACE-TW-051; TRACE-TW-052 |
-| REQ-TW-065 | Candidate requirement recorded / static wrapper implementation added / fixture smoke passed / code review passed / status-hash doc review passed / runtime and publication held | VAL-TW-001; VAL-TW-003; VAL-TW-011 | TRACE-TW-048 |
+| REQ-TW-065 | Candidate requirement recorded / static wrapper implementation added / fixture smoke passed / code review passed / status-hash doc review passed / runtime and publication held | VAL-TW-001; VAL-TW-003; VAL-TW-011 | TRACE-TW-048; TRACE-TW-053 |
 | REQ-TW-064 | Requirements review passed / authority doc review passed / static implementation and smokes added / code review passed / status-hash doc review passed / active-host currentness passed / runtime held | VAL-TW-011 | TRACE-TW-047 |
 | REQ-TW-063 | Requirements review passed / plan doc review passed / status-hash doc review passed / deterministic fixture smoke passed / code review passed / status-hash doc review passed / runtime held | VAL-TW-002; VAL-TW-003; VAL-TW-011 | TRACE-TW-044; TRACE-TW-050; TRACE-TW-052 |
 | REQ-TW-062 | Requirements review passed / plan doc review passed / status-hash doc review passed / deterministic fixture smoke passed / code review passed / status-hash doc review passed / runtime held | VAL-TW-001; VAL-TW-011 | TRACE-TW-044; TRACE-TW-048; TRACE-TW-049; TRACE-TW-052 |
@@ -51,6 +51,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Trace | Requirements | Artifact | Verification | Validation | Status |
 | --- | --- | --- | --- | --- | --- |
+| TRACE-TW-053 | REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-T... | ART-TW-067 | VER-TW-068 | VAL-TW-015 | Implementation added; verification passed; scoped review passed; TraceWeaver PR route authorized ... |
 | TRACE-TW-052 | REQ-TW-061; REQ-TW-062; REQ-TW-063; REQ-TW-052; REQ-TW-057; REQ-TW-066; REQ-T... | ART-TW-066 | VER-TW-065 | VAL-TW-014 | Static implementation added; deterministic verification passed; active-host filesystem/hash/promp... |
 | TRACE-TW-051 | REQ-TW-067; REQ-TW-005; REQ-TW-008; REQ-TW-023; REQ-TW-054; REQ-TW-056; REQ-T... | ART-TW-065 | VER-TW-064 | VAL-TW-013 | Static implementation added; generator smoke passed; JSON scanability repair verification passed;... |
 | TRACE-TW-050 | REQ-TW-055; REQ-TW-056; REQ-TW-063; REQ-TW-066 | ART-TW-064 | VER-TW-063 | VAL-TW-012 | Implementation added, fixture smoke passed, code review passed, and status-hash doc review passed |
@@ -62,12 +63,12 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | TRACE-TW-044 | REQ-TW-061; REQ-TW-062; REQ-TW-063 | ART-TW-058 | VER-TW-056 | VAL-TW-011 | Requirements review passed; plan doc review passed; status-hash doc review passed; deterministic ... |
 | TRACE-TW-043 | REQ-TW-041; REQ-TW-043; REQ-TW-052; REQ-TW-059; REQ-TW-060 | ART-TW-057 | VER-TW-055 | VAL-TW-011 | Requirements review passed; authority doc review passed; implementation code review passed |
 | TRACE-TW-042 | REQ-TW-053; REQ-TW-054; REQ-TW-055; REQ-TW-056; REQ-TW-057; REQ-TW-058 | ART-TW-056 | VER-TW-054 | VAL-TW-011 | Deterministic fixtures and smoke implementation added; code review passed; status/hash doc review... |
-| TRACE-TW-041 | REQ-TW-010; REQ-TW-011; REQ-TW-034; REQ-TW-041; REQ-TW-048; REQ-TW-050; REQ-T... | ART-TW-055 | VER-TW-053 | VAL-TW-011 | Implemented; code review passed; status-hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ANCHO... |
 
 ## Open Or Held Trace Rows
 
 | Trace | Requirements | Status | Next Step / Debt |
 | --- | --- | --- | --- |
+| TRACE-TW-053 | REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-T... | Implementation added; verification passed; scoped review passed; TraceWeaver PR route authorized by 2026-05... | Open the reviewed TraceWeaver PR; keep release tags, GitHub Release, website publication, runtime, and clean-replacement claims... |
 | TRACE-TW-052 | REQ-TW-061; REQ-TW-062; REQ-TW-063; REQ-TW-052; REQ-TW-057; REQ-TW-066; REQ-T... | Static implementation added; deterministic verification passed; active-host filesystem/hash/prompt-registry... | Broader runtime behavior, automatic cleanup/removal/merge/deprecation authority, publication, release/package/upstream readines... |
 | TRACE-TW-050 | REQ-TW-055; REQ-TW-056; REQ-TW-063; REQ-TW-066 | Implementation added, fixture smoke passed, code review passed, and status-hash doc review passed | Static/advisory fixture proof only; live runtime enforcement, arbitrary-project artifact creation, publication, release/package... |
 | TRACE-TW-049 | REQ-TW-066; REQ-TW-005; REQ-TW-007; REQ-TW-022; REQ-TW-038; REQ-TW-062 | Authority/status patch implemented; requirements review recorded as revise-before-approval for raw wording ... | Use as evidence-pack mechanism on the next real closure claim; do not claim runtime enforcement, broad retrospective validation... |
@@ -79,7 +80,6 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | TRACE-TW-043 | REQ-TW-041; REQ-TW-043; REQ-TW-052; REQ-TW-059; REQ-TW-060 | Requirements review passed; authority doc review passed; implementation code review passed | Use as reviewed static authority and code-review-passed implementation input after status/hash doc review passed; runtime enfor... |
 | TRACE-TW-042 | REQ-TW-053; REQ-TW-054; REQ-TW-055; REQ-TW-056; REQ-TW-057; REQ-TW-058 | Deterministic fixtures and smoke implementation added; code review passed; status/hash doc review passed as... | Use as reviewed static fixture implementation evidence only; runtime, Vestro, publication, clean replacement, release/package/u... |
 | TRACE-TW-041 | REQ-TW-010; REQ-TW-011; REQ-TW-034; REQ-TW-041; REQ-TW-048; REQ-TW-050; REQ-T... | Implemented; code review passed; status-hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ANCHOR-ALIAS-ST... | Use as scoped static inventory and anchor evidence only; runtime, CE body edits, replacement, publication, and upstream claims ... |
-| TRACE-TW-039 | REQ-TW-054; REQ-TW-055; REQ-TW-056; REQ-TW-057; REQ-TW-058 | Deterministic default smoke implementation added; code review passed as `TW-CODE-REVIEW-2026-05-08-TW-AUTO-... | Use as planned controlled fixture evidence only; no broad runtime parity, Vestro, publication, clean replacement, release/packa... |
 
 ## Structured Acceptance Results
 
@@ -116,6 +116,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Validation | Source Need | Result | Evidence |
 | --- | --- | --- | --- |
+| VAL-TW-015 | NEED-TW-004; NEED-TW-005; NEED-TW-006; NEED-TW-007; NEED-TW-008 | Verification passed / scoped review passed / exact TraceWeaver PR route authorized | `README.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/validation/traceweaver-first-time-doc... |
 | VAL-TW-014 | NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Dogfood audit completed; generated-view scanner-boundary repair reviewed and staged; invalid UTF-... | `plugins/traceweaver-core/skills/tw-audit/SKILL.md`; `traceability-matrix.md`; generated views; `.traceweav... |
 | VAL-TW-013 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Static implementation added / scoped generated-inventory and acceptance-coverage repair reviewed | `docs/generated/traceability-dashboard.md`; `docs/generated/traceability-graph.mmd`; `docs/generated/tracea... |
 | VAL-TW-012 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Partial | `docs/validation/traceweaver-system-acceptance-plan.md`; `docs/validation/traceweaver-system-acceptance-res... |
@@ -123,4 +124,3 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | VAL-TW-010 | NEED-TW-005 | Held | future R31 record |
 | VAL-TW-009 | NEED-TW-006 | Partial | validation evidence and scans |
 | VAL-TW-008 | NEED-TW-005 | Pass for narrow static/advisory claims | `docs/validation/traceweaver-u7-static-advisory-claims.md` |
-| VAL-TW-007 | NEED-TW-005; NEED-TW-006 | Accepted for source-pinned static materialization | CE inventory and source map |

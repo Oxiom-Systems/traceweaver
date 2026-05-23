@@ -2,7 +2,7 @@
 name: lfg
 description: TraceWeaver-controlled compatibility alias for full autonomous engineering workflow. Delegates to tw-auto so CE-style automation runs under Intent Contract, authority, traceability, verification, and stop-before-commit controls.
 argument-hint: "[feature description]"
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 <!-- TRACEWEAVER: file-role=tw-auto-compatibility-alias-skill; req=REQ-TW-034; trace=TRACE-TW-021; ver=VER-TW-030 -->

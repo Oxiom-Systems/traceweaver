@@ -325,10 +325,12 @@ assert_equal "manifest_model_default_codex_reasoning_override_env" "TRACEWEAVER_
 assert_equal "manifest_model_default_claude_model" "sonnet" "$(json_query "$manifest" modelDefaults.claude.model)"
 assert_equal "manifest_model_default_claude_enforcement" "policy_recorded_runtime_enforcement_held" "$(json_query "$manifest" modelDefaults.claude.enforcement)"
 assert_equal "manifest_model_default_ce_body_policy" "no_model_default_edits_without_reviewed_overlay_fork_record" "$(json_query "$manifest" modelDefaults.importedCeComponentBodyPolicy)"
-assert_equal "codex_plugin_model_default_codex_model" "gpt-5.5" "$(json_query "$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json" modelDefaults.codex.model)"
-assert_equal "codex_plugin_model_default_codex_reasoning_effort" "medium" "$(json_query "$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json" modelDefaults.codex.reasoningEffort)"
-assert_equal "codex_plugin_model_default_claude_model" "sonnet" "$(json_query "$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json" modelDefaults.claude.model)"
-assert_equal "claude_plugin_model_default_claude_model" "sonnet" "$(json_query "$repo_root/plugins/traceweaver-core/.claude-plugin/plugin.json" modelDefaults.claude.model)"
+if grep -Fq '"modelDefaults"' "$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json" \
+  || grep -Fq '"modelDefaults"' "$repo_root/plugins/traceweaver-core/.claude-plugin/plugin.json"; then
+  echo "plugin_manifest_model_defaults=failed_manifest_contains_loader_unsafe_policy"
+  exit 1
+fi
+echo "plugin_manifest_model_defaults=pass_policy_kept_in_reference_and_install_manifest"
 grep -Fq "legacy_active_namespaced_skill_surface=absent" "$install_output"
 
 if find "$codex_root" -path '*compound-engineering*' -print -quit | grep -q .; then

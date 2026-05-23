@@ -1,0 +1,84 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-23-PLUGIN-0.1-RELEASE-METADATA-001
+record_type: implementation_trace
+created_at: "2026-05-23"
+owner: Oxiom Systems
+baseline_id: REQ-BASELINE-2026-04-30-001
+requirements:
+  - REQ-TW-016
+  - REQ-TW-020
+  - REQ-TW-024
+  - REQ-TW-041
+  - REQ-TW-043
+  - REQ-TW-060
+trace_ids:
+  - TRACE-TW-010
+verification_ids:
+  - VER-TW-012
+  - VER-TW-019
+beads_issue: TraceWeaver-8s5
+intent_served:
+  - INTENT-TW-004
+  - INTENT-TW-005
+  - INTENT-TW-007
+scope:
+  - .agents/plugins/marketplace.json
+  - .claude-plugin/marketplace.json
+  - plugins/traceweaver-core/.codex-plugin/plugin.json
+  - plugins/traceweaver-core/.claude-plugin/plugin.json
+  - plugins/traceweaver-core/.cursor-plugin/plugin.json
+  - plugins/traceweaver-core/skills/ce-setup/SKILL.md
+  - plugins/traceweaver-core/skills/ce-test-xcode/SKILL.md
+  - plugins/traceweaver-core/skills/lfg/SKILL.md
+  - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+  - scripts/traceweaver-smoke-codex-discovery
+  - README.md
+  - plugins/traceweaver-core/README.md
+  - CHANGELOG.md
+  - docs/validation/traceweaver-plugin-0.1-release.md
+  - docs/validation/traceweaver-u7-static-advisory-claims.md
+  - traceability-matrix.md
+  - docs/generated/traceability-dashboard.md
+  - docs/generated/traceability-data.json
+authority_source:
+  approved_requirements:
+    - REQ-TW-016
+    - REQ-TW-020
+    - REQ-TW-024
+    - REQ-TW-041
+    - REQ-TW-043
+    - REQ-TW-060
+  authority_status: static_metadata_preparation_allowed_publication_held
+verification_required:
+  - Codex plugin manifest validation
+  - Claude plugin and marketplace validation
+  - Claude plugin release tag dry-run
+  - isolated Codex install/discovery smoke
+  - separate-home Codex runtime-disabled smoke
+  - controlled publication-route smoke
+  - git diff whitespace check
+verification_observed:
+  - "python3 -m json.tool for Codex/Claude/Cursor plugin and marketplace JSON: pass"
+  - "Codex plugin validator: pass"
+  - "claude plugin validate --strict .: pass"
+  - "claude plugin validate --strict plugins/traceweaver-core: pass"
+  - "claude plugin tag --dry-run --force plugins/traceweaver-core: pass, computed traceweaver-core--v0.1.0 without creating or pushing a tag"
+  - "TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery: pass"
+  - "TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=10 scripts/traceweaver-smoke-codex-separate-home-runtime: pass with runtime invocation held because isolated Codex exec timed out without auth copy"
+  - "scripts/traceweaver-smoke-controlled-publication: pass"
+  - "TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior: pass with active-host stale surfaces held"
+  - "implementation-mode code-anchor scan over changed files: pass with code_traceability_findings=0"
+  - "scripts/traceweaver-smoke-code-traceability: pass"
+  - "scripts/traceweaver-generate-traceability-views --root .: pass"
+  - "scripts/traceweaver-smoke-traceability-generated-views: pass"
+  - "git diff --check: pass"
+validation_question: "Can a user install and update TraceWeaver Core 0.1 through Codex and Claude plugin marketplace flows without expanding runtime or release-ready claims?"
+held_claims:
+  - actual GitHub tag or release publication
+  - runtime-driver invocation
+  - clean CE replacement
+  - release-ready or upstream-ready status
+  - R31 real-project validation closure
+  - slash-command or prompt availability
+  - enforcing authority gate behavior
+  - autonomous publication
+status: static_metadata_prepared_verification_passed_publication_held
