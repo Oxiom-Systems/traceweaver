@@ -1,0 +1,96 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-23-FIRST-TIME-DOCS-GUIDE-001
+date: 2026-05-23
+owner: Oxiom Systems
+status: implementation_added_verification_passed_review_passed_pr_publication_authorized_release_held
+
+scope:
+  requirements:
+    - REQ-TW-015
+    - REQ-TW-016
+    - REQ-TW-020
+    - REQ-TW-021
+    - REQ-TW-023
+    - REQ-TW-041
+    - REQ-TW-043
+    - REQ-TW-065
+  trace: TRACE-TW-053
+  artifact: ART-TW-067
+  verification: VER-TW-068
+  validation: VAL-TW-015
+
+authority:
+  baseline: requirements.md
+  intent_contract: .traceweaver/intent-contract.yml
+  plan: docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md
+  publication_boundary: >
+    This record authorizes and records documentation implementation and review
+    readiness. The 2026-05-23 `/tw-commit-push-pr` request authorizes the
+    exact reviewed TraceWeaver PR route after gates pass. It does not authorize
+    website deployment, GitHub release publication, tag creation, release-ready
+    claims, package-ready claims, clean CE replacement claims, enforcing-mode
+    claims, slash-command claims, unconstrained-host claims, or autonomous
+    publication.
+
+implemented_artifacts:
+  - README.md
+  - docs/guides/traceweaver-from-prompt-to-proof.md
+  - docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md
+  - traceability-matrix.md
+  - .traceweaver/intent-contract.yml
+  - docs/validation/traceweaver-first-time-docs-guide.md
+  - Oxiom Systems website source, section linked from https://oxiomsystems.com/#traceweaver
+
+held_claims:
+  - website publication
+  - GitHub release publication
+  - tag creation or deploy
+  - release-ready or package-ready status
+  - runtime-driver decision binding
+  - clean CE replacement
+  - enforcing mode
+  - slash-command support
+  - unconstrained-host support
+  - autonomous publication
+
+verification_plan:
+  - "scripts/traceweaver-generate-traceability-views --root ."
+  - "scripts/traceweaver-smoke-traceability-generated-views"
+  - "implementation-mode code-anchor scanner over changed TraceWeaver documentation and evidence files"
+  - "TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery"
+  - "claude plugin validate --strict ."
+  - "git diff --check"
+  - "static website local render check for the Oxiom Systems guide section"
+
+review_plan:
+  code_review: passed_no_findings
+  doc_review: passed_no_findings
+  reviewer_parallelism: not_used_in_this_run
+
+verification_results:
+  traceability_generated_views: pass
+  traceability_generated_view_smoke: pass
+  implementation_mode_code_anchor_scan: pass
+  codex_discovery_smoke_runtime_disabled: pass
+  claude_plugin_strict_validate: pass
+  diff_whitespace_check: pass
+  public_guide_hygiene_scan: pass
+  website_public_copy_hygiene_scan: pass
+  website_desktop_render_check: pass
+  website_mobile_render_check: pass
+  website_screenshots:
+    - /tmp/oxiomsystems-traceweaver-guide-desktop.png
+    - /tmp/oxiomsystems-traceweaver-guide-mobile.png
+
+review_results:
+  code_review_status: passed_no_findings
+  doc_review_status: passed_no_findings
+  review_ids:
+    - TW-CODE-REVIEW-2026-05-23-FIRST-TIME-DOCS-GUIDE-CLEAN-001
+    - TW-DOC-REVIEW-2026-05-23-FIRST-TIME-DOCS-GUIDE-STATUS-HASH-CLEAN-001
+  coverage: main_thread_scoped_review_no_reviewer_subagents
+  notes: >
+    Review covered README first-time flow, public guide copy, Oxiom website
+    guide section/CSS, matrix rows, Intent Contract gate/status fields, trace
+    record, validation record, generated-view drift, public-safety scans, and
+    publication-held boundaries.
+  publication_request: "2026-05-23 /tw-commit-push-pr authorizes exact TraceWeaver PR route only; release tag, GitHub Release, and OxiomSystems website publication remain held."

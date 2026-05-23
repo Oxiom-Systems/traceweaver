@@ -2,7 +2,7 @@
 name: tw-auto
 description: TraceWeaver-controlled autonomous alpha workflow. Use when you want CE-style plan/work/review/publication iteration with Intent Contract, authority, traceability, verification, and publication-route controls.
 argument-hint: "[feature description or plan path]"
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-031; ver=VER-TW-040 -->

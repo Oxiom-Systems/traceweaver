@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "5e9e469df6bfa8288f7cea0d468a5bc82671d3b0e59e95ece7478e9c620c7719"
+      "sha256": "21cdf7687d6d2b548ce3cbbcc58781bbd1f4a4319954aaba8686eab9db921337"
     },
     {
       "path": "requirements.md",
@@ -14,7 +14,7 @@
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "7c7ecf714f79d24565ed8dd5a97b6f470f55761fc7bfa2ad6ede99d60bbbad07"
+      "sha256": "d52e43b2a528813fbbdf2744c68ababbe1def586ceb7f6e327725595d34ef17c"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -23,12 +23,12 @@
   ],
   "row_counts": {
     "requirements": 67,
-    "trace_rows": 50,
-    "atp_entries": 34,
-    "result_records": 34,
-    "verification_records": 65,
-    "validation_records": 14,
-    "code_anchor_records": 223,
+    "trace_rows": 51,
+    "atp_entries": 35,
+    "result_records": 35,
+    "verification_records": 66,
+    "validation_records": 15,
+    "code_anchor_records": 234,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 67,
     "structured_acceptance_missing_requirements": 66,
@@ -254,7 +254,8 @@
       "owner": "Oxiom Systems",
       "status": "Approved",
       "trace_ids": [
-        "TRACE-TW-004"
+        "TRACE-TW-004",
+        "TRACE-TW-053"
       ]
     },
     {
@@ -276,7 +277,8 @@
         "TRACE-TW-018",
         "TRACE-TW-019",
         "TRACE-TW-020",
-        "TRACE-TW-022"
+        "TRACE-TW-022",
+        "TRACE-TW-053"
       ]
     },
     {
@@ -328,7 +330,8 @@
       "owner": "Oxiom Systems",
       "status": "Approved",
       "trace_ids": [
-        "TRACE-TW-006"
+        "TRACE-TW-006",
+        "TRACE-TW-053"
       ]
     },
     {
@@ -343,7 +346,8 @@
       "trace_ids": [
         "TRACE-TW-005",
         "TRACE-TW-019",
-        "TRACE-TW-021"
+        "TRACE-TW-021",
+        "TRACE-TW-053"
       ]
     },
     {
@@ -372,7 +376,8 @@
       "status": "Approved",
       "trace_ids": [
         "TRACE-TW-002",
-        "TRACE-TW-051"
+        "TRACE-TW-051",
+        "TRACE-TW-053"
       ]
     },
     {
@@ -643,7 +648,8 @@
         "TRACE-TW-040",
         "TRACE-TW-041",
         "TRACE-TW-043",
-        "TRACE-TW-047"
+        "TRACE-TW-047",
+        "TRACE-TW-053"
       ]
     },
     {
@@ -681,7 +687,8 @@
         "TRACE-TW-020",
         "TRACE-TW-040",
         "TRACE-TW-043",
-        "TRACE-TW-047"
+        "TRACE-TW-047",
+        "TRACE-TW-053"
       ]
     },
     {
@@ -1063,7 +1070,8 @@
       "owner": "Oxiom Systems",
       "status": "Candidate requirement recorded / static wrapper implementation added / fixture smoke passed / code review passed / status-hash doc review passed / runtime and publication held",
       "trace_ids": [
-        "TRACE-TW-048"
+        "TRACE-TW-048",
+        "TRACE-TW-053"
       ]
     },
     {
@@ -1647,6 +1655,17 @@
       "validation": "VAL-TW-014",
       "status": "Static implementation added; deterministic verification passed; active-host filesystem/hash/prompt-registry currentness passed; narrow runtime proof passed; dogfood generated-view scanner-boundary repair verified; scoped code review and status-hash doc review passed",
       "next_step": "Broader runtime behavior, automatic cleanup/removal/merge/deprecation authority, publication, release/package/upstream readiness, clean replacement, Vestro/R31 dogfood, and semantic-completeness claims remain held"
+    },
+    {
+      "id": "TRACE-TW-053",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-004; NEED-TW-005; NEED-TW-006; NEED-TW-007; NEED-TW-008",
+      "requirements": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "artifact": "ART-TW-067",
+      "verification": "VER-TW-068",
+      "validation": "VAL-TW-015",
+      "status": "Implementation added; verification passed; scoped review passed; TraceWeaver PR route authorized by 2026-05-23 `/tw-commit-push-pr`; release/runtime/website claims held",
+      "next_step": "Open the reviewed TraceWeaver PR; keep release tags, GitHub Release, website publication, runtime, and clean-replacement claims held."
     }
   ],
   "atp_entries": [
@@ -1955,6 +1974,15 @@
       "Expected Result": "`tw-audit` loads the authority triad, classifies changed-scope, whole-repo, and closure audit modes, delegates to existing traceability/acceptance/generated-view checkers, emits structured findings and held claims, and never grants mutation, cleanup, publication, release, or merge/deprecation authority.",
       "Owner": "Oxiom Systems",
       "Status": "Static implementation added / deterministic verification passed / active-host currentness passed / narrow active-host runtime skill-file-read proof passed"
+    },
+    {
+      "ID": "ATP-TW-037",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "Procedure / Scenario": "Inspect first-time README, public guide, website guide section, trace evidence, generated views, plugin validation, and whitespace validity.",
+      "Setup / Context": "`README.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; Oxiom Systems website source.",
+      "Expected Result": "First-time users can find install/update commands, first command, authority files, workflow loop, audit path, alpha boundaries, and proof trail; public guide avoids internal review IDs, local paths, protected text, and unsupported release/compliance claims.",
+      "Owner": "Oxiom Systems",
+      "Status": "Implementation added / verification passed / scoped review passed / exact TraceWeaver PR route authorized"
     }
   ],
   "result_records": [
@@ -2263,6 +2291,15 @@
       "Evidence Artifact": "`tw-audit` skill, operating-mode reference, routing docs, deterministic fixture, smoke updates, generated views, matrix proof-chain rows, guarded active-host reconciliation evidence, runtime target-skill host registry proof, and `.traceweaver/audit/tw-audit-dogfood-2026-05-20-*` evidence",
       "Result": "Static implementation added; deterministic smokes, package discovery, generated-view drift smoke, acceptance smoke, audit-closure smoke, behavior-bearing implementation-mode code-anchor scanner, guarded active-host reconciliation, host registry smoke, TW skill behavior smoke, discovery smoke, and controlled runtime skill-file-read proof passed. Full changed-scope code traceability found candidate generated-view scanner-boundary findings confined to `docs/generated/traceability-data.json`; no repair or cleanup was performed.",
       "Date / Session": "2026-05-20"
+    },
+    {
+      "ID": "RESULT-TW-037",
+      "Requirement / Need": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "ATP / Method": "ATP-TW-037",
+      "Tested Ref / Context": "First-time README, public guide, and Oxiom website guide implementation",
+      "Evidence Artifact": "`README.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; Oxiom Systems website source",
+      "Result": "Implementation added, verification passed, scoped review passed, and exact TraceWeaver PR route authorized by 2026-05-23 `/tw-commit-push-pr`. GitHub release, tag, website publication, release-ready/package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, and autonomous-publication claims remain held.",
+      "Date / Session": "2026-05-23"
     }
   ],
   "verification_evidence": [
@@ -2389,14 +2426,14 @@
     },
     {
       "ID": "VER-TW-012",
-      "Requirement": "REQ-TW-020; REQ-TW-022",
+      "Requirement": "REQ-TW-020; REQ-TW-022; REQ-TW-024; REQ-TW-041; REQ-TW-060",
       "Method": "Release / validation review",
-      "Procedure / Command": "Review U7 static/advisory claim record after alpha evidence gates pass; create U9 runtime records later.",
-      "Tested Ref": "`docs/validation/traceweaver-u7-static-advisory-claims.md`; future U9 records",
-      "Result": "Pass for narrow U7 static/advisory only / REQ-TW-048 amendment doc review passed / runtime held",
-      "Evidence Path": "U7 static/advisory evidence",
-      "Date / Session": "2026-05-02",
-      "Notes": "Prior `/ce-doc-review` passed on the refreshed authority records before the REQ-TW-048 two-mode amendment; `CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001` promoted REQ-TW-048 for static/advisory source-evidence behavior. Release-ready/upstream-ready, clean replacement, enforcing mode, slash commands, dynamic discovery, runtime behavior, U9, and R31 claims remain held."
+      "Procedure / Command": "Review U7 static/advisory claim record after alpha evidence gates pass; prepare 0.1.0 marketplace metadata; create U9 runtime records later.",
+      "Tested Ref": "`docs/validation/traceweaver-u7-static-advisory-claims.md`; `docs/validation/traceweaver-plugin-0.1-release.md`; future U9 records",
+      "Result": "Pass for narrow U7 static/advisory only / 0.1.0 static marketplace metadata prepared / runtime and publication held",
+      "Evidence Path": "U7 static/advisory evidence plus 0.1.0 metadata record",
+      "Date / Session": "2026-05-23",
+      "Notes": "Prior `/ce-doc-review` passed on the refreshed authority records before the REQ-TW-048 two-mode amendment; `CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001` promoted REQ-TW-048 for static/advisory source-evidence behavior. The 2026-05-23 0.1.0 metadata record prepares Codex/Claude marketplace update paths and the `traceweaver-core--v0.1.0` tag convention, but release-ready/upstream-ready, clean replacement, enforcing mode, slash commands, dynamic discovery, runtime behavior, U9, R31, and actual publication remain held."
     },
     {
       "ID": "VER-TW-013",
@@ -2960,6 +2997,17 @@
       "Notes": "Whole-repo audit remains blocked by design because non-product surfaces are held, not clean. Active-host `tw-traceability-check` scanner currentness is held until host reconciliation/install reruns after this source change. Automatic cleanup/removal/deprecation authority, release/package/upstream readiness, clean replacement, runtime enforcement, semantic completeness, Vestro/R31 validation, publication, and autonomous publication remain held."
     },
     {
+      "ID": "VER-TW-068",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "Method": "First-time documentation, public guide, website integration, and trace evidence verification",
+      "Procedure / Command": "`scripts/traceweaver-generate-traceability-views --root .`; `scripts/traceweaver-smoke-traceability-generated-views`; implementation-mode code-anchor scanner over changed TraceWeaver docs/evidence; `TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery`; `claude plugin validate --strict .`; `git diff --check`; Oxiom Systems website local static/render check",
+      "Tested Ref": "Root README, public guide, plan, validation record, trace record, Intent Contract scope, generated views, and Oxiom Systems website guide section",
+      "Result": "Passed. Generated views and drift smoke passed; scoped implementation-mode code-anchor scanner passed with `code_traceability_findings=0`; Codex discovery smoke passed with runtime execution disabled; Claude strict validation passed; diff whitespace check passed; public guide and website copy hygiene scans passed; local Chrome desktop/mobile render checks passed with the guide visible, three cards, and zero guide-section overflow findings.",
+      "Evidence Path": "`README.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; generated views; Oxiom Systems website source; `/tmp/oxiomsystems-traceweaver-guide-desktop.png`; `/tmp/oxiomsystems-traceweaver-guide-mobile.png`",
+      "Date / Session": "2026-05-23",
+      "Notes": "Verification passed; exact TraceWeaver PR route authorized by `/tw-commit-push-pr`; no release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, website publication, GitHub release, tag, or autonomous-publication claim is accepted."
+    },
+    {
       "ID": "VER-TW-056",
       "Requirement": "REQ-TW-061; REQ-TW-062; REQ-TW-063",
       "Method": "Systems-engineering audit closure deterministic fixture implementation",
@@ -3136,6 +3184,17 @@
       "Result": "Dogfood audit completed; generated-view scanner-boundary repair reviewed and staged; invalid UTF-8 audit scanner crash repair reviewed and status-recorded; controlled PR #23 publication authorized by explicit `/tw-commit-push-pr and merge` request",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "Current-branch dogfood generated-view JSON findings are classified as scanner-boundary false positives, repaired, reviewed, and review-staged. Invalid UTF-8 behavior-bearing audit targets now report held/unknown coverage instead of crashing. Controlled PR #23 publication/merge is authorized only through the current `tw-commit-push-pr` gate; full Vestro audit handover-clean, cleanup, release/package, clean replacement, semantic-completeness, Vestro/R31 validation, active-host currentness, broader runtime, and autonomous publication claims remain held."
+    },
+    {
+      "ID": "VAL-TW-015",
+      "Source Need": "NEED-TW-004; NEED-TW-005; NEED-TW-006; NEED-TW-007; NEED-TW-008",
+      "Scenario / Intended Use": "First-time users can follow the README and public guide from install/update through the first TraceWeaver command while understanding alpha boundaries and held release/runtime claims.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "A reviewer can read the README and guide, identify Codex and Claude Code install/update paths, select blank-project or existing-repo first steps, see the normal TraceWeaver wrapper loop, find authority files and proof trail links, and confirm public website copy avoids internal review IDs, local paths, protected text, and unsupported release/compliance claims.",
+      "Evidence Path": "`README.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; Oxiom Systems website source guide section",
+      "Result": "Verification passed / scoped review passed / exact TraceWeaver PR route authorized",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Website publication, GitHub release publication, tag, release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, and autonomous-publication claims remain held."
     }
   ],
   "code_anchor_evidence": [
@@ -3410,6 +3469,94 @@
       "Verification": "VER-TW-058",
       "Anchor Type": "file-role",
       "Role": "standalone-plugin-marketplace-manifest"
+    },
+    {
+      "Artifact Path": ".agents/plugins/marketplace.json",
+      "Requirement": "REQ-TW-041; REQ-TW-020",
+      "Trace": "TRACE-TW-010",
+      "Verification": "VER-TW-012",
+      "Anchor Type": "Exception",
+      "Role": "loader-safe-codex-marketplace-json"
+    },
+    {
+      "Artifact Path": ".claude-plugin/marketplace.json",
+      "Requirement": "REQ-TW-041; REQ-TW-020",
+      "Trace": "TRACE-TW-010",
+      "Verification": "VER-TW-012",
+      "Anchor Type": "Exception",
+      "Role": "loader-safe-claude-marketplace-json"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/.codex-plugin/plugin.json",
+      "Requirement": "REQ-TW-041; REQ-TW-020; REQ-TW-060",
+      "Trace": "TRACE-TW-010",
+      "Verification": "VER-TW-012",
+      "Anchor Type": "Exception",
+      "Role": "loader-safe-codex-plugin-json"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/.claude-plugin/plugin.json",
+      "Requirement": "REQ-TW-041; REQ-TW-020; REQ-TW-060",
+      "Trace": "TRACE-TW-010",
+      "Verification": "VER-TW-012",
+      "Anchor Type": "Exception",
+      "Role": "loader-safe-claude-plugin-json"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/.cursor-plugin/plugin.json",
+      "Requirement": "REQ-TW-041; REQ-TW-020",
+      "Trace": "TRACE-TW-010",
+      "Verification": "VER-TW-012",
+      "Anchor Type": "Exception",
+      "Role": "loader-safe-peer-plugin-json"
+    },
+    {
+      "Artifact Path": "CHANGELOG.md",
+      "Requirement": "REQ-TW-020",
+      "Trace": "TRACE-TW-010",
+      "Verification": "VER-TW-012",
+      "Anchor Type": "file-role",
+      "Role": "plugin-release-changelog"
+    },
+    {
+      "Artifact Path": "README.md",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "Trace": "TRACE-TW-053",
+      "Verification": "VER-TW-068",
+      "Anchor Type": "file-role",
+      "Role": "first-time-root-readme"
+    },
+    {
+      "Artifact Path": "docs/guides/traceweaver-from-prompt-to-proof.md",
+      "Requirement": "REQ-TW-021; REQ-TW-041; REQ-TW-065",
+      "Trace": "TRACE-TW-053",
+      "Verification": "VER-TW-068",
+      "Anchor Type": "file-role",
+      "Role": "public-oxiomsystems-guide"
+    },
+    {
+      "Artifact Path": "docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "Trace": "TRACE-TW-053",
+      "Verification": "VER-TW-068",
+      "Anchor Type": "file-role",
+      "Role": "first-time-docs-plan"
+    },
+    {
+      "Artifact Path": "docs/validation/traceweaver-first-time-docs-guide.md",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "Trace": "TRACE-TW-053",
+      "Verification": "VER-TW-068",
+      "Anchor Type": "file-role",
+      "Role": "first-time-docs-validation"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "Trace": "TRACE-TW-053",
+      "Verification": "VER-TW-068",
+      "Anchor Type": "trace-record",
+      "Role": "first-time-docs-guide-record"
     },
     {
       "Artifact Path": "src/index.ts",
