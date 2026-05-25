@@ -2,6 +2,7 @@
 
 // TRACEWEAVER: file-role=codex-installer; req=REQ-TW-016; trace=TRACE-TW-010; ver=VER-TW-019
 // TRACEWEAVER: file-role=model-default-installer-policy; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055
+// TRACEWEAVER: file-role=antigravity-installer; req=REQ-TW-068; trace=TRACE-TW-054; ver=VER-TW-069
 import {
   cpSync,
   existsSync,
@@ -37,6 +38,7 @@ type InstallOptions = {
   pluginRoot: string;
   target: string;
   codexHome: string;
+  geminiHome: string;
   includeSkills: boolean;
 };
 
@@ -45,6 +47,7 @@ function usage(): never {
     [
       "Usage:",
       "  bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills [--codexHome <path>]",
+      "  bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills [--geminiHome <path>]",
       "",
       "TraceWeaver alpha installs are self-contained for Codex and require --include-skills.",
     ].join("\n"),
@@ -59,6 +62,7 @@ function parseInstallArgs(argv: string[]): InstallOptions {
 
   let target = "";
   let codexHome = homedir();
+  let geminiHome = join(homedir(), ".gemini");
   let includeSkills = false;
   const pluginRoot = resolve(argv[1]);
 
@@ -86,12 +90,22 @@ function parseInstallArgs(argv: string[]): InstallOptions {
       continue;
     }
 
+    if (arg === "--geminiHome") {
+      geminiHome = argv[index + 1] ?? "";
+      if (!geminiHome || geminiHome.startsWith("--")) {
+        console.error("TraceWeaver alpha installer requires a path after --geminiHome.");
+        process.exit(1);
+      }
+      index += 1;
+      continue;
+    }
+
     console.error(`Unsupported TraceWeaver installer argument: ${arg}`);
     usage();
   }
 
-  if (target !== "codex") {
-    console.error("TraceWeaver alpha installer currently supports only --to codex.");
+  if (target !== "codex" && target !== "antigravity") {
+    console.error("TraceWeaver alpha installer currently supports only --to codex or --to antigravity.");
     process.exit(1);
   }
 
@@ -106,17 +120,19 @@ function parseInstallArgs(argv: string[]): InstallOptions {
     pluginRoot,
     target,
     codexHome: isAbsolute(codexHome) ? codexHome : resolve(codexHome),
+    geminiHome: isAbsolute(geminiHome) ? geminiHome : resolve(geminiHome),
     includeSkills,
   };
 }
 
-function assertTraceWeaverPlugin(pluginRoot: string): void {
-  const manifestPath = join(pluginRoot, ".codex-plugin", "plugin.json");
+function assertTraceWeaverPlugin(pluginRoot: string, target: string): void {
+  const manifestSubdir = target === "antigravity" ? ".antigravity-plugin" : ".codex-plugin";
+  const manifestPath = join(pluginRoot, manifestSubdir, "plugin.json");
   const skillsRoot = join(pluginRoot, "skills");
   const agentsRoot = join(pluginRoot, "agents");
 
   if (!existsSync(manifestPath)) {
-    console.error(`TraceWeaver Codex manifest not found: ${manifestPath}`);
+    console.error(`TraceWeaver ${target} manifest not found: ${manifestPath}`);
     process.exit(1);
   }
 
@@ -194,7 +210,7 @@ function renderCodexAgentToml(agent: ParsedAgent): string {
 // TRACEWEAVER: entrypoint=installCodexSkills; req=REQ-TW-016; trace=TRACE-TW-010; ver=VER-TW-019
 // TRACEWEAVER: entrypoint=installCodexSkills; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055
 function installCodexSkills(options: InstallOptions): void {
-  assertTraceWeaverPlugin(options.pluginRoot);
+  assertTraceWeaverPlugin(options.pluginRoot, options.target);
 
   const codexRoot = join(options.codexHome, ".codex");
   const sourceSkillsRoot = join(options.pluginRoot, "skills");
@@ -456,4 +472,50 @@ function listFiles(root: string): string[] {
   });
 }
 
-installCodexSkills(parseInstallArgs(process.argv.slice(2)));
+// TRACEWEAVER: entrypoint=installAntigravitySkills; req=REQ-TW-068; trace=TRACE-TW-054; ver=VER-TW-069
+function installAntigravitySkills(options: InstallOptions): void {
+  assertTraceWeaverPlugin(options.pluginRoot, options.target);
+
+  const geminiRoot = options.geminiHome;
+  const targetPluginRoot = join(geminiRoot, "config", "plugins", "traceweaver-core");
+  const targetSkillsRoot = join(targetPluginRoot, "skills");
+
+  const sourceSkillsRoot = join(options.pluginRoot, "skills");
+  const sourceManifestPath = join(options.pluginRoot, ".antigravity-plugin", "plugin.json");
+  const targetManifestPath = join(targetPluginRoot, "plugin.json");
+  const targetVersionPath = join(targetPluginRoot, "installed_version.json");
+
+  // Read installed skills
+  const installedSkills = readdirSync(sourceSkillsRoot)
+    .filter((entry) => statSync(join(sourceSkillsRoot, entry)).isDirectory())
+    .sort();
+  const callableSkills = installedSkills.filter(isUserCallableSkill);
+
+  // Clean target directory or ensure it exists
+  mkdirSync(targetSkillsRoot, { recursive: true });
+  rmSync(targetSkillsRoot, { force: true, recursive: true });
+  mkdirSync(targetSkillsRoot, { recursive: true });
+
+  // Copy manifest and version
+  cpSync(sourceManifestPath, targetManifestPath);
+  writeFileSync(targetVersionPath, JSON.stringify({ version: "0.1.0" }) + "\n");
+
+  // Copy user-callable skills
+  for (const skillName of callableSkills) {
+    const sourceSkillDir = join(sourceSkillsRoot, skillName);
+    const targetSkillDir = join(targetSkillsRoot, skillName);
+    cpSync(sourceSkillDir, targetSkillDir, { recursive: true });
+  }
+
+  console.log(`installed_skill_directory_count=${callableSkills.length}`);
+  console.log(`installed_callable_skill_directory_count=${callableSkills.length}`);
+  console.log(`installed_manifest=${targetManifestPath}`);
+  console.log(`installed_packaged_skills_root=${targetSkillsRoot}`);
+}
+
+const installOptions = parseInstallArgs(process.argv.slice(2));
+if (installOptions.target === "antigravity") {
+  installAntigravitySkills(installOptions);
+} else {
+  installCodexSkills(installOptions);
+}

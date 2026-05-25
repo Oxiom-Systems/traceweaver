@@ -6,11 +6,11 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "21cdf7687d6d2b548ce3cbbcc58781bbd1f4a4319954aaba8686eab9db921337"
+      "sha256": "0e4555052dcb0d6fd92c37b384c451ab6dd24a0390db89a41fbda643ca7f42a8"
     },
     {
       "path": "requirements.md",
-      "sha256": "e511c1c60836d294a52142e5210dc7e0f3f279a1fbf22acd927e1bf1312c5a37"
+      "sha256": "f1f0eca4db4f373bd6064ac86925a914467e0b570c8050f32e12653e148ac7e9"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
@@ -22,17 +22,17 @@
     }
   ],
   "row_counts": {
-    "requirements": 67,
-    "trace_rows": 51,
+    "requirements": 68,
+    "trace_rows": 52,
     "atp_entries": 35,
-    "result_records": 35,
+    "result_records": 36,
     "verification_records": 66,
-    "validation_records": 15,
-    "code_anchor_records": 234,
+    "validation_records": 16,
+    "code_anchor_records": 237,
     "structured_acceptance_results": 1,
-    "structured_acceptance_coverage": 67,
-    "structured_acceptance_missing_requirements": 66,
-    "structured_acceptance_non_closed_requirements": 67
+    "structured_acceptance_coverage": 68,
+    "structured_acceptance_missing_requirements": 67,
+    "structured_acceptance_non_closed_requirements": 68
   },
   "requirements": [
     {
@@ -1103,6 +1103,19 @@
         "TRACE-TW-051",
         "TRACE-TW-052"
       ]
+    },
+    {
+      "id": "REQ-TW-068",
+      "type": "Standalone Plugin",
+      "summary": "Support standalone plugin installation for Google Antigravity.",
+      "source_need": "NEED-TW-003; NEED-TW-007",
+      "verification_method": "Installation smoke / manifest verification",
+      "validation_path": "VAL-TW-016",
+      "owner": "Oxiom Systems",
+      "status": "Candidate for review",
+      "trace_ids": [
+        "TRACE-TW-054"
+      ]
     }
   ],
   "traces": [
@@ -1665,6 +1678,17 @@
       "verification": "VER-TW-068",
       "validation": "VAL-TW-015",
       "status": "Implementation added; verification passed; scoped review passed; TraceWeaver PR route authorized by 2026-05-23 `/tw-commit-push-pr`; release/runtime/website claims held",
+      "next_step": "Open the reviewed TraceWeaver PR; keep release tags, GitHub Release, website publication, runtime, and clean-replacement claims held."
+    },
+    {
+      "id": "TRACE-TW-054",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-007; NEED-TW-008",
+      "requirements": "REQ-TW-068",
+      "artifact": "ART-TW-068",
+      "verification": "VER-TW-069",
+      "validation": "VAL-TW-016",
+      "status": "Static packaging/install verified / runtime invocation held",
       "next_step": "Open the reviewed TraceWeaver PR; keep release tags, GitHub Release, website publication, runtime, and clean-replacement claims held."
     }
   ],
@@ -2300,6 +2324,15 @@
       "Evidence Artifact": "`README.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; Oxiom Systems website source",
       "Result": "Implementation added, verification passed, scoped review passed, and exact TraceWeaver PR route authorized by 2026-05-23 `/tw-commit-push-pr`. GitHub release, tag, website publication, release-ready/package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, and autonomous-publication claims remain held.",
       "Date / Session": "2026-05-23"
+    },
+    {
+      "ID": "RESULT-TW-038",
+      "Requirement / Need": "REQ-TW-068",
+      "ATP / Method": "ATP-TW-038",
+      "Tested Ref / Context": "Antigravity standalone plugin manifest and installer target support",
+      "Evidence Artifact": "`plugins/traceweaver-core/.antigravity-plugin/plugin.json`; `src/index.ts`; `scripts/traceweaver-smoke-antigravity-discovery`",
+      "Result": "Static packaging/install verified; installer verification smoke passed; runtime invocation/publication held.",
+      "Date / Session": "2026-05-25"
     }
   ],
   "verification_evidence": [
@@ -3195,6 +3228,17 @@
       "Result": "Verification passed / scoped review passed / exact TraceWeaver PR route authorized",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "Website publication, GitHub release publication, tag, release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, and autonomous-publication claims remain held."
+    },
+    {
+      "ID": "VAL-TW-016",
+      "Source Need": "NEED-TW-007; NEED-TW-008",
+      "Scenario / Intended Use": "Install and discover standalone TraceWeaver plugin skills under Antigravity.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Antigravity agent discovers and invokes tw-* and lfg skills only.",
+      "Evidence Path": "`plugins/traceweaver-core/.antigravity-plugin/plugin.json`; `src/index.ts`; `scripts/traceweaver-smoke-antigravity-discovery`",
+      "Result": "Static installation verified / runtime invocation and publication held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Dogfood install verified. Runtime invocation remains held."
     }
   ],
   "code_anchor_evidence": [
@@ -3437,6 +3481,30 @@
       "Verification": "VER-TW-019",
       "Anchor Type": "entrypoint",
       "Role": "installCodexSkills"
+    },
+    {
+      "Artifact Path": "src/index.ts",
+      "Requirement": "REQ-TW-068",
+      "Trace": "TRACE-TW-054",
+      "Verification": "VER-TW-069",
+      "Anchor Type": "file-role",
+      "Role": "antigravity-installer"
+    },
+    {
+      "Artifact Path": "src/index.ts",
+      "Requirement": "REQ-TW-068",
+      "Trace": "TRACE-TW-054",
+      "Verification": "VER-TW-069",
+      "Anchor Type": "entrypoint",
+      "Role": "installAntigravitySkills"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-antigravity-discovery",
+      "Requirement": "REQ-TW-068",
+      "Trace": "TRACE-TW-054",
+      "Verification": "VER-TW-069",
+      "Anchor Type": "file-role; verifies",
+      "Role": "antigravity-discovery-smoke"
     },
     {
       "Artifact Path": "plugins/traceweaver-core/references/traceweaver-model-defaults.md",
@@ -6141,6 +6209,22 @@
     },
     {
       "requirement_id": "REQ-TW-067",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-068",
       "coverage_status": "missing_structured_acceptance_result",
       "structured_acceptance_result_ids": [
 

@@ -2,6 +2,7 @@
 
 <!-- TRACEWEAVER: file-role=plugin-readme; req=REQ-TW-052; trace=TRACE-TW-036; ver=VER-TW-046 -->
 <!-- TRACEWEAVER: file-role=strategy-ideation-plugin-readme; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
+<!-- TRACEWEAVER: file-role=plugin-readme; req=REQ-TW-068; trace=TRACE-TW-054; ver=VAL-TW-016 -->
 
 TraceWeaver Core adds systems-engineering authority control to agentic software
 work. This alpha plugin wires requirement quality, traceability checks, and
@@ -153,6 +154,7 @@ package. Bump both plugin manifests for each release:
 
 - `plugins/traceweaver-core/.codex-plugin/plugin.json`
 - `plugins/traceweaver-core/.claude-plugin/plugin.json`
+- `plugins/traceweaver-core/.antigravity-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
 `traceweaver-core--v0.1.0`.
@@ -364,10 +366,16 @@ under `.traceweaver/`.
 This plugin follows the Compound Engineering plugin shape and is intended to be
 installed from the repository checkout during U6b proof.
 
-Example target command:
+Example target command for Codex:
 
 ```bash
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
+```
+
+Example target command for Antigravity:
+
+```bash
+bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills [--geminiHome <path>]
 ```
 
 From the TraceWeaver repository root, `src/index.ts` is a repo-local

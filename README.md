@@ -8,6 +8,7 @@
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-041; trace=TRACE-TW-010; ver=VAL-TW-011 -->
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-043; trace=TRACE-TW-010; ver=VAL-TW-011 -->
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-065; trace=TRACE-TW-048; ver=VAL-TW-011 -->
+<!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-068; trace=TRACE-TW-054; ver=VAL-TW-016 -->
 
 TraceWeaver is an open-source agent workflow that keeps coding-agent work tied
 to intent, approved requirements, verification evidence, validation questions,
@@ -93,6 +94,26 @@ versioned with the Codex and Claude manifests, but TraceWeaver does not yet
 claim a proven Cursor marketplace or runtime install path. Use the Codex or
 Claude setup above for supported alpha plugin use, and treat Cursor testing as
 held until a Cursor runtime validation record exists.
+
+### Antigravity
+
+For local alpha testing and dogfooding under the Google Antigravity coding assistant environment:
+
+```sh
+bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
+```
+
+By default, the installer targets `$HOME/.gemini/config/plugins/traceweaver-core`. If you are using a custom configuration path, you can specify it via `--geminiHome`:
+
+```sh
+bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills --geminiHome /path/to/custom/gemini/home
+```
+
+Verify the installed layout using the discovery smoke script:
+
+```sh
+scripts/traceweaver-smoke-antigravity-discovery
+```
 
 ## First Command
 
