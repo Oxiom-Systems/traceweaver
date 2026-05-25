@@ -1,0 +1,91 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-25-TW-AUTO-PUBLICATION-BOUNDARY-NEXT-STEP-001
+record_type: implementation_trace
+created_at: "2026-05-25"
+owner: Oxiom Systems
+status: static_fixture_repair_reviewed_verification_passed_publication_held
+
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_source: requirements.md
+intent_contract: .traceweaver/intent-contract.yml
+beads_issue: TraceWeaver-y3d
+
+requirements:
+  - REQ-TW-056
+  - REQ-TW-057
+trace_ids:
+  - TRACE-TW-045
+verification_ids:
+  - VER-TW-057
+validation_question: "Can tw-auto treat stop-before-commit/push/PR as a publication boundary while still completing post-work traceability/review closure and naming the next highest-level wrapper?"
+
+scope:
+  - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+  - scripts/traceweaver-smoke-tw-skill-behavior
+  - fixtures/tw-skill-behavior/tw-auto-post-work-stop-before-publication/loop-state.txt
+  - traceability-matrix.md
+  - /Users/hanneszietsman/.codex/skills/tw-auto/SKILL.md
+
+problem_observed:
+  summary: >
+    Dogfood use showed `tw-auto` could finish a verified implementation after a
+    "stop before commit/push/PR" request without suggesting the next workflow
+    step. The prompt wording was a publication boundary, not a request to stop
+    after implementation or skip review closure.
+  affected_use_case: Arcweaver U04 basic platform collision handoff
+
+repair:
+  summary: >
+    `tw-auto` now states that stop-before-commit, stop-before-push, stop-before-PR,
+    stop-before-publication, and equivalent wording must continue through
+    internal post-work traceability and review closure before stopping at the
+    publication boundary. The final stop must name the review/traceability state,
+    held claims, and next highest-level wrapper.
+  active_host_copy: /Users/hanneszietsman/.codex/skills/tw-auto/SKILL.md
+
+verification_observed:
+  - "TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior: pass"
+  - "plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-file plugins/traceweaver-core/skills/tw-auto/SKILL.md --changed-file scripts/traceweaver-smoke-tw-skill-behavior --changed-file fixtures/tw-skill-behavior/tw-auto-post-work-stop-before-publication/loop-state.txt --changed-file traceability-matrix.md: pass with code_traceability_findings=0"
+  - "git diff --check: pass"
+  - "active local Codex tw-auto copy contains the publication-boundary next-step contract"
+
+review_results:
+  code_review_id: TW-CODE-REVIEW-2026-05-25-TW-AUTO-PUBLICATION-BOUNDARY-NEXT-STEP-CLEAN-001
+  code_review_status: passed_no_findings
+  code_review_scope:
+    - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+    - scripts/traceweaver-smoke-tw-skill-behavior
+    - fixtures/tw-skill-behavior/tw-auto-post-work-stop-before-publication/loop-state.txt
+  code_review_notes: >
+    The patch is narrowly scoped to the missing publication-boundary branch of
+    the existing post-work review-closure contract. It does not alter runtime
+    execution, authority promotion, remote mutation, or release behavior.
+  doc_review_id: TW-DOC-REVIEW-2026-05-25-TW-AUTO-PUBLICATION-BOUNDARY-NEXT-STEP-STATUS-HASH-CLEAN-001
+  doc_review_status: passed_no_findings
+  doc_review_scope:
+    - traceability-matrix.md
+    - .traceweaver/trace-records/2026-05-25-tw-auto-publication-boundary-next-step.yml
+  doc_review_notes: >
+    Matrix and trace record preserve the held publication/release/runtime
+    boundaries and route the repair to REQ-TW-056, REQ-TW-057, TRACE-TW-045,
+    and VER-TW-057.
+
+artifact_hashes_before_commit:
+  plugins/traceweaver-core/skills/tw-auto/SKILL.md: c66f41d1d85d9b2fc63f36233e0a41801c44349013b790c703148a1e3f457ea2
+  scripts/traceweaver-smoke-tw-skill-behavior: 977f6feac1edea90ce56f17b1e1df2532685b8aeaad55e8487e1d3c296a9dbaa
+  fixtures/tw-skill-behavior/tw-auto-post-work-stop-before-publication/loop-state.txt: b957e289bc04682b5e1f208a0fc6d6d7dc7874d4747e14d8fc5411a1c534ada7
+  traceability-matrix.md: ccb443bd5d2efe3cb3b6a8226156fe8f279e5d0a90beacaa4e93a49c495424ed
+  docs/generated/traceability-dashboard.md: be2b9ae93931a6744761fe8bdde80c365718eab57f34c4d2293cef69f4c202d7
+  docs/generated/traceability-data.json: f0d02b3042e04af0d0432ac9053c4d62965544af2b8cd6e35ca37d608c61fa33
+  docs/generated/traceability-graph.mmd: 93d6b027d4792a699f40f868792a2fe07a91d07bbe553ffd91393b3a8a399cd3
+  /Users/hanneszietsman/.codex/skills/tw-auto/SKILL.md: de8a921241fd7036e7945b968e4ed955363d590035745d721622786f2e2cfef1
+
+held_claims:
+  - runtime-driver invocation
+  - autonomous publication
+  - release-ready or package-ready status
+  - GitHub tag or release publication
+  - clean CE replacement
+  - Vestro or Arcweaver behavior beyond the observed dogfood handoff symptom
+  - broader active-host runtime behavior beyond the patched local skill file
+
+next_step: "tw-commit-push-pr may publish this reviewed static repair to a PR; release tagging remains held."

@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "c9da1a7ecb950722cd76ab556a3eef46c805e561976a8617c055e70d5d36ecc8"
+      "sha256": "ccb443bd5d2efe3cb3b6a8226156fe8f279e5d0a90beacaa4e93a49c495424ed"
     },
     {
       "path": "requirements.md",
@@ -28,7 +28,7 @@
     "result_records": 36,
     "verification_records": 66,
     "validation_records": 16,
-    "code_anchor_records": 246,
+    "code_anchor_records": 247,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 68,
     "structured_acceptance_missing_requirements": 67,
@@ -1590,7 +1590,7 @@
       "artifact": "ART-TW-059",
       "verification": "VER-TW-057",
       "validation": "VAL-TW-011",
-      "status": "Deterministic fixture implementation added; code review passed as `TW-CODE-REVIEW-2026-05-12-TW-AUTO-POST-WORK-CLOSURE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-TW-AUTO-POST-WORK-CLOSURE-STATUS-HASH-CLEAN-001`; 2026-05-18 ZTEK/manual-lower-review tightening scoped code review passed as `TW-CODE-REVIEW-2026-05-18-TW-AUTO-ZTEK-HANDOFF-CLOSURE-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-18-TW-AUTO-ZTEK-HANDOFF-CLOSURE-STATUS-HASH-CLEAN-001`",
+      "status": "Deterministic fixture implementation added; code review passed as `TW-CODE-REVIEW-2026-05-12-TW-AUTO-POST-WORK-CLOSURE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-TW-AUTO-POST-WORK-CLOSURE-STATUS-HASH-CLEAN-001`; 2026-05-18 ZTEK/manual-lower-review tightening scoped code review passed as `TW-CODE-REVIEW-2026-05-18-TW-AUTO-ZTEK-HANDOFF-CLOSURE-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-18-TW-AUTO-ZTEK-HANDOFF-CLOSURE-STATUS-HASH-CLEAN-001`; 2026-05-25 publication-boundary next-step repair smoke, code-anchor scan, scoped code review, and status/hash doc review passed as `TW-CODE-REVIEW-2026-05-25-TW-AUTO-PUBLICATION-BOUNDARY-NEXT-STEP-CLEAN-001` and `TW-DOC-REVIEW-2026-05-25-TW-AUTO-PUBLICATION-BOUNDARY-NEXT-STEP-STATUS-HASH-CLEAN-001`",
       "next_step": "Use as reviewed static implementation input; runtime, Vestro behavior, publication, package/release, clean replacement, and active-session runtime claims remain held"
     },
     {
@@ -3898,6 +3898,14 @@
       "Verification": "VER-TW-057",
       "Anchor Type": "fixture; verifies",
       "Role": "post-work-explicit-stop-fixture"
+    },
+    {
+      "Artifact Path": "fixtures/tw-skill-behavior/tw-auto-post-work-stop-before-publication/loop-state.txt",
+      "Requirement": "REQ-TW-056",
+      "Trace": "TRACE-TW-045",
+      "Verification": "VER-TW-057",
+      "Anchor Type": "fixture; verifies",
+      "Role": "post-work-stop-before-publication-fixture"
     },
     {
       "Artifact Path": "fixtures/tw-skill-behavior/tw-auto-post-work-code-review-finding-repair/loop-state.txt",

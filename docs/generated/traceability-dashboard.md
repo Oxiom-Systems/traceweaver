@@ -9,7 +9,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `c9da1a7ecb950722cd76ab556a3eef46c805e561976a8617c055e70d5d36ecc8` |
+| `traceability-matrix.md` | `ccb443bd5d2efe3cb3b6a8226156fe8f279e5d0a90beacaa4e93a49c495424ed` |
 | `requirements.md` | `f1f0eca4db4f373bd6064ac86925a914467e0b570c8050f32e12653e148ac7e9` |
 | `.traceweaver/intent-contract.yml` | `90247503570e4e0ceff466d3dd480562a1553b672aafaab9a7c336d467c8d2df` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
@@ -24,7 +24,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | result records | 36 |
 | verification records | 66 |
 | validation records | 16 |
-| code anchor records | 246 |
+| code anchor records | 247 |
 | structured acceptance results | 1 |
 | structured acceptance coverage | 68 |
 | structured acceptance missing requirements | 67 |
