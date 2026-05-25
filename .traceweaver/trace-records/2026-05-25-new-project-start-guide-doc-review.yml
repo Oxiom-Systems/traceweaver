@@ -1,0 +1,510 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-25-NEW-PROJECT-START-GUIDE-DOC-REVIEW-001
+created_at: 2026-05-25
+owner: Oxiom Systems
+status: combined_scope_doc_review_passed_after_findings_repaired_verification_passed_publication_held
+
+scope:
+  summary: Combined guide documentation, 0.2.0 label/metadata, Antigravity changes, tw-auto approval-only handoff repair, matrix rows, and generated traceability views for the clean release worktree.
+  requirements:
+    - REQ-TW-016
+    - REQ-TW-020
+    - REQ-TW-023
+    - REQ-TW-024
+    - REQ-TW-041
+    - REQ-TW-043
+    - REQ-TW-042
+    - REQ-TW-045
+    - REQ-TW-048
+    - REQ-TW-056
+    - REQ-TW-060
+    - REQ-TW-064
+    - REQ-TW-065
+    - REQ-TW-068
+  traces:
+    - TRACE-TW-010
+    - TRACE-TW-009
+    - TRACE-TW-021
+    - TRACE-TW-041
+    - TRACE-TW-046
+    - TRACE-TW-047
+    - TRACE-TW-053
+    - TRACE-TW-054
+  verifications:
+    - VER-TW-012
+    - VER-TW-018
+    - VER-TW-019
+    - VER-TW-030
+    - VER-TW-053
+    - VER-TW-059
+    - VER-TW-060
+    - VER-TW-068
+    - VER-TW-069
+
+authority:
+  baseline: requirements.md
+  intent_contract: .traceweaver/intent-contract.yml
+  matrix: traceability-matrix.md
+  review_id: TW-DOC-REVIEW-2026-05-25-NEW-PROJECT-START-GUIDE-STATUS-HASH-CLEAN-001
+  authority_gate_result: proceed_scoped_documentation_status_record
+  test_first_decision: not_applicable_documentation_status_record_only
+
+reviewed_artifacts:
+  - .agents/plugins/marketplace.json
+  - .claude-plugin/marketplace.json
+  - README.md
+  - CHANGELOG.md
+  - docs/guides/starting-a-new-project-with-traceweaver.md
+  - docs/guides/traceweaver-from-prompt-to-proof.md
+  - docs/validation/traceweaver-plugin-0.2-release.md
+  - docs/validation/traceweaver-u7-static-advisory-claims.md
+  - plugins/traceweaver-core/.codex-plugin/plugin.json
+  - plugins/traceweaver-core/.claude-plugin/plugin.json
+  - plugins/traceweaver-core/.antigravity-plugin/plugin.json
+  - plugins/traceweaver-core/.cursor-plugin/plugin.json
+  - plugins/traceweaver-core/README.md
+  - plugins/traceweaver-core/skills/ce-commit-push-pr/references/pr-description-writing.md
+  - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+  - scripts/traceweaver-smoke-antigravity-discovery
+  - scripts/traceweaver-smoke-tw-skill-behavior
+  - fixtures/tw-skill-behavior/tw-auto-approval-only-stop/loop-state.txt
+  - src/index.ts
+  - .traceweaver/trace-records/2026-05-25-plugin-0.2-release-metadata.yml
+  - .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml
+  - .traceweaver/intent-contract.yml
+  - traceability-matrix.md
+  - docs/generated/traceability-dashboard.md
+  - docs/generated/traceability-data.json
+  - docs/generated/traceability-graph.mmd
+
+working_tree_hashes_before_record:
+  README.md: ffd021a1d698324ca600937ded03fce7335c8f93616db554ee2000644a4b269a
+  docs/guides/starting-a-new-project-with-traceweaver.md: a85c35eed3be6ada5daef2bdba6b3a2290c583c673f64069897e919082c85619
+  docs/guides/traceweaver-from-prompt-to-proof.md: 7d96fcd07442915fc785fc56b30bdc49992328eb86a969659a06804e723829dd
+  traceability-matrix.md: 739f6c3a0479c9bba48c181ecfc535c7995f0b47a476e839fed84092644f2561
+  docs/generated/traceability-dashboard.md: 6ad3b2d734e2c1d18825ccbd62b9055341a2a590dcac7116eac6905f1ccd4399
+  docs/generated/traceability-data.json: 486607b265e0a403d07019cc12f2804ade6d631adb8d7ddd593dbb347ddb089a
+  .traceweaver/intent-contract.yml: 19969ceb5ee11534461da817c03683ffbe891b6da70566145da972bde25d68fc
+
+verification_evidence:
+  - scripts/traceweaver-generate-traceability-views --root .
+  - scripts/traceweaver-smoke-traceability-generated-views
+  - TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior
+  - plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-file plugins/traceweaver-core/skills/tw-auto/SKILL.md --changed-file scripts/traceweaver-smoke-tw-skill-behavior --changed-file fixtures/tw-skill-behavior/tw-auto-approval-only-stop/loop-state.txt --changed-file traceability-matrix.md
+  - plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-file README.md --changed-file docs/guides/starting-a-new-project-with-traceweaver.md --changed-file docs/guides/traceweaver-from-prompt-to-proof.md --changed-file traceability-matrix.md
+  - git diff --check -- README.md docs/guides/starting-a-new-project-with-traceweaver.md docs/guides/traceweaver-from-prompt-to-proof.md traceability-matrix.md docs/generated/traceability-dashboard.md docs/generated/traceability-data.json
+
+review_results:
+  doc_review_status: passed_no_blocking_findings
+  review_coverage: main_thread_scoped_tw_doc_review_no_reviewer_subagents
+  subagent_parallelism: unavailable_for_this_run_without_explicit_delegation_request
+  notes: >
+    Review covered the README First Project link, the new project start guide,
+    the public prompt-to-proof guide link, matrix Code Anchor Evidence rows, and
+    generated traceability views. The guide keeps strategy, ideation, grill, and
+    brainstorm outputs as source evidence until reviewed requirements exist; it
+    keeps implementation behind authority gates and preserves runtime and
+    publication held claims.
+
+status_hash_refresh_2026_05_25_bootstrap_grill_clarification:
+  review_id: TW-DOC-REVIEW-2026-05-25-NEW-PROJECT-START-GUIDE-BOOTSTRAP-GRILL-CLARITY-CLEAN-001
+  status: passed_no_blocking_findings_status_hash_refreshed
+  trigger: >
+    Follow-up review clarified that the bootstrap-only `tw-auto` prompt stops
+    after authority files and does not continue into strategy, ideation, grill,
+    brainstorm, or planning. Large projects must explicitly request the
+    strategy/ideation/grill/brainstorm path before implementation planning.
+  refreshed_hashes_before_this_record_update:
+    docs/guides/starting-a-new-project-with-traceweaver.md: f4d25dc496db6c6148b0789ba48ddb08756612f8cbf282fd25c4c940f828cf53
+    README.md: ffd021a1d698324ca600937ded03fce7335c8f93616db554ee2000644a4b269a
+    docs/guides/traceweaver-from-prompt-to-proof.md: 7d96fcd07442915fc785fc56b30bdc49992328eb86a969659a06804e723829dd
+    traceability-matrix.md: b78027357b0bb781c230e6b5754905ab20bbd8bdbd838b150c25700da115ff5e
+    .traceweaver/intent-contract.yml: a9f65ea2fd66e212bd3280da3585a5addaa9605ede33c8d8bb0791a9252872de
+    .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml: fe3fdfa85ffc7b2ad46390ee7331603346e1fbddabdfe163fe93df8538148fc6
+  verification_evidence:
+    - git diff --check -- docs/guides/starting-a-new-project-with-traceweaver.md .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml .traceweaver/intent-contract.yml traceability-matrix.md docs/generated/traceability-dashboard.md docs/generated/traceability-data.json
+    - plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-file docs/guides/starting-a-new-project-with-traceweaver.md
+  notes: >
+    This refresh supersedes the stale guide hash captured in
+    `working_tree_hashes_before_record` for the guide artifact only. The earlier
+    section is retained as historical evidence of the first clean review state.
+
+work_repair_2026_05_25_post_bootstrap_next_step:
+  work_id: TW-WORK-2026-05-25-NEW-PROJECT-START-GUIDE-POST-BOOTSTRAP-NEXT-STEP-001
+  source_finding: TraceWeaver-w00
+  status: applied_verification_passed_follow_up_doc_review_recorded_held_artifact_identity
+  trigger: >
+    Follow-up document review found that the guide's final next-step section
+    still recommended only `tw-requirements-review` after a new-project
+    bootstrap. That generic wording could bypass the large-project
+    strategy/ideation/grill/brainstorm route described earlier in the guide.
+  repaired_behavior: >
+    The final next-step section now distinguishes large-project continuation
+    through `tw-auto` strategy, ideation, grill, and brainstorm before planning
+    from small-project continuation through `tw-requirements-review` when the
+    stakeholder need, acceptance criteria, verification method, and validation
+    question are already clear.
+  refreshed_hashes_before_this_record_update:
+    docs/guides/starting-a-new-project-with-traceweaver.md: ef170344dc2d0ecac726f0048568476a731a9f2b9752b7b23bcce833fddd9cc0
+    README.md: ffd021a1d698324ca600937ded03fce7335c8f93616db554ee2000644a4b269a
+    docs/guides/traceweaver-from-prompt-to-proof.md: 7d96fcd07442915fc785fc56b30bdc49992328eb86a969659a06804e723829dd
+    traceability-matrix.md: b78027357b0bb781c230e6b5754905ab20bbd8bdbd838b150c25700da115ff5e
+    .traceweaver/intent-contract.yml: 784444149dbf6f7ccb5e3f9df0befd3e9c923f89d3d82d6965d94767f740f231
+    .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml: 3ca4a9eb9d63ba9f3f375bcca63cffdc986729ab2171b09aa60a6b7e7b0a17e5
+  verification_evidence:
+    - git diff --check -- docs/guides/starting-a-new-project-with-traceweaver.md .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml .traceweaver/intent-contract.yml traceability-matrix.md docs/generated/traceability-dashboard.md docs/generated/traceability-data.json docs/generated/traceability-graph.mmd
+    - plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-file docs/guides/starting-a-new-project-with-traceweaver.md --changed-file .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml --changed-file .traceweaver/intent-contract.yml --changed-file traceability-matrix.md
+  follow_up_review: >
+    TraceWeaver-q8x tw-doc-review ran. Content and trace checks passed, but
+    accepted authority-state review remains held by artifact identity.
+
+tw_auto_review_attempt_2026_05_25_post_bootstrap_next_step:
+  run_id: TW-AUTO-2026-05-25-NEW-PROJECT-START-GUIDE-POST-BOOTSTRAP-NEXT-STEP-REVIEW-001
+  status: content_and_trace_checks_passed_artifact_identity_held
+  review_scope:
+    - docs/guides/starting-a-new-project-with-traceweaver.md
+    - .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml
+    - .traceweaver/intent-contract.yml
+    - traceability-matrix.md
+    - docs/generated/traceability-dashboard.md
+    - docs/generated/traceability-data.json
+    - docs/generated/traceability-graph.mmd
+  requirements_review_result: >
+    Planning-language review found the repaired next-step section consistent
+    with the earlier bootstrap-only and large-project route language. Large
+    projects continue through strategy, ideation, grill, and brainstorm before
+    planning; small clear projects may continue to requirements review.
+  trace_hash_status_result: >
+    YAML parse, generated traceability view generation, generated-view smoke,
+    implementation-mode code-anchor scan, and git diff whitespace checks passed.
+  artifact_identity_finding:
+    severity: block
+    status: held
+    issue: >
+      Accepted authority-state review cannot be claimed while required guide
+      and trace-record artifacts are untracked and shared authority/generated
+      files also contain then-unwidened 0.2 release/plugin metadata.
+    remediation: >
+      Separate the guide-docs scope from the release/plugin metadata or
+      explicitly widen the review/publication scope before review-staging or
+      publication.
+  refreshed_hashes_before_this_record_update:
+    requirements.md: f1f0eca4db4f373bd6064ac86925a914467e0b570c8050f32e12653e148ac7e9
+    docs/guides/starting-a-new-project-with-traceweaver.md: ef170344dc2d0ecac726f0048568476a731a9f2b9752b7b23bcce833fddd9cc0
+    .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml: d6ea0f2c65a96bcfb04464e6d722bdab3df85beea6ed2ab7e93174c7cc885f02
+    .traceweaver/intent-contract.yml: 6b9ebe4c80f38a18428b65d74d9e38b1cc0bfae51460f6ab5e4c5ec24c436a25
+    traceability-matrix.md: b78027357b0bb781c230e6b5754905ab20bbd8bdbd838b150c25700da115ff5e
+    docs/generated/traceability-dashboard.md: aa700d7bb89f5eee582fe3bc565619d1d61a1060d7b4c05f15a8bd24d796f920
+    docs/generated/traceability-data.json: d7b1f64e57f7d359b56ed5b27b4bd6d6e324519dce96be78a845618346f2fd27
+    docs/generated/traceability-graph.mmd: c3f02093afe30f8045f70697a4c2f6deefc546f8ba9080ef358c9acc7180cd96
+
+held_doc_review_record_2026_05_25_traceweaver_q8x:
+  review_id: TW-DOC-REVIEW-2026-05-25-NEW-PROJECT-START-GUIDE-TRACEWEAVER-W00-HELD-001
+  bead_id: TraceWeaver-q8x
+  status: content_passed_trace_hash_passed_artifact_identity_held
+  reviewed_scope:
+    - docs/guides/starting-a-new-project-with-traceweaver.md
+    - .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml
+    - .traceweaver/intent-contract.yml
+    - traceability-matrix.md
+    - docs/generated/traceability-dashboard.md
+    - docs/generated/traceability-data.json
+    - docs/generated/traceability-graph.mmd
+  content_review_result: >
+    The post-bootstrap next-step repair is accepted as content: large projects
+    continue through `tw-auto` strategy, ideation, grill, and brainstorm before
+    planning; small clear projects may continue to `tw-requirements-review`.
+  trace_hash_status_result: >
+    YAML parse, generated traceability views, generated-view smoke,
+    implementation-mode code-anchor scan, and git diff whitespace checks passed
+    for the scoped review inputs.
+  held_findings:
+    - finding_id: TW-DOC-FINDING-2026-05-25-Q8X-ARTIFACT-IDENTITY-HELD
+      severity: block
+      status: held
+      issue: >
+        Required guide and trace-record artifacts remain untracked while shared
+        authority/generated files also contain then-unwidened 0.2 release/plugin
+        metadata.
+      impact: >
+        Accepted authority-state review, review-staging, and publication remain
+        held until the scope is separated or explicitly widened.
+  refreshed_hashes_before_this_record_update:
+    requirements.md: f1f0eca4db4f373bd6064ac86925a914467e0b570c8050f32e12653e148ac7e9
+    docs/guides/starting-a-new-project-with-traceweaver.md: ef170344dc2d0ecac726f0048568476a731a9f2b9752b7b23bcce833fddd9cc0
+    .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml: 23fc087a534430d860ad212b3e1947f62835848e85c8894fcebe91f6227346e1
+    .traceweaver/intent-contract.yml: cccabb0e21030a0f00c6fee80ca80f7497ddda1de1e87be65890ac01d969de40
+    traceability-matrix.md: b78027357b0bb781c230e6b5754905ab20bbd8bdbd838b150c25700da115ff5e
+    docs/generated/traceability-dashboard.md: 6eb8dc7731450b836328dc3e6fc380b949e6c0aae7a1f37bef94eac5363f3677
+    docs/generated/traceability-data.json: 6ab9ac366d2890f29b17044e3ab61c496f32d4e4af8d0f18651a16f36c7174af
+    docs/generated/traceability-graph.mmd: c3f02093afe30f8045f70697a4c2f6deefc546f8ba9080ef358c9acc7180cd96
+
+guide_update_2026_05_25_interactive_delta_gap_grill_path:
+  work_id: TW-WORK-2026-05-25-NEW-PROJECT-GUIDE-INTERACTIVE-GRILL-PATH-001
+  bead_id: TraceWeaver-7ze
+  status: guide_updated_verification_passed_doc_review_recorded_combined_release_scope_held
+  trigger: >
+    User clarified that the guide should lead users toward an interactive
+    delta/gap `tw-grill` interview when existing strategy, ideation, grill
+    notes, plan, and authority files still do not capture enough intent.
+  changed_guidance: >
+    Added a "When The Grill Was Too Thin" section and prompt pattern that keeps
+    requirements promotion held, asks `tw-auto` to run a delta/gap `tw-grill`
+    interview, focuses the interview on missing player fantasy, core loop,
+    level scope, boss mechanics, progression, failure/retry, acceptance
+    criteria, verification, and validation, records source evidence only, and
+    stops before implementation.
+  authority_boundary: >
+    The new prompt path produces source evidence only. It does not approve
+    implementation authority, promote requirements, start `tw-work`, or publish.
+  refreshed_hashes_before_this_record_update:
+    docs/guides/starting-a-new-project-with-traceweaver.md: 75aa25e15e7fb6c881f1ea9508a340c23c4f6742e17fb069f18bd74f376cdd77
+    .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml: fa5e3c00fbad083e8e566c9a5acfa7821e2eb1ad68b159420c29d8a36eae85bc
+    .traceweaver/intent-contract.yml: a7a485e87abf13de966d170491e9266f3f25e972c05ca9cdbde166527741a817
+    traceability-matrix.md: b78027357b0bb781c230e6b5754905ab20bbd8bdbd838b150c25700da115ff5e
+  verification_evidence:
+    - ruby YAML parse for Intent Contract and trace record
+    - scripts/traceweaver-generate-traceability-views --root .
+    - scripts/traceweaver-smoke-traceability-generated-views
+    - plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-file docs/guides/starting-a-new-project-with-traceweaver.md --changed-file .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml --changed-file .traceweaver/intent-contract.yml --changed-file traceability-matrix.md
+    - git diff --check -- docs/guides/starting-a-new-project-with-traceweaver.md .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml .traceweaver/intent-contract.yml traceability-matrix.md docs/generated/traceability-dashboard.md docs/generated/traceability-data.json docs/generated/traceability-graph.mmd
+  follow_up_review: >
+    TraceWeaver-03a tw-doc-review passed content and trace/hash checks for the
+    interactive delta/gap grill path. Publication and combined release acceptance
+    remain held.
+
+held_doc_review_record_2026_05_25_traceweaver_03a:
+  review_id: TW-DOC-REVIEW-2026-05-25-NEW-PROJECT-GUIDE-INTERACTIVE-GRILL-PATH-HELD-001
+  bead_id: TraceWeaver-03a
+  status: content_passed_trace_hash_passed_combined_release_scope_recorded_publication_held
+  reviewed_scope:
+    - docs/guides/starting-a-new-project-with-traceweaver.md
+    - .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml
+    - .traceweaver/intent-contract.yml
+    - traceability-matrix.md
+    - docs/generated/traceability-dashboard.md
+    - docs/generated/traceability-data.json
+    - docs/generated/traceability-graph.mmd
+  content_review_result: >
+    The interactive delta/gap grill guide update passed content review. It
+    tells users not to promote requirements yet, to run a delta/gap `tw-grill`
+    interview through `tw-auto`, to ask questions with recommended answers, to
+    record source evidence only, and to stop before implementation.
+  trace_hash_status_result: >
+    YAML parse, generated traceability views, generated-view smoke,
+    implementation-mode code-anchor scan, and git diff whitespace checks passed
+    for the scoped review inputs.
+  combined_release_scope: >
+    The intended release scope is guide documentation, the 0.2.0 label/metadata,
+    Antigravity static local install/discovery changes, and the tw-auto
+    approval-only handoff repair together in the clean
+    `codex/guide-0.2-antigravity-release` worktree.
+  held_scope: >
+    Publication, tag creation, GitHub release publication, release-ready,
+    package-ready, runtime-driver binding, clean CE replacement, enforcing mode,
+    slash-command support, unconstrained-host support, and autonomous
+    publication remain held.
+  refreshed_hashes_before_this_record_update:
+    requirements.md: f1f0eca4db4f373bd6064ac86925a914467e0b570c8050f32e12653e148ac7e9
+    docs/guides/starting-a-new-project-with-traceweaver.md: 75aa25e15e7fb6c881f1ea9508a340c23c4f6742e17fb069f18bd74f376cdd77
+    .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml: c0b1fe2e3822a482a57019f449845e5083cb2f32cf65b00b2f56b61da30f465f
+    .traceweaver/intent-contract.yml: b40e833f29851bf07a38624ac6e481d1b6241d0b997f5a9f6d56daebc65ff355
+    traceability-matrix.md: b78027357b0bb781c230e6b5754905ab20bbd8bdbd838b150c25700da115ff5e
+    docs/generated/traceability-dashboard.md: c99d95506d4c5c6100cf9bd16953aab48961f177d33cbd5b3d08872572d5e031
+    docs/generated/traceability-data.json: d8614eb8195f45981af549cb03b1957e80fd6308e5270dfeb7d3450e60726849
+    docs/generated/traceability-graph.mmd: c3f02093afe30f8045f70697a4c2f6deefc546f8ba9080ef358c9acc7180cd96
+
+work_repair_2026_05_25_combined_scope_doc_review_findings:
+  work_id: TW-WORK-2026-05-25-COMBINED-GUIDE-0-2-ANTIGRAVITY-DOC-REVIEW-REPAIR-001
+  bead_id: TraceWeaver-9qx
+  status: applied_verification_passed_publication_held
+  source_review: TraceWeaver-veh
+  repaired_findings:
+    - matrix header and current scoped gate updated to the combined 2026-05-25 release scope
+    - Intent Contract active gate and guide review scope now enumerate the combined guide plus 0.2.0 plus Antigravity static install/discovery plus tw-auto approval-only handoff artifact set
+    - top-level guide trace-record scope and reviewed artifacts now enumerate the combined artifact set
+    - package-ready held wording normalized in the 0.2 release validation record and trace record
+    - README Alpha Boundaries now limits Antigravity to static local install/discovery metadata and keeps workflow invocation held
+    - 0.2 release validation record branch provenance points to the clean release worktree
+    - Big Project Path prompt includes brainstorm before planning
+    - tw-auto approval-only handoff repair is included in release scope, trace records, validation record, and required regression smoke
+  refreshed_hashes_before_this_record_update:
+    README.md: 52127054fac4ea7dd2c4897bc20860839ada252723f9f7356d9223e3a1910bf2
+    docs/guides/starting-a-new-project-with-traceweaver.md: 0925db2f3be37ef0ad2227512c717802368ee7d9719af6b98fc40bb3df1164d1
+    docs/validation/traceweaver-plugin-0.2-release.md: 60418be0c37a9049bdd79b07014b17e6b21d569f5497ac6f0e8c5ca73bb49c45
+    .traceweaver/trace-records/2026-05-25-plugin-0.2-release-metadata.yml: 4f8142d398a963e6053a38b8e8811a4343ebd5576f5a0d741b123bb6c70be95c
+    .traceweaver/intent-contract.yml: 7712f2d6052d2831b3d536b6e0a2733a750fd8c5872edea93864207864e2928c
+    traceability-matrix.md: 7524c795589f50b5b338e8d95c797c77ec141b24fe1269447fafd5eeeda789d6
+    .traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml: 2c65bef843b277a1362a9a9a1c813b04eb7f13b1e34ec4d44e14e05b9156f2ea
+  held_scope: >
+    Publication, tag creation, GitHub release publication, package-ready,
+    release-ready, runtime-driver binding, clean CE replacement, enforcing mode,
+    slash-command support, unconstrained-host support, and autonomous
+    publication remain held.
+  verification_evidence:
+    - ruby YAML parse for Intent Contract and both 2026-05-25 trace records
+    - python3 -m json.tool for Codex, Claude, Antigravity, and Cursor plugin and marketplace JSON
+    - python3 plugin validator for plugins/traceweaver-core
+    - claude plugin validate --strict . and plugins/traceweaver-core
+    - claude plugin tag --dry-run --force plugins/traceweaver-core computed traceweaver-core--v0.2.0 without creating or pushing a tag
+    - scripts/traceweaver-generate-traceability-views --root .
+    - scripts/traceweaver-smoke-traceability-generated-views
+    - implementation-mode code-anchor scan passed with code_traceability_findings=0
+    - scripts/traceweaver-smoke-antigravity-discovery
+    - scripts/traceweaver-smoke-controlled-publication
+    - TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
+    - TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=10 scripts/traceweaver-smoke-codex-separate-home-runtime passed install/default/auth-boundary checks with runtime invocation held because isolated Codex exec has no auth copy
+    - TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior
+    - git diff --check
+
+held_claims:
+  - publication
+  - release-ready or package-ready status
+  - runtime-driver decision binding
+  - autonomous tw-auto runtime proof
+  - clean CE replacement
+  - enforcing mode
+  - slash-command support
+  - unconstrained-host support
+  - combined guide plus 0.2.0 plus Antigravity static local install/discovery plus tw-auto approval-only handoff scope is recorded but not published
+
+next_step: tw-doc-review the repaired combined guide plus 0.2.0 plus Antigravity static local install/discovery plus tw-auto approval-only handoff scope before review-staging or publication; publication remains held.
+
+final_doc_review_2026_05_25_repaired_combined_scope:
+  review_id: TW-DOC-REVIEW-2026-05-25-GUIDE-0.2-ANTIGRAVITY-TW-AUTO-HANDOFF-CLEAN-001
+  status: passed_no_blocking_findings_after_repair_publication_held
+  review_coverage: main_thread_tw_doc_review_with_three_independent_reviewer_subagents
+  reviewed_scope:
+    - repaired combined guide documentation
+    - TraceWeaver Core 0.2.0 metadata and manifests
+    - Antigravity static local install/discovery metadata and smoke
+    - tw-auto approval-only handoff repair, fixture, and behavior smoke
+    - release validation and trace records
+    - Intent Contract, traceability matrix, and generated traceability views
+  repaired_review_findings:
+    - approval-only tw-auto handoff repair is now in active authority scope, release trace scope, validation prepared artifacts, reviewed artifacts, and required verification
+    - pre-publication checklist now includes tw-auto behavior smoke and implementation-mode code-anchor scan for the approval-only handoff artifacts
+    - release validation next step no longer instructs tag creation or GitHub release publication while publication is held
+    - README and public guide limit Antigravity to static local install/discovery metadata until runtime invocation evidence is promoted
+    - plugin README included-skill list and manifest-bump wording are consistent with the packaged 0.2.0 surface
+    - public prompt-to-proof guide no longer carries stale 0.1.0 alpha boundary wording
+  traceability_result: >
+    YAML parse, generated traceability views, generated-view smoke,
+    tw-auto behavior smoke, implementation-mode code-anchor scan, no-publication
+    smoke, Antigravity discovery smoke, controlled-publication smoke, JSON
+    manifest validation, Codex plugin validator, Claude strict validation, Claude
+    tag dry-run, and git diff whitespace checks passed.
+  accepted_use: >
+    Accepted as reviewed static/advisory documentation, metadata, trace, and
+    fixture evidence for the repaired combined worktree scope only.
+  held_scope: >
+    Publication, tag creation, GitHub release publication, package-ready,
+    release-ready, runtime-driver binding, Antigravity workflow invocation, clean
+    CE replacement, enforcing mode, slash-command support, unconstrained-host
+    support, and autonomous publication remain held.
+  next_step: >
+    Use tw-work to record the clean held-review state and refreshed artifact
+    hashes for the exact worktree scope before any review-staging or publication
+    route; actual publication still requires a separate controlled publication
+    gate.
+
+tw_work_record_2026_05_25_clean_held_review_state:
+  work_id: TW-WORK-2026-05-25-GUIDE-0.2-ANTIGRAVITY-TW-AUTO-HANDOFF-HASH-RECORD-001
+  status: clean_held_review_state_recorded_publication_held
+  trigger: >
+    User requested a `tw-work` record of the clean held-review state and
+    refreshed artifact hashes for the repaired combined guide, TraceWeaver Core
+    0.2.0 metadata, Antigravity static local install/discovery, and tw-auto
+    approval-only handoff scope.
+  authority_gate_result: >
+    Proceed for evidence/status recording only. The scope was already reviewed as
+    `TW-DOC-REVIEW-2026-05-25-GUIDE-0.2-ANTIGRAVITY-TW-AUTO-HANDOFF-CLEAN-001`.
+    This work record does not approve publication, runtime invocation,
+    release-ready status, or package-ready status.
+  test_first_decision: >
+    Not applicable. This work item records reviewed evidence and artifact hashes;
+    behavior-bearing changes were already covered by the tw-auto approval-only
+    regression fixture and behavior smoke.
+  refreshed_artifact_hashes_sha256:
+    .claude-plugin/marketplace.json: 716879722430ad09320c30517a596a8383b7af30634d9b9dde47c623d0f46000
+    plugins/traceweaver-core/.codex-plugin/plugin.json: 3b1a4e04b04de004ea63e518facc7ca05295a584a21efca594415f072e35d7e3
+    plugins/traceweaver-core/.claude-plugin/plugin.json: 9e8cf220b558670f9fa299a6ee9ec3fb91389a913f604070b27f8390e8ba0a26
+    plugins/traceweaver-core/.antigravity-plugin/plugin.json: 0b3a4324026982e25d97fb896968c05cef1157263f9b7841ce168fa70614d250
+    plugins/traceweaver-core/.cursor-plugin/plugin.json: 2173398e3e6891c10b5c07e1d8d53dfc14480f3010d2a3b0f4c32b21785bf2d8
+    src/index.ts: 28019a6d8afc5c2ec218ce826f89c96c58f300ae6a4189d0ffe22245f13adde2
+    scripts/traceweaver-smoke-antigravity-discovery: 38d9aa050037fe5125743448dcc06a086ab2e6d70f9270e37be395d1294528bf
+    plugins/traceweaver-core/skills/ce-commit-push-pr/references/pr-description-writing.md: 7977d22c679a63b710d18d9bc7f32f30eeca535e0bf046b1aa0823d98ec489e9
+    plugins/traceweaver-core/skills/tw-auto/SKILL.md: 43122ff288f586c38db7e832f87664dabce76ef244c243b8ea04387b4a343651
+    scripts/traceweaver-smoke-tw-skill-behavior: 16fc531efe1273bfabddcf2687c940eb00755f2649f4759b61e7d8c684de5d8c
+    fixtures/tw-skill-behavior/tw-auto-approval-only-stop/loop-state.txt: 46be4fdc93662d6eeafe46b2e545528127856dbfd08c366ca052b2e1c33c3a15
+    README.md: 90e3957b827d4c02b67ff25164c7bd668f247b4a5cfa58a4950f58ed14390ddb
+    plugins/traceweaver-core/README.md: f56d48e350070a2f68aa5550503217437dd82f60d1684ad778867f84c0a60f27
+    CHANGELOG.md: 167b216223f05f4f788908dbb72dfb8e8b24f751fe506f377960de3d898d3f17
+    docs/guides/starting-a-new-project-with-traceweaver.md: 0925db2f3be37ef0ad2227512c717802368ee7d9719af6b98fc40bb3df1164d1
+    docs/guides/traceweaver-from-prompt-to-proof.md: 45ef3fa717ab12c5d993ba05324521f60daec6d3801493210a61ae20f81ef93c
+    .traceweaver/intent-contract.yml: 90247503570e4e0ceff466d3dd480562a1553b672aafaab9a7c336d467c8d2df
+    .traceweaver/trace-records/2026-05-25-plugin-0.2-release-metadata.yml: f6d578ceed793bb59e4837054620b977ef0763a635a67bc79adf5b40159d6d6b
+    docs/validation/traceweaver-plugin-0.2-release.md: 3cc4392e64bc43ff773230b64cbeb2155222beed97c5835d1433f9361babfb42
+    docs/validation/traceweaver-u7-static-advisory-claims.md: 4d3ba07537e890794c02798c780cb793cc74eb460f7cfa10d51c6c44c707e948
+    traceability-matrix.md: c9da1a7ecb950722cd76ab556a3eef46c805e561976a8617c055e70d5d36ecc8
+    docs/generated/traceability-dashboard.md: f2f20f704c53d16c2741131fd8ea670fef8fdd0453dcea506463f8066a849ed0
+    docs/generated/traceability-data.json: 880f23409d8915fb5ce882455492b3cc65667778b2c41f66c48756018d300aac
+    docs/generated/traceability-graph.mmd: 93d6b027d4792a699f40f868792a2fe07a91d07bbe553ffd91393b3a8a399cd3
+  this_record_hash_before_tw_work_record_update_sha256: d83294c94c0d79dd1c3e5893a11b8d583b7f4e4bef47df5816f143c0c6ba80ed
+  verification_evidence:
+    - shasum -a 256 over active authority review scope
+    - ruby YAML parse for Intent Contract and both 2026-05-25 trace records
+    - git diff --check
+  held_scope: >
+    Publication, tag creation, GitHub release publication, package-ready,
+    release-ready, runtime-driver binding, Antigravity workflow invocation, clean
+    CE replacement, enforcing mode, slash-command support, unconstrained-host
+    support, review-staging, and autonomous publication remain held.
+  next_step: >
+    Run tw-traceability-check on the updated evidence record if another
+    consistency pass is desired; otherwise proceed only to a separately requested
+    controlled review-staging or publication route. Do not publish from this
+    record.
+
+tw_work_record_2026_05_25_post_traceability_doc_review_state:
+  work_id: TW-WORK-2026-05-25-GUIDE-0.2-ANTIGRAVITY-TW-AUTO-HANDOFF-POST-TRACE-DOC-REVIEW-001
+  status: clean_post_traceability_doc_review_state_recorded_staging_commit_publication_held
+  trigger: >
+    User requested a `tw-work` record of the clean post-traceability doc-review
+    state and refreshed evidence-record hash for the repaired combined guide,
+    TraceWeaver Core 0.2.0 metadata, Antigravity static local install/discovery,
+    and tw-auto approval-only handoff scope, with explicit no-stage, no-commit,
+    and no-publication boundaries.
+  authority_gate_result: >
+    Proceed for evidence/status recording only. The previous traceability check
+    found no P0/P1 blockers, confirmed the reviewed hash map, passed the
+    implementation-mode code-anchor scan for the tw-auto handoff scope, and kept
+    publication and review-staging held.
+  doc_review_result: >
+    The post-traceability `tw-doc-review` found no blocking document-review,
+    traceability, hash, or held-claim findings for the updated clean held-review
+    evidence record.
+  test_first_decision: >
+    Not applicable. This work item records post-review evidence state only;
+    behavior-bearing changes remain covered by the approval-only handoff fixture
+    and tw-auto behavior smoke.
+  evidence_record_hash_before_this_update_sha256: 8d4ccb00954df3f5daa4a99d44312181af3de09914e03f6a905d070718098d58
+  verification_evidence:
+    - ruby YAML parse for Intent Contract and both 2026-05-25 trace records
+    - git diff --check
+    - prior tw-traceability-check artifact hash comparison passed with count=24
+    - prior implementation-mode code-anchor scan passed with code_traceability_findings=0
+    - prior tw-auto behavior smoke passed
+    - prior generated traceability views and no-publication smoke passed
+  accepted_use: >
+    Accepted as a reviewed static/advisory post-traceability evidence-state
+    record for the exact repaired combined worktree scope only.
+  held_scope: >
+    Review-staging, staging, commit, push, PR, publication, tag creation, GitHub
+    release publication, package-ready, release-ready, runtime-driver binding,
+    Antigravity workflow invocation, clean CE replacement, enforcing mode,
+    slash-command support, unconstrained-host support, and autonomous
+    publication remain held.
+  next_step: >
+    Use tw-commit only if the user explicitly requests a controlled commit path
+    for this exact reviewed worktree scope. Otherwise stop here; do not stage,
+    commit, push, tag, release, or publish from this record.

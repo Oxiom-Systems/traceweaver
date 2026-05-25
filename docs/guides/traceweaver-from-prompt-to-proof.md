@@ -52,20 +52,28 @@ records under `.traceweaver/`.
 
 ## What A First-Time User Does
 
-1. Install the TraceWeaver Core plugin for Codex or Claude Code.
-2. In a blank project, ask TraceWeaver to bootstrap authority:
+1. Install the TraceWeaver Core plugin for Codex or Claude Code, or use the
+   0.2.0 Antigravity metadata for static local install/discovery only.
+2. In a blank project, use the new-project guide to choose the right route for
+   the project size:
+
+   ```text
+   docs/guides/starting-a-new-project-with-traceweaver.md
+   ```
+
+3. Ask TraceWeaver to bootstrap authority:
 
    ```text
    tw-auto "bootstrap TraceWeaver authority for this project"
    ```
 
-3. In an existing project, audit before changing code:
+4. In an existing project, audit before changing code:
 
    ```text
    tw-audit "audit this project for requirements authority, code traces, verification evidence, validation evidence, dark code, orphaned code, duplicate behavior, and lost intent. Report candidate findings only; do not remove or rewrite anything."
    ```
 
-4. For approved work, move through the controlled loop:
+5. For approved work, move through the controlled loop:
 
    ```text
    tw-plan
@@ -76,7 +84,7 @@ records under `.traceweaver/`.
    tw-doc-review
    ```
 
-5. Publish only after the controlled publication gate is in scope and clean.
+6. Publish only after the controlled publication gate is in scope and clean.
 
 ## What Changes In The Team Workflow
 
@@ -96,9 +104,11 @@ instead of letting it leak into release notes or customer-facing copy.
 
 ## Current Alpha Boundary
 
-TraceWeaver Core `0.1.0` is an alpha advisory plugin. It can guide first-time
+TraceWeaver Core `0.2.0` is an alpha advisory plugin. It can guide first-time
 authority setup, requirements review, planning, work handoffs, traceability
-checks, audits, and controlled review flows.
+checks, audits, and controlled review flows in Codex and Claude Code.
+Antigravity support is limited to static local install/discovery metadata until
+runtime invocation evidence is promoted.
 
 The following remain held until later evidence gates pass:
 

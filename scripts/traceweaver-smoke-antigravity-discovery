@@ -1,0 +1,127 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=antigravity-discovery-smoke; req=REQ-TW-068; trace=TRACE-TW-054; ver=VER-TW-069
+# TRACEWEAVER: verifies=VER-TW-069; req=REQ-TW-068; trace=TRACE-TW-054
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+tmp_root="$(mktemp -d)"
+trap 'rm -rf "$tmp_root"' EXIT
+
+gemini_home="$tmp_root/gemini-home"
+mkdir -p "$gemini_home"
+
+install_output="$tmp_root/install.out"
+bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" \
+  --to antigravity \
+  --include-skills \
+  --geminiHome "$gemini_home" >"$install_output"
+
+target_plugin_root="$gemini_home/config/plugins/traceweaver-core"
+manifest="$target_plugin_root/plugin.json"
+version_file="$target_plugin_root/installed_version.json"
+skills_root="$target_plugin_root/skills"
+
+assert_file() {
+  if [ ! -f "$1" ]; then
+    echo "missing_file=$1"
+    exit 1
+  fi
+}
+
+assert_dir() {
+  if [ ! -d "$1" ]; then
+    echo "missing_directory=$1"
+    exit 1
+  fi
+}
+
+assert_equal() {
+  local label="$1"
+  local expected="$2"
+  local actual="$3"
+  if [ "$expected" != "$actual" ]; then
+    echo "${label}=failed expected=${expected} actual=${actual}"
+    exit 1
+  fi
+}
+
+assert_file "$manifest"
+assert_file "$version_file"
+assert_dir "$skills_root"
+
+# Check manifest content
+name="$(python3 -c "import json; print(json.load(open('$manifest'))['name'])")"
+assert_equal "manifest_name" "traceweaver-core" "$name"
+
+# Check version file content
+version="$(python3 -c "import json; print(json.load(open('$version_file'))['version'])")"
+assert_equal "version_value" "0.2.0" "$version"
+
+expected_skills=(
+  tw-auto
+  tw-strategy
+  tw-ideate
+  tw-plan
+  tw-brainstorm
+  tw-audit
+  lfg
+  tw-authority-gate
+  tw-work
+  tw-traceability-check
+  tw-requirements-review
+  tw-debug
+  tw-code-review
+  tw-doc-review
+  tw-commit
+  tw-commit-push-pr
+  tw-compound
+  tw-compound-refresh
+  tw-resolve-pr-feedback
+  tw-sessions
+  tw-test-browser
+  tw-test-xcode
+  tw-setup
+  tw-worktree
+  tw-grill
+)
+
+unexpected_skills=(
+  ce-brainstorm
+  ce-code-review
+  ce-commit
+  ce-commit-push-pr
+  ce-compound
+  ce-compound-refresh
+  ce-debug
+  ce-doc-review
+  ce-ideate
+  ce-plan
+  ce-resolve-pr-feedback
+  ce-sessions
+  ce-setup
+  ce-strategy
+  ce-test-browser
+  ce-test-xcode
+  ce-work
+  ce-worktree
+)
+
+# Verify expected skills exist in target
+for skill in "${expected_skills[@]}"; do
+  assert_dir "$skills_root/$skill"
+  assert_file "$skills_root/$skill/SKILL.md"
+done
+
+# Verify unexpected skills do NOT exist in target
+for skill in "${unexpected_skills[@]}"; do
+  if [ -d "$skills_root/$skill" ]; then
+    echo "unexpected_skill_present=$skill"
+    exit 1
+  fi
+done
+
+echo "antigravity_discovery_smoke=pass"
+echo "installed_manifest=$manifest"
+echo "installed_version_file=$version_file"
+echo "installed_skills_root=$skills_root"

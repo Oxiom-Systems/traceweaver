@@ -1,0 +1,105 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-25-PLUGIN-0.2-RELEASE-METADATA-001
+record_type: implementation_trace
+created_at: "2026-05-25"
+owner: Oxiom Systems
+baseline_id: REQ-BASELINE-2026-04-30-001
+requirements:
+  - REQ-TW-016
+  - REQ-TW-020
+  - REQ-TW-023
+  - REQ-TW-024
+  - REQ-TW-041
+  - REQ-TW-043
+  - REQ-TW-056
+  - REQ-TW-060
+  - REQ-TW-068
+trace_ids:
+  - TRACE-TW-010
+  - TRACE-TW-046
+  - TRACE-TW-054
+verification_ids:
+  - VER-TW-012
+  - VER-TW-019
+  - VER-TW-059
+  - VER-TW-069
+beads_issue: TraceWeaver-0qg
+intent_served:
+  - INTENT-TW-004
+  - INTENT-TW-005
+  - INTENT-TW-007
+scope:
+  - .agents/plugins/marketplace.json
+  - .claude-plugin/marketplace.json
+  - plugins/traceweaver-core/.codex-plugin/plugin.json
+  - plugins/traceweaver-core/.claude-plugin/plugin.json
+  - plugins/traceweaver-core/.antigravity-plugin/plugin.json
+  - plugins/traceweaver-core/.cursor-plugin/plugin.json
+  - src/index.ts
+  - scripts/traceweaver-smoke-antigravity-discovery
+  - plugins/traceweaver-core/skills/ce-commit-push-pr/references/pr-description-writing.md
+  - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+  - scripts/traceweaver-smoke-tw-skill-behavior
+  - fixtures/tw-skill-behavior/tw-auto-approval-only-stop/loop-state.txt
+  - README.md
+  - plugins/traceweaver-core/README.md
+  - CHANGELOG.md
+  - .traceweaver/intent-contract.yml
+  - .traceweaver/trace-records/2026-05-25-plugin-0.2-release-metadata.yml
+  - docs/validation/traceweaver-plugin-0.2-release.md
+  - docs/validation/traceweaver-u7-static-advisory-claims.md
+  - traceability-matrix.md
+  - docs/generated/traceability-dashboard.md
+  - docs/generated/traceability-data.json
+  - docs/generated/traceability-graph.mmd
+authority_source:
+  approved_requirements:
+    - REQ-TW-016
+    - REQ-TW-020
+    - REQ-TW-023
+    - REQ-TW-024
+    - REQ-TW-041
+    - REQ-TW-043
+    - REQ-TW-060
+  candidate_requirements:
+    - REQ-TW-056
+    - REQ-TW-068
+  authority_status: static_metadata_preparation_allowed_publication_held_req_tw_068_candidate_planning_input_only_approval_only_handoff_static_fixture_included_runtime_held
+verification_required:
+  - Codex plugin manifest validation
+  - Claude plugin and marketplace validation
+  - Claude plugin release tag dry-run
+  - isolated Codex install/discovery smoke
+  - separate-home Codex runtime-disabled smoke
+  - Antigravity local install/discovery smoke
+  - controlled publication-route smoke
+  - tw-auto approval-only handoff fixture smoke
+  - implementation-mode code-anchor scan for approval-only handoff artifacts
+  - git diff whitespace check
+verification_observed:
+  - "python3 -m json.tool for Codex/Claude/Antigravity/Cursor plugin and marketplace JSON: pass"
+  - "YAML parse for Intent Contract and 0.2 trace record: pass"
+  - "Codex plugin validator: pass"
+  - "claude plugin validate --strict .: pass"
+  - "claude plugin validate --strict plugins/traceweaver-core: pass"
+  - "claude plugin tag --dry-run --force plugins/traceweaver-core: pass, computed traceweaver-core--v0.2.0 without creating or pushing a tag"
+  - "TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery: pass"
+  - "TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=10 scripts/traceweaver-smoke-codex-separate-home-runtime: pass with runtime invocation held because isolated Codex exec has no auth copy"
+  - "scripts/traceweaver-smoke-antigravity-discovery: pass"
+  - "scripts/traceweaver-smoke-controlled-publication: pass"
+  - "TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior: pass with approval-only stop regression fixture and existing active-host stale-surface held notes"
+  - "implementation-mode code-anchor scan over changed files: pass with code_traceability_findings=0"
+  - "scripts/traceweaver-generate-traceability-views --root .: pass"
+  - "scripts/traceweaver-smoke-traceability-generated-views: pass"
+  - "git diff --check: pass"
+validation_question: "Can users update TraceWeaver Core 0.2 through Codex and Claude plugin marketplace flows plus Antigravity static local install/discovery, and can approval-only tw-auto runs return next-step handoff guidance, without expanding runtime, package-ready, release-ready, or publication claims?"
+held_claims:
+  - actual GitHub tag or release publication
+  - runtime-driver invocation
+  - clean CE replacement
+  - package-ready, release-ready, or upstream-ready status
+  - R31 real-project validation closure
+  - slash-command or prompt availability
+  - enforcing authority gate behavior
+  - autonomous publication
+  - unconstrained-host support
+status: static_metadata_prepared_verification_passed_publication_held

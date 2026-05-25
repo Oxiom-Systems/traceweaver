@@ -2,6 +2,32 @@
 
 # Changelog
 
+## 0.2.0 - 2026-05-25
+
+TraceWeaver Core 0.2 packages the latest alpha plugin surface for Codex,
+Claude Code, and Antigravity local install/update flows.
+
+### Changed
+
+- Bumped Codex, Claude Code, Antigravity, and Cursor peer plugin manifests to
+  `0.2.0`.
+- Bumped Claude marketplace metadata to `0.2.0` so Claude Code users can pick
+  up the new plugin version.
+- Updated the Antigravity installer and discovery smoke to write and verify
+  installed version `0.2.0`.
+- Updated `tw-auto` approval-only stops so approval/record-only runs that
+  explicitly say "do not implement" still name the next wrapper command or
+  blocker instead of ending at approval evidence alone.
+- Updated the PR description badge template to label the generated badge as
+  Tracewaver Compound Engineering.
+
+### Held
+
+- Git tag creation, GitHub release publication, package-ready/release-ready
+  claims, runtime-driver invocation, clean CE replacement, unconstrained-host
+  support, slash-command surfaces, enforcing mode, R31 validation, and
+  autonomous publication remain held until their own gates pass.
+
 ## 0.1.0 - 2026-05-23
 
 TraceWeaver Core 0.1 packages the current static/advisory alpha plugin surface

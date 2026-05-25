@@ -1,6 +1,5 @@
 {
   "name": "traceweaver-core",
-  "displayName": "TraceWeaver Core",
   "version": "0.2.0",
   "description": "Systems-engineering authority control and advisory automation for agentic software work.",
   "author": {
@@ -11,8 +10,6 @@
   "repository": "https://github.com/Oxiom-Systems/traceweaver",
   "license": "MIT",
   "keywords": [
-    "cursor",
-    "plugin",
     "traceweaver",
     "systems-engineering",
     "requirements",

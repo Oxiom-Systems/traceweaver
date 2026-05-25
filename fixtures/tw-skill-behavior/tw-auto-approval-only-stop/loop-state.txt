@@ -1,0 +1,11 @@
+TRACEWEAVER: file-role=wrapper-handoff-fixture; req=REQ-TW-023; trace=TRACE-TW-046; ver=VER-TW-059
+scenario=tw_auto_approval_only_stop
+user_boundary=do_not_implement
+approval_artifacts_recorded=true
+implementation_started=false
+expected_stop_reason=explicit_no_implementation_boundary
+next_step_required=true
+expected_next_wrapper=tw-auto
+next_command_purpose=implement_approved_plan_or_task_capsule_with_closure
+held_claims=publication,runtime,release,clean_replacement
+accepted_scope=deterministic_fixture_only_no_runtime_pass
