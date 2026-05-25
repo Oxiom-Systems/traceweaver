@@ -18,15 +18,18 @@ Claude Code, and Antigravity local install/update flows.
 - Updated `tw-auto` approval-only stops so approval/record-only runs that
   explicitly say "do not implement" still name the next wrapper command or
   blocker instead of ending at approval evidence alone.
+- Updated `tw-auto` publication-boundary stops so requests that say "stop before
+  commit/push/PR" still continue through post-work traceability/review closure
+  before naming the next wrapper command or blocker.
 - Updated the PR description badge template to label the generated badge as
   Tracewaver Compound Engineering.
 
 ### Held
 
-- Git tag creation, GitHub release publication, package-ready/release-ready
-  claims, runtime-driver invocation, clean CE replacement, unconstrained-host
-  support, slash-command surfaces, enforcing mode, R31 validation, and
-  autonomous publication remain held until their own gates pass.
+- Package-ready/release-ready claims, runtime-driver invocation, clean CE
+  replacement, unconstrained-host support, slash-command surfaces, enforcing
+  mode, R31 validation, and autonomous publication remain held until their own
+  gates pass.
 
 ## 0.1.0 - 2026-05-23
 

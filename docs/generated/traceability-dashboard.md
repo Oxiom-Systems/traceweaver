@@ -9,7 +9,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `ccb443bd5d2efe3cb3b6a8226156fe8f279e5d0a90beacaa4e93a49c495424ed` |
+| `traceability-matrix.md` | `aef3f9b1d58318b0c6c7d50549423db15111b1b17e3aaf6ea340b7ba1db8b3e7` |
 | `requirements.md` | `f1f0eca4db4f373bd6064ac86925a914467e0b570c8050f32e12653e148ac7e9` |
 | `.traceweaver/intent-contract.yml` | `90247503570e4e0ceff466d3dd480562a1553b672aafaab9a7c336d467c8d2df` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |

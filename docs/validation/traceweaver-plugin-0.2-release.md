@@ -1,6 +1,6 @@
 # TraceWeaver Plugin 0.2 Release Metadata Record
 
-Status: `STATIC_MARKETPLACE_METADATA_PREPARED_PUBLICATION_HELD`
+Status: `STATIC_MARKETPLACE_METADATA_PREPARED_PUBLICATION_AUTHORIZED`
 
 Date/session: 2026-05-25, Codex, branch
 `codex/guide-0.2-antigravity-release` worktree
@@ -31,14 +31,21 @@ This record includes the `tw-auto` approval-only handoff repair so
 record/approval-only runs that explicitly say "do not implement" still stop
 with the next wrapper command or blocker.
 
+This record also includes the PR #27 `tw-auto` publication-boundary next-step
+repair so requests that say "stop before commit/push/PR" still continue through
+post-work traceability/review closure before stopping at the publication
+boundary with the next wrapper command or blocker.
+
 Antigravity local install metadata is included under REQ-TW-068
 candidate/planning input. This record does not promote REQ-TW-068 to approved
 baseline authority.
 
 This record does not approve runtime-driver invocation, clean CE replacement,
 package-ready status, release-ready status, upstream-ready status, R31 validation closure,
-slash-command availability, enforcing mode, unconstrained-host support, Git tag
-creation, GitHub release publication, or autonomous publication.
+slash-command availability, enforcing mode, unconstrained-host support, or
+autonomous publication. The exact `traceweaver-core--v0.2.0` tag and GitHub
+release are authorized after PR #27 was merged and the release-scope refresh
+checks pass.
 
 ## Prepared Artifacts
 
@@ -62,6 +69,10 @@ creation, GitHub release publication, or autonomous publication.
   `scripts/traceweaver-smoke-tw-skill-behavior`, and
   `fixtures/tw-skill-behavior/tw-auto-approval-only-stop/loop-state.txt`:
   approval-only handoff guidance and deterministic regression fixture added.
+- `fixtures/tw-skill-behavior/tw-auto-post-work-stop-before-publication/loop-state.txt`
+  and `.traceweaver/trace-records/2026-05-25-tw-auto-publication-boundary-next-step.yml`:
+  publication-boundary next-step handoff guidance, fixture proof, and review
+  evidence added by PR #27.
 - `README.md`, `plugins/traceweaver-core/README.md`, and `CHANGELOG.md`:
   install, update, release, and held-claim instructions updated for 0.2.0.
 
@@ -96,7 +107,8 @@ TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=10 scripts/traceweaver-smoke-codex-separa
 scripts/traceweaver-smoke-antigravity-discovery: pass
 scripts/traceweaver-smoke-controlled-publication: pass
 TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior: pass with approval-only stop regression fixture and existing active-host stale-surface held notes
-implementation-mode code-anchor scan over changed files: pass with code_traceability_findings=0
+publication-boundary next-step repair from PR #27: pass with deterministic fixture and trace record
+implementation-mode code-anchor scan over changed files, including PR #27 fixture/evidence: pass with code_traceability_findings=0
 scripts/traceweaver-generate-traceability-views --root .: pass
 scripts/traceweaver-smoke-traceability-generated-views: pass
 git diff --check: pass
@@ -121,6 +133,7 @@ scripts/traceweaver-smoke-antigravity-discovery
 scripts/traceweaver-smoke-controlled-publication
 TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior
 plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-file plugins/traceweaver-core/skills/tw-auto/SKILL.md --changed-file scripts/traceweaver-smoke-tw-skill-behavior --changed-file fixtures/tw-skill-behavior/tw-auto-approval-only-stop/loop-state.txt --changed-file traceability-matrix.md
+plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-file docs/validation/traceweaver-plugin-0.2-release.md --changed-file .traceweaver/trace-records/2026-05-25-plugin-0.2-release-metadata.yml --changed-file .traceweaver/trace-records/2026-05-25-tw-auto-publication-boundary-next-step.yml --changed-file traceability-matrix.md --changed-file plugins/traceweaver-core/skills/tw-auto/SKILL.md --changed-file scripts/traceweaver-smoke-tw-skill-behavior --changed-file fixtures/tw-skill-behavior/tw-auto-post-work-stop-before-publication/loop-state.txt
 scripts/traceweaver-generate-traceability-views --root .
 scripts/traceweaver-smoke-traceability-generated-views
 git diff --check
@@ -128,20 +141,18 @@ git diff --check
 
 ## Held Claims
 
-- actual GitHub tag or release publication;
 - runtime-driver invocation;
 - clean CE replacement;
 - package-ready, release-ready, or upstream-ready status beyond this static
-  metadata preparation record;
+  metadata preparation and exact 0.2.0 GitHub release publication record;
 - R31 real-project validation closure;
 - slash-command or prompt availability;
 - enforcing authority gate behavior;
-- autonomous commit, push, PR, or release publication;
+- autonomous commit, push, PR, or future release publication;
 - unconstrained-host support.
 
 ## Suggested Next Step
 
-Run the verification plan above, then use `tw-work` to record the clean
-held-publication state and refreshed artifact hashes for the exact release
-commit. Actual tag creation and GitHub release publication remain blocked until
-a separate controlled publication gate explicitly authorizes them.
+Run the verification plan above, commit and push this release-scope refresh, then
+create the exact `traceweaver-core--v0.2.0` GitHub release from the refreshed
+main commit. Do not create `0.2.1` for this scope.

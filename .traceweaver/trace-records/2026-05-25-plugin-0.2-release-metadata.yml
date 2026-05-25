@@ -40,11 +40,13 @@ scope:
   - plugins/traceweaver-core/skills/tw-auto/SKILL.md
   - scripts/traceweaver-smoke-tw-skill-behavior
   - fixtures/tw-skill-behavior/tw-auto-approval-only-stop/loop-state.txt
+  - fixtures/tw-skill-behavior/tw-auto-post-work-stop-before-publication/loop-state.txt
   - README.md
   - plugins/traceweaver-core/README.md
   - CHANGELOG.md
   - .traceweaver/intent-contract.yml
   - .traceweaver/trace-records/2026-05-25-plugin-0.2-release-metadata.yml
+  - .traceweaver/trace-records/2026-05-25-tw-auto-publication-boundary-next-step.yml
   - docs/validation/traceweaver-plugin-0.2-release.md
   - docs/validation/traceweaver-u7-static-advisory-claims.md
   - traceability-matrix.md
@@ -63,7 +65,7 @@ authority_source:
   candidate_requirements:
     - REQ-TW-056
     - REQ-TW-068
-  authority_status: static_metadata_preparation_allowed_publication_held_req_tw_068_candidate_planning_input_only_approval_only_handoff_static_fixture_included_runtime_held
+  authority_status: static_metadata_preparation_allowed_exact_0_2_0_publication_authorized_req_tw_068_candidate_planning_input_only_approval_only_and_publication_boundary_handoff_static_fixtures_included_runtime_held
 verification_required:
   - Codex plugin manifest validation
   - Claude plugin and marketplace validation
@@ -73,7 +75,8 @@ verification_required:
   - Antigravity local install/discovery smoke
   - controlled publication-route smoke
   - tw-auto approval-only handoff fixture smoke
-  - implementation-mode code-anchor scan for approval-only handoff artifacts
+  - tw-auto publication-boundary next-step fixture smoke
+  - implementation-mode code-anchor scan for approval-only and publication-boundary handoff artifacts
   - git diff whitespace check
 verification_observed:
   - "python3 -m json.tool for Codex/Claude/Antigravity/Cursor plugin and marketplace JSON: pass"
@@ -86,20 +89,25 @@ verification_observed:
   - "TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=10 scripts/traceweaver-smoke-codex-separate-home-runtime: pass with runtime invocation held because isolated Codex exec has no auth copy"
   - "scripts/traceweaver-smoke-antigravity-discovery: pass"
   - "scripts/traceweaver-smoke-controlled-publication: pass"
-  - "TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior: pass with approval-only stop regression fixture and existing active-host stale-surface held notes"
-  - "implementation-mode code-anchor scan over changed files: pass with code_traceability_findings=0"
+  - "TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior: pass with approval-only stop and publication-boundary next-step regression fixtures and existing active-host stale-surface held notes"
+  - "implementation-mode code-anchor scan over changed files, including PR #27 publication-boundary fixture and trace record: pass with code_traceability_findings=0"
   - "scripts/traceweaver-generate-traceability-views --root .: pass"
   - "scripts/traceweaver-smoke-traceability-generated-views: pass"
   - "git diff --check: pass"
-validation_question: "Can users update TraceWeaver Core 0.2 through Codex and Claude plugin marketplace flows plus Antigravity static local install/discovery, and can approval-only tw-auto runs return next-step handoff guidance, without expanding runtime, package-ready, release-ready, or publication claims?"
+validation_question: "Can users update TraceWeaver Core 0.2 through Codex and Claude plugin marketplace flows plus Antigravity static local install/discovery, can approval-only and stop-before-publication tw-auto runs return next-step handoff guidance, and can the exact 0.2.0 GitHub release be published without expanding runtime, package-ready, release-ready, or autonomous-publication claims?"
 held_claims:
-  - actual GitHub tag or release publication
   - runtime-driver invocation
   - clean CE replacement
   - package-ready, release-ready, or upstream-ready status
   - R31 real-project validation closure
   - slash-command or prompt availability
   - enforcing authority gate behavior
-  - autonomous publication
+  - autonomous or future publication beyond the exact user-authorized 0.2.0 GitHub release
   - unconstrained-host support
-status: static_metadata_prepared_verification_passed_publication_held
+publication_authorization:
+  requested_by_user_at: "2026-05-25"
+  exact_tag: traceweaver-core--v0.2.0
+  exact_release: TraceWeaver Core 0.2.0
+  target_commit_before_release_refresh: 061e24784ce11abf5cb2a700d97661c6e7298e43
+  release_version_decision: fold_pr_27_into_0_2_0_no_0_2_1_because_no_0_2_0_tag_or_github_release_exists
+status: static_metadata_prepared_verification_passed_exact_0_2_0_publication_authorized_runtime_claims_held
