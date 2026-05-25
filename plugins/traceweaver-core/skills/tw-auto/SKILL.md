@@ -12,6 +12,7 @@ disable-model-invocation: false
 <!-- TRACEWEAVER: file-role=strategy-ideation-orchestrator; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
+<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-023; trace=TRACE-TW-046; ver=VER-TW-059 -->
 
 # TraceWeaver Auto
 
@@ -333,6 +334,33 @@ capacity or missing skill availability that prevents trustworthy review; or any
 next action that would commit, branch, push, open/update a PR, deploy, release,
 mutate a remote, or publish. Those actions remain controlled publication route
 work only.
+
+## Approval-Only Stop Handoff
+
+When the user asks `tw-auto` to approve, accept, record, or update an authority
+decision, plan, stack choice, task capsule, gap, change, exception, validation
+record, or review result and explicitly says "do not implement", "approval
+only", "record only", or equivalent, `tw-auto` must classify the run as an
+approval-only authority stop.
+
+An approval-only authority stop is a valid stop condition for implementation,
+but it is not a valid reason to leave the user without a continuation route.
+The output must name:
+
+- the explicit stop reason, including the user's no-implementation boundary;
+- the approved or updated authority artifacts and any held implementation,
+  review, runtime, publication, release, or validation claims;
+- whether the approved authority is sufficient to start a later implementation
+  loop;
+- the highest-level next wrapper command that continues from the approved
+  authority, normally `/tw-auto "implement <approved plan or task capsule>;
+  run TraceWeaver closure; stop before publication"`; or
+- the exact blocker or human decision if no implementation loop can proceed.
+
+Do not end an approval-only stop with only "approved", "done", artifact paths,
+or verification summaries. Even when the requested work was non-implementation,
+the final output must still carry the next TraceWeaver step or the blocker that
+prevents one.
 
 ## Closure-Claim Validation Loop
 

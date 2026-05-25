@@ -69,7 +69,7 @@ The caller (SKILL.md) decides whether to capture new evidence. This step covers 
 - If the caller passed in a freshly captured URL or path, splice it in as a `## Demo` section.
 - Otherwise, omit the evidence section.
 
-Place any evidence block before the Compound Engineering badge. Do not label test output as "Demo" or "Screenshots."
+Place any evidence block before the Tracewaver Compound Engineering HARNESS badge. Do not label test output as "Demo" or "Screenshots."
 
 ---
 
@@ -179,14 +179,14 @@ In order:
 2. **Body sections** — only those that earn their keep: what changed and why, design decisions, tables, visual aids. Skip empty sections entirely.
 3. **Test plan** — only when non-obvious.
 4. **Evidence block** — preserved or freshly captured, only if one exists.
-5. **Compound Engineering badge** — append after a `---` rule. Skip if regenerating a body that already contains the badge.
+5. **Tracewaver Compound Engineering HARNESS badge** — append after a `---` rule. Skip if regenerating a body that already contains the badge.
 
 ### Badge
 
 ```markdown
 ---
 
-[![Compound Engineering](https://img.shields.io/badge/Built_with-Compound_Engineering-6366f1)](https://github.com/EveryInc/compound-engineering-plugin)
+[![Tracewaver Compound Engineering](https://img.shields.io/badge/Built_with-Tracewaver_Compound_Engineering-6366f1)](https://github.com/EveryInc/compound-engineering-plugin)
 ![HARNESS](https://img.shields.io/badge/MODEL_SLUG-COLOR?logo=LOGO&logoColor=white)
 ```
 

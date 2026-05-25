@@ -56,7 +56,7 @@ assert_equal "manifest_name" "traceweaver-core" "$name"
 
 # Check version file content
 version="$(python3 -c "import json; print(json.load(open('$version_file'))['version'])")"
-assert_equal "version_value" "0.1.0" "$version"
+assert_equal "version_value" "0.2.0" "$version"
 
 expected_skills=(
   tw-auto

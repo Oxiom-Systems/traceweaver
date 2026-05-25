@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "0e4555052dcb0d6fd92c37b384c451ab6dd24a0390db89a41fbda643ca7f42a8"
+      "sha256": "c9da1a7ecb950722cd76ab556a3eef46c805e561976a8617c055e70d5d36ecc8"
     },
     {
       "path": "requirements.md",
@@ -14,7 +14,7 @@
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "d52e43b2a528813fbbdf2744c68ababbe1def586ceb7f6e327725595d34ef17c"
+      "sha256": "90247503570e4e0ceff466d3dd480562a1553b672aafaab9a7c336d467c8d2df"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -28,7 +28,7 @@
     "result_records": 36,
     "verification_records": 66,
     "validation_records": 16,
-    "code_anchor_records": 237,
+    "code_anchor_records": 246,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 68,
     "structured_acceptance_missing_requirements": 67,
@@ -376,6 +376,7 @@
       "status": "Approved",
       "trace_ids": [
         "TRACE-TW-002",
+        "TRACE-TW-046",
         "TRACE-TW-051",
         "TRACE-TW-053"
       ]
@@ -1596,11 +1597,11 @@
       "id": "TRACE-TW-046",
       "owner": "Oxiom Systems",
       "needs": "NEED-TW-001; NEED-TW-003; NEED-TW-004; NEED-TW-008",
-      "requirements": "REQ-TW-052; REQ-TW-056; REQ-TW-057; REQ-TW-061",
+      "requirements": "REQ-TW-023; REQ-TW-052; REQ-TW-056; REQ-TW-057; REQ-TW-061",
       "artifact": "ART-TW-060",
       "verification": "VER-TW-059",
       "validation": "VAL-TW-011",
-      "status": "Plan doc review passed; deterministic static implementation added; code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`",
+      "status": "Plan doc review passed; deterministic static implementation added; code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`; active-host currentness code review passed as `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`; approval-only stop regression fixture added in 0.2 release scope",
       "next_step": "Use as reviewed static implementation and active-host filesystem/hash currentness input; runtime, Vestro, publication, package/release, clean replacement, and full autonomous runtime-driver claims remain held"
     },
     {
@@ -2459,14 +2460,14 @@
     },
     {
       "ID": "VER-TW-012",
-      "Requirement": "REQ-TW-020; REQ-TW-022; REQ-TW-024; REQ-TW-041; REQ-TW-060",
+      "Requirement": "REQ-TW-020; REQ-TW-022; REQ-TW-024; REQ-TW-041; REQ-TW-060; REQ-TW-068",
       "Method": "Release / validation review",
-      "Procedure / Command": "Review U7 static/advisory claim record after alpha evidence gates pass; prepare 0.1.0 marketplace metadata; create U9 runtime records later.",
-      "Tested Ref": "`docs/validation/traceweaver-u7-static-advisory-claims.md`; `docs/validation/traceweaver-plugin-0.1-release.md`; future U9 records",
-      "Result": "Pass for narrow U7 static/advisory only / 0.1.0 static marketplace metadata prepared / runtime and publication held",
-      "Evidence Path": "U7 static/advisory evidence plus 0.1.0 metadata record",
-      "Date / Session": "2026-05-23",
-      "Notes": "Prior `/ce-doc-review` passed on the refreshed authority records before the REQ-TW-048 two-mode amendment; `CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001` promoted REQ-TW-048 for static/advisory source-evidence behavior. The 2026-05-23 0.1.0 metadata record prepares Codex/Claude marketplace update paths and the `traceweaver-core--v0.1.0` tag convention, but release-ready/upstream-ready, clean replacement, enforcing mode, slash commands, dynamic discovery, runtime behavior, U9, R31, and actual publication remain held."
+      "Procedure / Command": "Review U7 static/advisory claim record after alpha evidence gates pass; prepare 0.2.0 marketplace metadata; create U9 runtime records later.",
+      "Tested Ref": "`docs/validation/traceweaver-u7-static-advisory-claims.md`; `docs/validation/traceweaver-plugin-0.2-release.md`; future U9 records",
+      "Result": "Pass for narrow U7 static/advisory only / 0.2.0 static marketplace metadata prepared / runtime and publication held",
+      "Evidence Path": "U7 static/advisory evidence plus 0.2.0 metadata record",
+      "Date / Session": "2026-05-25",
+      "Notes": "Prior `/ce-doc-review` passed on the refreshed authority records before the REQ-TW-048 two-mode amendment; `CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001` promoted REQ-TW-048 for static/advisory source-evidence behavior. The 2026-05-25 0.2.0 metadata record prepares Codex/Claude marketplace update paths, Antigravity local install version metadata, and the `traceweaver-core--v0.2.0` tag convention, but release-ready/upstream-ready, clean replacement, enforcing mode, slash commands, dynamic discovery, runtime behavior, U9, R31, and actual publication remain held."
     },
     {
       "ID": "VER-TW-013",
@@ -3579,12 +3580,36 @@
       "Role": "loader-safe-peer-plugin-json"
     },
     {
+      "Artifact Path": "plugins/traceweaver-core/.antigravity-plugin/plugin.json",
+      "Requirement": "REQ-TW-068; REQ-TW-020",
+      "Trace": "TRACE-TW-054",
+      "Verification": "VER-TW-069",
+      "Anchor Type": "Exception",
+      "Role": "loader-safe-antigravity-plugin-json"
+    },
+    {
       "Artifact Path": "CHANGELOG.md",
       "Requirement": "REQ-TW-020",
       "Trace": "TRACE-TW-010",
       "Verification": "VER-TW-012",
       "Anchor Type": "file-role",
       "Role": "plugin-release-changelog"
+    },
+    {
+      "Artifact Path": "docs/validation/traceweaver-plugin-0.2-release.md",
+      "Requirement": "REQ-TW-016; REQ-TW-020; REQ-TW-024; REQ-TW-041; REQ-TW-043; REQ-TW-060; REQ-TW-068",
+      "Trace": "TRACE-TW-010; TRACE-TW-054",
+      "Verification": "VER-TW-012; VER-TW-019; VER-TW-069",
+      "Anchor Type": "validation-record",
+      "Role": "plugin-0.2-release-metadata"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-05-25-plugin-0.2-release-metadata.yml",
+      "Requirement": "REQ-TW-016; REQ-TW-020; REQ-TW-024; REQ-TW-041; REQ-TW-043; REQ-TW-060; REQ-TW-068",
+      "Trace": "TRACE-TW-010; TRACE-TW-054",
+      "Verification": "VER-TW-012; VER-TW-019; VER-TW-069",
+      "Anchor Type": "trace-record",
+      "Role": "plugin-0.2-release-metadata"
     },
     {
       "Artifact Path": "README.md",
@@ -3625,6 +3650,14 @@
       "Verification": "VER-TW-068",
       "Anchor Type": "trace-record",
       "Role": "first-time-docs-guide-record"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml",
+      "Requirement": "REQ-TW-042; REQ-TW-045; REQ-TW-048; REQ-TW-064; REQ-TW-065",
+      "Trace": "TRACE-TW-009; TRACE-TW-021; TRACE-TW-041; TRACE-TW-047; TRACE-TW-053",
+      "Verification": "VER-TW-018; VER-TW-030; VER-TW-053; VER-TW-060; VER-TW-068",
+      "Anchor Type": "trace-record",
+      "Role": "new-project-start-guide-doc-review"
     },
     {
       "Artifact Path": "src/index.ts",
@@ -3683,6 +3716,14 @@
       "Role": "intent-deepening-source-evidence-skill"
     },
     {
+      "Artifact Path": "docs/guides/starting-a-new-project-with-traceweaver.md",
+      "Requirement": "REQ-TW-048",
+      "Trace": "TRACE-TW-009",
+      "Verification": "VER-TW-018",
+      "Anchor Type": "file-role",
+      "Role": "new-project-start-guide"
+    },
+    {
       "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
       "Requirement": "REQ-TW-056",
       "Trace": "TRACE-TW-031",
@@ -3699,6 +3740,14 @@
       "Role": "tw-auto-compatibility-alias-skill"
     },
     {
+      "Artifact Path": "docs/guides/starting-a-new-project-with-traceweaver.md",
+      "Requirement": "REQ-TW-042",
+      "Trace": "TRACE-TW-021",
+      "Verification": "VER-TW-030",
+      "Anchor Type": "file-role",
+      "Role": "new-project-start-guide"
+    },
+    {
       "Artifact Path": "plugins/traceweaver-core/skills/requirements-reviewer/SKILL.md",
       "Requirement": "REQ-TW-010",
       "Trace": "TRACE-TW-041",
@@ -3713,6 +3762,14 @@
       "Verification": "VER-TW-053",
       "Anchor Type": "file-role",
       "Role": "core-traceability-method-skill"
+    },
+    {
+      "Artifact Path": "docs/guides/starting-a-new-project-with-traceweaver.md",
+      "Requirement": "REQ-TW-045",
+      "Trace": "TRACE-TW-041",
+      "Verification": "VER-TW-053",
+      "Anchor Type": "file-role",
+      "Role": "new-project-start-guide"
     },
     {
       "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
@@ -3921,6 +3978,14 @@
       "Verification": "VER-TW-060",
       "Anchor Type": "file-role",
       "Role": "strategy-ideation-orchestrator"
+    },
+    {
+      "Artifact Path": "docs/guides/starting-a-new-project-with-traceweaver.md",
+      "Requirement": "REQ-TW-064",
+      "Trace": "TRACE-TW-047",
+      "Verification": "VER-TW-060",
+      "Anchor Type": "file-role",
+      "Role": "new-project-start-guide"
     },
     {
       "Artifact Path": "plugins/traceweaver-core/skills/using-agent-skills/SKILL.md",
@@ -4524,7 +4589,7 @@
     },
     {
       "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
-      "Requirement": "REQ-TW-056",
+      "Requirement": "REQ-TW-023; REQ-TW-056",
       "Trace": "TRACE-TW-046",
       "Verification": "VER-TW-059",
       "Anchor Type": "file-role",
@@ -4657,6 +4722,14 @@
       "Verification": "VER-TW-059",
       "Anchor Type": "fixture; verifies",
       "Role": "wrapper-handoff-standalone-exceptions-fixture"
+    },
+    {
+      "Artifact Path": "fixtures/tw-skill-behavior/tw-auto-approval-only-stop/loop-state.txt",
+      "Requirement": "REQ-TW-023; REQ-TW-056",
+      "Trace": "TRACE-TW-046",
+      "Verification": "VER-TW-059",
+      "Anchor Type": "fixture; verifies",
+      "Role": "tw-auto-approval-only-stop-fixture"
     },
     {
       "Artifact Path": "Artifact Path",

@@ -35,7 +35,7 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.1.0`
+Plugin version: `0.2.0`
 
 Included skills:
 
@@ -51,9 +51,15 @@ Included skills:
 - `tw-traceability-check`
 - `tw-auto`
 - `tw-plan`
+- `tw-work`
 - `tw-brainstorm`
+- `tw-debug`
+- `tw-code-review`
+- `tw-doc-review`
 - `tw-compound`
 - `tw-compound-refresh`
+- `tw-commit`
+- `tw-commit-push-pr`
 - `tw-resolve-pr-feedback`
 - `tw-sessions`
 - `tw-test-browser`
@@ -150,14 +156,15 @@ claude plugin update traceweaver-core@traceweaver
 ```
 
 Claude Code uses the plugin manifest version as the update cache key for this
-package. Bump both plugin manifests for each release:
+package. Bump every peer plugin manifest carried by the release:
 
 - `plugins/traceweaver-core/.codex-plugin/plugin.json`
 - `plugins/traceweaver-core/.claude-plugin/plugin.json`
 - `plugins/traceweaver-core/.antigravity-plugin/plugin.json`
+- `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.1.0`.
+`traceweaver-core--v0.2.0`.
 
 ## Skill Entry Points
 

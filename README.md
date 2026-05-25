@@ -21,7 +21,7 @@ without losing the proof behind what changed and why.
 
 ### Codex
 
-After the `0.1.0` plugin release is published, add the marketplace:
+After the `0.2.0` plugin release is published, add the marketplace:
 
 ```sh
 codex plugin marketplace add Oxiom-Systems/traceweaver
@@ -89,7 +89,7 @@ Reload active plugins inside Claude Code:
 TraceWeaver includes a Cursor peer manifest at
 `plugins/traceweaver-core/.cursor-plugin/plugin.json`.
 
-Cursor install/update is compatibility-preview only in `0.1.0`: the manifest is
+Cursor install/update is compatibility-preview only in `0.2.0`: the manifest is
 versioned with the Codex and Claude manifests, but TraceWeaver does not yet
 claim a proven Cursor marketplace or runtime install path. Use the Codex or
 Claude setup above for supported alpha plugin use, and treat Cursor testing as
@@ -137,9 +137,11 @@ tw-auto "implement the approved plan"
 
 ## Current Alpha Boundaries
 
-TraceWeaver Core `0.1.0` is an alpha advisory plugin for Codex and Claude Code.
+TraceWeaver Core `0.2.0` is an alpha advisory plugin for Codex and Claude Code.
 It is usable for first-time authority bootstrap, requirements review, planning,
 work handoffs, traceability checks, audits, and controlled review flows.
+Antigravity support is limited to static local install/discovery metadata in
+this release scope; Antigravity workflow invocation remains held.
 Runtime-driver binding, release-ready status, clean CE replacement, enforcing
 mode, slash-command support, unconstrained-host support, and autonomous
 publication remain held until their own evidence gates pass.
@@ -177,6 +179,9 @@ TraceWeaver is useful when you need to answer:
   change, exception, or held claim?
 
 ## First Project
+
+For a step-by-step route from a blank prompt to a reviewed first plan, see
+[Starting A New Project With TraceWeaver](docs/guides/starting-a-new-project-with-traceweaver.md).
 
 TraceWeaver expects three authority files at the root of a consuming project:
 
@@ -336,7 +341,8 @@ tw-doc-review
 
 What is available now:
 
-- installable TraceWeaver Core plugin metadata for Codex and Claude Code;
+- installable TraceWeaver Core plugin metadata for Codex and Claude Code, plus
+  Antigravity local install metadata;
 - TraceWeaver-owned `tw-*` skills and the `lfg` compatibility alias;
 - selected CE-derived workflow components packaged internally;
 - file-based authority model with `requirements.md`,
@@ -418,7 +424,7 @@ validation files when auditing specific claims:
 
 ## Near-Term Next Steps
 
-1. Review the `0.1.0` plugin metadata and publish the release only through the
+1. Review the `0.2.0` plugin metadata and publish the release only through the
    controlled publication route.
 2. Dogfood the alpha on TraceWeaver and Vestro through `tw-auto`, `tw-work`,
    `tw-traceability-check`, `tw-code-review`, and `tw-doc-review`.

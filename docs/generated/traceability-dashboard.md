@@ -9,9 +9,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `0e4555052dcb0d6fd92c37b384c451ab6dd24a0390db89a41fbda643ca7f42a8` |
+| `traceability-matrix.md` | `c9da1a7ecb950722cd76ab556a3eef46c805e561976a8617c055e70d5d36ecc8` |
 | `requirements.md` | `f1f0eca4db4f373bd6064ac86925a914467e0b570c8050f32e12653e148ac7e9` |
-| `.traceweaver/intent-contract.yml` | `d52e43b2a528813fbbdf2744c68ababbe1def586ceb7f6e327725595d34ef17c` |
+| `.traceweaver/intent-contract.yml` | `90247503570e4e0ceff466d3dd480562a1553b672aafaab9a7c336d467c8d2df` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
 
 ## Coverage Counts
@@ -24,7 +24,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | result records | 36 |
 | verification records | 66 |
 | validation records | 16 |
-| code anchor records | 237 |
+| code anchor records | 246 |
 | structured acceptance results | 1 |
 | structured acceptance coverage | 68 |
 | structured acceptance missing requirements | 67 |
@@ -59,7 +59,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | TRACE-TW-049 | REQ-TW-066; REQ-TW-005; REQ-TW-007; REQ-TW-022; REQ-TW-038; REQ-TW-062 | ART-TW-063 | VER-TW-062 | VAL-TW-012 | Authority/status patch implemented; requirements review recorded as revise-before-approval for ra... |
 | TRACE-TW-048 | REQ-TW-065; REQ-TW-038; REQ-TW-054; REQ-TW-055; REQ-TW-056; REQ-TW-057; REQ-T... | ART-TW-062 | VER-TW-061 | VAL-TW-011 | Candidate requirement recorded, static wrapper wording added, deterministic fixture smoke passed,... |
 | TRACE-TW-047 | REQ-TW-064; REQ-TW-041; REQ-TW-043; REQ-TW-045; REQ-TW-048; REQ-TW-051; REQ-T... | ART-TW-061 | VER-TW-060 | VAL-TW-011 | Static implementation and deterministic smokes passed; code review passed / status-hash doc revie... |
-| TRACE-TW-046 | REQ-TW-052; REQ-TW-056; REQ-TW-057; REQ-TW-061 | ART-TW-060 | VER-TW-059 | VAL-TW-011 | Plan doc review passed; deterministic static implementation added; code review passed as `TW-CODE... |
+| TRACE-TW-046 | REQ-TW-023; REQ-TW-052; REQ-TW-056; REQ-TW-057; REQ-TW-061 | ART-TW-060 | VER-TW-059 | VAL-TW-011 | Plan doc review passed; deterministic static implementation added; code review passed as `TW-CODE... |
 | TRACE-TW-045 | REQ-TW-035; REQ-TW-037; REQ-TW-038; REQ-TW-039; REQ-TW-049; REQ-TW-053; REQ-T... | ART-TW-059 | VER-TW-057 | VAL-TW-011 | Deterministic fixture implementation added; code review passed as `TW-CODE-REVIEW-2026-05-12-TW-A... |
 | TRACE-TW-044 | REQ-TW-061; REQ-TW-062; REQ-TW-063 | ART-TW-058 | VER-TW-056 | VAL-TW-011 | Requirements review passed; plan doc review passed; status-hash doc review passed; deterministic ... |
 | TRACE-TW-043 | REQ-TW-041; REQ-TW-043; REQ-TW-052; REQ-TW-059; REQ-TW-060 | ART-TW-057 | VER-TW-055 | VAL-TW-011 | Requirements review passed; authority doc review passed; implementation code review passed |
@@ -75,7 +75,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | TRACE-TW-049 | REQ-TW-066; REQ-TW-005; REQ-TW-007; REQ-TW-022; REQ-TW-038; REQ-TW-062 | Authority/status patch implemented; requirements review recorded as revise-before-approval for raw wording ... | Use as evidence-pack mechanism on the next real closure claim; do not claim runtime enforcement, broad retrospective validation... |
 | TRACE-TW-048 | REQ-TW-065; REQ-TW-038; REQ-TW-054; REQ-TW-055; REQ-TW-056; REQ-TW-057; REQ-T... | Candidate requirement recorded, static wrapper wording added, deterministic fixture smoke passed, and scope... | Runtime enforcement, active-host currentness, Vestro/R31 dogfood, publication, release/package/upstream readiness, clean replac... |
 | TRACE-TW-047 | REQ-TW-064; REQ-TW-041; REQ-TW-043; REQ-TW-045; REQ-TW-048; REQ-TW-051; REQ-T... | Static implementation and deterministic smokes passed; code review passed / status-hash doc review passed; ... | Strategy/ideation output remains source evidence and cannot approve requirements, validation, implementation, publication, rele... |
-| TRACE-TW-046 | REQ-TW-052; REQ-TW-056; REQ-TW-057; REQ-TW-061 | Plan doc review passed; deterministic static implementation added; code review passed as `TW-CODE-REVIEW-20... | Use as reviewed static implementation and active-host filesystem/hash currentness input; runtime, Vestro, publication, package/... |
+| TRACE-TW-046 | REQ-TW-023; REQ-TW-052; REQ-TW-056; REQ-TW-057; REQ-TW-061 | Plan doc review passed; deterministic static implementation added; code review passed as `TW-CODE-REVIEW-20... | Use as reviewed static implementation and active-host filesystem/hash currentness input; runtime, Vestro, publication, package/... |
 | TRACE-TW-045 | REQ-TW-035; REQ-TW-037; REQ-TW-038; REQ-TW-039; REQ-TW-049; REQ-TW-053; REQ-T... | Deterministic fixture implementation added; code review passed as `TW-CODE-REVIEW-2026-05-12-TW-AUTO-POST-W... | Use as reviewed static implementation input; runtime, Vestro behavior, publication, package/release, clean replacement, and act... |
 | TRACE-TW-044 | REQ-TW-061; REQ-TW-062; REQ-TW-063 | Requirements review passed; plan doc review passed; status-hash doc review passed; deterministic fixture sm... | Use as deterministic static implementation input only; runtime, Vestro dogfood, package/release, semantic-completeness, and aut... |
 | TRACE-TW-043 | REQ-TW-041; REQ-TW-043; REQ-TW-052; REQ-TW-059; REQ-TW-060 | Requirements review passed; authority doc review passed; implementation code review passed | Use as reviewed static authority and code-review-passed implementation input after status/hash doc review passed; runtime enfor... |

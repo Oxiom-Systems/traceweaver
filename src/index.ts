@@ -498,7 +498,7 @@ function installAntigravitySkills(options: InstallOptions): void {
 
   // Copy manifest and version
   cpSync(sourceManifestPath, targetManifestPath);
-  writeFileSync(targetVersionPath, JSON.stringify({ version: "0.1.0" }) + "\n");
+  writeFileSync(targetVersionPath, JSON.stringify({ version: "0.2.0" }) + "\n");
 
   // Copy user-callable skills
   for (const skillName of callableSkills) {
