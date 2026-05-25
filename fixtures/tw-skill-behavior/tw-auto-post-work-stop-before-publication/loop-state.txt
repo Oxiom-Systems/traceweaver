@@ -1,0 +1,13 @@
+TRACEWEAVER: file-role=post-work-publication-boundary-fixture; req=REQ-TW-056; trace=TRACE-TW-045; ver=VER-TW-057
+scenario=tw_auto_post_work_stop_before_publication
+user_boundary=stop_before_commit_push_pr
+work_result=tw_work_completed
+explicit_stop_after_work=false
+explicit_do_not_review=false
+expected_internal_continuation=tw_traceability_check_then_tw_code_review_then_scoped_tw_doc_review_when_docs_changed
+publication_actions_allowed=false
+final_stop_reason=publication_boundary
+next_step_required=true
+expected_next_wrapper=tw-work_or_tw-commit_or_tw-commit-push-pr
+forbidden_output=implementation_summary_without_next_step
+accepted_scope=deterministic_fixture_only_no_runtime_pass

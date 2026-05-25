@@ -325,6 +325,18 @@ tw-work", "stop after implementation", "do not review", or equivalent,
 done, traceability-complete, review-complete, publication-ready, release-ready,
 runtime-equivalent, or clean replacement.
 
+"Stop before commit/push/PR", "stop before publication", "do not commit",
+"do not push", "do not open a PR", and equivalent publication-boundary wording
+are not stop-after-work or do-not-review instructions. They mean `tw-auto` must
+continue through the internal post-work traceability and review closure above,
+then stop before any publication action. That final stop must name the exact
+publication boundary, the review/traceability state reached, held claims, and
+the highest-level next wrapper for the next allowed action, normally `tw-work`
+to record clean held-review state, `tw-commit` for an explicitly requested local
+commit path, or `tw-commit-push-pr` for an explicitly requested push/PR path.
+It must not end with only the implementation summary, verification list, changed
+files, or held scope.
+
 `tw-auto` must stop instead of continuing post-work closure when `tw-work`
 reports unclear, missing, contradictory, incomplete, stale, or changed
 authority; unresolved P0/P1 traceability findings that need human authority;
