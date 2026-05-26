@@ -9,6 +9,10 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-055; req=REQ-TW-060; trace=TRACE-TW-043
 # TRACEWEAVER: file-role=audit-wrapper-host-runtime-smoke; req=REQ-TW-061; trace=TRACE-TW-052; ver=VER-TW-065
 # TRACEWEAVER: verifies=VER-TW-065; req=REQ-TW-061; trace=TRACE-TW-052
+# TRACEWEAVER: file-role=requirements-quality-active-host-smoke; req=REQ-TW-069; trace=TRACE-TW-055; ver=VER-TW-071
+# TRACEWEAVER: verifies=VER-TW-071; req=REQ-TW-069; trace=TRACE-TW-055
+# TRACEWEAVER: file-role=requirements-quality-runtime-output-smoke; req=REQ-TW-069; trace=TRACE-TW-055; ver=VER-TW-072
+# TRACEWEAVER: verifies=VER-TW-072; req=REQ-TW-069; trace=TRACE-TW-055
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 codex_home="${CODEX_HOME:-$HOME/.codex}"
@@ -25,13 +29,29 @@ reasoning_effort="${TRACEWEAVER_CODEX_REASONING_EFFORT:-medium}"
 exec_timeout_seconds="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-60}"
 host_runtime_exec="${TRACEWEAVER_HOST_RUNTIME_EXEC:-1}"
 host_runtime_skill="${TRACEWEAVER_HOST_RUNTIME_SKILL:-tw-authority-gate}"
+host_runtime_proof="${TRACEWEAVER_HOST_RUNTIME_PROOF:-skill-file-read}"
 
 case "$host_runtime_skill" in
-  tw-authority-gate|tw-audit)
+  tw-authority-gate|tw-audit|tw-requirements-review)
     ;;
   *)
     echo "unsupported_traceweaver_host_runtime_skill=$host_runtime_skill" >&2
     exit 64
+    ;;
+esac
+
+case "$host_runtime_proof" in
+  skill-file-read)
+    ;;
+  requirements-review-output)
+    if [ "$host_runtime_skill" != "tw-requirements-review" ]; then
+      echo "unsupported_traceweaver_host_runtime_proof_target=$host_runtime_skill" >&2
+      exit 65
+    fi
+    ;;
+  *)
+    echo "unsupported_traceweaver_host_runtime_proof=$host_runtime_proof" >&2
+    exit 66
     ;;
 esac
 
@@ -224,6 +244,7 @@ if [ -f "$host_model_policy_reference" ]; then
 fi
 
 runtime_tmp="$(mktemp -d /tmp/traceweaver-host-runtime.XXXXXX)"
+requirements_review_runtime_prompt="$repo_root/fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt"
 prompt_input="$runtime_tmp/prompt-input.json"
 visible_skills="$runtime_tmp/visible-skills.txt"
 prompt="$runtime_tmp/prompt.txt"
@@ -248,6 +269,14 @@ exactly with this one line and nothing else:
 
 TRACEWEAVER_SKILL_HELD=not_available
 EOF
+
+if [ "$host_runtime_proof" = "requirements-review-output" ]; then
+  if [ ! -f "$requirements_review_runtime_prompt" ]; then
+    echo "missing_requirements_review_runtime_prompt=$requirements_review_runtime_prompt" >&2
+    exit 67
+  fi
+  cp "$requirements_review_runtime_prompt" "$prompt"
+fi
 
 set +e
 codex debug prompt-input "Use TraceWeaver required direct skills: tw-authority-gate tw-auto tw-strategy tw-ideate tw-plan tw-brainstorm tw-audit lfg tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-commit tw-commit-push-pr tw-grill." >"$prompt_input" 2>"$runtime_tmp/prompt-input.err"
@@ -340,6 +369,7 @@ fi
 
 echo "codex_host_runtime_exec_enabled=$host_runtime_exec"
 echo "codex_host_runtime_skill=$host_runtime_skill"
+echo "codex_host_runtime_proof=$host_runtime_proof"
 echo "codex_host_runtime_model=$model"
 echo "codex_host_runtime_reasoning_effort=$reasoning_effort"
 echo "codex_host_model_default_policy_codex_model=$expected_codex_model"
@@ -368,13 +398,50 @@ echo "codex_host_expected_tw_authority_gate_hash=${expected_authority_gate_hash:
 echo "codex_host_expected_runtime_skill_hash=${expected_runtime_skill_hash:-missing}"
 echo "codex_host_exec_exit_code=$exec_status"
 
+host_registry_untrusted=0
+if [ "${#missing[@]}" -ne 0 ] \
+  || [ "${#stale[@]}" -ne 0 ] \
+  || [ "${#unmarked[@]}" -ne 0 ] \
+  || [ "${#missing_prompt_input_skills[@]}" -ne 0 ]; then
+  host_registry_untrusted=1
+fi
+
 if [ "$host_runtime_exec" != "1" ]; then
   echo "real_tw_skill_runtime_invocation=held_host_runtime_exec_disabled"
 elif [ "$exec_status" -ne 0 ]; then
   echo "real_tw_skill_runtime_invocation=held_host_codex_exec_failed"
 elif [ "$normalized_message" = "TRACEWEAVER_SKILL_HELD=not_available" ] || printf '%s' "$normalized_message" | grep -Eiq "(not available|not listed|not loaded|cannot be used|unavailable|not found|no such skill)"; then
   echo "real_tw_skill_runtime_invocation=held_host_exec_skill_not_available"
-elif [ -n "$expected_runtime_skill_hash" ] && [ "$normalized_message" = "TRACEWEAVER_SKILL_HASH=$expected_runtime_skill_hash" ] && { [ "${#missing[@]}" -ne 0 ] || [ "${#stale[@]}" -ne 0 ] || [ "${#unmarked[@]}" -ne 0 ] || [ "${#missing_prompt_input_skills[@]}" -ne 0 ]; }; then
+elif [ "$host_runtime_proof" = "requirements-review-output" ]; then
+  required_runtime_lines=(
+    "TRACEWEAVER_TW_REQUIREMENTS_REVIEW_SENTINEL=pass"
+    "TRACEWEAVER_TW_REQUIREMENTS_REVIEW_SKILL_HASH=$expected_runtime_skill_hash"
+    "requirements_reviewed=REQ-FIXTURE-QUALITY-001"
+    "classification=requirement"
+    "quality_score=5"
+    "default_outcome=Can approve"
+    "score_boundary=triage_not_approval_authority"
+    "requirement_set_quality_findings=none"
+    "authority_ready=static_advisory_only"
+    "publication=held"
+    "accepted_traceweaver_input=false"
+  )
+  missing_runtime_line=""
+  for runtime_line in "${required_runtime_lines[@]}"; do
+    if ! grep -Fxq "$runtime_line" "$last_message"; then
+      missing_runtime_line="$runtime_line"
+      break
+    fi
+  done
+  if [ -n "$missing_runtime_line" ]; then
+    echo "real_tw_skill_runtime_invocation=held_requirements_review_output_missing_required_field"
+    echo "real_tw_requirements_review_missing_runtime_field=$missing_runtime_line"
+  elif [ "$host_registry_untrusted" -ne 0 ]; then
+    echo "real_tw_skill_runtime_invocation=held_host_registry_untrusted_after_requirements_review_output"
+  else
+    echo "real_tw_skill_runtime_invocation=pass_host_tw_requirements_review_runtime_output_fixture"
+  fi
+elif [ -n "$expected_runtime_skill_hash" ] && [ "$normalized_message" = "TRACEWEAVER_SKILL_HASH=$expected_runtime_skill_hash" ] && [ "$host_registry_untrusted" -ne 0 ]; then
   echo "real_tw_skill_runtime_invocation=held_host_registry_untrusted_after_skill_hash_sentinel"
 elif [ -n "$expected_runtime_skill_hash" ] && [ "$normalized_message" = "TRACEWEAVER_SKILL_HASH=$expected_runtime_skill_hash" ]; then
   normalized_runtime_skill="${host_runtime_skill//-/_}"

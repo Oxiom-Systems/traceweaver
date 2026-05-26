@@ -45,9 +45,36 @@ guidance.
 3. Classify each candidate item as requirement, need, idea, assumption, design
    note, constraint, acceptance criterion, verification evidence, validation
    evidence, or traceability gap.
-4. Mark weak, ambiguous, unverifiable, source-free, or unapproved requirements
+4. Assign each real requirement a 0-5 quality score using the
+   `requirements-reviewer` ranking model. Use the score to summarize and
+   prioritize requirement quality only; do not let a numeric score override
+   blocking authority, verification, validation, source, or human-decision
+   gaps.
+5. Mark weak, ambiguous, unverifiable, source-free, or unapproved requirements
    as `Needs revision`, `Blocked`, `Human decision`, or `Reclassify`.
-5. State whether the reviewed material can become implementation authority.
+6. Review set-level quality across the candidate requirements: orphaned needs,
+   missing allocation, duplication, conflicts, mixed abstraction levels, and
+   missing verification or validation coverage.
+7. State whether the reviewed material can become implementation authority.
+
+## Requirement Quality Ranking
+
+For each real requirement, include the `requirements-reviewer` quality score:
+
+| Score | Meaning | Default Outcome |
+|---:|---|---|
+| 5 | Clear, typed, traceable, verifiable, validatable, and approvable | Can approve |
+| 4 | Mostly sound with minor metadata or wording edits | Revise |
+| 3 | Understandable but incomplete, weakly testable, or missing trace/V&V detail | Revise |
+| 2 | Ambiguous, compound, unverifiable, conflicting, or unsafe as authority | Block |
+| 1 | Not actually a requirement or mostly a design note/idea | Reclassify |
+| 0 | Contradictory, hazardous, or unusable as written | Block |
+
+The score is a triage signal, not approval authority. Any block condition,
+missing human decision, missing source basis, missing objective verification,
+or missing validation path still prevents authority promotion until revised,
+held by an approved gap/risk/exception, or explicitly accepted by the project
+owner.
 
 ## Highest-Level Handoff Discipline
 
@@ -68,10 +95,12 @@ Return:
 
 - requirements reviewed
 - authority-ready requirements
+- requirement quality scores ranked 0-5 with default outcome
 - blocked requirements
 - required revisions
 - human decisions
 - verification/validation gaps
+- requirement-set quality findings
 - traceability impact
 - highest-level next TraceWeaver wrapper command or exact human decision
 

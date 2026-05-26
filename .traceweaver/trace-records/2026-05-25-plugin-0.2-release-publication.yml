@@ -1,0 +1,82 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-25-PLUGIN-0.2-RELEASE-PUBLICATION-001
+record_type: publication_trace
+created_at: "2026-05-25"
+owner: Oxiom Systems
+status: exact_0_2_0_tag_and_github_release_published_runtime_claims_held
+
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_source: requirements.md
+intent_contract: .traceweaver/intent-contract.yml
+release_metadata_record: .traceweaver/trace-records/2026-05-25-plugin-0.2-release-metadata.yml
+
+requirements:
+  - REQ-TW-016
+  - REQ-TW-020
+  - REQ-TW-023
+  - REQ-TW-024
+  - REQ-TW-041
+  - REQ-TW-043
+  - REQ-TW-056
+  - REQ-TW-060
+  - REQ-TW-068
+trace_ids:
+  - TRACE-TW-010
+  - TRACE-TW-046
+  - TRACE-TW-054
+verification_ids:
+  - VER-TW-012
+  - VER-TW-019
+  - VER-TW-057
+  - VER-TW-059
+  - VER-TW-069
+validation_question: "Was TraceWeaver Core 0.2.0 published at the exact reviewed tag and commit while keeping runtime, release-ready/package-ready, clean replacement, and autonomous-publication claims held?"
+
+publication_observed:
+  repository: Oxiom-Systems/traceweaver
+  tag: traceweaver-core--v0.2.0
+  tag_ref_sha: 3fd442a90c86c2b1ab76436677933b3386045cda
+  release_name: TraceWeaver Core 0.2.0
+  release_url: https://github.com/Oxiom-Systems/traceweaver/releases/tag/traceweaver-core--v0.2.0
+  release_commit: fc1d3058a0cc98fb3187e7576ec13320e4879aa8
+  target_commitish: main
+  published_at: "2026-05-25T12:22:41Z"
+  is_draft: false
+  is_prerelease: false
+  author: jjziets
+
+observed_commands:
+  - "git rev-parse HEAD: fc1d3058a0cc98fb3187e7576ec13320e4879aa8"
+  - "git rev-parse origin/main: fc1d3058a0cc98fb3187e7576ec13320e4879aa8"
+  - "git rev-parse traceweaver-core--v0.2.0^{commit}: fc1d3058a0cc98fb3187e7576ec13320e4879aa8"
+  - "git show-ref --tags traceweaver-core--v0.2.0: 3fd442a90c86c2b1ab76436677933b3386045cda refs/tags/traceweaver-core--v0.2.0"
+  - "gh release view traceweaver-core--v0.2.0: published release, not draft, not prerelease"
+
+pre_publication_verification_summary:
+  - JSON validation passed for Codex, Claude, Antigravity, Cursor plugin and marketplace manifests.
+  - YAML validation passed for Intent Contract and 0.2 release trace records.
+  - Claude plugin validation passed for repository and plugin manifests.
+  - Claude plugin tag dry-run computed traceweaver-core--v0.2.0 before tag creation.
+  - Codex discovery, separate-home runtime-disabled, Antigravity discovery, controlled-publication, tw-skill-behavior, code-anchor traceability, generated traceability views, and whitespace checks passed.
+  - The older local Codex plugin-validator helper path was absent in this host; JSON and available plugin validations passed.
+
+published_scope:
+  - TraceWeaver Core 0.2.0 static/advisory plugin metadata.
+  - Codex, Claude Code, Antigravity, and Cursor peer manifests at version 0.2.0.
+  - Antigravity local install/discovery support.
+  - tw-auto approval-only next-step handoff repair.
+  - tw-auto stop-before-publication next-step handoff repair from PR #27.
+  - PR badge wording update.
+
+held_claims:
+  - runtime-driver invocation
+  - release-ready status
+  - package-ready status
+  - upstream-ready status
+  - clean CE replacement
+  - enforcing authority gate behavior
+  - slash-command availability
+  - unconstrained-host support
+  - R31 real-project validation closure
+  - autonomous publication beyond this explicit user-authorized 0.2.0 release
+
+next_step: "Run tw-doc-review on this post-release evidence record before treating it as accepted TraceWeaver evidence."
