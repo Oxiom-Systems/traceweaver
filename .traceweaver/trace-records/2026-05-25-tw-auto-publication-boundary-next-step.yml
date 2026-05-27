@@ -23,7 +23,7 @@ scope:
   - scripts/traceweaver-smoke-tw-skill-behavior
   - fixtures/tw-skill-behavior/tw-auto-post-work-stop-before-publication/loop-state.txt
   - traceability-matrix.md
-  - /Users/hanneszietsman/.codex/skills/tw-auto/SKILL.md
+  - redacted active-host tw-auto skill path
 
 problem_observed:
   summary: >
@@ -40,7 +40,7 @@ repair:
     internal post-work traceability and review closure before stopping at the
     publication boundary. The final stop must name the review/traceability state,
     held claims, and next highest-level wrapper.
-  active_host_copy: /Users/hanneszietsman/.codex/skills/tw-auto/SKILL.md
+  active_host_copy: redacted active-host tw-auto skill path
 
 verification_observed:
   - "TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior: pass"
@@ -77,7 +77,7 @@ artifact_hashes_before_commit:
   docs/generated/traceability-dashboard.md: be2b9ae93931a6744761fe8bdde80c365718eab57f34c4d2293cef69f4c202d7
   docs/generated/traceability-data.json: f0d02b3042e04af0d0432ac9053c4d62965544af2b8cd6e35ca37d608c61fa33
   docs/generated/traceability-graph.mmd: 93d6b027d4792a699f40f868792a2fe07a91d07bbe553ffd91393b3a8a399cd3
-  /Users/hanneszietsman/.codex/skills/tw-auto/SKILL.md: de8a921241fd7036e7945b968e4ed955363d590035745d721622786f2e2cfef1
+  redacted active-host tw-auto skill path: de8a921241fd7036e7945b968e4ed955363d590035745d721622786f2e2cfef1
 
 held_claims:
   - runtime-driver invocation

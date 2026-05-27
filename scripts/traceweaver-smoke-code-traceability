@@ -84,7 +84,7 @@ run_blocked_all() {
   echo "code_traceability_${label}=blocked findings=$expected_findings_csv"
 }
 
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-code-traceability.XXXXXX")"
+TMP_DIR="$(mktemp -d)"
 repo_before="$(authority_fingerprint)"
 
 # TRACEWEAVER: entrypoint=complete_fixture_positive_control; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041

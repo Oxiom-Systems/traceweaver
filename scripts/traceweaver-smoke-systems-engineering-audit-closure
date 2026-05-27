@@ -11,7 +11,7 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SCANNER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors"
 CONTRACT="$ROOT_DIR/plugins/traceweaver-core/references/traceweaver-systems-engineering-audit-closure.md"
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-systems-engineering-audit.XXXXXX")"
+TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 AUDIT_REQ_PREFIX="REQ-AUDIT"

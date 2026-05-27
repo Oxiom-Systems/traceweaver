@@ -243,7 +243,7 @@ if [ -f "$host_model_policy_reference" ]; then
   host_model_policy_hash="$(hash_file "$host_model_policy_reference")"
 fi
 
-runtime_tmp="$(mktemp -d /tmp/traceweaver-host-runtime.XXXXXX)"
+runtime_tmp="$(mktemp -d)"
 requirements_review_runtime_prompt="$repo_root/fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt"
 prompt_input="$runtime_tmp/prompt-input.json"
 visible_skills="$runtime_tmp/visible-skills.txt"

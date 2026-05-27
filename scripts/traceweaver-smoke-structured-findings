@@ -42,7 +42,7 @@ require_file() {
   fi
 }
 
-tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-structured-findings.XXXXXX")"
+tmp_dir="$(mktemp -d)"
 findings_tsv="$tmp_dir/findings.tsv"
 findings_jsonl="$tmp_dir/structured-findings.jsonl"
 findings_md="$tmp_dir/structured-findings.md"

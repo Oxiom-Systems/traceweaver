@@ -1,6 +1,6 @@
 # TraceWeaver Plugin 0.2 Release Metadata Record
 
-Status: `STATIC_MARKETPLACE_METADATA_PREPARED_PUBLICATION_COMPLETE`
+Status: `STATIC_MARKETPLACE_METADATA_PREPARED_0_2_0_AND_0_2_1_PUBLICATION_COMPLETE_0_2_2_PUBLICATION_PENDING`
 
 Date/session: 2026-05-25, Codex, branch
 `codex/guide-0.2-antigravity-release` worktree
@@ -200,5 +200,51 @@ Observed 0.2.1 verification on 2026-05-26:
 - Separate-home Codex install passed and runtime remained expected-held without
   copied auth in the isolated `CODEX_HOME`.
 
-Publication remains pending because exact tag/GitHub release mutation must run
-through a clean controlled-publication route for `traceweaver-core--v0.2.1`.
+Publication is confirmed complete for `traceweaver-core--v0.2.1`: read-only
+checks reported non-draft GitHub release `TraceWeaver Core 0.2.1` published at
+2026-05-27T10:17:58Z and remote tag
+`35b3f850681a1fea571a3148950525a364457e7d`.
+
+## 0.2.2 Update Scope
+
+TraceWeaver Core 0.2.2 is a scoped patch release for install/update guidance
+and selected Compound Engineering 3.9.0 continuity evidence:
+
+- Codex, Claude Code, Antigravity, and Cursor peer manifests carry version
+  `0.2.2`.
+- Claude marketplace metadata carries version `0.2.2`.
+- README and plugin README install examples use the pinned
+  `traceweaver-core--v0.2.2` release snapshot.
+- Antigravity local install writes `installed_version.json` with `0.2.2`.
+- The selected CE-derived implementation component inventory remains pinned to
+  `compound-engineering-v3.9.0` / `cli-v3.9.0` at
+  `e2c9cd23525eeb1ecddd637e027d53b02f892e7b`.
+
+Wrapper delta check against the CE 3.5.0 baseline:
+
+- The redacted CE 3.5.0 baseline cache has 39 skill directories, including
+  `lfg`.
+- TraceWeaver packages 18 selected `ce-*` implementation component skill
+  directories plus the TraceWeaver-owned `lfg` alias.
+- The CE 3.5.0 split session helpers `ce-session-extract` and
+  `ce-session-inventory` are not selected in the CE 3.9.0 package surface;
+  `tw-sessions` routes through selected `ce-sessions`.
+- The remaining CE 3.5.0 surfaces not packaged as selected TraceWeaver CE
+  components remain held or out of scope until separately classified, wrapped,
+  proven, and reviewed.
+- `scripts/traceweaver-classify-ce-replacement` was run during 0.2.2 prep and
+  returned `failed_static_readiness` with stale classifier rows and unclassified
+  newer `tw-*` wrapper surfaces. That result is recorded as a held wrapper
+  classifier refresh need, not as clean replacement evidence.
+
+This update still does not approve package-ready, release-ready,
+upstream-ready, clean replacement, enforcing behavior, slash-command support,
+unconstrained-host support, broad runtime behavior, runtime-equivalent CE
+behavior, R31 real-project validation closure, Vestro dogfood evidence, or
+autonomous publication.
+
+Observed 0.2.2 verification is recorded in
+`.traceweaver/trace-records/2026-05-27-plugin-0.2.2-release-metadata.yml`.
+Next step: exact `traceweaver-core--v0.2.2` tag/GitHub Release publication
+remains held until target confirmation and a clean controlled
+`tw-commit-push-pr` publication action.

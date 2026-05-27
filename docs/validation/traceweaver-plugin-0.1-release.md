@@ -69,7 +69,7 @@ Observed checks for this metadata update:
 
 ```text
 python3 -m json.tool ...: pass for Codex/Claude/Cursor plugin and marketplace JSON
-python3 /Users/hanneszietsman/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/traceweaver-core: pass
+python3 redacted active-host plugin-creator validate_plugin.py plugins/traceweaver-core: pass
 claude plugin validate --strict .: pass
 claude plugin validate --strict plugins/traceweaver-core: pass
 claude plugin tag --dry-run --force plugins/traceweaver-core: pass, computed traceweaver-core--v0.1.0
@@ -87,7 +87,7 @@ git diff --check: pass
 Run these checks again before tagging or publishing a release:
 
 ```sh
-python3 /Users/hanneszietsman/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/traceweaver-core
+python3 redacted active-host plugin-creator validate_plugin.py plugins/traceweaver-core
 claude plugin validate .
 claude plugin validate plugins/traceweaver-core
 claude plugin tag --dry-run plugins/traceweaver-core

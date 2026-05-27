@@ -509,7 +509,7 @@ Acceptance:
    filesystem/hash currentness evidence for this changed source set:
    reconciliation backed up stale `ce-debug`, `tw-authority-gate`, `tw-grill`,
    `tw-requirements-review`, and `tw-traceability-check` under
-   `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260512T162740Z`;
+   `redacted active-host reconciliation backup`;
    host registry smoke reports no missing, unmarked, stale, missing
    skill-local, or stale skill-local files; TW skill behavior smoke reports
    `active_host_tw_auto_review_routing_surface=pass_host_review_routing_skill_hashes_current`.

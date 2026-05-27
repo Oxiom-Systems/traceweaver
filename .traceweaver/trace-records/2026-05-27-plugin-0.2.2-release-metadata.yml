@@ -1,0 +1,169 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-27-PLUGIN-0.2.2-RELEASE-METADATA-001
+record_type: implementation_trace
+created_at: "2026-05-27"
+owner: Oxiom Systems
+status: release_0_2_2_metadata_verified_publication_and_runtime_readiness_claims_held
+
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_source: requirements.md
+intent_contract: .traceweaver/intent-contract.yml
+
+requirements:
+  - REQ-TW-016
+  - REQ-TW-017
+  - REQ-TW-020
+  - REQ-TW-023
+  - REQ-TW-041
+  - REQ-TW-043
+  - REQ-TW-051
+  - REQ-TW-052
+  - REQ-TW-059
+  - REQ-TW-060
+  - REQ-TW-068
+trace_ids:
+  - TRACE-TW-010
+  - TRACE-TW-024
+  - TRACE-TW-025
+  - TRACE-TW-046
+  - TRACE-TW-054
+verification_ids:
+  - VER-TW-012
+  - VER-TW-019
+  - VER-TW-033
+  - VER-TW-034
+  - VER-TW-059
+  - VER-TW-069
+  - VER-TW-074
+
+intent_served:
+  - INTENT-TW-003
+  - INTENT-TW-004
+  - INTENT-TW-005
+  - INTENT-TW-007
+  - INTENT-TW-008
+
+scope:
+  - README.md
+  - plugins/traceweaver-core/README.md
+  - CHANGELOG.md
+  - .claude-plugin/marketplace.json
+  - plugins/traceweaver-core/.codex-plugin/plugin.json
+  - plugins/traceweaver-core/.claude-plugin/plugin.json
+  - plugins/traceweaver-core/.antigravity-plugin/plugin.json
+  - plugins/traceweaver-core/.cursor-plugin/plugin.json
+  - src/index.ts
+  - scripts/traceweaver-smoke-antigravity-discovery
+  - plugins/traceweaver-core/references/ce-upstream-source-inventory.md
+  - plugins/traceweaver-core/references/ce-replacement-classification.yml
+  - docs/validation/traceweaver-core-11-ce-runtime-inventory.md
+  - docs/validation/traceweaver-plugin-0.2-release.md
+  - docs/validation/traceweaver-ce-replacement-classification.md
+  - .traceweaver/ce-replacement-classification.generated.json
+  - docs/guides/traceweaver-from-prompt-to-proof.md
+  - traceability-matrix.md
+  - .traceweaver/trace-records/2026-05-27-plugin-0.2.2-release-metadata.yml
+  - docs/generated/traceability-dashboard.md
+  - docs/generated/traceability-data.json
+  - docs/generated/traceability-graph.mmd
+
+release:
+  version: "0.2.2"
+  intended_tag: traceweaver-core--v0.2.2
+  intended_release_name: TraceWeaver Core 0.2.2
+  previous_prepared_release_tag: traceweaver-core--v0.2.1
+  previous_prepared_release_commit: 649b605
+  previous_prepared_release_publication_status: published_non_draft_github_release_confirmed_by_read_only_check
+  previous_prepared_release_publication_evidence:
+    release_name: TraceWeaver Core 0.2.1
+    published_at: "2026-05-27T10:17:58Z"
+    tag_sha: 35b3f850681a1fea571a3148950525a364457e7d
+  release_reason: install/update documentation and metadata for selected CE 3.9.0 static compatibility surface
+
+wrapper_delta_check:
+  baseline_source: CE 3.5.0 local baseline cache; private host path redacted from tracked release evidence
+  baseline_skill_dirs_including_lfg: 39
+  selected_traceweaver_ce_skill_dirs: 18
+  selected_traceweaver_aliases:
+    - lfg delegates to tw-auto
+  removed_from_selected_surface_since_ce_3_5_0:
+    - ce-session-extract
+    - ce-session-inventory
+  selected_session_route: tw-sessions wraps selected ce-sessions
+  held_observation: scripts/traceweaver-classify-ce-replacement currently returns failed_static_readiness because classifier rows predate the CE 3.9.0 selected refresh and newer tw-* wrapper surfaces.
+  allowed_use: install/update metadata and held wrapper-refresh evidence only
+
+verification_required:
+  - JSON validation for peer plugin manifests and marketplace metadata
+  - YAML validation for trace records and Intent Contract
+  - Claude plugin validation and tag dry-run
+  - Codex discovery smoke with runtime execution disabled
+  - Codex separate-home install/runtime boundary smoke
+  - Antigravity local install/discovery smoke
+  - controlled publication-route smoke
+  - tw-skill-behavior smoke with runtime disabled
+  - wrapper delta check against CE 3.5.0 baseline
+  - implementation-mode code-anchor scan for changed behavior-bearing files
+  - code-traceability fixture smoke
+  - generated traceability views and drift smoke
+  - git diff whitespace check
+
+verification_observed:
+  - result: pass
+    command: python3 -m json.tool for .claude-plugin/marketplace.json and peer plugin manifests
+  - result: pass
+    command: ruby YAML.load_file for .traceweaver/intent-contract.yml and this trace record
+  - result: pass
+    command: claude plugin validate --strict . && claude plugin validate --strict plugins/traceweaver-core && claude plugin tag --dry-run --force plugins/traceweaver-core
+    observed: dry-run would create traceweaver-core--v0.2.2
+  - result: pass
+    command: TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
+    observed: selected packaged skills visible; installed CE-derived components absent from the direct Codex callable surface; lfg delegation present; raw CE autopilot absent
+  - result: held_pass
+    command: TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=10 scripts/traceweaver-smoke-codex-separate-home-runtime
+    observed: isolated install and skill visibility passed; Codex exec returned 142 under isolated unauthenticated home; runtime invocation remains held without auth copy
+  - result: pass
+    command: scripts/traceweaver-smoke-antigravity-discovery
+    observed: Antigravity install metadata wrote and verified version 0.2.2
+  - result: pass
+    command: scripts/traceweaver-smoke-controlled-publication
+    observed: negative publication routes blocked and no-real-remote dry run allowed without external mutation
+  - result: pass_with_held_observations
+    command: TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior
+    observed: wrapper behavior fixtures passed; active-host CE-derived component hash currentness and active-host review routing remain held where host cache is stale
+  - result: held_fail_expected
+    command: scripts/traceweaver-classify-ce-replacement
+    observed: failed_static_readiness because classifier rows and unclassified tw-* surfaces require a follow-up CE 3.9.0 wrapper classifier refresh before any clean-replacement claim
+  - result: pass
+    command: plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-file ...
+    observed: code_traceability_status=pass for changed behavior-bearing files
+  - result: pass
+    command: scripts/traceweaver-smoke-code-traceability
+    observed: code-traceability fixture suite passed, including generated-file and changed-file-scope cases
+  - result: pass
+    command: scripts/traceweaver-generate-traceability-views --root .
+  - result: pass
+    command: scripts/traceweaver-smoke-traceability-generated-views
+  - result: pass
+    command: git diff --check
+
+validation_question: "Can users install or update TraceWeaver Core 0.2.2 from the pinned release snapshot and receive the selected CE 3.9.0 static compatibility surface without expanding release-ready, package-ready, broad runtime, clean replacement, runtime-equivalent CE behavior, R31/Vestro validation, or autonomous-publication claims?"
+
+held_claims:
+  - broad runtime behavior
+  - runtime-driver invocation
+  - clean CE replacement
+  - runtime-equivalent CE behavior
+  - package-ready status
+  - release-ready status
+  - upstream-ready status
+  - R31 real-project validation closure
+  - Vestro dogfood evidence
+  - slash-command or prompt availability
+  - enforcing authority gate behavior
+  - unconstrained-host support
+  - autonomous publication
+
+publication_boundary:
+  publication_requested_by_user: "release 0.2.2 with compound-engineering v3.9.0 and wrapper changes checked since CE 3.5.0"
+  requested_at: "2026-05-27"
+  stop_before_publication_until: exact_target_confirmation_and_clean_tw_commit_push_pr_publication_gate_for_traceweaver_core_v0_2_2

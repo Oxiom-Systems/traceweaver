@@ -21,12 +21,13 @@ without losing the proof behind what changed and why.
 
 Use marketplace updates or the tagged release snapshot for normal installs.
 Do not install TraceWeaver Core from `main` unless you are developing
-TraceWeaver itself; `main` is the active development branch. The 0.2.1 release
-snapshot is tagged as `traceweaver-core--v0.2.1`.
+TraceWeaver itself; `main` is the active development branch. The intended 0.2.2
+release snapshot tag is `traceweaver-core--v0.2.2`; use it only after the
+controlled publication route creates that tag.
 
 ### Codex
 
-After the `0.2.1` plugin release is published, add or refresh the marketplace:
+After the `0.2.2` plugin release is published, add or refresh the marketplace:
 
 ```sh
 codex plugin marketplace add Oxiom-Systems/traceweaver
@@ -35,11 +36,11 @@ codex plugin marketplace upgrade traceweaver
 
 Install `traceweaver-core` from the Codex plugin UI.
 
-For a pinned local alpha install, use the tagged release snapshot rather than
-`main`:
+After the 0.2.2 tag is published, use the tagged release snapshot rather than
+`main` for a pinned local alpha install:
 
 ```sh
-git clone --branch traceweaver-core--v0.2.1 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.2.2 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
@@ -83,10 +84,10 @@ Reload active plugins inside Claude Code:
 TraceWeaver includes a Cursor peer manifest at
 `plugins/traceweaver-core/.cursor-plugin/plugin.json`.
 
-Cursor install/update is compatibility-preview only in `0.2.1`: the manifest is
+Cursor install/update is compatibility-preview only in `0.2.2`: the manifest is
 versioned with the Codex and Claude manifests, but TraceWeaver does not claim a
 proven Cursor marketplace or runtime install path yet. If you inspect the Cursor
-manifest, inspect it from the `traceweaver-core--v0.2.1` tag rather than `main`.
+manifest, inspect it from the `traceweaver-core--v0.2.2` tag rather than `main`.
 Use the Codex or Claude setup above for supported alpha plugin use, and treat
 Cursor testing as held until a Cursor runtime validation record exists.
 
@@ -94,10 +95,10 @@ Cursor testing as held until a Cursor runtime validation record exists.
 
 For local alpha testing and dogfooding under the Google Antigravity coding
 assistant environment, start from the tagged release snapshot rather than
-`main`:
+`main` after the 0.2.2 tag is published:
 
 ```sh
-git clone --branch traceweaver-core--v0.2.1 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.2.2 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
 ```
@@ -138,9 +139,13 @@ tw-auto "implement the approved plan"
 
 ## Current Alpha Boundaries
 
-TraceWeaver Core `0.2.1` is an alpha advisory plugin for Codex and Claude Code.
+TraceWeaver Core `0.2.2` is an alpha advisory plugin for Codex and Claude Code.
 It is usable for first-time authority bootstrap, requirements review, planning,
 work handoffs, traceability checks, audits, and controlled review flows.
+This release keeps the selected Compound Engineering compatibility surface
+pinned to upstream `compound-engineering-v3.9.0` while preserving the
+TraceWeaver wrapper boundary; direct CE parity and clean replacement remain
+held.
 Antigravity support is limited to static local install/discovery metadata in
 this release scope; Antigravity workflow invocation remains held.
 Runtime-driver binding, release-ready status, clean CE replacement, enforcing
@@ -425,7 +430,7 @@ validation files when auditing specific claims:
 
 ## Near-Term Next Steps
 
-1. Review the `0.2.1` plugin metadata and publish the release only through the
+1. Review the `0.2.2` plugin metadata and publish the release only through the
    controlled publication route.
 2. Dogfood the alpha on TraceWeaver and Vestro through `tw-auto`, `tw-work`,
    `tw-traceability-check`, `tw-code-review`, and `tw-doc-review`.

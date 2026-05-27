@@ -4,7 +4,7 @@ type: feat
 status: implemented_static_code_review_passed_status_hash_doc_review_passed
 date: 2026-05-16
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3
+baseline_hash_sha256: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
 ---
 
 <!-- TRACEWEAVER: file-role=wrapper-handoff-discipline-plan; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
@@ -44,7 +44,7 @@ listed below, pause for `tw-requirements-review` before continuing.
 Accepted baseline:
 
 - Baseline ID: `REQ-BASELINE-2026-04-30-001`
-- Baseline hash: `9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3`
+- Baseline hash: `f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda`
 
 Primary requirements:
 

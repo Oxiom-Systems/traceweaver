@@ -982,7 +982,7 @@ callable skills to appear in `codex debug prompt-input`.
 - Candidate review-wrapper visibility now includes `tw-code-review` and
   `tw-doc-review`; their accepted behavior remains review-pending and held.
 - Active host wrapper expansion backup:
-  `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260505T132921Z-wrapper-expansion`.
+  `redacted active-host reconciliation backup`.
 - Current host direct-callable expectations have been expanded by candidate
   review wrappers; rerun host smoke before treating the current active directory
   counts as evidence for the new set.

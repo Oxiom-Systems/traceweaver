@@ -10,6 +10,14 @@ trap 'rm -rf "$tmp_root"' EXIT
 
 json_out="$tmp_root/generated.json"
 markdown_out="$tmp_root/generated.md"
+missing_row_out="$tmp_root/traceweaver-missing-row.out"
+missing_core_authority_out="$tmp_root/traceweaver-missing-core-authority.out"
+missing_expected_hash_out="$tmp_root/traceweaver-missing-expected-hash.out"
+bad_broad_out="$tmp_root/traceweaver-bad-broad.out"
+missing_authority_out="$tmp_root/traceweaver-missing-authority.out"
+low_confidence_out="$tmp_root/traceweaver-low-confidence.out"
+bad_hash_out="$tmp_root/traceweaver-bad-hash.out"
+fixture_unclassified_out="$tmp_root/traceweaver-fixture-unclassified.out"
 
 LC_ALL=C LANG=C ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --json-out "$json_out" \
@@ -79,12 +87,12 @@ PY
 if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --classification "$missing_classification" \
   --json-out "$tmp_root/missing-row.json" \
-  --markdown-out "$tmp_root/missing-row.md" >/tmp/traceweaver-missing-row.out 2>&1; then
+  --markdown-out "$tmp_root/missing-row.md" >"$missing_row_out" 2>&1; then
   echo "missing_packaged_row_check=failed"
-  cat /tmp/traceweaver-missing-row.out
+  cat "$missing_row_out"
   exit 1
 fi
-grep -Fq "unclassified_packaged_skills=tw-auto" /tmp/traceweaver-missing-row.out
+grep -Fq "unclassified_packaged_skills=tw-auto" "$missing_row_out"
 
 missing_core_authority="$tmp_root/missing-core-authority.yml"
 cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$missing_core_authority"
@@ -103,12 +111,12 @@ PY
 if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --classification "$missing_core_authority" \
   --json-out "$tmp_root/missing-core-authority.json" \
-  --markdown-out "$tmp_root/missing-core-authority.md" >/tmp/traceweaver-missing-core-authority.out 2>&1; then
+  --markdown-out "$tmp_root/missing-core-authority.md" >"$missing_core_authority_out" 2>&1; then
   echo "missing_core_authority_check=failed"
-  cat /tmp/traceweaver-missing-core-authority.out
+  cat "$missing_core_authority_out"
   exit 1
 fi
-grep -Fq "TW-SKILL-tw-grill_missing=authority_evidence" /tmp/traceweaver-missing-core-authority.out
+grep -Fq "TW-SKILL-tw-grill_missing=authority_evidence" "$missing_core_authority_out"
 
 missing_expected_hash="$tmp_root/missing-expected-hash.yml"
 cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$missing_expected_hash"
@@ -127,13 +135,13 @@ PY
 if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --classification "$missing_expected_hash" \
   --json-out "$tmp_root/missing-expected-hash.json" \
-  --markdown-out "$tmp_root/missing-expected-hash.md" >/tmp/traceweaver-missing-expected-hash.out 2>&1; then
+  --markdown-out "$tmp_root/missing-expected-hash.md" >"$missing_expected_hash_out" 2>&1; then
   echo "missing_expected_hash_check=failed"
-  cat /tmp/traceweaver-missing-expected-hash.out
+  cat "$missing_expected_hash_out"
   exit 1
 fi
-grep -Fq "TW-SKILL-tw-grill_missing=expected_hash" /tmp/traceweaver-missing-expected-hash.out
-grep -Fq "missing_expected_hashes=TW-SKILL-tw-grill" /tmp/traceweaver-missing-expected-hash.out
+grep -Fq "TW-SKILL-tw-grill_missing=expected_hash" "$missing_expected_hash_out"
+grep -Fq "missing_expected_hashes=TW-SKILL-tw-grill" "$missing_expected_hash_out"
 
 bad_broad="$tmp_root/bad-broad.yml"
 cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$bad_broad"
@@ -153,12 +161,12 @@ PY
 if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --classification "$bad_broad" \
   --json-out "$tmp_root/bad-broad.json" \
-  --markdown-out "$tmp_root/bad-broad.md" >/tmp/traceweaver-bad-broad.out 2>&1; then
+  --markdown-out "$tmp_root/bad-broad.md" >"$bad_broad_out" 2>&1; then
   echo "broad_gate_check=failed"
-  cat /tmp/traceweaver-bad-broad.out
+  cat "$bad_broad_out"
   exit 1
 fi
-grep -Fq "CE-BROAD-ce-agent-native-architecture_missing=classification,reopen_condition" /tmp/traceweaver-bad-broad.out
+grep -Fq "CE-BROAD-ce-agent-native-architecture_missing=classification,reopen_condition" "$bad_broad_out"
 
 missing_authority="$tmp_root/missing-authority.yml"
 cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$missing_authority"
@@ -180,12 +188,12 @@ PY
 if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --classification "$missing_authority" \
   --json-out "$tmp_root/missing-authority.json" \
-  --markdown-out "$tmp_root/missing-authority.md" >/tmp/traceweaver-missing-authority.out 2>&1; then
+  --markdown-out "$tmp_root/missing-authority.md" >"$missing_authority_out" 2>&1; then
   echo "missing_authority_evidence_check=failed"
-  cat /tmp/traceweaver-missing-authority.out
+  cat "$missing_authority_out"
   exit 1
 fi
-grep -Fq "CE-OOS-ce-clean-gone-branches_missing=authority_evidence" /tmp/traceweaver-missing-authority.out
+grep -Fq "CE-OOS-ce-clean-gone-branches_missing=authority_evidence" "$missing_authority_out"
 
 low_confidence="$tmp_root/low-confidence.yml"
 cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$low_confidence"
@@ -215,12 +223,12 @@ PY
 if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --classification "$low_confidence" \
   --json-out "$tmp_root/low-confidence.json" \
-  --markdown-out "$tmp_root/low-confidence.md" >/tmp/traceweaver-low-confidence.out 2>&1; then
+  --markdown-out "$tmp_root/low-confidence.md" >"$low_confidence_out" 2>&1; then
   echo "low_confidence_wrapped_check=failed"
-  cat /tmp/traceweaver-low-confidence.out
+  cat "$low_confidence_out"
   exit 1
 fi
-grep -Fq "CE-OOS-ce-clean-gone-branches_low_confidence_wrapped_without_held_evidence_status" /tmp/traceweaver-low-confidence.out
+grep -Fq "CE-OOS-ce-clean-gone-branches_low_confidence_wrapped_without_held_evidence_status" "$low_confidence_out"
 
 bad_hash="$tmp_root/bad-hash.yml"
 cp "$repo_root/plugins/traceweaver-core/references/ce-replacement-classification.yml" "$bad_hash"
@@ -239,12 +247,12 @@ PY
 if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --classification "$bad_hash" \
   --json-out "$tmp_root/bad-hash.json" \
-  --markdown-out "$tmp_root/bad-hash.md" >/tmp/traceweaver-bad-hash.out 2>&1; then
+  --markdown-out "$tmp_root/bad-hash.md" >"$bad_hash_out" 2>&1; then
   echo "stale_hash_check=failed"
-  cat /tmp/traceweaver-bad-hash.out
+  cat "$bad_hash_out"
   exit 1
 fi
-grep -Fq "hash_mismatches=TW-SKILL-tw-grill" /tmp/traceweaver-bad-hash.out
+grep -Fq "hash_mismatches=TW-SKILL-tw-grill" "$bad_hash_out"
 
 fixture_roadmap="$tmp_root/fixture-roadmap.md"
 cat >"$fixture_roadmap" <<'MD'
@@ -391,11 +399,11 @@ if ruby "$repo_root/scripts/traceweaver-classify-ce-replacement" \
   --plugin-root "$repo_root/fixtures/ce-replacement-classifier/traceweaver" \
   --roadmap "$fixture_roadmap" \
   --json-out "$tmp_root/fixture-unclassified.json" \
-  --markdown-out "$tmp_root/fixture-unclassified.md" >/tmp/traceweaver-fixture-unclassified.out 2>&1; then
+  --markdown-out "$tmp_root/fixture-unclassified.md" >"$fixture_unclassified_out" 2>&1; then
   echo "fixture_unclassified_check=failed"
-  cat /tmp/traceweaver-fixture-unclassified.out
+  cat "$fixture_unclassified_out"
   exit 1
 fi
-grep -Fq "unclassified_packaged_skills=ce-sample" /tmp/traceweaver-fixture-unclassified.out
+grep -Fq "unclassified_packaged_skills=ce-sample" "$fixture_unclassified_out"
 
 echo "traceweaver_ce_replacement_classifier_smoke=passed"

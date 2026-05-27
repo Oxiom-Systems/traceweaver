@@ -123,7 +123,7 @@ Unit 12 reconciles the active host workflow surface. After the staged
 TraceWeaver workflow and wrapper source changes, the active-host reconciler
 reran on 2026-05-07, backed up stale direct-callable `tw-auto`,
 `tw-code-review`, `tw-traceability-check`, and `tw-work` under
-`/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260507T204258Z`,
+`redacted active-host reconciliation backup`,
 and installed 43 TraceWeaver-marked callable skills. Fresh active-host checks
 report `codex_host_missing_skills=none`, `codex_host_stale_skills=none`,
 `codex_host_missing_skill_local_files=none`, and
@@ -201,7 +201,7 @@ Held claims:
 | `src/index.ts` | `ace494e9d81c0e47c384b591d0213a2dcd484b7e70efc032a5ffc92e47c836ef` | Repo-local Codex installer | Unit 9 registry-shape repair code review and authority doc review passed; runtime held. Packaged skills now install outside `.codex/skills`, leaving only direct callable skills as active registry surface, owned legacy active namespaced surfaces are removed during upgrade, and the install manifest records standalone TraceWeaver ownership with no external CE plugin dependency. |
 | `scripts/traceweaver-smoke-codex-discovery` | `b3b6506a460ab6033f86c15381c2d192db94f123137233f633da6e5daa3b7335` | Unit 1 isolated Codex install/discovery smoke harness plus Unit 4 installed `lfg` boundary check, Unit 9 registry-shape visibility/legacy-upgrade proof, wrapper direct-callable visibility expansion, candidate `tw-code-review`/`tw-doc-review` visibility expansion, wrapper-completion direct-callable coverage, and standalone CE-absent manifest checks | Wrapper completion and smoke anchors are part of the scoped trace-anchor explicit-mapping/currentness code review `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-CLEAN-001` and scoped authority doc review `TW-DOC-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-STATUS-HASH-CLEAN-001`. The latest isolated smoke passed with `standalone=true`, `externalCePluginRequired=false`, no external Compound Engineering plugin surface, and runtime wrapper behavior/publication still held. |
 | `scripts/traceweaver-smoke-codex-host-registry` | `e144dce6596f2068eb8b59bb6e5d47f3a1a92fe2e07c1bb882d65039961bde49` | Unit 5 read-only current Codex host-home filesystem registry probe, extended by Unit 10 to capture active prompt-input and read-only host `codex exec` runtime evidence, extended by Unit 11 to print active skill-surface count plus external CE plugin state, and extended to include `tw-plan` and selected CE/TW wrapper currentness | Fresh active-host probe after the Codex CLI `0.130.0` upgrade reports all required direct-callable files present/current/marked with no missing or stale skill-local files, prompt-input registry visibility passed for the required skills, runtime model default is `gpt-5.5` with medium reasoning, and constrained `tw-authority-gate` runtime invocation passed. Scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-12-ART-TW-059-ACTIVE-HOST-PROMPT-REGISTRY-RUNTIME-STATUS-HASH-CLEAN-001` for this proof update. Full `tw-auto` runtime-driver behavior, runtime CE delegation, commit, push, PR, publication, and clean replacement claims remain held. |
-| `scripts/traceweaver-reconcile-codex-host-skills` | `e4fb3561165b53fa9f108224ef7f4371d4a660f5b4883ec2f9b5f4ff1197dcd9` | Guarded active-host reconciliation script for TraceWeaver-owned direct-callable skill copies | Backs up touched unmarked or stale active-host skill directories, including stale TraceWeaver-marked direct-callable copies and stale nested skill-local files, before installing the staged TraceWeaver skill surface; verifies markers/source tree parity and preserves unrelated host skills. Deterministic smoke passed before active-host mutation. Active-host reconciliation succeeded after the REQ-TW-058 source changes on 2026-05-07, backing up stale direct-callable `tw-auto`, `tw-code-review`, `tw-traceability-check`, and `tw-work` under `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260507T204258Z`. Code review passed as `TW-CODE-REVIEW-2026-05-07-ACTIVE-HOST-RECONCILIATION-CLEAN-001`; nested skill-local backup repair code review passed as `TW-CODE-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-STATUS-HASH-CLEAN-001`; scoped authority doc review passed. |
+| `scripts/traceweaver-reconcile-codex-host-skills` | `e4fb3561165b53fa9f108224ef7f4371d4a660f5b4883ec2f9b5f4ff1197dcd9` | Guarded active-host reconciliation script for TraceWeaver-owned direct-callable skill copies | Backs up touched unmarked or stale active-host skill directories, including stale TraceWeaver-marked direct-callable copies and stale nested skill-local files, before installing the staged TraceWeaver skill surface; verifies markers/source tree parity and preserves unrelated host skills. Deterministic smoke passed before active-host mutation. Active-host reconciliation succeeded after the REQ-TW-058 source changes on 2026-05-07, backing up stale direct-callable `tw-auto`, `tw-code-review`, `tw-traceability-check`, and `tw-work` under a redacted active-host reconciliation backup. Code review passed as `TW-CODE-REVIEW-2026-05-07-ACTIVE-HOST-RECONCILIATION-CLEAN-001`; nested skill-local backup repair code review passed as `TW-CODE-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-STATUS-HASH-CLEAN-001`; scoped authority doc review passed. |
 | `scripts/traceweaver-smoke-codex-host-reconciliation` | `06a583bb3c42f90c4c647fd9c983c42ebf1cb60b9fb4c2b10ee37347ee487b1e` | Temporary-host reconciliation smoke covering missing, stale marked, stale nested marked, stale unmarked, already-current, unrelated-preserved, backup, refusal, installer-failure rollback, and `tw-plan` install/marker/hash coverage | Smoke passed and printed `codex_host_reconciliation_backed_up=ce-work tw-auto tw-traceability-check`, `codex_host_reconciliation_stale_nested_backup=pass`, and `codex_host_reconciliation_smoke=pass`; code review passed as `TW-CODE-REVIEW-2026-05-07-ACTIVE-HOST-RECONCILIATION-CLEAN-001`; nested skill-local backup repair code review passed as `TW-CODE-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-CLEAN-001`; status/hash doc review passed as `TW-DOC-REVIEW-2026-05-08-ACTIVE-HOST-NESTED-SKILL-BACKUP-STATUS-HASH-CLEAN-001`; refreshed helper/currentness code review passed as `TW-CODE-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-CLEAN-001`; scoped authority doc review passed as `TW-DOC-REVIEW-2026-05-07-TRACE-ANCHOR-EXPLICIT-MAPPING-ACTIVE-HOST-STATUS-HASH-CLEAN-001`. |
 | `scripts/traceweaver-smoke-codex-separate-home-runtime` | `a6852d5b3f90a1328723f6284f88aaedf67a579f79e0737402a52e5309507b63` | Unit 8 separate Codex home install plus fresh `codex exec` registry probe, updated by Unit 9 to require all required visible skills, updated by Unit 10 to default to auth-safe no-copy execution, and extended to require selected CE wrapper continuity entries plus candidate TW review wrappers in the visible-skill set | Candidate review-wrapper expansion recorded/review-pending; isolated visible-skill expectations now include `tw-code-review` and `tw-doc-review`. Runtime invocation remains limited to the existing `tw-authority-gate` sentinel path and broader wrapper behavior remains held. |
 | `scripts/traceweaver-smoke-no-publication` | `9e14b7066ed0d6d7e55f82df106dff41db8d18eb0d59be88dd5748e73f9def40` | Unit 4 PR-helper publication-stop, `lfg` delegation, and event-derived reviewer backpressure boundary smoke | Pass accepted as reviewed deterministic boundary evidence. |
@@ -273,8 +273,8 @@ skill_hash_ce-work=27220abdd867043b957a97c4a051aaab574b7c1eb098e7e5ed97bd6fdc59d
 skill_hash_ce-code-review=66a1da73677a5fe2e5d3e6292872a2375c697704353799adf0eaa7b3a9f947f9
 skill_hash_ce-doc-review=9b197bee814542328be6153afa5cf560f638eb3fe3ea94ba62c5b66129bdc246
 codex_discovery_smoke=pass
-temp_codex_home=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home
-installed_manifest=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home/.codex/traceweaver-core/install-manifest.json
+temp_codex_home=redacted temporary Codex home
+installed_manifest=redacted temporary Codex home install-manifest.json
 installed_packaged_skill_directory_count=29
 installed_callable_skill_directory_count=29
 installed_agent_toml_count=49
@@ -282,10 +282,10 @@ installed_reference_file_count=18
 installed_manifest_prompts=0
 installed_manifest_prompt_files=0
 direct_callable_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-code-review tw-doc-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
-packaged_traceweaver_skills_root=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home/.codex/traceweaver-core/skills
-direct_callable_skills_root=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home/.codex/skills
-selected_agents_root=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home/.codex/agents/traceweaver-core
-references_root=/var/folders/2f/ntb_0p9558v4wfcwr5_64dg00000gn/T/tmp.X1nzTfAhxd/codex-home/.codex/traceweaver-core/references
+packaged_traceweaver_skills_root=redacted temporary packaged TraceWeaver skills root
+direct_callable_skills_root=redacted temporary direct-callable skills root
+selected_agents_root=redacted temporary selected-agents root
+references_root=redacted temporary references root
 unowned_direct_callable_conflict=blocked_before_overwrite
 installed_lfg_delegation=pass
 installed_lfg_no_raw_ce_autopilot=pass
@@ -472,7 +472,7 @@ surface. It does not install, delete, overwrite, or reload Codex skills.
 ## Unit 5 Host Registry Filesystem Result
 
 ```text
-codex_host_skills_root=/Users/hanneszietsman/.codex/skills
+codex_host_skills_root=redacted active-host skills root
 codex_host_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review
 codex_host_present_skills=lfg ce-plan ce-work ce-code-review ce-doc-review
 codex_host_missing_skills=tw-auto tw-authority-gate tw-traceability-check tw-requirements-review tw-grill
@@ -566,10 +566,10 @@ active user Codex home and does not copy the user's Codex config.
 Observed output:
 
 ```text
-separate_codex_home=/tmp/traceweaver-u9-separate-home.Rwv0vP
-separate_codex_dot_home=/tmp/traceweaver-u9-separate-home.Rwv0vP/.codex
-separate_home_prompt_input=/tmp/traceweaver-u9-separate-home.Rwv0vP/prompt-input.json
-separate_home_visible_skills=/tmp/traceweaver-u9-separate-home.Rwv0vP/visible-skills.txt
+separate_codex_home=redacted temporary separate Codex home
+separate_codex_dot_home=redacted temporary separate Codex dot-home
+separate_home_prompt_input=redacted temporary prompt-input path
+separate_home_visible_skills=redacted temporary visible-skills path
 separate_home_install_result=pass
 separate_home_runtime_home_isolated=true
 fresh_codex_invocation_target=tw-authority-gate
@@ -732,7 +732,7 @@ copied live auth file.
 Observed active-host runtime output:
 
 ```text
-codex_host_skills_root=/Users/hanneszietsman/.codex/skills
+codex_host_skills_root=redacted active-host skills root
 codex_host_required_skills=tw-auto lfg tw-authority-gate tw-traceability-check tw-requirements-review tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr
 codex_host_present_skills=lfg ce-plan ce-work ce-code-review ce-doc-review
 codex_host_missing_skills=tw-auto tw-authority-gate tw-traceability-check tw-requirements-review tw-grill
@@ -792,8 +792,8 @@ unit10_held_scope=real tw-auto/lfg/tw-grill runtime invocation, project-level tr
 Observed host reconciliation:
 
 ```text
-host_reconciliation_backup=/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260505T102358Z-active-surface
-config_backup=/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/config.toml.20260505T102538Z.bak
+host_reconciliation_backup=redacted active-host reconciliation backup
+config_backup=redacted active-host config backup
 active_skill_surface=.system plus tw-auto, lfg, tw-authority-gate, tw-traceability-check, tw-requirements-review, tw-grill, ce-plan, ce-work, ce-code-review, ce-doc-review
 external_compound_engineering_plugin=disabled
 ```
@@ -835,7 +835,7 @@ unit11_held_scope=clean CE replacement, project-level trace/matrix/gap/change/ex
 Observed wrapper expansion:
 
 ```text
-wrapper_expansion_backup=/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260505T132921Z-wrapper-expansion
+wrapper_expansion_backup=redacted active-host wrapper expansion backup
 active_skill_surface=.system plus tw-auto, lfg, tw-authority-gate, tw-traceability-check, tw-requirements-review, tw-grill, ce-plan, ce-work, ce-code-review, ce-doc-review, ce-debug, ce-commit, ce-commit-push-pr
 external_compound_engineering_plugin=disabled
 ```
@@ -900,7 +900,7 @@ codex_host_reconciliation_smoke=pass
 traceweaver_reconcile_source_skills=43
 traceweaver_reconcile_missing_targets=none
 traceweaver_reconcile_backed_up=tw-auto tw-code-review tw-traceability-check tw-work
-traceweaver_reconcile_backup_dir=/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260507T204258Z
+traceweaver_reconcile_backup_dir=redacted active-host reconciliation backup
 traceweaver_reconcile_host_skills=pass
 codex_host_active_skill_directory_count=51
 codex_host_required_skills=tw-auto tw-plan tw-brainstorm lfg tw-authority-gate tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-commit tw-commit-push-pr tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-grill ce-plan ce-work ce-code-review ce-doc-review ce-debug ce-commit ce-commit-push-pr

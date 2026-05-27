@@ -78,8 +78,8 @@ verification_results:
   website_desktop_render_check: pass
   website_mobile_render_check: pass
   website_screenshots:
-    - /tmp/oxiomsystems-traceweaver-guide-desktop.png
-    - /tmp/oxiomsystems-traceweaver-guide-mobile.png
+    - redacted local desktop render screenshot
+    - redacted local mobile render screenshot
 
 review_results:
   code_review_status: passed_no_findings

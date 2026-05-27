@@ -5,7 +5,7 @@
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-tmp_home="$(mktemp -d /tmp/traceweaver-u9-separate-home.XXXXXX)"
+tmp_home="$(mktemp -d)"
 codex_home="$tmp_home/.codex"
 expected_codex_model="gpt-5.5"
 expected_codex_reasoning_effort="medium"
