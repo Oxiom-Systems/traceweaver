@@ -183,23 +183,25 @@ Resolvers run only targeted tests on their own changes. This step runs the proje
 
 Record the validation outcome (command run, pass/fail counts, any pre-existing failures noted) for the step 10 summary.
 
-## 7. Draft Held Commit and Push Summary
+## 7. Commit and Push
 
-TraceWeaver packaged alpha holds branch mutation, staging, commit, push, PR
-comment posting, and thread resolution. Do not stage files, commit, push, post
-comments, or resolve threads from this reference flow.
+1. Stage only files reported by sub-agents and commit with a message referencing the PR:
 
-Prepare a summary containing:
+```bash
+git add [files from agent summaries]
+git commit -m "Address PR review feedback (#PR_NUMBER)
 
-- files changed by feedback resolution work;
-- the commit message that would be used if a future publication gate approves;
-- validation command and outcome;
-- any pre-existing failures or human-decision blockers.
+- [list changes from agent summaries]"
+```
 
-## 8. Draft Replies and Held Resolution
+2. Push to remote:
+```bash
+git push
+```
 
-After local fixes and validation, draft replies and resolution decisions where
-applicable. Do not post replies or resolve threads from the packaged alpha.
+## 8. Reply and Resolve
+
+After the push succeeds, post replies and resolve where applicable. The mechanism depends on the feedback type.
 
 ### Reply format
 
@@ -226,21 +228,33 @@ For declined items:
 Declined: [specific harm cited, e.g., "this would add a defensive null check the type system already guarantees" or "violates the no-premature-abstraction guidance in CLAUDE.md"]
 ```
 
-For `needs-human` verdicts, draft the reply but do NOT post or resolve the thread. Leave the remote thread unchanged for human input.
+For `needs-human` verdicts, post the reply but do NOT resolve the thread. Leave it open for human input.
 
 ### Review threads
 
-Draft reply text and a resolution recommendation only. Do not call `scripts/reply-to-pr-thread` or `scripts/resolve-pr-thread` from the packaged TraceWeaver alpha flow. Record the held action in the final report so a human can apply it deliberately.
+1. **Reply** using [scripts/reply-to-pr-thread](../scripts/reply-to-pr-thread):
+```bash
+echo "REPLY_TEXT" | bash scripts/reply-to-pr-thread THREAD_ID
+```
+
+2. **Resolve** using [scripts/resolve-pr-thread](../scripts/resolve-pr-thread):
+```bash
+bash scripts/resolve-pr-thread THREAD_ID
+```
 
 ### PR comments and review bodies
 
-These cannot be resolved via GitHub's API from the packaged TraceWeaver alpha flow. Draft a top-level PR comment referencing the original, but do not post it.
+These cannot be resolved via GitHub's API. Reply with a top-level PR comment referencing the original:
+
+```bash
+gh pr comment PR_NUMBER --body "REPLY_TEXT"
+```
 
 Include enough quoted context in the reply so the reader can follow which comment is being addressed without scrolling.
 
 ## 9. Verify
 
-If a read-only GitHub check is available, re-fetch feedback to confirm the current state before reporting held replies:
+Re-fetch feedback to confirm resolution:
 
 ```bash
 bash scripts/get-pr-comments PR_NUMBER

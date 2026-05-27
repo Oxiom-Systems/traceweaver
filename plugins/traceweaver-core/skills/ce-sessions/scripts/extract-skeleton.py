@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
 # TRACEWEAVER: file-role=packaged-skills-ce-sessions-scripts-extract-skeleton-py; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
+#!/usr/bin/env python3
 """Extract the conversation skeleton from a Claude Code, Codex, or Cursor JSONL session file.
 
 Usage:
@@ -59,7 +59,6 @@ _STRIP_TAG = re.compile(
 )
 
 
-# TRACEWEAVER: entrypoint=clean_text; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
 def clean_text(text):
     """Strip framework wrapper tags from message text (Claude and Cursor)."""
     text = _STRIP_BLOCK.sub("", text)

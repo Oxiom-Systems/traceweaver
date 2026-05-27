@@ -19,30 +19,33 @@ without losing the proof behind what changed and why.
 
 ## Setup
 
+Use marketplace updates or the tagged release snapshot for normal installs.
+Do not install TraceWeaver Core from `main` unless you are developing
+TraceWeaver itself; `main` is the active development branch. The 0.2.1 release
+snapshot is tagged as `traceweaver-core--v0.2.1`.
+
 ### Codex
 
-After the `0.2.1` plugin release is published, add the marketplace:
+After the `0.2.1` plugin release is published, add or refresh the marketplace:
 
 ```sh
 codex plugin marketplace add Oxiom-Systems/traceweaver
-```
-
-Install `traceweaver-core` from the Codex plugin UI. Refresh the marketplace
-when a new TraceWeaver release is published:
-
-```sh
 codex plugin marketplace upgrade traceweaver
 ```
 
-For local alpha testing from a checkout:
+Install `traceweaver-core` from the Codex plugin UI.
+
+For a pinned local alpha install, use the tagged release snapshot rather than
+`main`:
 
 ```sh
-git clone git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.2.1 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
 
-If the checkout already exists:
+If you are developing TraceWeaver itself from an existing checkout, update from
+`main` explicitly before reinstalling:
 
 ```sh
 cd /path/to/traceweaver
@@ -59,21 +62,12 @@ TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-separate-home-ru
 
 ### Claude
 
-Add the repository marketplace:
+Add or refresh the repository marketplace, then install or update the released
+plugin:
 
 ```sh
 claude plugin marketplace add Oxiom-Systems/traceweaver
-```
-
-Install the plugin:
-
-```sh
 claude plugin install traceweaver-core@traceweaver
-```
-
-Update after a new release:
-
-```sh
 claude plugin marketplace update traceweaver
 claude plugin update traceweaver-core@traceweaver
 ```
@@ -90,20 +84,27 @@ TraceWeaver includes a Cursor peer manifest at
 `plugins/traceweaver-core/.cursor-plugin/plugin.json`.
 
 Cursor install/update is compatibility-preview only in `0.2.1`: the manifest is
-versioned with the Codex and Claude manifests, but TraceWeaver does not yet
-claim a proven Cursor marketplace or runtime install path. Use the Codex or
-Claude setup above for supported alpha plugin use, and treat Cursor testing as
-held until a Cursor runtime validation record exists.
+versioned with the Codex and Claude manifests, but TraceWeaver does not claim a
+proven Cursor marketplace or runtime install path yet. If you inspect the Cursor
+manifest, inspect it from the `traceweaver-core--v0.2.1` tag rather than `main`.
+Use the Codex or Claude setup above for supported alpha plugin use, and treat
+Cursor testing as held until a Cursor runtime validation record exists.
 
 ### Antigravity
 
-For local alpha testing and dogfooding under the Google Antigravity coding assistant environment:
+For local alpha testing and dogfooding under the Google Antigravity coding
+assistant environment, start from the tagged release snapshot rather than
+`main`:
 
 ```sh
+git clone --branch traceweaver-core--v0.2.1 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
 ```
 
-By default, the installer targets `$HOME/.gemini/config/plugins/traceweaver-core`. If you are using a custom configuration path, you can specify it via `--geminiHome`:
+By default, the installer targets
+`$HOME/.gemini/config/plugins/traceweaver-core`. If you are using a custom
+configuration path, specify it via `--geminiHome`:
 
 ```sh
 bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills --geminiHome /path/to/custom/gemini/home

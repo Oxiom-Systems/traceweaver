@@ -112,7 +112,8 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
 1. **Read Plan and Clarify** _(skip if arriving from Phase 0 with a bare prompt)_
 
-   - Read the work document completely
+   - Read the work document completely. Plans may be markdown (`.md`) or HTML (`.html`) — both formats are read as text linearly. HTML plans carry the same section names and IDs as markdown plans, just wrapped in semantic HTML elements (`<section>`, `<article>`, etc.); section-finding works the same way (substring match on section names, ignoring HTML wrapper noise).
+   - When auto-detecting the latest plan (blank invocation), glob `docs/plans/*.md` AND `docs/plans/*.html` and pick the most recent regardless of extension.
    - Treat the plan as a decision artifact, not an execution script
    - If the plan includes sections such as `Implementation Units`, `Work Breakdown`, `Requirements` (or legacy `Requirements Trace`), `Files`, `Test Scenarios`, or `Verification`, use those as the primary source material for execution
    - Check for `Execution note` on each implementation unit — these carry the plan's execution posture signal for that unit (for example, test-first or characterization-first). Note them when creating tasks.
@@ -123,7 +124,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
    - If anything is unclear or ambiguous, ask clarifying questions now
    - If clarifying questions were needed above, get user approval on the resolved answers. If no clarifications were needed, proceed without a separate approval step — plan scope is the plan's authority, not something to renegotiate
    - **Do not skip this** - better to ask questions now than build the wrong thing
-   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker. The only plan mutation during ordinary CE work is the final `status: active → completed` flip at shipping (see `references/shipping-workflow.md` Phase 4 Step 2). In TraceWeaver publication-gated mode, do not perform that status flip during implementation; report the proposed status update back to `tw-auto` or the publication gate instead. Legacy plans may contain `- [ ]` / `- [x]` marks on unit headings — ignore them as state; per-unit completion is determined during execution by reading the current file state.
+   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker. The only plan mutation during ce-work is the final `status: active → completed` flip at shipping (see `references/shipping-workflow.md` Phase 4 Step 2). Legacy plans may contain `- [ ]` / `- [x]` marks on unit headings — ignore them as state; per-unit completion is determined during execution by reading the current file state.
 
 2. **Setup Environment**
 
@@ -223,8 +224,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
    **Shared-directory fallback constraints** — apply only when worktree isolation is unavailable:
    - Instruct each subagent: "Do not stage files (`git add`), create commits, or run the project test suite. The orchestrator handles testing, staging, and committing after all parallel units complete."
    - These constraints prevent git index contention and test interference between concurrent subagents.
-   - With worktree isolation active, omit these constraints — subagents may stage, commit, and run their unit's tests within their own worktree branch unless TraceWeaver publication-gated mode is active.
-   - In TraceWeaver publication-gated mode, subagents must not stage, commit, push, publish, create issues, or open PRs in any isolation mode unless the controlled TraceWeaver publication route explicitly authorizes that target.
+   - With worktree isolation active, omit these constraints — subagents may stage, commit, and run their unit's tests within their own worktree branch.
 
    **Permission mode:** Omit the `mode` parameter when dispatching subagents so the user's configured permission settings apply. Do not pass `mode: "auto"` — it overrides user-level settings like `bypassPermissions`.
 
@@ -236,13 +236,6 @@ Determine how to proceed based on what was provided in `<input_document>`.
    5. Dispatch the next unit
 
    **After all parallel subagents in a batch complete (worktree-isolated mode):**
-   - In TraceWeaver publication-gated mode, do not use this merge/commit flow
-     during implementation.
-     Instead, wait for every subagent, collect each worktree diff, changed-file
-     list, verification result, trace/matrix status, and open gap, then return
-     that evidence to `tw-auto` or the TraceWeaver controller. Do not stage,
-     commit, merge subagent branches, push, create issues, open PRs, or remove a
-     worktree whose unmerged changes are still needed for human review.
    1. Wait for every subagent in the current parallel batch to finish.
    2. For each completed subagent, in dependency order: review the worktree's diff against the orchestrator's branch. If the subagent did not commit its own work, stage and commit it inside that worktree.
    3. Merge each subagent's branch into the orchestrator's branch sequentially in dependency order. **If a merge conflict surfaces, abort the merge (`git merge --abort`) and re-dispatch the conflicting unit serially against the now-merged tree** — hand-resolving silently picks a side and discards one unit's intent. (Predicted overlap from the Parallel Safety Check surfaces here as a conflict, not as silent data loss in shared-directory mode.)
@@ -255,13 +248,6 @@ Determine how to proceed based on what was provided in `<input_document>`.
    7. Dispatch the next batch of independent units, or the next dependent unit.
 
    **After all parallel subagents in a batch complete (shared-directory fallback):**
-   - In TraceWeaver publication-gated mode, do not use this staging/commit flow
-     during implementation.
-     Instead, wait for every subagent, cross-check file collisions, collect the
-     combined diff, changed-file list, verification results, trace/matrix status,
-     and open gaps, then return that evidence to `tw-auto` or the TraceWeaver
-     controller. Do not stage files, create commits, push, create issues, open
-     PRs, or mark the plan complete.
    1. Wait for every subagent in the current parallel batch to finish before acting on any of their results
    2. Cross-check for discovered file collisions: compare the actual files modified by all subagents in the batch (not just their declared `Files:` lists). Subagents may create or modify files not anticipated during planning — this is expected, since plans describe *what* not *how*. A collision only matters when 2+ subagents in the same batch modified the same file. In a shared working directory, only the last writer's version survives — the other unit's changes to that file are lost. If a collision is detected: commit all non-colliding files from all units first, then re-run the affected units serially for the shared file so each builds on the other's committed work
    3. For each completed unit, in dependency order: review the diff, run the relevant test suite, stage only that unit's files, and commit with a conventional message derived from the unit's Goal
@@ -327,13 +313,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
 2. **Incremental Commits**
 
-   In TraceWeaver publication-gated mode, skip this section during
-   implementation. Record the
-   completed logical unit, changed files, verification evidence, trace update,
-   and next review/human decision for `tw-auto`; do not stage or commit.
-
-   After completing each task in ordinary CE work, evaluate whether to create an
-   incremental commit:
+   After completing each task, evaluate whether to create an incremental commit:
 
    | Commit when... | Don't commit when... |
    |----------------|---------------------|
@@ -408,17 +388,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
 ### Phase 3-4: Quality Check and Finishing Work
 
-When all Phase 2 tasks are complete and execution transitions to quality check
-in ordinary CE work, you must read `references/shipping-workflow.md` for the
-full shipping workflow. Do not skip this.
-
-In TraceWeaver publication-gated mode, do not read or execute
-`references/shipping-workflow.md` during implementation. Instead run the
-relevant verification and review handoff, update or report required trace
-evidence, and return control to `tw-auto` with the stop reason and suggested
-next step. The controlled TraceWeaver publication route may load the relevant
-publication wrapper after authority, traceability, verification, review,
-staged-tree, credential, remote-boundary, and target-confirmation checks pass.
+When all Phase 2 tasks are complete and execution transitions to quality check, you must read `references/shipping-workflow.md` for the full shipping workflow.Do not skip this.
 
 ## Key Principles
 

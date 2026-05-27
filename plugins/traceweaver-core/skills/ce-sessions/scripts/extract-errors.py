@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
 # TRACEWEAVER: file-role=packaged-skills-ce-sessions-scripts-extract-errors-py; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
+#!/usr/bin/env python3
 """Extract error signals from a Claude Code, Codex, or Cursor JSONL session file.
 
 Usage:
@@ -38,7 +38,6 @@ if args.output:
 stats = {"lines": 0, "parse_errors": 0, "errors_found": 0}
 
 
-# TRACEWEAVER: entrypoint=summarize_error; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
 def summarize_error(raw):
     """Extract a short error summary instead of dumping the full payload."""
     text = str(raw).strip()

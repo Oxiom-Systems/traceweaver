@@ -1,6 +1,6 @@
+# TRACEWEAVER: file-role=packaged-skills-ce-resolve-pr-feedback-scripts-get-thread-for-comment; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
 #!/usr/bin/env bash
 
-# TRACEWEAVER: file-role=packaged-skills-ce-resolve-pr-feedback-scripts-get-thread-for-comment; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
 # Maps a PR review comment node ID to its parent thread.
 # Fetches all review threads (paginated) and their comments, then returns the
 # thread whose comments contain the target ID.

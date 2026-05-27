@@ -1,5 +1,5 @@
-#!/usr/bin/env bash
 # TRACEWEAVER: file-role=packaged-skills-ce-sessions-scripts-discover-sessions-sh; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
+#!/usr/bin/env bash
 # Discover session files across Claude Code, Codex, and Cursor.
 #
 # Usage: discover-sessions.sh <repo-name> <days> [--platform claude|codex|cursor]
@@ -29,7 +29,6 @@ while [ $# -gt 0 ]; do
 done
 
 # --- Claude Code ---
-# TRACEWEAVER: entrypoint=discover_claude; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
 discover_claude() {
     local base="$HOME/.claude/projects"
     [ -d "$base" ] || return 0

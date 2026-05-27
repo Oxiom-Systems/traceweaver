@@ -1,6 +1,6 @@
+# TRACEWEAVER: file-role=packaged-skills-ce-resolve-pr-feedback-scripts-get-pr-comments; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
 #!/usr/bin/env bash
 
-# TRACEWEAVER: file-role=packaged-skills-ce-resolve-pr-feedback-scripts-get-pr-comments; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
 set -e
 
 if [ $# -lt 1 ]; then

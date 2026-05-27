@@ -4,6 +4,7 @@ description: "Search and ask questions about coding agent session history across
 ---
 
 <!-- TRACEWEAVER: file-role=packaged-skills-ce-sessions-skill; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
+
 # /ce-sessions
 
 Search session history across Claude Code, Codex, and Cursor and synthesize findings about what was worked on, tried, decided, or learned in prior sessions.

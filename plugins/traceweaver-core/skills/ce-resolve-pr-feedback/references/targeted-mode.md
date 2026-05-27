@@ -23,12 +23,6 @@ bash scripts/get-thread-for-comment PR_NUMBER COMMENT_NODE_ID [OWNER/REPO]
 
 This fetches thread IDs and their first comment IDs (minimal fields, no bodies) and returns the matching thread with full comment details.
 
-## 2. Fix, Draft Reply, And Hold Resolution
+## 2. Fix, Reply, Resolve
 
-Spawn a single `ce-pr-comment-resolver` agent for the thread. Pass the same
-fields full mode does, including `isOutdated` and the location fields (`line`,
-`originalLine`, `startLine`, `originalStartLine`) -- targeted threads can be
-outdated too and need the same relocation handling. Then follow Full Mode steps
-6-8 (in `references/full-mode.md`) for validation, held commit/push summary,
-draft reply text, and held resolution. Do not stage, commit, push, post a
-reply, or resolve the thread from the packaged TraceWeaver alpha.
+Spawn a single `ce-pr-comment-resolver` agent for the thread. Pass the same fields full mode does, including `isOutdated` and the location fields (`line`, `originalLine`, `startLine`, `originalStartLine`) -- targeted threads can be outdated too and need the same relocation handling. Then follow the same validate -> commit -> push -> reply -> resolve flow as Full Mode steps 6-8 (in `references/full-mode.md`).

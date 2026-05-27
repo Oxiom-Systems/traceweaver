@@ -229,8 +229,8 @@ function installCodexSkills(options: InstallOptions): void {
   const callableSkills = installedSkills.filter(isUserCallableSkill);
   const internalPackagedSkills = installedSkills.filter((skillName) => !isUserCallableSkill(skillName));
   const installedAgents = readdirSync(sourceAgentsRoot)
-    .filter((entry) => entry.endsWith(".agent.md") && statSync(join(sourceAgentsRoot, entry)).isFile())
-    .map((entry) => entry.replace(/\.agent\.md$/, ".toml"))
+    .filter((entry) => entry.endsWith(".md") && statSync(join(sourceAgentsRoot, entry)).isFile())
+    .map((entry) => entry.replace(/(?:\.agent)?\.md$/, ".toml"))
     .sort();
   const installedReferences = existsSync(sourceReferencesRoot)
     ? listFiles(sourceReferencesRoot).map((entry) => entry.replace(`${sourceReferencesRoot}/`, "")).sort()
@@ -271,7 +271,10 @@ function installCodexSkills(options: InstallOptions): void {
   }
 
   for (const agentFile of installedAgents) {
-    const sourceFile = agentFile.replace(/\.toml$/, ".agent.md");
+    const baseName = agentFile.replace(/\.toml$/, "");
+    const sourceFile = existsSync(join(sourceAgentsRoot, `${baseName}.md`))
+      ? `${baseName}.md`
+      : `${baseName}.agent.md`;
     const agent = parseAgentMarkdown(join(sourceAgentsRoot, sourceFile));
     writeFileSync(join(targetAgentsRoot, agentFile), `${renderCodexAgentToml(agent)}\n`);
   }
