@@ -1,12 +1,12 @@
 {
   "record_id": "TWCORE-CE-REPLACEMENT-CLASSIFIER-GENERATED-2026-05-04-001",
-  "generated_at": "2026-05-14T16:13:11Z",
-  "checker_status": "passed_static_readiness",
+  "generated_at": "2026-05-27T21:41:07Z",
+  "checker_status": "failed_static_readiness",
   "traceweaver_mode": "advisory",
   "scope_mode": "current_core_with_broad_surface_held",
   "baseline": {
     "id": "REQ-BASELINE-2026-04-30-001",
-    "hash_sha256": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+    "hash_sha256": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
     "authority_source": "requirements.md",
     "linked_requirements": [
       "REQ-TW-014",
@@ -23,24 +23,24 @@
     ]
   },
   "source_pin": {
-    "record_id": "TWCORE-CE-SOURCE-PIN-2026-05-13-001",
-    "version": "3.8.1",
-    "commit": "b07aac55b5dc6d5b940a7b194497ccd6121f62a5",
-    "aggregate_fingerprint": "fb3b853793720fa228b2b8a7c6fe7267c30db61d9e97111b3f96eaa883d97b72"
+    "record_id": "TWCORE-CE-SOURCE-PIN-2026-05-27-001",
+    "version": "3.9.0",
+    "commit": "e2c9cd23525eeb1ecddd637e027d53b02f892e7b",
+    "aggregate_fingerprint": "13fe8c0a2c5154cef8c64974f39e929f59a6c3ca652daa074e5b48f67aec6c02"
   },
   "plan": "docs/plans/2026-05-04-001-feat-ce-replacement-inventory-classifier-plan.md",
   "unit0_review_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
   "counts": {
     "upstream_ce_skills": 36,
     "upstream_lfg": 1,
-    "packaged_traceweaver_skills": 25,
+    "packaged_traceweaver_skills": 46,
     "current_core_rows": 18,
     "current_packaged_held_rows": 7,
     "broad_held_rows": 17,
     "out_of_scope_rows": 3,
     "package_support_rows": 1,
-    "selected_agent_files": 49,
-    "direct_callable_skills": 25,
+    "selected_agent_files": 43,
+    "package_level_skill_dirs_scanned": 46,
     "prompt_surfaces": 0,
     "command_surfaces": 0,
     "default_prompt_surfaces": 1,
@@ -51,9 +51,12 @@
     "held_rows": 42,
     "prompts_or_commands": 0,
     "manifests": 3,
-    "references": 18,
+    "references": 20,
     "host_visible_skills": 0,
-    "unclassified_rows": 0
+    "unclassified_rows": 21
+  },
+  "count_basis": {
+    "upstream_ce_skills": "classifier_roadmap_default_held_not_full_ce_inventory"
   },
   "inventories": {
     "upstream_skills": [
@@ -104,10 +107,12 @@
       "ce-compound-refresh",
       "ce-debug",
       "ce-doc-review",
+      "ce-ideate",
       "ce-plan",
       "ce-resolve-pr-feedback",
       "ce-sessions",
       "ce-setup",
+      "ce-strategy",
       "ce-test-browser",
       "ce-test-xcode",
       "ce-work",
@@ -115,20 +120,40 @@
       "lfg",
       "requirements-reviewer",
       "systems-engineering-traceability",
+      "tw-audit",
       "tw-authority-gate",
       "tw-auto",
+      "tw-brainstorm",
+      "tw-code-review",
+      "tw-commit",
+      "tw-commit-push-pr",
+      "tw-compound",
+      "tw-compound-refresh",
+      "tw-debug",
+      "tw-doc-review",
       "tw-grill",
+      "tw-ideate",
+      "tw-plan",
       "tw-requirements-review",
+      "tw-resolve-pr-feedback",
+      "tw-sessions",
+      "tw-setup",
+      "tw-strategy",
+      "tw-test-browser",
+      "tw-test-xcode",
       "tw-traceability-check",
+      "tw-work",
+      "tw-worktree",
       "using-agent-skills"
     ],
     "selected_skill_files": [
       "skills/ce-brainstorm/SKILL.md",
+      "skills/ce-brainstorm/references/brainstorm-sections.md",
       "skills/ce-brainstorm/references/handoff.md",
-      "skills/ce-brainstorm/references/requirements-capture.md",
+      "skills/ce-brainstorm/references/html-rendering.md",
+      "skills/ce-brainstorm/references/markdown-rendering.md",
       "skills/ce-brainstorm/references/synthesis-summary.md",
       "skills/ce-brainstorm/references/universal-brainstorming.md",
-      "skills/ce-brainstorm/references/visual-communication.md",
       "skills/ce-code-review/SKILL.md",
       "skills/ce-code-review/references/bulk-preview.md",
       "skills/ce-code-review/references/diff-scope.md",
@@ -166,13 +191,18 @@
       "skills/ce-doc-review/references/subagent-template.md",
       "skills/ce-doc-review/references/synthesis-and-presentation.md",
       "skills/ce-doc-review/references/walkthrough.md",
+      "skills/ce-ideate/SKILL.md",
+      "skills/ce-ideate/references/post-ideation-workflow.md",
+      "skills/ce-ideate/references/universal-ideation.md",
+      "skills/ce-ideate/references/web-research-cache.md",
       "skills/ce-plan/SKILL.md",
       "skills/ce-plan/references/deepening-workflow.md",
+      "skills/ce-plan/references/html-rendering.md",
+      "skills/ce-plan/references/markdown-rendering.md",
       "skills/ce-plan/references/plan-handoff.md",
-      "skills/ce-plan/references/plan-template.md",
+      "skills/ce-plan/references/plan-sections.md",
       "skills/ce-plan/references/synthesis-summary.md",
       "skills/ce-plan/references/universal-planning.md",
-      "skills/ce-plan/references/visual-communication.md",
       "skills/ce-resolve-pr-feedback/SKILL.md",
       "skills/ce-resolve-pr-feedback/references/full-mode.md",
       "skills/ce-resolve-pr-feedback/references/targeted-mode.md",
@@ -188,117 +218,106 @@
       "skills/ce-setup/SKILL.md",
       "skills/ce-setup/references/config-template.yaml",
       "skills/ce-setup/scripts/check-health",
+      "skills/ce-strategy/SKILL.md",
+      "skills/ce-strategy/references/interview.md",
+      "skills/ce-strategy/references/strategy-template.md",
       "skills/ce-test-browser/SKILL.md",
       "skills/ce-test-xcode/SKILL.md",
       "skills/ce-work/SKILL.md",
       "skills/ce-work/references/shipping-workflow.md",
       "skills/ce-work/references/tracker-defer.md",
       "skills/ce-worktree/SKILL.md",
-      "skills/ce-worktree/scripts/worktree-manager.sh",
-      "skills/lfg/SKILL.md",
-      "skills/lfg/references/tracker-defer.md"
+      "skills/ce-worktree/scripts/worktree-manager.sh"
     ],
     "selected_agent_files": [
-      "agents/ce-adversarial-document-reviewer.agent.md",
-      "agents/ce-adversarial-reviewer.agent.md",
-      "agents/ce-agent-native-reviewer.agent.md",
-      "agents/ce-ankane-readme-writer.agent.md",
-      "agents/ce-api-contract-reviewer.agent.md",
-      "agents/ce-architecture-strategist.agent.md",
-      "agents/ce-best-practices-researcher.agent.md",
-      "agents/ce-code-simplicity-reviewer.agent.md",
-      "agents/ce-coherence-reviewer.agent.md",
-      "agents/ce-correctness-reviewer.agent.md",
-      "agents/ce-data-integrity-guardian.agent.md",
-      "agents/ce-data-migration-expert.agent.md",
-      "agents/ce-data-migrations-reviewer.agent.md",
-      "agents/ce-deployment-verification-agent.agent.md",
-      "agents/ce-design-implementation-reviewer.agent.md",
-      "agents/ce-design-iterator.agent.md",
-      "agents/ce-design-lens-reviewer.agent.md",
-      "agents/ce-dhh-rails-reviewer.agent.md",
-      "agents/ce-feasibility-reviewer.agent.md",
-      "agents/ce-figma-design-sync.agent.md",
-      "agents/ce-framework-docs-researcher.agent.md",
-      "agents/ce-git-history-analyzer.agent.md",
-      "agents/ce-issue-intelligence-analyst.agent.md",
-      "agents/ce-julik-frontend-races-reviewer.agent.md",
-      "agents/ce-kieran-python-reviewer.agent.md",
-      "agents/ce-kieran-rails-reviewer.agent.md",
-      "agents/ce-kieran-typescript-reviewer.agent.md",
-      "agents/ce-learnings-researcher.agent.md",
-      "agents/ce-maintainability-reviewer.agent.md",
-      "agents/ce-pattern-recognition-specialist.agent.md",
-      "agents/ce-performance-oracle.agent.md",
-      "agents/ce-performance-reviewer.agent.md",
-      "agents/ce-pr-comment-resolver.agent.md",
-      "agents/ce-previous-comments-reviewer.agent.md",
-      "agents/ce-product-lens-reviewer.agent.md",
-      "agents/ce-project-standards-reviewer.agent.md",
-      "agents/ce-reliability-reviewer.agent.md",
-      "agents/ce-repo-research-analyst.agent.md",
-      "agents/ce-schema-drift-detector.agent.md",
-      "agents/ce-scope-guardian-reviewer.agent.md",
-      "agents/ce-security-lens-reviewer.agent.md",
-      "agents/ce-security-reviewer.agent.md",
-      "agents/ce-security-sentinel.agent.md",
-      "agents/ce-session-historian.agent.md",
-      "agents/ce-slack-researcher.agent.md",
-      "agents/ce-spec-flow-analyzer.agent.md",
-      "agents/ce-swift-ios-reviewer.agent.md",
-      "agents/ce-testing-reviewer.agent.md",
-      "agents/ce-web-researcher.agent.md"
+      "agents/ce-adversarial-document-reviewer.md",
+      "agents/ce-adversarial-reviewer.md",
+      "agents/ce-agent-native-reviewer.md",
+      "agents/ce-ankane-readme-writer.md",
+      "agents/ce-api-contract-reviewer.md",
+      "agents/ce-architecture-strategist.md",
+      "agents/ce-best-practices-researcher.md",
+      "agents/ce-code-simplicity-reviewer.md",
+      "agents/ce-coherence-reviewer.md",
+      "agents/ce-correctness-reviewer.md",
+      "agents/ce-data-integrity-guardian.md",
+      "agents/ce-data-migration-reviewer.md",
+      "agents/ce-deployment-verification-agent.md",
+      "agents/ce-design-implementation-reviewer.md",
+      "agents/ce-design-iterator.md",
+      "agents/ce-design-lens-reviewer.md",
+      "agents/ce-feasibility-reviewer.md",
+      "agents/ce-figma-design-sync.md",
+      "agents/ce-framework-docs-researcher.md",
+      "agents/ce-git-history-analyzer.md",
+      "agents/ce-issue-intelligence-analyst.md",
+      "agents/ce-julik-frontend-races-reviewer.md",
+      "agents/ce-learnings-researcher.md",
+      "agents/ce-maintainability-reviewer.md",
+      "agents/ce-pattern-recognition-specialist.md",
+      "agents/ce-performance-oracle.md",
+      "agents/ce-performance-reviewer.md",
+      "agents/ce-pr-comment-resolver.md",
+      "agents/ce-previous-comments-reviewer.md",
+      "agents/ce-product-lens-reviewer.md",
+      "agents/ce-project-standards-reviewer.md",
+      "agents/ce-reliability-reviewer.md",
+      "agents/ce-repo-research-analyst.md",
+      "agents/ce-scope-guardian-reviewer.md",
+      "agents/ce-security-lens-reviewer.md",
+      "agents/ce-security-reviewer.md",
+      "agents/ce-security-sentinel.md",
+      "agents/ce-session-historian.md",
+      "agents/ce-slack-researcher.md",
+      "agents/ce-spec-flow-analyzer.md",
+      "agents/ce-swift-ios-reviewer.md",
+      "agents/ce-testing-reviewer.md",
+      "agents/ce-web-researcher.md"
     ],
     "plugin_agents": [
-      "agents/ce-adversarial-document-reviewer.agent.md",
-      "agents/ce-adversarial-reviewer.agent.md",
-      "agents/ce-agent-native-reviewer.agent.md",
-      "agents/ce-ankane-readme-writer.agent.md",
-      "agents/ce-api-contract-reviewer.agent.md",
-      "agents/ce-architecture-strategist.agent.md",
-      "agents/ce-best-practices-researcher.agent.md",
-      "agents/ce-code-simplicity-reviewer.agent.md",
-      "agents/ce-coherence-reviewer.agent.md",
-      "agents/ce-correctness-reviewer.agent.md",
-      "agents/ce-data-integrity-guardian.agent.md",
-      "agents/ce-data-migration-expert.agent.md",
-      "agents/ce-data-migrations-reviewer.agent.md",
-      "agents/ce-deployment-verification-agent.agent.md",
-      "agents/ce-design-implementation-reviewer.agent.md",
-      "agents/ce-design-iterator.agent.md",
-      "agents/ce-design-lens-reviewer.agent.md",
-      "agents/ce-dhh-rails-reviewer.agent.md",
-      "agents/ce-feasibility-reviewer.agent.md",
-      "agents/ce-figma-design-sync.agent.md",
-      "agents/ce-framework-docs-researcher.agent.md",
-      "agents/ce-git-history-analyzer.agent.md",
-      "agents/ce-issue-intelligence-analyst.agent.md",
-      "agents/ce-julik-frontend-races-reviewer.agent.md",
-      "agents/ce-kieran-python-reviewer.agent.md",
-      "agents/ce-kieran-rails-reviewer.agent.md",
-      "agents/ce-kieran-typescript-reviewer.agent.md",
-      "agents/ce-learnings-researcher.agent.md",
-      "agents/ce-maintainability-reviewer.agent.md",
-      "agents/ce-pattern-recognition-specialist.agent.md",
-      "agents/ce-performance-oracle.agent.md",
-      "agents/ce-performance-reviewer.agent.md",
-      "agents/ce-pr-comment-resolver.agent.md",
-      "agents/ce-previous-comments-reviewer.agent.md",
-      "agents/ce-product-lens-reviewer.agent.md",
-      "agents/ce-project-standards-reviewer.agent.md",
-      "agents/ce-reliability-reviewer.agent.md",
-      "agents/ce-repo-research-analyst.agent.md",
-      "agents/ce-schema-drift-detector.agent.md",
-      "agents/ce-scope-guardian-reviewer.agent.md",
-      "agents/ce-security-lens-reviewer.agent.md",
-      "agents/ce-security-reviewer.agent.md",
-      "agents/ce-security-sentinel.agent.md",
-      "agents/ce-session-historian.agent.md",
-      "agents/ce-slack-researcher.agent.md",
-      "agents/ce-spec-flow-analyzer.agent.md",
-      "agents/ce-swift-ios-reviewer.agent.md",
-      "agents/ce-testing-reviewer.agent.md",
-      "agents/ce-web-researcher.agent.md"
+      "agents/ce-adversarial-document-reviewer.md",
+      "agents/ce-adversarial-reviewer.md",
+      "agents/ce-agent-native-reviewer.md",
+      "agents/ce-ankane-readme-writer.md",
+      "agents/ce-api-contract-reviewer.md",
+      "agents/ce-architecture-strategist.md",
+      "agents/ce-best-practices-researcher.md",
+      "agents/ce-code-simplicity-reviewer.md",
+      "agents/ce-coherence-reviewer.md",
+      "agents/ce-correctness-reviewer.md",
+      "agents/ce-data-integrity-guardian.md",
+      "agents/ce-data-migration-reviewer.md",
+      "agents/ce-deployment-verification-agent.md",
+      "agents/ce-design-implementation-reviewer.md",
+      "agents/ce-design-iterator.md",
+      "agents/ce-design-lens-reviewer.md",
+      "agents/ce-feasibility-reviewer.md",
+      "agents/ce-figma-design-sync.md",
+      "agents/ce-framework-docs-researcher.md",
+      "agents/ce-git-history-analyzer.md",
+      "agents/ce-issue-intelligence-analyst.md",
+      "agents/ce-julik-frontend-races-reviewer.md",
+      "agents/ce-learnings-researcher.md",
+      "agents/ce-maintainability-reviewer.md",
+      "agents/ce-pattern-recognition-specialist.md",
+      "agents/ce-performance-oracle.md",
+      "agents/ce-performance-reviewer.md",
+      "agents/ce-pr-comment-resolver.md",
+      "agents/ce-previous-comments-reviewer.md",
+      "agents/ce-product-lens-reviewer.md",
+      "agents/ce-project-standards-reviewer.md",
+      "agents/ce-reliability-reviewer.md",
+      "agents/ce-repo-research-analyst.md",
+      "agents/ce-scope-guardian-reviewer.md",
+      "agents/ce-security-lens-reviewer.md",
+      "agents/ce-security-reviewer.md",
+      "agents/ce-security-sentinel.md",
+      "agents/ce-session-historian.md",
+      "agents/ce-slack-researcher.md",
+      "agents/ce-spec-flow-analyzer.md",
+      "agents/ce-swift-ios-reviewer.md",
+      "agents/ce-testing-reviewer.md",
+      "agents/ce-web-researcher.md"
     ],
     "plugin_references": [
       "references/authority-baseline-template.yml",
@@ -318,7 +337,9 @@
       "references/traceability-matrix-bootstrap-template.md",
       "references/traceability-matrix-template.md",
       "references/traceweaver-controlled-autonomy-policy.md",
-      "references/traceweaver-runtime-policy.md"
+      "references/traceweaver-model-defaults.md",
+      "references/traceweaver-runtime-policy.md",
+      "references/traceweaver-systems-engineering-audit-closure.md"
     ],
     "manifest_surfaces": [
       {
@@ -326,12 +347,9 @@
         "surface_type": "default_prompt",
         "key": "interface.defaultPrompt",
         "value": [
-          "Use the tw-requirements-review skill for requirements or planning authority review.",
-          "Use the tw-grill skill after ideation and before brainstorming when one selected idea needs deeper interview; its output is source evidence, not authority.",
-          "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
-          "Use the tw-traceability-check skill during plan, code, document, or release-evidence review.",
-          "Use the tw-auto skill for advisory controlled autonomy; it preserves the CE-style loop while adding authority, traceability, verification, validation, and dark-behavior controls.",
-          "The packaged lfg name delegates to tw-auto and must stop before commit, push, or PR creation in this alpha."
+          "Use tw-auto for advisory TraceWeaver-controlled CE-style work.",
+          "Run tw-authority-gate before meaningful behavior changes.",
+          "Run tw-traceability-check before closing implementation or release evidence."
         ]
       }
     ],
@@ -347,12 +365,9 @@
         "surface_type": "default_prompt",
         "key": "interface.defaultPrompt",
         "value": [
-          "Use the tw-requirements-review skill for requirements or planning authority review.",
-          "Use the tw-grill skill after ideation and before brainstorming when one selected idea needs deeper interview; its output is source evidence, not authority.",
-          "Use the tw-authority-gate skill before implementation starts on meaningful behavior.",
-          "Use the tw-traceability-check skill during plan, code, document, or release-evidence review.",
-          "Use the tw-auto skill for advisory controlled autonomy; it preserves the CE-style loop while adding authority, traceability, verification, validation, and dark-behavior controls.",
-          "The packaged lfg name delegates to tw-auto and must stop before commit, push, or PR creation in this alpha."
+          "Use tw-auto for advisory TraceWeaver-controlled CE-style work.",
+          "Run tw-authority-gate before meaningful behavior changes.",
+          "Run tw-traceability-check before closing implementation or release evidence."
         ]
       }
     ],
@@ -388,8 +403,10 @@
     "support_edges": {
       "ce-brainstorm": [
         "skills/ce-brainstorm/references/universal-brainstorming.md",
+        "skills/ce-brainstorm/references/brainstorm-sections.md",
+        "skills/ce-brainstorm/references/markdown-rendering.md",
+        "skills/ce-brainstorm/references/html-rendering.md",
         "skills/ce-brainstorm/references/synthesis-summary.md",
-        "skills/ce-brainstorm/references/requirements-capture.md",
         "skills/ce-brainstorm/references/handoff.md"
       ],
       "ce-code-review": [
@@ -430,11 +447,17 @@
         "skills/ce-doc-review/references/subagent-template.md",
         "skills/ce-doc-review/references/findings-schema.json"
       ],
+      "ce-ideate": [
+        "skills/ce-ideate/references/universal-ideation.md",
+        "skills/ce-ideate/references/post-ideation-workflow.md",
+        "skills/ce-ideate/references/web-research-cache.md"
+      ],
       "ce-plan": [
+        "skills/ce-plan/references/plan-sections.md",
+        "skills/ce-plan/references/markdown-rendering.md",
+        "skills/ce-plan/references/html-rendering.md",
         "skills/ce-plan/references/universal-planning.md",
         "skills/ce-plan/references/synthesis-summary.md",
-        "skills/ce-plan/references/plan-template.md",
-        "skills/ce-plan/references/visual-communication.md",
         "skills/ce-plan/references/plan-handoff.md",
         "skills/ce-plan/references/deepening-workflow.md"
       ],
@@ -455,6 +478,10 @@
       "ce-setup": [
         "skills/ce-setup/scripts/check-health",
         "skills/ce-setup/references/config-template.yaml"
+      ],
+      "ce-strategy": [
+        "skills/ce-strategy/references/interview.md",
+        "skills/ce-strategy/references/strategy-template.md"
       ],
       "ce-test-browser": [
 
@@ -486,24 +513,94 @@
         "skills/systems-engineering-traceability/references/requirements-and-vv-guide.md",
         "skills/systems-engineering-traceability/references/risk-gap-and-change-control-guide.md"
       ],
+      "tw-audit": [
+        "skills/tw-audit/references/traceweaver-operating-modes.md",
+        "skills/tw-audit/scripts/traceweaver-generate-traceability-views",
+        "skills/tw-audit/scripts/traceweaver-smoke-traceability-generated-views"
+      ],
       "tw-authority-gate": [
 
       ],
       "tw-auto": [
+        "skills/tw-auto/references/traceweaver-operating-modes.md",
+        "skills/tw-auto/references/trace-anchor-authoring.md",
+        "skills/tw-auto/references/traceweaver-wrapper-handoff-discipline.md",
         "skills/tw-auto/references/requirements-baseline-template.md",
         "skills/tw-auto/references/intent-contract-template.yml",
         "skills/tw-auto/references/traceability-matrix-bootstrap-template.md",
         "skills/tw-auto/references/automation-loop-state-template.yml",
         "skills/tw-auto/references/traceweaver-controlled-autonomy-policy.md"
       ],
+      "tw-brainstorm": [
+        "skills/tw-brainstorm/references/traceweaver-operating-modes.md"
+      ],
+      "tw-code-review": [
+        "skills/tw-code-review/references/traceweaver-operating-modes.md"
+      ],
+      "tw-commit-push-pr": [
+
+      ],
+      "tw-commit": [
+
+      ],
+      "tw-compound-refresh": [
+        "skills/tw-compound-refresh/references/traceweaver-operating-modes.md"
+      ],
+      "tw-compound": [
+        "skills/tw-compound/references/traceweaver-operating-modes.md"
+      ],
+      "tw-debug": [
+
+      ],
+      "tw-doc-review": [
+        "skills/tw-doc-review/references/traceweaver-operating-modes.md",
+        "skills/tw-doc-review/references/trace-anchor-authoring.md"
+      ],
       "tw-grill": [
         "skills/tw-grill/references/upstream-notice.md"
+      ],
+      "tw-ideate": [
+        "skills/tw-ideate/references/traceweaver-operating-modes.md"
+      ],
+      "tw-plan": [
+        "skills/tw-plan/references/traceweaver-operating-modes.md"
       ],
       "tw-requirements-review": [
 
       ],
+      "tw-resolve-pr-feedback": [
+        "skills/tw-resolve-pr-feedback/references/traceweaver-operating-modes.md"
+      ],
+      "tw-sessions": [
+        "skills/tw-sessions/references/traceweaver-operating-modes.md"
+      ],
+      "tw-setup": [
+        "skills/tw-setup/references/traceweaver-operating-modes.md"
+      ],
+      "tw-strategy": [
+        "skills/tw-strategy/references/traceweaver-operating-modes.md"
+      ],
+      "tw-test-browser": [
+        "skills/tw-test-browser/references/traceweaver-operating-modes.md"
+      ],
+      "tw-test-xcode": [
+        "skills/tw-test-xcode/references/traceweaver-operating-modes.md"
+      ],
       "tw-traceability-check": [
-
+        "skills/tw-traceability-check/references/traceweaver-operating-modes.md",
+        "skills/tw-traceability-check/references/code-trace-anchor-contract.md",
+        "skills/tw-traceability-check/references/trace-anchor-authoring.md",
+        "skills/tw-traceability-check/references/structured-findings.md",
+        "skills/tw-traceability-check/scripts/traceweaver-check-code-anchors",
+        "skills/tw-traceability-check/scripts/traceweaver-author-code-anchors",
+        "skills/tw-traceability-check/scripts/traceweaver-check-acceptance-results"
+      ],
+      "tw-work": [
+        "skills/tw-work/references/traceweaver-operating-modes.md",
+        "skills/tw-work/references/trace-anchor-authoring.md"
+      ],
+      "tw-worktree": [
+        "skills/tw-worktree/references/traceweaver-operating-modes.md"
       ],
       "using-agent-skills": [
 
@@ -526,7 +623,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -550,7 +647,7 @@
         ],
         "close_condition": "reviewed promotion evidence proves tw-grill authority boundaries",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001",
-        "actual_hash": "666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90",
+        "actual_hash": "4cdaf10ee1363464f81b2f569a5f78639f35631bb55e6e628bc6608fb7d693b1",
         "checker_status": "present"
       },
       {
@@ -568,7 +665,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -592,7 +689,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves source-evidence routing and stop behavior",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "2d2082e8821dd7adb535a2996d8ea0a5bbe0d718469b8ab915a8aaae3b7fc0e6",
+        "actual_hash": "5fff7bc3d0c5017b0c0a8936658909db08c01c8506654b5d4db66980cf596933",
         "checker_status": "present"
       },
       {
@@ -611,7 +708,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -635,7 +732,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves authority-gated planning",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "dd96d54eec7f1912928619bf2b4cbefb82a13a9e00553ef9b632f062094e4640",
+        "actual_hash": "4e8357ce7841f525bee630e9b66cb4c655b9d6d2fbdcc95a16d00909da321d0c",
         "checker_status": "present"
       },
       {
@@ -653,7 +750,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -677,7 +774,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves promotion gates and stale-reset behavior",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "f45459c1144646ece057f882da5eb730ff223ec725c19041d59cc3e3c9b7c4e1",
+        "actual_hash": "6c25458eda9ed48eb6aa9e12bd42c4926de0d325b915aaa712bd34173e822e55",
         "checker_status": "present"
       },
       {
@@ -694,7 +791,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -718,7 +815,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves reviewer support boundaries",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d",
+        "actual_hash": "39ca78a8f8c14b62e07c97369b7f5d723ea7ab664aba63bb733ce04d93d1c309",
         "checker_status": "present"
       },
       {
@@ -738,7 +835,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -762,7 +859,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves gate invocation and fail-closed behavior",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "93d78f160ee5dd78bd7ebf5dd9cff28e9c1ec3b8f5bfe2b25474b11512e475e3",
+        "actual_hash": "e1ac6f7f46188ff29f054e150aa9861b3cd199bd80f69c203aaa9372cd97f42c",
         "checker_status": "present"
       },
       {
@@ -782,7 +879,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -806,7 +903,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves authority-gated execution",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "bc490d75d4a972355def18699bb01210d39b89c423eb9853a0d51eebf47f922e",
+        "actual_hash": "3b599c951cfa22a99e335c07940753a7dfc18dc88045beb77172ec412f94a7be",
         "checker_status": "present"
       },
       {
@@ -825,7 +922,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -849,7 +946,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves traceability checking and stale-reset behavior",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "c2ac0332032b577e1749bb7990b01b6875f33d81bbec31de31f52d742250b943",
+        "actual_hash": "2ea238ee1d12b37bdb7733b5b4718f2f393fe3a399fae799b75659cd78b3fcac",
         "checker_status": "present"
       },
       {
@@ -868,7 +965,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -892,7 +989,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves support-surface boundaries",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282",
+        "actual_hash": "cdf2f0e7867de3e8014be24bdf62e7ea717d781e5402dc13d18dc5b41f937f50",
         "checker_status": "present"
       },
       {
@@ -911,7 +1008,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -935,7 +1032,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves stale-reset and evidence-record routing",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "0d5d82acb8986b65ba1c494f2b708c6a4f94a10a893f86501e268bb53e77b1f4",
+        "actual_hash": "14e91257f75cde2bd25c47a05dce5073cc6122d31d6b7c97b4039b97a6fb314b",
         "checker_status": "present"
       },
       {
@@ -954,7 +1051,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -978,7 +1075,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves review scope and held-claim routing",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "905c9774b254b7b9352aaeffdc80d91ec0eaadc628522d1e75160b213809ab6d",
+        "actual_hash": "2fbb6ee39199a2826072b2e06ee2872430417e7bfb8c36ca88bdcc655d577d92",
         "checker_status": "present"
       },
       {
@@ -996,7 +1093,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -1020,7 +1117,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves browser verification routing",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "a7240cf469d410b2ee46fbf24ef19cf70becaefa55549b13a0d4eaa63166a71f",
+        "actual_hash": "93e6fa00e14c9acdd08c69f2fcfc88f41a9e7556762bab58e7ea72168dedd280",
         "checker_status": "present"
       },
       {
@@ -1038,7 +1135,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -1080,7 +1177,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -1104,7 +1201,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves learning-record authority boundaries",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "62065d44ca49ce04af8332cc13a3a82795f29e5240b3ed6cc12ccfe69404081b",
+        "actual_hash": "0f2b5c3a50b9d1b0ec7f93ef42f82d66be5274fb41237e08a1cd9bdfde320f9c",
         "checker_status": "present"
       },
       {
@@ -1122,7 +1219,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -1146,7 +1243,7 @@
         ],
         "close_condition": "reviewed wrapper evidence proves refresh provenance and stale-reset routing",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "4b8b7e8eff97d63453f6e2bde428e15d7e140c5c100ba8030b526fdd66bd7dba",
+        "actual_hash": "2e60dbbd7fb7945ebcca68166f54f40cb9653d53ec61f7d4037d09de95ee3447",
         "checker_status": "present"
       },
       {
@@ -1164,7 +1261,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -1188,7 +1285,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves lfg delegates to tw-auto and preserves held claims",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083",
+        "actual_hash": "46ce8f69fa0a321b8a4891a0194ba3dcd663c8cba75eab77417cbe54673047eb",
         "checker_status": "present"
       },
       {
@@ -1206,7 +1303,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -1230,7 +1327,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves bounded advisory stops and trace updates",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3",
+        "actual_hash": "c66f41d1d85d9b2fc63f36233e0a41801c44349013b790c703148a1e3f457ea2",
         "checker_status": "present"
       },
       {
@@ -1248,7 +1345,7 @@
           ],
           "source": "requirements.md",
           "baseline_id": "REQ-BASELINE-2026-04-30-001",
-          "baseline_hash": "6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba",
+          "baseline_hash": "f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda",
           "accepted_exception": null,
           "validation_question": "Does this surface preserve the approved TraceWeaver authority chain without promoting held runtime, release, publication, host-removal, or clean-replacement claims?"
         },
@@ -1272,7 +1369,7 @@
         ],
         "close_condition": "reviewed runtime evidence proves routing support preserves authority gates",
         "reviewer_evidence_id": "CE-DOC-REVIEW-2026-05-04-UNIT0-CE-REPLACEMENT-CLASSIFICATION-CLEAN-001",
-        "actual_hash": "fb4b21b09db42d0b5b9a9fea3f5d3c0aa0dfda1d3fd8157df8298bb94c0def28",
+        "actual_hash": "431380ca3d3543f8908276e3e97af2ad1b008a9601784b27be0eed5740b8c5e3",
         "checker_status": "present"
       }
     ],
@@ -1376,7 +1473,7 @@
           "clean replacement"
         ],
         "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves feedback provenance, authority gates, trace updates, and held publication stops.",
-        "actual_hash": "3b6496790383db003700fe888011bb3a631716ed1ddb4d930d11a4404ea65207",
+        "actual_hash": "ea51005586103df29bddd4627cd3768054fe23eee6859db77590b1a414dae072",
         "checker_status": "held"
       },
       {
@@ -1401,7 +1498,7 @@
           "clean replacement"
         ],
         "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves privacy/provenance handling and prevents session material from becoming authority without review.",
-        "actual_hash": "cee2a94d11419d204542910f4afcf78a83f23ea1c6799884f36688cc3b64bd70",
+        "actual_hash": "99e6c867f7f50222ba06a54eb838c2a58f516f4481428eb5eebc8a9a2ed21a5b",
         "checker_status": "held"
       },
       {
@@ -1451,7 +1548,7 @@
           "clean replacement"
         ],
         "reopen_condition": "Reclassify only after Unit 1 through Unit 4 evidence proves workspace mutation boundaries, trace updates, and held publication stops.",
-        "actual_hash": "bccd3015024cb040232574b9cc77a46832414266af094cb77bf844330a5c7171",
+        "actual_hash": "54ad044bab5207b1f860d6bab5d7460ada9cde7cac910866e1eefe21623746e7",
         "checker_status": "held"
       }
     ],
@@ -1870,7 +1967,9 @@
   },
   "blockers": {
     "errors": [
-
+      "unclassified_packaged_skills=ce-ideate,ce-strategy,tw-audit,tw-brainstorm,tw-code-review,tw-commit,tw-commit-push-pr,tw-compound,tw-compound-refresh,tw-debug,tw-doc-review,tw-ideate,tw-plan,tw-resolve-pr-feedback,tw-sessions,tw-setup,tw-strategy,tw-test-browser,tw-test-xcode,tw-work,tw-worktree",
+      "hash_mismatches=TW-SKILL-tw-grill:666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90:4cdaf10ee1363464f81b2f569a5f78639f35631bb55e6e628bc6608fb7d693b1,CE-SKILL-ce-brainstorm:2d2082e8821dd7adb535a2996d8ea0a5bbe0d718469b8ab915a8aaae3b7fc0e6:5fff7bc3d0c5017b0c0a8936658909db08c01c8506654b5d4db66980cf596933,CE-SKILL-ce-plan:dd96d54eec7f1912928619bf2b4cbefb82a13a9e00553ef9b632f062094e4640:4e8357ce7841f525bee630e9b66cb4c655b9d6d2fbdcc95a16d00909da321d0c,TW-SKILL-tw-requirements-review:f45459c1144646ece057f882da5eb730ff223ec725c19041d59cc3e3c9b7c4e1:6c25458eda9ed48eb6aa9e12bd42c4926de0d325b915aaa712bd34173e822e55,TW-SKILL-requirements-reviewer:1cd5a3cb0316bb814afda991cc7b22602849949a25772e4dc214bbf5a995a91d:39ca78a8f8c14b62e07c97369b7f5d723ea7ab664aba63bb733ce04d93d1c309,TW-SKILL-tw-authority-gate:93d78f160ee5dd78bd7ebf5dd9cff28e9c1ec3b8f5bfe2b25474b11512e475e3:e1ac6f7f46188ff29f054e150aa9861b3cd199bd80f69c203aaa9372cd97f42c,CE-SKILL-ce-work:bc490d75d4a972355def18699bb01210d39b89c423eb9853a0d51eebf47f922e:3b599c951cfa22a99e335c07940753a7dfc18dc88045beb77172ec412f94a7be,TW-SKILL-tw-traceability-check:c2ac0332032b577e1749bb7990b01b6875f33d81bbec31de31f52d742250b943:2ea238ee1d12b37bdb7733b5b4718f2f393fe3a399fae799b75659cd78b3fcac,TW-SKILL-systems-engineering-traceability:e14608e14d341df67c173a0c3b03c5725cae6844991565a1d150cdbfbb898282:cdf2f0e7867de3e8014be24bdf62e7ea717d781e5402dc13d18dc5b41f937f50,CE-SKILL-ce-doc-review:0d5d82acb8986b65ba1c494f2b708c6a4f94a10a893f86501e268bb53e77b1f4:14e91257f75cde2bd25c47a05dce5073cc6122d31d6b7c97b4039b97a6fb314b,CE-SKILL-ce-code-review:905c9774b254b7b9352aaeffdc80d91ec0eaadc628522d1e75160b213809ab6d:2fbb6ee39199a2826072b2e06ee2872430417e7bfb8c36ca88bdcc655d577d92,CE-SKILL-ce-test-browser:a7240cf469d410b2ee46fbf24ef19cf70becaefa55549b13a0d4eaa63166a71f:93e6fa00e14c9acdd08c69f2fcfc88f41a9e7556762bab58e7ea72168dedd280,CE-SKILL-ce-compound:62065d44ca49ce04af8332cc13a3a82795f29e5240b3ed6cc12ccfe69404081b:0f2b5c3a50b9d1b0ec7f93ef42f82d66be5274fb41237e08a1cd9bdfde320f9c,CE-SKILL-ce-compound-refresh:4b8b7e8eff97d63453f6e2bde428e15d7e140c5c100ba8030b526fdd66bd7dba:2e60dbbd7fb7945ebcca68166f54f40cb9653d53ec61f7d4037d09de95ee3447,CE-SKILL-lfg:ed542a61234d8e0cf062c07423ce02f75d31507626d495563af56ecdde52f083:46ce8f69fa0a321b8a4891a0194ba3dcd663c8cba75eab77417cbe54673047eb,TW-SKILL-tw-auto:a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3:c66f41d1d85d9b2fc63f36233e0a41801c44349013b790c703148a1e3f457ea2,TW-SKILL-using-agent-skills:fb4b21b09db42d0b5b9a9fea3f5d3c0aa0dfda1d3fd8157df8298bb94c0def28:431380ca3d3543f8908276e3e97af2ad1b008a9601784b27be0eed5740b8c5e3,CE-CURRENT-HELD-ce-resolve-pr-feedback:3b6496790383db003700fe888011bb3a631716ed1ddb4d930d11a4404ea65207:ea51005586103df29bddd4627cd3768054fe23eee6859db77590b1a414dae072,CE-CURRENT-HELD-ce-sessions:cee2a94d11419d204542910f4afcf78a83f23ea1c6799884f36688cc3b64bd70:99e6c867f7f50222ba06a54eb838c2a58f516f4481428eb5eebc8a9a2ed21a5b,CE-CURRENT-HELD-ce-worktree:bccd3015024cb040232574b9cc77a46832414266af094cb77bf844330a5c7171:54ad044bab5207b1f860d6bab5d7460ada9cde7cac910866e1eefe21623746e7",
+      "missing_support_files=skills/tw-audit/scripts/traceweaver-generate-traceability-views,skills/tw-audit/scripts/traceweaver-smoke-traceability-generated-views"
     ],
     "warnings": [
 
@@ -1885,6 +1984,7 @@
       "host CE removal",
       "clean replacement",
       "runtime-equivalent CE behavior",
+      "Vestro dogfood evidence",
       "R31-complete status"
     ]
   }

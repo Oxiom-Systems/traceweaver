@@ -2,6 +2,31 @@
 
 # Changelog
 
+## 0.2.2 - 2026-05-27
+
+TraceWeaver Core 0.2.2 documents the CE 3.9.0 selected compatibility surface
+as the intended post-publication install target for Codex, Claude Code,
+Antigravity local installs, and peer manifests.
+
+### Changed
+
+- Bumped Codex, Claude Code, Antigravity, Cursor, and Claude marketplace
+  metadata to `0.2.2`.
+- Updated README and plugin README install examples to use
+  `traceweaver-core--v0.2.2`.
+- Clarified that selected CE-derived implementation components are refreshed
+  from Compound Engineering `3.9.0`, while direct CE parity, runtime
+  equivalence, and clean replacement remain held.
+- Updated the Antigravity installer and discovery smoke to write and verify
+  installed version `0.2.2`.
+
+### Held
+
+- Package-ready/release-ready claims, broad runtime behavior, runtime-driver
+  invocation, clean CE replacement, unconstrained-host support, slash-command
+  surfaces, enforcing mode, R31 validation, and autonomous publication remain
+  held until their own gates pass.
+
 ## 0.2.1 - 2026-05-26
 
 TraceWeaver Core 0.2.1 packages the REQ-TW-069 requirements-quality ranking

@@ -4,7 +4,7 @@ type: feat
 status: static_implementation_added_verification_passed_code_review_passed_status_hash_doc_review_passed
 date: "2026-05-19"
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3
+baseline_hash_sha256: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
 ---
 
 <!-- TRACEWEAVER: file-role=structured-acceptance-validation-plan; req=REQ-TW-055; trace=TRACE-TW-050; ver=VER-TW-063 -->
@@ -70,7 +70,7 @@ Accepted baseline:
 
 - Baseline ID: `REQ-BASELINE-2026-04-30-001`
 - Baseline hash:
-  `9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3`
+  `f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda`
 
 Planning authority:
 

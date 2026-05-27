@@ -4,7 +4,7 @@ type: feat
 status: requirements_review_passed_authority_doc_review_passed_implementation_pending
 date: 2026-05-17
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3
+baseline_hash_sha256: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
 ---
 
 <!-- TRACEWEAVER: file-role=strategy-ideate-wrapper-plan; req=REQ-TW-051; trace=TRACE-TW-047; ver=VER-TW-060 -->
@@ -59,7 +59,7 @@ Accepted baseline:
 
 - Baseline ID: `REQ-BASELINE-2026-04-30-001`
 - Baseline hash:
-  `9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3`
+  `f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda`
 
 Existing authority:
 

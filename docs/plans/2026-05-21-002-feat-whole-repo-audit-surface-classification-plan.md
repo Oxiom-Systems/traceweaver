@@ -36,7 +36,7 @@ completeness, Vestro/R31, or clean-replacement authority.
 
 - Baseline: `REQ-BASELINE-2026-04-30-001`
 - Baseline hash:
-  `9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3`
+  `f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda`
 - Requirement authority: `requirements.md`
 - Intent Contract: `.traceweaver/intent-contract.yml`
 - Requirements:
@@ -83,7 +83,7 @@ ruby -c scripts/traceweaver-classify-ce-replacement
 bash -n scripts/traceweaver-smoke-code-traceability
 scripts/traceweaver-smoke-code-traceability
 plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode audit --markdown .traceweaver/audit/code-traceability-audit.md --jsonl .traceweaver/audit/code-traceability-audit.jsonl
-plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-files /tmp/tw-surface-changed-files.txt --markdown .traceweaver/audit/code-traceability-check.md --jsonl .traceweaver/audit/code-traceability-check.jsonl
+plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-files redacted temporary changed-files list --markdown .traceweaver/audit/code-traceability-check.md --jsonl .traceweaver/audit/code-traceability-check.jsonl
 plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-acceptance-results --root . --file docs/validation/traceweaver-system-acceptance-results.md
 scripts/traceweaver-smoke-systems-engineering-audit-closure
 scripts/traceweaver-generate-traceability-views --root .

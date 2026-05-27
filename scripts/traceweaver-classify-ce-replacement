@@ -511,6 +511,7 @@ held_claims = [
   "host CE removal",
   "clean replacement",
   "runtime-equivalent CE behavior",
+  "Vestro dogfood evidence",
   "R31-complete status"
 ]
 
@@ -534,7 +535,7 @@ result = {
     out_of_scope_rows: out_of_scope_rows.size,
     package_support_rows: package_support.size,
     selected_agent_files: selected_agent_files.size,
-    direct_callable_skills: plugin_skill_names.size,
+    package_level_skill_dirs_scanned: plugin_skill_names.size,
     prompt_surfaces: prompt_surfaces.size,
     command_surfaces: command_surfaces.size,
     default_prompt_surfaces: default_prompt_surfaces.size,
@@ -548,6 +549,9 @@ result = {
     references: plugin_refs.size,
     host_visible_skills: host_visible_skills.size,
     unclassified_rows: missing_packaged.size + missing_upstream_ce.size + missing_support_classification.size
+  },
+  count_basis: {
+    upstream_ce_skills: options[:upstream_root] ? "upstream_root_scan" : "classifier_roadmap_default_held_not_full_ce_inventory"
   },
   inventories: {
     upstream_skills: upstream_skills,
@@ -618,7 +622,8 @@ markdown = <<~MARKDOWN
 
   | Count | Value |
   | --- | ---: |
-  | Upstream CE skills represented | #{result[:counts][:upstream_ce_skills]} |
+  | Classifier roadmap CE skills represented | #{result[:counts][:upstream_ce_skills]} |
+  | Classifier count basis | #{result[:count_basis][:upstream_ce_skills]} |
   | Upstream `lfg` represented | #{result[:counts][:upstream_lfg]} |
   | Packaged TraceWeaver skills | #{result[:counts][:packaged_traceweaver_skills]} |
   | Current/core rows | #{result[:counts][:current_core_rows]} |
@@ -626,7 +631,7 @@ markdown = <<~MARKDOWN
   | Package support held rows | #{result[:counts][:package_support_rows]} |
   | Broad held rows | #{result[:counts][:broad_held_rows]} |
   | Out-of-scope rows | #{result[:counts][:out_of_scope_rows]} |
-  | Direct callable skills | #{result[:counts][:direct_callable_skills]} |
+  | Package-level skill directories scanned | #{result[:counts][:package_level_skill_dirs_scanned]} |
   | Selected agent files | #{result[:counts][:selected_agent_files]} |
   | Prompt surfaces discovered | #{result[:counts][:prompt_surfaces]} |
   | Command surfaces discovered | #{result[:counts][:command_surfaces]} |
@@ -645,7 +650,8 @@ markdown = <<~MARKDOWN
   `.traceweaver/ce-replacement-classification.generated.json`
 
   Runtime invocation, enforcement, publication, release-ready, clean-replacement,
-  host CE removal, package-ready, upstream-ready, and R31 claims remain held.
+  host CE removal, package-ready, upstream-ready, Vestro dogfood, and R31 claims
+  remain held.
   #{MARKER_END}
 MARKDOWN
 

@@ -103,7 +103,7 @@ run_scanner_pass() {
 
 # TRACEWEAVER: entrypoint=trace_anchor_authoring_smoke; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044
 
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-code-trace-authoring.XXXXXX")"
+TMP_DIR="$(mktemp -d)"
 repo_before="$(authority_fingerprint)"
 
 code_dir="$(copy_fixture unambiguous-code-anchor)"

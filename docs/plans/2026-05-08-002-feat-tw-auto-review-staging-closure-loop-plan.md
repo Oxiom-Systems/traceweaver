@@ -48,7 +48,7 @@ claims, or material authority.
 ## Authority Capsule
 
 - Baseline: `REQ-BASELINE-2026-04-30-001`
-- Baseline hash: `9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3`
+- Baseline hash: `f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda`
 - Primary requirements:
   - `REQ-TW-053`: review-staging is not publication; publication remains gated
   - `REQ-TW-054`: trace anchors and Code Anchor Evidence are implementation evidence

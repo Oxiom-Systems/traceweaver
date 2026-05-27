@@ -35,7 +35,7 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.2.1`
+Plugin version: `0.2.2`
 
 Included skills:
 
@@ -66,13 +66,12 @@ Included skills:
 - `tw-test-xcode`
 - `tw-setup`
 - `tw-worktree`
-- selected CE-compatible workflow skills, including `ce-strategy`,
-  `ce-ideate`, `ce-brainstorm`,
+- selected CE-compatible workflow skills refreshed from Compound Engineering
+  `3.9.0`, including `ce-strategy`, `ce-ideate`, `ce-brainstorm`,
   `ce-plan`, `ce-work`, `ce-code-review`, `ce-doc-review`, `ce-compound`,
   `ce-resolve-pr-feedback`, `ce-commit`, `ce-commit-push-pr`,
-  `ce-compound-refresh`, `ce-sessions`, `ce-session-inventory`,
-  `ce-session-extract`, `ce-test-browser`, `ce-test-xcode`, `ce-worktree`,
-  `ce-setup`, `ce-debug`, and `lfg`
+  `ce-compound-refresh`, `ce-sessions`, `ce-test-browser`, `ce-test-xcode`,
+  `ce-worktree`, `ce-setup`, `ce-debug`, and `lfg`
 
 Included references:
 
@@ -164,7 +163,7 @@ package. Bump every peer plugin manifest carried by the release:
 - `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.2.1`.
+`traceweaver-core--v0.2.2`.
 
 ## Skill Entry Points
 
@@ -195,9 +194,9 @@ Release tags should use the Claude Code plugin tag convention:
   `tw-requirements-review`.
 - `tw-compound` and `tw-compound-refresh` wrap packaged CE learning capture and
   refresh workflows as source evidence, not authority rewrites.
-- `tw-sessions` wraps packaged `ce-sessions`; packaged `ce-session-inventory`
-  and `ce-session-extract` remain hidden/internal helpers under that route, not
-  direct-callable `tw-*` surfaces.
+- `tw-sessions` wraps packaged `ce-sessions`; the older CE 3.5.0
+  `ce-session-inventory` and `ce-session-extract` split helpers are not part of
+  the selected 3.9.0 package surface.
 - `tw-test-browser` and `tw-test-xcode` wrap packaged verification engines and
   require requirement/trace/verification context for gate-closing evidence.
 - `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree` wrap local repair,
@@ -284,8 +283,9 @@ selected packaged CE continuity entrypoints users are expected to call directly:
 `tw-doc-review`, `tw-commit`, `tw-commit-push-pr`, `tw-compound`,
 `tw-compound-refresh`, `tw-sessions`, `tw-test-browser`, `tw-test-xcode`,
 `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree`. Packaged
-`ce-session-inventory` and `ce-session-extract` stay hidden/internal under
-`tw-sessions`.
+`ce-sessions` is the selected internal session component; the older CE 3.5.0
+`ce-session-inventory` and `ce-session-extract` split helpers are not part of
+the selected CE 3.9.0 package surface.
 Runtime-equivalent CE replacement, agent-backed behavior, slash commands, and
 enforcing mode remain held until U9 or a later accepted runtime proof.
 

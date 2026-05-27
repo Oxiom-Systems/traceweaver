@@ -476,7 +476,7 @@ assert_manifest_field "$FIXTURE_ROOT/ambiguous-per-artifact-anchor/manifest.txt"
 assert_manifest_field "$FIXTURE_ROOT/stale-missing-authority/manifest.txt" "expected_behavior" "hold_before_runtime_driver_proof" "tw_auto_runtime_driver_stale_manifest"
 assert_manifest_field "$FIXTURE_ROOT/fake-publication-boundary/manifest.txt" "expected_behavior" "fake_git_and_gh_markers_absent" "tw_auto_runtime_driver_publication_manifest"
 
-TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-tw-auto-runtime-driver.XXXXXX")"
+TMP_DIR="$(mktemp -d)"
 repo_before="$(authority_fingerprint)"
 fixture_repo="$TMP_DIR/runtime-driver-fixture"
 publication_marker="$TMP_DIR/publication-marker.log"

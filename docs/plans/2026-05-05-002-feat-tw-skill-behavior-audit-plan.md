@@ -31,7 +31,7 @@ Controlling authority:
 - `docs/validation/traceweaver-controlled-autonomy-alpha.md`
 - `docs/plans/2026-05-05-001-feat-traceweaver-dogfood-audit-plan.md`
 - Compound Engineering 3.5.0 source worktree:
-  `/Users/hanneszietsman/CrypotAI/compound-engineering-plugin-main-3.5.0`
+  `redacted CE 3.5.0 source worktree`
   at upstream commit `1f3c6466e4eb4e1b584c658953dfb1ca98dd3335`
 
 Private source-oracle boundary:
@@ -162,7 +162,7 @@ Files:
 
 Work:
 
-- Use `/Users/hanneszietsman/CrypotAI/compound-engineering-plugin-main-3.5.0`
+- Use `redacted CE 3.5.0 source worktree`
   as the current CE source surface.
 - Record the CE 3.5.0 commit, package/plugin manifest hashes, skill counts,
   missing TraceWeaver-packaged skills, and authority-reviewed wrapper route

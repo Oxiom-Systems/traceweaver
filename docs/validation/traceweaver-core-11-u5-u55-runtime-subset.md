@@ -53,11 +53,11 @@ Observed result: `66` total skill files and `66` U4-covered skill files.
 U4 evidence-integrity cross-check:
 
 ```bash
-git ls-tree -r --name-only HEAD skills | sort > /tmp/tw-skill-files.txt
+git ls-tree -r --name-only HEAD skills | sort > redacted temporary skill-file list
 rg -o '`skills/[^`]+`' docs/validation/traceweaver-core-11-promotion-records.md \
   | tr -d '`' \
-  | sort -u > /tmp/tw-u4-targets.txt
-comm -23 /tmp/tw-skill-files.txt /tmp/tw-u4-targets.txt | wc -l
+  | sort -u > redacted temporary U4 target list
+comm -23 redacted temporary skill-file list redacted temporary U4 target list | wc -l
 ```
 
 Observed result: `0` current skill files missing from U4 target-path evidence.

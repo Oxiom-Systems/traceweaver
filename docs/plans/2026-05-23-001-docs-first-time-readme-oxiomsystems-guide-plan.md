@@ -61,7 +61,7 @@ publication claims held.
 ## Authority
 
 - `requirements.md`, baseline `REQ-BASELINE-2026-04-30-001`, hash
-  `9e94f5a1f2aa4f43562a505c40c9ecdc84a624d27723613b17b8062558bc36f3`
+  `f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda`
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
 - `plugins/traceweaver-core/skills/tw-plan/references/traceweaver-operating-modes.md`

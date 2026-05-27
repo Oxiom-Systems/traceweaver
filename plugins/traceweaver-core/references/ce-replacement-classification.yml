@@ -7,7 +7,7 @@ owner: Oxiom Systems
 traceweaver_mode: advisory
 baseline:
   id: REQ-BASELINE-2026-04-30-001
-  hash_sha256: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+  hash_sha256: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
   authority_source: requirements.md
   linked_requirements:
   - REQ-TW-014
@@ -95,7 +95,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -132,7 +132,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -173,7 +173,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -212,7 +212,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -249,7 +249,7 @@ current_core_surface_candidates:
     - REQ-TW-020
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -288,7 +288,7 @@ current_core_surface_candidates:
     - REQ-TW-034
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -328,7 +328,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -367,7 +367,7 @@ current_core_surface_candidates:
     - REQ-TW-041
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -406,7 +406,7 @@ current_core_surface_candidates:
     - REQ-TW-041
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -444,7 +444,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -484,7 +484,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -521,7 +521,7 @@ current_core_surface_candidates:
     - REQ-TW-043
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -558,7 +558,7 @@ current_core_surface_candidates:
     - REQ-TW-043
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -595,7 +595,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -633,7 +633,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -672,7 +672,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -710,7 +710,7 @@ current_core_surface_candidates:
     - REQ-TW-048
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or
@@ -748,7 +748,7 @@ current_core_surface_candidates:
     - REQ-TW-047
     source: requirements.md
     baseline_id: REQ-BASELINE-2026-04-30-001
-    baseline_hash: 6934da7234fe4b59057baebb3cd1ff8a6570b533776185e9a9e3572b617768ba
+    baseline_hash: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
     accepted_exception:
     validation_question: Does this surface preserve the approved TraceWeaver authority
       chain without promoting held runtime, release, publication, host-removal, or

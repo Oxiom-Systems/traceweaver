@@ -1,8 +1,8 @@
 # TraceWeaver Core 11 CE Runtime Inventory
 
-Status: `SOURCE_INVENTORY_REFRESHED_FOR_0_2_1_RELEASE_CE_3_9_0_STATIC_SCOPE`
+Status: `SOURCE_INVENTORY_REFRESHED_FOR_0_2_2_RELEASE_CE_3_9_0_STATIC_SCOPE`
 
-Date/session: 2026-05-27, upstream refresh from Compound Engineering `3.9.0` on branch `codex/traceweaver-0.2.1-release-fixes`
+Date/session: 2026-05-27, upstream refresh from Compound Engineering `3.9.0` on branch `codex/traceweaver-0.2.2-ce390`
 
 This record pins the Compound Engineering runtime surface considered for the TraceWeaver clean-swap plan. The selected files below are static materialization evidence; this record alone does not prove CE runtime loading, approve a clean swap, or create broad release-readiness claims.
 
@@ -10,7 +10,7 @@ This record pins the Compound Engineering runtime surface considered for the Tra
 
 Record ID: `TWCORE-CE-RUNTIME-INVENTORY-2026-05-27-001`
 
-Decision state: `source_pin_refreshed_for_traceweaver_core_0_2_1_static_materialization_review`
+Decision state: `source_pin_refreshed_for_traceweaver_core_0_2_2_static_materialization_review`
 
 Allowed use:
 
@@ -23,7 +23,9 @@ Held claims:
 - TraceWeaver replaces Compound Engineering cleanly;
 - CE agent-backed review/research behavior works without the CE plugin;
 - TraceWeaver systems-engineering controls are integrated into every CE workflow;
-- release-ready or runtime-equivalent claims beyond the recorded 0.2.1 smokes.
+- release-ready status and runtime-equivalent CE behavior; the recorded 0.2.2
+  smokes are scoped only to install/update metadata, static provenance, and
+  discovery/fixture evidence.
 
 ## Source Pin
 
@@ -203,4 +205,4 @@ These agent files are statically materialized so agent-dependent CE workflows ha
 
 This record resets to `held` if the CE source version changes, any selected file hash changes, upstream license/provenance changes, TraceWeaver copies any CE file not listed here, CE agent files are omitted while claiming clean-swap continuity, or this static inventory is used as install/runtime proof.
 
-Next recommended step: run `tw-traceability-check`, `tw-code-review`, and `tw-doc-review` against the 0.2.1 release scope before publication.
+Next recommended step: run `tw-traceability-check`, `tw-code-review`, and `tw-doc-review` against the 0.2.2 release scope before publication.

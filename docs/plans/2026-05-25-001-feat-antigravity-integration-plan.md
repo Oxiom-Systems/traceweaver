@@ -20,24 +20,24 @@ There are no unresolved open questions.
 
 ### Requirements & Traceability
 
-#### [MODIFY] [requirements.md](file:///Users/hanneszietsman/CrypotAI/TraceWeaver/requirements.md)
+#### [MODIFY] [requirements.md](requirements.md)
 - Add a new candidate requirement `REQ-TW-068` under the "CE Adapter And Plugin Alpha" section, specifying the target Antigravity integration behavior.
 
-#### [MODIFY] [traceability-matrix.md](file:///Users/hanneszietsman/CrypotAI/TraceWeaver/traceability-matrix.md)
+#### [MODIFY] [traceability-matrix.md](traceability-matrix.md)
 - Add trace mappings for `REQ-TW-068` showing intent traces, verification artifacts, and validation outcomes.
 
 ---
 
 ### Antigravity Manifest
 
-#### [NEW] [plugin.json](file:///Users/hanneszietsman/CrypotAI/TraceWeaver/plugins/traceweaver-core/.antigravity-plugin/plugin.json)
+#### [NEW] [plugin.json](plugins/traceweaver-core/.antigravity-plugin/plugin.json)
 - Create the Antigravity-specific plugin manifest with metadata (name, description, version, keywords, etc.).
 
 ---
 
 ### Installer
 
-#### [MODIFY] [index.ts](file:///Users/hanneszietsman/CrypotAI/TraceWeaver/src/index.ts)
+#### [MODIFY] [index.ts](src/index.ts)
 - Extend `parseInstallArgs` to accept `--to antigravity` and the optional `--geminiHome <path>` argument.
 - Implement `installAntigravitySkills` to copy the Antigravity manifest and the skills directory to `~/.gemini/config/plugins/traceweaver-core`.
 - Update `assertTraceWeaverPlugin` to support verifying the presence of `.antigravity-plugin/plugin.json` when the target is `antigravity`.
@@ -46,20 +46,20 @@ There are no unresolved open questions.
 
 ### Documentation
 
-#### [MODIFY] [README.md](file:///Users/hanneszietsman/CrypotAI/TraceWeaver/README.md)
+#### [MODIFY] [README.md](README.md)
 - Update the main README to add a setup section for Antigravity, including the local alpha install command:
   ```sh
   bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
   ```
 
-#### [MODIFY] [README.md](file:///Users/hanneszietsman/CrypotAI/TraceWeaver/plugins/traceweaver-core/README.md)
+#### [MODIFY] [README.md](plugins/traceweaver-core/README.md)
 - Mention Antigravity plugin structure and configuration details.
 
 ---
 
 ### Verification Smokes
 
-#### [NEW] [traceweaver-smoke-antigravity-discovery](file:///Users/hanneszietsman/CrypotAI/TraceWeaver/scripts/traceweaver-smoke-antigravity-discovery)
+#### [NEW] [traceweaver-smoke-antigravity-discovery](scripts/traceweaver-smoke-antigravity-discovery)
 - Create a smoke test script to verify that installing to an isolated `--geminiHome` copies the files correctly and produces a valid manifest/skills layout.
 
 ---

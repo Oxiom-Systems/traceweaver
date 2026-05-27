@@ -87,7 +87,7 @@ assert_fixture_field() {
   fi
 }
 
-tmp_dir="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-tw-skill-behavior.XXXXXX")"
+tmp_dir="$(mktemp -d)"
 runtime_prompt="$FIXTURE_ROOT/active-host-structured-finding/prompt.txt"
 runtime_events="$tmp_dir/exec-events.jsonl"
 runtime_stderr="$tmp_dir/exec.err"
