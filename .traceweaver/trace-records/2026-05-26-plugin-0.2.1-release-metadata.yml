@@ -1,0 +1,137 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-26-PLUGIN-0.2.1-RELEASE-METADATA-001
+record_type: implementation_trace
+created_at: "2026-05-26"
+owner: Oxiom Systems
+status: release_0_2_1_metadata_prepared_verified_publication_pending_runtime_readiness_claims_held
+
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_source: requirements.md
+intent_contract: .traceweaver/intent-contract.yml
+
+requirements:
+  - REQ-TW-016
+  - REQ-TW-020
+  - REQ-TW-023
+  - REQ-TW-041
+  - REQ-TW-043
+  - REQ-TW-050
+  - REQ-TW-061
+  - REQ-TW-069
+trace_ids:
+  - TRACE-TW-010
+  - TRACE-TW-021
+  - TRACE-TW-044
+  - TRACE-TW-055
+verification_ids:
+  - VER-TW-012
+  - VER-TW-070
+  - VER-TW-071
+  - VER-TW-072
+
+intent_served:
+  - INTENT-TW-001
+  - INTENT-TW-003
+  - INTENT-TW-004
+  - INTENT-TW-007
+  - INTENT-TW-008
+
+scope:
+  - plugins/traceweaver-core/.codex-plugin/plugin.json
+  - plugins/traceweaver-core/.claude-plugin/plugin.json
+  - plugins/traceweaver-core/.antigravity-plugin/plugin.json
+  - plugins/traceweaver-core/.cursor-plugin/plugin.json
+  - .claude-plugin/marketplace.json
+  - src/index.ts
+  - scripts/traceweaver-smoke-antigravity-discovery
+  - plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md
+  - scripts/traceweaver-smoke-tw-skill-behavior
+  - scripts/traceweaver-smoke-codex-host-registry
+  - fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt
+  - README.md
+  - plugins/traceweaver-core/README.md
+  - CHANGELOG.md
+  - requirements.md
+  - traceability-matrix.md
+  - docs/validation/traceweaver-plugin-0.2-release.md
+  - .traceweaver/trace-records/2026-05-26-plugin-0.2.1-release-metadata.yml
+  - docs/generated/traceability-dashboard.md
+  - docs/generated/traceability-data.json
+  - docs/generated/traceability-graph.mmd
+
+release:
+  version: "0.2.1"
+  intended_tag: traceweaver-core--v0.2.1
+  intended_release_name: TraceWeaver Core 0.2.1
+  prior_release_tag: traceweaver-core--v0.2.0
+  prior_release_commit: fc1d3058a0cc98fb3187e7576ec13320e4879aa8
+  release_reason: REQ-TW-069 requirement-quality ranking and active-host runtime-output fixture proof
+
+verification_required:
+  - JSON validation for peer plugin manifests and marketplace metadata
+  - Claude plugin validation and tag dry-run
+  - Codex discovery smoke with runtime execution disabled
+  - separate-home Codex install/runtime-disabled smoke
+  - Antigravity local install/discovery smoke
+  - controlled publication-route smoke
+  - tw-skill-behavior smoke
+  - active-host tw-requirements-review skill-file-read proof
+  - active-host tw-requirements-review runtime-output fixture proof
+  - implementation-mode code-anchor scan
+  - generated traceability views and drift smoke
+  - git diff whitespace check
+
+verification_observed:
+  - result: pass
+    command: python3 -m json.tool over marketplace and peer plugin manifests
+  - result: pass
+    command: ruby YAML.load_file over Intent Contract and release trace records
+  - result: pass
+    command: claude plugin validate --strict .
+  - result: pass
+    command: claude plugin validate --strict plugins/traceweaver-core
+  - result: pass
+    command: claude plugin tag --dry-run --force plugins/traceweaver-core
+    observed_tag: traceweaver-core--v0.2.1
+  - result: pass
+    command: TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
+  - result: expected_held
+    command: TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=10 scripts/traceweaver-smoke-codex-separate-home-runtime
+    held_observation: held_no_runtime_invocation_without_auth_in_isolated_codex_home
+  - result: pass
+    command: scripts/traceweaver-smoke-antigravity-discovery
+  - result: pass
+    command: scripts/traceweaver-smoke-controlled-publication
+  - result: pass
+    command: TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior
+  - result: pass
+    command: TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_HOST_RUNTIME_PROOF=requirements-review-output TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry
+  - result: pass
+    command: TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry
+  - result: pass
+    command: scripts/traceweaver-smoke-code-traceability
+  - result: pass
+    command: scripts/traceweaver-generate-traceability-views --root .
+  - result: pass
+    command: scripts/traceweaver-smoke-traceability-generated-views
+  - result: pass
+    command: git diff --check
+
+validation_question: "Can users update to TraceWeaver Core 0.2.1 to receive REQ-TW-069 requirement quality ranking and bounded active-host runtime-output proof without expanding release-ready, package-ready, broad runtime, clean replacement, or autonomous-publication claims?"
+
+held_claims:
+  - broad real-document tw-requirements-review runtime behavior
+  - runtime-driver invocation
+  - clean CE replacement
+  - package-ready status
+  - release-ready status
+  - upstream-ready status
+  - R31 real-project validation closure
+  - slash-command or prompt availability
+  - enforcing authority gate behavior
+  - unconstrained-host support
+  - autonomous publication
+
+publication_boundary:
+  publication_requested_by_user: "release 0.2.1 is needed for this"
+  requested_at: "2026-05-26"
+  stop_before_publication_until: exact_target_confirmation_and_clean_publication_worktree_or_explicit_staging_pass

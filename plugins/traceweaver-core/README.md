@@ -35,7 +35,7 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.2.0`
+Plugin version: `0.2.1`
 
 Included skills:
 
@@ -164,7 +164,7 @@ package. Bump every peer plugin manifest carried by the release:
 - `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.2.0`.
+`traceweaver-core--v0.2.1`.
 
 ## Skill Entry Points
 

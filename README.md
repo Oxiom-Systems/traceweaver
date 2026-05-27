@@ -21,7 +21,7 @@ without losing the proof behind what changed and why.
 
 ### Codex
 
-After the `0.2.0` plugin release is published, add the marketplace:
+After the `0.2.1` plugin release is published, add the marketplace:
 
 ```sh
 codex plugin marketplace add Oxiom-Systems/traceweaver
@@ -89,7 +89,7 @@ Reload active plugins inside Claude Code:
 TraceWeaver includes a Cursor peer manifest at
 `plugins/traceweaver-core/.cursor-plugin/plugin.json`.
 
-Cursor install/update is compatibility-preview only in `0.2.0`: the manifest is
+Cursor install/update is compatibility-preview only in `0.2.1`: the manifest is
 versioned with the Codex and Claude manifests, but TraceWeaver does not yet
 claim a proven Cursor marketplace or runtime install path. Use the Codex or
 Claude setup above for supported alpha plugin use, and treat Cursor testing as
@@ -137,7 +137,7 @@ tw-auto "implement the approved plan"
 
 ## Current Alpha Boundaries
 
-TraceWeaver Core `0.2.0` is an alpha advisory plugin for Codex and Claude Code.
+TraceWeaver Core `0.2.1` is an alpha advisory plugin for Codex and Claude Code.
 It is usable for first-time authority bootstrap, requirements review, planning,
 work handoffs, traceability checks, audits, and controlled review flows.
 Antigravity support is limited to static local install/discovery metadata in
@@ -424,7 +424,7 @@ validation files when auditing specific claims:
 
 ## Near-Term Next Steps
 
-1. Review the `0.2.0` plugin metadata and publish the release only through the
+1. Review the `0.2.1` plugin metadata and publish the release only through the
    controlled publication route.
 2. Dogfood the alpha on TraceWeaver and Vestro through `tw-auto`, `tw-work`,
    `tw-traceability-check`, `tw-code-review`, and `tw-doc-review`.

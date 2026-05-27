@@ -2,6 +2,35 @@
 
 # Changelog
 
+## 0.2.1 - 2026-05-26
+
+TraceWeaver Core 0.2.1 packages the REQ-TW-069 requirements-quality ranking
+update for Codex, Claude Code, Antigravity local install/update flows, and
+peer manifests.
+
+### Added
+
+- `tw-requirements-review` now explicitly requires 0-5 requirement quality
+  scores, default outcomes, score-as-triage-only boundaries, and
+  requirement-set quality findings.
+- Added active-host `tw-requirements-review` proof coverage for both installed
+  skill-file-read identity and a bounded runtime-output fixture.
+
+### Changed
+
+- Bumped Codex, Claude Code, Antigravity, and Cursor peer plugin manifests to
+  `0.2.1`.
+- Bumped Claude marketplace metadata to `0.2.1`.
+- Updated the Antigravity installer and discovery smoke to write and verify
+  installed version `0.2.1`.
+
+### Held
+
+- Broad real-document runtime behavior, package-ready/release-ready claims,
+  runtime-driver invocation, clean CE replacement, unconstrained-host support,
+  slash-command surfaces, enforcing mode, R31 validation, and autonomous
+  publication remain held until their own gates pass.
+
 ## 0.2.0 - 2026-05-25
 
 TraceWeaver Core 0.2 packages the latest alpha plugin surface for Codex,

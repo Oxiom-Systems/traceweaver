@@ -1,0 +1,42 @@
+Use the tw-requirements-review skill on this bounded fixture.
+
+Candidate requirement:
+
+REQ-FIXTURE-QUALITY-001: `tw-requirements-review` must report a 0-5
+requirement quality score, default outcome, score-as-triage-only boundary, and
+requirement-set quality findings for each real requirement before that
+requirement is used as static/advisory planning authority.
+
+Fixture facts:
+- Source basis: REQ-TW-069, REQ-TW-050, and the user request to rank
+  requirements quality.
+- Verification method: inspect wrapper output fields.
+- Validation question: can reviewers see quality ranking without mistaking it
+  for approval authority?
+- Held claims: publication, release/package readiness, clean replacement,
+  autonomous publication, and broad runtime behavior are not authorized by this
+  fixture.
+
+You may run read-only shell commands only to hash the installed
+tw-requirements-review SKILL.md file. Do not edit files. Do not stage, commit,
+push, open a PR, or publish.
+
+Return exactly these structured fields if the skill is available, replacing
+SKILL_HASH with the SHA-256 of the installed tw-requirements-review SKILL.md
+file you inspected:
+
+TRACEWEAVER_TW_REQUIREMENTS_REVIEW_SENTINEL=pass
+TRACEWEAVER_TW_REQUIREMENTS_REVIEW_SKILL_HASH=SKILL_HASH
+requirements_reviewed=REQ-FIXTURE-QUALITY-001
+classification=requirement
+quality_score=5
+default_outcome=Can approve
+score_boundary=triage_not_approval_authority
+requirement_set_quality_findings=none
+authority_ready=static_advisory_only
+publication=held
+accepted_traceweaver_input=false
+
+If the skill is unavailable, return:
+
+TRACEWEAVER_SKILL_HELD=not_available

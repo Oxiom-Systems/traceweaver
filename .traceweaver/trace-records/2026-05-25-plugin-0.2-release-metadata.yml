@@ -110,4 +110,12 @@ publication_authorization:
   exact_release: TraceWeaver Core 0.2.0
   target_commit_before_release_refresh: 061e24784ce11abf5cb2a700d97661c6e7298e43
   release_version_decision: fold_pr_27_into_0_2_0_no_0_2_1_because_no_0_2_0_tag_or_github_release_exists
-status: static_metadata_prepared_verification_passed_exact_0_2_0_publication_authorized_runtime_claims_held
+status: static_metadata_prepared_verification_passed_exact_0_2_0_tag_and_github_release_published_runtime_claims_held
+publication_observed:
+  tag: traceweaver-core--v0.2.0
+  tag_ref_sha: 3fd442a90c86c2b1ab76436677933b3386045cda
+  release_commit: fc1d3058a0cc98fb3187e7576ec13320e4879aa8
+  release_url: https://github.com/Oxiom-Systems/traceweaver/releases/tag/traceweaver-core--v0.2.0
+  published_at: "2026-05-25T12:22:41Z"
+  release_record: .traceweaver/trace-records/2026-05-25-plugin-0.2-release-publication.yml
+post_release_status: exact_0_2_0_tag_and_github_release_published_runtime_claims_held

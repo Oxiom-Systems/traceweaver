@@ -6,15 +6,15 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "aef3f9b1d58318b0c6c7d50549423db15111b1b17e3aaf6ea340b7ba1db8b3e7"
+      "sha256": "7cc7c8bfc092d2aa7ce4d44eee8f3a72ccd1ff497624a50fb462b81d00f712b8"
     },
     {
       "path": "requirements.md",
-      "sha256": "f1f0eca4db4f373bd6064ac86925a914467e0b570c8050f32e12653e148ac7e9"
+      "sha256": "4fbb03c01fade77e6ca969b796b1cf8afbf755ca84874cd74a8dbc665f16d4ba"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "90247503570e4e0ceff466d3dd480562a1553b672aafaab9a7c336d467c8d2df"
+      "sha256": "a8066400d85b6c4adea1b9e19a9075c22fedcd161b12d23162d74136b9db4312"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -22,17 +22,17 @@
     }
   ],
   "row_counts": {
-    "requirements": 68,
-    "trace_rows": 52,
-    "atp_entries": 35,
-    "result_records": 36,
-    "verification_records": 66,
-    "validation_records": 16,
-    "code_anchor_records": 247,
+    "requirements": 69,
+    "trace_rows": 53,
+    "atp_entries": 36,
+    "result_records": 37,
+    "verification_records": 70,
+    "validation_records": 17,
+    "code_anchor_records": 253,
     "structured_acceptance_results": 1,
-    "structured_acceptance_coverage": 68,
-    "structured_acceptance_missing_requirements": 67,
-    "structured_acceptance_non_closed_requirements": 68
+    "structured_acceptance_coverage": 69,
+    "structured_acceptance_missing_requirements": 68,
+    "structured_acceptance_non_closed_requirements": 69
   },
   "requirements": [
     {
@@ -178,7 +178,8 @@
       "status": "Approved",
       "trace_ids": [
         "TRACE-TW-003",
-        "TRACE-TW-041"
+        "TRACE-TW-041",
+        "TRACE-TW-055"
       ]
     },
     {
@@ -807,7 +808,8 @@
         "TRACE-TW-029",
         "TRACE-TW-030",
         "TRACE-TW-031",
-        "TRACE-TW-041"
+        "TRACE-TW-041",
+        "TRACE-TW-055"
       ]
     },
     {
@@ -1014,7 +1016,8 @@
         "TRACE-TW-044",
         "TRACE-TW-046",
         "TRACE-TW-047",
-        "TRACE-TW-052"
+        "TRACE-TW-052",
+        "TRACE-TW-055"
       ]
     },
     {
@@ -1116,6 +1119,19 @@
       "status": "Candidate for review",
       "trace_ids": [
         "TRACE-TW-054"
+      ]
+    },
+    {
+      "id": "REQ-TW-069",
+      "type": "Requirements Quality Ranking",
+      "summary": "`tw-requirements-review` must explicitly rank each real requirement with the TraceWeaver `requirements-reviewer` 0-5 quality score, report the default outcome, and preserve the rule that numeric ranking is triage only and cannot override blocking authority, source, verification, validation, or human-decision gaps. Requirement-set quality findings must also be reported.",
+      "source_need": "NEED-TW-001; NEED-TW-003; NEED-TW-008",
+      "verification_method": "Wrapper instruction inspection / deterministic skill-behavior smoke / private-source hygiene inspection / scoped doc review / active-host skill-file-read proof / runtime-output fixture proof",
+      "validation_path": "VAL-TW-017",
+      "owner": "Oxiom Systems",
+      "status": "Requirements review passed / scoped doc review passed / static wrapper update added / deterministic smoke passed / generated views passed / active-host skill-file-read proof passed / runtime-output fixture passed / broad runtime held",
+      "trace_ids": [
+        "TRACE-TW-055"
       ]
     }
   ],
@@ -1691,6 +1707,17 @@
       "validation": "VAL-TW-016",
       "status": "Static packaging/install verified / runtime invocation held",
       "next_step": "Open the reviewed TraceWeaver PR; keep release tags, GitHub Release, website publication, runtime, and clean-replacement claims held."
+    },
+    {
+      "id": "TRACE-TW-055",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-003; NEED-TW-008",
+      "requirements": "REQ-TW-069; REQ-TW-010; REQ-TW-050; REQ-TW-061",
+      "artifact": "ART-TW-069",
+      "verification": "VER-TW-070; VER-TW-071; VER-TW-072",
+      "validation": "VAL-TW-017",
+      "status": "Requirements review passed; scoped doc review passed; static wrapper update added; deterministic smoke passed; generated-view smoke passed; active-host skill-file-read proof passed; runtime-output fixture passed; broad runtime held",
+      "next_step": "Keep broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous publication held until separately reviewed evidence authorizes those claims."
     }
   ],
   "atp_entries": [
@@ -2008,6 +2035,15 @@
       "Expected Result": "First-time users can find install/update commands, first command, authority files, workflow loop, audit path, alpha boundaries, and proof trail; public guide avoids internal review IDs, local paths, protected text, and unsupported release/compliance claims.",
       "Owner": "Oxiom Systems",
       "Status": "Implementation added / verification passed / scoped review passed / exact TraceWeaver PR route authorized"
+    },
+    {
+      "ID": "ATP-TW-039",
+      "Requirement": "REQ-TW-069; REQ-TW-010; REQ-TW-050; REQ-TW-061",
+      "Procedure / Scenario": "Inspect `tw-requirements-review`, run the deterministic skill-behavior smoke for the requirement-quality ranking contract, run scoped doc review over the authority/status update, reconcile the active Codex host skill surface when stale, run an active-host `tw-requirements-review` skill-file-read proof, and run a bounded runtime-output fixture.",
+      "Setup / Context": "`plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md`; `/Users/hanneszietsman/.codex/skills/tw-requirements-review/SKILL.md`; `scripts/traceweaver-smoke-tw-skill-behavior`; `scripts/traceweaver-reconcile-codex-host-skills`; `scripts/traceweaver-smoke-codex-host-registry`; `fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt`; `requirements.md`; `traceability-matrix.md`; private promoted `requirements-reviewer` references used as source context only.",
+      "Expected Result": "The wrapper requires 0-5 per-requirement scores, default outcomes, score-as-triage-only boundary, and requirement-set quality findings while continuing to block weak or unapproved requirements from becoming authority. Scoped doc review confirms the REQ-TW-069 status update remains static/advisory and keeps publication claims held. Active-host proof confirms the installed `tw-requirements-review` wrapper is visible and readable by Codex after host reconciliation; runtime-output fixture confirms the required output fields for one fixed requirement. Broad real-document runtime behavior remains held.",
+      "Owner": "Oxiom Systems",
+      "Status": "Requirements review passed / scoped doc review passed / static wrapper update added / deterministic smoke passed / active-host skill-file-read proof passed / runtime-output fixture passed / broad runtime held"
     }
   ],
   "result_records": [
@@ -2334,6 +2370,15 @@
       "Evidence Artifact": "`plugins/traceweaver-core/.antigravity-plugin/plugin.json`; `src/index.ts`; `scripts/traceweaver-smoke-antigravity-discovery`",
       "Result": "Static packaging/install verified; installer verification smoke passed; runtime invocation/publication held.",
       "Date / Session": "2026-05-25"
+    },
+    {
+      "ID": "RESULT-TW-039",
+      "Requirement / Need": "REQ-TW-069; REQ-TW-010; REQ-TW-050; REQ-TW-061",
+      "ATP / Method": "ATP-TW-039",
+      "Tested Ref / Context": "Requirements quality ranking wrapper update",
+      "Evidence Artifact": "`plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md`; `/Users/hanneszietsman/.codex/skills/tw-requirements-review/SKILL.md`; `scripts/traceweaver-smoke-tw-skill-behavior`; `scripts/traceweaver-smoke-codex-host-registry`; `fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt`; `requirements.md`; `traceability-matrix.md`",
+      "Result": "Requirements review and scoped doc review passed as `TW-DOC-REVIEW-2026-05-26-REQ-TW-069-REQUIREMENTS-QUALITY-RANKING-STATUS-CLEAN-001`. Static wrapper update added and deterministic skill-behavior smoke passed. Active-host reconciliation refreshed stale `tw-auto` and `lfg` host copies. `TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry` passed with `real_tw_skill_runtime_invocation=pass_host_tw_requirements_review_skill_file_read`. `TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_HOST_RUNTIME_PROOF=requirements-review-output TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry` passed with `real_tw_skill_runtime_invocation=pass_host_tw_requirements_review_runtime_output_fixture`. The adapter now requires 0-5 quality scores, default outcomes, score-as-triage boundary, and requirement-set quality findings. Broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous publication remain held.",
+      "Date / Session": "2026-05-26"
     }
   ],
   "verification_evidence": [
@@ -2463,11 +2508,11 @@
       "Requirement": "REQ-TW-020; REQ-TW-022; REQ-TW-024; REQ-TW-041; REQ-TW-060; REQ-TW-068",
       "Method": "Release / validation review",
       "Procedure / Command": "Review U7 static/advisory claim record after alpha evidence gates pass; prepare 0.2.0 marketplace metadata; create U9 runtime records later.",
-      "Tested Ref": "`docs/validation/traceweaver-u7-static-advisory-claims.md`; `docs/validation/traceweaver-plugin-0.2-release.md`; future U9 records",
-      "Result": "Pass for narrow U7 static/advisory only / 0.2.0 static marketplace metadata prepared / runtime and publication held",
-      "Evidence Path": "U7 static/advisory evidence plus 0.2.0 metadata record",
+      "Tested Ref": "`docs/validation/traceweaver-u7-static-advisory-claims.md`; `docs/validation/traceweaver-plugin-0.2-release.md`; `.traceweaver/trace-records/2026-05-25-plugin-0.2-release-publication.yml`; future U9 records",
+      "Result": "Pass for narrow U7 static/advisory only / 0.2.0 static marketplace metadata prepared / exact 0.2.0 GitHub release published / runtime and readiness claims held",
+      "Evidence Path": "U7 static/advisory evidence plus 0.2.0 metadata and publication records",
       "Date / Session": "2026-05-25",
-      "Notes": "Prior `/ce-doc-review` passed on the refreshed authority records before the REQ-TW-048 two-mode amendment; `CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001` promoted REQ-TW-048 for static/advisory source-evidence behavior. The 2026-05-25 0.2.0 metadata record prepares Codex/Claude marketplace update paths, Antigravity local install version metadata, and the `traceweaver-core--v0.2.0` tag convention, but release-ready/upstream-ready, clean replacement, enforcing mode, slash commands, dynamic discovery, runtime behavior, U9, R31, and actual publication remain held."
+      "Notes": "Prior `/ce-doc-review` passed on the refreshed authority records before the REQ-TW-048 two-mode amendment; `CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001` promoted REQ-TW-048 for static/advisory source-evidence behavior. The 2026-05-25 0.2.0 metadata record prepares Codex/Claude marketplace update paths, Antigravity local install version metadata, and the `traceweaver-core--v0.2.0` tag convention; the exact `traceweaver-core--v0.2.0` GitHub release publication is recorded in `.traceweaver/trace-records/2026-05-25-plugin-0.2-release-publication.yml`, while release-ready/upstream-ready/package-ready, clean replacement, enforcing mode, slash commands, dynamic discovery, runtime behavior, U9, R31, and autonomous or future publication remain held."
     },
     {
       "ID": "VER-TW-013",
@@ -3042,6 +3087,50 @@
       "Notes": "Verification passed; exact TraceWeaver PR route authorized by `/tw-commit-push-pr`; no release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, website publication, GitHub release, tag, or autonomous-publication claim is accepted."
     },
     {
+      "ID": "VER-TW-070",
+      "Requirement": "REQ-TW-069; REQ-TW-010; REQ-TW-050; REQ-TW-061",
+      "Method": "Requirements quality ranking wrapper inspection, static smoke, and scoped doc review",
+      "Procedure / Command": "`TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior`; `scripts/traceweaver-generate-traceability-views --root .`; `scripts/traceweaver-smoke-traceability-generated-views`; inspection of packaged and active-host `tw-requirements-review` skill files; scoped `tw-doc-review` over `requirements.md`, `traceability-matrix.md`, and the wrapper skill",
+      "Tested Ref": "`tw-requirements-review` wrapper, active Codex callable copy, skill-behavior smoke assertions, requirements baseline, traceability matrix, and generated views",
+      "Result": "Pass. Static instructions and smoke assertions require quality ranking, 0-5 scoring, score-as-triage boundary, and requirement-set quality output. Scoped doc review passed as `TW-DOC-REVIEW-2026-05-26-REQ-TW-069-REQUIREMENTS-QUALITY-RANKING-STATUS-CLEAN-001`; generated-view drift check passed after the status update.",
+      "Evidence Path": "`plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md`; `/Users/hanneszietsman/.codex/skills/tw-requirements-review/SKILL.md`; `scripts/traceweaver-smoke-tw-skill-behavior`; `requirements.md`; `traceability-matrix.md`; generated views",
+      "Date / Session": "2026-05-26",
+      "Notes": "Runtime invocation, active-host wrapper testing, publication, release/package/upstream readiness, clean replacement, and autonomous publication remain held."
+    },
+    {
+      "ID": "VER-TW-071",
+      "Requirement": "REQ-TW-069; REQ-TW-050; REQ-TW-061",
+      "Method": "Active-host `tw-requirements-review` skill-file-read proof",
+      "Procedure / Command": "`scripts/traceweaver-reconcile-codex-host-skills --dry-run`; `scripts/traceweaver-reconcile-codex-host-skills`; `TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry`",
+      "Tested Ref": "Active Codex host skill registry, installed `tw-requirements-review` callable copy, prompt-input visible skill list, model default policy reference, and host reconciliation backup `/Users/hanneszietsman/.codex/traceweaver-core/host-reconciliation-backups/20260526T164903Z`",
+      "Result": "Pass. Dry-run identified stale `tw-auto` and `lfg` host copies only; reconciliation refreshed them with backup. The active host then reported all required TraceWeaver direct skills visible, no stale/missing/unmarked skills, no direct CE-derived callable skills, current model-default reference hashes, and `real_tw_skill_runtime_invocation=pass_host_tw_requirements_review_skill_file_read` with expected hash `6c25458eda9ed48eb6aa9e12bd42c4926de0d325b915aaa712bd34173e822e55`.",
+      "Evidence Path": "`scripts/traceweaver-smoke-codex-host-registry`; `/Users/hanneszietsman/.codex/skills/tw-requirements-review/SKILL.md`; `scripts/traceweaver-reconcile-codex-host-skills`",
+      "Date / Session": "2026-05-26",
+      "Notes": "This is an active-host skill-file-read proof only. Full functional review-output runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous publication remain held."
+    },
+    {
+      "ID": "VER-TW-072",
+      "Requirement": "REQ-TW-069; REQ-TW-050; REQ-TW-061",
+      "Method": "Active-host `tw-requirements-review` runtime-output fixture",
+      "Procedure / Command": "`TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_HOST_RUNTIME_PROOF=requirements-review-output TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry`",
+      "Tested Ref": "Active Codex host skill registry, installed `tw-requirements-review` callable copy, fixed candidate requirement fixture, output sentinel checks, and model default policy reference",
+      "Result": "Pass. The active host reported all required TraceWeaver direct skills visible, no stale/missing/unmarked skills, no direct CE-derived callable skills, current model-default reference hashes, and `real_tw_skill_runtime_invocation=pass_host_tw_requirements_review_runtime_output_fixture`. The fixture output required `quality_score=5`, `default_outcome=Can approve`, `score_boundary=triage_not_approval_authority`, `requirement_set_quality_findings=none`, `authority_ready=static_advisory_only`, `publication=held`, and `accepted_traceweaver_input=false`.",
+      "Evidence Path": "`scripts/traceweaver-smoke-codex-host-registry`; `fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt`; `/Users/hanneszietsman/.codex/skills/tw-requirements-review/SKILL.md`",
+      "Date / Session": "2026-05-26",
+      "Notes": "This is a bounded runtime-output fixture for one fixed candidate requirement. Broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous publication remain held."
+    },
+    {
+      "ID": "VER-TW-073",
+      "Requirement": "REQ-TW-016; REQ-TW-020; REQ-TW-023; REQ-TW-050; REQ-TW-061; REQ-TW-069",
+      "Method": "TraceWeaver Core 0.2.1 release metadata preparation",
+      "Procedure / Command": "JSON/plugin validation; Claude plugin validation and tag dry-run; Codex discovery/install smokes; Antigravity discovery smoke; controlled-publication smoke; `tw-requirements-review` active-host proofs; implementation-mode code traceability; generated-view drift smoke; `git diff --check`",
+      "Tested Ref": "0.2.1 manifests, installer version, release docs, trace records, matrix, generated views, and REQ-TW-069 fixture evidence",
+      "Result": "Pass. JSON/YAML validation, Claude strict validation, tag dry-run, Codex discovery, Antigravity discovery, controlled-publication, TW skill behavior, active-host `tw-requirements-review` skill-file-read, active-host runtime-output fixture, code traceability, generated-view drift, and whitespace checks passed. Separate-home Codex install passed with expected-held no-auth runtime observation.",
+      "Evidence Path": "`.traceweaver/trace-records/2026-05-26-plugin-0.2.1-release-metadata.yml`; `CHANGELOG.md`; manifests; `src/index.ts`; generated views",
+      "Date / Session": "2026-05-26",
+      "Notes": "Exact 0.2.1 tag/GitHub release publication pending controlled route; release-ready, package-ready, broad runtime, clean replacement, and autonomous publication claims remain held."
+    },
+    {
       "ID": "VER-TW-056",
       "Requirement": "REQ-TW-061; REQ-TW-062; REQ-TW-063",
       "Method": "Systems-engineering audit closure deterministic fixture implementation",
@@ -3226,9 +3315,9 @@
       "Stakeholder / Representative": "Oxiom Systems",
       "Acceptance Signal": "A reviewer can read the README and guide, identify Codex and Claude Code install/update paths, select blank-project or existing-repo first steps, see the normal TraceWeaver wrapper loop, find authority files and proof trail links, and confirm public website copy avoids internal review IDs, local paths, protected text, and unsupported release/compliance claims.",
       "Evidence Path": "`README.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; Oxiom Systems website source guide section",
-      "Result": "Verification passed / scoped review passed / exact TraceWeaver PR route authorized",
+      "Result": "Verification passed / scoped review passed / exact TraceWeaver PR route authorized / exact 0.2.0 GitHub release published / 0.2.1 metadata prepared for controlled publication",
       "Owner": "Oxiom Systems",
-      "Deferred Trigger / Notes": "Website publication, GitHub release publication, tag, release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, and autonomous-publication claims remain held."
+      "Deferred Trigger / Notes": "Website publication, release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, future release publication beyond the explicit 0.2.1 GitHub release target, and autonomous-publication claims remain held."
     },
     {
       "ID": "VAL-TW-016",
@@ -3240,6 +3329,17 @@
       "Result": "Static installation verified / runtime invocation and publication held",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "Dogfood install verified. Runtime invocation remains held."
+    },
+    {
+      "ID": "VAL-TW-017",
+      "Source Need": "NEED-TW-001; NEED-TW-003; NEED-TW-008",
+      "Scenario / Intended Use": "Reviewers can compare requirement quality before promotion without confusing ranking with approval authority.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "A `tw-requirements-review` output lists each real requirement with a 0-5 quality score, default outcome, blocked authority gaps, and requirement-set quality findings.",
+      "Evidence Path": "`plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md`; `scripts/traceweaver-smoke-tw-skill-behavior`; `scripts/traceweaver-smoke-codex-host-registry`; `fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt`; future reviewed `tw-requirements-review` outputs",
+      "Result": "Requirements review passed / scoped doc review passed / static wrapper update added / active-host skill-file-read proof passed / runtime-output fixture passed / broad runtime held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Score is triage only; approval, source basis, verification, validation, human decision, and held-claim gates still control authority promotion."
     }
   ],
   "code_anchor_evidence": [
@@ -3698,6 +3798,54 @@
       "Verification": "VER-TW-030",
       "Anchor Type": "file-role",
       "Role": "requirements-review-wrapper-skill"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md",
+      "Requirement": "REQ-TW-069",
+      "Trace": "TRACE-TW-055",
+      "Verification": "VER-TW-070",
+      "Anchor Type": "file-role",
+      "Role": "requirements-quality-ranking-wrapper-skill"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-tw-skill-behavior",
+      "Requirement": "REQ-TW-069",
+      "Trace": "TRACE-TW-055",
+      "Verification": "VER-TW-070",
+      "Anchor Type": "verifies",
+      "Role": "requirements-quality-ranking-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-codex-host-registry",
+      "Requirement": "REQ-TW-069",
+      "Trace": "TRACE-TW-055",
+      "Verification": "VER-TW-071",
+      "Anchor Type": "verifies",
+      "Role": "requirements-quality-active-host-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-codex-host-registry",
+      "Requirement": "REQ-TW-069",
+      "Trace": "TRACE-TW-055",
+      "Verification": "VER-TW-072",
+      "Anchor Type": "verifies",
+      "Role": "requirements-quality-runtime-output-smoke"
+    },
+    {
+      "Artifact Path": "fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt",
+      "Requirement": "REQ-TW-069",
+      "Trace": "TRACE-TW-055",
+      "Verification": "VER-TW-072",
+      "Anchor Type": "verifies",
+      "Role": "requirements-review-runtime-output-fixture"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-05-26-plugin-0.2.1-release-metadata.yml",
+      "Requirement": "REQ-TW-016; REQ-TW-020; REQ-TW-069",
+      "Trace": "TRACE-TW-055",
+      "Verification": "VER-TW-073",
+      "Anchor Type": "trace-record",
+      "Role": "plugin-0.2.1-release-metadata"
     },
     {
       "Artifact Path": "plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md",
@@ -6306,6 +6454,22 @@
     },
     {
       "requirement_id": "REQ-TW-068",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-069",
       "coverage_status": "missing_structured_acceptance_result",
       "structured_acceptance_result_ids": [
 

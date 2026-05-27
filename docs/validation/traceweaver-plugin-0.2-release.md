@@ -1,6 +1,6 @@
 # TraceWeaver Plugin 0.2 Release Metadata Record
 
-Status: `STATIC_MARKETPLACE_METADATA_PREPARED_PUBLICATION_AUTHORIZED`
+Status: `STATIC_MARKETPLACE_METADATA_PREPARED_PUBLICATION_COMPLETE`
 
 Date/session: 2026-05-25, Codex, branch
 `codex/guide-0.2-antigravity-release` worktree
@@ -44,8 +44,15 @@ This record does not approve runtime-driver invocation, clean CE replacement,
 package-ready status, release-ready status, upstream-ready status, R31 validation closure,
 slash-command availability, enforcing mode, unconstrained-host support, or
 autonomous publication. The exact `traceweaver-core--v0.2.0` tag and GitHub
-release are authorized after PR #27 was merged and the release-scope refresh
-checks pass.
+release were published after PR #27 was merged and the release-scope refresh
+checks passed.
+
+Post-release evidence:
+
+- tag: `traceweaver-core--v0.2.0`
+- release URL: <https://github.com/Oxiom-Systems/traceweaver/releases/tag/traceweaver-core--v0.2.0>
+- release commit: `fc1d3058a0cc98fb3187e7576ec13320e4879aa8`
+- release record: `.traceweaver/trace-records/2026-05-25-plugin-0.2-release-publication.yml`
 
 ## Prepared Artifacts
 
@@ -123,7 +130,8 @@ python3 -m json.tool plugins/traceweaver-core/.codex-plugin/plugin.json
 python3 -m json.tool plugins/traceweaver-core/.claude-plugin/plugin.json
 python3 -m json.tool plugins/traceweaver-core/.antigravity-plugin/plugin.json
 python3 -m json.tool plugins/traceweaver-core/.cursor-plugin/plugin.json
-python3 /Users/hanneszietsman/.codex/skills/.system/plugin-creator/scripts/validate_plugin.py plugins/traceweaver-core
+# The older local Codex plugin-validator helper path was absent on the release
+# host; use JSON validation plus the available Claude/plugin manifest checks.
 claude plugin validate --strict .
 claude plugin validate --strict plugins/traceweaver-core
 claude plugin tag --dry-run --force plugins/traceweaver-core
@@ -153,6 +161,44 @@ git diff --check
 
 ## Suggested Next Step
 
-Run the verification plan above, commit and push this release-scope refresh, then
-create the exact `traceweaver-core--v0.2.0` GitHub release from the refreshed
-main commit. Do not create `0.2.1` for this scope.
+Use `.traceweaver/trace-records/2026-05-25-plugin-0.2-release-publication.yml`
+as the post-release evidence record for 0.2.0. The later REQ-TW-069
+requirements-quality ranking runtime-output proof requires a new `0.2.1`
+release scope, recorded separately in
+`.traceweaver/trace-records/2026-05-26-plugin-0.2.1-release-metadata.yml`.
+
+## 0.2.1 Update Scope
+
+TraceWeaver Core 0.2.1 is a scoped patch release for REQ-TW-069:
+
+- `tw-requirements-review` explicitly reports 0-5 requirement quality scores,
+  default outcomes, score-as-triage-only boundaries, and requirement-set quality
+  findings.
+- Active-host proof now covers installed `tw-requirements-review` skill-file
+  identity and one bounded runtime-output fixture.
+- Codex, Claude Code, Antigravity, and Cursor peer manifests carry version
+  `0.2.1`.
+- Antigravity local install writes `installed_version.json` with `0.2.1`.
+
+This update still does not approve package-ready, release-ready,
+upstream-ready, clean replacement, enforcing behavior, slash-command support,
+unconstrained-host support, broad real-document runtime behavior, or autonomous
+publication.
+
+Observed 0.2.1 verification on 2026-05-26:
+
+- JSON validation passed for marketplace and peer plugin manifests.
+- YAML parse passed for Intent Contract and release trace records.
+- `claude plugin validate --strict .` passed.
+- `claude plugin validate --strict plugins/traceweaver-core` passed.
+- `claude plugin tag --dry-run --force plugins/traceweaver-core` passed and
+  computed `traceweaver-core--v0.2.1`.
+- Codex discovery, Antigravity discovery, controlled-publication, TW skill
+  behavior, active-host `tw-requirements-review` skill-file-read,
+  active-host runtime-output fixture, code traceability, generated-view drift,
+  and `git diff --check` passed.
+- Separate-home Codex install passed and runtime remained expected-held without
+  copied auth in the isolated `CODEX_HOME`.
+
+Publication remains pending because exact tag/GitHub release mutation must run
+through a clean controlled-publication route for `traceweaver-core--v0.2.1`.
