@@ -1,5 +1,5 @@
-#!/usr/bin/env python3
 # TRACEWEAVER: file-role=packaged-skills-ce-sessions-scripts-extract-metadata-py; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
+#!/usr/bin/env python3
 """Extract session metadata from Claude Code, Codex, and Cursor JSONL files.
 
 Batch mode (preferred — one invocation for all files):
@@ -20,7 +20,6 @@ import os
 MAX_LINES = 25  # Only need first ~25 lines for metadata
 
 
-# TRACEWEAVER: entrypoint=try_claude; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
 def try_claude(lines):
     for line in lines:
         try:

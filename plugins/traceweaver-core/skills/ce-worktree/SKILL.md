@@ -5,6 +5,7 @@ allowed-tools: Bash(bash *worktree-manager.sh)
 ---
 
 <!-- TRACEWEAVER: file-role=packaged-skills-ce-worktree-skill; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
+
 # Worktree Creation
 
 Create a worktree under `.worktrees/<branch>` with branch-specific setup that `git worktree add` alone does not handle:

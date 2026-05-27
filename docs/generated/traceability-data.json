@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "7cc7c8bfc092d2aa7ce4d44eee8f3a72ccd1ff497624a50fb462b81d00f712b8"
+      "sha256": "37963f00e8da982ff8ff2148e70d1f4cb3f951184c043ba63bcd7a770d33e784"
     },
     {
       "path": "requirements.md",
@@ -2041,7 +2041,7 @@
       "Requirement": "REQ-TW-069; REQ-TW-010; REQ-TW-050; REQ-TW-061",
       "Procedure / Scenario": "Inspect `tw-requirements-review`, run the deterministic skill-behavior smoke for the requirement-quality ranking contract, run scoped doc review over the authority/status update, reconcile the active Codex host skill surface when stale, run an active-host `tw-requirements-review` skill-file-read proof, and run a bounded runtime-output fixture.",
       "Setup / Context": "`plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md`; `/Users/hanneszietsman/.codex/skills/tw-requirements-review/SKILL.md`; `scripts/traceweaver-smoke-tw-skill-behavior`; `scripts/traceweaver-reconcile-codex-host-skills`; `scripts/traceweaver-smoke-codex-host-registry`; `fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt`; `requirements.md`; `traceability-matrix.md`; private promoted `requirements-reviewer` references used as source context only.",
-      "Expected Result": "The wrapper requires 0-5 per-requirement scores, default outcomes, score-as-triage-only boundary, and requirement-set quality findings while continuing to block weak or unapproved requirements from becoming authority. Scoped doc review confirms the REQ-TW-069 status update remains static/advisory and keeps publication claims held. Active-host proof confirms the installed `tw-requirements-review` wrapper is visible and readable by Codex after host reconciliation; runtime-output fixture confirms the required output fields for one fixed requirement. Broad real-document runtime behavior remains held.",
+      "Expected Result": "The wrapper requires 0-5 per-requirement scores, default outcomes, score-as-triage-only boundary, and requirement-set quality findings while continuing to block weak or unapproved requirements from becoming authority. Scoped doc review confirms the REQ-TW-069 status update remains static/advisory and keeps publication claims held. Active-host proof confirms the installed `tw-requirements-review` wrapper is visible and readable by Codex after host reconciliation; runtime-output fixture confirms the required output fields for a bounded REQ-TW-069 requirement-quality prompt. Broad real-document runtime behavior remains held.",
       "Owner": "Oxiom Systems",
       "Status": "Requirements review passed / scoped doc review passed / static wrapper update added / deterministic smoke passed / active-host skill-file-read proof passed / runtime-output fixture passed / broad runtime held"
     }
@@ -2545,7 +2545,7 @@
       "Result": "Pass for static checks and refreshed current-hash isolated install smoke under approved/runtime-held split; full runtime invocation remains held",
       "Evidence Path": "`docs/validation/traceweaver-controlled-autonomy-alpha.md`",
       "Date / Session": "2026-05-04",
-      "Notes": "Refreshed isolated install smoke through the repo-local README command with `--codexHome <TEMP_CODEX_HOME>` proved current `tw-auto` hash `a65199ab5d447bd750bfae03251bc755452d35b424e6ba428f926e143f766de3`, `lfg`, and current `tw-grill` hash `666420213f2a9df5b44d7212efeb621943413ace61c3b74c86f89b2c43e79c90` materialize under packaged TraceWeaver directories such as `<TEMP_CODEX_HOME>/.codex/traceweaver-core/skills/tw-grill/SKILL.md` and direct callable directories such as `<TEMP_CODEX_HOME>/.codex/skills/tw-grill/SKILL.md`; selected agents materialize under `<TEMP_CODEX_HOME>/.codex/agents/traceweaver-core/ce-correctness-reviewer.toml`; install manifest records 27 packaged skill copies, 27 direct callable skill copies, 49 selected agent TOML files, 17 reference files, and zero prompts. Existing-home upgrade/conflict behavior is held except for the direct-callable unowned-directory conflict smoke. `tw-grill` is installed/static source-evidence support for idea/brainstorm flow; runtime and implementation-authority claims remain held."
+      "Notes": "Refreshed 0.2.1 isolated install smoke through the repo-local README command with `--codexHome <TEMP_CODEX_HOME>` proved current TraceWeaver direct callable skills plus selected CE 3.9.0 internal components materialize under packaged TraceWeaver directories; selected CE agents materialize under `<TEMP_CODEX_HOME>/.codex/agents/traceweaver-core/*.toml`; install manifest records 46 packaged skill copies, 25 direct callable skill copies, 43 selected agent TOML files, 20 reference files, and zero prompts. Existing-home upgrade/conflict behavior is held except for the direct-callable unowned-directory conflict smoke. `tw-grill` is installed/static source-evidence support for idea/brainstorm flow; runtime and implementation-authority claims remain held."
     },
     {
       "ID": "VER-TW-016",
@@ -2589,7 +2589,7 @@
       "Result": "Pass for isolated install/direct callable identity and conflict fail-closed behavior; active Codex host-registry discovery held",
       "Evidence Path": "`docs/validation/traceweaver-u9-codex-runtime-discovery.md`",
       "Date / Session": "2026-05-02",
-      "Notes": "Smoke proved 27 packaged skill directories outside `.codex/skills`, 27 direct callable skill directories, 49 selected agent TOML files, 17 reference files, zero prompts, zero prompt files, source-identical required `tw-*`/`lfg`/CE-compatible dependency `SKILL.md` copies, direct callable `.traceweaver-core-install.json` markers, and fail-closed handling before overwriting an unowned `.codex/skills/ce-work` directory. It records runtime invocation held until the exact fresh Codex exec skill-hash sentinel is captured."
+      "Notes": "Refreshed 0.2.1 smoke proved 46 packaged skill directories outside `.codex/skills`, 25 direct callable skill directories, 43 selected CE 3.9.0 agent TOML files, 20 reference files, zero prompts, zero prompt files, source-identical required `tw-*`/`lfg`/CE-compatible dependency `SKILL.md` copies, direct callable `.traceweaver-core-install.json` markers, and fail-closed handling before overwriting an unowned `.codex/skills/ce-work` directory. It records runtime invocation held until the exact fresh Codex exec skill-hash sentinel is captured."
     },
     {
       "ID": "VER-TW-020",
@@ -3113,21 +3113,21 @@
       "Requirement": "REQ-TW-069; REQ-TW-050; REQ-TW-061",
       "Method": "Active-host `tw-requirements-review` runtime-output fixture",
       "Procedure / Command": "`TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_HOST_RUNTIME_PROOF=requirements-review-output TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry`",
-      "Tested Ref": "Active Codex host skill registry, installed `tw-requirements-review` callable copy, fixed candidate requirement fixture, output sentinel checks, and model default policy reference",
+      "Tested Ref": "Active Codex host skill registry, installed `tw-requirements-review` callable copy, bounded `REQ-TW-069` requirement-quality fixture, output sentinel checks, and model default policy reference",
       "Result": "Pass. The active host reported all required TraceWeaver direct skills visible, no stale/missing/unmarked skills, no direct CE-derived callable skills, current model-default reference hashes, and `real_tw_skill_runtime_invocation=pass_host_tw_requirements_review_runtime_output_fixture`. The fixture output required `quality_score=5`, `default_outcome=Can approve`, `score_boundary=triage_not_approval_authority`, `requirement_set_quality_findings=none`, `authority_ready=static_advisory_only`, `publication=held`, and `accepted_traceweaver_input=false`.",
       "Evidence Path": "`scripts/traceweaver-smoke-codex-host-registry`; `fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt`; `/Users/hanneszietsman/.codex/skills/tw-requirements-review/SKILL.md`",
       "Date / Session": "2026-05-26",
-      "Notes": "This is a bounded runtime-output fixture for one fixed candidate requirement. Broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous publication remain held."
+      "Notes": "This is a bounded runtime-output fixture for the approved `REQ-TW-069` requirement-quality surface. Broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous publication remain held."
     },
     {
       "ID": "VER-TW-073",
-      "Requirement": "REQ-TW-016; REQ-TW-020; REQ-TW-023; REQ-TW-050; REQ-TW-061; REQ-TW-069",
+      "Requirement": "REQ-TW-016; REQ-TW-020; REQ-TW-023; REQ-TW-050; REQ-TW-059; REQ-TW-061; REQ-TW-069",
       "Method": "TraceWeaver Core 0.2.1 release metadata preparation",
-      "Procedure / Command": "JSON/plugin validation; Claude plugin validation and tag dry-run; Codex discovery/install smokes; Antigravity discovery smoke; controlled-publication smoke; `tw-requirements-review` active-host proofs; implementation-mode code traceability; generated-view drift smoke; `git diff --check`",
-      "Tested Ref": "0.2.1 manifests, installer version, release docs, trace records, matrix, generated views, and REQ-TW-069 fixture evidence",
-      "Result": "Pass. JSON/YAML validation, Claude strict validation, tag dry-run, Codex discovery, Antigravity discovery, controlled-publication, TW skill behavior, active-host `tw-requirements-review` skill-file-read, active-host runtime-output fixture, code traceability, generated-view drift, and whitespace checks passed. Separate-home Codex install passed with expected-held no-auth runtime observation.",
-      "Evidence Path": "`.traceweaver/trace-records/2026-05-26-plugin-0.2.1-release-metadata.yml`; `CHANGELOG.md`; manifests; `src/index.ts`; generated views",
-      "Date / Session": "2026-05-26",
+      "Procedure / Command": "JSON/plugin validation; Claude plugin validation and tag dry-run; Codex discovery/install smokes; Antigravity discovery smoke; controlled-publication smoke; `tw-requirements-review` active-host proofs; selected CE 3.9.0 source inventory refresh; implementation-mode code traceability; generated-view drift smoke; `git diff --check`",
+      "Tested Ref": "0.2.1 manifests, installer version, release docs, selected CE 3.9.0 skill/agent files, source inventory records, trace records, matrix, generated views, and REQ-TW-069 fixture evidence",
+      "Result": "Pending refreshed full bundle after selected CE 3.9.0 fold-in. Codex discovery passed with 46 packaged skill directories, 25 direct callable directories, 43 selected agent TOML files, and 20 reference files; remaining verification must rerun before publication.",
+      "Evidence Path": "`.traceweaver/trace-records/2026-05-26-plugin-0.2.1-release-metadata.yml`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; `CHANGELOG.md`; manifests; `src/index.ts`; generated views",
+      "Date / Session": "2026-05-27",
       "Notes": "Exact 0.2.1 tag/GitHub release publication pending controlled route; release-ready, package-ready, broad runtime, clean replacement, and autonomous publication claims remain held."
     },
     {

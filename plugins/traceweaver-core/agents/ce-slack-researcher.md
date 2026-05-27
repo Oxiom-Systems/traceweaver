@@ -4,7 +4,6 @@ description: "Searches Slack for organizational context -- decisions, constraint
 model: sonnet
 ---
 
-<!-- TRACEWEAVER: file-role=selected-agents-ce-slack-researcher-agent; req=REQ-TW-028; trace=TRACE-TW-004; ver=VER-TW-006 -->
 <examples>
 <example>
 Context: ce-ideate is running Phase 1 and dispatches research agents in parallel to gather grounding context.

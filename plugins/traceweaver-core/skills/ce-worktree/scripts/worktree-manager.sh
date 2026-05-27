@@ -1,5 +1,5 @@
-#!/bin/bash
 # TRACEWEAVER: file-role=packaged-skills-ce-worktree-scripts-worktree-manager-sh; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
+#!/bin/bash
 #
 # Create a new git worktree with environment files and dev-tool trust.
 #
@@ -26,7 +26,6 @@ set -euo pipefail
 GIT_ROOT=$(git worktree list --porcelain | sed -n 's/^worktree //p' | head -n 1)
 WORKTREE_DIR="$GIT_ROOT/.worktrees"
 
-# TRACEWEAVER: entrypoint=usage; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015
 usage() {
   cat <<'EOF'
 Usage: worktree-manager.sh create <branch-name> [from-branch]

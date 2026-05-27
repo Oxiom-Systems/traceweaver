@@ -2,7 +2,7 @@ trace_record_id: TW-TRACE-RECORD-2026-05-26-PLUGIN-0.2.1-RELEASE-METADATA-001
 record_type: implementation_trace
 created_at: "2026-05-26"
 owner: Oxiom Systems
-status: release_0_2_1_metadata_prepared_verified_publication_pending_runtime_readiness_claims_held
+status: release_0_2_1_metadata_prepared_verified_ce_3_9_folded_publication_pending_runtime_readiness_claims_held
 
 baseline_id: REQ-BASELINE-2026-04-30-001
 baseline_source: requirements.md
@@ -15,6 +15,7 @@ requirements:
   - REQ-TW-041
   - REQ-TW-043
   - REQ-TW-050
+  - REQ-TW-059
   - REQ-TW-061
   - REQ-TW-069
 trace_ids:
@@ -47,6 +48,10 @@ scope:
   - scripts/traceweaver-smoke-tw-skill-behavior
   - scripts/traceweaver-smoke-codex-host-registry
   - fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt
+  - plugins/traceweaver-core/skills/ce-*
+  - plugins/traceweaver-core/agents/*.md
+  - plugins/traceweaver-core/references/ce-upstream-source-inventory.md
+  - docs/validation/traceweaver-core-11-ce-runtime-inventory.md
   - README.md
   - plugins/traceweaver-core/README.md
   - CHANGELOG.md
@@ -64,7 +69,7 @@ release:
   intended_release_name: TraceWeaver Core 0.2.1
   prior_release_tag: traceweaver-core--v0.2.0
   prior_release_commit: fc1d3058a0cc98fb3187e7576ec13320e4879aa8
-  release_reason: REQ-TW-069 requirement-quality ranking and active-host runtime-output fixture proof
+  release_reason: REQ-TW-069 requirement-quality ranking, active-host runtime-output fixture proof, README release-install guidance, and selected CE 3.9.0 source refresh
 
 verification_required:
   - JSON validation for peer plugin manifests and marketplace metadata
@@ -74,6 +79,7 @@ verification_required:
   - Antigravity local install/discovery smoke
   - controlled publication-route smoke
   - tw-skill-behavior smoke
+  - selected CE 3.9.0 source inventory refresh
   - active-host tw-requirements-review skill-file-read proof
   - active-host tw-requirements-review runtime-output fixture proof
   - implementation-mode code-anchor scan
@@ -94,6 +100,7 @@ verification_observed:
     observed_tag: traceweaver-core--v0.2.1
   - result: pass
     command: TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
+    observed_counts: 46 packaged skills, 25 direct callable skills, 43 selected CE agent TOML files, 20 reference files
   - result: expected_held
     command: TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=10 scripts/traceweaver-smoke-codex-separate-home-runtime
     held_observation: held_no_runtime_invocation_without_auth_in_isolated_codex_home
@@ -103,6 +110,10 @@ verification_observed:
     command: scripts/traceweaver-smoke-controlled-publication
   - result: pass
     command: TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior
+    observed_ce_import: selected CE 3.9.0 skill files with TraceWeaver overlays; imported CE inline-anchor gaps held
+  - result: pass
+    command: selected CE 3.9.0 source inventory refresh
+    observed_source: compound-engineering-v3.9.0 / cli-v3.9.0 at e2c9cd23525eeb1ecddd637e027d53b02f892e7b
   - result: pass
     command: TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_HOST_RUNTIME_PROOF=requirements-review-output TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry
   - result: pass
@@ -116,7 +127,7 @@ verification_observed:
   - result: pass
     command: git diff --check
 
-validation_question: "Can users update to TraceWeaver Core 0.2.1 to receive REQ-TW-069 requirement quality ranking and bounded active-host runtime-output proof without expanding release-ready, package-ready, broad runtime, clean replacement, or autonomous-publication claims?"
+validation_question: "Can users update to TraceWeaver Core 0.2.1 to receive REQ-TW-069 requirement quality ranking, bounded active-host runtime-output proof, clear release install guidance, and the selected CE 3.9.0 static refresh without expanding release-ready, package-ready, broad runtime, clean replacement, or autonomous-publication claims?"
 
 held_claims:
   - broad real-document tw-requirements-review runtime behavior

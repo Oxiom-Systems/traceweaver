@@ -288,7 +288,7 @@ if [ -d "$codex_root/skills/traceweaver-core" ]; then
 fi
 
 source_skill_count="$(find "$repo_root/plugins/traceweaver-core/skills" -mindepth 1 -maxdepth 1 -type d | wc -l | tr -d ' ')"
-source_agent_count="$(find "$repo_root/plugins/traceweaver-core/agents" -maxdepth 1 -type f -name '*.agent.md' | wc -l | tr -d ' ')"
+source_agent_count="$(find "$repo_root/plugins/traceweaver-core/agents" -maxdepth 1 -type f -name '*.md' | wc -l | tr -d ' ')"
 source_reference_count="$(find "$repo_root/plugins/traceweaver-core/references" -type f | wc -l | tr -d ' ')"
 
 manifest_skill_count="$(json_len "$manifest" skills)"
@@ -395,7 +395,7 @@ grep -Fq "Semantic Audit Mode Contract" "$references_root/traceweaver-systems-en
 ce_policy_grep="$tmp_root/model-default-ce-body-grep.txt"
 if grep -R -nE 'REQ-TW-060|gpt-5\.5|TRACEWEAVER_CODEX_MODEL|TRACEWEAVER_CODEX_REASONING_EFFORT|model-default|model default' \
   "$repo_root/plugins/traceweaver-core/skills"/ce-* \
-  "$repo_root/plugins/traceweaver-core/agents"/ce-*.agent.md >"$ce_policy_grep" 2>/dev/null; then
+  "$repo_root/plugins/traceweaver-core/agents"/ce-*.md >"$ce_policy_grep" 2>/dev/null; then
   echo "model_default_ce_body_drift_guard=failed_model_policy_marker_in_imported_ce_body"
   cat "$ce_policy_grep"
   exit 1

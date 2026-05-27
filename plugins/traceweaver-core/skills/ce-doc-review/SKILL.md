@@ -5,6 +5,7 @@ argument-hint: "[mode:headless] [path/to/document.md]"
 ---
 
 <!-- TRACEWEAVER: file-role=packaged-skills-ce-doc-review-skill; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
+
 # Document Review
 
 Review requirements or plan documents through multi-persona analysis. Dispatches specialized reviewer agents in parallel, auto-applies `safe_auto` fixes, and routes remaining findings through a four-option interaction (per-finding walk-through, auto-resolve with best judgment, Append-to-Open-Questions, Report-only) for user decision.
