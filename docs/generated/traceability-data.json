@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "d4c829fb6ece358fc58a4ab4593def5527dd4bc726d76ab226303f765f141d83"
+      "sha256": "1ccecfef590467364ab29bf2076c830c15d74878b68098cab68586bf6c38b686"
     },
     {
       "path": "requirements.md",
@@ -14,7 +14,7 @@
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "d67f5559a3a94ef7b81a65b4662b83b98f6cf1d4204b4b4dd7513593a5883896"
+      "sha256": "3b3921dae48a7171b16a431f5157b465b13aa34bc091b4ae8a0f5c7d075595eb"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -28,7 +28,7 @@
     "result_records": 37,
     "verification_records": 71,
     "validation_records": 17,
-    "code_anchor_records": 254,
+    "code_anchor_records": 255,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 69,
     "structured_acceptance_missing_requirements": 68,
@@ -3134,12 +3134,12 @@
       "ID": "VER-TW-074",
       "Requirement": "REQ-TW-016; REQ-TW-017; REQ-TW-020; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-051; REQ-TW-052; REQ-TW-059; REQ-TW-060; REQ-TW-068",
       "Method": "TraceWeaver Core 0.2.2 install/update metadata and CE 3.9.0 wrapper delta evidence",
-      "Procedure / Command": "JSON/plugin validation; YAML validation; Claude plugin validation and tag dry-run; Codex discovery/install smokes; Antigravity discovery smoke; controlled-publication smoke; TW skill behavior smoke; CE 3.5.0-to-selected-CE-3.9.0 wrapper delta check; implementation-mode code-anchor scan; generated-view drift smoke; `git diff --check`",
-      "Tested Ref": "0.2.2 manifests, installer version, README install docs, release validation record, selected CE 3.9.0 source inventory records, wrapper delta evidence, trace record, matrix, and generated views",
-      "Result": "Pass for scoped install/update metadata. JSON/YAML validation passed; Claude validation passed and dry-run computed `traceweaver-core--v0.2.2`; Codex discovery passed with runtime execution disabled; separate-home install/visibility passed with unauthenticated runtime invocation held; Antigravity discovery verified installed version `0.2.2`; controlled-publication smoke passed; TW skill behavior smoke passed with active-host CE currentness held where host cache is stale; implementation-mode code-anchor scan passed; generated views and drift smoke passed; `git diff --check` passed. The wrapper delta check found the redacted CE 3.5.0 baseline cache has 39 skill directories including `lfg`; TraceWeaver packages 18 selected `ce-*` component directories plus `lfg`; CE 3.5.0 `ce-session-extract` and `ce-session-inventory` are not selected in the CE 3.9.0 package surface. The CE replacement classifier returns `failed_static_readiness` because classifier rows are stale and newer `tw-*` wrapper surfaces are unclassified; this is held as classifier-refresh evidence, not clean replacement evidence.",
-      "Evidence Path": "`.traceweaver/trace-records/2026-05-27-plugin-0.2.2-release-metadata.yml`; `README.md`; `plugins/traceweaver-core/README.md`; `CHANGELOG.md`; manifests; `src/index.ts`; `scripts/traceweaver-smoke-antigravity-discovery`; `docs/validation/traceweaver-plugin-0.2-release.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; generated views",
-      "Date / Session": "2026-05-27",
-      "Notes": "Exact 0.2.2 tag/GitHub release publication pending exact target confirmation and clean controlled `tw-commit-push-pr` action; release-ready, package-ready, broad runtime, runtime-equivalent CE behavior, clean replacement, R31 real-project validation closure, Vestro dogfood evidence, and autonomous publication claims remain held."
+      "Procedure / Command": "JSON/plugin validation; YAML validation; Claude plugin validation and tag dry-run; Codex discovery/install smokes; Antigravity discovery smoke; controlled-publication smoke; TW skill behavior smoke; CE 3.5.0-to-selected-CE-3.9.0 wrapper delta check; implementation-mode code-anchor scan; generated-view drift smoke; `git diff --check`; read-only GitHub release/tag check after merge",
+      "Tested Ref": "0.2.2 manifests, installer version, README install docs, release validation record, selected CE 3.9.0 source inventory records, wrapper delta evidence, trace records, matrix, generated views, GitHub release metadata, and remote tag",
+      "Result": "Pass for scoped install/update metadata and exact publication evidence. JSON/YAML validation passed; Claude validation passed and dry-run computed `traceweaver-core--v0.2.2`; Codex discovery passed with runtime execution disabled; separate-home install/visibility passed with unauthenticated runtime invocation held; Antigravity discovery verified installed version `0.2.2`; controlled-publication smoke passed; TW skill behavior smoke passed with active-host CE currentness held where host cache is stale; implementation-mode code-anchor scan passed; generated views and drift smoke passed; `git diff --check` passed. The wrapper delta check found the redacted CE 3.5.0 baseline cache has 39 skill directories including `lfg`; TraceWeaver packages 18 selected `ce-*` component directories plus `lfg`; CE 3.5.0 `ce-session-extract` and `ce-session-inventory` are not selected in the CE 3.9.0 package surface. The CE replacement classifier returns `failed_static_readiness` because classifier rows are stale and newer `tw-*` wrapper surfaces are unclassified; this is held as classifier-refresh evidence, not clean replacement evidence. Read-only post-release checks confirmed PR #30 merged to `main` at `718465c64f3aec8b100f07065a1b5a738affddd6`, remote tag `traceweaver-core--v0.2.2` peels to the same commit, and GitHub Release `TraceWeaver Core 0.2.2` is non-draft and non-prerelease.",
+      "Evidence Path": "`.traceweaver/trace-records/2026-05-27-plugin-0.2.2-release-metadata.yml`; `.traceweaver/trace-records/2026-05-28-plugin-0.2.2-release-publication.yml`; `README.md`; `plugins/traceweaver-core/README.md`; `CHANGELOG.md`; manifests; `src/index.ts`; `scripts/traceweaver-smoke-antigravity-discovery`; `docs/validation/traceweaver-plugin-0.2-release.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; generated views; `gh release view traceweaver-core--v0.2.2 --repo Oxiom-Systems/traceweaver`; `git ls-remote --tags origin traceweaver-core--v0.2.2`",
+      "Date / Session": "2026-05-28",
+      "Notes": "Exact 0.2.2 tag/GitHub release publication confirmed; release-ready, package-ready, broad runtime, runtime-equivalent CE behavior, clean replacement, R31 real-project validation closure, Vestro dogfood evidence, future release publication, and autonomous publication claims remain held."
     },
     {
       "ID": "VER-TW-056",
@@ -3326,9 +3326,9 @@
       "Stakeholder / Representative": "Oxiom Systems",
       "Acceptance Signal": "A reviewer can read the README and guide, identify Codex and Claude Code install/update paths, select blank-project or existing-repo first steps, see the normal TraceWeaver wrapper loop, find authority files and proof trail links, and confirm public website copy avoids internal review IDs, local paths, protected text, and unsupported release/compliance claims.",
       "Evidence Path": "`README.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; Oxiom Systems website source guide section",
-      "Result": "Verification passed / scoped review passed / exact TraceWeaver PR route authorized / exact 0.2.0 GitHub release published / 0.2.2 metadata prepared for controlled publication",
+      "Result": "Verification passed / scoped review passed / exact TraceWeaver PR route authorized / exact 0.2.0, 0.2.1, and 0.2.2 GitHub releases published / runtime readiness claims held",
       "Owner": "Oxiom Systems",
-      "Deferred Trigger / Notes": "Website publication, release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, 0.2.2 tag/GitHub Release publication until exact target confirmation and controlled publication action, future release publication beyond 0.2.2, and autonomous-publication claims remain held."
+      "Deferred Trigger / Notes": "Website publication, release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, future release publication beyond the explicit 0.2.2 GitHub Release, and autonomous-publication claims remain held."
     },
     {
       "ID": "VAL-TW-016",
@@ -3865,6 +3865,14 @@
       "Verification": "VER-TW-074",
       "Anchor Type": "trace-record",
       "Role": "plugin-0.2.2-release-metadata"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-05-28-plugin-0.2.2-release-publication.yml",
+      "Requirement": "REQ-TW-016; REQ-TW-017; REQ-TW-020; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-051; REQ-TW-052; REQ-TW-059; REQ-TW-060; REQ-TW-068",
+      "Trace": "TRACE-TW-010; TRACE-TW-024; TRACE-TW-025; TRACE-TW-046; TRACE-TW-054",
+      "Verification": "VER-TW-074",
+      "Anchor Type": "trace-record",
+      "Role": "plugin-0.2.2-release-publication"
     },
     {
       "Artifact Path": "plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md",

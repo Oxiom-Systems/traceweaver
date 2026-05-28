@@ -1,0 +1,112 @@
+trace_record_id: TW-TRACE-RECORD-2026-05-28-PLUGIN-0.2.2-RELEASE-PUBLICATION-001
+record_type: publication_trace
+created_at: "2026-05-28"
+owner: Oxiom Systems
+status: exact_0_2_2_tag_and_github_release_published_post_release_doc_review_passed_runtime_claims_held
+
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_source: requirements.md
+intent_contract: .traceweaver/intent-contract.yml
+release_metadata_record: .traceweaver/trace-records/2026-05-27-plugin-0.2.2-release-metadata.yml
+
+requirements:
+  - REQ-TW-016
+  - REQ-TW-017
+  - REQ-TW-020
+  - REQ-TW-023
+  - REQ-TW-041
+  - REQ-TW-043
+  - REQ-TW-051
+  - REQ-TW-052
+  - REQ-TW-059
+  - REQ-TW-060
+  - REQ-TW-068
+trace_ids:
+  - TRACE-TW-010
+  - TRACE-TW-024
+  - TRACE-TW-025
+  - TRACE-TW-046
+  - TRACE-TW-054
+verification_ids:
+  - VER-TW-012
+  - VER-TW-019
+  - VER-TW-033
+  - VER-TW-034
+  - VER-TW-059
+  - VER-TW-069
+  - VER-TW-074
+
+validation_question: "Was TraceWeaver Core 0.2.2 published at the exact reviewed tag and merge commit while keeping package-ready, release-ready, broad runtime, clean replacement, runtime-equivalent CE behavior, R31/Vestro validation, and autonomous-publication claims held?"
+
+publication_observed:
+  repository: Oxiom-Systems/traceweaver
+  pull_request: 30
+  tag: traceweaver-core--v0.2.2
+  tag_ref_sha: 8df4536034f293c3aedb8793ea7d2dafe1bc387e
+  release_name: TraceWeaver Core 0.2.2
+  release_url: https://github.com/Oxiom-Systems/traceweaver/releases/tag/traceweaver-core--v0.2.2
+  release_commit: 718465c64f3aec8b100f07065a1b5a738affddd6
+  merge_commit: 718465c64f3aec8b100f07065a1b5a738affddd6
+  target_commitish: main
+  published_at: "2026-05-27T21:59:38Z"
+  is_draft: false
+  is_prerelease: false
+  author: jjziets
+
+observed_commands:
+  - "gh pr view 30 --repo Oxiom-Systems/traceweaver: merged at 2026-05-27T21:58:40Z with merge commit 718465c64f3aec8b100f07065a1b5a738affddd6"
+  - "git rev-parse origin/main: 718465c64f3aec8b100f07065a1b5a738affddd6"
+  - "git rev-parse traceweaver-core--v0.2.2^{commit}: 718465c64f3aec8b100f07065a1b5a738affddd6"
+  - "git show-ref --tags traceweaver-core--v0.2.2: 8df4536034f293c3aedb8793ea7d2dafe1bc387e refs/tags/traceweaver-core--v0.2.2"
+  - "git ls-remote --tags origin traceweaver-core--v0.2.2: remote tag present and peels to 718465c64f3aec8b100f07065a1b5a738affddd6"
+  - "gh release view traceweaver-core--v0.2.2: published release, not draft, not prerelease"
+
+pre_publication_verification_summary:
+  - Generated traceability views and generated-view smoke passed before PR publication.
+  - Controlled-publication route smoke passed before PR publication.
+  - YAML and JSON parse checks passed for the scoped 0.2.2 evidence set before PR publication.
+  - Implementation-mode code traceability smoke passed for changed behavior-bearing/plugin/script surfaces before PR publication.
+  - The CE replacement classifier returned expected failed_static_readiness and kept clean replacement held.
+  - GitHub CodeQL checks for PR 30 passed before merge.
+
+published_scope:
+  - TraceWeaver Core 0.2.2 install and update documentation.
+  - Codex, Claude Code, Antigravity, and Cursor peer manifests at version 0.2.2.
+  - Selected Compound Engineering 3.9.0 static continuity and wrapper-delta evidence.
+  - Antigravity installed-version metadata for 0.2.2.
+
+held_claims:
+  - package-ready status
+  - release-ready status
+  - upstream-ready status
+  - broad runtime behavior
+  - runtime-driver invocation
+  - clean CE replacement
+  - runtime-equivalent CE behavior
+  - enforcing authority gate behavior
+  - slash-command availability
+  - unconstrained-host support
+  - R31 real-project validation closure
+  - Vestro dogfood evidence
+  - autonomous publication beyond this explicit user-authorized 0.2.2 release
+
+doc_review:
+  result: passed
+  reviewed_scope:
+    - README.md
+    - docs/validation/traceweaver-plugin-0.2-release.md
+    - .traceweaver/intent-contract.yml
+    - .traceweaver/trace-records/2026-05-27-plugin-0.2.2-release-metadata.yml
+    - .traceweaver/trace-records/2026-05-28-plugin-0.2.2-release-publication.yml
+    - traceability-matrix.md
+    - docs/generated/traceability-dashboard.md
+    - docs/generated/traceability-data.json
+  findings_repaired:
+    - docs/validation/traceweaver-plugin-0.2-release.md status changed from 0.2.2 publication pending to 0.2.2 publication complete with runtime claims held
+    - traceability-matrix.md last-updated date refreshed to 2026-05-28
+  reviewer_coverage:
+    - coherence reviewer found two status findings; both repaired
+    - project standards reviewer reported clean
+    - final focused status, generated-view, YAML/JSON, stale-publication wording, private-path, stale-hash, tag, and GitHub Release checks passed
+
+next_step: "Dogfood the 0.2.2 release through TraceWeaver and Vestro while keeping release-ready, package-ready, runtime-equivalent, clean replacement, R31/Vestro validation, future release publication, and autonomous-publication claims held until their own evidence gates pass."
