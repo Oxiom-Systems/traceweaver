@@ -19,15 +19,13 @@ without losing the proof behind what changed and why.
 
 ## Setup
 
-Use marketplace updates or the tagged release snapshot for normal installs.
-Do not install TraceWeaver Core from `main` unless you are developing
-TraceWeaver itself; `main` is the active development branch. The intended 0.2.2
-release snapshot tag is `traceweaver-core--v0.2.2`; use it only after the
-controlled publication route creates that tag.
+Use marketplace updates or the tagged `0.2.2` release snapshot for normal
+installs. Do not install TraceWeaver Core from `main` unless you are developing
+TraceWeaver itself; `main` is the active development branch.
 
 ### Codex
 
-After the `0.2.2` plugin release is published, add or refresh the marketplace:
+Add or refresh the marketplace:
 
 ```sh
 codex plugin marketplace add Oxiom-Systems/traceweaver
@@ -36,8 +34,8 @@ codex plugin marketplace upgrade traceweaver
 
 Install `traceweaver-core` from the Codex plugin UI.
 
-After the 0.2.2 tag is published, use the tagged release snapshot rather than
-`main` for a pinned local alpha install:
+Use the tagged release snapshot rather than `main` for a pinned local alpha
+install:
 
 ```sh
 git clone --branch traceweaver-core--v0.2.2 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
@@ -95,7 +93,7 @@ Cursor testing as held until a Cursor runtime validation record exists.
 
 For local alpha testing and dogfooding under the Google Antigravity coding
 assistant environment, start from the tagged release snapshot rather than
-`main` after the 0.2.2 tag is published:
+`main`:
 
 ```sh
 git clone --branch traceweaver-core--v0.2.2 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
@@ -430,11 +428,9 @@ validation files when auditing specific claims:
 
 ## Near-Term Next Steps
 
-1. Review the `0.2.2` plugin metadata and publish the release only through the
-   controlled publication route.
-2. Dogfood the alpha on TraceWeaver and Vestro through `tw-auto`, `tw-work`,
+1. Dogfood the alpha on TraceWeaver and Vestro through `tw-auto`, `tw-work`,
    `tw-traceability-check`, `tw-code-review`, and `tw-doc-review`.
-3. Close or explicitly keep held the full `tw-auto` runtime-driver proof.
-4. Keep release-ready, package-ready, upstream-ready, clean-replacement,
+2. Close or explicitly keep held the full `tw-auto` runtime-driver proof.
+3. Keep release-ready, package-ready, upstream-ready, clean-replacement,
    unconstrained-host, autonomous-publication, and automatic cleanup claims held
    until their own evidence gates pass.

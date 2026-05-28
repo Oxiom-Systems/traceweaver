@@ -2,7 +2,7 @@ trace_record_id: TW-TRACE-RECORD-2026-05-27-PLUGIN-0.2.2-RELEASE-METADATA-001
 record_type: implementation_trace
 created_at: "2026-05-27"
 owner: Oxiom Systems
-status: release_0_2_2_metadata_verified_publication_and_runtime_readiness_claims_held
+status: release_0_2_2_metadata_verified_exact_tag_and_github_release_published_runtime_readiness_claims_held
 
 baseline_id: REQ-BASELINE-2026-04-30-001
 baseline_source: requirements.md
@@ -166,4 +166,6 @@ held_claims:
 publication_boundary:
   publication_requested_by_user: "release 0.2.2 with compound-engineering v3.9.0 and wrapper changes checked since CE 3.5.0"
   requested_at: "2026-05-27"
-  stop_before_publication_until: exact_target_confirmation_and_clean_tw_commit_push_pr_publication_gate_for_traceweaver_core_v0_2_2
+  completed_publication_record: .traceweaver/trace-records/2026-05-28-plugin-0.2.2-release-publication.yml
+  completed_release_url: https://github.com/Oxiom-Systems/traceweaver/releases/tag/traceweaver-core--v0.2.2
+  future_publication_boundary: future release tags, GitHub Releases, marketplace publication claims, package-ready claims, release-ready claims, broad runtime claims, clean CE replacement, runtime-equivalent CE behavior, R31/Vestro validation, and autonomous publication remain held until their own exact controlled route and evidence gates pass

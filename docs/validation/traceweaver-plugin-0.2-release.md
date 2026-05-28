@@ -1,6 +1,6 @@
 # TraceWeaver Plugin 0.2 Release Metadata Record
 
-Status: `STATIC_MARKETPLACE_METADATA_PREPARED_0_2_0_AND_0_2_1_PUBLICATION_COMPLETE_0_2_2_PUBLICATION_PENDING`
+Status: `STATIC_MARKETPLACE_METADATA_PREPARED_0_2_0_0_2_1_AND_0_2_2_PUBLICATION_COMPLETE_RUNTIME_CLAIMS_HELD`
 
 Date/session: 2026-05-25, Codex, branch
 `codex/guide-0.2-antigravity-release` worktree
@@ -245,6 +245,15 @@ autonomous publication.
 
 Observed 0.2.2 verification is recorded in
 `.traceweaver/trace-records/2026-05-27-plugin-0.2.2-release-metadata.yml`.
-Next step: exact `traceweaver-core--v0.2.2` tag/GitHub Release publication
-remains held until target confirmation and a clean controlled
-`tw-commit-push-pr` publication action.
+
+Publication is confirmed complete for `traceweaver-core--v0.2.2`: PR #30
+merged to `main` at `718465c64f3aec8b100f07065a1b5a738affddd6`, the remote
+annotated tag resolves to tag object
+`8df4536034f293c3aedb8793ea7d2dafe1bc387e` and peels to the same merge commit,
+and read-only GitHub Release checks reported non-draft, non-prerelease release
+`TraceWeaver Core 0.2.2` published at `2026-05-27T21:59:38Z`.
+
+Post-release publication evidence is recorded in
+`.traceweaver/trace-records/2026-05-28-plugin-0.2.2-release-publication.yml`.
+Future release publication beyond the explicit 0.2.2 tag/GitHub Release remains
+held until a separate exact target and controlled publication route pass.
