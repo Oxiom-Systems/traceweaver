@@ -87,25 +87,25 @@ the same Claude Code session running on your machine.
 
 Web/cloud sessions (launched from the Claude mobile or web app) run in a fresh,
 isolated container that does **not** inherit the plugins installed on your
-machine. There is no plugin-only way to auto-install a marketplace plugin into a
-cloud session today, so the marketplace and an install step must be committed
-into the repository you open on the web.
+machine. Cloud sessions load a marketplace plugin only when it is declared in
+the repository's committed `.claude/settings.json`, where it installs and loads
+**at session start**. Mid-session install does not work on the web
+(`/reload-plugins` is unavailable there), so the declaration must be committed
+in advance.
 
 Copy the small kit in [`examples/claude-code-on-web/`](examples/claude-code-on-web/)
-into the repo you want to use on the web. It adds two things to that repo's
-`.claude/` configuration:
+into the repo you want to use on the web. It adds two keys to that repo's
+`.claude/settings.json`:
 
 - `extraKnownMarketplaces`, so the TraceWeaver marketplace is known in the
   container, and
-- a `SessionStart` hook that runs `claude plugin install
-  traceweaver-core@traceweaver` once the container starts.
+- `enabledPlugins`, enabling `traceweaver-core@traceweaver` so it loads at
+  session start.
 
-After the repo trusts the configuration and the hook runs, the plugin is
-installed in the container. If the `tw-*` skills do not appear immediately, run
-`/reload-plugins` (or start a fresh session): Claude Code does not always
-register a plugin installed into an already-running session without a reload.
-This is optional: if you only use the desktop app and mobile remote-control, the
-user-scope install above is enough.
+Open a **fresh** web session on the repo and trust the configuration; the `tw-*`
+skills then load as `/traceweaver-core:tw-...`. This is optional: if you only use
+the desktop app and mobile remote-control, the user-scope install above is
+enough.
 
 ### Cursor
 
