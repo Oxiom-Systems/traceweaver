@@ -19,7 +19,7 @@ without losing the proof behind what changed and why.
 
 ## Setup
 
-Use marketplace updates or the tagged `0.2.2` release snapshot for normal
+Use marketplace updates or the tagged `0.2.3` release snapshot for normal
 installs. Do not install TraceWeaver Core from `main` unless you are developing
 TraceWeaver itself; `main` is the active development branch.
 
@@ -38,7 +38,7 @@ Use the tagged release snapshot rather than `main` for a pinned local alpha
 install:
 
 ```sh
-git clone --branch traceweaver-core--v0.2.2 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.2.3 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
@@ -77,15 +77,45 @@ Reload active plugins inside Claude Code:
 /reload-plugins
 ```
 
+Install at user scope (the default above) so the `tw-*` skills are available in
+every repository you open. The `/reload-plugins` step picks the plugin up
+without restarting Claude Code. A user-scope install also follows the Claude
+desktop app into mobile remote-control sessions, because remote-control drives
+the same Claude Code session running on your machine.
+
+#### Claude Code on the web
+
+Web/cloud sessions (launched from the Claude mobile or web app) run in a fresh,
+isolated container that does **not** inherit the plugins installed on your
+machine. There is no plugin-only way to auto-install a marketplace plugin into a
+cloud session today, so the marketplace and an install step must be committed
+into the repository you open on the web.
+
+Copy the small kit in [`examples/claude-code-on-web/`](examples/claude-code-on-web/)
+into the repo you want to use on the web. It adds two things to that repo's
+`.claude/` configuration:
+
+- `extraKnownMarketplaces`, so the TraceWeaver marketplace is known in the
+  container, and
+- a `SessionStart` hook that runs `claude plugin install
+  traceweaver-core@traceweaver` once the container starts.
+
+After the repo trusts the configuration and the hook runs, the plugin is
+installed in the container. If the `tw-*` skills do not appear immediately, run
+`/reload-plugins` (or start a fresh session): Claude Code does not always
+register a plugin installed into an already-running session without a reload.
+This is optional: if you only use the desktop app and mobile remote-control, the
+user-scope install above is enough.
+
 ### Cursor
 
 TraceWeaver includes a Cursor peer manifest at
 `plugins/traceweaver-core/.cursor-plugin/plugin.json`.
 
-Cursor install/update is compatibility-preview only in `0.2.2`: the manifest is
+Cursor install/update is compatibility-preview only in `0.2.3`: the manifest is
 versioned with the Codex and Claude manifests, but TraceWeaver does not claim a
 proven Cursor marketplace or runtime install path yet. If you inspect the Cursor
-manifest, inspect it from the `traceweaver-core--v0.2.2` tag rather than `main`.
+manifest, inspect it from the `traceweaver-core--v0.2.3` tag rather than `main`.
 Use the Codex or Claude setup above for supported alpha plugin use, and treat
 Cursor testing as held until a Cursor runtime validation record exists.
 
@@ -96,7 +126,7 @@ assistant environment, start from the tagged release snapshot rather than
 `main`:
 
 ```sh
-git clone --branch traceweaver-core--v0.2.2 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.2.3 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
 ```
@@ -137,7 +167,7 @@ tw-auto "implement the approved plan"
 
 ## Current Alpha Boundaries
 
-TraceWeaver Core `0.2.2` is an alpha advisory plugin for Codex and Claude Code.
+TraceWeaver Core `0.2.3` is an alpha advisory plugin for Codex and Claude Code.
 It is usable for first-time authority bootstrap, requirements review, planning,
 work handoffs, traceability checks, audits, and controlled review flows.
 This release keeps the selected Compound Engineering compatibility surface
