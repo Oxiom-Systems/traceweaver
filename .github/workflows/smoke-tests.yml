@@ -1,0 +1,57 @@
+name: Smoke tests
+
+# Runs the TraceWeaver discovery/traceability smokes on pull requests and on
+# pushes to main. Includes the Codex discovery smoke, which needs the Codex CLI
+# and bun (both installed via npm). ruby, python3, jq, and perl are preinstalled
+# on ubuntu-latest.
+#
+# Intentionally excluded:
+# - scripts/traceweaver-audit-plugin-scope — its hash baseline
+#   (docs/validation/traceweaver-controlled-autonomy-alpha.md) is currently
+#   drifted on main for files unrelated to any recent release; add it here once
+#   that baseline is reconciled by the release gate.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: smoke-tests-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install bun and the Codex CLI
+        run: |
+          npm install -g bun @openai/codex
+          echo "bun: $(bun --version)"
+          echo "codex: $(codex --version)"
+
+      - name: Codex discovery smoke
+        run: TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
+
+      - name: Antigravity discovery smoke
+        run: scripts/traceweaver-smoke-antigravity-discovery
+
+      - name: Generated-views drift smoke
+        run: scripts/traceweaver-smoke-traceability-generated-views
+
+      - name: Code traceability smoke
+        run: scripts/traceweaver-smoke-code-traceability
+
+      - name: Controlled-publication smoke
+        run: scripts/traceweaver-smoke-controlled-publication
