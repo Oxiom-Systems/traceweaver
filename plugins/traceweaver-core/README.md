@@ -165,6 +165,14 @@ package. Bump every peer plugin manifest carried by the release:
 Release tags should use the Claude Code plugin tag convention:
 `traceweaver-core--v0.2.3`.
 
+Tagging and the GitHub Release are automated: when a commit that bumps the
+plugin version lands on `main`, the `Release on version bump` workflow
+(`.github/workflows/release-on-version-bump.yml`) creates the
+`traceweaver-core--v<version>` tag and a matching GitHub Release using the
+`CHANGELOG.md` section for that version. The job is idempotent, so non-version
+commits do not produce a release. Bumping the manifests and CHANGELOG is the
+only manual step.
+
 ## Skill Entry Points
 
 - `tw-requirements-review` checks whether candidate
