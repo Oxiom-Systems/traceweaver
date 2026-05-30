@@ -1,0 +1,98 @@
+name: Release on version bump
+
+# Creates the `traceweaver-core--v<version>` git tag and a matching GitHub
+# Release whenever a commit that bumps the plugin version lands on `main`
+# (for example when a release PR is merged). The job is idempotent: if the tag
+# for the current version already exists, it does nothing, so ordinary
+# non-version commits never produce a release.
+
+on:
+  push:
+    branches: [main]
+
+# Avoid two pushes racing to create the same tag/release.
+concurrency:
+  group: release-on-version-bump
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  tag-release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Resolve version and tag
+        id: version
+        run: |
+          set -euo pipefail
+          marketplace_version="$(jq -r '.metadata.version' .claude-plugin/marketplace.json)"
+          plugin_version="$(jq -r '.version' plugins/traceweaver-core/.claude-plugin/plugin.json)"
+
+          if [ -z "$plugin_version" ] || [ "$plugin_version" = "null" ]; then
+            echo "::error::Could not read plugin version from plugins/traceweaver-core/.claude-plugin/plugin.json"
+            exit 1
+          fi
+
+          # A release must ship a single coherent version across the marketplace
+          # and the plugin manifest. Refuse to auto-release on an inconsistent
+          # state rather than tag the wrong version.
+          if [ "$marketplace_version" != "$plugin_version" ]; then
+            echo "::error::Version mismatch: marketplace=$marketplace_version plugin=$plugin_version"
+            exit 1
+          fi
+
+          echo "version=$plugin_version" >> "$GITHUB_OUTPUT"
+          echo "tag=traceweaver-core--v$plugin_version" >> "$GITHUB_OUTPUT"
+
+      - name: Check whether the tag already exists
+        id: check
+        run: |
+          set -euo pipefail
+          tag="${{ steps.version.outputs.tag }}"
+          if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+            echo "Tag $tag already exists; nothing to release."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Tag $tag does not exist; a release will be created."
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Extract release notes from CHANGELOG
+        if: steps.check.outputs.exists == 'false'
+        run: |
+          set -euo pipefail
+          version="${{ steps.version.outputs.version }}"
+          # Pull the section between "## <version> ..." and the next "## " header.
+          awk -v ver="$version" '
+            index($0, "## " ver " ") == 1 { capture = 1; next }
+            capture && /^## / { exit }
+            capture { print }
+          ' CHANGELOG.md > release-notes.md
+
+          # Trim leading/trailing blank lines.
+          sed -i -e '/./,$!d' release-notes.md
+
+          if [ ! -s release-notes.md ]; then
+            echo "No CHANGELOG section found for $version; using a default note."
+            printf 'TraceWeaver Core %s.\n' "$version" > release-notes.md
+          fi
+
+          echo "----- release notes -----"
+          cat release-notes.md
+
+      - name: Create tag and GitHub Release
+        if: steps.check.outputs.exists == 'false'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          gh release create "${{ steps.version.outputs.tag }}" \
+            --target "${{ github.sha }}" \
+            --title "TraceWeaver Core ${{ steps.version.outputs.version }}" \
+            --notes-file release-notes.md
