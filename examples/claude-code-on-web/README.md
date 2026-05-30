@@ -15,8 +15,9 @@ you open.
 - Declares the TraceWeaver marketplace with `extraKnownMarketplaces`, so the
   cloud container knows where to find the plugin.
 - Adds a `SessionStart` hook that runs `claude plugin install
-  traceweaver-core@traceweaver` when the container starts, so the `tw-*` skills
-  are present in the session.
+  traceweaver-core@traceweaver` when the container starts, so the plugin is
+  present in the session (run `/reload-plugins` if the `tw-*` skills do not show
+  up right away).
 
 ## Install into your repository
 
@@ -40,8 +41,10 @@ If you already have a `.claude/settings.json`, merge the `extraKnownMarketplaces
 and `hooks.SessionStart` keys into it instead of overwriting the file.
 
 Commit both files. The next time you open this repo in a Claude Code web session
-and trust the configuration, the hook installs the plugin and `tw-*` skills
-become available.
+and trust the configuration, the hook installs the plugin. If the `tw-*` skills
+do not appear right away, run `/reload-plugins` (or start a fresh session) —
+Claude Code does not always register a plugin installed into an already-running
+session without a reload.
 
 ## Requirements and caveats
 
@@ -55,6 +58,9 @@ become available.
   documented workaround.
 - **Slight startup latency:** the hook runs on every session start, adding a few
   seconds while the plugin installs or verifies.
+- **May need a reload:** if the skills do not show in the session where the hook
+  first ran, run `/reload-plugins` or start a fresh session so Claude Code picks
+  up the just-installed plugin.
 
 The script only acts in remote sessions (it checks `CLAUDE_CODE_REMOTE`), so it
 is a no-op when the same repo is opened on your desktop.

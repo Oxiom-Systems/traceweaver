@@ -100,9 +100,12 @@ into the repo you want to use on the web. It adds two things to that repo's
 - a `SessionStart` hook that runs `claude plugin install
   traceweaver-core@traceweaver` once the container starts.
 
-After the repo trusts the configuration and the hook runs, the `tw-*` skills are
-available in that web session. This is optional: if you only use the desktop app
-and mobile remote-control, the user-scope install above is enough.
+After the repo trusts the configuration and the hook runs, the plugin is
+installed in the container. If the `tw-*` skills do not appear immediately, run
+`/reload-plugins` (or start a fresh session): Claude Code does not always
+register a plugin installed into an already-running session without a reload.
+This is optional: if you only use the desktop app and mobile remote-control, the
+user-scope install above is enough.
 
 ### Cursor
 

@@ -20,7 +20,9 @@ runtime or skill-behavior changes in this release.
 - Bumped Codex, Claude Code, Antigravity, Cursor, and Claude marketplace
   metadata to `0.2.3`.
 - Updated README and plugin README install examples to use
-  `traceweaver-core--v0.2.3`.
+  `traceweaver-core--v0.2.3`, and bumped the version-identity references in the
+  prompt-to-proof guide and the packaged CE upstream source inventory to
+  `0.2.3` (the selected CE 3.9.0 source pin is unchanged).
 - Clarified in the Claude setup docs that a user-scope plugin install makes the
   `tw-*` skills available in every repository on the desktop app and in mobile
   remote-control sessions, and that web/cloud sessions need the committed kit.

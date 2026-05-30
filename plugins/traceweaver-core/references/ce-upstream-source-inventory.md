@@ -4,7 +4,7 @@
 Record ID: `TWCORE-CE-SOURCE-PIN-2026-05-27-001`
 
 This package includes a selected Compound Engineering compatibility surface for
-TraceWeaver Core 0.2.2 static materialization.
+TraceWeaver Core 0.2.3 static materialization.
 
 ## Source Pin
 
@@ -54,5 +54,5 @@ This source map resets to held if:
 - static evidence is used to claim clean CE replacement or runtime-equivalent
   agent behavior.
 
-Next recommended step: run the 0.2.2 release verification bundle and keep clean
+Next recommended step: run the 0.2.3 release verification bundle and keep clean
 replacement/runtime-equivalence claims held unless those evidence gates pass.
