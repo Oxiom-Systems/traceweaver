@@ -2,6 +2,39 @@
 
 # Changelog
 
+## 0.2.3 - 2026-05-30
+
+TraceWeaver Core 0.2.3 documents how to make the `tw-*` skills available across
+repositories and adds an optional kit for Claude Code on the web. There are no
+runtime or skill-behavior changes in this release.
+
+### Added
+
+- `examples/claude-code-on-web/` kit: an `extraKnownMarketplaces` snippet and a
+  `SessionStart` install hook that make the `tw-*` skills available in
+  web/cloud sessions, which start from a fresh container without locally
+  installed plugins.
+
+### Changed
+
+- Bumped Codex, Claude Code, Antigravity, Cursor, and Claude marketplace
+  metadata to `0.2.3`.
+- Updated README and plugin README install examples to use
+  `traceweaver-core--v0.2.3`.
+- Clarified in the Claude setup docs that a user-scope plugin install makes the
+  `tw-*` skills available in every repository on the desktop app and in mobile
+  remote-control sessions, and that web/cloud sessions need the committed kit.
+
+### Held
+
+- Auto-enabling a marketplace plugin in cloud sessions without a committed hook
+  is not available; the web kit is a documented best-effort workaround, not a
+  turn-key plugin-only install.
+- Package-ready/release-ready claims, broad runtime behavior, runtime-driver
+  invocation, clean CE replacement, unconstrained-host support, slash-command
+  surfaces, enforcing mode, R31 validation, and autonomous publication remain
+  held until their own gates pass.
+
 ## 0.2.2 - 2026-05-27
 
 TraceWeaver Core 0.2.2 documents the CE 3.9.0 selected compatibility surface
