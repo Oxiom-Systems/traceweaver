@@ -26,6 +26,9 @@ Before review, load and cite:
 - skill-local `references/trace-anchor-authoring.md` when the document review
   concerns code-anchor hierarchy, authoring policy, or matrix Code Anchor
   Evidence updates
+- skill-local `references/design-decision-reviewer-guide.md` when the document
+  under review contains ADRs, design rationale, alternatives or tradeoff
+  records, or unrecorded design decisions
 - relevant validation, gap, change, exception, task, or trace records for the
   document being reviewed
 

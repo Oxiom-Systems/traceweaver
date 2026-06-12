@@ -22,15 +22,15 @@ Promotion states:
 |---|---|---|---|
 | requirements-reviewer | requirements-and-vv-guide.md | runtime-skill | requirements-reviewer skill; tw-requirements-review, tw-authority-gate, tw-traceability-check, tw-audit |
 | systems-engineering-traceability | systems-engineering-traceability-operating-model.md, traceability-matrix-template.md | runtime-skill | systems-engineering-traceability skill; tw-traceability-check, tw-authority-gate, tw-audit |
-| risk-gap-change-control | risk-gap-and-change-control-guide.md | guide-only | systems-engineering-traceability skill references |
-| verification-planner | verification-planner-guide.md | guide-only | tw-plan, tw-test-browser, tw-test-xcode |
-| validation-planner | validation-planner-guide.md | guide-only | tw-plan, tw-audit |
-| baseline-configuration-control | baseline-configuration-control-guide.md | guide-only | tw-authority-gate, tw-audit |
-| technical-review-and-audit-gate | technical-review-and-audit-gate-guide.md | guide-only | tw-audit |
-| needs-and-requirements-capture | none | private-only | none (tw-brainstorm/tw-grill cover capture process, not elicitation knowledge) |
-| design-decision-reviewer | none | private-only | none (trade-study knowledge gap flagged by K5) |
-| architecture-and-interface-reviewer | none | private-only | none |
-| traceweaver-lifecycle-orchestrator | none | private-only | none (tw-auto is an independent public implementation, not a promotion) |
+| risk-gap-change-control | risk-gap-and-change-control-guide.md | runtime-skill | risk-gap-change-control skill; systems-engineering-traceability, tw-audit |
+| verification-planner | verification-planner-guide.md | runtime-skill | verification-planner skill; tw-plan, tw-test-browser, tw-test-xcode |
+| validation-planner | validation-planner-guide.md | runtime-skill | validation-planner skill; tw-plan, tw-audit |
+| baseline-configuration-control | baseline-configuration-control-guide.md | runtime-skill | baseline-configuration-control skill; tw-authority-gate, tw-audit |
+| technical-review-and-audit-gate | technical-review-and-audit-gate-guide.md | runtime-skill | technical-review-and-audit-gate skill; tw-audit |
+| needs-and-requirements-capture | needs-and-requirements-capture-guide.md | guide-only | tw-brainstorm, tw-grill |
+| design-decision-reviewer | design-decision-reviewer-guide.md | guide-only | tw-plan, tw-doc-review |
+| architecture-and-interface-reviewer | architecture-and-interface-reviewer-guide.md | guide-only | tw-plan, tw-code-review |
+| traceweaver-lifecycle-orchestrator | none | private-only | none (tw-auto is an independent public implementation; overlap decision held per `docs/validation/candidate-baseline-review-traceweaver-lifecycle-orchestrator-2026-06-12.md`) |
 
 ## Promotion Rule
 

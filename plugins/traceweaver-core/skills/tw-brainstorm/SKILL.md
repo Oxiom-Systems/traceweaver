@@ -26,6 +26,9 @@ Before delegating, load and cite the available authority context:
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
 - skill-local `references/traceweaver-operating-modes.md`
+- skill-local `references/needs-and-requirements-capture-guide.md` so raw
+  stakeholder wording, needs, wants, design suggestions, constraints, and
+  success signals are elicited and separated per distilled capture rules
 
 If authority files are missing, classify the run as authority bootstrap source
 evidence. Do not implement from brainstorm output.

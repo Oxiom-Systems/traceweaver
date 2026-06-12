@@ -5,12 +5,36 @@
 ## Unreleased
 
 Distilled-knowledge transfer pass: wire stranded guides into their consuming
-skills and make private-to-public knowledge promotion mechanically checkable.
-Runtime, enforcing, clean-replacement, release-ready, package-ready, and
-publication claims remain held.
+skills, make private-to-public knowledge promotion mechanically checkable, and
+execute the candidate baseline review queue, promoting five domains to packaged
+knowledge skills and three domains to public distilled guides. Runtime,
+enforcing, clean-replacement, release-ready, package-ready, and publication
+claims remain held.
 
 ### Added
 
+- Five packaged distilled knowledge skills, each promoted through a per-domain
+  candidate baseline review record under `docs/validation/` (source hygiene
+  plus requirements-quality gate per the candidate-baseline-review protocol,
+  GAP-TW-2026-06-12-007): `validation-planner`, `verification-planner`,
+  `technical-review-and-audit-gate`, `baseline-configuration-control`, and
+  `risk-gap-change-control`. Each follows the `requirements-reviewer` pattern
+  (inline core model, mandatory reference loading, skill-local operating
+  model/checklist/output schema/source basis/examples) and is routed by name
+  from its consuming wrappers (`tw-plan`, `tw-audit`, `tw-test-browser`,
+  `tw-test-xcode`, `tw-authority-gate`, `systems-engineering-traceability`).
+- Three new public distilled guides promoted from private-only with review
+  records: `needs-and-requirements-capture-guide.md` (elicitation gap, finding
+  K5; wired into `tw-brainstorm` and `tw-grill`),
+  `design-decision-reviewer-guide.md` (trade-study gap, K5; wired into
+  `tw-plan` and `tw-doc-review`), and
+  `architecture-and-interface-reviewer-guide.md` (wired into `tw-plan` and
+  `tw-code-review`), each packaged centrally and skill-locally under the
+  distilled-coverage gate.
+- `docs/validation/candidate-baseline-review-traceweaver-lifecycle-orchestrator-2026-06-12.md`:
+  overlap analysis of the private lifecycle orchestrator against `tw-auto`,
+  with options laid out; the promotion/overlap decision remains held for the
+  project owner.
 - `scripts/traceweaver-smoke-distilled-coverage` (wired into CI): anti-stranding
   gate that fails when any `docs/distilled/` guide is missing from the packaged
   plugin references, drifted from its source of truth (central or skill-local

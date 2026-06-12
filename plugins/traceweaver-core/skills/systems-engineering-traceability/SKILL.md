@@ -54,7 +54,7 @@ For a reusable matrix and diagram shape, use `references/traceability-matrix-tem
 
 For requirement quality, ATP/result records, and verification/validation evidence, use `references/requirements-and-vv-guide.md`.
 
-For risk controls, approved gaps, traceability debt, dark-code candidates, and change control, use `references/risk-gap-and-change-control-guide.md`.
+For risk controls, approved gaps, traceability debt, dark-code candidates, and change control, use `references/risk-gap-and-change-control-guide.md`, and use the TraceWeaver-packaged `risk-gap-change-control` skill for the full disposition model and record schemas.
 
 ## Process
 

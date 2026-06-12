@@ -61,6 +61,9 @@ Before interviewing, load and cite the available authority context:
 - relevant `.traceweaver/` gaps, changes, exceptions, tasks, trace records, or
   validation evidence
 - `references/upstream-notice.md`
+- skill-local `references/needs-and-requirements-capture-guide.md` so the
+  interview elicits and separates raw wording, needs, wants, design
+  suggestions, constraints, and success signals per distilled capture rules
 
 If authority files are absent, stay in bootstrap source-evidence mode. If they
 exist, use them to narrow questions to deltas, gaps, assumptions, validation
