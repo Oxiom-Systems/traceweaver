@@ -27,7 +27,7 @@ are the canonical release list. To stay current after installing, see
 [Updating](#updating) — or just run the `tw-update` skill from inside your
 harness.
 
-Pin the tagged `traceweaver-core--v0.2.4` snapshot instead when you need a
+Pin the tagged `traceweaver-core--v0.2.5` snapshot instead when you need a
 reproducible, fixed install. Contributors developing TraceWeaver itself work on
 feature branches and open PRs into `main`.
 
@@ -45,7 +45,7 @@ Install `traceweaver-core` from the Codex plugin UI.
 Use the tagged release snapshot for a pinned, reproducible local alpha install:
 
 ```sh
-git clone --branch traceweaver-core--v0.2.4 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.2.5 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
@@ -119,10 +119,10 @@ user-scope install above is enough.
 TraceWeaver includes a Cursor peer manifest at
 `plugins/traceweaver-core/.cursor-plugin/plugin.json`.
 
-Cursor install/update is compatibility-preview only in `0.2.4`: the manifest is
+Cursor install/update is compatibility-preview only in `0.2.5`: the manifest is
 versioned with the Codex and Claude manifests, but TraceWeaver does not claim a
 proven Cursor marketplace or runtime install path yet. If you inspect the Cursor
-manifest, inspect it from the `traceweaver-core--v0.2.4` tag rather than `main`.
+manifest, inspect it from the `traceweaver-core--v0.2.5` tag rather than `main`.
 Use the Codex or Claude setup above for supported alpha plugin use, and treat
 Cursor testing as held until a Cursor runtime validation record exists.
 
@@ -133,7 +133,7 @@ assistant environment, start from the tagged release snapshot rather than
 `main`:
 
 ```sh
-git clone --branch traceweaver-core--v0.2.4 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.2.5 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
 ```
@@ -234,7 +234,7 @@ tw-auto "implement the approved plan"
 
 ## Current Alpha Boundaries
 
-TraceWeaver Core `0.2.4` is an alpha advisory plugin for Codex and Claude Code.
+TraceWeaver Core `0.2.5` is an alpha advisory plugin for Codex and Claude Code.
 It is usable for first-time authority bootstrap, requirements review, planning,
 work handoffs, traceability checks, audits, and controlled review flows.
 This release keeps the selected Compound Engineering compatibility surface
@@ -476,6 +476,12 @@ work:
 - explicit risk, gap, change, exception, and held-claim records;
 - review gates before unsupported claims become release decisions.
 
+Intended scope: TraceWeaver targets single-project, well-scoped agentic
+feature work. It does not claim coverage of multi-layer system programs,
+supplier management, or regulated-domain engineering, and its distilled
+knowledge base deliberately omits quantitative SE domains such as design
+margins, FMEA, and performance budgeting (REQ-TW-073).
+
 TraceWeaver does not claim certification, endorsement, or formal compliance
 with INCOSE, ISO, IEEE, NASA, or any other standard. Public artifacts must use
 original TraceWeaver wording and must not copy protected standards or handbook
@@ -523,6 +529,13 @@ validation files when auditing specific claims:
 - [docs/validation/](docs/validation/)
 - [docs/plans/](docs/plans/)
 - [CHANGELOG.md](CHANGELOG.md)
+
+Gate types (REQ-TW-071): the smoke scripts under `scripts/` -- including the
+`traceweaver-smoke-verify` aggregate, the distilled-coverage gate, and the
+code-anchor scan -- are mechanical checks with pass/fail exit codes wired into
+CI. Requirements-quality scores, review records, audits, and `tw-*` skill
+judgments are LLM judgment surfaces and are advisory in alpha; they prepare
+evidence but do not mechanically block anything.
 
 ## Near-Term Next Steps
 

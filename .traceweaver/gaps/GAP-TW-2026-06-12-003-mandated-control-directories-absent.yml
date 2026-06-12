@@ -1,5 +1,5 @@
 gap_id: GAP-TW-2026-06-12-003
-status: open
+status: resolved
 linked_intent: "INTENT-TW-002, INTENT-TW-003"
 linked_requirement: REQ-TW-031
 proposed_requirement_id: null
@@ -26,3 +26,11 @@ implementation_rule: No meaningful implementation may use this gap as authority 
 
 next_recommended_steps:
   - Run tw-requirements-review to reconcile REQ-TW-031 wording with dogfood practice.
+
+resolution: >
+  Clarification CLARIFY-TW-2026-06-12-001 resolved with option (b) by
+  project-owner decision on 2026-06-12: record directories under .traceweaver/
+  are created on first use; absence with no records is compliant. The
+  clarifying sentence was added to the Alpha Intent Contract Schema section of
+  requirements.md; REQ-TW-031 text and ID are unchanged.
+resolved_at: 2026-06-12

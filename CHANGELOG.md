@@ -2,16 +2,38 @@
 
 # Changelog
 
-## Unreleased
+## 0.2.5 - 2026-06-12
 
-Distilled-knowledge transfer pass: wire stranded guides into their consuming
-skills, make private-to-public knowledge promotion mechanically checkable, and
-execute the candidate baseline review queue, promoting five domains to packaged
-knowledge skills and three domains to public distilled guides. Runtime,
-enforcing, clean-replacement, release-ready, package-ready, and publication
-claims remain held.
+Distilled-knowledge transfer and promotion release: wire stranded guides into
+their consuming skills, make private-to-public knowledge promotion mechanically
+checkable, execute the candidate baseline review queue (five domains promoted
+to packaged knowledge skills, three to public distilled guides), and promote
+the 2026-06-12 framework-review gap candidates into approved baseline
+requirements REQ-TW-070 through REQ-TW-075 by project-owner decision. Runtime,
+enforcing, clean-replacement, and broader release claims remain held.
 
 ### Added
+
+- Approved requirements REQ-TW-070 - REQ-TW-075 in `requirements.md`
+  (bounded authority snapshot, mechanical gates, validation-closure metric,
+  explicit SE scope framing, distilled-guide coverage rule, and the
+  candidate-baseline promotion protocol), promoted from gap records
+  GAP-TW-2026-06-12-001..007 with owner approval on 2026-06-12; the canonical
+  baseline hash was rotated and the matrix, trace, ATP, result, verification,
+  and validation evidence rows (TRACE-TW-056, ATP-TW-040, RESULT-TW-040,
+  VER-TW-075, VAL-TW-018) were added, with generated views and the bounded
+  snapshot regenerated. GAP-TW-2026-06-12-003 was resolved with
+  created-on-first-use semantics for `.traceweaver/` record directories, and
+  the GAP-TW-2026-06-12-007 access-route clarification was answered
+  (session-scoped private-candidate access per named review).
+- README statements for the intended systems-engineering scope (REQ-TW-073)
+  and for which gates are mechanical versus LLM judgment (REQ-TW-071), and a
+  `tw-auto` output-contract clause naming the validation-closure ratio
+  (REQ-TW-072).
+- Owner decision recorded for the `traceweaver-lifecycle-orchestrator`
+  overlap: do not promote; `tw-auto` stays the public orchestration surface,
+  and candidate-only routing assets may fold into `tw-auto` references only
+  via a later gated change.
 
 - Five packaged distilled knowledge skills, each promoted through a per-domain
   candidate baseline review record under `docs/validation/` (source hygiene

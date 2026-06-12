@@ -30,7 +30,7 @@ Promotion states:
 | needs-and-requirements-capture | needs-and-requirements-capture-guide.md | guide-only | tw-brainstorm, tw-grill |
 | design-decision-reviewer | design-decision-reviewer-guide.md | guide-only | tw-plan, tw-doc-review |
 | architecture-and-interface-reviewer | architecture-and-interface-reviewer-guide.md | guide-only | tw-plan, tw-code-review |
-| traceweaver-lifecycle-orchestrator | none | private-only | none (tw-auto is an independent public implementation; overlap decision held per `docs/validation/candidate-baseline-review-traceweaver-lifecycle-orchestrator-2026-06-12.md`) |
+| traceweaver-lifecycle-orchestrator | none | private-only | none (tw-auto is the public lifecycle-orchestration surface; owner decided do-not-promote on 2026-06-12 per `docs/validation/candidate-baseline-review-traceweaver-lifecycle-orchestrator-2026-06-12.md`; candidate-only routing assets may fold into tw-auto references only via a later gated change) |
 
 ## Promotion Rule
 

@@ -1,7 +1,7 @@
 gap_id: GAP-TW-2026-06-12-005
-status: open
+status: promoted
 linked_intent: "INTENT-TW-005, INTENT-TW-006"
-linked_requirement: null
+linked_requirement: REQ-TW-073
 proposed_requirement_id: REQ-PROPOSED-2026-06-12-004
 clarification_question_id: null
 reason: >
@@ -30,3 +30,10 @@ implementation_rule: No meaningful implementation may use this gap as authority 
 
 next_recommended_steps:
   - Run tw-requirements-review to decide scope-framing and provenance disposition.
+
+resolution: >
+  Promoted to approved requirement REQ-TW-073 in requirements.md by project-owner
+  decision on 2026-06-12 (framework self-check and distilled-knowledge
+  promotion section). Scoped doc review of the amended baseline is the next
+  gate before the new row drives further implementation claims.
+resolved_at: 2026-06-12

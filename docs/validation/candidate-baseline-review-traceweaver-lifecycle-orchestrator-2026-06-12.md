@@ -249,3 +249,16 @@ The following stay unpromoted pending the owner's overlap decision:
   (`private-only`); any state or note change is part of the held decision.
 - `plugins/traceweaver-core/skills/tw-auto/` — unchanged; no reconciliation
   edits performed in this review.
+
+## 7. Owner decision (2026-06-12 update)
+
+The project owner decided the held question on 2026-06-12 in the same session
+that promoted GAP-TW-2026-06-12-001..007: **option (a) accepted - do not
+promote**. The `traceweaver-lifecycle-orchestrator` domain stays private-only;
+`tw-auto` remains the public lifecycle-orchestration surface. Folding the
+candidate-only routing assets named in section 6 (the 12-state lifecycle
+vocabulary, route modes, hold-clearing rule, and structured route-record
+schema) into `tw-auto` skill-local references is authorized only as a later,
+normally gated change with its own review; it was not performed in this
+session. The promotion-status inventory row for this domain now records the
+decision.
