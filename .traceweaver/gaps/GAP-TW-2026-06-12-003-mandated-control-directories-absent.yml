@@ -1,0 +1,28 @@
+gap_id: GAP-TW-2026-06-12-003
+status: open
+linked_intent: "INTENT-TW-002, INTENT-TW-003"
+linked_requirement: REQ-TW-031
+proposed_requirement_id: null
+clarification_question_id: CLARIFY-TW-2026-06-12-001
+reason: >
+  requirements.md lists .traceweaver/gaps/, changes/, exceptions/, and
+  task-capsules/ as minimum consuming-repo artifact paths, but none of these
+  directories existed in this dogfood repo before this review. Twelve trace
+  records exist (milestone/release only); zero gap records existed despite 18+
+  held-claim categories. Either the requirement overstates what the framework
+  practices, or the practice is non-compliant. This gap record (and its
+  directory) is the first instance of dogfooding the mandated discipline.
+proposed_disposition: clarification_needed
+clarification_question: >
+  Should the mandated control directories be (a) enforced as always-present in
+  consuming repos via bootstrap, or (b) downgraded in requirements.md to
+  "created on first use"? The current text reads as (a) but practice is (b).
+owner: Oxiom Systems
+review_gate: tw-requirements-review
+created_at: 2026-06-12
+source_review: docs/validation/traceweaver-framework-design-review-2026-06-12.md (F4)
+
+implementation_rule: No meaningful implementation may use this gap as authority until it is promoted to an approved requirement or approved exception.
+
+next_recommended_steps:
+  - Run tw-requirements-review to reconcile REQ-TW-031 wording with dogfood practice.

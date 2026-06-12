@@ -1,0 +1,28 @@
+gap_id: GAP-TW-2026-06-12-001
+status: open
+linked_intent: "INTENT-TW-001, INTENT-TW-003"
+linked_requirement: null
+proposed_requirement_id: REQ-PROPOSED-2026-06-12-001
+clarification_question_id: null
+reason: >
+  The Intent Contract and requirement/matrix status fields have grown into
+  multi-thousand-character concatenated snake_case strings (intent-contract.yml
+  baseline_status ~4,600 chars; requirements.md candidate_amendment_status
+  ~2,500 chars; matrix rows up to 8,803 chars on one line). The authority record
+  is therefore neither human-reviewable nor machine-parseable, which defeats
+  INTENT-TW-001 (preserve stakeholder intent through a reviewable chain) and
+  INTENT-TW-003 (a lightweight file-based model a normal repo can control).
+proposed_disposition: proposed_requirement
+proposed_requirement_summary: >
+  The Intent Contract must be a bounded current-state snapshot (baseline hash,
+  mode, active gate, open held claims) with structured scalar/list status
+  fields. Historical decision logs move to .traceweaver/history/ or rely on git.
+owner: Oxiom Systems
+review_gate: tw-requirements-review
+created_at: 2026-06-12
+source_review: docs/validation/traceweaver-framework-design-review-2026-06-12.md (F1)
+
+implementation_rule: No meaningful implementation may use this gap as authority until it is promoted to an approved requirement or approved exception.
+
+next_recommended_steps:
+  - Run tw-requirements-review on this gap and the design-review record to decide promotion.

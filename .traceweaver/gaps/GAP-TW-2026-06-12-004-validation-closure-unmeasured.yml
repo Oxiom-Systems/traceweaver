@@ -1,0 +1,27 @@
+gap_id: GAP-TW-2026-06-12-004
+status: open
+linked_intent: "INTENT-TW-001, INTENT-TW-005"
+linked_requirement: null
+proposed_requirement_id: REQ-PROPOSED-2026-06-12-003
+clarification_question_id: null
+reason: >
+  Validation is the gate that asks "did we build what the user wanted," yet the
+  repo's own generated data reports acceptance_missing=66 of 67 requirements.
+  Validation questions are authored but effectively never answered; validation
+  is perpetually held while verification rituals accumulate. This is the
+  inversion of the framework's purpose under INTENT-TW-001 and INTENT-TW-005.
+proposed_disposition: proposed_requirement
+proposed_requirement_summary: >
+  Treat validation-closure ratio (validation questions answered / total) as a
+  first-class published metric in the traceability dashboard and in every
+  tw-auto output, so intent fidelity is visible rather than implied by
+  verification pass counts.
+owner: Oxiom Systems
+review_gate: tw-requirements-review
+created_at: 2026-06-12
+source_review: docs/validation/traceweaver-framework-design-review-2026-06-12.md (F5)
+
+implementation_rule: No meaningful implementation may use this gap as authority until it is promoted to an approved requirement or approved exception.
+
+next_recommended_steps:
+  - Run tw-requirements-review to decide whether a validation-closure metric becomes an approved requirement.

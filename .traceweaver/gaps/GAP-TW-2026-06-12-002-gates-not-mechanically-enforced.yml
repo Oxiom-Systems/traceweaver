@@ -1,0 +1,29 @@
+gap_id: GAP-TW-2026-06-12-002
+status: open
+linked_intent: "INTENT-TW-002, INTENT-TW-005"
+linked_requirement: null
+proposed_requirement_id: REQ-PROPOSED-2026-06-12-002
+clarification_question_id: null
+reason: >
+  Core gates are honor-system. The canonical baseline-hash procedure has no
+  validating script; the code-anchor scanner checks ID existence but never
+  whether code implements the cited requirement; the ~22 smoke scripts have no
+  aggregator, CI gate, or pre-commit hook. The agent under control also operates
+  the controls and writes the audit log (recurring
+  main_thread_scoped_*_no_reviewer_subagents evidence), so INTENT-TW-002
+  (prevent assumptions becoming authority) and INTENT-TW-005 (ship only claims
+  with evidence) rely on self-attestation.
+proposed_disposition: proposed_requirement
+proposed_requirement_summary: >
+  Provide a mechanical baseline-hash validator, a pre-commit/CI anchor lint, and
+  a single traceweaver-verify aggregator with a pass/fail exit code. Documentation
+  must state which gates are mechanical and which are LLM judgment.
+owner: Oxiom Systems
+review_gate: tw-requirements-review
+created_at: 2026-06-12
+source_review: docs/validation/traceweaver-framework-design-review-2026-06-12.md (F2)
+
+implementation_rule: No meaningful implementation may use this gap as authority until it is promoted to an approved requirement or approved exception.
+
+next_recommended_steps:
+  - Run tw-requirements-review to decide whether mechanical enforcement becomes an approved requirement.
