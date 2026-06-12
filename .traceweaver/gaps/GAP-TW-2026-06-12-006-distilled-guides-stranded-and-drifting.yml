@@ -1,0 +1,28 @@
+gap_id: GAP-TW-2026-06-12-006
+status: open
+linked_intent: "INTENT-TW-001, INTENT-TW-002"
+linked_requirement: REQ-TW-020
+proposed_requirement_id: REQ-PROPOSED-2026-06-12-006
+clarification_question_id: null
+reason: >
+  Four public distilled guides (verification-planner, validation-planner,
+  baseline-configuration-control, technical-review-and-audit-gate) existed in
+  docs/distilled/ but were packaged into the runtime plugin by nothing and
+  referenced by zero skills, so installed agents never received that knowledge.
+  Three of the four previously packaged guides had also silently drifted behind
+  their docs/distilled source of truth. Distilled-knowledge transfer from the
+  private source repo therefore leaked at the promotion-to-runtime stage with
+  no mechanical detection.
+proposed_disposition: proposed_requirement
+proposed_requirement_summary: >
+  Every docs/distilled guide must be packaged byte-identical into the plugin
+  references, referenced by at least one consuming skill's load instructions,
+  and listed in a promotion-status inventory; a CI smoke
+  (traceweaver-smoke-distilled-coverage) must fail on stranding, drift, or
+  missing inventory rows.
+owner: Oxiom Systems
+review_gate: tw-requirements-review
+created_at: 2026-06-12
+source_review: tw-requirements-review session record 2026-06-12 (CAND-A1, CAND-A2, CAND-B1, CAND-B2); design review K5
+
+implementation_rule: Implemented as advisory alpha behavior with this gap as the tracked authority candidate; promotion to an approved requirement remains a human decision.

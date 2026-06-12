@@ -79,6 +79,10 @@ Included references:
 - `references/requirements-and-vv-guide.md`
 - `references/requirements-baseline-template.md`
 - `references/risk-gap-and-change-control-guide.md`
+- `references/verification-planner-guide.md`
+- `references/validation-planner-guide.md`
+- `references/baseline-configuration-control-guide.md`
+- `references/technical-review-and-audit-gate-guide.md`
 - `references/systems-engineering-traceability-operating-model.md`
 - `references/traceability-matrix-template.md`
 - `references/intent-contract-template.yml`

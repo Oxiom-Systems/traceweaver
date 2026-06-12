@@ -28,6 +28,8 @@ Before returning an authority decision, load and cite:
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
 - the planned task, plan, changed-file scope, or requested behavior
+- skill-local `references/baseline-configuration-control-guide.md` when judging
+  baseline identity, change control, or authority custody
 - the claimed requirement IDs, trace IDs, verification target, validation
   question, baseline ID/hash, and must-not-change boundaries
 

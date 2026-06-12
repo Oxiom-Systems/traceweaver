@@ -58,3 +58,6 @@ jobs:
 
       - name: Verify gate (baseline hash, bounded snapshot drift, intent-fidelity metrics)
         run: scripts/traceweaver-smoke-verify
+
+      - name: Distilled-knowledge coverage gate (anti-stranding, drift, skill wiring)
+        run: scripts/traceweaver-smoke-distilled-coverage

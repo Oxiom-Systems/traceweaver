@@ -22,4 +22,4 @@ authority_reviewability:
   longest_authority_line_chars: 8803
   authority_lines_over_2000_chars: 37
   human_reviewable: false
-open_gaps: 5
+open_gaps: 7
