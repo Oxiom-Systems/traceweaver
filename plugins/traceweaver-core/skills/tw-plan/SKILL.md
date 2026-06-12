@@ -32,8 +32,20 @@ Before planning meaningful behavior, load and cite:
 - skill-local `references/traceweaver-operating-modes.md`
 - skill-local `references/verification-planner-guide.md` when planning the
   verification method, evidence, and pass/fail criteria for planned work
+- TraceWeaver-packaged `verification-planner` for substantive verification
+  planning: method selection, procedure and evidence planning, and pass/fail
+  criteria beyond the summary guide
 - skill-local `references/validation-planner-guide.md` when planning how the
   result will be validated against stakeholder need or acceptance signal
+- TraceWeaver-packaged `validation-planner` for substantive validation
+  planning: scenario, rater profile, acceptance signal, and evidence path
+  beyond the summary guide
+- skill-local `references/design-decision-reviewer-guide.md` when a plan
+  selects between implementation approaches, records a design decision or ADR,
+  or creates derived requirements from a design choice
+- skill-local `references/architecture-and-interface-reviewer-guide.md` when
+  planned work crosses module, runtime, package, API, or human workflow
+  boundaries or introduces external dependencies or derived requirements
 - relevant `.traceweaver/` task, gap, change, exception, trace, or evidence
   records
 

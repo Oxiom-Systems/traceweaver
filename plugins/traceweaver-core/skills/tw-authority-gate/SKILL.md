@@ -33,10 +33,11 @@ Before returning an authority decision, load and cite:
 - the claimed requirement IDs, trace IDs, verification target, validation
   question, baseline ID/hash, and must-not-change boundaries
 
-Use the TraceWeaver-packaged `requirements-reviewer` and
-`systems-engineering-traceability` skills as the distilled
-systems-engineering knowledge source for requirement quality, authority,
-traceability, verification, validation, gaps, and held claims.
+Use the TraceWeaver-packaged `requirements-reviewer`,
+`systems-engineering-traceability`, and `baseline-configuration-control`
+skills as the distilled systems-engineering knowledge source for requirement
+quality, authority, traceability, verification, validation, gaps, held
+claims, and baseline/configuration-control judgment.
 
 ## Process
 

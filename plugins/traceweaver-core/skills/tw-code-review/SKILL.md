@@ -24,6 +24,9 @@ Before review, load and cite:
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
 - skill-local `references/traceweaver-operating-modes.md`
+- skill-local `references/architecture-and-interface-reviewer-guide.md` when
+  the reviewed change crosses interface boundaries or alters contracts,
+  external dependencies, or integration assumptions
 - relevant `.traceweaver/` gap, change, exception, task, or trace records when
   the changed behavior depends on them
 

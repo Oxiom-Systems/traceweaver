@@ -41,6 +41,15 @@ Before auditing, load and cite:
 - TraceWeaver-packaged `tw-traceability-check`
 - TraceWeaver-packaged `requirements-reviewer` when requirement quality,
   authority status, acceptance criteria, or closure wording is weak or unclear
+- TraceWeaver-packaged `technical-review-and-audit-gate` for the full
+  entry/exit, lens-coverage, and proceed/hold/reduce/reject gate model behind
+  the skill-local guide
+- TraceWeaver-packaged `validation-planner` when judging validation or
+  acceptance closure evidence in depth
+- TraceWeaver-packaged `baseline-configuration-control` when judging baseline
+  identity, authority custody, stale evidence, or uncontrolled change in depth
+- TraceWeaver-packaged `risk-gap-change-control` when checking risk, gap,
+  exception, and change closure before cleanup, completion, or release claims
 - TraceWeaver-packaged `systems-engineering-traceability` for candidate dark
   behavior, orphan behavior, duplicate/similar behavior, missing verification,
   missing validation, and held-claim analysis

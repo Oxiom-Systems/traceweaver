@@ -25,6 +25,9 @@ Before delegating, load and cite:
 - skill-local `references/traceweaver-operating-modes.md`
 - skill-local `references/verification-planner-guide.md` so the run is planned
   as verification evidence with method and pass/fail criteria, not an ad hoc test
+- TraceWeaver-packaged `verification-planner` when the run needs substantive
+  verification planning: method selection, procedure refs, evidence paths, and
+  pass/fail criteria beyond the summary guide
 - scheme, target, simulator, device, or test scope
 - requirement, trace, and verification IDs when the result is accepted evidence
 
