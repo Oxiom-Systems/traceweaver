@@ -1,7 +1,7 @@
 gap_id: GAP-TW-2026-06-12-007
-status: open
+status: promoted
 linked_intent: "INTENT-TW-001, INTENT-TW-002"
-linked_requirement: null
+linked_requirement: REQ-TW-075
 proposed_requirement_id: REQ-PROPOSED-2026-06-12-007
 clarification_question_id: CLAR-TW-2026-06-12-007
 reason: >
@@ -30,3 +30,17 @@ created_at: 2026-06-12
 source_review: tw-requirements-review session record 2026-06-12 (CAND-C1); private source README promotion path; design review K5
 
 implementation_rule: No promotion of an unpromoted domain may proceed without a per-domain candidate baseline review record; this gap does not grant promotion authority.
+
+resolution: >
+  Promoted to approved requirement REQ-TW-075 in requirements.md by project-owner
+  decision on 2026-06-12 (framework self-check and distilled-knowledge
+  promotion section). Scoped doc review of the amended baseline is the next
+  gate before the new row drives further implementation claims.
+resolved_at: 2026-06-12
+clarification_resolution: >
+  CLAR-TW-2026-06-12-007 answered by the project owner via the 2026-06-12
+  handover kickoff: agent sessions receive the scrubbed public-candidate
+  material by adding the private repo to the session's repository scope per
+  named review, restricted to outputs/agent-skills-public-candidate/ and
+  outputs/agent-skills/promoted-runtime-snapshot/. The nine 2026-06-12 review
+  records used this route.

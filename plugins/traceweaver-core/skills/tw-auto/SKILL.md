@@ -553,6 +553,9 @@ Always return:
 - implementation files changed or proposed;
 - test-first evidence, verification evidence, and result;
 - structured acceptance evidence status when closure claims are detected;
+- the validation-closure ratio (requirements with recorded acceptance evidence
+  versus total) when authority files are loaded, so intent fidelity stays
+  visible rather than implied by verification pass counts;
 - review coverage, including completed reviewers, pending reviewers, skipped
   reviewers, capacity backpressure, and any degraded main-thread fallback;
 - validation question carried forward;

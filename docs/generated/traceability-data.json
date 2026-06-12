@@ -6,15 +6,15 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "cad14483104aa4382642cca75c2343e62512817e382ff1614e364ee9fbd2b2c5"
+      "sha256": "aa181f953813a57c034dc0fc1212771743a8054c85caae9f9b8149bd2d90e11e"
     },
     {
       "path": "requirements.md",
-      "sha256": "df5cabee6fba8ea04a30caaa9c2e91c7b6d6c414bbc367340b90e21314ed69d8"
+      "sha256": "0ccba1007290b907a594c2b99e3112b8da5726d1c7bdf05dddd95e0035142762"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "3b3921dae48a7171b16a431f5157b465b13aa34bc091b4ae8a0f5c7d075595eb"
+      "sha256": "8ce4a84ed22626494b32d146e643980807ded7114a80c7b6375d3fba95cffb29"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -22,17 +22,17 @@
     }
   ],
   "row_counts": {
-    "requirements": 69,
-    "trace_rows": 53,
-    "atp_entries": 36,
-    "result_records": 37,
-    "verification_records": 71,
-    "validation_records": 17,
+    "requirements": 75,
+    "trace_rows": 54,
+    "atp_entries": 37,
+    "result_records": 38,
+    "verification_records": 72,
+    "validation_records": 18,
     "code_anchor_records": 256,
     "structured_acceptance_results": 1,
-    "structured_acceptance_coverage": 69,
-    "structured_acceptance_missing_requirements": 68,
-    "structured_acceptance_non_closed_requirements": 69
+    "structured_acceptance_coverage": 75,
+    "structured_acceptance_missing_requirements": 74,
+    "structured_acceptance_non_closed_requirements": 75
   },
   "requirements": [
     {
@@ -1133,6 +1133,84 @@
       "trace_ids": [
         "TRACE-TW-055"
       ]
+    },
+    {
+      "id": "REQ-TW-070",
+      "type": "Constraint",
+      "summary": "The Intent Contract must include a bounded current-state authority snapshot with a published schema, regenerated and drift-checked mechanically by the verify gate; historical decision narrative stays out of the snapshot.",
+      "source_need": "NEED-TW-001; NEED-TW-003; GAP-TW-2026-06-12-001",
+      "verification_method": "Verify-gate snapshot regeneration and drift check / schema inspection",
+      "validation_path": "VAL-TW-018",
+      "owner": "Oxiom Systems",
+      "status": "Approved 2026-06-12 / scoped doc review of amended baseline pending / runtime and publication held",
+      "trace_ids": [
+        "TRACE-TW-056"
+      ]
+    },
+    {
+      "id": "REQ-TW-071",
+      "type": "Constraint",
+      "summary": "Core authority gates must be mechanically checkable: verify gate with pass/fail exit code wired into CI, plus public documentation of which gates are mechanical versus LLM judgment.",
+      "source_need": "NEED-TW-002; NEED-TW-005; GAP-TW-2026-06-12-002",
+      "verification_method": "Script, CI workflow, and README gate-type statement inspection / CI run evidence",
+      "validation_path": "VAL-TW-018",
+      "owner": "Oxiom Systems",
+      "status": "Approved 2026-06-12 / scoped doc review of amended baseline pending / runtime and publication held",
+      "trace_ids": [
+        "TRACE-TW-056"
+      ]
+    },
+    {
+      "id": "REQ-TW-072",
+      "type": "System",
+      "summary": "The validation-closure ratio must be a first-class published metric in the generated views, the verify-gate output, and the `tw-auto` output contract.",
+      "source_need": "NEED-TW-001; NEED-TW-005; GAP-TW-2026-06-12-004",
+      "verification_method": "Dashboard coverage counts, verify-gate output, and `tw-auto` output-contract inspection",
+      "validation_path": "VAL-TW-018",
+      "owner": "Oxiom Systems",
+      "status": "Approved 2026-06-12 / scoped doc review of amended baseline pending / runtime and publication held",
+      "trace_ids": [
+        "TRACE-TW-056"
+      ]
+    },
+    {
+      "id": "REQ-TW-073",
+      "type": "Constraint",
+      "summary": "Public framing must state the intended systems-engineering scope explicitly (single-project, well-scoped agentic feature work) and keep distilled-knowledge provenance curated per skill or as one clearly scoped shared statement.",
+      "source_need": "NEED-TW-005; NEED-TW-006; GAP-TW-2026-06-12-005",
+      "verification_method": "README scope statement and packaged `source-basis.md` inspection",
+      "validation_path": "VAL-TW-018",
+      "owner": "Oxiom Systems",
+      "status": "Approved 2026-06-12 / scoped doc review of amended baseline pending / runtime and publication held",
+      "trace_ids": [
+        "TRACE-TW-056"
+      ]
+    },
+    {
+      "id": "REQ-TW-074",
+      "type": "Constraint",
+      "summary": "Every distilled guide must be packaged byte-identical, referenced by at least one packaged skill, and inventoried; the distilled-coverage smoke must fail on stranding, drift, or missing inventory rows.",
+      "source_need": "NEED-TW-001; NEED-TW-002; GAP-TW-2026-06-12-006",
+      "verification_method": "`traceweaver-smoke-distilled-coverage` run and CI wiring inspection",
+      "validation_path": "VAL-TW-018",
+      "owner": "Oxiom Systems",
+      "status": "Approved 2026-06-12 / implemented and passing in CI / scoped doc review of amended baseline pending",
+      "trace_ids": [
+        "TRACE-TW-056"
+      ]
+    },
+    {
+      "id": "REQ-TW-075",
+      "type": "Constraint",
+      "summary": "A distilled domain may change promotion state only through the candidate baseline review protocol with per-domain review records; batch promotions without records are not allowed.",
+      "source_need": "NEED-TW-001; NEED-TW-002; GAP-TW-2026-06-12-007",
+      "verification_method": "Review-record inspection against promotion-status inventory state changes",
+      "validation_path": "VAL-TW-018",
+      "owner": "Oxiom Systems",
+      "status": "Approved 2026-06-12 / exercised by nine review records 2026-06-12 / scoped doc review of amended baseline pending",
+      "trace_ids": [
+        "TRACE-TW-056"
+      ]
     }
   ],
   "traces": [
@@ -1718,6 +1796,17 @@
       "validation": "VAL-TW-017",
       "status": "Requirements review passed; scoped doc review passed; static wrapper update added; deterministic smoke passed; generated-view smoke passed; active-host skill-file-read proof passed; runtime-output fixture passed; broad runtime held",
       "next_step": "Keep broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous publication held until separately reviewed evidence authorizes those claims."
+    },
+    {
+      "id": "TRACE-TW-056",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005; NEED-TW-006",
+      "requirements": "REQ-TW-070; REQ-TW-071; REQ-TW-072; REQ-TW-073; REQ-TW-074; REQ-TW-075",
+      "artifact": "ART-TW-070",
+      "verification": "VER-TW-075",
+      "validation": "VAL-TW-018",
+      "status": "Owner approved promotion 2026-06-12; verify, distilled-coverage, and full local smoke suite pass; scoped doc review of the amended baseline is the next gate",
+      "next_step": "Lifecycle-orchestrator domain remains private-only by owner decision 2026-06-12; validation-closure backlog on the pre-existing baseline remains open; runtime, enforcing, publication, release-ready, and clean-replacement claims remain held"
     }
   ],
   "atp_entries": [
@@ -2044,6 +2133,15 @@
       "Expected Result": "The wrapper requires 0-5 per-requirement scores, default outcomes, score-as-triage-only boundary, and requirement-set quality findings while continuing to block weak or unapproved requirements from becoming authority. Scoped doc review confirms the REQ-TW-069 status update remains static/advisory and keeps publication claims held. Active-host proof confirms the installed `tw-requirements-review` wrapper is visible and readable by Codex after host reconciliation; runtime-output fixture confirms the required output fields for a bounded REQ-TW-069 requirement-quality prompt. Broad real-document runtime behavior remains held.",
       "Owner": "Oxiom Systems",
       "Status": "Requirements review passed / scoped doc review passed / static wrapper update added / deterministic smoke passed / active-host skill-file-read proof passed / runtime-output fixture passed / broad runtime held"
+    },
+    {
+      "ID": "ATP-TW-040",
+      "Requirement": "REQ-TW-070 - REQ-TW-075",
+      "Procedure / Scenario": "Run `scripts/traceweaver-smoke-verify` and `scripts/traceweaver-smoke-distilled-coverage`; inspect the README scope and gate-type statements, the `tw-auto` output contract, the bounded snapshot and schema, and the nine candidate baseline review records against promotion-status inventory state changes.",
+      "Setup / Context": "`requirements.md`; `.traceweaver/intent-contract.current.yml`; `.traceweaver/schema/`; `docs/distilled/promotion-status.md`; `docs/validation/candidate-baseline-review-*.md`; `README.md`; `plugins/traceweaver-core/skills/tw-auto/SKILL.md`",
+      "Expected Result": "Verify gate and distilled-coverage gate exit zero; the snapshot is current; every promotion-state change has a per-domain review record; the README states intended scope and gate types; the `tw-auto` output contract names the validation-closure ratio.",
+      "Owner": "Oxiom Systems",
+      "Status": "Executed 2026-06-12 / pass / scoped doc review of amended baseline pending"
     }
   ],
   "result_records": [
@@ -2379,6 +2477,15 @@
       "Evidence Artifact": "`plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md`; `active-host tw-requirements-review callable path (private path redacted)`; `scripts/traceweaver-smoke-tw-skill-behavior`; `scripts/traceweaver-smoke-codex-host-registry`; `fixtures/tw-skill-behavior/active-host-requirements-review-runtime/prompt.txt`; `requirements.md`; `traceability-matrix.md`",
       "Result": "Requirements review and scoped doc review passed as `TW-DOC-REVIEW-2026-05-26-REQ-TW-069-REQUIREMENTS-QUALITY-RANKING-STATUS-CLEAN-001`. Static wrapper update added and deterministic skill-behavior smoke passed. Active-host reconciliation refreshed stale `tw-auto` and `lfg` host copies. `TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry` passed with `real_tw_skill_runtime_invocation=pass_host_tw_requirements_review_skill_file_read`. `TRACEWEAVER_HOST_RUNTIME_EXEC=1 TRACEWEAVER_HOST_RUNTIME_SKILL=tw-requirements-review TRACEWEAVER_HOST_RUNTIME_PROOF=requirements-review-output TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS=120 scripts/traceweaver-smoke-codex-host-registry` passed with `real_tw_skill_runtime_invocation=pass_host_tw_requirements_review_runtime_output_fixture`. The adapter now requires 0-5 quality scores, default outcomes, score-as-triage boundary, and requirement-set quality findings. Broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous publication remain held.",
       "Date / Session": "2026-05-26"
+    },
+    {
+      "ID": "RESULT-TW-040",
+      "Requirement / Need": "REQ-TW-070 - REQ-TW-075",
+      "ATP / Method": "ATP-TW-040",
+      "Tested Ref / Context": "Framework self-check promotion and distilled-promotion queue execution",
+      "Evidence Artifact": "`scripts/traceweaver-smoke-verify` output; `scripts/traceweaver-smoke-distilled-coverage` output; full local smoke suite run; nine candidate baseline review records; `docs/distilled/promotion-status.md`",
+      "Result": "Verify gate passed with the bounded snapshot current; distilled-coverage reported 11/11 guides packaged and referenced with a 7 runtime-skill / 3 guide-only / 1 private-only domain ratio; the full local smoke suite passed; the owner approved the gap promotions, the GAP-TW-2026-06-12-003 clarification resolution, and the lifecycle-orchestrator do-not-promote decision on 2026-06-12.",
+      "Date / Session": "2026-06-12"
     }
   ],
   "verification_evidence": [
@@ -3162,6 +3269,17 @@
       "Evidence Path": "`plugins/traceweaver-core/skills/tw-auto/SKILL.md`; `plugins/traceweaver-core/skills/tw-auto/references/traceweaver-operating-modes.md`; `plugins/traceweaver-core/skills/tw-auto/references/traceweaver-wrapper-handoff-discipline.md`; `plugins/traceweaver-core/skills/tw-auto/references/traceweaver-controlled-autonomy-policy.md`; `plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors`; `scripts/traceweaver-smoke-tw-skill-behavior`; `fixtures/tw-skill-behavior/tw-auto-post-work-*/loop-state.txt`",
       "Date / Session": "2026-05-18",
       "Notes": "Deterministic static fixture input only; active-host filesystem/hash currentness refreshed on 2026-05-18 for `tw-auto` and changed skill-local references; `TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior` passed with `active_host_tw_auto_review_routing_surface=pass_host_review_routing_skill_hashes_current`; code traceability scanner over scoped changed behavior-bearing files passed with `code_traceability_findings=0`; scoped code review passed as `TW-CODE-REVIEW-2026-05-18-TW-AUTO-ZTEK-HANDOFF-CLOSURE-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-18-TW-AUTO-ZTEK-HANDOFF-CLOSURE-STATUS-HASH-CLEAN-001`; full `tw-auto` runtime-driver behavior, Vestro dogfood, publication, clean replacement, release/package/upstream readiness, R31, and unconstrained-host support remain held."
+    },
+    {
+      "ID": "VER-TW-075",
+      "Requirement": "REQ-TW-070 - REQ-TW-075",
+      "Method": "Inspection and mechanical smoke",
+      "Procedure / Command": "`scripts/traceweaver-smoke-verify`; `scripts/traceweaver-smoke-distilled-coverage`; full local smoke suite; README and `tw-auto` output-contract inspection",
+      "Tested Ref": "Amended `requirements.md` baseline, bounded snapshot, promotion-status inventory, nine review records, five packaged knowledge skills, three new distilled guides",
+      "Result": "Verification passed: verify gate and distilled-coverage gate exit zero; snapshot regenerated and current; promotion ratio 7 runtime-skill / 3 guide-only / 1 private-only; consuming wrappers reference the promoted skills and guides.",
+      "Evidence Path": "`docs/validation/candidate-baseline-review-*.md`; `docs/distilled/promotion-status.md`; CI smoke workflow",
+      "Date / Session": "2026-06-12",
+      "Notes": "Scoped doc review of the amended baseline remains the next gate; runtime and publication claims stay held."
     }
   ],
   "validation_evidence": [
@@ -3351,6 +3469,17 @@
       "Result": "Requirements review passed / scoped doc review passed / static wrapper update added / active-host skill-file-read proof passed / runtime-output fixture passed / broad runtime held",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "Score is triage only; approval, source basis, verification, validation, human decision, and held-claim gates still control authority promotion."
+    },
+    {
+      "ID": "VAL-TW-018",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-005",
+      "Scenario / Intended Use": "A maintainer audits the framework's self-check and knowledge-promotion state: the bounded snapshot, verify-gate output, promotion-status inventory, and a per-domain review record show whether intent fidelity is visible and promotions are controlled.",
+      "Stakeholder / Representative": "Project owner (Oxiom Systems), not the promoting agent session",
+      "Acceptance Signal": "Owner reviewed and approved the gap promotions and promotion-queue execution on 2026-06-12; the dashboard and verify gate expose the validation-closure backlog rather than hiding it.",
+      "Evidence Path": "`requirements.md`; `.traceweaver/intent-contract.current.yml`; `docs/generated/traceability-dashboard.md`; `docs/distilled/promotion-status.md`; nine candidate baseline review records",
+      "Result": "Owner approval recorded 2026-06-12; representative real-project validation of the promoted knowledge skills remains open",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Validation of the promoted skills in real consuming-project use (R31 family) remains deferred under the existing held claims."
     }
   ],
   "code_anchor_evidence": [
@@ -6505,6 +6634,102 @@
     },
     {
       "requirement_id": "REQ-TW-069",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-070",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-071",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-072",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-073",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-074",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-075",
       "coverage_status": "missing_structured_acceptance_result",
       "structured_acceptance_result_ids": [
 

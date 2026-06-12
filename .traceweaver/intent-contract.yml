@@ -5,7 +5,7 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
+baseline_hash_sha256: 4cec2a1b5bc27729ac433a6522ca144a47908141227c92156b8700260a16b78a
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
@@ -2253,7 +2253,7 @@ workflow_controls:
 task_capsule_minimum:
   task_id: required
   baseline_id: REQ-BASELINE-2026-04-30-001
-  baseline_hash_sha256: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
+  baseline_hash_sha256: 4cec2a1b5bc27729ac433a6522ca144a47908141227c92156b8700260a16b78a
   authorized_by: approved requirement ID or approved exception ID required for meaningful implementation
   intent_served: at least one INTENT-TW ID
   verification_required: required

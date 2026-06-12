@@ -1,5 +1,5 @@
 gap_id: GAP-TW-2026-06-12-006
-status: open
+status: promoted
 linked_intent: "INTENT-TW-001, INTENT-TW-002"
 linked_requirement: REQ-TW-020
 proposed_requirement_id: REQ-PROPOSED-2026-06-12-006
@@ -26,3 +26,10 @@ created_at: 2026-06-12
 source_review: tw-requirements-review session record 2026-06-12 (CAND-A1, CAND-A2, CAND-B1, CAND-B2); design review K5
 
 implementation_rule: Implemented as advisory alpha behavior with this gap as the tracked authority candidate; promotion to an approved requirement remains a human decision.
+
+resolution: >
+  Promoted to approved requirement REQ-TW-074 in requirements.md by project-owner
+  decision on 2026-06-12 (framework self-check and distilled-knowledge
+  promotion section). Scoped doc review of the amended baseline is the next
+  gate before the new row drives further implementation claims.
+resolved_at: 2026-06-12

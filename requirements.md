@@ -3,7 +3,7 @@ id: TW-REQ-MASTER-2026-04-30-001
 status: accepted_controlled_baseline_with_authority_doc_reviewed_candidate_requirements_as_planning_input
 date: 2026-04-30
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: f48d98c924f051004d0352a7680366bf4f89748d4c01013f23da1a84ff97adda
+baseline_hash_sha256: 4cec2a1b5bc27729ac433a6522ca144a47908141227c92156b8700260a16b78a
 acceptance_state: accepted_for_approved_requirements_candidate_requirements_authority_doc_reviewed_as_planning_input
 acceptance_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 accepted_at: 2026-04-30
@@ -134,6 +134,13 @@ Minimum consuming-repo artifact paths:
 .traceweaver/changes/
 .traceweaver/exceptions/
 ```
+
+Record directories other than `intent-contract.yml` are created on first use:
+a consuming repo with no gap, change, exception, task-capsule, or trace
+records is compliant while those directories are absent, and the first record
+creates its directory. This resolves clarification
+CLARIFY-TW-2026-06-12-001 (GAP-TW-2026-06-12-003) with option (b), decided by
+the project owner on 2026-06-12.
 
 Minimum `intent-contract.yml` fields:
 
@@ -336,6 +343,24 @@ until later evidence records approve those claims.
 | REQ-TW-068 | TraceWeaver must support installation as a standalone plugin for the Google Antigravity coding assistant environment. The installer must accept `--to antigravity` and the optional `--geminiHome <path>` parameters, packaging user-callable `tw-*` and `lfg` skills under `$HOME/.gemini/config/plugins/traceweaver-core/skills/`, and copying the Antigravity-specific plugin manifest to `plugin.json` in the plugin root. | INTENT-TW-003, INTENT-TW-007 | Installation smoke, manifest validation, and skill-local directory structure check. | Can an Antigravity agent discover and invoke the standalone TraceWeaver plugin skills? | User request 2026-05-25 for Antigravity plugin integration; REQ-TW-011; REQ-TW-013; REQ-TW-014; REQ-TW-016 | candidate_reviewed_planning_input |
 | REQ-TW-069 | `tw-requirements-review` must explicitly rank each real requirement with the TraceWeaver `requirements-reviewer` 0-5 quality score, report the default outcome, and preserve the rule that numeric ranking is triage only and cannot override blocking authority, source, verification, validation, or human-decision gaps. The review must also report requirement-set quality issues such as orphaned needs, missing allocation, duplication, conflicts, mixed abstraction, and missing verification or validation coverage. | INTENT-TW-001, INTENT-TW-003, INTENT-TW-008 | Requirements-review wrapper instruction inspection, deterministic skill-behavior smoke, private-source hygiene inspection, active-host skill-file-read proof, and active-host runtime-output fixture proof. | Can reviewers see requirement quality ranked clearly without accidentally treating a score as approval authority? | User request 2026-05-26 to fold requirement-quality ranking into `tw-requirements-review`; private TraceWeaver requirements-reviewer quality model; REQ-TW-010; REQ-TW-050; REQ-TW-061; TW-DOC-REVIEW-2026-05-26-REQ-TW-069-REQUIREMENTS-QUALITY-RANKING-STATUS-CLEAN-001; VER-TW-071; VER-TW-072 | requirements_review_passed_doc_review_passed_static_skill_update_added_smoke_passed_generated_views_passed_active_host_skill_file_read_proof_passed_runtime_output_fixture_passed_broad_runtime_held |
 
+### Framework Self-Check And Distilled-Knowledge Promotion
+
+These requirements promote the 2026-06-12 framework design review findings and
+the distilled-knowledge promotion controls from tracked gap candidates
+(GAP-TW-2026-06-12-001 through -007) into the master baseline. The project
+owner approved promotion on 2026-06-12 after requirements-quality review.
+Runtime, enforcing, release-ready, clean-replacement, and publication claims
+remain held per the existing exception records.
+
+| Req ID | Requirement | Intent | Verification method | Validation question | Source | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| REQ-TW-070 | The Intent Contract must include a bounded current-state authority snapshot (`.traceweaver/intent-contract.current.yml`) limited to baseline identity and hash, mode, active gate, held claims, and structured scalar or list status fields with a published schema, regenerated and drift-checked mechanically by `scripts/traceweaver-smoke-verify`; historical decision narrative must stay out of the bounded snapshot and live in git history or dated records. | INTENT-TW-001, INTENT-TW-003 | `scripts/traceweaver-smoke-verify` snapshot regeneration and drift check; inspection of `.traceweaver/schema/` and snapshot field shapes. | Can a reviewer read the current authority state on one screen without parsing multi-thousand-character concatenated status strings? | GAP-TW-2026-06-12-001; framework design review F1; owner approval 2026-06-12 | approved |
+| REQ-TW-071 | Core authority gates must be mechanically checkable: `scripts/traceweaver-smoke-verify` must recompute the canonical baseline hash, assert `requirements.md` and the Intent Contract agree, and exit non-zero on failure; the smoke suite including the verify gate and the code-anchor scan must run in CI; and public documentation must state which TraceWeaver gates are mechanical and which depend on LLM judgment. | INTENT-TW-002, INTENT-TW-005 | Inspection of `scripts/traceweaver-smoke-verify`, the CI smoke workflow, and the README gate-type statement; CI run evidence. | Can a reviewer distinguish mechanically enforced gate outcomes from agent self-attestation? | GAP-TW-2026-06-12-002; framework design review F2; owner approval 2026-06-12 | approved |
+| REQ-TW-072 | The validation-closure ratio (requirements with recorded acceptance evidence versus total) must be a first-class published metric: surfaced by the generated traceability views, printed by `scripts/traceweaver-smoke-verify`, and named in the `tw-auto` output contract, so intent fidelity is visible rather than implied by verification pass counts. | INTENT-TW-001, INTENT-TW-005 | Inspection of generated dashboard coverage counts, verify-gate output, and the `tw-auto` output contract; smoke run evidence. | Can stakeholders see how much of the baseline is actually validated, not merely verified? | GAP-TW-2026-06-12-004; framework design review F5; owner approval 2026-06-12 | approved |
+| REQ-TW-073 | Public framing must state the intended systems-engineering scope explicitly: TraceWeaver targets single-project, well-scoped agentic feature work and does not claim coverage of multi-layer system programs, supplier management, or regulated-domain engineering; distilled-knowledge provenance must be either curated per skill or collapsed into one clearly scoped shared statement. | INTENT-TW-005, INTENT-TW-006 | Inspection of the README scope statement and packaged `source-basis.md` files. | Does public positioning match what the distilled knowledge base actually covers? | GAP-TW-2026-06-12-005; framework design review K4, K5; owner approval 2026-06-12 | approved |
+| REQ-TW-074 | Every `docs/distilled/` guide must be packaged byte-identical into the plugin references, referenced by at least one packaged skill's load instructions, and listed in the promotion-status inventory; `scripts/traceweaver-smoke-distilled-coverage` must fail in CI on stranding, drift, or missing inventory rows. | INTENT-TW-001, INTENT-TW-002 | `scripts/traceweaver-smoke-distilled-coverage` run and CI wiring inspection. | Does distilled knowledge promoted from the private source repo actually reach installed agents without silent decay? | GAP-TW-2026-06-12-006; tw-requirements-review session record 2026-06-12; owner approval 2026-06-12 | approved |
+| REQ-TW-075 | A distilled domain may move promotion state (`private-only` to `guide-only`, or `guide-only` to `runtime-skill`) only through the candidate baseline review protocol: a per-domain review record under `docs/validation/` with source-hygiene verification and requirements-quality findings, followed by a promotion-status inventory update; batch promotions without per-domain records are not allowed. | INTENT-TW-001, INTENT-TW-002 | Inspection of `docs/validation/candidate-baseline-review-*` records against promotion-status inventory state changes. | Can every public promotion of distilled knowledge be traced to a recorded hygiene and quality review? | GAP-TW-2026-06-12-007; `docs/validation/candidate-baseline-review-protocol.md`; nine per-domain review records 2026-06-12; owner approval 2026-06-12 | approved |
+
 ## Current Traceability Matrix
 
 | Requirement | Planning / implementation artifact | Verification evidence | Validation status | Open gap |
@@ -363,6 +388,7 @@ until later evidence records approve those claims.
 | REQ-TW-067 | User request on 2026-05-19 for generated traceability views that remain derived from authority files | Candidate bounded generator requirement records deterministic read-only Markdown, Mermaid, and JSON traceability views plus a drift smoke | Static implementation added / JSON scanability repair verification passed / scoped code review passed / status-hash doc review passed | Runtime enforcement, active-host wrapper invocation, arbitrary-project automatic artifact creation, publication, release/package/upstream readiness, clean replacement, Vestro/R31 dogfood, and autonomous publication remain held |
 | REQ-TW-068 | User request on 2026-05-25 for Antigravity plugin integration | Standalone Antigravity plugin manifest, installer target support, and setup documentation | Candidate requirement recorded / static implementation added / installer verification smoke passed | Runtime invocation, active-host wrapper testing, publication, release/package/upstream readiness, clean replacement, and autonomous publication remain held |
 | REQ-TW-069 | User request on 2026-05-26 to rank requirement quality in `tw-requirements-review` | Wrapper requirement records 0-5 per-requirement quality scores, default outcomes, score-as-triage-only boundary, and requirement-set quality findings | Requirements review passed / scoped doc review passed / static wrapper update added / deterministic smoke passed / generated views passed / active-host skill-file-read proof passed / runtime-output fixture passed | Broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous publication remain held |
+| REQ-TW-070 - REQ-TW-075 | `.traceweaver/gaps/GAP-TW-2026-06-12-001..007`, `docs/validation/traceweaver-framework-design-review-2026-06-12.md`, `docs/validation/candidate-baseline-review-protocol.md`, nine candidate baseline review records 2026-06-12, `docs/distilled/promotion-status.md`, `scripts/traceweaver-smoke-verify`, `scripts/traceweaver-smoke-distilled-coverage` | Verify gate and distilled-coverage gate pass in CI; bounded snapshot regenerated and drift-checked; README scope and gate-type statements added; `tw-auto` output contract names the validation-closure ratio; five knowledge skills and three guides promoted through per-domain review records | Owner approved gap promotion 2026-06-12; scoped doc review of this amended baseline is the next gate before these rows drive new implementation claims | Validation-closure backlog on the pre-existing baseline remains open; runtime, enforcing, publication, release-ready, and clean-replacement claims remain held |
 
 ## Approved Exceptions And Held Claims
 
@@ -388,6 +414,11 @@ This file is the master requirements baseline. Changes to it must:
   capsules.
 
 ## Next Required Work
+
+1. Run a scoped `/tw-doc-review` over this amended baseline (REQ-TW-070 -
+   REQ-TW-075, the GAP-TW-2026-06-12-003 clarification resolution, and the
+   updated traceability rows) before using the new rows as authority for
+   further implementation claims.
 
 1. Keep REQ-TW-068 runtime invocation, active-host wrapper testing, publication, release/package/upstream readiness, clean replacement, and autonomous publication held until separately reviewed evidence authorizes those claims.
 
