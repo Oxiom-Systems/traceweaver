@@ -35,7 +35,7 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.2.3`
+Plugin version: `0.2.4`
 
 Included skills:
 
@@ -164,7 +164,7 @@ package. Bump every peer plugin manifest carried by the release:
 - `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.2.3`.
+`traceweaver-core--v0.2.4`.
 
 Tagging and the GitHub Release are automated: when a commit that bumps the
 plugin version lands on `main`, the `Release on version bump` workflow

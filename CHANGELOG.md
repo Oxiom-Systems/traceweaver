@@ -2,7 +2,7 @@
 
 # Changelog
 
-## Unreleased
+## 0.2.4 - 2026-06-12
 
 Framework engineering pass: a mechanical self-check gate plus a controlled
 refresh of the vendored Compound Engineering surface. Runtime, enforcing,

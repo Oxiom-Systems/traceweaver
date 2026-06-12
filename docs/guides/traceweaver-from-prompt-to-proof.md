@@ -53,7 +53,7 @@ records under `.traceweaver/`.
 ## What A First-Time User Does
 
 1. Install the TraceWeaver Core plugin for Codex or Claude Code, or use the
-   0.2.3 Antigravity metadata for static local install/discovery only.
+   0.2.4 Antigravity metadata for static local install/discovery only.
 2. In a blank project, use the new-project guide to choose the right route for
    the project size:
 
@@ -104,7 +104,7 @@ instead of letting it leak into release notes or customer-facing copy.
 
 ## Current Alpha Boundary
 
-TraceWeaver Core `0.2.3` is an alpha advisory plugin. It can guide first-time
+TraceWeaver Core `0.2.4` is an alpha advisory plugin. It can guide first-time
 authority setup, requirements review, planning, work handoffs, traceability
 checks, audits, and controlled review flows in Codex and Claude Code.
 Antigravity support is limited to static local install/discovery metadata until

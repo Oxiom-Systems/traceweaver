@@ -54,5 +54,5 @@ This source map resets to held if:
 - static evidence is used to claim clean CE replacement or runtime-equivalent
   agent behavior.
 
-Next recommended step: run the 0.2.3 release verification bundle and keep clean
+Next recommended step: run the 0.2.4 release verification bundle and keep clean
 replacement/runtime-equivalence claims held unless those evidence gates pass.

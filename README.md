@@ -27,7 +27,7 @@ are the canonical release list. To stay current after installing, see
 [Updating](#updating) — or just run the `tw-update` skill from inside your
 harness.
 
-Pin the tagged `traceweaver-core--v0.2.3` snapshot instead when you need a
+Pin the tagged `traceweaver-core--v0.2.4` snapshot instead when you need a
 reproducible, fixed install. Contributors developing TraceWeaver itself work on
 feature branches and open PRs into `main`.
 
@@ -45,7 +45,7 @@ Install `traceweaver-core` from the Codex plugin UI.
 Use the tagged release snapshot for a pinned, reproducible local alpha install:
 
 ```sh
-git clone --branch traceweaver-core--v0.2.3 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.2.4 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
@@ -119,10 +119,10 @@ user-scope install above is enough.
 TraceWeaver includes a Cursor peer manifest at
 `plugins/traceweaver-core/.cursor-plugin/plugin.json`.
 
-Cursor install/update is compatibility-preview only in `0.2.3`: the manifest is
+Cursor install/update is compatibility-preview only in `0.2.4`: the manifest is
 versioned with the Codex and Claude manifests, but TraceWeaver does not claim a
 proven Cursor marketplace or runtime install path yet. If you inspect the Cursor
-manifest, inspect it from the `traceweaver-core--v0.2.3` tag rather than `main`.
+manifest, inspect it from the `traceweaver-core--v0.2.4` tag rather than `main`.
 Use the Codex or Claude setup above for supported alpha plugin use, and treat
 Cursor testing as held until a Cursor runtime validation record exists.
 
@@ -133,7 +133,7 @@ assistant environment, start from the tagged release snapshot rather than
 `main`:
 
 ```sh
-git clone --branch traceweaver-core--v0.2.3 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.2.4 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
 ```
@@ -234,7 +234,7 @@ tw-auto "implement the approved plan"
 
 ## Current Alpha Boundaries
 
-TraceWeaver Core `0.2.3` is an alpha advisory plugin for Codex and Claude Code.
+TraceWeaver Core `0.2.4` is an alpha advisory plugin for Codex and Claude Code.
 It is usable for first-time authority bootstrap, requirements review, planning,
 work handoffs, traceability checks, audits, and controlled review flows.
 This release keeps the selected Compound Engineering compatibility surface
