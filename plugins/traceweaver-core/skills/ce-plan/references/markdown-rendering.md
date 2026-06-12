@@ -13,10 +13,8 @@ content rendered by different skills shares the same markdown principles.
 These hold regardless of which skill produced the artifact.
 
 - **YAML frontmatter at the top of the file.** Standard `---` delimited block
-  containing the artifact's stable metadata (title, status, date, type, etc.
-  — exact fields are per-skill, defined in the section contract). Editable
-  in place; tools and agents that do status flips (`active → completed`)
-  update the YAML directly.
+  containing the artifact's stable metadata (title, date, type, etc.
+  — exact fields are per-skill, defined in the section contract).
 - **ASCII identifiers in anchors.** Markdown headings auto-generate anchors
   from the heading text. Keep headings ASCII so anchors are predictable
   (`#implementation-units`, not `#implementación-units`).
@@ -99,10 +97,12 @@ How section types commonly render in markdown. These are patterns, not
 contracts — the agent picks the shape that fits the content.
 
 - **Summary / Problem Frame** — prose paragraphs.
-- **Requirements** — bullets with `R<N>.` prefix. Group with bold inline
-  headers when requirements span distinct concerns (group by capability,
-  not by discussion order). When requirements have status, traceability,
-  or severity that warrant additional columns, escalate to a table.
+- **Requirements** — bullets with `R<N>.` prefix. When requirements span
+  more than one concern, grouping under bold inline headers is the default
+  shape, not optional polish (group by capability, not by discussion order);
+  render a flat list only when every requirement is about the same thing.
+  When requirements have status, traceability, or severity that warrant
+  additional columns, escalate to a table.
 - **Implementation Units** — H3 heading per unit with `U<N>.` prefix.
   Fields (Goal, Files, Patterns, Test Scenarios, Verification) render as
   bullets with bold leader labels, or as sub-headings if the field has
@@ -179,15 +179,12 @@ brainstorm frontmatter). Common rules:
 
 - YAML at the top of the file, delimited by `---` on its own line above
   and below.
-- Field names in lowercase snake_case (`status`, `created_at`, not
-  `Status`, `CreatedAt`).
-- **Status lifecycle is per-contract.** When the section contract
-  defines a `status` field with a lifecycle (plans use
-  `active → completed`, flipped by ce-work at shipping time via direct
-  YAML edit), it is editable in place. When the section contract does
-  not define a status lifecycle (brainstorms, for example, have no
-  `active → completed` flip — they are upstream of plans and
-  referenced via the plan's `origin:`), do not introduce one.
+- Field names in lowercase snake_case (`created_at`, `topic`, not
+  `CreatedAt`, `Topic`).
+- **No status / lifecycle field.** Artifacts are point-in-time records
+  (decision or discovery), not tracked work items. Do not introduce a
+  mutable `status` field or an `active → completed` lifecycle — whether
+  the work shipped is derived from git, not stored in the doc.
 - Stable across artifact revisions — never rename or repurpose a field.
 
 ## Post-write audit

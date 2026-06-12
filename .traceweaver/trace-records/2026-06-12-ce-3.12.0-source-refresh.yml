@@ -1,0 +1,65 @@
+trace_record_id: TW-TRACE-RECORD-2026-06-12-CE-3.12.0-SOURCE-REFRESH-001
+date: 2026-06-12
+owner: Oxiom Systems
+record_type: ce_source_refresh
+status: ce_surface_refreshed_3_9_0_to_3_12_0_overlays_preserved_closure_audit_passed_runtime_clean_replacement_publication_held
+
+scope:
+  requirements:
+    - REQ-TW-017
+  trace: TRACE-TW-005
+  verification: VER-TW-009
+
+authority:
+  baseline: requirements.md
+  intent_contract: .traceweaver/intent-contract.yml
+  source_pin: plugins/traceweaver-core/references/ce-upstream-source-inventory.md
+  inventory: docs/validation/traceweaver-core-11-ce-runtime-inventory.md
+
+source_pin_change:
+  from_version: 3.9.0
+  from_commit: e2c9cd23525eeb1ecddd637e027d53b02f892e7b
+  to_version: 3.12.0
+  to_tag: compound-engineering-v3.12.0
+  to_commit: 4719dc509fdc45656a830e3ed6060f674e206076
+  repository: https://github.com/EveryInc/compound-engineering-plugin
+  license: MIT
+  capture_date: 2026-06-12
+  full_cache_aggregate_fingerprint: f7225f23ca97949dc1de63f1d347d45f9acd0395450b0efff754a3430b63c3cd
+
+method:
+  approach: three_way_merge
+  base: compound-engineering-v3.9.0
+  theirs: compound-engineering-v3.12.0
+  ours: vendored CE surface (3.9.0 + TraceWeaver overlays)
+  changed_upstream_files: 57
+  auto_merged_clean: 54
+  conflicts_resolved_favoring_upstream: 3   # ce-code-review/SKILL.md, ce-ideate/SKILL.md, ce-work/references/tracker-defer.md
+  removed_upstream: 3                        # ce-code-review/references/{bulk-preview,tracker-defer,walkthrough}.md, no longer referenced
+  added_upstream: 12
+  overlays_preserved: package-boundary sections (6/6), file-role anchors, held-publication neutering of ce-commit/ce-commit-push-pr/ce-work
+  redaction_preserved: concrete /tmp/compound-engineering and /var/folders temp paths re-redacted to placeholders (0 residual)
+
+verification:
+  - scripts/traceweaver-audit-ce-closure passed (selected-file inventory matches vendored surface)
+  - TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior passed
+  - scripts/traceweaver-smoke-code-traceability passed
+  - scripts/traceweaver-smoke-traceability-generated-views passed
+  - scripts/traceweaver-smoke-controlled-publication passed
+  - scripts/traceweaver-smoke-antigravity-discovery passed
+  - scripts/traceweaver-smoke-verify passed
+  - no conflict markers, no residual sensitive temp paths, git diff --check clean
+
+held_claims:
+  - runtime-equivalent CE behavior
+  - clean CE replacement
+  - enforcing mode
+  - release-ready / package-ready / upstream-ready
+  - publication / autonomous publication
+  - ce-replacement-classification.yml expected-hash refresh (pre-existing staleness, including unchanged tw-* skills; out of scope for this CE source update)
+
+next_step: >
+  Run tw-requirements-review / tw-doc-review on the refreshed CE surface and the
+  updated inventory before any release or publication claim. Refresh
+  ce-replacement-classification.yml expected hashes as a separate controlled
+  change. No publication, tag, or release is authorized by this record.
