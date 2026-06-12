@@ -155,7 +155,77 @@ adopter onboarding cliff.
 
 ## Distilled knowledge base review
 
-<!-- KNOWLEDGE-BASE-SECTION: pending subagent synthesis; appended below -->
+This section reviews the source of the distilled SE knowledge: the
+`skills/*/references/` material (`source-basis.md`, `operating-model.md`,
+`checklist.md`, `output-schema.md`, `examples.md`) and the packaged copies under
+`plugins/traceweaver-core/skills/*/references/`. The framework claims to adapt
+INCOSE/ISO/IEEE/NASA practice without copying protected text and without claiming
+compliance.
+
+Overall: the knowledge base is the strongest part of the framework. It is
+IP-clean, internally consistent, and faithful to core SE on the concepts it
+covers. Its weaknesses are missing upstream/quantitative SE domains and
+boilerplate provenance — not incorrectness.
+
+### K1 (good) IP hygiene is clean
+
+No verbatim or closely paraphrased standard text was found. The good-requirement
+characteristics are reframed as agent questions ("Necessary -> Is this needed to
+satisfy a parent need, source, constraint, or risk control?") rather than copied
+from ISO 29148, and the V&V distinction is an original restatement, not a
+quotation. The README's disclaimer (no certification/endorsement/compliance with
+INCOSE, ISO, IEEE, NASA) is honoured throughout. Copyright risk: low.
+
+### K2 (good) Core SE fidelity and cross-skill consistency are high
+
+Verification vs validation, the idea->need->requirement->design->implementation
+->verification->validation->change-control chain, baseline/configuration
+control, and the gap/risk/change/exception taxonomy are all stated correctly and
+consistently across the 11 skills. No contradictory definitions or routing
+conflicts were found; each skill's handoff table matches the lifecycle
+orchestrator's routing map. Within scope, the content is accurate.
+
+### K3 (good) Operational value, low padding
+
+The guidance is checklist-and-gate driven with block/revise/approve outcomes and
+calibrated rewrite examples (e.g. "fast" -> "return the first page of results
+within 2 seconds for 95% of searches under normal load"). Outputs are structured
+schemas, not prose. The strongest skill is `requirements-reviewer` (rich,
+testable, teaches the rewrite); the weakest is
+`architecture-and-interface-reviewer`, which identifies interfaces but does not
+govern them (no interface-spec template, no data-contract/timing/error-behaviour
+guidance, derived requirements are routed away rather than produced).
+
+### K4 (P3) Provenance is boilerplate and non-traceable
+
+All 11 `source-basis.md` files are byte-identical 14-line templates citing
+"generally known engineering concepts" with zero specific standard editions or
+sections. This is honest (it claims nothing false) but unauditable: a reviewer
+cannot verify which basis informed a given rule, and the 1:1 duplication
+suggests the provenance was templated rather than curated per skill. Acceptable
+for open-source guidance; insufficient for any regulated/compliance positioning.
+
+### K5 (P2) Upstream and quantitative SE domains are missing
+
+For a framework selling SE rigor, notable omissions: requirements elicitation
+(the capture skill records, it does not elicit), trade studies (design decisions
+are reviewed after the fact with no method for exploring alternatives),
+interface specification/ICD control, design margins and FMEA, ConOps/operational
+scenarios, measures of effectiveness and performance budgeting/flow-down, and
+risk quantification (risk is categorised but never scored by likelihood/impact).
+The suite is fit for single-project, well-scoped agentic feature work; it is not
+sufficient for multi-layer system programs, supplier management, or regulated
+domains. This is a scoping reality to state plainly in the docs, not necessarily
+a defect to fix — but today the framing implies broader SE coverage than the
+knowledge base delivers.
+
+### Knowledge-base verdict
+
+B+/A-: a solid, honest, operationally useful distillation of the core authority
+and traceability pipeline. The gap between this knowledge base (genuinely good)
+and the authority/evidence machinery built on top of it (findings F1-F7, which
+have grown past human reviewability) is the central tension of the framework:
+the method is sound; the bookkeeping has outgrown it.
 
 ## Recommendations (prioritized)
 
@@ -196,6 +266,7 @@ They are candidates for requirements review, not approved authority.
 - GAP-TW-2026-06-12-002: framework gates are not mechanically enforced (F2).
 - GAP-TW-2026-06-12-003: mandated gap/change/exception directories are absent (F4).
 - GAP-TW-2026-06-12-004: validation closure is effectively unmeasured (F5).
+- GAP-TW-2026-06-12-005: SE-coverage framing exceeds knowledge-base scope; provenance is boilerplate (K4, K5).
 
 ## Authority effect
 
