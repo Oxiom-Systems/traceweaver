@@ -141,6 +141,7 @@ expected_direct_skills=(
   tw-test-xcode
   tw-setup
   tw-worktree
+  tw-update
   tw-grill
 )
 
@@ -169,6 +170,7 @@ expected_visible_skills=(
   tw-test-xcode
   tw-setup
   tw-worktree
+  tw-update
   tw-grill
 )
 
@@ -197,6 +199,7 @@ identity_skills=(
   tw-test-xcode
   tw-setup
   tw-worktree
+  tw-update
   tw-grill
 )
 

@@ -1,7 +1,7 @@
 {
   "name": "traceweaver-core",
   "displayName": "TraceWeaver Core",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "Systems-engineering authority control and advisory automation for agentic software work.",
   "author": {
     "name": "Oxiom Systems",

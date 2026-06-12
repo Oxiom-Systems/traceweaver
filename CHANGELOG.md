@@ -2,6 +2,45 @@
 
 # Changelog
 
+## 0.2.4 - 2026-06-12
+
+Framework engineering pass: a mechanical self-check gate plus a controlled
+refresh of the vendored Compound Engineering surface. Runtime, enforcing,
+clean-replacement, runtime-equivalent CE behavior, release-ready, package-ready,
+and publication claims remain held.
+
+### Added
+
+- `tw-update` skill: an in-harness "stay current" path. It checks the installed
+  TraceWeaver Core version against the latest release and prints the exact update
+  command for the active harness (Claude Code, Codex, Antigravity). Added a
+  dedicated **Updating** section to the README and clarified that TraceWeaver
+  releases from `main` (version bump + `traceweaver-core--v<version>` tag +
+  GitHub Release), so the marketplace tracks the current release rather than an
+  off-limits dev branch.
+- `scripts/traceweaver-smoke-verify`: a one-screen mechanical gate that
+  recomputes the canonical baseline hash and asserts `requirements.md` and the
+  Intent Contract agree, regenerates and drift-checks a bounded human-readable
+  authority snapshot (`.traceweaver/intent-contract.current.yml`, schema under
+  `.traceweaver/schema/`), and surfaces the validation-closure ratio and an
+  authority-reviewability metric. Wired into the smoke-tests CI workflow.
+
+### Changed
+
+- Refreshed the selected Compound Engineering compatibility surface from
+  upstream `compound-engineering-v3.9.0` to `compound-engineering-v3.12.0`
+  (commit `4719dc5`). TraceWeaver authority overlays (package-boundary sections,
+  anchors, held-publication neutering) and the temp-path redaction policy were
+  preserved through a 3-way merge; 54 of 57 changed files auto-merged and 3 were
+  resolved favoring upstream in the conflicting regions. Updated the source pin
+  and regenerated the selected-file inventory; the CE closure audit passes.
+
+### Held / follow-up
+
+- The `ce-replacement-classification.yml` expected-hash records remain stale
+  (pre-existing, including for unchanged `tw-*` skills) and are refreshed
+  separately from this CE source update.
+
 ## 0.2.3 - 2026-05-30
 
 TraceWeaver Core 0.2.3 documents how to make the `tw-*` skills available across

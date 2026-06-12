@@ -52,6 +52,44 @@ brainstorm with sparse content produces a sparse doc; one with rich content
 produces a rich doc. Don't add ceremony to make a slim brainstorm look
 substantial.
 
+## Prose economy
+
+Match-depth-to-content sizes *which* sections appear and how deep each goes.
+This sizes *how the kept prose reads*. A section can be material and still be
+written loosely — the failure mode is a material section padded into a wall of
+text where contradictions hide and a downstream agent loses the thread. Length
+that earns its place is fine; wordiness around that length is not.
+
+Hold every kept section to these:
+
+- **One idea per sentence.** A Summary is a handful of sentences, not one
+  sentence with five semicolons and four parentheticals. If a sentence needs a
+  second parenthetical to stay true, split it.
+- **A requirement is one sentence of intent plus at most one qualifier.** When
+  a requirement would specify two outcomes ("either A or B, planning decides"),
+  state the intent and send the fork to Outstanding Questions — don't write both
+  arms in full inside the requirement.
+- **Cut hedges and intensifiers.** "Critically", "deliberately", "explicitly",
+  "genuinely", "actually", "simply" carry nothing a downstream agent acts on.
+- **Prefer the verb to the nominalization.** "Demote the grid", not "the
+  demotion of the grid is the deliberate change in this brief".
+
+Precision is not padding: keep domain terms, conditionals, and exact thresholds
+verbatim. Economy targets the connective tissue around them, never the precision
+itself.
+
+**Resolve in place; don't stratify.** When a later decision answers a parked
+question or supersedes earlier text, rewrite or remove the original entry —
+don't append a separate "resolutions" layer that leaves the superseded text
+standing, and don't keep superseded prose as strikethrough. Version control
+holds the history. Stacked question/resolution strata double the reading surface
+and hide which text is live.
+
+**Named test, run before the doc is declared written:** could a reader find a
+contradiction in each section in one pass? A sentence carrying more than one
+parenthetical, or a requirement specifying two outcomes, fails the test — split
+it or defer it.
+
 ## Hard floor
 
 When a doc is warranted, these are present.
@@ -66,8 +104,12 @@ When a doc is warranted, these are present.
   "Migration and compatibility" / "Contributor workflow"), group them
   under bold inline headers within the Requirements section — group by
   capability or concern, not by the order requirements were discussed.
-  R-IDs stay continuous across groups (R1, R2 in the first group; R3, R4
-  in the second; never restart at R1 per group).
+  The trigger is distinct concerns, not item count — even four
+  requirements benefit if they cover three different topics. Skip
+  grouping only when all requirements are genuinely about the same thing;
+  a long flat list is a smell that subgroups were missed. R-IDs stay
+  continuous across groups (R1, R2 in the first group; R3, R4 in the
+  second; never restart at R1 per group).
 
 ## Include when material
 
@@ -96,6 +138,30 @@ worse than omitting it.
   and Actors / Requirements / Scope Boundaries / Acceptance Examples
   together prevent downstream invention of paths. When omitting from a
   behavioral brainstorm, note the reason in the doc.
+
+- **Visualizations** — include a diagram when the brainstorm contains a
+  diagram-shaped concept that a picture carries faster than prose. Common
+  shapes: a data-shape transformation (before/after schema or field
+  mapping), a source-of-truth fan-out (one authority feeding many derived
+  surfaces), state-or-lifecycle logic, a multi-step flow, or a quantitative
+  comparison. A diagram is cross-cutting, not a section of its own — it sits
+  next to the Key Decision, Requirements group, or Flow it illustrates. The
+  named test: *does the picture let a reader grasp the concept faster than
+  the paragraph alone?* If yes, add it; if the prose already conveys it at a
+  glance, skip it. One diagram per load-bearing concept — don't add visuals
+  for ceremony. This affordance is the conceptual-diagram path; it is
+  distinct from the wireframe affordance (a wireframe is for visual-product
+  UI and does not apply to non-visual systems like data models or agent
+  workflows, but a conceptual diagram does).
+
+  **Diagrams complement prose; they never replace it.** A diagram is an
+  on-ramp to the prose it illustrates, not a substitute. The IDed prose
+  (Requirements, Key Decisions, Acceptance Examples) stays complete and
+  standalone — a reader who ignores every diagram still gets the full
+  content in text, and a downstream agent that reads the artifact as linear
+  text is never left with a relationship that exists only in an SVG. Adding
+  a before/after diagram is not license to thin the requirement or decision
+  prose it depicts.
 
 - **Acceptance Examples** — include when any requirement has a
   state-dependent or conditional shape ("When X, Y") where prose alone leaves
@@ -145,7 +211,8 @@ The agent also picks per artifact:
 - How much depth each present section gets
 
 (Requirements grouping is covered above in the Hard Floor item — group by
-concern when they span distinct areas, with continuous R-IDs across groups.)
+concern by default, rendering a flat list only when all requirements are
+about the same thing, with continuous R-IDs across groups.)
 
 ## Brainstorm metadata fields
 
@@ -166,14 +233,13 @@ the brainstorm.
   alongside `date` and as the resume-detection key when `ce-brainstorm`'s
   Phase 0.1 scans `docs/brainstorms/` for an existing artifact to continue.
 
-### Status flip does not apply to brainstorm
+### No status field
 
-Unlike plans, brainstorm artifacts have no `status` field — there is no
-`active → completed` lifecycle. A brainstorm is a one-time output that
-downstream consumers (`ce-plan`, `ce-doc-review`) reference via the plan's
-`origin:` field. The `<span class="status">` HTML hook described in
-`html-rendering.md` is a plan-side mechanic and does not render on
-brainstorm artifacts.
+Brainstorm artifacts have no `status` field and no `active → completed`
+lifecycle — a brainstorm is a one-time output that downstream consumers
+(`ce-plan`, `ce-doc-review`) reference via the plan's `origin:` field. No
+CE artifact carries a mutable status; whether work shipped is derived from
+git, not stored in the doc. Do not introduce one.
 
 ### Field-name stability
 

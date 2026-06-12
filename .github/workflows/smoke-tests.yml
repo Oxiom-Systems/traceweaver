@@ -55,3 +55,6 @@ jobs:
 
       - name: Controlled-publication smoke
         run: scripts/traceweaver-smoke-controlled-publication
+
+      - name: Verify gate (baseline hash, bounded snapshot drift, intent-fidelity metrics)
+        run: scripts/traceweaver-smoke-verify

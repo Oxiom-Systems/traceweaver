@@ -1,10 +1,10 @@
 <!-- TRACEWEAVER: file-role=ce-upstream-source-inventory; req=REQ-TW-017; trace=TRACE-TW-005; ver=VER-TW-009 -->
 # CE Upstream Source Inventory
 
-Record ID: `TWCORE-CE-SOURCE-PIN-2026-05-27-001`
+Record ID: `TWCORE-CE-SOURCE-PIN-2026-06-12-001`
 
 This package includes a selected Compound Engineering compatibility surface for
-TraceWeaver Core 0.2.3 static materialization.
+TraceWeaver Core static materialization refreshed to CE 3.12.0.
 
 ## Source Pin
 
@@ -12,13 +12,13 @@ TraceWeaver Core 0.2.3 static materialization.
 | --- | --- |
 | Source package | Compound Engineering plugin |
 | Source repository | `https://github.com/EveryInc/compound-engineering-plugin` |
-| Source version | `3.9.0` |
-| Source tags | `compound-engineering-v3.9.0`, `cli-v3.9.0` |
-| Source commit | `e2c9cd23525eeb1ecddd637e027d53b02f892e7b` |
+| Source version | `3.12.0` |
+| Source tags | `compound-engineering-v3.12.0` |
+| Source commit | `4719dc509fdc45656a830e3ed6060f674e206076` |
 | Source license | MIT, from source plugin manifest |
-| Capture date | 2026-05-27 |
+| Capture date | 2026-06-12 |
 | Source basis | upstream tag fetched from GitHub and folded into the selected TraceWeaver package surface |
-| Full cache aggregate fingerprint | `13fe8c0a2c5154cef8c64974f39e929f59a6c3ca652daa074e5b48f67aec6c02` |
+| Full cache aggregate fingerprint | `f7225f23ca97949dc1de63f1d347d45f9acd0395450b0efff754a3430b63c3cd` |
 
 ## Selected File Authority
 
@@ -54,5 +54,5 @@ This source map resets to held if:
 - static evidence is used to claim clean CE replacement or runtime-equivalent
   agent behavior.
 
-Next recommended step: run the 0.2.3 release verification bundle and keep clean
+Next recommended step: run the 0.2.4 release verification bundle and keep clean
 replacement/runtime-equivalence claims held unless those evidence gates pass.

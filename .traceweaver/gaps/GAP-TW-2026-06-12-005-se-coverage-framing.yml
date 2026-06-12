@@ -1,0 +1,32 @@
+gap_id: GAP-TW-2026-06-12-005
+status: open
+linked_intent: "INTENT-TW-005, INTENT-TW-006"
+linked_requirement: null
+proposed_requirement_id: REQ-PROPOSED-2026-06-12-004
+clarification_question_id: null
+reason: >
+  The distilled knowledge base is faithful and IP-clean on the SE concepts it
+  covers (V&V separation, traceability chain, baseline control, gap/risk/change
+  taxonomy) but omits major upstream and quantitative SE domains: requirements
+  elicitation, trade studies, interface specification/ICD control, design
+  margins/FMEA, ConOps, measures of effectiveness and performance flow-down, and
+  risk quantification. Public framing ("adapts established systems-engineering
+  controls") can imply broader coverage than delivered, which is in tension with
+  INTENT-TW-005 (ship only supported claims) and INTENT-TW-006 (no unsupported
+  SE/compliance positioning). Provenance is also boilerplate: all 11
+  source-basis.md files are byte-identical with no per-skill basis.
+proposed_disposition: proposed_requirement
+proposed_requirement_summary: >
+  State the intended SE scope explicitly (single-project, well-scoped agentic
+  feature work; not multi-layer system programs / supplier management /
+  regulated domains), and either curate per-skill source-basis provenance or
+  collapse it to one shared, clearly-scoped statement.
+owner: Oxiom Systems
+review_gate: tw-requirements-review
+created_at: 2026-06-12
+source_review: docs/validation/traceweaver-framework-design-review-2026-06-12.md (K4, K5)
+
+implementation_rule: No meaningful implementation may use this gap as authority until it is promoted to an approved requirement or approved exception.
+
+next_recommended_steps:
+  - Run tw-requirements-review to decide scope-framing and provenance disposition.
