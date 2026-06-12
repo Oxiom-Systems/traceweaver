@@ -30,6 +30,10 @@ Before planning meaningful behavior, load and cite:
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
 - skill-local `references/traceweaver-operating-modes.md`
+- skill-local `references/verification-planner-guide.md` when planning the
+  verification method, evidence, and pass/fail criteria for planned work
+- skill-local `references/validation-planner-guide.md` when planning how the
+  result will be validated against stakeholder need or acceptance signal
 - relevant `.traceweaver/` task, gap, change, exception, trace, or evidence
   records
 

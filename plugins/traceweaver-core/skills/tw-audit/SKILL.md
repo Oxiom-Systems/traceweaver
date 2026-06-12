@@ -32,6 +32,12 @@ Before auditing, load and cite:
   ID, closure claim, validation record, or explicit file paths
 - relevant validation or acceptance result artifacts under `docs/validation/`
 - skill-local `references/traceweaver-operating-modes.md`
+- skill-local `references/technical-review-and-audit-gate-guide.md` for audit
+  entry/exit criteria, evidence expectations, and gate outcomes
+- skill-local `references/validation-planner-guide.md` when judging validation
+  or acceptance closure claims
+- skill-local `references/baseline-configuration-control-guide.md` when judging
+  baseline integrity, authority custody, or uncontrolled-change findings
 - TraceWeaver-packaged `tw-traceability-check`
 - TraceWeaver-packaged `requirements-reviewer` when requirement quality,
   authority status, acceptance criteria, or closure wording is weak or unclear

@@ -1,0 +1,32 @@
+gap_id: GAP-TW-2026-06-12-007
+status: open
+linked_intent: "INTENT-TW-001, INTENT-TW-002"
+linked_requirement: null
+proposed_requirement_id: REQ-PROPOSED-2026-06-12-007
+clarification_question_id: CLAR-TW-2026-06-12-007
+reason: >
+  Nine of the eleven privately distilled systems-engineering skill domains have
+  no promoted runtime knowledge skill; four have guide-only coverage and four
+  have no public output at all (needs-and-requirements-capture,
+  design-decision-reviewer, architecture-and-interface-reviewer,
+  traceweaver-lifecycle-orchestrator). The framework's weakest measured metric
+  (validation closure 0/69) maps directly to the unpromoted validation-planner
+  domain. Promotion requires a fresh candidate baseline review of the scrubbed
+  public-candidate material, which is not accessible from agent sessions scoped
+  to the public repo.
+proposed_disposition: proposed_requirement
+proposed_requirement_summary: >
+  Each unpromoted distilled domain shall be promoted (guide-only or
+  runtime-skill) only through the recorded candidate-baseline-review protocol
+  (docs/validation/candidate-baseline-review-protocol.md), with per-domain
+  review records, source-hygiene verification, and promotion-status updates.
+clarification_question: >
+  How should agent sessions receive the scrubbed public-candidate material for
+  review: add the private repo to session scope per review, or export the
+  candidate folder into a reviewable location?
+owner: Oxiom Systems
+review_gate: tw-requirements-review
+created_at: 2026-06-12
+source_review: tw-requirements-review session record 2026-06-12 (CAND-C1); private source README promotion path; design review K5
+
+implementation_rule: No promotion of an unpromoted domain may proceed without a per-domain candidate baseline review record; this gap does not grant promotion authority.

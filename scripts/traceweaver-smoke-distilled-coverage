@@ -1,0 +1,105 @@
+#!/usr/bin/env bash
+# TRACEWEAVER: file-role=distilled-coverage-smoke; req=REQ-TW-020; trace=TRACE-TW-010; ver=VER-TW-012
+# TRACEWEAVER: verifies=VER-TW-012; req=REQ-TW-020; trace=TRACE-TW-010
+#
+# Formal requirement/verification promotion for this gate is tracked by
+# GAP-TW-2026-06-12-006; until then it anchors to REQ-TW-020, the packaged
+# plugin-surface requirement whose distilled-knowledge coverage it checks.
+#
+# traceweaver-distilled-coverage: anti-stranding gate for distilled guidance.
+#
+# docs/distilled/ is the public source of truth promoted from the private
+# TraceWeaver source-material repo. This gate fails when that knowledge
+# strands or decays on its way into the runtime plugin:
+#   1. every docs/distilled/*.md guide has a byte-identical packaged copy
+#      under plugins/traceweaver-core/references/;
+#   2. every skill-local copy of a guide is byte-identical to docs/distilled;
+#   3. every guide is referenced by at least one packaged SKILL.md, so an
+#      installed agent is actually instructed to load it;
+#   4. docs/distilled/promotion-status.md lists every guide, so promotion
+#      state stays visible and current.
+# It also reports the domain promotion ratio (distilled domains with a
+# packaged knowledge skill vs guide-only vs private-only).
+set -u
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DISTILLED="$ROOT_DIR/docs/distilled"
+PLUGIN_REFS="$ROOT_DIR/plugins/traceweaver-core/references"
+SKILLS="$ROOT_DIR/plugins/traceweaver-core/skills"
+STATUS_DOC="$DISTILLED/promotion-status.md"
+
+fail=0
+guides_total=0
+guides_packaged=0
+guides_referenced=0
+stale_copies=0
+
+if [ ! -d "$DISTILLED" ]; then
+  echo "distilled_coverage=failed reason=missing_docs_distilled" >&2
+  exit 1
+fi
+if [ ! -f "$STATUS_DOC" ]; then
+  echo "distilled_coverage=failed reason=missing_promotion_status_doc" >&2
+  exit 1
+fi
+
+for guide in "$DISTILLED"/*.md; do
+  name="$(basename "$guide")"
+  [ "$name" = "promotion-status.md" ] && continue
+  guides_total=$((guides_total + 1))
+
+  # 1. packaged central copy exists and is identical
+  if [ ! -f "$PLUGIN_REFS/$name" ]; then
+    echo "distilled_guide_packaged_${name}=missing" >&2
+    fail=1
+  elif ! cmp -s "$guide" "$PLUGIN_REFS/$name"; then
+    echo "distilled_guide_packaged_${name}=stale_drift" >&2
+    stale_copies=$((stale_copies + 1))
+    fail=1
+  else
+    guides_packaged=$((guides_packaged + 1))
+  fi
+
+  # 2. every skill-local copy is identical
+  while IFS= read -r copy; do
+    if ! cmp -s "$guide" "$copy"; then
+      echo "distilled_guide_skill_local_stale=$copy" >&2
+      stale_copies=$((stale_copies + 1))
+      fail=1
+    fi
+  done < <(find "$SKILLS" -path "*/references/$name" -type f)
+
+  # 3. at least one packaged skill instructs loading it
+  ref_count="$(grep -rls -- "$name" "$SKILLS"/*/SKILL.md 2>/dev/null | wc -l | tr -d '[:space:]')"
+  if [ "$ref_count" -lt 1 ]; then
+    echo "distilled_guide_referenced_${name}=stranded_zero_skill_references" >&2
+    fail=1
+  else
+    guides_referenced=$((guides_referenced + 1))
+  fi
+
+  # 4. promotion-status inventory lists the guide
+  if ! grep -Fq -- "$name" "$STATUS_DOC"; then
+    echo "distilled_guide_inventoried_${name}=missing_from_promotion_status" >&2
+    fail=1
+  fi
+done
+
+# Domain promotion ratio from the inventory's status column.
+skill_promoted="$(grep -c '| runtime-skill ' "$STATUS_DOC" || true)"
+guide_only="$(grep -c '| guide-only ' "$STATUS_DOC" || true)"
+private_only="$(grep -c '| private-only ' "$STATUS_DOC" || true)"
+
+echo "distilled_guides_total=$guides_total"
+echo "distilled_guides_packaged_current=$guides_packaged"
+echo "distilled_guides_referenced=$guides_referenced"
+echo "distilled_stale_copies=$stale_copies"
+echo "distilled_domains_runtime_skill=$skill_promoted"
+echo "distilled_domains_guide_only=$guide_only"
+echo "distilled_domains_private_only=$private_only"
+
+if [ "$fail" -ne 0 ]; then
+  echo "distilled_coverage=failed" >&2
+  exit 1
+fi
+echo "distilled_coverage=pass"

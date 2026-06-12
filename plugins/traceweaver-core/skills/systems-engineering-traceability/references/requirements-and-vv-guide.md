@@ -108,6 +108,18 @@ Rules:
 - If approval is denied or deferred, convert the item to traceability debt,
   approved gap, or rejected decision with rationale.
 
+## Accepted Weak Requirements
+
+Human acceptance of a weak, ambiguous, unverifiable, conflicting,
+implementation-biased, or misleveled requirement does not make it an approved
+requirement. If the team intentionally proceeds, convert the item into an
+approved gap, accepted risk, design decision, validation gap, or change-control
+exception.
+
+Record the acceptance evidence: owner, approved by, date/session, allowed use,
+rationale, linked authority, and review condition. Without that evidence, the
+item remains `Draft` or traceability debt and must not authorize implementation.
+
 ## Verification
 
 Verification asks whether the implementation satisfies the requirement.
@@ -236,8 +248,10 @@ Before build:
 - [ ] Need/source is known.
 - [ ] Any idea-refinement output is marked `Candidate` or `Draft`, not approved
       authority.
-- [ ] Requirement or approved authority exists.
+- [ ] Valid approved authority exists.
 - [ ] Inferred requirements are `Draft`.
+- [ ] Accepted weak requirements are converted to approved exceptions, not
+      approved requirements.
 - [ ] Verification method is identified.
 - [ ] Validation path is identified or explicitly deferred.
 

@@ -23,6 +23,8 @@ Before delegating, load and cite:
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
 - skill-local `references/traceweaver-operating-modes.md`
+- skill-local `references/verification-planner-guide.md` so the run is planned
+  as verification evidence with method and pass/fail criteria, not an ad hoc test
 - scheme, target, simulator, device, or test scope
 - requirement, trace, and verification IDs when the result is accepted evidence
 

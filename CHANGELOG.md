@@ -2,6 +2,39 @@
 
 # Changelog
 
+## Unreleased
+
+Distilled-knowledge transfer pass: wire stranded guides into their consuming
+skills and make private-to-public knowledge promotion mechanically checkable.
+Runtime, enforcing, clean-replacement, release-ready, package-ready, and
+publication claims remain held.
+
+### Added
+
+- `scripts/traceweaver-smoke-distilled-coverage` (wired into CI): anti-stranding
+  gate that fails when any `docs/distilled/` guide is missing from the packaged
+  plugin references, drifted from its source of truth (central or skill-local
+  copies), referenced by zero skills, or absent from the promotion-status
+  inventory. Reports the domain promotion ratio.
+- `docs/distilled/promotion-status.md`: inventory mapping each privately
+  distilled systems-engineering domain to its public guide and runtime
+  packaging state (runtime-skill / guide-only / private-only).
+- `docs/validation/candidate-baseline-review-protocol.md`: the per-domain
+  review protocol required before promoting any unpromoted distilled domain,
+  with the current promotion queue. Tracked by GAP-TW-2026-06-12-007.
+- Packaged the four stranded distilled guides (verification-planner,
+  validation-planner, baseline-configuration-control,
+  technical-review-and-audit-gate) into the plugin references and skill-local
+  references, and wired load instructions into `tw-plan`, `tw-audit`,
+  `tw-test-browser`, `tw-test-xcode`, and `tw-authority-gate`.
+
+### Fixed
+
+- Re-synced three previously packaged guides (requirements-and-vv,
+  risk-gap-and-change-control, systems-engineering-traceability-operating-model)
+  that had silently drifted behind their `docs/distilled/` source of truth,
+  including skill-local copies.
+
 ## 0.2.4 - 2026-06-12
 
 Framework engineering pass: a mechanical self-check gate plus a controlled
