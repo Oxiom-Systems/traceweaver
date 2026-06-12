@@ -227,6 +227,28 @@ and the authority/evidence machinery built on top of it (findings F1-F7, which
 have grown past human reviewability) is the central tension of the framework:
 the method is sound; the bookkeeping has outgrown it.
 
+## Keystone implemented in this change set
+
+The single highest-leverage recommendation below (make the framework
+mechanically check itself) is now implemented additively, without amending the
+controlled requirements baseline:
+
+- `scripts/traceweaver-smoke-verify` — a one-screen mechanical gate that
+  recomputes the canonical baseline hash and asserts `requirements.md` and the
+  Intent Contract agree, regenerates and drift-checks a bounded snapshot, and
+  surfaces the validation-closure ratio and an authority-reviewability metric.
+  Wired into CI in `.github/workflows/smoke-tests.yml`.
+- `.traceweaver/intent-contract.current.yml` — a 30-line, structured,
+  human-readable current-state snapshot (the worked example behind F1), with its
+  schema at `.traceweaver/schema/intent-contract-current.schema.md`.
+
+First run on this repo reports, mechanically: `baseline hash consistent`,
+`validation closed=0/69`, and `longest authority line=8803 chars; lines over
+2000=37`. F1, F2, and F5 are now measured rather than asserted. Promoting these
+into approved requirements (REQ-TW-070+) via `tw-requirements-review` remains the
+correct follow-up and is tracked by the candidate gaps; the gate is anchored to
+REQ-TW-001 (the controlled baseline it checks) until then.
+
 ## Recommendations (prioritized)
 
 1. Separate the contract from the log. Make `intent-contract.yml` a bounded

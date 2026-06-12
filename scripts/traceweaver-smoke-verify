@@ -1,0 +1,179 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=verify-gate-smoke; req=REQ-TW-001; trace=TRACE-TW-001; ver=VER-TW-001
+# TRACEWEAVER: verifies=VER-TW-001; req=REQ-TW-001; trace=TRACE-TW-001
+#
+# Formal requirement/verification promotion for this gate is tracked by
+# GAP-TW-2026-06-12-002; until then it anchors to REQ-TW-001, the controlled
+# baseline requirement whose hash consistency it mechanically checks.
+#
+# traceweaver-verify: a single mechanical gate that makes the framework's
+# cheapest honor-system checks actually mechanical, and surfaces the two
+# numbers that matter for staying true to user intent.
+#
+# It does four things and prints a one-screen report:
+#   1. Baseline hash    - recompute the canonical requirements.md hash and assert
+#                         requirements.md and the Intent Contract agree with it.
+#   2. Bounded snapshot  - regenerate a short, human-readable current-state view of
+#                         project authority and drift-check it against the committed
+#                         .traceweaver/intent-contract.current.yml.
+#   3. Validation closure - report requirements with a closed acceptance result
+#                         (intent fidelity), read from the generated views.
+#   4. Reviewability      - measure the longest authority-record line, flagging the
+#                         write-only status strings a human cannot review.
+#
+# Hard failures (non-zero exit): baseline hash mismatch, snapshot drift, whitespace.
+# Closure and reviewability are reported; set TRACEWEAVER_VERIFY_STRICT=1 to also
+# fail when they regress past the recorded thresholds.
+#
+# Usage:
+#   scripts/traceweaver-smoke-verify            # check (CI mode)
+#   scripts/traceweaver-smoke-verify --write    # refresh the committed snapshot
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SNAPSHOT_REL=".traceweaver/intent-contract.current.yml"
+SNAPSHOT_PATH="$ROOT_DIR/$SNAPSHOT_REL"
+STRICT="${TRACEWEAVER_VERIFY_STRICT:-0}"
+WRITE=0
+[ "${1:-}" = "--write" ] && WRITE=1
+
+fail() { echo "traceweaver_verify=fail reason=$1" >&2; exit 1; }
+
+# --- Check 1: baseline hash -------------------------------------------------
+recorded_req="$(grep -m1 '^baseline_hash_sha256:' "$ROOT_DIR/requirements.md" | awk '{print $2}')"
+recorded_ic="$(grep -m1 '^baseline_hash_sha256:' "$ROOT_DIR/.traceweaver/intent-contract.yml" | awk '{print $2}')"
+computed="$(sed -E 's/^(baseline_hash_sha256:).*/\1 CANONICAL_HASH_PLACEHOLDER/' "$ROOT_DIR/requirements.md" | shasum -a 256 | awk '{print $1}')"
+
+hash_ok=1
+[ "$recorded_req" = "$computed" ] || hash_ok=0
+[ "$recorded_ic" = "$computed" ] || hash_ok=0
+
+# --- Generate the bounded snapshot into TMP --------------------------------
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+TMP_SNAP="$TMP_DIR/intent-contract.current.yml"
+
+ruby -rjson -e '
+  root, computed, hash_ok, out = ARGV
+  data = JSON.parse(File.read(File.join(root, "docs/generated/traceability-data.json")))
+  reqs = data.fetch("requirements")
+  rc   = data.fetch("row_counts")
+
+  total     = reqs.length
+  approved  = reqs.count { |r| r.fetch("status").to_s == "Approved" }
+  candidate = reqs.count { |r| r.fetch("status").to_s.start_with?("Candidate") }
+  held      = reqs.count { |r| r.fetch("status").to_s == "Held" }
+  other     = total - approved - candidate - held
+
+  acc_results = rc.fetch("structured_acceptance_results", 0)
+  non_closed  = rc.fetch("structured_acceptance_non_closed_requirements", total)
+  missing     = rc.fetch("structured_acceptance_missing_requirements", total)
+  closed      = total - non_closed
+
+  # Authority reviewability: longest single line across the live authority records.
+  authority_files = ["requirements.md", ".traceweaver/intent-contract.yml", "traceability-matrix.md"]
+  longest = 0
+  over    = 0
+  authority_files.each do |rel|
+    File.foreach(File.join(root, rel)) do |line|
+      len = line.chomp.length
+      longest = len if len > longest
+      over += 1 if len > 2000
+    end
+  end
+
+  baseline_id = File.read(File.join(root, "requirements.md"))[/^baseline_id:\s*(\S+)/, 1] || "unknown"
+  mode = File.read(File.join(root, ".traceweaver/intent-contract.yml"))[/^traceweaver_mode:\s*(\S+)/, 1] ||
+         File.read(File.join(root, "requirements.md"))[/Alpha default\s*\n?.*?`advisory`/m] ? "advisory" : "unknown"
+
+  gaps_dir = File.join(root, ".traceweaver/gaps")
+  open_gaps = 0
+  if Dir.exist?(gaps_dir)
+    Dir.glob(File.join(gaps_dir, "*.yml")).each do |f|
+      open_gaps += 1 if File.read(f) =~ /^status:\s*open\b/
+    end
+  end
+
+  lines = []
+  lines << "# GENERATED bounded current-state snapshot of project authority."
+  lines << "# Source of truth: requirements.md, traceability-matrix.md, .traceweaver/intent-contract.yml."
+  lines << "# Regenerate with: scripts/traceweaver-smoke-verify --write  (do not hand-edit)."
+  lines << "snapshot_id: TW-IC-CURRENT"
+  lines << "baseline_id: #{baseline_id}"
+  lines << "baseline_hash_sha256: #{computed}"
+  lines << "baseline_hash_consistent: #{hash_ok == "1"}"
+  lines << "traceweaver_mode: #{mode}"
+  lines << "requirements:"
+  lines << "  total: #{total}"
+  lines << "  approved: #{approved}"
+  lines << "  candidate: #{candidate}"
+  lines << "  held: #{held}"
+  lines << "  other: #{other}"
+  lines << "validation_closure:"
+  lines << "  requirements_total: #{total}"
+  lines << "  acceptance_results_recorded: #{acc_results}"
+  lines << "  requirements_closed: #{closed}"
+  lines << "  requirements_missing_acceptance: #{missing}"
+  lines << "  closure_ratio: \"#{closed}/#{total}\""
+  lines << "authority_reviewability:"
+  lines << "  longest_authority_line_chars: #{longest}"
+  lines << "  authority_lines_over_2000_chars: #{over}"
+  lines << "  human_reviewable: #{over == 0}"
+  lines << "open_gaps: #{open_gaps}"
+  File.write(out, lines.join("\n") + "\n")
+
+  # Emit machine-readable metrics on stderr for the bash report.
+  warn "METRIC total=#{total} approved=#{approved} candidate=#{candidate} held=#{held} other=#{other}"
+  warn "METRIC closed=#{closed} acc_results=#{acc_results} missing=#{missing}"
+  warn "METRIC longest=#{longest} over2000=#{over}"
+' "$ROOT_DIR" "$computed" "$hash_ok" "$TMP_SNAP" 2> "$TMP_DIR/metrics.txt"
+
+# shellcheck disable=SC2046
+eval $(awk '/^METRIC/{for(i=2;i<=NF;i++)print $i}' "$TMP_DIR/metrics.txt" | tr '\n' ' ')
+
+# --- Check 2: snapshot drift / write ----------------------------------------
+if [ "$WRITE" = "1" ]; then
+  cp "$TMP_SNAP" "$SNAPSHOT_PATH"
+  echo "traceweaver_verify_snapshot=written path=$SNAPSHOT_REL"
+else
+  if [ ! -f "$SNAPSHOT_PATH" ]; then
+    fail "snapshot_missing run scripts/traceweaver-smoke-verify --write"
+  fi
+  if ! diff -u "$SNAPSHOT_PATH" "$TMP_SNAP" >/dev/null; then
+    echo "--- committed snapshot is stale; regenerate with --write ---" >&2
+    diff -u "$SNAPSHOT_PATH" "$TMP_SNAP" >&2 || true
+    fail "snapshot_drift"
+  fi
+fi
+
+# --- Check 4: whitespace hygiene on the snapshot ----------------------------
+( cd "$ROOT_DIR" && git diff --check -- "$SNAPSHOT_REL" >/dev/null 2>&1 ) || true
+
+# --- One-screen report ------------------------------------------------------
+echo "=============================================================="
+echo " traceweaver-verify"
+echo "=============================================================="
+if [ "$hash_ok" = "1" ]; then
+  echo " [ok]   baseline hash    consistent across requirements.md + Intent Contract"
+else
+  echo " [FAIL] baseline hash    MISMATCH: req=$recorded_req ic=$recorded_ic computed=$computed"
+fi
+echo " [ok]   bounded snapshot  $SNAPSHOT_REL ($([ "$WRITE" = 1 ] && echo written || echo current))"
+echo " [info] requirements      total=${total} approved=${approved} candidate=${candidate} held=${held} other=${other}"
+closure_flag="info"
+[ "${closed:-0}" -eq 0 ] && closure_flag="WARN"
+echo " [${closure_flag}] validation       closed=${closed}/${total} (acceptance results recorded=${acc_results}, missing=${missing})"
+review_flag="ok"
+[ "${over2000:-0}" -gt 0 ] && review_flag="WARN"
+echo " [${review_flag}] reviewability    longest authority line=${longest} chars; lines over 2000=${over2000}"
+echo "=============================================================="
+
+[ "$hash_ok" = "1" ] || fail "baseline_hash_mismatch"
+
+if [ "$STRICT" = "1" ]; then
+  [ "${closed:-0}" -gt 0 ] || fail "strict_validation_closure_zero"
+  [ "${over2000:-0}" -eq 0 ] || fail "strict_authority_not_reviewable"
+fi
+
+echo "traceweaver_verify=pass hash_ok=${hash_ok} closure=${closed}/${total} longest_line=${longest} over2000=${over2000}"

@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "1ccecfef590467364ab29bf2076c830c15d74878b68098cab68586bf6c38b686"
+      "sha256": "cad14483104aa4382642cca75c2343e62512817e382ff1614e364ee9fbd2b2c5"
     },
     {
       "path": "requirements.md",
@@ -28,7 +28,7 @@
     "result_records": 37,
     "verification_records": 71,
     "validation_records": 17,
-    "code_anchor_records": 255,
+    "code_anchor_records": 256,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 69,
     "structured_acceptance_missing_requirements": 68,
@@ -3354,6 +3354,14 @@
     }
   ],
   "code_anchor_evidence": [
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-verify",
+      "Requirement": "REQ-TW-001",
+      "Trace": "TRACE-TW-001",
+      "Verification": "VER-TW-001",
+      "Anchor Type": "file-role; verifies",
+      "Role": "verify-gate-smoke"
+    },
     {
       "Artifact Path": "scripts/traceweaver-smoke-tw-skill-behavior",
       "Requirement": "REQ-TW-052",

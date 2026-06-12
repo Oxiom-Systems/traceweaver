@@ -451,6 +451,7 @@ ATP means acceptance test plan or acceptance test procedure.
 
 | Artifact Path | Requirement | Trace | Verification | Anchor Type | Role |
 | --- | --- | --- | --- | --- | --- |
+| scripts/traceweaver-smoke-verify | REQ-TW-001 | TRACE-TW-001 | VER-TW-001 | file-role; verifies | verify-gate-smoke |
 | scripts/traceweaver-smoke-tw-skill-behavior | REQ-TW-052 | TRACE-TW-037 | VER-TW-047 | verifies | skill-behavior-smoke |
 | scripts/traceweaver-smoke-codex-discovery | REQ-TW-052 | TRACE-TW-037 | VER-TW-047 | verifies | install-discovery-smoke |
 | scripts/traceweaver-smoke-codex-host-registry | REQ-TW-052 | TRACE-TW-037 | VER-TW-047 | verifies | host-registry-smoke |
