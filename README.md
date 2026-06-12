@@ -19,9 +19,17 @@ without losing the proof behind what changed and why.
 
 ## Setup
 
-Use marketplace updates or the tagged `0.2.3` release snapshot for normal
-installs. Do not install TraceWeaver Core from `main` unless you are developing
-TraceWeaver itself; `main` is the active development branch.
+TraceWeaver Core releases from `main`: every release bumps the plugin version
+and publishes a `traceweaver-core--v<version>` git tag and a matching GitHub
+Release. The marketplace tracks `main`, so a marketplace install or update gives
+you the current release, and [GitHub Releases](https://github.com/Oxiom-Systems/traceweaver/releases)
+are the canonical release list. To stay current after installing, see
+[Updating](#updating) — or just run the `tw-update` skill from inside your
+harness.
+
+Pin the tagged `traceweaver-core--v0.2.3` snapshot instead when you need a
+reproducible, fixed install. Contributors developing TraceWeaver itself work on
+feature branches and open PRs into `main`.
 
 ### Codex
 
@@ -34,8 +42,7 @@ codex plugin marketplace upgrade traceweaver
 
 Install `traceweaver-core` from the Codex plugin UI.
 
-Use the tagged release snapshot rather than `main` for a pinned local alpha
-install:
+Use the tagged release snapshot for a pinned, reproducible local alpha install:
 
 ```sh
 git clone --branch traceweaver-core--v0.2.3 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
@@ -145,6 +152,66 @@ Verify the installed layout using the discovery smoke script:
 scripts/traceweaver-smoke-antigravity-discovery
 ```
 
+## Updating
+
+TraceWeaver Core releases from `main` with a bumped version per release, so
+staying current means pulling the marketplace's current state (or re-running the
+installer against the latest tag). The easiest path is to ask your agent to run
+the `tw-update` skill — it checks the installed version against the latest
+release and prints the exact command for your harness:
+
+```text
+tw-update
+```
+
+The per-harness update commands it recommends are:
+
+### Codex
+
+```sh
+codex plugin marketplace upgrade traceweaver
+```
+
+Then reinstall `traceweaver-core` from the Codex plugin UI. For a pinned local
+install, re-run the installer against the latest tag:
+
+```sh
+git clone --branch traceweaver-core--v<latest> --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+cd traceweaver && bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
+```
+
+### Claude
+
+```sh
+claude plugin marketplace update traceweaver
+claude plugin update traceweaver-core@traceweaver
+```
+
+Then reload active plugins inside Claude Code:
+
+```text
+/reload-plugins
+```
+
+Claude resolves a plugin's version from its manifest and caches by that string,
+so an update only lands when a new release bumps the version — which every
+TraceWeaver release does. For Claude Code on the web, the committed
+`SessionStart` install hook reinstalls on each fresh container, picking up the
+current release; pin the marketplace ref in `extraKnownMarketplaces` to hold a
+specific version.
+
+### Antigravity
+
+```sh
+git clone --branch traceweaver-core--v<latest> --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+cd traceweaver && bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
+```
+
+Find `<latest>` on the
+[Releases page](https://github.com/Oxiom-Systems/traceweaver/releases). After any
+update, reload plugins or start a fresh session so the new skill surface
+registers.
+
 ## First Command
 
 For a new or unclear project, start with the high-level route:
@@ -171,7 +238,7 @@ TraceWeaver Core `0.2.3` is an alpha advisory plugin for Codex and Claude Code.
 It is usable for first-time authority bootstrap, requirements review, planning,
 work handoffs, traceability checks, audits, and controlled review flows.
 This release keeps the selected Compound Engineering compatibility surface
-pinned to upstream `compound-engineering-v3.9.0` while preserving the
+pinned to upstream `compound-engineering-v3.12.0` while preserving the
 TraceWeaver wrapper boundary; direct CE parity and clean replacement remain
 held.
 Antigravity support is limited to static local install/discovery metadata in
@@ -338,6 +405,7 @@ themselves.
 | `tw-debug` | Diagnose failures or incidents without bypassing authority or publication gates. |
 | `tw-test-browser` / `tw-test-xcode` | Produce linked browser or Xcode verification evidence. |
 | `tw-setup` / `tw-worktree` | Diagnose local setup or manage worktrees inside TraceWeaver boundaries. |
+| `tw-update` | Check whether the installed TraceWeaver Core is current and recommend the per-harness update command. |
 | `tw-sessions` | Use prior sessions as source evidence, not authority. |
 | `tw-resolve-pr-feedback` | Evaluate and repair PR feedback with TraceWeaver gates. |
 | `tw-commit` / `tw-commit-push-pr` | Publication wrappers for commit, push, and PR intent after gates are clean. |

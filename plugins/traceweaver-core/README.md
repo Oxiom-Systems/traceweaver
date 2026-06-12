@@ -66,8 +66,9 @@ Included skills:
 - `tw-test-xcode`
 - `tw-setup`
 - `tw-worktree`
+- `tw-update`
 - selected CE-compatible workflow skills refreshed from Compound Engineering
-  `3.9.0`, including `ce-strategy`, `ce-ideate`, `ce-brainstorm`,
+  `3.12.0`, including `ce-strategy`, `ce-ideate`, `ce-brainstorm`,
   `ce-plan`, `ce-work`, `ce-code-review`, `ce-doc-review`, `ce-compound`,
   `ce-resolve-pr-feedback`, `ce-commit`, `ce-commit-push-pr`,
   `ce-compound-refresh`, `ce-sessions`, `ce-test-browser`, `ce-test-xcode`,
@@ -204,7 +205,7 @@ only manual step.
   refresh workflows as source evidence, not authority rewrites.
 - `tw-sessions` wraps packaged `ce-sessions`; the older CE 3.5.0
   `ce-session-inventory` and `ce-session-extract` split helpers are not part of
-  the selected 3.9.0 package surface.
+  the selected 3.12.0 package surface.
 - `tw-test-browser` and `tw-test-xcode` wrap packaged verification engines and
   require requirement/trace/verification context for gate-closing evidence.
 - `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree` wrap local repair,
@@ -293,7 +294,7 @@ selected packaged CE continuity entrypoints users are expected to call directly:
 `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree`. Packaged
 `ce-sessions` is the selected internal session component; the older CE 3.5.0
 `ce-session-inventory` and `ce-session-extract` split helpers are not part of
-the selected CE 3.9.0 package surface.
+the selected CE 3.12.0 package surface.
 Runtime-equivalent CE replacement, agent-backed behavior, slash commands, and
 enforcing mode remain held until U9 or a later accepted runtime proof.
 

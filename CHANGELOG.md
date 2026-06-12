@@ -11,6 +11,13 @@ and publication claims remain held.
 
 ### Added
 
+- `tw-update` skill: an in-harness "stay current" path. It checks the installed
+  TraceWeaver Core version against the latest release and prints the exact update
+  command for the active harness (Claude Code, Codex, Antigravity). Added a
+  dedicated **Updating** section to the README and clarified that TraceWeaver
+  releases from `main` (version bump + `traceweaver-core--v<version>` tag +
+  GitHub Release), so the marketplace tracks the current release rather than an
+  off-limits dev branch.
 - `scripts/traceweaver-smoke-verify`: a one-screen mechanical gate that
   recomputes the canonical baseline hash and asserts `requirements.md` and the
   Intent Contract agree, regenerates and drift-checks a bounded human-readable

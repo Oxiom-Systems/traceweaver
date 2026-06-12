@@ -110,6 +110,7 @@ required_direct_skills=(
   tw-test-xcode
   tw-setup
   tw-worktree
+  tw-update
   tw-grill
 )
 
@@ -137,6 +138,7 @@ traceweaver_native_skills=(
   tw-test-xcode
   tw-setup
   tw-worktree
+  tw-update
   tw-grill
 )
 
@@ -279,7 +281,7 @@ if [ "$host_runtime_proof" = "requirements-review-output" ]; then
 fi
 
 set +e
-codex debug prompt-input "Use TraceWeaver required direct skills: tw-authority-gate tw-auto tw-strategy tw-ideate tw-plan tw-brainstorm tw-audit lfg tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-commit tw-commit-push-pr tw-grill." >"$prompt_input" 2>"$runtime_tmp/prompt-input.err"
+codex debug prompt-input "Use TraceWeaver required direct skills: tw-authority-gate tw-auto tw-strategy tw-ideate tw-plan tw-brainstorm tw-audit lfg tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-commit tw-commit-push-pr tw-grill tw-update." >"$prompt_input" 2>"$runtime_tmp/prompt-input.err"
 prompt_input_status=$?
 set -e
 
