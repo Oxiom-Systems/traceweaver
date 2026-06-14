@@ -1,0 +1,100 @@
+#!/usr/bin/env bash
+# TRACEWEAVER: file-role=self-audit-report-runner; req=REQ-TW-063; trace=TRACE-TW-044; ver=VER-TW-056
+#
+# traceweaver-audit-self: run the whole-repo code-anchor audit against THIS
+# repository and print a one-screen report. Non-blocking by design.
+#
+# The audit scanner (dark behavior, duplicate/similar behavior, orphaned and
+# anchor-only behavior, surface classification) was previously exercised only
+# against synthetic fixtures, so its findings never reached the repository it is
+# meant to protect. This runner points the same scanner at the real tree on
+# every CI run and surfaces:
+#   - the count of each finding id and severity (product candidates + blockers),
+#   - the support/generated/worktree surface breakdown, so exemptions are
+#     visible rather than silently hiding behavior.
+#
+# It always exits 0: surfaced findings are a visibility signal for review, not a
+# build gate, while the framework is advisory alpha and a real-repo audit
+# baseline is still being driven down (tracked debt: docs/audit/self-audit-debt.md).
+# A future gated change may make selected findings blocking once the baseline is
+# clean.
+set -u
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCANNER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors"
+
+if [ ! -f "$SCANNER" ]; then
+  echo "self_audit=skipped reason=scanner_not_found path=$SCANNER"
+  exit 0
+fi
+if ! command -v ruby >/dev/null 2>&1; then
+  echo "self_audit=skipped reason=ruby_unavailable"
+  exit 0
+fi
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+jsonl="$tmp/self-audit.jsonl"
+
+set +e
+ruby "$SCANNER" --root "$ROOT_DIR" --mode audit --jsonl "$jsonl" >"$tmp/out" 2>"$tmp/err"
+scanner_status=$?
+set -e
+
+if [ ! -s "$jsonl" ]; then
+  echo "self_audit=clean findings=0 scanner_status=$scanner_status"
+  exit 0
+fi
+
+python3 - "$jsonl" <<'PY'
+import json, sys, collections
+
+rows = []
+for line in open(sys.argv[1]):
+    line = line.strip()
+    if not line:
+        continue
+    try:
+        rows.append(json.loads(line))
+    except json.JSONDecodeError:
+        continue
+
+by_id = collections.Counter(r.get("id") for r in rows)
+by_sev = collections.Counter(r.get("severity") for r in rows)
+by_surface = collections.Counter(
+    r.get("surface_class") for r in rows if r.get("surface_class")
+)
+
+print("=" * 62)
+print("TraceWeaver self-audit report (non-blocking, real repo)")
+print("=" * 62)
+print(f"total_findings={len(rows)}")
+print("severity: " + ", ".join(f"{k}={v}" for k, v in sorted(by_sev.items())))
+print("")
+print("findings by id:")
+for fid, n in by_id.most_common():
+    print(f"  {n:4d}  {fid}")
+
+print("")
+print("surface classification (visible exemptions):")
+if by_surface:
+    for surface, n in by_surface.most_common():
+        print(f"  {n:4d}  {surface}")
+else:
+    print("  (no held/exempt surface groups reported)")
+
+# Behavior-detection signal the runner exists to surface.
+dark = sum(v for k, v in by_id.items() if k == "TW-AUDIT-DARK-BEHAVIOR")
+dup = sum(v for k, v in by_id.items() if k == "TW-AUDIT-DUPLICATE-BEHAVIOR")
+sim = sum(v for k, v in by_id.items() if k == "TW-AUDIT-SIMILAR-BEHAVIOR")
+orphan = sum(v for k, v in by_id.items() if k == "TW-AUDIT-ORPHANED-BEHAVIOR")
+print("")
+print(
+    "detection_summary: "
+    f"dark_behavior={dark} duplicate={dup} similar={sim} orphaned={orphan}"
+)
+print("self_audit=report_complete")
+PY
+
+echo "self_audit_status=non_blocking_report scanner_status=$scanner_status"
+exit 0

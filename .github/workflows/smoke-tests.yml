@@ -61,3 +61,6 @@ jobs:
 
       - name: Distilled-knowledge coverage gate (anti-stranding, drift, skill wiring)
         run: scripts/traceweaver-smoke-distilled-coverage
+
+      - name: Self-audit report (dark/duplicate/orphan behavior, non-blocking)
+        run: scripts/traceweaver-audit-self

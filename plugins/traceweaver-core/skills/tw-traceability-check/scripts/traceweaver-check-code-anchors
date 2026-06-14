@@ -642,7 +642,12 @@ if mode == "audit"
     end
   end
 
-  grouped = audit_records.select { |record| record[:file_anchor] && record[:tokens].any? }
+  # Include unanchored (dark) behavior in similarity comparison: a dark copy of
+  # an anchored file is the highest-value duplicate, so the comparison pool must
+  # not require a file anchor. Files still group by their first referenced
+  # requirement (unanchored files that cite no requirement group under
+  # "unlinked"); cross-requirement comparison is a separate tracked improvement.
+  grouped = audit_records.select { |record| record[:tokens].any? }
                          .group_by { |record| record[:referenced_requirements].first || "unlinked" }
   grouped.each_value do |records|
     records.combination(2) do |left, right|
