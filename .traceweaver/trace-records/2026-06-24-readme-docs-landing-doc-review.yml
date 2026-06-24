@@ -1,0 +1,135 @@
+trace_record_id: TW-TRACE-RECORD-2026-06-24-README-DOCS-LANDING-DOC-REVIEW-001
+date: 2026-06-24
+owner: Oxiom Systems
+status: clean_doc_review_state_recorded_status_hash_refreshed_publication_held
+record_type: traceweaver_review_state_record
+
+scope:
+  requirements:
+    - REQ-TW-015
+    - REQ-TW-016
+    - REQ-TW-020
+    - REQ-TW-021
+    - REQ-TW-023
+    - REQ-TW-041
+    - REQ-TW-043
+    - REQ-TW-065
+    - REQ-TW-068
+  trace: TRACE-TW-053
+  artifact: ART-TW-067
+  verification: VER-TW-068
+  validation: VAL-TW-015
+  beads_issue: TraceWeaver-8ct
+
+authority:
+  baseline: requirements.md
+  baseline_id: REQ-BASELINE-2026-04-30-001
+  baseline_hash_sha256: 4cec2a1b5bc27729ac433a6522ca144a47908141227c92156b8700260a16b78a
+  intent_contract: .traceweaver/intent-contract.yml
+  matrix: traceability-matrix.md
+  authority_gate_result: proceed_static_advisory_doc_record_only
+  allowed_scope: >
+    Record the clean README/docs landing-page doc review state, include
+    docs/README.md and docs/guides/using-traceweaver.md in the reviewed file
+    set, refresh scoped status/hash evidence, regenerate derived traceability
+    views, and stage only the scoped review identity files.
+  must_not_change:
+    - no requirements promotion
+    - no runtime-driver claim
+    - no release-ready or package-ready claim
+    - no clean CE replacement claim
+    - no enforcing-mode claim
+    - no slash-command claim
+    - no unconstrained-host claim
+    - no autonomous-publication claim
+    - no commit, push, PR, tag, release, deploy, or remote mutation
+
+work_classification:
+  operating_mode: review_staging_mode_for_static_advisory_documentation_record
+  behavior_bearing_change: false
+  test_first_evidence: not_applicable_pure_documentation_and_evidence_record
+  closure_claim_validation: not_applicable_no_requirement_closure_claim
+  publication_mode: held
+
+reviewed_file_set:
+  - path: README.md
+    role: first-time-root-readme
+    sha256: 34f75b9f36db1bc4b5c994efed5343a00372579d25319a8ab8f2f989d115f1e1
+  - path: docs/README.md
+    role: documentation-index
+    sha256: 020bfe221c6e7a4dfbd3f212c45545d553684af5344bc73e4eb3522b7ecd8902
+  - path: docs/guides/using-traceweaver.md
+    role: deep-usage-guide
+    sha256: 1a0cdd3eb70de17314826f21a851cd69d10f9c05a79a88a55344d506ce970685
+  - path: traceability-matrix.md
+    role: authority-matrix
+    sha256: cbdd0a2e78524862eaa99387d1235e1573711b196e68e8d48408b53c1b4b4f7e
+  - path: docs/generated/traceability-dashboard.md
+    role: generated-traceability-view
+    sha256: 3f7830f7aa5902978256638289c1bf8e15593d9a37ba3b10edb8906e2f55a136
+  - path: docs/generated/traceability-data.json
+    role: generated-traceability-view
+    sha256: 8eb8b4a649cc66bd72ddd2e48661407a5c6ced300f4a3c0dbb2774b0a8f75ef1
+
+authority_source_hashes_sha256:
+  requirements.md: 0ccba1007290b907a594c2b99e3112b8da5726d1c7bdf05dddd95e0035142762
+  .traceweaver/intent-contract.yml: 8ce4a84ed22626494b32d146e643980807ded7114a80c7b6375d3fba95cffb29
+
+generated_traceability_artifact_hashes_sha256:
+  docs/generated/traceability-dashboard.md: 3f7830f7aa5902978256638289c1bf8e15593d9a37ba3b10edb8906e2f55a136
+  docs/generated/traceability-data.json: 8eb8b4a649cc66bd72ddd2e48661407a5c6ced300f4a3c0dbb2774b0a8f75ef1
+  docs/generated/traceability-graph.mmd: d50384acb18d23a26ad6dc4b6d843d6dd6a03cf1b304958967c024d1748f6e11
+
+doc_review_result:
+  review_id: TW-DOC-REVIEW-2026-06-24-README-DOCS-LANDING-CLEAN-001
+  status: passed_no_findings
+  coverage: main_thread_scoped_tw_doc_review_no_reviewer_subagents
+  documents_reviewed:
+    - README.md
+    - docs/README.md
+    - docs/guides/using-traceweaver.md
+    - traceability-matrix.md
+    - docs/generated/traceability-dashboard.md
+    - docs/generated/traceability-data.json
+  structured_findings:
+    - id: TW-DOC-REVIEW-2026-06-24-001
+      severity: P1
+      status: closed_by_this_record_and_review_staging
+      title: Untracked docs and unstaged review scope blocked accepted authority-state review.
+      remediation: >
+        Record this trace review state, add the new docs to ART-TW-067 and
+        Code Anchor Evidence, regenerate generated views, and stage only the
+        scoped review identity files. Publication remains held.
+
+verification_results:
+  local_markdown_links: pass
+  git_diff_check: pass
+  traceweaver_smoke_verify: pass_with_existing_validation_closure_and_reviewability_warnings
+  codex_discovery_runtime_disabled: pass
+  traceability_generated_views: pass
+  traceability_generated_view_smoke: pass
+  code_traceability_smoke: pass
+
+held_claims:
+  - publication
+  - commit
+  - push
+  - pull_request
+  - tag
+  - release
+  - deploy
+  - release-ready
+  - package-ready
+  - upstream-ready
+  - runtime-driver decision binding
+  - clean CE replacement
+  - enforcing mode
+  - slash-command support
+  - unconstrained-host support
+  - autonomous publication
+  - automatic audit cleanup authority
+
+next_step: >
+  Run scoped tw-doc-review after review staging if the staged file set changes;
+  otherwise proceed only to a controlled no-publication review handoff. Do not
+  publish without an explicit tw-commit-push-pr publication route.

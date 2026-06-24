@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "aa181f953813a57c034dc0fc1212771743a8054c85caae9f9b8149bd2d90e11e"
+      "sha256": "cbdd0a2e78524862eaa99387d1235e1573711b196e68e8d48408b53c1b4b4f7e"
     },
     {
       "path": "requirements.md",
@@ -28,7 +28,7 @@
     "result_records": 38,
     "verification_records": 72,
     "validation_records": 18,
-    "code_anchor_records": 256,
+    "code_anchor_records": 259,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 75,
     "structured_acceptance_missing_requirements": 74,
@@ -3868,6 +3868,22 @@
       "Role": "first-time-root-readme"
     },
     {
+      "Artifact Path": "docs/README.md",
+      "Requirement": "REQ-TW-015; REQ-TW-021; REQ-TW-023",
+      "Trace": "TRACE-TW-053",
+      "Verification": "VER-TW-068",
+      "Anchor Type": "file-role",
+      "Role": "documentation-index"
+    },
+    {
+      "Artifact Path": "docs/guides/using-traceweaver.md",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065; REQ-TW-068",
+      "Trace": "TRACE-TW-053",
+      "Verification": "VER-TW-068",
+      "Anchor Type": "file-role",
+      "Role": "deep-usage-guide"
+    },
+    {
       "Artifact Path": "docs/guides/traceweaver-from-prompt-to-proof.md",
       "Requirement": "REQ-TW-021; REQ-TW-041; REQ-TW-065",
       "Trace": "TRACE-TW-053",
@@ -3898,6 +3914,14 @@
       "Verification": "VER-TW-068",
       "Anchor Type": "trace-record",
       "Role": "first-time-docs-guide-record"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-06-24-readme-docs-landing-doc-review.yml",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065; REQ-TW-068",
+      "Trace": "TRACE-TW-053",
+      "Verification": "VER-TW-068",
+      "Anchor Type": "trace-record",
+      "Role": "readme-docs-landing-doc-review-record"
     },
     {
       "Artifact Path": ".traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml",
