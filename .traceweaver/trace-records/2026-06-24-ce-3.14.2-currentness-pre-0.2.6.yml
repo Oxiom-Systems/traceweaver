@@ -1,0 +1,83 @@
+trace_record_id: TW-TRACE-RECORD-2026-06-24-CE-3.14.2-CURRENTNESS-PRE-0.2.6-001
+date: 2026-06-24
+owner: Oxiom Systems
+record_type: ce_upstream_currentness_check
+status: upstream_ce_3_14_2_fetched_selected_traceweaver_ce_surface_remains_3_12_0_refresh_held
+
+scope:
+  requirements:
+    - REQ-TW-017
+    - REQ-TW-020
+    - REQ-TW-052
+    - REQ-TW-059
+    - REQ-TW-060
+  trace:
+    - TRACE-TW-005
+    - TRACE-TW-046
+  verification:
+    - VER-TW-009
+    - VER-TW-074
+
+authority:
+  baseline: requirements.md
+  intent_contract: .traceweaver/intent-contract.yml
+  source_pin: plugins/traceweaver-core/references/ce-upstream-source-inventory.md
+  inventory: docs/validation/traceweaver-core-11-ce-runtime-inventory.md
+  current_selected_ce_pin:
+    version: 3.12.0
+    tag: compound-engineering-v3.12.0
+    commit: 4719dc509fdc45656a830e3ed6060f674e206076
+  allowed_use: >
+    Currentness evidence for the TraceWeaver Core 0.2.6 docs/metadata release
+    route only. This record does not authorize changing selected CE files,
+    claiming CE 3.14.2 continuity, clean replacement, runtime-equivalent CE
+    behavior, upstream-ready status, or release-ready status.
+
+upstream_fetch:
+  repository: https://github.com/EveryInc/compound-engineering-plugin
+  local_cache: compound-engineering-plugin-main-3.5.0
+  command: git fetch --tags upstream
+  observed_latest_tag: compound-engineering-v3.14.2
+  observed_latest_tag_commit: fadeea9027659327246ecb4ef382912119169651
+  observed_latest_tag_commit_date: "2026-06-24T10:50:44-07:00"
+  observed_latest_tag_subject: "chore: release main (#993)"
+  observed_upstream_main_commit: 2c330ad32a28049fec8dcb1c5c557f06e5b614db
+
+shape_observations:
+  ce_3_12_0_source_basis: plugins/compound-engineering/
+  ce_3_14_2_source_basis: repository_root_plugin_layout
+  ce_3_12_0_skill_dirs: 39
+  ce_3_14_2_skill_dirs: 27
+  selected_surface_risk_examples:
+    - ce-sessions is no longer present as a top-level upstream skill in CE 3.14.2.
+    - CE 3.14.2 stores agent/persona material under skill-local references instead of the older root agent shape used by the selected inventory.
+    - A package-shape refresh would need a new selected-file inventory, overlay review, hash refresh, and closure audit.
+
+verification_observed:
+  - result: pass
+    command: git status --short in TraceWeaver before release-prep edits
+    observed: clean main at 391ae1546a026512d2d7f028c49fe640392869ee before branch creation
+  - result: pass
+    command: git -C compound-engineering-plugin-main-3.5.0 fetch --tags upstream
+    observed: upstream main advanced and tags through compound-engineering-v3.14.2 were fetched
+  - result: pass
+    command: git log -1 --format for compound-engineering-v3.14.2
+    observed: "fadeea9027659327246ecb4ef382912119169651 2026-06-24T10:50:44-07:00 chore: release main (#993)"
+  - result: held
+    command: selected CE 3.12.0 to CE 3.14.2 package shape inspection
+    observed: selected TraceWeaver CE surface remains pinned to CE 3.12.0; CE 3.14.2 refresh requires a separate controlled source-refresh change
+
+held_claims:
+  - selected CE 3.14.2 source refresh
+  - clean CE replacement
+  - runtime-equivalent CE behavior
+  - upstream-ready status
+  - release-ready status
+  - package-ready status
+  - autonomous publication
+
+next_step: >
+  Treat CE 3.14.2 as fetched currentness evidence only for 0.2.6. If the CE
+  source surface should be updated, run a separate tw-work/tw-doc-review route
+  that refreshes selected-file inventory, overlay preservation evidence, hashes,
+  closure audit, and held-claim review before publication.

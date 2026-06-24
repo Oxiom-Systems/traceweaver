@@ -20,6 +20,22 @@ TraceWeaver Core static materialization refreshed to CE 3.12.0.
 | Source basis | upstream tag fetched from GitHub and folded into the selected TraceWeaver package surface |
 | Full cache aggregate fingerprint | `f7225f23ca97949dc1de63f1d347d45f9acd0395450b0efff754a3430b63c3cd` |
 
+## Currentness Check
+
+On 2026-06-24, upstream `EveryInc/compound-engineering-plugin` was fetched
+before the TraceWeaver Core 0.2.6 release-prep route. The latest observed
+upstream tag was `compound-engineering-v3.14.2` at commit
+`fadeea9027659327246ecb4ef382912119169651`; upstream `main` was
+`2c330ad32a28049fec8dcb1c5c557f06e5b614db`.
+
+This currentness check does not change the selected source pin or packaged CE
+files. Folding CE 3.14.2 remains held because the upstream package shape moved
+from the older `plugins/compound-engineering/` source basis to a root plugin
+layout, agent material moved into skill-local references, and selected surfaces
+such as `ce-sessions` are no longer present as top-level upstream skills. A
+separate CE source-refresh validation delta is required before changing selected
+CE files or claiming CE 3.14.2 package continuity.
+
 ## Selected File Authority
 
 The controlling selected-file list and hashes are recorded in
@@ -54,5 +70,7 @@ This source map resets to held if:
 - static evidence is used to claim clean CE replacement or runtime-equivalent
   agent behavior.
 
-Next recommended step: run the 0.2.5 release verification bundle and keep clean
-replacement/runtime-equivalence claims held unless those evidence gates pass.
+Next recommended step: run the 0.2.6 release verification bundle for the docs
+and metadata release route, and keep CE 3.14.2 source refresh, clean
+replacement, and runtime-equivalence claims held unless separate evidence gates
+pass.
