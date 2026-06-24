@@ -2,6 +2,38 @@
 
 # Changelog
 
+## 0.2.6 - 2026-06-24
+
+README and docs landing-page release: publish the shorter GitHub README,
+documentation index, and in-depth usage guide from PR #42 as the pinned
+TraceWeaver Core release snapshot.
+
+Before this release route, upstream Compound Engineering was fetched. The latest
+observed upstream tag was `compound-engineering-v3.14.2` at
+`fadeea9027659327246ecb4ef382912119169651`, with upstream `main` at
+`2c330ad32a28049fec8dcb1c5c557f06e5b614db`. The selected packaged CE surface
+remains pinned to the reviewed `compound-engineering-v3.12.0` source inventory;
+folding CE 3.14.2 is held for a separate source-refresh change because upstream
+changed plugin package layout and removed or relocated selected surfaces such as
+`ce-sessions`.
+
+### Changed
+
+- Bumped Codex, Claude Code, Antigravity, Cursor, and Claude marketplace
+  metadata to `0.2.6`.
+- Updated README and plugin README pinned install/tag examples to
+  `traceweaver-core--v0.2.6`.
+- Recorded CE 3.14.2 upstream currentness while keeping the selected CE 3.12.0
+  package surface unchanged.
+
+### Held
+
+- Runtime-driver binding, enforcing mode, release-ready, package-ready,
+  upstream-ready, clean CE replacement, runtime-equivalent CE behavior,
+  slash-command support, unconstrained-host support, R31/Vestro validation,
+  automatic CE 3.14.2 refresh, future publication, and autonomous publication
+  remain held until their own controlled evidence gates pass.
+
 ## 0.2.5 - 2026-06-12
 
 Distilled-knowledge transfer and promotion release: wire stranded guides into

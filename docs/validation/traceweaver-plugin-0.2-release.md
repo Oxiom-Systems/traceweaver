@@ -257,3 +257,44 @@ Post-release publication evidence is recorded in
 `.traceweaver/trace-records/2026-05-28-plugin-0.2.2-release-publication.yml`.
 Future release publication beyond the explicit 0.2.2 tag/GitHub Release remains
 held until a separate exact target and controlled publication route pass.
+
+## 0.2.6 Update Scope
+
+TraceWeaver Core 0.2.6 is a scoped README/docs landing-page release:
+
+- Codex, Claude Code, Antigravity, and Cursor peer manifests carry version
+  `0.2.6`.
+- Claude marketplace metadata carries version `0.2.6`.
+- README and plugin README pinned install/tag examples use
+  `traceweaver-core--v0.2.6`.
+- The simplified GitHub README, documentation index, and in-depth usage guide
+  from PR #42 are the release-facing onboarding path.
+
+Before preparing 0.2.6, upstream Compound Engineering was fetched from
+`https://github.com/EveryInc/compound-engineering-plugin`. The latest observed
+tag was `compound-engineering-v3.14.2` at commit
+`fadeea9027659327246ecb4ef382912119169651`, and upstream `main` was
+`2c330ad32a28049fec8dcb1c5c557f06e5b614db`.
+
+The selected TraceWeaver CE surface remains pinned to reviewed CE 3.12.0:
+`compound-engineering-v3.12.0` at
+`4719dc509fdc45656a830e3ed6060f674e206076`. Folding CE 3.14.2 is held for a
+separate source-refresh change because upstream changed package layout and
+removed or relocated selected surfaces such as `ce-sessions`.
+
+This update still does not approve package-ready, release-ready,
+upstream-ready, clean replacement, enforcing behavior, slash-command support,
+unconstrained-host support, broad runtime behavior, runtime-equivalent CE
+behavior, automatic CE 3.14.2 refresh, R31 real-project validation closure,
+Vestro dogfood evidence, or autonomous publication.
+
+Observed 0.2.6 pre-publication verification is recorded in
+`.traceweaver/trace-records/2026-06-24-plugin-0.2.6-release-metadata.yml`.
+CE currentness evidence is recorded in
+`.traceweaver/trace-records/2026-06-24-ce-3.14.2-currentness-pre-0.2.6.yml`.
+
+Publication route: merge the reviewed 0.2.6 version-bump PR into `main`. The
+`Release on version bump` workflow reads the coherent plugin version, creates
+`traceweaver-core--v0.2.6`, and publishes `TraceWeaver Core 0.2.6` from this
+CHANGELOG section if the tag does not already exist. Future publication beyond
+that exact tag and workflow route remains held.

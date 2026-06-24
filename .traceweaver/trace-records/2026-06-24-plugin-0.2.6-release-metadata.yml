@@ -1,0 +1,175 @@
+trace_record_id: TW-TRACE-RECORD-2026-06-24-PLUGIN-0.2.6-RELEASE-METADATA-001
+record_type: implementation_trace
+created_at: "2026-06-24"
+owner: Oxiom Systems
+status: release_0_2_6_metadata_verified_pr_route_ready_publication_pending_main_version_bump_workflow
+
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_source: requirements.md
+intent_contract: .traceweaver/intent-contract.yml
+
+requirements:
+  - REQ-TW-015
+  - REQ-TW-016
+  - REQ-TW-017
+  - REQ-TW-020
+  - REQ-TW-021
+  - REQ-TW-023
+  - REQ-TW-041
+  - REQ-TW-043
+  - REQ-TW-065
+  - REQ-TW-068
+trace_ids:
+  - TRACE-TW-005
+  - TRACE-TW-010
+  - TRACE-TW-053
+  - TRACE-TW-054
+verification_ids:
+  - VER-TW-009
+  - VER-TW-012
+  - VER-TW-068
+  - VER-TW-069
+  - VER-TW-074
+
+intent_served:
+  - INTENT-TW-004
+  - INTENT-TW-005
+  - INTENT-TW-006
+  - INTENT-TW-007
+  - INTENT-TW-008
+
+scope:
+  - README.md
+  - docs/README.md
+  - docs/guides/using-traceweaver.md
+  - plugins/traceweaver-core/README.md
+  - CHANGELOG.md
+  - .claude-plugin/marketplace.json
+  - plugins/traceweaver-core/.codex-plugin/plugin.json
+  - plugins/traceweaver-core/.claude-plugin/plugin.json
+  - plugins/traceweaver-core/.antigravity-plugin/plugin.json
+  - plugins/traceweaver-core/.cursor-plugin/plugin.json
+  - plugins/traceweaver-core/references/ce-upstream-source-inventory.md
+  - docs/validation/traceweaver-core-11-ce-runtime-inventory.md
+  - docs/validation/traceweaver-plugin-0.2-release.md
+  - .traceweaver/trace-records/2026-06-24-readme-docs-landing-doc-review.yml
+  - .traceweaver/trace-records/2026-06-24-ce-3.14.2-currentness-pre-0.2.6.yml
+  - .traceweaver/trace-records/2026-06-24-plugin-0.2.6-release-metadata.yml
+  - traceability-matrix.md
+  - docs/generated/traceability-dashboard.md
+  - docs/generated/traceability-data.json
+  - docs/generated/traceability-graph.mmd
+
+scoped_artifact_hashes_sha256:
+  README.md: d41bcd2278e83a7e8b91a4da26f9f1f3f5ca2496cd16e2158360adf52f985a12
+  docs/README.md: 020bfe221c6e7a4dfbd3f212c45545d553684af5344bc73e4eb3522b7ecd8902
+  docs/guides/using-traceweaver.md: 1a0cdd3eb70de17314826f21a851cd69d10f9c05a79a88a55344d506ce970685
+  plugins/traceweaver-core/README.md: b8d0050d4595868b3a200641ad4f315a36a34fce734dca08b21d5233d1b66e90
+  CHANGELOG.md: 82adc9275e135d44bcc68c7c9a2740c949ecb097cbbc9c0fb04aee2e42927530
+  docs/validation/traceweaver-plugin-0.2-release.md: 874fe9b3b917e4dda63b7020d84c98d04a922644a9b7387848c02ce351525f20
+  docs/validation/traceweaver-core-11-ce-runtime-inventory.md: f26455e6d905cc422d4d15a524a98055cfc74e6ead6c2e7917d4f8b7d9e02a61
+  plugins/traceweaver-core/references/ce-upstream-source-inventory.md: 6ad3c30f71082c82f8e50ea242fe7df5661fe2660ab2d3117bbc27434d458e7a
+  traceability-matrix.md: bc2bb0671bb8b4e44cd9c22c7a4ce200644f33150a607208b4e6df12de7adfa0
+  .traceweaver/intent-contract.current.yml: f62657a6d76f04db3ff4a1f5249eab07f6612064b3b884764159759eb46807bb
+  docs/generated/traceability-dashboard.md: 418fa6e9d91404c2a279735bdc8ae4c8582f50c664ac094f50a50524665eef3f
+  docs/generated/traceability-data.json: 287ab050ec339abc5ccd3d9e19adfd7f23ee172697d27222c0d8bdea6b93a091
+  docs/generated/traceability-graph.mmd: 0d7dbc28df7298c468446fd58c8e08d0fe16fd94fad1c32959b09fb5b8e46dac
+  .traceweaver/trace-records/2026-06-24-ce-3.14.2-currentness-pre-0.2.6.yml: 428a5b593e885da007d89a3b1b18e61793ade82187faf3e4c148198530ef6b01
+
+release:
+  version: "0.2.6"
+  intended_tag: traceweaver-core--v0.2.6
+  intended_release_name: TraceWeaver Core 0.2.6
+  previous_published_release_tag: traceweaver-core--v0.2.5
+  previous_published_release_commit: 0054e12188d1ae77005dadf27a77f8d589d6efa3
+  release_reason: README and docs landing-page release with upstream CE currentness checked before publication
+  release_route: >
+    Merge a reviewed version-bump PR into main. The repository release workflow
+    creates traceweaver-core--v0.2.6 and the GitHub Release from the CHANGELOG
+    section when the coherent 0.2.6 manifest bump lands on main.
+
+ce_upstream_currentness:
+  latest_observed_upstream_tag: compound-engineering-v3.14.2
+  latest_observed_upstream_commit: fadeea9027659327246ecb4ef382912119169651
+  latest_observed_upstream_main: 2c330ad32a28049fec8dcb1c5c557f06e5b614db
+  selected_traceweaver_ce_pin: compound-engineering-v3.12.0
+  selected_traceweaver_ce_commit: 4719dc509fdc45656a830e3ed6060f674e206076
+  source_refresh_status: held_for_separate_controlled_change
+
+verification_required:
+  - JSON validation for marketplace metadata and peer plugin manifests
+  - YAML validation for release/currentness trace records
+  - Claude plugin validation and tag dry-run for traceweaver-core--v0.2.6
+  - Codex discovery smoke with runtime execution disabled
+  - Antigravity discovery smoke
+  - controlled publication-route smoke
+  - traceability generated-view regeneration and drift smoke
+  - implementation-mode code-anchor scan for changed docs and evidence
+  - git diff whitespace check
+  - after merge: read-only tag and GitHub Release check for traceweaver-core--v0.2.6
+
+verification_observed:
+  - result: pass
+    command: python3 -m json.tool for .claude-plugin/marketplace.json and peer plugin manifests
+    observed: marketplace metadata and Codex/Claude/Antigravity/Cursor manifests parse with version 0.2.6
+  - result: pass
+    command: ruby YAML.load_file for Intent Contract and 0.2.6 trace records
+    observed: Intent Contract, CE currentness record, and release metadata record parse
+  - result: pass
+    command: claude plugin validate --strict . && claude plugin validate --strict plugins/traceweaver-core && claude plugin tag --dry-run --force plugins/traceweaver-core
+    observed: dry-run would create traceweaver-core--v0.2.6 at HEAD without mutating the repository
+  - result: pass
+    command: TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
+    observed: Codex install/discovery passes with runtime execution disabled; selected CE-derived components remain internal and not direct-callable
+  - result: pass
+    command: scripts/traceweaver-smoke-antigravity-discovery
+    observed: Antigravity install/discovery smoke passes for the 0.2.6 manifest
+  - result: pass
+    command: scripts/traceweaver-smoke-controlled-publication
+    observed: negative publication routes block and no-real-remote dry-run remains the only allowed fixture path
+  - result: pass
+    command: scripts/traceweaver-audit-ce-closure
+    observed: selected CE files and support references remain tracked; no selected CE 3.14.2 refresh was applied
+  - result: pass
+    command: scripts/traceweaver-generate-traceability-views --root . && scripts/traceweaver-smoke-traceability-generated-views
+    observed: generated traceability dashboard, data JSON, and graph regenerated and drift smoke passed
+  - result: pass_with_existing_warnings
+    command: scripts/traceweaver-smoke-verify --write && scripts/traceweaver-smoke-verify
+    observed: baseline hash is consistent; generated snapshot is current; existing validation-closure and reviewability warnings remain
+  - result: pass
+    command: implementation-mode traceweaver-check-code-anchors over changed README/docs/release/evidence files
+    observed: code_traceability_findings=0
+  - result: pass
+    command: scripts/traceweaver-smoke-code-traceability
+    observed: deterministic code-traceability smoke suite passed
+  - result: pass
+    command: git diff --check
+    observed: no whitespace errors
+  - result: pass_absent_expected_pre_merge
+    command: git ls-remote --tags origin refs/tags/traceweaver-core--v0.2.6 && gh release view traceweaver-core--v0.2.6 --repo Oxiom-Systems/traceweaver
+    observed: tag and GitHub Release are absent before the version-bump PR merge, as expected
+
+validation_question: "Can users install TraceWeaver Core 0.2.6 from the pinned release snapshot and start from the simplified README/docs landing page while upstream CE currentness is recorded and CE 3.14.2 refresh, runtime, clean replacement, and readiness claims remain held?"
+
+held_claims:
+  - broad runtime behavior
+  - runtime-driver invocation
+  - clean CE replacement
+  - runtime-equivalent CE behavior
+  - selected CE 3.14.2 source refresh
+  - package-ready status
+  - release-ready status
+  - upstream-ready status
+  - R31 real-project validation closure
+  - Vestro dogfood evidence
+  - slash-command or prompt availability
+  - enforcing authority gate behavior
+  - unconstrained-host support
+  - future publication beyond the exact 0.2.6 release route
+  - autonomous publication
+
+publication_boundary:
+  publication_requested_by_user: "0.2.6 but fetch upstream CE before release"
+  requested_at: "2026-06-24"
+  publication_route_status: verified_pre_publication_pending_pr_merge_and_release_workflow
+  future_publication_boundary: future release tags, GitHub Releases, marketplace publication claims, package-ready claims, release-ready claims, broad runtime claims, clean CE replacement, runtime-equivalent CE behavior, CE 3.14.2 source refresh, R31/Vestro validation, and autonomous publication remain held until their own exact controlled route and evidence gates pass

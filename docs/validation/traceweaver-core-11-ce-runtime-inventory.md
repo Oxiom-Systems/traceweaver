@@ -1,6 +1,6 @@
 # TraceWeaver Core 11 CE Runtime Inventory
 
-Status: `SOURCE_INVENTORY_REFRESHED_FOR_0_2_2_RELEASE_CE_3_9_0_STATIC_SCOPE`
+Status: `SOURCE_INVENTORY_REFRESHED_FOR_CE_3_12_0_STATIC_SCOPE_CURRENTNESS_CHECKED_PRE_0_2_6_CE_3_14_2_REFRESH_HELD`
 
 Date/session: 2026-06-12, upstream refresh from Compound Engineering `3.12.0` on branch `claude/system-engineering-framework-review-p1zo6a`
 
@@ -41,6 +41,21 @@ Held claims:
 | Skills file count | 192 files |
 | Agent file count | 43 files |
 | Full cache aggregate fingerprint | `f7225f23ca97949dc1de63f1d347d45f9acd0395450b0efff754a3430b63c3cd` over sorted SHA-256 output |
+
+## 2026-06-24 Upstream Currentness Check
+
+Before the TraceWeaver Core 0.2.6 release-prep route, upstream Compound
+Engineering was fetched from `https://github.com/EveryInc/compound-engineering-plugin`.
+The latest observed tag was `compound-engineering-v3.14.2` at
+`fadeea9027659327246ecb4ef382912119169651`; upstream `main` was
+`2c330ad32a28049fec8dcb1c5c557f06e5b614db`.
+
+The selected TraceWeaver CE package surface remains this reviewed CE 3.12.0
+inventory. The 3.14.2 source refresh is held because upstream package layout,
+agent/reference placement, and selected skill availability changed. This record
+therefore supports only a currentness observation for the 0.2.6 docs/metadata
+release route, not a new CE source pin, clean replacement, runtime-equivalent
+CE behavior, or upstream-ready claim.
 
 ## Manifest And Support Hashes
 

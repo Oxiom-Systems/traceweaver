@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "cbdd0a2e78524862eaa99387d1235e1573711b196e68e8d48408b53c1b4b4f7e"
+      "sha256": "bc2bb0671bb8b4e44cd9c22c7a4ce200644f33150a607208b4e6df12de7adfa0"
     },
     {
       "path": "requirements.md",
@@ -26,9 +26,9 @@
     "trace_rows": 54,
     "atp_entries": 37,
     "result_records": 38,
-    "verification_records": 72,
+    "verification_records": 73,
     "validation_records": 18,
-    "code_anchor_records": 259,
+    "code_anchor_records": 261,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 75,
     "structured_acceptance_missing_requirements": 74,
@@ -1770,10 +1770,10 @@
       "needs": "NEED-TW-004; NEED-TW-005; NEED-TW-006; NEED-TW-007; NEED-TW-008",
       "requirements": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
       "artifact": "ART-TW-067",
-      "verification": "VER-TW-068",
+      "verification": "VER-TW-068; VER-TW-076",
       "validation": "VAL-TW-015",
-      "status": "Implementation added; verification passed; scoped review passed; TraceWeaver PR route authorized by 2026-05-23 `/tw-commit-push-pr`; exact 0.2.0 release published; later release/runtime/website claims held",
-      "next_step": "The reviewed 0.2.0 PR/release route is complete; keep website publication, runtime, clean replacement, and future or current release tags/GitHub Releases beyond explicitly confirmed controlled targets held."
+      "status": "Implementation added; verification passed; scoped review passed; PR #42 merged; 0.2.6 release metadata prepared after upstream CE fetch/currentness check; tag and GitHub Release remain routed through main version-bump workflow",
+      "next_step": "Keep website publication, runtime, clean replacement, automatic CE 3.14.2 refresh, and future release tags/GitHub Releases beyond explicitly confirmed controlled targets held."
     },
     {
       "id": "TRACE-TW-054",
@@ -3187,11 +3187,11 @@
       "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
       "Method": "First-time documentation, public guide, website integration, and trace evidence verification",
       "Procedure / Command": "`scripts/traceweaver-generate-traceability-views --root .`; `scripts/traceweaver-smoke-traceability-generated-views`; implementation-mode code-anchor scanner over changed TraceWeaver docs/evidence; `TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery`; `claude plugin validate --strict .`; `git diff --check`; Oxiom Systems website local static/render check",
-      "Tested Ref": "Root README, public guide, plan, validation record, trace record, Intent Contract scope, generated views, and Oxiom Systems website guide section",
-      "Result": "Passed. Generated views and drift smoke passed; scoped implementation-mode code-anchor scanner passed with `code_traceability_findings=0`; Codex discovery smoke passed with runtime execution disabled; Claude strict validation passed; diff whitespace check passed; public guide and website copy hygiene scans passed; local Chrome desktop/mobile render checks passed with the guide visible, three cards, and zero guide-section overflow findings.",
-      "Evidence Path": "`README.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; generated views; Oxiom Systems website source; redacted local desktop/mobile render screenshots",
-      "Date / Session": "2026-05-23",
-      "Notes": "Verification passed; exact TraceWeaver PR route authorized by `/tw-commit-push-pr`; no release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, website publication, GitHub release, tag, or autonomous-publication claim is accepted."
+      "Tested Ref": "Root README, public guide, docs landing page, usage guide, plan, validation record, trace record, Intent Contract scope, generated views, and Oxiom Systems website guide section",
+      "Result": "Passed for original first-time guide and refreshed 2026-06-24 README/docs landing-page record. Generated views and drift smoke passed; scoped implementation-mode code-anchor scanner passed with `code_traceability_findings=0`; Codex discovery smoke passed with runtime execution disabled; Claude strict validation passed; diff whitespace check passed; local docs landing review passed.",
+      "Evidence Path": "`README.md`; `docs/README.md`; `docs/guides/using-traceweaver.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; `.traceweaver/trace-records/2026-06-24-readme-docs-landing-doc-review.yml`; generated views; Oxiom Systems website source; redacted local desktop/mobile render screenshots",
+      "Date / Session": "2026-06-24",
+      "Notes": "Verification passed for docs landing review state; no release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, website publication, automatic CE 3.14.2 refresh, or autonomous-publication claim is accepted."
     },
     {
       "ID": "VER-TW-070",
@@ -3247,6 +3247,17 @@
       "Evidence Path": "`.traceweaver/trace-records/2026-05-27-plugin-0.2.2-release-metadata.yml`; `.traceweaver/trace-records/2026-05-28-plugin-0.2.2-release-publication.yml`; `README.md`; `plugins/traceweaver-core/README.md`; `CHANGELOG.md`; manifests; `src/index.ts`; `scripts/traceweaver-smoke-antigravity-discovery`; `docs/validation/traceweaver-plugin-0.2-release.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; generated views; `gh release view traceweaver-core--v0.2.2 --repo Oxiom-Systems/traceweaver`; `git ls-remote --tags origin traceweaver-core--v0.2.2`",
       "Date / Session": "2026-05-28",
       "Notes": "Exact 0.2.2 tag/GitHub release publication confirmed; release-ready, package-ready, broad runtime, runtime-equivalent CE behavior, clean replacement, R31 real-project validation closure, Vestro dogfood evidence, future release publication, and autonomous publication claims remain held."
+    },
+    {
+      "ID": "VER-TW-076",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-017; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065; REQ-TW-068",
+      "Method": "TraceWeaver Core 0.2.6 README/docs release metadata and upstream CE currentness check",
+      "Procedure / Command": "JSON/plugin validation; YAML validation; Claude plugin validation and tag dry-run; Codex discovery smoke; Antigravity discovery smoke; controlled-publication smoke; CE closure audit; upstream CE fetch/currentness inspection; implementation-mode code-anchor scan; generated-view drift smoke; verify gate; `git diff --check`; read-only tag/GitHub Release check before merge",
+      "Tested Ref": "0.2.6 manifests, README/plugin README pinned install docs, CHANGELOG release notes, docs landing-page review record, CE currentness trace record, release metadata trace record, release validation record, selected CE 3.12.0 source inventory records, generated views, and pre-merge remote tag/release absence proof",
+      "Result": "Pass for scoped 0.2.6 metadata preparation. JSON/YAML validation passed; Claude validation passed and dry-run computed `traceweaver-core--v0.2.6`; Codex discovery passed with runtime execution disabled; Antigravity discovery passed; controlled-publication smoke passed; CE closure audit passed; implementation-mode code-anchor scan passed with `code_traceability_findings=0`; code-traceability smoke passed; generated views and drift smoke passed; verify gate passed with existing validation-closure/reviewability warnings; `git diff --check` passed. Upstream CE was fetched through `compound-engineering-v3.14.2`; selected TraceWeaver CE files remain pinned to reviewed CE 3.12.0 and CE 3.14.2 refresh is held. Read-only checks confirmed `traceweaver-core--v0.2.6` tag and GitHub Release are absent before PR merge.",
+      "Evidence Path": "`.traceweaver/trace-records/2026-06-24-plugin-0.2.6-release-metadata.yml`; `.traceweaver/trace-records/2026-06-24-ce-3.14.2-currentness-pre-0.2.6.yml`; `.traceweaver/trace-records/2026-06-24-readme-docs-landing-doc-review.yml`; `README.md`; `docs/README.md`; `docs/guides/using-traceweaver.md`; `plugins/traceweaver-core/README.md`; `CHANGELOG.md`; manifests; `docs/validation/traceweaver-plugin-0.2-release.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; generated views",
+      "Date / Session": "2026-06-24",
+      "Notes": "Release metadata verified; exact tag/GitHub Release publication remains pending workflow execution after merge. Release-ready, package-ready, broad runtime, runtime-equivalent CE behavior, CE 3.14.2 refresh, clean replacement, R31/Vestro validation, future publication, and autonomous publication claims remain held."
     },
     {
       "ID": "VER-TW-056",
@@ -3858,6 +3869,22 @@
       "Verification": "VER-TW-012; VER-TW-019; VER-TW-069",
       "Anchor Type": "trace-record",
       "Role": "plugin-0.2-release-metadata"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-06-24-plugin-0.2.6-release-metadata.yml",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-017; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065; REQ-TW-068",
+      "Trace": "TRACE-TW-005; TRACE-TW-010; TRACE-TW-053; TRACE-TW-054",
+      "Verification": "VER-TW-009; VER-TW-012; VER-TW-068; VER-TW-069; VER-TW-074; VER-TW-076",
+      "Anchor Type": "trace-record",
+      "Role": "plugin-0.2.6-release-metadata"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-06-24-ce-3.14.2-currentness-pre-0.2.6.yml",
+      "Requirement": "REQ-TW-017; REQ-TW-020; REQ-TW-052; REQ-TW-059; REQ-TW-060",
+      "Trace": "TRACE-TW-005; TRACE-TW-046",
+      "Verification": "VER-TW-009; VER-TW-074; VER-TW-076",
+      "Anchor Type": "trace-record",
+      "Role": "ce-3.14.2-currentness-pre-0.2.6"
     },
     {
       "Artifact Path": "README.md",
