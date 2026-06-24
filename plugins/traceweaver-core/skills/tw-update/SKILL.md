@@ -21,7 +21,25 @@ and produces a `traceweaver-core--v<version>` git tag and a matching GitHub
 Release. The marketplace tracks `main`, so the latest released `version` on
 `main` is the "current" target.
 
-## Step 1: Determine the installed version
+## Required Inputs
+
+Before reporting an update recommendation, load and cite when available:
+
+- the installed plugin manifest for the active harness (the source of the
+  installed version)
+- the latest released version (GitHub Release list or the `version` field on
+  `main`)
+- the active harness identity (Claude Code, Codex, or Antigravity), which
+  selects the correct update command
+
+This skill reads version metadata only; it does not consume `requirements.md`,
+`traceability-matrix.md`, or `.traceweaver/intent-contract.yml` authority, and
+it changes none of them. It is a TraceWeaver-packaged maintenance utility, not a
+knowledge skill, so it loads no `references/` systems-engineering guidance.
+
+## Workflow
+
+### Step 1: Determine the installed version
 
 Read the `version` field from the installed plugin manifest. Look in the
 harness's install location, in this order, and use the first that exists:
@@ -38,7 +56,7 @@ If no installed manifest is found, report that TraceWeaver may be running from a
 local development checkout and that no marketplace update applies to this
 session; recommend `git pull --ff-only origin main` in the checkout instead.
 
-## Step 2: Determine the latest released version
+### Step 2: Determine the latest released version
 
 Read the canonical released `version` without cloning. Prefer the GitHub
 Release, fall back to `main`:
@@ -62,7 +80,7 @@ curl -fsSL https://raw.githubusercontent.com/Oxiom-Systems/traceweaver/main/plug
 If neither network path succeeds, say the latest version could not be
 determined and stop; do not guess.
 
-## Step 3: Compare and recommend
+### Step 3: Compare and recommend
 
 If the installed version equals the latest released version, report that
 TraceWeaver Core is current and stop.
@@ -109,6 +127,16 @@ committed `SessionStart` install hook runs `claude plugin install
 traceweaver-core@traceweaver` on container start, which pulls the marketplace's
 current `main` state. To move to a specific release, pin the marketplace ref in
 the committed `extraKnownMarketplaces` configuration.
+
+## Output
+
+Return:
+
+- installed TraceWeaver Core version (or "running from a development checkout")
+- latest released version (or "could not be determined")
+- current-vs-behind verdict
+- if behind: the exact per-harness update command
+- explicit note that no authority, requirements, or held-claim state changed
 
 ## Boundaries
 

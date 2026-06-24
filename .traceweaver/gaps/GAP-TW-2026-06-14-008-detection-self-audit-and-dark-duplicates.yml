@@ -1,0 +1,35 @@
+gap_id: GAP-TW-2026-06-14-008
+status: open
+linked_intent: "INTENT-TW-001, INTENT-TW-002"
+linked_requirement: REQ-TW-063
+proposed_requirement_id: REQ-PROPOSED-2026-06-14-008
+clarification_question_id: null
+reason: >
+  The whole-repo audit scanner detects dark behavior, duplicate/similar
+  behavior, orphaned and anchor-only behavior, but ran only against synthetic
+  fixtures; it was never pointed at the real repository, so its findings never
+  reached the codebase it protects (the same stranding pattern fixed earlier for
+  distilled guides). Separately, duplicate detection excluded unanchored (dark)
+  files from the comparison pool, so a dark copy of an anchored file - the
+  highest-value duplicate - could never be flagged.
+proposed_disposition: proposed_requirement
+proposed_requirement_summary: >
+  (1) A non-blocking self-audit report (scripts/traceweaver-audit-self) must run
+  the whole-repo audit against the real repository in CI on every run, summarize
+  findings by id/severity and surface classification (making exemptions
+  visible), and record its baseline as tracked debt (docs/audit/self-audit-debt.md).
+  (2) Duplicate/similar-behavior detection must include unanchored behavior in
+  the comparison pool so dark duplicates of anchored files are caught.
+constraints: >
+  Cross-requirement duplicate comparison and per-function granularity remain
+  deferred (would need LSH bucketing and per-symbol shingling to avoid O(n^2)
+  cost and short-file false positives). The self-audit stays non-blocking until
+  the baseline debt is driven down; making selected findings blocking is a later
+  gated change. Reclassifying .claude/.github/examples as support surface is a
+  separate reviewed scanner change.
+owner: Oxiom Systems
+review_gate: tw-requirements-review
+created_at: 2026-06-14
+source_review: detection-improvement review 2026-06-14 (steps D2, D3, U2); framework design review F5
+
+implementation_rule: Implemented as advisory non-blocking detection with this gap as the tracked authority candidate; promotion to an approved requirement and any move to blocking enforcement remain human decisions.

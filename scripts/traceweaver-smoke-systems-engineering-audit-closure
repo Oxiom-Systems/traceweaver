@@ -307,6 +307,25 @@ similar_beta() {
   printf "order %s %s %s %s %s\n" "$order_state" "$fill_count" "$risk_limit" "$settlement_mode" "$retry_policy"
 }
 SRC
+  # Two unanchored (dark) duplicate source files. They carry no file-role anchor,
+  # so before the dark-inclusive similarity change they were excluded from the
+  # comparison pool entirely. They must now be flagged as a duplicate pair.
+  cat >"$root/src/dark_dup_a.sh" <<'SRC'
+shipment_reconcile() {
+  freight_manifest="pending"
+  customs_clearance="awaiting"
+  bonded_warehouse="zone_seven"
+  printf "%s %s %s\n" "$freight_manifest" "$customs_clearance" "$bonded_warehouse"
+}
+SRC
+  cat >"$root/src/dark_dup_b.sh" <<'SRC'
+shipment_reconcile() {
+  freight_manifest="pending"
+  customs_clearance="awaiting"
+  bonded_warehouse="zone_seven"
+  printf "%s %s %s\n" "$freight_manifest" "$customs_clearance" "$bonded_warehouse"
+}
+SRC
 }
 
 clean_root="$TMP_DIR/clean"
@@ -338,6 +357,15 @@ assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-SIMILAR-BEHAVIOR"
 assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-ANCHOR-ONLY-COVERAGE"
 assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-MISSING-VERIFICATION-PROCEDURE"
 assert_finding "$TMP_DIR/audit.jsonl" "TW-AUDIT-MISSING-VALIDATION-PROCEDURE"
+
+# Dark-inclusive duplicate detection: the two unanchored duplicate files must be
+# reported as a duplicate pair even though neither carries a file-role anchor.
+if ! grep -F '"id":"TW-AUDIT-DUPLICATE-BEHAVIOR"' "$TMP_DIR/audit.jsonl" | grep -Fq "dark_dup"; then
+  echo "systems_engineering_dark_duplicate_detection=failed_expected_dark_dup_pair" >&2
+  cat "$TMP_DIR/audit.jsonl" >&2
+  exit 1
+fi
+echo "systems_engineering_dark_duplicate_detection=pass"
 
 python3 - "$TMP_DIR/audit.jsonl" <<'PY'
 import json

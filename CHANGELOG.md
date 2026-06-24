@@ -2,6 +2,39 @@
 
 # Changelog
 
+## Unreleased
+
+Detection-improvement increment (steps 1-2 of the dark-code / duplicate /
+intent-fidelity review): point the existing whole-repo audit at the real
+repository and close the dark-duplicate blind spot. Runtime, enforcing,
+clean-replacement, and broader release claims remain held.
+
+### Added
+
+- `scripts/traceweaver-audit-self` (wired into CI, non-blocking): runs the
+  whole-repo code-anchor audit against this repository on every CI run and
+  reports findings by id, severity, and surface classification, so the audit
+  scanner's dark/duplicate/orphan detection finally reaches the codebase it
+  protects (previously it ran only against synthetic fixtures). Pointed at the
+  repo it immediately surfaced real debt, including a genuine dark duplicate
+  (the install hook copied verbatim into `.claude/` and `examples/`).
+- `docs/audit/self-audit-debt.md`: tracked baseline of the findings the
+  self-audit currently surfaces, so they are visible rather than silently
+  accumulating. Tracked by GAP-TW-2026-06-14-008.
+
+### Changed
+
+- The duplicate/similar-behavior similarity scan now includes unanchored (dark)
+  files in its comparison pool, so a dark copy of an anchored file is caught.
+  Cross-requirement comparison and per-function granularity remain deferred.
+
+### Fixed
+
+- `tw-update` now conforms to the uniform `tw-*` skill prompt contract
+  (`Required Inputs`, `Workflow`, `Output`, and authority-context references) —
+  a latent nonconformance since 0.2.4 that the `systems-engineering-audit-closure`
+  smoke (not in CI) surfaced while adding the dark-duplicate fixture.
+
 ## 0.2.5 - 2026-06-12
 
 Distilled-knowledge transfer and promotion release: wire stranded guides into
