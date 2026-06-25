@@ -2,6 +2,39 @@
 
 # Changelog
 
+## 0.2.7 - 2026-06-25
+
+Combined selected-CE-refresh and first-time onboarding release: carry the PR
+#44 selected Compound Engineering `3.14.3` package refresh together with the PR
+#45 README/docs bootstrap clarity pass, intro video, setup video, and worked
+authority-bootstrap example.
+
+### Changed
+
+- Bumped Codex, Claude Code, Antigravity, Cursor, and Claude marketplace
+  metadata to `0.2.7`.
+- Updated README, usage guide, prompt-to-proof guide, and plugin README current
+  release and pinned install examples to `traceweaver-core--v0.2.7`.
+- Refreshed selected CE-compatible package surfaces to upstream Compound
+  Engineering `compound-engineering-v3.14.3`, while keeping `ce-sessions` held
+  at the prior reviewed selected surface because upstream CE no longer exposes
+  it as a top-level skill.
+- Added first-time user clarity: a shorter README entry path, a worked
+  authority bootstrap example, clearer expected bootstrap-stop wording, and
+  intro/setup video links in the README and guides.
+
+### Held
+
+- Tag and GitHub Release publication remain held until the reviewed version-bump
+  state lands on `main` and the release workflow creates
+  `traceweaver-core--v0.2.7`.
+- Runtime-driver binding, enforcing mode, release-ready, package-ready,
+  upstream-ready, clean CE replacement, runtime-equivalent CE behavior,
+  slash-command support, unconstrained-host support, R31/Vestro validation,
+  `ce-sessions` CE 3.14.3 currentness, upstream-only CE 3.14.3 skill
+  packaging, future publication, and autonomous publication remain held until
+  their own controlled evidence gates pass.
+
 ## 0.2.6 - 2026-06-24
 
 README and docs landing-page release: publish the shorter GitHub README,

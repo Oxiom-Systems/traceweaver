@@ -1,6 +1,6 @@
 ---
 name: ce-work
-description: Execute work efficiently while maintaining quality and finishing features
+description: Execute a plan or concrete work prompt end-to-end. Use when implementing from docs/plans, a spec path, or a clear build request; use ce-debug for open-ended bugs.
 argument-hint: "[Plan doc path or description of work. Blank to auto use latest plan doc]"
 ---
 
@@ -124,7 +124,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
    - If anything is unclear or ambiguous, ask clarifying questions now
    - If clarifying questions were needed above, get user approval on the resolved answers. If no clarifications were needed, proceed without a separate approval step — plan scope is the plan's authority, not something to renegotiate
    - **Do not skip this** - better to ask questions now than build the wrong thing
-   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in git commits and the task tracker, not the plan. `ce-work` does not mutate the plan — whether it shipped is derived from git, not recorded in the doc. Legacy plans may contain `- [ ]` / `- [x]` marks on unit headings or a `status:` field — ignore them as state; per-unit completion is determined during execution by reading the current file state.
+   - **Do not edit the plan body during execution.** The plan is a decision artifact; progress lives in task state, verification evidence, trace records, and the final held-publication handoff, not the plan. `ce-work` does not mutate the plan — whether it shipped is derived from the later controlled TraceWeaver publication route, not recorded in the doc. Legacy plans may contain `- [ ]` / `- [x]` marks on unit headings or a `status:` field — ignore them as state; per-unit completion is determined during execution by reading the current file state.
 
 2. **Setup Environment**
 
@@ -166,13 +166,15 @@ Determine how to proceed based on what was provided in `<input_document>`.
    **Option B: Use a worktree (recommended for parallel development)**
    ```bash
    skill: ce-worktree
-   # The skill will create a new branch from the default branch in an isolated worktree
+   # Ensures isolation: detects an existing worktree, prefers the harness's
+   # native worktree tool, else creates one from the default branch
    ```
 
    **Option C: Continue on the default branch**
    - Requires explicit user confirmation
-   - Only proceed after user explicitly says "yes, commit to [default_branch]"
-   - Never commit directly to the default branch without explicit permission
+   - Only proceed after user explicitly says to continue on `[default_branch]`
+     under TraceWeaver no-publication mode
+   - Never stage, commit, push, or publish directly from `ce-work`
 
    **Recommendation**: Use worktree if:
    - You want to work on multiple features simultaneously
@@ -213,7 +215,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
    **Subagent isolation** — give each parallel subagent its own working tree:
    - **Claude Code (`Agent` tool):** pass `isolation: "worktree"` and `run_in_background: true`. The harness creates a per-subagent worktree under `.claude/worktrees/agent-<id>` on its own branch. Verify `.claude/worktrees/` is gitignored before relying on this.
-   - **Other platforms** without built-in worktree isolation (e.g., Codex `spawn_agent`, Pi `subagent`): subagents share the orchestrator's directory.
+   - **Other platforms** without built-in worktree isolation: subagents share the orchestrator's directory.
 
    **Subagent dispatch** uses your available subagent or task spawning mechanism. For each unit, give the subagent:
    - The full plan file path (for overall context)
@@ -221,10 +223,17 @@ Determine how to proceed based on what was provided in `<input_document>`.
    - Any resolved deferred questions relevant to that unit
    - Instruction to check whether the unit's test scenarios cover all applicable categories (happy paths, edge cases, error paths, integration) and supplement gaps before writing tests
 
-   **Shared-directory fallback constraints** — apply only when worktree isolation is unavailable:
-   - Instruct each subagent: "Do not stage files (`git add`), create commits, or run the project test suite. The orchestrator handles testing, staging, and committing after all parallel units complete."
-   - These constraints prevent git index contention and test interference between concurrent subagents.
-   - With worktree isolation active, omit these constraints — subagents may stage, commit, and run their unit's tests within their own worktree branch.
+   **TraceWeaver subagent constraints** — apply in every isolation mode:
+   - Instruct each subagent: "Do not stage files (`git add`), create commits,
+     push branches, publish, or open/update PRs. Return changed files,
+     verification performed, and any unresolved gaps to the orchestrator."
+   - In shared-directory fallback, also instruct subagents not to run the full
+     project test suite concurrently. The orchestrator handles combined
+     validation after each batch.
+   - With worktree isolation active, subagents may run their unit's targeted
+     tests inside the isolated worktree, but they still must not stage, commit,
+     push, or publish. Any branch created by the harness is an implementation
+     workspace only, not a publication branch.
 
    **Permission mode:** Omit the `mode` parameter when dispatching subagents so the user's configured permission settings apply. Do not pass `mode: "auto"` — it overrides user-level settings like `bypassPermissions`.
 
@@ -232,16 +241,26 @@ Determine how to proceed based on what was provided in `<input_document>`.
    1. Review the subagent's diff — verify changes match the unit's scope and `Files:` list
    2. Run the relevant test suite to confirm the tree is healthy
    3. If tests fail, diagnose and fix before proceeding — do not dispatch dependent units on a broken tree
-   4. Update the task list (do not edit the plan body — progress is carried by the commit)
+   4. Update the task list (do not edit the plan body — progress is carried by the task state and held-publication handoff)
    5. Dispatch the next unit
 
    **After all parallel subagents in a batch complete (worktree-isolated mode):**
    1. Wait for every subagent in the current parallel batch to finish.
-   2. For each completed subagent, in dependency order: review the worktree's diff against the orchestrator's branch. If the subagent did not commit its own work, stage and commit it inside that worktree.
-   3. Merge each subagent's branch into the orchestrator's branch sequentially in dependency order. **If a merge conflict surfaces, abort the merge (`git merge --abort`) and re-dispatch the conflicting unit serially against the now-merged tree** — hand-resolving silently picks a side and discards one unit's intent. (Predicted overlap from the Parallel Safety Check surfaces here as a conflict, not as silent data loss in shared-directory mode.)
-   4. After each merge, run the relevant test suite. If tests fail, diagnose and fix before merging the next branch.
-   5. Update the task list (progress is carried by the merge commits).
-   6. After merging, remove each subagent's worktree and delete its branch. Use the absolute path and branch name returned in the subagent's result.
+   2. For each completed subagent, in dependency order: review the worktree's
+      diff against the orchestrator's branch. Do not stage or commit inside the
+      subagent worktree.
+   3. Integrate accepted changes only as an uncommitted diff in the orchestrator
+      workspace using harness-supported no-commit patch integration, or rerun
+      the unit serially in the orchestrator workspace when patch integration is
+      unsafe. Do not merge subagent branches or create merge commits from
+      `ce-work`.
+   4. After each accepted integration, run the relevant test suite. If tests
+      fail, diagnose and fix before integrating the next unit.
+   5. Update the task list; progress is carried by changed files, verification
+      evidence, and held-publication handoff entries.
+   6. After integration, remove each subagent's worktree and delete its branch
+      only when doing so will not discard unintegrated work. Use the absolute
+      path and branch name returned in the subagent's result.
       - Unlock the worktree first — the harness locks per-subagent worktrees: `git worktree unlock <absolute-path>`
       - Remove the worktree: `git worktree remove <absolute-path>`
       - Delete the branch: `git branch -d <branch-name>` (the branch outlives the worktree by default and accumulates as orphans if not cleaned up; `-d` lowercase refuses to delete unmerged branches, which is the safety we want — if it fails, investigate before forcing)
@@ -249,10 +268,10 @@ Determine how to proceed based on what was provided in `<input_document>`.
 
    **After all parallel subagents in a batch complete (shared-directory fallback):**
    1. Wait for every subagent in the current parallel batch to finish before acting on any of their results
-   2. Cross-check for discovered file collisions: compare the actual files modified by all subagents in the batch (not just their declared `Files:` lists). Subagents may create or modify files not anticipated during planning — this is expected, since plans describe *what* not *how*. A collision only matters when 2+ subagents in the same batch modified the same file. In a shared working directory, only the last writer's version survives — the other unit's changes to that file are lost. If a collision is detected: commit all non-colliding files from all units first, then re-run the affected units serially for the shared file so each builds on the other's committed work
-   3. For each completed unit, in dependency order: review the diff, run the relevant test suite, stage only that unit's files, and commit with a conventional message derived from the unit's Goal
-   4. If tests fail after committing a unit's changes, diagnose and fix before committing the next unit
-   5. Update the task list (do not edit the plan body — progress is carried by the commits just made)
+   2. Cross-check for discovered file collisions: compare the actual files modified by all subagents in the batch (not just their declared `Files:` lists). Subagents may create or modify files not anticipated during planning — this is expected, since plans describe *what* not *how*. A collision only matters when 2+ subagents in the same batch modified the same file. In a shared working directory, only the last writer's version survives — the other unit's changes to that file are lost. If a collision is detected, keep non-colliding changes as uncommitted work and re-run the affected units serially for the shared file so each builds on the other's current work.
+   3. For each completed unit, in dependency order: review the diff, run the relevant test suite, and record the changed files plus proposed commit boundary in the held-publication handoff. Do not stage or commit.
+   4. If tests fail after a unit's changes, diagnose and fix before moving to the next unit.
+   5. Update the task list (do not edit the plan body — progress is carried by task state, changed files, and verification evidence)
    6. Dispatch the next batch of independent units, or the next dependent unit
 
 ### Phase 2: Execute
@@ -274,7 +293,7 @@ Determine how to proceed based on what was provided in `<input_document>`.
      - Run tests after changes
      - Assess testing coverage: did this task change behavior? If yes, were tests written or updated? If no tests were added, is the justification deliberate (e.g., pure config, no behavioral change)?
      - Mark task as completed
-     - Evaluate for incremental commit (see below)
+    - Evaluate for an incremental checkpoint (see below)
    ```
 
    When a unit carries an `Execution note`, honor it. For test-first units, write the failing test before implementation for that unit. For characterization-first units, capture existing behavior before changing it. For units without an `Execution note`, proceed pragmatically.
@@ -311,47 +330,55 @@ Determine how to proceed based on what was provided in `<input_document>`.
    **When this matters most:** Any change that touches models with callbacks, error handling with fallback/retry, or functionality exposed through multiple interfaces.
 
 
-2. **Incremental Commits**
+2. **Incremental Checkpoints**
 
-   After completing each task, evaluate whether to create an incremental commit:
+   After completing each task, evaluate whether to record an incremental
+   checkpoint for the later controlled publication route:
 
-   | Commit when... | Don't commit when... |
+   | Record a checkpoint when... | Don't record a checkpoint when... |
    |----------------|---------------------|
    | Logical unit complete (model, service, component) | Small part of a larger unit |
    | Tests pass + meaningful progress | Tests failing |
    | About to switch contexts (backend → frontend) | Purely scaffolding with no behavior |
    | About to attempt risky/uncertain changes | Would need a "WIP" commit message |
 
-   **Heuristic:** "Can I write a commit message that describes a complete, valuable change? If yes, commit. If the message would be 'WIP' or 'partial X', wait."
+   **Heuristic:** "Can I write a proposed commit message that describes a complete, valuable change? If yes, record the boundary. If the message would be 'WIP' or 'partial X', wait."
 
-   If the plan has Implementation Units, use them as a starting guide for commit boundaries — but adapt based on what you find during implementation. A unit might need multiple commits if it's larger than expected, or small related units might land together. Use each unit's Goal to inform the commit message.
+   If the plan has Implementation Units, use them as a starting guide for later
+   commit boundaries — but adapt based on what you find during implementation. A
+   unit might need multiple later commits if it's larger than expected, or small
+   related units might land together. Use each unit's Goal to inform the
+   proposed commit message.
 
-   **Commit workflow:**
-   ```bash
-   # 1. Verify tests pass (use project's test command)
-   # Examples: bin/rails test, npm test, pytest, go test, etc.
+   **Checkpoint workflow:**
+   1. Verify tests pass (use the project's test command).
+   2. Record the files related to this logical unit.
+   3. Draft a conventional proposed commit message, e.g.
+      `feat(scope): description of this unit`.
+   4. Keep files unstaged and uncommitted. Commit creation belongs to the later
+      controlled TraceWeaver publication route.
 
-   # 2. Stage only files related to this logical unit (not `git add .`)
-   git add <files related to this logical unit>
+   **Handling integration conflicts:** If conflicts arise while integrating
+   parallel work, resolve them immediately or rerun the affected unit serially.
+   Incremental checkpoints make conflict review easier because each proposed
+   boundary is small and focused.
 
-   # 3. Commit with conventional message
-   git commit -m "feat(scope): description of this unit"
-   ```
+   **Note:** Incremental checkpoints use clean proposed conventional messages without attribution footers. The later controlled publication route decides final commit/PR attribution.
 
-   **Handling merge conflicts:** If conflicts arise during rebasing or merging, resolve them immediately. Incremental commits make conflict resolution easier since each commit is small and focused.
-
-   **Note:** Incremental commits use clean conventional messages without attribution footers. The final Phase 4 commit/PR includes the full attribution.
-
-   **Parallel subagent mode:** Commit ownership is split by isolation mode (see Phase 1 Step 4):
-   - **Worktree-isolated:** subagents may stage and commit inside their own worktree branch; the orchestrator merges those branches in dependency order after the batch.
-   - **Shared-directory fallback:** subagents do not commit; the orchestrator stages and commits each unit after the entire parallel batch completes.
+   **Parallel subagent mode:** Publication remains held in every isolation mode
+   (see Phase 1 Step 4):
+   - **Worktree-isolated:** subagents return diffs and verification evidence;
+     they do not stage, commit, push, or publish.
+   - **Shared-directory fallback:** subagents return changed files and
+     verification notes; the orchestrator records proposed commit boundaries
+     after the batch completes without staging or committing.
 
 3. **Follow Existing Patterns**
 
    - The plan should reference similar code - read those files first
    - Match naming conventions exactly
    - Reuse existing components where possible
-   - Follow project coding standards (see AGENTS.md; use CLAUDE.md only if the repo still keeps a compatibility shim)
+   - Follow the project's coding standards already in your context
    - When in doubt, grep for similar implementations
 
 4. **Test Continuously**
@@ -375,30 +402,42 @@ Determine how to proceed based on what was provided in `<input_document>`.
    For UI work with Figma designs:
 
    - Implement components following design specs
-   - Use ce-figma-design-sync agent iteratively to compare
+   - Read `references/agents/figma-design-sync.md` and dispatch a generic subagent seeded with that local prompt to compare implementation against the Figma design. Do not dispatch a standalone agent by type/name.
    - Fix visual differences identified
    - Repeat until implementation matches design
 
-6. **Track Progress**
+7. **Frontend Design Guidance** (if applicable)
+
+   For UI tasks without a Figma design -- where the implementation touches view, template, component, layout, or page files, creates user-visible routes, or the plan contains explicit UI/frontend/design language:
+
+   - Apply the frontend guidance embedded in this skill and the active repo instructions: preserve existing design-system conventions, use real UI controls and states, keep layouts responsive, and verify text does not overflow or overlap.
+   - When browser tooling is available, inspect the changed UI at desktop and mobile widths before final validation. If no browser access is available, do a code-level responsive/layout review and record that browser verification was unavailable.
+   - Phase 4's screenshot capture still applies when the change is user-visible.
+
+8. **Track Progress**
    - Keep the task list updated as you complete tasks
    - Note any blockers or unexpected discoveries
    - Create new tasks if scope expands
    - Keep user informed of major milestones
    - When the plan defines U-IDs for Implementation Units, or the plan or origin document carries stable R-IDs (and optionally A/F/AE IDs), reference them in blockers, deferred-work notes, task summaries, and final verification — not routine status updates. U-IDs anchor units across plan edits; R/A/F/AE anchor product intent across the brainstorm-plan handoff. Use the IDs the plan supplies and do not invent ones it does not. This preserves traceability without burying signal under noise.
 
-### Phase 3-4: Quality Check and Finishing Work
+### Phase 3-4: Quality Check and Held Publication Handoff
 
-When all Phase 2 tasks are complete and execution transitions to quality check, you must read `references/shipping-workflow.md` for the full shipping workflow. Do not skip this.
+When all Phase 2 tasks are complete and execution transitions to quality check,
+continue in TraceWeaver no-publication mode. Do not read or load
+`references/shipping-workflow.md`, `ce-commit`, or `ce-commit-push-pr` unless a
+controlled TraceWeaver publication route has already authorized that exact
+target. The shipping workflow remains upstream CE reference material only.
 
-**Code review tiers:** Tier 1 when the harness has built-in review. Tier 2 only when escalation criteria in `shipping-workflow.md` match — not because Tier 1 is missing.
+**Code review tiers:** Tier 1 when the harness has built-in review. Tier 2 only when the escalation criteria below match — not because Tier 1 is missing.
 
 **Tier 2 is two steps — review, then fix.** `ce-code-review` is review-only. It returns findings (markdown or `mode:agent` JSON); it never edits the checkout, commits, or applies fixes.
 
 When Tier 2 applies:
 
 1. **Review** — Invoke the `ce-code-review` skill (invocation command in `references/review-findings-followup.md` § Fallback). Use `mode:agent` in orchestrated workflows; pass `plan:<path>` when you have a plan and `base:<ref>` when the merge base is already known.
-2. **Apply fixes** — Load `references/review-findings-followup.md`. Filter eligibility on JSON only, **batch applicable findings by file**, dispatch fix subagents (parallel when file sets are disjoint). The orchestrator merges diffs, runs tests, and commits — it does not pre-investigate findings.
-3. **Residual Work Gate** — Only after followup; unresolved actionable findings go through the gate in `shipping-workflow.md`.
+2. **Apply fixes** — Load `references/review-findings-followup.md`. Filter eligibility on JSON only, **batch applicable findings by file**, dispatch fix subagents (parallel when file sets are disjoint). The orchestrator integrates diffs without staging or committing, runs tests, and records the changed files and proposed publication handoff — it does not pre-investigate findings.
+3. **Residual Work Gate** — Only after followup; unresolved actionable findings go through the held residual-work gate described by the TraceWeaver publication handoff.
 
 Tier 1 harness-native review may still fix inline; Tier 2 always separates review from apply.
 
@@ -426,14 +465,15 @@ Tier 1 harness-native review may still fix inline; Tier 2 always separates revie
 
 - Follow existing patterns
 - Write tests for new code
-- Run linting before pushing
-- Review when Tier 1 is available or Tier 2 criteria match (see `shipping-workflow.md`)
+- Run linting before the held publication handoff
+- Review when Tier 1 is available or Tier 2 criteria match; keep publication held
 
-### Ship Complete Features
+### Finish Complete Features
 
-- Mark all tasks completed before moving on
+- Mark all implementation tasks ready for review before moving on
 - Don't leave features 80% done
-- A finished feature that ships beats a perfect feature that doesn't
+- A complete, verified handoff beats an incomplete implementation with a
+  premature publication claim
 
 ## Common Pitfalls to Avoid
 
@@ -443,5 +483,5 @@ Tier 1 harness-native review may still fix inline; Tier 2 always separates revie
 - **Testing at the end** - Test continuously or suffer later
 - **Forgetting to track progress** - Update task status as you go or lose track of what's done
 - **80% done syndrome** - Finish the feature, don't move on early
-- **Skipping review without reason** — Use Tier 1 when available; escalate to Tier 2 only on criteria in `shipping-workflow.md`; document when both are skipped
+- **Skipping review without reason** — Use Tier 1 when available; escalate to Tier 2 only on the criteria above; document when both are skipped
 - **Re-scoping the plan into human-time phases** - The plan's Implementation Units define the scope of execution. Do not estimate human-hours per unit, propose multi-day breakdowns, or ask the user to pick a subset of units for "this session". Agents execute at agent speed, and context-window pressure is addressed by subagent dispatch (Phase 1 Step 4), not by phased sessions. If a plan-file input is genuinely too large for a single execution, say so plainly and suggest the user return to `/ce-plan` to reduce scope — don't invent session phases as a workaround. For bare-prompt input, Phase 0's Large routing already handles oversized work

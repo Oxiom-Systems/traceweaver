@@ -12,6 +12,9 @@ TraceWeaver to preserve intent before code is written.
 The first decision is not which file to edit. The first decision is how much
 intent still needs to be shaped before implementation authority exists.
 
+For a concrete example of the three files created during bootstrap, read
+[Worked Authority Bootstrap Example](worked-authority-bootstrap-example.md).
+
 ## Start Here
 
 For a brand-new project with no authority files, first choose whether you want
@@ -26,7 +29,8 @@ tw-auto "bootstrap TraceWeaver authority for this project from <source brief>; r
 
 That command intentionally stops after the authority files exist. It does not
 continue into `tw-strategy`, `tw-ideate`, `tw-grill`, `tw-brainstorm`, or
-`tw-plan`.
+`tw-plan`. The stop is expected behavior: a fresh project has source evidence,
+but not reviewed implementation authority yet.
 
 For a big project where the implementation shape is not obvious, use the
 large-project prompt instead:

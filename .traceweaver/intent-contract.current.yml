@@ -20,6 +20,6 @@ validation_closure:
   closure_ratio: "0/75"
 authority_reviewability:
   longest_authority_line_chars: 8803
-  authority_lines_over_2000_chars: 38
+  authority_lines_over_2000_chars: 40
   human_reviewable: false
 open_gaps: 0

@@ -1,6 +1,22 @@
 # Shipping Workflow
 
-This file contains the shipping workflow (Phase 3-4). It is loaded when all Phase 2 tasks are complete and execution transitions to quality check.
+This file contains the upstream CE shipping workflow (Phase 3-4). In
+TraceWeaver packaged mode it is reference material only unless a controlled
+TraceWeaver publication route has already authorized the exact publication
+target.
+
+## TraceWeaver Packaged Alpha Hold
+
+Do not stage files, create commits, push branches, open or update PRs, mutate
+remotes, load `ce-commit`, or load `ce-commit-push-pr` from this reference
+unless the controlled TraceWeaver publication route has already passed
+authority, traceability, verification, review, staged-tree, credential, remote,
+and human-confirmation gates for that exact target.
+
+When this file is consulted without that publication authorization, use Phase 3
+only to prepare a held publication handoff: changed files, validation performed,
+known residuals, trace evidence, proposed commit/PR text, and held claims.
+Return control to `tw-work` or `tw-auto` before any external mutation.
 
 ## Phase 3: Quality Check
 
@@ -12,8 +28,8 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
    # Run full test suite (use project's test command)
    # Examples: bin/rails test, npm test, pytest, go test, etc.
 
-   # Run linting (per AGENTS.md)
-   # Use linting-agent before pushing to origin
+   # Run linting (per the project's configured lint command / active instructions)
+   # Use linting-agent before the held publication handoff
    ```
 
 2. **Simplify** (conditional — separate from code review tiers)
@@ -34,7 +50,7 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
 
    **2a. Review (read-only).** Invoke `ce-code-review` with `mode:agent` (and `plan:<path>` when known; add `base:<ref>` when the diff base is already resolved). Parse JSON or Actionable Findings. Do not pass `mode:autofix`.
 
-   **2b. Apply fixes (caller-owned).** Load `references/review-findings-followup.md`: filter on JSON, batch by file, dispatch fix subagents. Orchestrator merges, tests, commits. Then proceed to the Residual Work Gate.
+   **2b. Apply fixes (caller-owned).** Load `references/review-findings-followup.md`: filter on JSON, batch by file, dispatch fix subagents. Orchestrator integrates diffs without staging or committing, tests, and records the proposed publication boundary. Then proceed to the Residual Work Gate.
 
    **When Tier 1 is unavailable and Tier 2 criteria are not met:** skip a dedicated review step. Phase 2 testing, simplify (when run), lint, and Final Validation still apply. Note in the shipping summary: `Code review: skipped (no Tier 1 tool; Tier 2 criteria not met).`
 
@@ -51,17 +67,17 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
 
    After Tier 2 code review and review-findings followup, inspect the **Actionable Findings** summary (or read the run artifact at `<temporary CE code-review artifact root>/<run-id>/` if the summary was truncated). If one or more actionable `downstream-resolver` findings were not applied in followup, do not proceed to Final Validation until the user decides how to handle them.
 
-   Ask the user using the platform's blocking question tool (`AskUserQuestion` in Claude Code with `ToolSearch select:AskUserQuestion` pre-loaded if needed, `request_user_input` in Codex, `ask_user` in Gemini, `ask_user` in Pi (requires the `pi-ask-user` extension)). Fall back to numbered options in chat only when the harness genuinely lacks a blocking tool. Never silently skip the gate.
+   Ask the user using the platform's blocking question tool (`AskUserQuestion` in Claude Code with `ToolSearch select:AskUserQuestion` pre-loaded if needed, `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). Fall back to numbered options in chat only when the harness genuinely lacks a blocking tool. Never silently skip the gate.
 
    Stem: `Code review left N actionable finding(s) not yet fixed. How should the agent proceed?`
 
    Options (four or fewer, self-contained labels):
-   - `Apply/fix now` — load `references/review-findings-followup.md`, dispatch batched fix subagents for remaining eligible findings, run tests, commit if needed; optionally re-run `ce-code-review` only after the diff changed materially.
-   - `File tickets via project tracker` — load `references/tracker-defer.md` in Interactive mode; the agent files tickets in the project's detected tracker (or `gh` fallback, or leaves them in the report if no sink exists) and proceeds to Final Validation.
-   - `Accept and proceed` — record the residual findings verbatim in a durable "Known Residuals" sink before shipping. If a PR will be created or updated in Phase 4, include them in the PR description's "Known Residuals" section (the agent owns this when calling `ce-commit-push-pr`). If the user later chooses the no-PR `ce-commit` path, create `docs/residual-review-findings/<branch-or-head-sha>.md`, include the accepted findings and source review-run context, stage it with the implementation commit, and mention the file path in the final summary. The user has acknowledged the risk, but the findings must not live only in the transient session.
+   - `Apply/fix now` — load `references/review-findings-followup.md`, dispatch batched fix subagents for remaining eligible findings, run tests, and record the changed files plus proposed commit text; optionally re-run `ce-code-review` only after the diff changed materially.
+   - `File tickets via project tracker` — load `references/tracker-defer.md` in Interactive mode; the agent files tickets in the project's detected tracker (or `gh` fallback, or leaves them in the report if no sink exists) and proceeds to Final Validation only when tracker mutation is authorized by the active workflow.
+   - `Accept and proceed` — record the residual findings verbatim in a durable "Known Residuals" sink before the held publication handoff. If a later controlled PR route is approved, include them in the PR description's "Known Residuals" section. If a later no-PR commit path is approved, create `docs/residual-review-findings/<branch-or-head-sha>.md`, include the accepted findings and source review-run context, and mention the file path in the final summary. The user has acknowledged the risk, but the findings must not live only in the transient session.
    - `Stop — do not ship` — abort the shipping workflow. The user will handle findings manually before re-invoking.
 
-   Skip this gate entirely when the review reported `Actionable findings: none.` (and followup applied everything mechanical) or when only Tier 1 was used. Do not proceed past this gate on an `Accept and proceed` decision until the agent has recorded whether the durable sink is `PR Known Residuals` or `docs/residual-review-findings/<branch-or-head-sha>.md`.
+   Skip this gate entirely when the review reported `Actionable findings: none.` (and followup applied everything mechanical) or when only Tier 1 was used. Do not proceed past this gate on an `Accept and proceed` decision until the agent has recorded the durable sink that a later controlled publication route would use.
 
 5. **Final Validation**
    - All tasks marked completed
@@ -74,46 +90,53 @@ This file contains the shipping workflow (Phase 3-4). It is loaded when all Phas
    - If any `Deferred to Implementation` questions were noted, confirm they were resolved during execution
 
 6. **Prepare Operational Validation Plan** (REQUIRED)
-   - Add a `## Post-Deploy Monitoring & Validation` section to the PR description for every change.
+   - Draft a `## Post-Deploy Monitoring & Validation` section for the later PR description when a controlled PR route is approved.
    - Include concrete:
      - Log queries/search terms
      - Metrics or dashboards to watch
      - Expected healthy signals
      - Failure signals and rollback/mitigation trigger
      - Validation window and owner
-   - If there is truly no production/runtime impact, still include the section with: `No additional operational monitoring required` and a one-line reason.
+   - If there is truly no production/runtime impact, still include the drafted section with: `No additional operational monitoring required` and a one-line reason.
 
-## Phase 4: Ship It
+## Phase 4: Held Publication Handoff
 
-1. **Prepare Evidence Context**
+1. **Prepare Validation Context**
 
-   Do not invoke `ce-demo-reel` directly in this step. Evidence capture belongs to the PR creation or PR description update flow, where the final PR diff and description context are available.
+   Do not try to launch a dedicated CE evidence-capture workflow. Modern harnesses provide their own browser, screenshot, terminal recording, and artifact capture tools; use those directly only when the user asks or when the artifact already exists.
 
-   Note whether the completed work has observable behavior (UI rendering, CLI output, API/library behavior with a runnable example, generated artifacts, or workflow output). The `ce-commit-push-pr` skill will ask whether to capture evidence only when evidence is possible.
+   Note whether the completed work has observable behavior (UI rendering, CLI output, API/library behavior with a runnable example, generated artifacts, or workflow output), and summarize any manual validation performed. If the user supplied evidence (URL, markdown embed, local artifact path), include it in the held publication handoff for the later controlled PR route.
 
-2. **Commit and Create Pull Request**
+2. **Prepare Controlled Publication Handoff**
 
-   Load the `ce-commit-push-pr` skill to handle committing, pushing, and PR creation. The skill handles convention detection, branch safety, logical commit splitting, adaptive PR descriptions, and attribution badges.
+   Do not load `ce-commit-push-pr` or `ce-commit` from TraceWeaver packaged
+   `ce-work` unless the controlled TraceWeaver publication route has already
+   authorized that exact target. Instead, prepare the publication handoff for
+   `tw-work` or `tw-auto`.
 
-   When providing context for the PR description, include:
+   Handoff context should include:
    - The plan's summary and key decisions
    - Testing notes (tests added/modified, manual testing performed)
-   - Evidence context from step 1, so `ce-commit-push-pr` can decide whether to ask about capturing evidence
+   - Evidence context from step 1
    - Figma design link (if applicable)
    - The Post-Deploy Monitoring & Validation section (see Phase 3 Step 6)
-   - Any "Known Residuals" accepted in the Phase 3 Residual Work Gate, rendered as a dedicated section in the PR body with severity, file:line, and title per finding
+   - Any "Known Residuals" accepted in the Phase 3 Residual Work Gate, rendered as a dedicated section with severity, file:line, and title per finding
+   - Exact changed-file list and proposed commit/PR text
+   - Held claims and required next TraceWeaver gate
 
-   If the user prefers to commit without creating a PR, load the `ce-commit` skill instead.
+   If the user later prefers to commit without creating a PR, route through the
+   TraceWeaver-controlled `tw-commit` wrapper instead of loading raw CE commit
+   tooling from this reference.
 
 3. **Notify User**
    - Summarize what was completed
-   - Link to PR (if one was created)
+   - State that no PR was created by this held handoff
    - Note any follow-up work needed
    - Suggest next steps if applicable
 
 ## Quality Checklist
 
-Before creating PR, verify:
+Before controlled publication handoff, verify:
 
 - [ ] All clarifying questions asked and answered
 - [ ] All tasks marked completed
@@ -121,13 +144,13 @@ Before creating PR, verify:
 - [ ] Linting passes (use linting-agent)
 - [ ] Code follows existing patterns
 - [ ] Figma designs match implementation (if applicable)
-- [ ] Evidence decision handled by `ce-commit-push-pr` when the change has observable behavior
-- [ ] Commit messages follow conventional format
-- [ ] PR description includes Post-Deploy Monitoring & Validation section (or explicit no-impact rationale)
+- [ ] Validation/evidence context is recorded for the later controlled publication route when the change has observable behavior
+- [ ] Proposed commit messages follow conventional format
+- [ ] Draft PR description context includes Post-Deploy Monitoring & Validation section (or explicit no-impact rationale)
 - [ ] Simplify: `ce-simplify-code` when diff >=30 lines (or skipped with reason)
 - [ ] Code review: Tier 1 completed, or Tier 2 when escalated, or skipped (no Tier 1 + Tier 2 criteria not met — note in summary)
-- [ ] PR description includes summary, testing notes, and evidence when captured
-- [ ] PR description includes Compound Engineered badge with accurate model and harness
+- [ ] Draft PR description context includes summary, testing notes, and evidence when captured
+- [ ] Any later PR badge/attribution is left to the controlled publication route
 
 ## Code Review Tiers
 
