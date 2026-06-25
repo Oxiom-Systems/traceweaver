@@ -12,10 +12,7 @@ full workflow, reference files, or proof trail.
 
 | Need | Read |
 | --- | --- |
-| Watch the intro | [TraceWeaver prompt-to-proof video](https://youtu.be/Vtpzw_27tbo?si=I2Myn2EXu9TfXOdl) |
-| Watch the setup walkthrough | [TraceWeaver setup video](https://youtu.be/7ZK5m8_VvZA?si=z-IZw-l5ChIbrA6C) |
 | Understand the idea in a few minutes | [TraceWeaver: From Prompt To Proof](guides/traceweaver-from-prompt-to-proof.md) |
-| See what the first authority files should contain | [Worked authority bootstrap example](guides/worked-authority-bootstrap-example.md) |
 | Install, update, and use the plugin | [How to use TraceWeaver](guides/using-traceweaver.md) |
 | Start a blank project safely | [Starting a new project](guides/starting-a-new-project-with-traceweaver.md) |
 | Audit an existing project | [How to use TraceWeaver: Audit an existing codebase](guides/using-traceweaver.md#audit-an-existing-codebase) |
@@ -26,7 +23,6 @@ full workflow, reference files, or proof trail.
 | Topic | Link |
 | --- | --- |
 | Quick start and first commands | [How to use TraceWeaver](guides/using-traceweaver.md#first-command) |
-| Worked bootstrap file contents | [Worked authority bootstrap example](guides/worked-authority-bootstrap-example.md) |
 | New project routing | [Starting a new project](guides/starting-a-new-project-with-traceweaver.md) |
 | Normal TraceWeaver loop | [How to use TraceWeaver](guides/using-traceweaver.md#the-traceweaver-loop) |
 | Authority files | [How to use TraceWeaver](guides/using-traceweaver.md#authority-files) |

@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "ed8d3bf11b8ea550ec22b952d9e355bcbdf80c12d237fd65c5321ea383b8d491"
+      "sha256": "5b15b9ddeea88c6ba26dcedf5d5c215b201f02332fc02ebb1348ab94866e07d1"
     },
     {
       "path": "requirements.md",
@@ -28,7 +28,7 @@
     "result_records": 38,
     "verification_records": 73,
     "validation_records": 18,
-    "code_anchor_records": 264,
+    "code_anchor_records": 262,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 75,
     "structured_acceptance_missing_requirements": 74,
@@ -666,8 +666,7 @@
       "trace_ids": [
         "TRACE-TW-009",
         "TRACE-TW-011",
-        "TRACE-TW-012",
-        "TRACE-TW-053"
+        "TRACE-TW-012"
       ]
     },
     {
@@ -1769,11 +1768,11 @@
       "id": "TRACE-TW-053",
       "owner": "Oxiom Systems",
       "needs": "NEED-TW-004; NEED-TW-005; NEED-TW-006; NEED-TW-007; NEED-TW-008",
-      "requirements": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-042; REQ-TW-043; REQ-TW-065",
+      "requirements": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
       "artifact": "ART-TW-067",
       "verification": "VER-TW-068; VER-TW-076",
       "validation": "VAL-TW-015",
-      "status": "Implementation added; verification passed; scoped review passed; PR #42 merged; 0.2.6 release metadata prepared after upstream CE fetch/currentness check; 2026-06-25 bootstrap-doc clarity plus intro/setup video update verification and scoped doc review passed; tag and GitHub Release remain routed through main version-bump workflow",
+      "status": "Implementation added; verification passed; scoped review passed; PR #42 merged; 0.2.6 release metadata prepared after upstream CE fetch/currentness check; tag and GitHub Release remain routed through main version-bump workflow",
       "next_step": "Keep website publication, runtime, clean replacement, automatic CE 3.14.2 refresh, and future release tags/GitHub Releases beyond explicitly confirmed controlled targets held."
     },
     {
@@ -3185,14 +3184,14 @@
     },
     {
       "ID": "VER-TW-068",
-      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-042; REQ-TW-043; REQ-TW-065",
-      "Method": "First-time documentation, intro and setup videos, public guide, website integration, and trace evidence verification",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "Method": "First-time documentation, public guide, website integration, and trace evidence verification",
       "Procedure / Command": "`scripts/traceweaver-generate-traceability-views --root .`; `scripts/traceweaver-smoke-traceability-generated-views`; implementation-mode code-anchor scanner over changed TraceWeaver docs/evidence; `TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery`; `claude plugin validate --strict .`; `git diff --check`; Oxiom Systems website local static/render check",
-      "Tested Ref": "Root README, intro video, setup video, public guide, docs landing page, usage guide, worked authority bootstrap example, plan, validation record, trace record, Intent Contract scope, generated views, and Oxiom Systems website guide section",
-      "Result": "Passed for original first-time guide and refreshed 2026-06-24 README/docs landing-page record. Generated views and drift smoke passed; scoped implementation-mode code-anchor scanner passed with `code_traceability_findings=0`; Codex discovery smoke passed with runtime execution disabled; Claude strict validation passed; diff whitespace check passed; local docs landing review passed. 2026-06-25 bootstrap-doc clarity plus intro/setup video updates passed `git diff --check`, generated-view refresh, generated-view smoke, scoped implementation-mode code-anchor scanner with `code_traceability_findings=0`, and scoped doc review `TW-DOC-REVIEW-2026-06-25-FIRST-TIME-BOOTSTRAP-DOCS-CLARITY-CLEAN-001`.",
-      "Evidence Path": "`README.md`; `docs/README.md`; `docs/guides/using-traceweaver.md`; `docs/guides/worked-authority-bootstrap-example.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; `.traceweaver/trace-records/2026-06-24-readme-docs-landing-doc-review.yml`; `.traceweaver/trace-records/2026-06-25-first-time-bootstrap-docs-clarity.yml`; generated views; Oxiom Systems website source; redacted local desktop/mobile render screenshots",
-      "Date / Session": "2026-06-25",
-      "Notes": "Verification and scoped doc review passed for bootstrap-doc clarity plus intro/setup video updates; no release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, website publication, automatic CE 3.14.2 refresh, or autonomous-publication claim is accepted."
+      "Tested Ref": "Root README, public guide, docs landing page, usage guide, plan, validation record, trace record, Intent Contract scope, generated views, and Oxiom Systems website guide section",
+      "Result": "Passed for original first-time guide and refreshed 2026-06-24 README/docs landing-page record. Generated views and drift smoke passed; scoped implementation-mode code-anchor scanner passed with `code_traceability_findings=0`; Codex discovery smoke passed with runtime execution disabled; Claude strict validation passed; diff whitespace check passed; local docs landing review passed.",
+      "Evidence Path": "`README.md`; `docs/README.md`; `docs/guides/using-traceweaver.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; `.traceweaver/trace-records/2026-06-24-readme-docs-landing-doc-review.yml`; generated views; Oxiom Systems website source; redacted local desktop/mobile render screenshots",
+      "Date / Session": "2026-06-24",
+      "Notes": "Verification passed for docs landing review state; no release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, website publication, automatic CE 3.14.2 refresh, or autonomous-publication claim is accepted."
     },
     {
       "ID": "VER-TW-070",
@@ -3920,14 +3919,6 @@
       "Role": "deep-usage-guide"
     },
     {
-      "Artifact Path": "docs/guides/worked-authority-bootstrap-example.md",
-      "Requirement": "REQ-TW-042; REQ-TW-015",
-      "Trace": "TRACE-TW-021; TRACE-TW-053",
-      "Verification": "VER-TW-030; VER-TW-068",
-      "Anchor Type": "file-role",
-      "Role": "worked-bootstrap-example"
-    },
-    {
       "Artifact Path": "docs/guides/traceweaver-from-prompt-to-proof.md",
       "Requirement": "REQ-TW-021; REQ-TW-041; REQ-TW-065",
       "Trace": "TRACE-TW-053",
@@ -3966,14 +3957,6 @@
       "Verification": "VER-TW-068",
       "Anchor Type": "trace-record",
       "Role": "readme-docs-landing-doc-review-record"
-    },
-    {
-      "Artifact Path": ".traceweaver/trace-records/2026-06-25-first-time-bootstrap-docs-clarity.yml",
-      "Requirement": "REQ-TW-042; REQ-TW-015",
-      "Trace": "TRACE-TW-021; TRACE-TW-053",
-      "Verification": "VER-TW-030; VER-TW-068",
-      "Anchor Type": "trace-record",
-      "Role": "first-time-bootstrap-docs-clarity"
     },
     {
       "Artifact Path": ".traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml",
