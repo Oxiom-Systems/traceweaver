@@ -165,6 +165,41 @@ function screenVersion(options) {
   }
 }
 
+const HTML_ESCAPE = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  "\"": "&quot;",
+  "'": "&#39;",
+}
+
+function escapeHtml(value) {
+  return String(value).replace(/[&<>"']/g, (char) => HTML_ESCAPE[char])
+}
+
+function screenDocument(html) {
+  if (isFullDocument(html)) return html
+  return `<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #fff; color: #1f2328; }
+  </style>
+</head>
+<body>
+${html}
+</body>
+</html>`
+}
+
+function sandboxedScreen(screen, html) {
+  const screenName = path.basename(screen)
+  const title = `CE Brainstorm Visual Probe: ${screenName}`
+  return `<iframe class="visual-probe-frame" title="${escapeHtml(title)}" sandbox="" referrerpolicy="no-referrer" srcdoc="${escapeHtml(screenDocument(html))}"></iframe>`
+}
+
 function refreshScript(options) {
   const initialVersion = JSON.stringify(screenVersion(options))
   return `<script>
@@ -201,6 +236,7 @@ function wrapFragment(options, content) {
     body { margin: 0; font-family: system-ui, -apple-system, BlinkMacSystemFont, sans-serif; background: #f7f7f8; color: #1f2328; }
     header { padding: 10px 18px; border-bottom: 1px solid #d8dee4; background: #fff; color: #57606a; font-size: 13px; }
     main { padding: 24px; }
+    .visual-probe-frame { display: block; width: 100%; min-height: calc(100vh - 98px); border: 0; background: #fff; }
   </style>
 </head>
 <body>
@@ -208,14 +244,7 @@ function wrapFragment(options, content) {
   <main>${content}</main>
   ${refreshScript(options)}
 </body>
-</html>`
-}
-
-function injectRefresh(options, html) {
-  if (html.includes("</body>")) {
-    return html.replace("</body>", `${refreshScript(options)}\n</body>`)
-  }
-  return `${html}\n${refreshScript(options)}`
+  </html>`
 }
 
 function renderPage(options) {
@@ -224,7 +253,7 @@ function renderPage(options) {
     return wrapFragment(options, "<h1>Waiting for a visual probe...</h1><p>The agent will update this page when a sketch is ready.</p>")
   }
   const html = fs.readFileSync(screen, "utf8")
-  return isFullDocument(html) ? injectRefresh(options, html) : wrapFragment(options, html)
+  return wrapFragment(options, sandboxedScreen(screen, html))
 }
 
 function safeFileResponse(options, req, res) {
@@ -233,6 +262,11 @@ function safeFileResponse(options, req, res) {
   if (!fs.existsSync(filePath)) {
     res.writeHead(404)
     res.end("Not found")
+    return
+  }
+  if (path.extname(filePath).toLowerCase() === ".html") {
+    res.writeHead(403, { "Content-Type": "text/plain; charset=utf-8" })
+    res.end("HTML screens are rendered through the sandboxed preview page.")
     return
   }
   res.writeHead(200, { "Content-Type": contentType(filePath) })

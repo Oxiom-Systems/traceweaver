@@ -168,6 +168,9 @@ verification_observed:
   - result: pass
     command: scoped PR-ready file boundary generation
     observed: pr_ready_staging_files=107; excluded_untracked_artifacts=1; pycache_in_staging=0; session_history_files=4; artifacts/social/traceweaver-html5-slides/animated-render/traceweaver-prompt-to-proof-html5-animated-video.mp4 excluded
+  - result: pass
+    command: PR 44 CodeQL stored-XSS repair
+    observed: plugins/traceweaver-core/skills/ce-brainstorm/scripts/visual-probe-server.js now renders stored screen HTML through a sandboxed iframe boundary, blocks direct /files/*.html serving, and records refreshed selected-file hash e0c6b86dc0e578faead1fb887b439d5d8f12896814d7a212dfdc20d32bf43a98
 
 pr_readiness_closure:
   date: 2026-06-24
@@ -245,6 +248,13 @@ publication_route_preflight:
     - active-host selected CE currentness for refreshed CE skills
     - ce-sessions currentness with CE 3.14.3
     - publication beyond the controlled draft PR route
+  codeql_followup:
+    date: 2026-06-25
+    pr: 44
+    alert: stored cross-site scripting in ce-brainstorm visual probe server
+    file: plugins/traceweaver-core/skills/ce-brainstorm/scripts/visual-probe-server.js
+    mitigation: stored screen HTML is escaped into sandboxed iframe srcdoc; direct HTML file serving from /files is blocked
+    selected_file_hash_sha256: e0c6b86dc0e578faead1fb887b439d5d8f12896814d7a212dfdc20d32bf43a98
 
 next_step: >
   The local package is ready for the controlled PR route only. Next command:
