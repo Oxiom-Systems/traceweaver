@@ -194,10 +194,24 @@ ${html}
 </html>`
 }
 
-function sandboxedScreen(screen, html) {
+function visualProbeFrame(screen) {
   const screenName = path.basename(screen)
   const title = `CE Brainstorm Visual Probe: ${screenName}`
-  return `<iframe class="visual-probe-frame" title="${escapeHtml(title)}" sandbox="" referrerpolicy="no-referrer" srcdoc="${escapeHtml(screenDocument(html))}"></iframe>`
+  return `<iframe id="visual-probe-frame" class="visual-probe-frame" title="${escapeHtml(title)}" sandbox="" referrerpolicy="no-referrer"></iframe>`
+}
+
+function screenPayload(options) {
+  const screen = newestScreen(options)
+  if (!screen) {
+    return {
+      screen: null,
+      html: screenDocument("<h1>Waiting for a visual probe...</h1><p>The agent will update this page when a sketch is ready.</p>"),
+    }
+  }
+  return {
+    screen: path.basename(screen),
+    html: screenDocument(fs.readFileSync(screen, "utf8")),
+  }
 }
 
 function refreshScript(options) {
@@ -205,6 +219,18 @@ function refreshScript(options) {
   return `<script>
 (function(){
   var currentVersion = ${initialVersion};
+  async function loadVisualProbeScreen() {
+    var frame = document.getElementById("visual-probe-frame");
+    if (!frame) return;
+    try {
+      var response = await fetch("/screen", { cache: "no-store" });
+      if (!response.ok) return;
+      var payload = await response.json();
+      frame.srcdoc = payload.html;
+    } catch (error) {
+      // Keep the current sketch visible if the transient screen load fails.
+    }
+  }
   function key(version) {
     return String(version && version.screen) + ":" + String(version && version.mtimeMs);
   }
@@ -220,6 +246,7 @@ function refreshScript(options) {
       // Keep the current sketch visible if the transient version check fails.
     }
   }
+  loadVisualProbeScreen();
   setInterval(checkForVisualProbeUpdate, 1000);
 })();
 </script>`
@@ -252,8 +279,7 @@ function renderPage(options) {
   if (!screen) {
     return wrapFragment(options, "<h1>Waiting for a visual probe...</h1><p>The agent will update this page when a sketch is ready.</p>")
   }
-  const html = fs.readFileSync(screen, "utf8")
-  return wrapFragment(options, sandboxedScreen(screen, html))
+  return wrapFragment(options, visualProbeFrame(screen))
 }
 
 function safeFileResponse(options, req, res) {
@@ -357,6 +383,15 @@ async function serve(options) {
         "Cache-Control": "no-store",
       })
       res.end(`${JSON.stringify(screenVersion(options))}\n`)
+      return
+    }
+    if (req.method === "GET" && req.url === "/screen") {
+      res.writeHead(200, {
+        "Content-Type": "application/json; charset=utf-8",
+        "Cache-Control": "no-store",
+        "X-Content-Type-Options": "nosniff",
+      })
+      res.end(`${JSON.stringify(screenPayload(options))}\n`)
       return
     }
     if (req.method === "GET" && req.url.startsWith("/files/")) {

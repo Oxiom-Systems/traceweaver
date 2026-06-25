@@ -170,7 +170,7 @@ verification_observed:
     observed: pr_ready_staging_files=107; excluded_untracked_artifacts=1; pycache_in_staging=0; session_history_files=4; artifacts/social/traceweaver-html5-slides/animated-render/traceweaver-prompt-to-proof-html5-animated-video.mp4 excluded
   - result: pass
     command: PR 44 CodeQL stored-XSS repair
-    observed: plugins/traceweaver-core/skills/ce-brainstorm/scripts/visual-probe-server.js now renders stored screen HTML through a sandboxed iframe boundary, blocks direct /files/*.html serving, and records refreshed selected-file hash e0c6b86dc0e578faead1fb887b439d5d8f12896814d7a212dfdc20d32bf43a98
+    observed: plugins/traceweaver-core/skills/ce-brainstorm/scripts/visual-probe-server.js now keeps stored screen HTML out of the server-rendered page, loads it through JSON into a sandboxed iframe boundary, blocks direct /files/*.html serving, and records refreshed selected-file hash 6eae560c041df587e185da685d551b6a5d0a6e34e90dd53b5b29a9911380b978
 
 pr_readiness_closure:
   date: 2026-06-24
@@ -253,8 +253,8 @@ publication_route_preflight:
     pr: 44
     alert: stored cross-site scripting in ce-brainstorm visual probe server
     file: plugins/traceweaver-core/skills/ce-brainstorm/scripts/visual-probe-server.js
-    mitigation: stored screen HTML is escaped into sandboxed iframe srcdoc; direct HTML file serving from /files is blocked
-    selected_file_hash_sha256: e0c6b86dc0e578faead1fb887b439d5d8f12896814d7a212dfdc20d32bf43a98
+    mitigation: stored screen HTML is not embedded in the server-rendered page; the client loads it from JSON into a sandboxed iframe srcdoc; direct HTML file serving from /files is blocked
+    selected_file_hash_sha256: 6eae560c041df587e185da685d551b6a5d0a6e34e90dd53b5b29a9911380b978
 
 next_step: >
   The local package is ready for the controlled PR route only. Next command:
