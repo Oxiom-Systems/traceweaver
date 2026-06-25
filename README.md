@@ -23,7 +23,38 @@ install/discovery metadata. Runtime-driver binding, enforcing mode, clean CE
 replacement, slash-command support, unconstrained-host support, and autonomous
 publication remain held until separate evidence gates pass.
 
+## Intro Video
+
+<a href="https://youtu.be/Vtpzw_27tbo?si=I2Myn2EXu9TfXOdl">
+  <img src="https://img.youtube.com/vi/Vtpzw_27tbo/hqdefault.jpg" alt="TraceWeaver prompt-to-proof workflow for AI coding agents" width="640">
+</a>
+
+Watch the intro: how TraceWeaver moves agent work from prompt to proof without
+turning assumptions into authority.
+
+## Why It Exists
+
+The failure mode is familiar: someone asks an agent to "add export", the agent
+builds a CSV path, tests pass, and the change looks complete. Later the team
+discovers the stakeholder meant monthly invoice totals, while the agent assumed
+an admin export of every customer field. The code works, but the authority for
+the behavior was never visible.
+
+TraceWeaver calls that missing link proof of authority. For meaningful work,
+the agent should be able to point at the stakeholder intent, approved
+requirement or approved exception, verification method, validation question,
+and current baseline before treating the work as ready.
+
 ## Get Started
+
+### Setup Video
+
+<a href="https://youtu.be/7ZK5m8_VvZA?si=z-IZw-l5ChIbrA6C">
+  <img src="https://img.youtube.com/vi/7ZK5m8_VvZA/hqdefault.jpg" alt="TraceWeaver setup guide: install, bootstrap, and run the first cycle" width="640">
+</a>
+
+Watch the setup guide: install TraceWeaver, bootstrap authority, and run the
+first controlled cycle.
 
 ### Codex
 
@@ -66,6 +97,12 @@ Blank project:
 tw-auto "bootstrap TraceWeaver authority for this project"
 ```
 
+If the project has no authority files yet, bootstrap mode is expected to draft
+them and stop for review. That stop is not a failure; it is the guardrail that
+keeps a prompt from becoming implementation authority by accident. See the
+[worked bootstrap example](docs/guides/worked-authority-bootstrap-example.md)
+for the minimum file shape.
+
 Existing codebase:
 
 ```text
@@ -105,11 +142,17 @@ TraceWeaver expects these project authority files:
 | `.traceweaver/intent-contract.yml` | Current project authority contract: baseline hash, approved scope, active gate, and held claims. |
 | `.traceweaver/trace-records/` | Evidence records for tasks, reviews, audits, validation runs, and held conditions. |
 
+Use the [worked bootstrap example](docs/guides/worked-authority-bootstrap-example.md)
+when you want to see what belongs in the first three files before reading the
+full reference templates.
+
 ## Documentation
 
-Start with the docs landing page:
+This README is the short entry point. The complete docs live under
+[`docs/`](docs/README.md):
 
 - [Documentation index](docs/README.md)
+- [Worked authority bootstrap example](docs/guides/worked-authority-bootstrap-example.md)
 - [How to use TraceWeaver](docs/guides/using-traceweaver.md)
 - [Starting a new project](docs/guides/starting-a-new-project-with-traceweaver.md)
 - [TraceWeaver: From Prompt To Proof](docs/guides/traceweaver-from-prompt-to-proof.md)
