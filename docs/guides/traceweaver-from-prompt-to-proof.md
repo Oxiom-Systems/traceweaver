@@ -13,6 +13,15 @@ TraceWeaver is the control layer for that chain. It turns loose agent activity
 into a file-based workflow for intent, authority, traceability, verification,
 validation, and held claims.
 
+## Intro Video
+
+<a href="https://youtu.be/Vtpzw_27tbo?si=I2Myn2EXu9TfXOdl">
+  <img src="https://img.youtube.com/vi/Vtpzw_27tbo/hqdefault.jpg" alt="TraceWeaver prompt-to-proof workflow for AI coding agents" width="640">
+</a>
+
+Watch the intro: how TraceWeaver moves agent work from prompt to proof without
+turning assumptions into authority.
+
 ## Why TraceWeaver Exists
 
 Prompt-only work often looks complete because the code runs. That is not enough
@@ -53,7 +62,7 @@ records under `.traceweaver/`.
 ## What A First-Time User Does
 
 1. Install the TraceWeaver Core plugin for Codex or Claude Code, or use the
-   0.2.5 Antigravity metadata for static local install/discovery only.
+   0.2.7 Antigravity metadata for static local install/discovery only.
 2. In a blank project, use the new-project guide to choose the right route for
    the project size:
 
@@ -104,7 +113,7 @@ instead of letting it leak into release notes or customer-facing copy.
 
 ## Current Alpha Boundary
 
-TraceWeaver Core `0.2.5` is an alpha advisory plugin. It can guide first-time
+TraceWeaver Core `0.2.7` is an alpha advisory plugin. It can guide first-time
 authority setup, requirements review, planning, work handoffs, traceability
 checks, audits, and controlled review flows in Codex and Claude Code.
 Antigravity support is limited to static local install/discovery metadata until

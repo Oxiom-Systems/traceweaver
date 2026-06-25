@@ -1,0 +1,206 @@
+trace_record_id: TW-TRACE-RECORD-2026-06-25-PLUGIN-0.2.7-COMBINED-RELEASE-METADATA-001
+record_type: implementation_trace
+created_at: "2026-06-25"
+owner: Oxiom Systems
+status: release_0_2_7_combined_pr44_pr45_metadata_prepared_publication_held
+
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_source: requirements.md
+baseline_hash_sha256: 4cec2a1b5bc27729ac433a6522ca144a47908141227c92156b8700260a16b78a
+intent_contract: .traceweaver/intent-contract.yml
+
+requirements:
+  - REQ-TW-015
+  - REQ-TW-016
+  - REQ-TW-017
+  - REQ-TW-018
+  - REQ-TW-020
+  - REQ-TW-021
+  - REQ-TW-023
+  - REQ-TW-029
+  - REQ-TW-041
+  - REQ-TW-042
+  - REQ-TW-043
+  - REQ-TW-051
+  - REQ-TW-052
+  - REQ-TW-059
+  - REQ-TW-060
+  - REQ-TW-065
+  - REQ-TW-068
+trace_ids:
+  - TRACE-TW-005
+  - TRACE-TW-009
+  - TRACE-TW-010
+  - TRACE-TW-046
+  - TRACE-TW-053
+  - TRACE-TW-054
+verification_ids:
+  - VER-TW-009
+  - VER-TW-010
+  - VER-TW-012
+  - VER-TW-068
+  - VER-TW-069
+  - VER-TW-074
+  - VER-TW-076
+  - VER-TW-077
+validation_ids:
+  - VAL-TW-007
+  - VAL-TW-009
+  - VAL-TW-015
+  - VAL-TW-016
+
+combined_inputs:
+  pr_44:
+    url: https://github.com/Oxiom-Systems/traceweaver/pull/44
+    head_branch: codex/ce-3.14.3-selected-refresh-hold-sessions
+    head_sha: 6469e4dfd4cd3141484eebf36e8d1b1641ba0e74
+    scope: selected_ce_3_14_3_refresh_with_ce_sessions_held
+    check_status_at_prep: pass
+  pr_45:
+    url: https://github.com/Oxiom-Systems/traceweaver/pull/45
+    head_branch: codex/first-time-docs-bootstrap-video
+    head_sha: b997149122d5c8be8dbf32b7caac5943f9efd6dd
+    scope: first_time_bootstrap_clarity_intro_setup_video_updates
+    check_status_at_prep: smoke_failed_snapshot_drift_local_fix_prepared
+    smoke_failure_root_cause: >
+      PR #45-only smoke failed because .traceweaver/intent-contract.current.yml
+      was stale at authority_lines_over_2000_chars 38 instead of the PR
+      #45-only value 39. The combined 0.2.7 release-prep snapshot adds this
+      release metadata record and now records the combined value 40.
+
+scope:
+  - README.md
+  - docs/README.md
+  - docs/guides/using-traceweaver.md
+  - docs/guides/starting-a-new-project-with-traceweaver.md
+  - docs/guides/worked-authority-bootstrap-example.md
+  - docs/guides/traceweaver-from-prompt-to-proof.md
+  - plugins/traceweaver-core/README.md
+  - CHANGELOG.md
+  - .claude-plugin/marketplace.json
+  - plugins/traceweaver-core/.codex-plugin/plugin.json
+  - plugins/traceweaver-core/.claude-plugin/plugin.json
+  - plugins/traceweaver-core/.antigravity-plugin/plugin.json
+  - plugins/traceweaver-core/.cursor-plugin/plugin.json
+  - plugins/traceweaver-core/references/ce-upstream-source-inventory.md
+  - docs/validation/traceweaver-core-11-ce-runtime-inventory.md
+  - .traceweaver/intent-contract.current.yml
+  - .traceweaver/trace-records/2026-06-24-ce-3.14.3-selected-refresh-hold-sessions.yml
+  - .traceweaver/trace-records/2026-06-25-first-time-bootstrap-docs-clarity.yml
+  - .traceweaver/trace-records/2026-06-25-plugin-0.2.7-combined-release-metadata.yml
+  - traceability-matrix.md
+  - docs/generated/traceability-dashboard.md
+  - docs/generated/traceability-data.json
+  - docs/generated/traceability-graph.mmd
+
+release:
+  version: "0.2.7"
+  intended_tag: traceweaver-core--v0.2.7
+  intended_release_name: TraceWeaver Core 0.2.7
+  previous_published_release_tag: traceweaver-core--v0.2.6
+  previous_published_release_commit: 4a0d8cfc14ea6981c0b7777b1391b2890a24e1b3
+  release_reason: combined selected CE 3.14.3 refresh plus first-time onboarding clarity release
+  release_route: >
+    Merge a reviewed version-bump PR into main after PR #44 and PR #45 are
+    accepted. The repository release workflow creates traceweaver-core--v0.2.7
+    and the GitHub Release from the CHANGELOG section when the coherent 0.2.7
+    manifest bump lands on main.
+
+ce_selected_surface:
+  refreshed_to_version: 3.14.3
+  refreshed_to_tag: compound-engineering-v3.14.3
+  refreshed_to_commit: e176a6db46b3de9c4e724a3ab5d7dd1d0bf60a33
+  observed_upstream_main_commit: 1284290af27139c2df192488099626688fd4898b
+  ce_sessions_status: held_at_prior_reviewed_selected_surface
+  upstream_only_skills_status: held_unselected
+
+verification_required:
+  - JSON validation for marketplace metadata and peer plugin manifests
+  - YAML validation for release, CE refresh, and onboarding trace records
+  - Claude plugin validation and tag dry-run for traceweaver-core--v0.2.7
+  - Codex discovery smoke with runtime execution disabled
+  - Antigravity discovery smoke
+  - controlled publication-route smoke
+  - CE closure audit
+  - traceability generated-view regeneration and drift smoke
+  - verify gate snapshot refresh and drift check
+  - implementation-mode code-anchor scan for changed release/docs/evidence files
+  - git diff whitespace check
+  - read-only tag and GitHub Release absence check before merge
+
+verification_observed:
+  status: pass_with_held_publication
+  json_manifests: pass
+  yaml_trace_records: pass
+  claude_plugin_validate_strict: pass
+  claude_plugin_tag_dry_run: pass_would_create_traceweaver_core_v0_2_7_without_mutation
+  codex_discovery_smoke: pass_runtime_execution_disabled
+  antigravity_discovery_smoke: pass
+  controlled_publication_smoke: pass_no_external_mutation
+  ce_closure_audit: pass_missing_none_untracked_none
+  generated_views_refresh: pass
+  generated_views_smoke: pass
+  verify_gate: pass_with_existing_validation_closure_and_reviewability_warnings
+  validation_closure_ratio: "0/75"
+  authority_lines_over_2000_chars: 40
+  code_traceability_smoke: pass
+  scoped_release_code_anchor_scan: pass_code_traceability_findings_0
+  git_diff_check: pass
+  local_tag_absence: pass_traceweaver_core_v0_2_7_absent
+  remote_tag_absence: pass_traceweaver_core_v0_2_7_absent
+  github_release_absence: pass_traceweaver_core_v0_2_7_absent
+  commands:
+    - for f in .claude-plugin/marketplace.json plugins/traceweaver-core/.codex-plugin/plugin.json plugins/traceweaver-core/.claude-plugin/plugin.json plugins/traceweaver-core/.antigravity-plugin/plugin.json plugins/traceweaver-core/.cursor-plugin/plugin.json; do python3 -m json.tool "$f" >/dev/null || exit 1; done
+    - ruby -ryaml -e 'ARGV.each { |f| YAML.load_file(f) }' .traceweaver/intent-contract.yml .traceweaver/trace-records/2026-06-24-ce-3.14.3-selected-refresh-hold-sessions.yml .traceweaver/trace-records/2026-06-25-first-time-bootstrap-docs-clarity.yml .traceweaver/trace-records/2026-06-25-plugin-0.2.7-combined-release-metadata.yml
+    - claude plugin validate --strict .
+    - claude plugin validate --strict plugins/traceweaver-core
+    - claude plugin tag --dry-run --force plugins/traceweaver-core
+    - TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
+    - scripts/traceweaver-smoke-antigravity-discovery
+    - scripts/traceweaver-smoke-controlled-publication
+    - ruby scripts/traceweaver-audit-ce-closure
+    - scripts/traceweaver-generate-traceability-views --root .
+    - scripts/traceweaver-smoke-traceability-generated-views
+    - scripts/traceweaver-smoke-verify --write
+    - scripts/traceweaver-smoke-verify
+    - scripts/traceweaver-smoke-code-traceability
+    - plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors --root . --mode implementation --changed-files /tmp/tw-0.2.7-release-changed-files.txt
+    - git diff --check
+    - git rev-parse -q --verify refs/tags/traceweaver-core--v0.2.7
+    - git ls-remote --exit-code --tags origin refs/tags/traceweaver-core--v0.2.7
+    - gh release view traceweaver-core--v0.2.7 --repo Oxiom-Systems/traceweaver
+
+validation_question: "Can users install TraceWeaver Core 0.2.7 from the combined PR #44/#45 release snapshot, get the selected CE 3.14.3 surface refresh and first-time onboarding clarity, and still see that runtime, clean-replacement, ce-sessions-currentness, and release-readiness claims remain held?"
+
+held_claims:
+  - tag
+  - GitHub Release
+  - deploy
+  - release-ready
+  - package-ready
+  - upstream-ready
+  - broad runtime behavior
+  - runtime-driver invocation
+  - clean CE replacement
+  - runtime-equivalent CE behavior
+  - ce-sessions currentness with CE 3.14.3
+  - upstream-only CE 3.14.3 skill packaging or wrapping
+  - R31 real-project validation closure
+  - Vestro dogfood evidence
+  - slash-command or prompt availability
+  - enforcing authority gate behavior
+  - unconstrained-host support
+  - future publication beyond the exact 0.2.7 release route
+  - autonomous publication
+
+publication_boundary:
+  publication_requested_by_user: "after this we want to cut a release for combine this pr and pr 44"
+  requested_at: "2026-06-25"
+  publication_route_status: local_release_metadata_prepared_tag_and_release_publication_held
+  stop_condition: stop_before_tag_release_publication
+  future_publication_boundary: >
+    Tag, GitHub Release, marketplace/package claims, release-ready claims,
+    broad runtime claims, clean CE replacement, runtime-equivalent CE behavior,
+    ce-sessions CE 3.14.3 currentness, upstream-only CE 3.14.3 selected
+    packaging, R31/Vestro validation, and autonomous publication remain held
+    until their own exact controlled route and evidence gates pass.
