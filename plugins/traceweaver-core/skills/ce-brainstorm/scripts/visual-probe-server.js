@@ -194,31 +194,31 @@ ${html}
 </html>`
 }
 
-function visualProbeFrame(screen) {
-  const screenName = path.basename(screen)
-  const title = `CE Brainstorm Visual Probe: ${screenName}`
-  return `<iframe id="visual-probe-frame" class="visual-probe-frame" title="${escapeHtml(title)}" sandbox="" referrerpolicy="no-referrer"></iframe>`
+function visualProbeFrame() {
+  return '<iframe id="visual-probe-frame" class="visual-probe-frame" title="CE Brainstorm Visual Probe" sandbox="" referrerpolicy="no-referrer"></iframe>'
 }
 
 function screenPayload(options) {
   const screen = newestScreen(options)
   if (!screen) {
+    const version = screenVersion(options)
     return {
       screen: null,
+      version,
       html: screenDocument("<h1>Waiting for a visual probe...</h1><p>The agent will update this page when a sketch is ready.</p>"),
     }
   }
   return {
     screen: path.basename(screen),
+    version: screenVersion(options),
     html: screenDocument(fs.readFileSync(screen, "utf8")),
   }
 }
 
-function refreshScript(options) {
-  const initialVersion = JSON.stringify(screenVersion(options))
+function refreshScript() {
   return `<script>
 (function(){
-  var currentVersion = ${initialVersion};
+  var currentVersion = null;
   async function loadVisualProbeScreen() {
     var frame = document.getElementById("visual-probe-frame");
     if (!frame) return;
@@ -227,6 +227,7 @@ function refreshScript(options) {
       if (!response.ok) return;
       var payload = await response.json();
       frame.srcdoc = payload.html;
+      currentVersion = payload.version;
     } catch (error) {
       // Keep the current sketch visible if the transient screen load fails.
     }
@@ -239,6 +240,10 @@ function refreshScript(options) {
       var response = await fetch("/version", { cache: "no-store" });
       if (!response.ok) return;
       var nextVersion = await response.json();
+      if (!currentVersion) {
+        currentVersion = nextVersion;
+        return;
+      }
       if (key(nextVersion) !== key(currentVersion)) {
         window.location.reload();
       }
@@ -269,17 +274,13 @@ function wrapFragment(options, content) {
 <body>
   <header>CE Brainstorm Visual Probe - directional sketch, reply in chat</header>
   <main>${content}</main>
-  ${refreshScript(options)}
+  ${refreshScript()}
 </body>
   </html>`
 }
 
 function renderPage(options) {
-  const screen = newestScreen(options)
-  if (!screen) {
-    return wrapFragment(options, "<h1>Waiting for a visual probe...</h1><p>The agent will update this page when a sketch is ready.</p>")
-  }
-  return wrapFragment(options, visualProbeFrame(screen))
+  return wrapFragment(options, visualProbeFrame())
 }
 
 function safeFileResponse(options, req, res) {
