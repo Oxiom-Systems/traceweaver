@@ -8,7 +8,7 @@ This content is loaded when Phase 4 begins — after the requirements document i
 
 The Phase 4 menu's visible option count varies by state: no requirements doc hides the review and Proof options, unresolved `Resolve Before Planning` hides `Plan implementation` and `Build it now`, a failing direct-to-work gate hides `Build it now`. Count the visible options for the current state and choose the rendering mode accordingly:
 
-- **4 or fewer visible:** use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex; `ask_user` in Gemini, `ask_user` in Pi (requires the `pi-ask-user` extension)). This is the default.
+- **4 or fewer visible:** use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex; `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). This is the default.
 - **5 or more visible:** render as a numbered list in chat. This is the narrow option-overflow fallback; trimming would hide legitimate choices (plan, review, Proof, build, refine, pause are all distinct destinations). Include a hint that free-form input is accepted ("Pick a number or describe what you want.") so the numbered list retains the blocking tool's open-endedness.
 
 Never silently skip the question.
@@ -47,13 +47,14 @@ Present only the options that apply. Renumber so visible options stay contiguous
 
 1. **Review and register requirements with `tw-requirements-review` (Recommended for TraceWeaver)** - Move the brainstorm output through TraceWeaver requirements quality review and authority-baseline registration before planning. Shown only when a requirements document exists.
 2. **Plan implementation with `ce-plan` (legacy/manual-continuity)** - Move to `ce-plan` for structured implementation planning without claiming TraceWeaver authority closure. Shown only when `Resolve Before Planning` is empty.
-3. **Agent review of requirements doc with `ce-doc-review`** - Dispatch reviewer agents to check the doc for coherence, feasibility, scope, and other persona-specific issues; auto-apply safe fixes; route remaining findings interactively. Shown only when a requirements document exists.
-4. **External/manual review** - Use a non-packaged review path. `ce-proof` is not part of the current TraceWeaver alpha surface.
+3. **Agent review of requirements doc with `ce-doc-review`** - Dispatch reviewer agents to check the doc for coherence, feasibility, scope, and other persona-specific issues; auto-apply safe fixes; route remaining findings interactively. Shown only when a requirements document exists **and `OUTPUT_FORMAT=md`**. Under HTML mode, surface a one-line note above the menu: `Agent review unavailable in output:html mode - ce-doc-review is markdown-only today. Switch to output:md if you want a review pass.`
+4. **External/manual review** - Use a non-packaged review path. `ce-proof` is not part of the current TraceWeaver alpha surface. Shown only when a requirements document exists **and `OUTPUT_FORMAT=md`**.
+4. **Open in browser** - Open the HTML requirements file locally for review and sharing. Shown only when a requirements document exists **and `OUTPUT_FORMAT=html`**.
 5. **Build it now with `ce-work` (legacy/manual-continuity; skip planning)** - Skip planning and move to `ce-work`; suited to lightweight, well-defined changes. Shown only when `Resolve Before Planning` is empty **and** scope is lightweight, success criteria are clear, scope boundaries are clear, and no meaningful technical or research questions remain (the "direct-to-work gate"). This does not close TraceWeaver requirements authority, traceability, verification, or validation gates.
 6. **More clarifying questions to sharpen the doc** - Keep refining scope, edge cases, constraints, and preferences through further dialogue. Always shown.
 7. **Done for now** - Pause; the requirements doc is saved and can be resumed later. Always shown.
 
-**Post-review nudge (subsequent rounds only):** If the user has already run `ce-doc-review` this session and residual P0/P1 findings remain unaddressed, add a one-line prose nudge adjacent to the menu (e.g., "Document review flagged 2 P1 findings you may want to address — pick \"Agent review of requirements doc\" to run another pass."). Reference the option by label, not number: the menu renumbers when `Resolve Before Planning` hides `Plan implementation` and `Build it now`, so a hardcoded option number can point users at the wrong action. Do not add a separate menu option; reuse the existing agent-review option.
+**Post-review nudge (subsequent rounds only):** If the user has already run `ce-doc-review` this session and residual P0/P1 findings remain unaddressed, add a one-line prose nudge adjacent to the menu (e.g., "Document review flagged 2 P1 findings you may want to address — pick \"Agent review of requirements doc\" to run another pass."). Reference the option by label, not number: the menu renumbers when `Resolve Before Planning` hides `Plan implementation` and `Build it now`, so a hardcoded option number can point users at the wrong action. Do not add a separate menu option; reuse the existing agent-review option. Suppress this nudge when `OUTPUT_FORMAT=html` because the agent-review option is hidden in that mode.
 
 #### 4.2 Handle the Selected Option
 
@@ -69,7 +70,7 @@ summary first.
 
 **If user selects "Plan implementation with `ce-plan` (legacy/manual-continuity)":**
 
-Immediately load the `ce-plan` skill in the current session. Pass the requirements document path when one exists; otherwise pass a concise summary of the finalized brainstorm decisions. Do not print the closing summary first.
+Immediately load the `ce-plan` skill in the current session. Pass the requirements document path when one exists; otherwise pass a concise summary of the finalized brainstorm decisions. When the Phase 1.1 grounding scout produced a dossier and the file still exists, also pass its path (`/tmp/compound-engineering/ce-brainstorm/<run-id>/grounding.md`) — it gives planning verified quotes with `file:line` pointers to start from instead of re-scanning the repo. Do not print the closing summary first.
 
 **If user selects "Agent review of requirements doc with `ce-doc-review`":**
 
@@ -86,11 +87,13 @@ mode. Do not print the closing summary first.
 
 **If user selects "More clarifying questions to sharpen the doc":** Return to Phase 1.3 (Collaborative Dialogue) and continue asking the user clarifying questions one at a time to further refine scope, edge cases, constraints, and preferences. Continue until the user is satisfied, then return to Phase 4. Do not show the closing summary yet.
 
-**If user selects "External/manual review" or asks for "Open in Proof" or HITL review:**
+**If user selects "External/manual review" or asks for "Open in Proof", "Publish to Proof", or HITL review:**
 
 Stop and explain that `ce-proof` is not packaged in the current TraceWeaver
 alpha. Recommend external/manual review or a future package unit that explicitly
 adds and reviews the Proof surface.
+
+**If user selects "Open in browser":** Display the absolute path to the `.html` requirements file so the user can open it locally. Where the platform exposes a browser-opening primitive (e.g., `open` on macOS, `xdg-open` on Linux, `start` on Windows), the agent may invoke it directly; otherwise print the absolute path and let the user open it. After the path is displayed (or the browser is opened), return to the Phase 4 options so the user can pick a follow-up action.
 
 **If user selects "Done for now":** Display the closing summary (see 4.3) and end the turn.
 

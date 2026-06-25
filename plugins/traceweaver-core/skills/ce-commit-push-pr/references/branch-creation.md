@@ -1,6 +1,14 @@
 <!-- TRACEWEAVER: file-role=packaged-skills-ce-commit-push-pr-references-branch-creation-md; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
 # Branch creation from default branch
 
+## TraceWeaver Packaged Alpha Hold
+
+When this reference is packaged by TraceWeaver, it is upstream reference
+material only. Do not run the commands below, create or switch branches, stash,
+stage, commit, push, or publish from `ce-commit-push-pr` unless a future
+TraceWeaver publication gate explicitly approves that exact mutation route. In
+the current packaged alpha, draft the branch/publication plan and stop.
+
 Local `<base>` may have stale commits (another session/worktree advanced it) or commits the user authored intending to branch from later. Local git can't distinguish these — ask when unpushed commits are present.
 
 ## Decision flow

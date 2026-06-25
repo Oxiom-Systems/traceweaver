@@ -13,7 +13,14 @@ gh pr view --json number -q .number
 Then fetch all feedback using the GraphQL script at [scripts/get-pr-comments](../scripts/get-pr-comments):
 
 ```bash
-bash scripts/get-pr-comments PR_NUMBER
+if [ -n "${CLAUDE_SKILL_DIR}" ] && [ -f "${CLAUDE_SKILL_DIR}/scripts/get-pr-comments" ]; then
+  SCRIPT_DIR="${CLAUDE_SKILL_DIR}/scripts"
+else
+  echo "ce-resolve-pr-feedback bundled scripts are unavailable in this harness; use the fallback gh commands below." >&2
+  exit 1
+fi
+
+bash "$SCRIPT_DIR/get-pr-comments" PR_NUMBER
 ```
 
 Returns a JSON object with three keys:
@@ -57,9 +64,9 @@ Process all three feedback types. Review threads are the primary type; PR commen
 
 ### Dispatch
 
-**For review threads** (`review_threads`): Spawn a `ce-pr-comment-resolver` agent for each new thread.
+**For review threads** (`review_threads`): Read `references/agents/pr-comment-resolver.md` and spawn a generic subagent seeded with that prompt for each new thread. Do not dispatch a standalone agent by type/name.
 
-Each agent receives:
+Each resolver subagent receives:
 - The thread ID
 - The file path and location fields: `line`, `originalLine`, `startLine`, `originalStartLine` (any can be null; outdated and file-level threads often have `line == null` and must fall back to `originalLine`)
 - The full comment text (all comments in the thread)
@@ -67,15 +74,15 @@ Each agent receives:
 - The feedback type (`review_thread`)
 - The `isOutdated` flag from the thread node (tells the agent the reported line may have drifted)
 
-**For PR comments and review bodies** (`pr_comments`, `review_bodies`): These lack file/line context. Spawn a `ce-pr-comment-resolver` agent for each actionable item. The agent receives the comment ID, body text, PR number, and feedback type (`pr_comment` or `review_body`). The agent must identify the relevant files from the comment text and the PR diff.
+**For PR comments and review bodies** (`pr_comments`, `review_bodies`): These lack file/line context. Read `references/agents/pr-comment-resolver.md` and spawn a generic subagent seeded with that prompt for each actionable item. The resolver receives the comment ID, body text, PR number, and feedback type (`pr_comment` or `review_body`). The resolver must identify the relevant files from the comment text and the PR diff.
 
-### Agent return format
+### Resolver return format
 
-Each agent returns a short summary:
+Each resolver returns a short summary:
 - **verdict**: `fixed`, `fixed-differently`, `replied`, `not-addressing`, `declined`, or `needs-human`
 - **feedback_id**: the thread ID or comment ID it handled
 - **feedback_type**: `review_thread`, `pr_comment`, or `review_body`
-- **reply_text**: the markdown reply to post (quoting the relevant part of the original feedback)
+- **reply_text**: the draft markdown reply (quoting the relevant part of the original feedback)
 - **files_changed**: list of files modified (empty if replied/not-addressing)
 - **reason**: brief explanation of what was done or why it was skipped
 
@@ -95,7 +102,7 @@ Verdict meanings:
 
 **Sequential fallback**: Platforms that do not support parallel dispatch should run agents sequentially.
 
-Fixes can occasionally expand beyond their referenced file (e.g., renaming a method updates callers elsewhere). This is rare but can cause parallel agents to collide. Step 5 (combined validation) catches test breakage; step 8 (verify) catches unresolved threads. If either surfaces inconsistent changes from parallel fixes, re-run the affected agents sequentially.
+Fixes can occasionally expand beyond their referenced file (e.g., renaming a method updates callers elsewhere). This is rare but can cause parallel resolvers to collide. Step 5 (combined validation) catches test breakage; step 8 (verify) catches unresolved threads. If either surfaces inconsistent changes from parallel fixes, re-run the affected resolvers sequentially.
 
 ## 5. Validate Combined State
 
@@ -107,31 +114,31 @@ Resolvers run only targeted tests on their own changes. This step runs the proje
 
 2. **Green** -> proceed to step 6.
 
-3. **Red, failures touch files resolvers changed** -> one inline diagnose-and-fix pass. Re-run validation. If still red, escalate with a `needs-human` item containing the test output; do **not** commit.
+3. **Red, failures touch files resolvers changed** -> one inline diagnose-and-fix pass. Re-run validation. If still red, escalate with a `needs-human` item containing the test output; do **not** publish.
 
-4. **Red, failures touch only files no resolver changed** -> treat as pre-existing. Proceed to step 6, but add a footer to the commit message: `Note: pre-existing failure in <test> not addressed by this PR.`
+4. **Red, failures touch only files no resolver changed** -> treat as pre-existing. Proceed to step 6, but add a footer to the held publication handoff: `Note: pre-existing failure in <test> not addressed by this PR.`
 
 Record the validation outcome (command run, pass/fail counts, any pre-existing failures noted) for the step 9 summary.
 
-## 6. Commit and Push
+## 6. TraceWeaver Alpha Stop Before Commit and Push
 
-1. Stage only files reported by sub-agents and commit with a message referencing the PR:
+Do not stage files, create commits, push branches, open PRs, post issue or PR
+replies, or resolve review threads from this packaged alpha surface.
 
-```bash
-git add [files from agent summaries]
-git commit -m "Address PR review feedback (#PR_NUMBER)
+Prepare a draft-only publication handoff instead:
 
-- [list changes from agent summaries]"
-```
+1. List only files reported by sub-agents.
+2. Record validation command and result.
+3. Draft a proposed commit message referencing the PR:
+   `Address PR review feedback (#PR_NUMBER)`.
+4. Keep all changes local and uncommitted until a future TraceWeaver
+   publication gate explicitly approves branch mutation.
 
-2. Push to remote:
-```bash
-git push
-```
+## 7. Draft Replies and Held Thread Resolution
 
-## 7. Reply and Resolve
-
-After the push succeeds, post replies and resolve where applicable. The mechanism depends on the feedback type.
+After validation, draft replies and resolution intent. Do not post replies,
+posting PR comments, or resolving review threads from this packaged alpha
+surface.
 
 ### Reply format
 
@@ -158,48 +165,54 @@ For declined items:
 Declined: [specific harm cited, e.g., "this would add a defensive null check the type system already guarantees" or "violates the no-premature-abstraction guidance in CLAUDE.md"]
 ```
 
-For `needs-human` verdicts, post the reply but do NOT resolve the thread. Leave it open for human input.
+For `needs-human` verdicts, draft the reply but do NOT resolve the thread. Leave it open for human input.
 
 ### Review threads
 
 0. **Verify the thread ID** before replying. GitHub Enterprise can return inconsistent node IDs for the same thread depending on the query path. Always confirm the ID from `get-pr-comments` resolves to the correct thread using [scripts/get-thread-for-comment](../scripts/get-thread-for-comment) with the comment's numeric URL ID:
 ```bash
+if [ -n "${CLAUDE_SKILL_DIR}" ] && [ -f "${CLAUDE_SKILL_DIR}/scripts/get-thread-for-comment" ]; then
+  SCRIPT_DIR="${CLAUDE_SKILL_DIR}/scripts"
+else
+  echo "ce-resolve-pr-feedback bundled scripts are unavailable in this harness; use gh api to inspect the review thread." >&2
+  exit 1
+fi
+
 # Extract numeric comment ID from the comment URL (e.g. discussion_r2589700 → 2589700)
 GH_REPO=OWNER/REPO gh api repos/{owner}/{repo}/pulls/comments/COMMENT_ID --jq .node_id
-bash scripts/get-thread-for-comment PR_NUMBER COMMENT_NODE_ID OWNER/REPO
+bash "$SCRIPT_DIR/get-thread-for-comment" PR_NUMBER COMMENT_NODE_ID OWNER/REPO
 ```
 The returned `id` is the authoritative thread ID to use for reply and resolve. If it differs from what `get-pr-comments` returned, use the one from this script.
 
-1. **Reply** using [scripts/reply-to-pr-thread](../scripts/reply-to-pr-thread):
-```bash
-echo "REPLY_TEXT" | bash scripts/reply-to-pr-thread THREAD_ID
-```
-Check that the returned comment URL contains the correct `OWNER/REPO` and PR number before proceeding.
-
-2. **Resolve** using [scripts/resolve-pr-thread](../scripts/resolve-pr-thread):
-```bash
-bash scripts/resolve-pr-thread THREAD_ID
-```
+1. **Draft reply** by recording `THREAD_ID` and `REPLY_TEXT` in the held handoff.
+2. **Draft resolution intent** by listing thread IDs that should be resolved
+   after an approved publication gate. For `needs-human`, keep the thread open.
 
 ### PR comments and review bodies
 
-These cannot be resolved via GitHub's API. Reply with a top-level PR comment referencing the original:
-
-```bash
-gh pr comment PR_NUMBER --body "REPLY_TEXT"
-```
+These cannot be resolved via GitHub's API. Draft a top-level PR comment
+referencing the original, but do not post it from this packaged alpha surface.
 
 Include enough quoted context in the reply so the reader can follow which comment is being addressed without scrolling.
 
 ## 8. Verify
 
-Re-fetch feedback to confirm resolution:
+Re-fetch feedback only as read-only context when needed:
 
 ```bash
-bash scripts/get-pr-comments PR_NUMBER
+if [ -n "${CLAUDE_SKILL_DIR}" ] && [ -f "${CLAUDE_SKILL_DIR}/scripts/get-pr-comments" ]; then
+  SCRIPT_DIR="${CLAUDE_SKILL_DIR}/scripts"
+else
+  echo "ce-resolve-pr-feedback bundled scripts are unavailable in this harness; use the fallback gh commands from Step 1." >&2
+  exit 1
+fi
+
+bash "$SCRIPT_DIR/get-pr-comments" PR_NUMBER
 ```
 
-The `review_threads` array should be empty (except `needs-human` items).
+Because publication is held, the `review_threads` array is not expected to be
+empty yet. Use the read-only output to verify that the draft handoff targets the
+right currently-open items.
 
 **If new threads remain**, check the iteration count for this run:
 
@@ -207,7 +220,9 @@ The `review_threads` array should be empty (except `needs-human` items).
 
 - **After the second fix-verify cycle** (3rd pass would begin): Stop looping. Surface remaining issues to the user with context about the recurring pattern: "Multiple rounds of feedback on [area/theme] suggest a deeper issue. Here's what we've fixed so far and what keeps appearing." Use the same `needs-human` escalation pattern -- leave threads open and present the pattern for the user to decide.
 
-PR comments and review bodies have no resolve mechanism, so they will still appear in the output. Verify they were replied to by checking the PR conversation.
+PR comments and review bodies have no resolve mechanism, so they will still
+appear in the output. Verify that each actionable item has draft reply text in
+the held handoff.
 
 ## 9. Summary
 
@@ -224,7 +239,8 @@ Replied (count): [what questions were answered]
 Not addressing (count): [what was skipped and why]
 Declined (count): [what was declined and the harm cited]
 
-Validation: [one line -- e.g., "bun test passed (893/893)" or "bun test passed with pre-existing failure in X noted"; omit when no code changes were committed]
+Validation: [one line -- e.g., "bun test passed (893/893)" or "bun test passed with pre-existing failure in X noted"; omit when no code changes were prepared]
+Publication: held -- no commit, push, PR comment, or thread resolution performed
 ```
 
 If any agent returned `needs-human`, append a decisions section. These are rare but high-signal. Each `needs-human` agent returns a `decision_context` field with a structured analysis: what the reviewer said, what the agent investigated, why it needs a decision, concrete options with tradeoffs, and the agent's lean if it has one.
@@ -239,7 +255,7 @@ Needs your input (count):
    tradeoffs, and the agent's recommendation if any]
 ```
 
-The `needs-human` threads already have a natural-sounding acknowledgment reply posted and remain open on the PR.
+The `needs-human` threads have draft acknowledgment replies and remain open on the PR.
 
 If there are **pending decisions from a previous run** (threads detected in step 2 as already responded to but still unresolved), surface them after the new work:
 
@@ -254,6 +270,6 @@ Still pending from a previous run (count):
 
 If a blocking question tool is available, use it to ask about all pending decisions (both new `needs-human` and previous-run pending) together. If there are only pending decisions and no new work was done, the summary is just the pending items.
 
-Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_user` in Gemini, `ask_user` in Pi (requires the `pi-ask-user` extension). Use it to present the decisions and wait for the user's response. After they decide, process the remaining items: fix the code, compose the reply, post it, and resolve the thread.
+Use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Use it to present the decisions and wait for the user's response. After they decide, process the remaining items: fix the code, compose the reply, and keep posting/resolution held for an explicit TraceWeaver publication gate.
 
 Fall back to presenting the decisions in the summary output and waiting in conversation only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip. If the user doesn't respond, the items remain open on the PR for later handling.
