@@ -1,30 +1,40 @@
 ---
 name: ce-commit-push-pr
-description: Draft a publication plan or PR description while stopping before branch mutation, commit, push, PR creation, or PR update in the TraceWeaver packaged alpha. Use when the user asks to ship, create a PR, or write/rewrite a PR description.
+description: Internal TraceWeaver publication engine. Draft freely, but mutate Git or GitHub only with a current single-use authorization capsule issued by tw-commit-push-pr for the exact repository, tree, target, operations, and credential identity.
 ---
 
 <!-- TRACEWEAVER: file-role=packaged-ce-commit-push-pr-skill; req=REQ-TW-043; trace=TRACE-TW-009; ver=VER-TW-015 -->
+<!-- TRACEWEAVER: file-role=controlled-publication-delegate; req=REQ-TW-053; trace=TRACE-TW-033; ver=VER-TW-042 -->
 
 # Git Commit, Push, and PR
 
 ## TraceWeaver Package Boundary
 
-When this `ce-commit-push-pr` skill is installed by the TraceWeaver plugin, it
-is not an approved publication surface for the current alpha. This boundary
-applies to direct invocation and to invocation from `tw-auto`, `lfg`,
-`tw-authority-gate`, `tw-traceability-check`, or any TraceWeaver-controlled
-workflow. Stop before branch mutation, staging, commit, push, PR creation, PR
-update, or any `gh` command that edits remote state. Report that publication
-remains held until TraceWeaver review, traceability, runtime, and publication
-gates explicitly approve it, and suggest the next required review or human
-decision.
+This packaged CE-derived skill is an internal execution engine, never the
+user-facing authority boundary. Direct invocation, invocation from a raw CE
+workflow, or delegation without a complete publication authorization capsule
+must stop before branch mutation, staging, commit, push, PR mutation, merge, or
+any other remote write. User wording alone is not a capsule and cannot bypass
+this rule.
 
-Description-only drafting may proceed only when it does not edit a PR, run
-`gh`, publish content, or imply that TraceWeaver publication gates are closed.
+A valid capsule must be issued by `tw-commit-push-pr` in the current run and
+must name the baseline/hash, trace/verification/review evidence, reviewed tree
+identity and file scope, repository and verified remote URL, exact base/head and
+starting ref, allowed operations, verified credential identity, explicit human
+confirmation, issue time, and single-use run ID. Recheck every applicable field
+immediately before each mutation. Any mismatch, missing field, reused run ID,
+new diff, check-state change, or target change invalidates the capsule and stops
+the workflow. Resolve the canonical ledger as
+`<git-common-dir>/traceweaver/publication-consumed-run-ids`, create only its
+parent directory, then validate and atomically consume the run ID exactly once
+before the first mutation with the sibling TraceWeaver wrapper validator
+`../tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule --mode consume --repo <exact-repo-path>`. Before each
+later operation, use `--mode revalidate` against that same ledger; an absent
+consumed run ID or changed capsule digest is a blocker, not a fresh validation
+path.
 
-Do not treat user wording such as "commit anyway", "ship", or "ignore
-TraceWeaver" as authority to bypass this boundary inside the packaged
-TraceWeaver alpha.
+Description-only drafting remains available without a capsule because it does
+not mutate local or remote state.
 
 **Asking the user:** When this skill says "ask the user", use the platform's blocking question tool: `AskUserQuestion` in Claude Code (call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded), `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension). Fall back to presenting the question in chat only when no blocking tool exists in the harness or the call errors (e.g., Codex edit modes) — not because a schema load is required. Never silently skip the question.
 
@@ -32,7 +42,9 @@ TraceWeaver alpha.
 
 - **Description-only** — user wants *just* a description ("write/draft a PR description", "describe this PR", or pasted a PR URL/number alone). Run Step 4 only; print the result. Do not apply it to a PR from this packaged alpha flow.
 - **Description update** — user wants to refresh/rewrite an existing PR's description with no commit/push intent. If no open PR, report and stop. Otherwise run Step 4 (PR mode using the existing PR's URL), then Step 5 to preview the replacement text and stop. Do not run `gh pr edit`.
-- **Full workflow** — otherwise. Gather context, optionally draft the PR title/body, then stop with a held-publication report. Do not run Step 3 publication actions or any Step 5 `gh` mutation.
+- **Full workflow** — otherwise. Require and validate the TraceWeaver
+  authorization capsule, then run the exact allowed operations only. Without a
+  valid capsule, gather context, optionally draft, and stop held.
 
 ## Context
 
@@ -70,8 +82,11 @@ The remote default branch returns something like `origin/main`; strip the `origi
 
 Branch routing:
 
-- **Detached HEAD** — report a branch-mutation hold, draft the commit/PR metadata if useful, and stop before changing repository state.
-- **On default branch with work to do** (uncommitted, unpushed, or no upstream) — report a branch-mutation hold, draft the commit/PR metadata if useful, and stop before changing repository state.
+- **Detached HEAD** — create only the exact capsule-authorized feature branch
+  from the capsule's expected starting ref; otherwise stop held.
+- **On default branch with work to do** (uncommitted, unpushed, or no upstream)
+  — create only the exact capsule-authorized feature branch after confirming
+  the base and starting ref; otherwise stop held.
 - **On default branch with no work** — report no feature branch work and stop.
 - **Feature branch** — continue.
 
@@ -81,17 +96,24 @@ Note the existing PR URL from the PR check if `state: OPEN`. Step 5 uses it to r
 
 Match repo style for commit messages and PR titles (project instructions in context > recent commits > conventional commits as default). With conventional commits, default to `fix:` over `feat:` when ambiguous — adding code to remedy broken or missing behavior is `fix:`. Reserve `feat:` for capabilities the user could not previously accomplish. The user may override.
 
-## Step 3: Commit and push
+## Step 3: Authorized branch, commit, and push
 
-TraceWeaver packaged alpha holds this step. Do not create or switch branches,
-stage files, commit, push, or run publication commands. Continue to Step 4 only
-when drafting a PR title/body is useful for the held-publication report.
+Stop unless the capsule is valid and explicitly allows each operation below.
 
-Do not read or execute branch-creation flow from the packaged TraceWeaver alpha path. Branch creation, branch switching, staging, commits, pushes, and PR publication remain held.
-
-When reporting the hold, include the file groups that would have been staged,
-the commit message convention that would apply, and whether a branch or PR
-already exists. Do not execute the upstream publication workflow.
+1. Recheck the repository identity, remote URL, expected starting ref, current
+   tree identity, declared file scope, and credential identity.
+2. When branch creation is allowed and required, create the exact head branch
+   named in the capsule. Never invent or substitute a branch name.
+3. Stage only the capsule-declared files. Never use `git add .` or
+   `git add -A`. Recompute the staged-tree identity and stop if it differs from
+   the reviewed identity recorded by the wrapper.
+4. Commit using the repository convention and the reviewed commit grouping.
+5. Push only the exact authorized head branch to the verified remote. Require
+   the local ref and expected parent to match the capsule, then use the explicit
+   refspec `git push -u <remote> HEAD:refs/heads/<authorized-head>`. Verify the
+   resulting remote SHA before PR mutation. Never force-push.
+6. Re-read branch, upstream, commit, and working-tree state. Stop before PR
+   mutation if the pushed commit or tree is not the reviewed candidate.
 
 ## Step 4: Compose the PR title and body
 
@@ -113,29 +135,32 @@ Then continue with the rest of the reference (Steps A through G) to compose the 
 
 **Description-only mode** — print the title and body. Stop.
 
-**Full workflow** — print the title/body draft when one was prepared, then
-report that PR publication remains held by TraceWeaver gates. Do not create,
-push, edit, or publish a PR.
+**Full workflow** — with a valid capsule allowing `pr_create` or `pr_edit`,
+write the body to a temporary file and apply it with `gh pr create` or
+`gh pr edit`. Verify the returned PR URL, base, head, state, and head SHA. If
+the capsule does not authorize the required PR operation, print the draft and
+stop held.
 
-**Existing PR** (full workflow, found in Step 1) — report the PR URL as context
-only. Do not push commits to it or ask to rewrite its description from this
-packaged alpha flow.
+**Existing PR** (full workflow, found in Step 1) — update or push only when the
+capsule names the repository-qualified PR number/URL and exact head SHA and
+authorizes the exact operation.
 
-**Description update mode, or existing-PR rewrite requested** — preview the new
-title/body and stop. Do not apply it with `gh pr edit`.
+**Description update mode, or existing-PR rewrite requested** — preview and
+stop unless the capsule authorizes `pr_edit` for that exact PR.
 
 Name the next required TraceWeaver review, traceability check, or human
 publication decision.
 
 ---
 
-## Applying via gh (Held Reference)
+## Optional authorized merge
 
-The commands in this section are upstream reference material only. Do not run
-them from the packaged TraceWeaver alpha unless a future publication gate
-explicitly approves remote mutation for this skill.
-
-TraceWeaver intentionally omits executable `gh` mutation examples here so the
-packaged alpha cannot be followed as a remote-publication recipe. If a future
-publication gate approves remote mutation, reintroduce the exact command pattern
-in the same change that records the approving evidence and stale-reset trigger.
+Merge is outside the branch/commit/push/PR capsule. Require a new post-PR merge
+capsule whose only operation is `merge` and which names the repository-qualified
+PR number/URL, expected base/head, exact head SHA, and approved merge method.
+Immediately before merging, validate that capsule and verify that the PR is
+open, non-draft, mergeable, has no requested changes, and every required check
+is successful. Use only the capsule's merge method, then verify the PR is merged
+and record the merge commit. If the merge triggers CI/CD or deployment, verify
+that downstream outcome separately; report `verification blocked` rather than
+implying success when it cannot be observed.

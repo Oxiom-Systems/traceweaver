@@ -6,8 +6,16 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/controlled-publication-route"
+VALIDATOR="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
+TW_SKILL="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md"
+CE_SKILL="$ROOT_DIR/plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md"
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
+REAL_GIT="$(command -v git)"
+
+capsule_repo="$TMP_DIR/capsule-repo"
+"$REAL_GIT" init -q "$capsule_repo"
+canonical_ledger="$($REAL_GIT -C "$capsule_repo" rev-parse --path-format=absolute --git-common-dir)/traceweaver/publication-consumed-run-ids"
 
 mkdir -p "$TMP_DIR/bin"
 git_marker="$TMP_DIR/git-called"
@@ -15,6 +23,9 @@ gh_marker="$TMP_DIR/gh-called"
 
 cat >"$TMP_DIR/bin/git" <<'SH'
 #!/usr/bin/env bash
+if [[ "$*" == *"rev-parse --git-common-dir"* ]]; then
+  exec "${TRACEWEAVER_REAL_GIT:?}" "$@"
+fi
 echo "git called: $*" >>"${TRACEWEAVER_GIT_MARKER:?}"
 exit 97
 SH
@@ -29,6 +40,7 @@ chmod +x "$TMP_DIR/bin/git" "$TMP_DIR/bin/gh"
 export PATH="$TMP_DIR/bin:$PATH"
 export TRACEWEAVER_GIT_MARKER="$git_marker"
 export TRACEWEAVER_GH_MARKER="$gh_marker"
+export TRACEWEAVER_REAL_GIT="$REAL_GIT"
 
 load_fixture() {
   local fixture="$1"
@@ -44,6 +56,10 @@ load_fixture() {
   credential_status=""
   remote_status=""
   human_confirmation=""
+  capsule_file=""
+  context_file=""
+  ledger_path=""
+  repo_path=""
   publication_mode=""
   expected_status=""
   expected_reason=""
@@ -69,16 +85,50 @@ publication_decision() {
     echo "blocked staged_tree_incoherent"
   elif [[ "$target_status" != "confirmed" ]]; then
     echo "blocked target_mismatch"
-  elif [[ "$credential_status" != "verified" || "$remote_status" != "verified_no_real_remote" ]]; then
+  elif [[ "$credential_status" != "verified" ]]; then
     echo "blocked credential_remote_uncertain"
   elif [[ "$human_confirmation" != "confirmed" ]]; then
     echo "blocked missing_human_confirmation"
-  elif [[ "$publication_mode" != "no_real_remote_dry_run" ]]; then
+  elif [[ "$publication_mode" == "real_remote" && "$remote_status" != "verified" ]]; then
+    echo "blocked credential_remote_uncertain"
+  elif [[ "$publication_mode" == "real_remote" && ( -z "$capsule_file" || -z "$context_file" || -z "$ledger_path" || -z "$repo_path" ) ]]; then
+    echo "blocked missing_publication_authorization_capsule"
+  elif [[ "$publication_mode" == "real_remote" ]] && ! "$VALIDATOR" \
+      --capsule "$capsule_file" --context "$context_file" \
+      --mode consume --repo "$repo_path" --ledger "$ledger_path" >/dev/null 2>&1; then
+    echo "blocked invalid_publication_authorization_capsule"
+  elif [[ "$publication_mode" == "real_remote" ]]; then
+    echo "allowed real_remote_publication"
+  elif [[ "$publication_mode" != "no_real_remote_dry_run" || "$remote_status" != "verified_no_real_remote" ]]; then
     echo "blocked real_remote_publication_held"
   else
     echo "allowed no_real_remote_dry_run"
   fi
 }
+
+prepare_capsule() {
+  local capsule_template="$1" context_template="$2" capsule_out="$3" context_out="$4" repo="$5" ledger="$6" run_id="$7"
+  ruby -ryaml -rtime -e '
+    capsule = YAML.safe_load(File.read(ARGV[0])); context = YAML.safe_load(File.read(ARGV[1])); now = Time.now.utc
+    capsule["issued_at"] = (now - 30).iso8601
+    capsule["expires_at"] = (now + 600).iso8601
+    capsule["repo_path"] = ARGV[4]
+    context["repo_path"] = ARGV[4]
+    capsule["ledger_path"] = ARGV[5]
+    context["ledger_path"] = ARGV[5]
+    capsule["run_id"] = ARGV[6]
+    File.write(ARGV[2], YAML.dump(capsule)); File.write(ARGV[3], YAML.dump(context))
+  ' "$capsule_template" "$context_template" "$capsule_out" "$context_out" "$repo" "$ledger" "$run_id"
+}
+
+publication_ledger="$canonical_ledger"
+publication_capsule="$TMP_DIR/publication-capsule.yml"
+publication_context="$TMP_DIR/publication-context.yml"
+prepare_capsule "$FIXTURE_ROOT/capsules/publication-valid.yml" "$FIXTURE_ROOT/contexts/publication-valid.yml" "$publication_capsule" "$publication_context" "$capsule_repo" "$publication_ledger" "PUB-FIXTURE-MAIN-001"
+export TRACEWEAVER_PUBLICATION_CAPSULE="$publication_capsule"
+export TRACEWEAVER_PUBLICATION_CONTEXT="$publication_context"
+export TRACEWEAVER_PUBLICATION_LEDGER="$publication_ledger"
+export TRACEWEAVER_PUBLICATION_REPO="$capsule_repo"
 
 assert_case() {
   local fixture_name="$1"
@@ -110,6 +160,8 @@ assert_case review-findings
 assert_case dirty-untracked-authority
 assert_case target-mismatch
 assert_case credential-remote-uncertainty
+assert_case real-remote-missing-capsule
+assert_case clean-real-remote-authorized
 assert_case clean-no-real-remote
 
 if [[ -f "$git_marker" || -f "$gh_marker" ]]; then
@@ -120,4 +172,177 @@ if [[ -f "$git_marker" || -f "$gh_marker" ]]; then
 fi
 
 echo "controlled_publication_no_external_mutation=pass"
+
+"$VALIDATOR" --capsule "$publication_capsule" --context "$publication_context" --mode revalidate --repo "$capsule_repo" --ledger "$publication_ledger" >/dev/null
+if "$VALIDATOR" --capsule "$publication_capsule" --context "$publication_context" --mode revalidate >/dev/null 2>&1; then
+  echo "controlled_publication_capsule_no_ledger=failed" >&2
+  exit 1
+fi
+if "$VALIDATOR" --capsule "$publication_capsule" --context "$publication_context" --mode consume --repo "$capsule_repo" --ledger "$TMP_DIR/alternate-ledger" >/dev/null 2>&1; then
+  echo "controlled_publication_capsule_alternate_ledger=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_capsule_ledger_binding=pass"
+noncanonical_capsule="$TMP_DIR/noncanonical-capsule.yml"
+noncanonical_context="$TMP_DIR/noncanonical-context.yml"
+prepare_capsule "$FIXTURE_ROOT/capsules/publication-valid.yml" "$FIXTURE_ROOT/contexts/publication-valid.yml" "$noncanonical_capsule" "$noncanonical_context" "$capsule_repo" "$TMP_DIR/noncanonical-ledger" "PUB-NONCANONICAL-001"
+if "$VALIDATOR" --capsule "$noncanonical_capsule" --context "$noncanonical_context" --mode consume --repo "$capsule_repo" --ledger "$TMP_DIR/noncanonical-ledger" >/dev/null 2>&1; then
+  echo "controlled_publication_capsule_matching_noncanonical_ledger=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_capsule_matching_noncanonical_ledger=blocked"
+if "$VALIDATOR" --capsule "$publication_capsule" --context "$publication_context" --mode consume --repo "$capsule_repo" --ledger "$publication_ledger" >/dev/null 2>&1; then
+  echo "controlled_publication_capsule_replay=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_capsule_replay=blocked"
+
+stage_only_capsule="$TMP_DIR/stage-only-capsule.yml"
+stage_only_context="$TMP_DIR/stage-only-context.yml"
+prepare_capsule "$FIXTURE_ROOT/capsules/publication-valid.yml" "$FIXTURE_ROOT/contexts/publication-valid.yml" "$stage_only_capsule" "$stage_only_context" "$capsule_repo" "$publication_ledger" "PUB-STAGE-ONLY-001"
+ruby -ryaml -e 'data = YAML.safe_load(File.read(ARGV[0])); data["allowed_operations"] = ["stage"]; File.write(ARGV[0], YAML.dump(data))' "$stage_only_capsule"
+"$VALIDATOR" --capsule "$stage_only_capsule" --context "$stage_only_context" --mode consume --repo "$capsule_repo" --ledger "$publication_ledger" >/dev/null
+escalated_after_consume="$TMP_DIR/escalated-after-consume.yml"
+ruby -ryaml -e 'data = YAML.safe_load(File.read(ARGV[0])); data["allowed_operations"] = ["stage", "push"]; File.write(ARGV[1], YAML.dump(data))' "$stage_only_capsule" "$escalated_after_consume"
+if "$VALIDATOR" --capsule "$escalated_after_consume" --context "$stage_only_context" --mode revalidate --repo "$capsule_repo" --ledger "$publication_ledger" >/dev/null 2>&1; then
+  echo "controlled_publication_capsule_post_consume_escalation=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_capsule_post_consume_escalation=blocked"
+
+parallel_ledger="$publication_ledger"
+parallel_capsule="$TMP_DIR/parallel-capsule.yml"
+parallel_context="$TMP_DIR/parallel-context.yml"
+prepare_capsule "$FIXTURE_ROOT/capsules/publication-valid.yml" "$FIXTURE_ROOT/contexts/publication-valid.yml" "$parallel_capsule" "$parallel_context" "$capsule_repo" "$parallel_ledger" "PUB-FIXTURE-PARALLEL-001"
+set +e
+"$VALIDATOR" --capsule "$parallel_capsule" --context "$parallel_context" --mode consume --repo "$capsule_repo" --ledger "$parallel_ledger" >/dev/null 2>&1 &
+parallel_one=$!
+"$VALIDATOR" --capsule "$parallel_capsule" --context "$parallel_context" --mode consume --repo "$capsule_repo" --ledger "$parallel_ledger" >/dev/null 2>&1 &
+parallel_two=$!
+wait "$parallel_one"; parallel_one_status=$?
+wait "$parallel_two"; parallel_two_status=$?
+set -e
+if [[ "$parallel_one_status" -eq 0 && "$parallel_two_status" -eq 0 ]] || [[ "$parallel_one_status" -ne 0 && "$parallel_two_status" -ne 0 ]]; then
+  echo "controlled_publication_capsule_parallel_replay=failed statuses=$parallel_one_status,$parallel_two_status" >&2
+  exit 1
+fi
+echo "controlled_publication_capsule_parallel_replay=blocked_one_of_two"
+
+for drift in publication-tree-drift publication-target-drift publication-credential-drift; do
+  drift_context="$TMP_DIR/$drift.yml"
+  ruby -ryaml -e 'base = YAML.safe_load(File.read(ARGV[0])); drift = YAML.safe_load(File.read(ARGV[1])); drift["ledger_path"] = base["ledger_path"]; drift["repo_path"] = base["repo_path"]; File.write(ARGV[2], YAML.dump(drift))' "$publication_context" "$FIXTURE_ROOT/contexts/$drift.yml" "$drift_context"
+  if "$VALIDATOR" --capsule "$publication_capsule" --context "$drift_context" --mode revalidate --repo "$capsule_repo" --ledger "$publication_ledger" >/dev/null 2>&1; then
+    echo "controlled_publication_capsule_${drift}=failed" >&2
+    exit 1
+  fi
+  echo "controlled_publication_capsule_${drift}=blocked"
+done
+
+merge_ledger="$publication_ledger"
+merge_capsule="$TMP_DIR/merge-capsule.yml"
+merge_context="$TMP_DIR/merge-context.yml"
+prepare_capsule "$FIXTURE_ROOT/capsules/merge-valid.yml" "$FIXTURE_ROOT/contexts/merge-valid.yml" "$merge_capsule" "$merge_context" "$capsule_repo" "$merge_ledger" "MERGE-FIXTURE-001"
+"$VALIDATOR" --capsule "$merge_capsule" --context "$merge_context" --mode consume --repo "$capsule_repo" --ledger "$merge_ledger" >/dev/null
+merge_drift_context="$TMP_DIR/merge-check-drift.yml"
+ruby -ryaml -e 'base = YAML.safe_load(File.read(ARGV[0])); drift = YAML.safe_load(File.read(ARGV[1])); drift["ledger_path"] = base["ledger_path"]; drift["repo_path"] = base["repo_path"]; File.write(ARGV[2], YAML.dump(drift))' "$merge_context" "$FIXTURE_ROOT/contexts/merge-check-drift.yml" "$merge_drift_context"
+if "$VALIDATOR" --capsule "$merge_capsule" --context "$merge_drift_context" --mode revalidate --repo "$capsule_repo" --ledger "$merge_ledger" >/dev/null 2>&1; then
+  echo "controlled_publication_merge_check_drift=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_merge_check_drift=blocked"
+
+invalid_capsule="$TMP_DIR/invalid-capsule.yml"
+ruby -ryaml -e 'data = YAML.safe_load(File.read(ARGV[0])); data.delete("baseline_hash"); data["allowed_operations"] << "merge"; File.write(ARGV[1], YAML.dump(data))' "$publication_capsule" "$invalid_capsule"
+if "$VALIDATOR" --capsule "$invalid_capsule" --context "$publication_context" --mode revalidate --repo "$capsule_repo" --ledger "$publication_ledger" >/dev/null 2>&1; then
+  echo "controlled_publication_malformed_or_escalated_capsule=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_malformed_or_escalated_capsule=blocked"
+
+for clock_case in expired future-issued; do
+  clock_capsule="$TMP_DIR/$clock_case.yml"
+  ruby -ryaml -rtime -e '
+    data = YAML.safe_load(File.read(ARGV[0])); now = Time.now.utc
+    if ARGV[2] == "expired" then data["issued_at"] = (now - 900).iso8601; data["expires_at"] = (now - 1).iso8601
+    else data["issued_at"] = (now + 60).iso8601; data["expires_at"] = (now + 600).iso8601 end
+    File.write(ARGV[1], YAML.dump(data))
+  ' "$publication_capsule" "$clock_capsule" "$clock_case"
+  if "$VALIDATOR" --capsule "$clock_capsule" --context "$publication_context" --mode revalidate --repo "$capsule_repo" --ledger "$publication_ledger" >/dev/null 2>&1; then
+    echo "controlled_publication_capsule_${clock_case}=failed" >&2
+    exit 1
+  fi
+  echo "controlled_publication_capsule_${clock_case}=blocked"
+done
+
+pr_edit_capsule="$TMP_DIR/pr-edit-missing-identity.yml"
+ruby -ryaml -e 'data = YAML.safe_load(File.read(ARGV[0])); data["allowed_operations"] = ["pr_edit"]; File.write(ARGV[1], YAML.dump(data))' "$publication_capsule" "$pr_edit_capsule"
+if "$VALIDATOR" --capsule "$pr_edit_capsule" --context "$publication_context" --mode revalidate --repo "$capsule_repo" --ledger "$publication_ledger" >/dev/null 2>&1; then
+  echo "controlled_publication_pr_edit_missing_identity=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_pr_edit_missing_identity=blocked"
+
+stale_context="$TMP_DIR/stale-authority-context.yml"
+ruby -ryaml -e 'data = YAML.safe_load(File.read(ARGV[0])); data["baseline_hash"] = "stale"; data["verification_evidence_ids"] = ["VER-STALE"]; File.write(ARGV[1], YAML.dump(data))' "$publication_context" "$stale_context"
+if "$VALIDATOR" --capsule "$publication_capsule" --context "$stale_context" --mode revalidate --repo "$capsule_repo" --ledger "$publication_ledger" >/dev/null 2>&1; then
+  echo "controlled_publication_stale_capsule_authority=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_stale_capsule_authority=blocked"
+
+# Exercise the exact explicit push refspec against a temporary local bare remote.
+bare="$TMP_DIR/remote.git"
+work="$TMP_DIR/work"
+"$REAL_GIT" init --bare -q "$bare"
+"$REAL_GIT" init -q "$work"
+"$REAL_GIT" -C "$work" config user.email fixture@example.invalid
+"$REAL_GIT" -C "$work" config user.name "TraceWeaver Fixture"
+touch "$work/fixture.txt"
+"$REAL_GIT" -C "$work" add fixture.txt
+"$REAL_GIT" -C "$work" commit -qm fixture
+"$REAL_GIT" -C "$work" remote add origin "$bare"
+local_sha="$("$REAL_GIT" -C "$work" rev-parse HEAD)"
+execution_ledger="$($REAL_GIT -C "$work" rev-parse --path-format=absolute --git-common-dir)/traceweaver/publication-consumed-run-ids"
+execution_capsule="$TMP_DIR/execution-capsule.yml"
+execution_context="$TMP_DIR/execution-context.yml"
+ruby -ryaml -rtime -e '
+  capsule = YAML.safe_load(File.read(ARGV[0])); context = YAML.safe_load(File.read(ARGV[1])); now = Time.now.utc
+  capsule["issued_at"] = (now - 30).iso8601; capsule["expires_at"] = (now + 600).iso8601
+  capsule["run_id"] = "PUB-EXECUTION-FIXTURE-001"; capsule["repo_identity"] = "local/fixture"
+  capsule["remote_url"] = ARGV[4]; capsule["expected_starting_ref"] = ARGV[5]
+  capsule["reviewed_tree_sha256"] = ARGV[5]; capsule["file_scope"] = ["fixture.txt"]
+  capsule["allowed_operations"] = ["push"]; capsule["repo_path"] = ARGV[6]; capsule["ledger_path"] = ARGV[7]
+  context["repo_identity"] = capsule["repo_identity"]; context["remote_url"] = ARGV[4]
+  context["current_starting_ref"] = ARGV[5]; context["current_tree_sha256"] = ARGV[5]
+  context["current_file_scope"] = ["fixture.txt"]; context["repo_path"] = ARGV[6]; context["ledger_path"] = ARGV[7]
+  File.write(ARGV[2], YAML.dump(capsule)); File.write(ARGV[3], YAML.dump(context))
+  ' "$FIXTURE_ROOT/capsules/publication-valid.yml" "$FIXTURE_ROOT/contexts/publication-valid.yml" "$execution_capsule" "$execution_context" "$bare" "$local_sha" "$work" "$execution_ledger"
+"$VALIDATOR" --capsule "$execution_capsule" --context "$execution_context" --mode consume --repo "$work" --ledger "$execution_ledger" >/dev/null
+authorized_head="$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV[0])).fetch("head_branch")' "$execution_capsule")"
+authorized_remote="$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV[0])).fetch("remote_name")' "$execution_capsule")"
+authorized_url="$(ruby -ryaml -e 'puts YAML.safe_load(File.read(ARGV[0])).fetch("remote_url")' "$execution_capsule")"
+[[ "$("$REAL_GIT" -C "$work" remote get-url "$authorized_remote")" == "$authorized_url" ]]
+"$REAL_GIT" -C "$work" push -q -u "$authorized_remote" "HEAD:refs/heads/$authorized_head"
+remote_sha="$("$REAL_GIT" --git-dir="$bare" rev-parse "refs/heads/$authorized_head")"
+[[ "$local_sha" == "$remote_sha" ]]
+if "$REAL_GIT" --git-dir="$bare" rev-parse --verify refs/heads/wrong >/dev/null 2>&1; then
+  echo "controlled_publication_explicit_refspec=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_explicit_refspec=pass"
+
+grep -Fq "single-use authorization capsule" "$TW_SKILL"
+grep -Fq "single-use authorization capsule" "$CE_SKILL"
+grep -Fq "traceweaver-validate-publication-capsule" "$CE_SKILL"
+grep -Fq 'capsule_source = File.binread(options[:capsule])' "$VALIDATOR"
+grep -Fq 'Digest::SHA256.hexdigest(capsule_source)' "$VALIDATOR"
+if grep -Fq 'Digest::SHA256.file(options[:capsule])' "$VALIDATOR"; then
+  echo "controlled_publication_capsule_single_read_digest_binding=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_capsule_single_read_digest_binding=pass"
+grep -Fq "Direct invocation" "$CE_SKILL"
+grep -Fq "Optional authorized merge" "$CE_SKILL"
+grep -Fq "equate merge with deployment" "$TW_SKILL"
+echo "controlled_publication_capsule_contract=pass"
 echo "controlled_publication_route_smoke=pass"

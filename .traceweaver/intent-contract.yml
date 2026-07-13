@@ -5,7 +5,7 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 4cec2a1b5bc27729ac433a6522ca144a47908141227c92156b8700260a16b78a
+baseline_hash_sha256: c7f28db5ec503a2d0a84f48b0d40a939719a731141db99350e105eb24c8ef354
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
@@ -2321,7 +2321,40 @@ open_gaps:
     review_gate: U7/U9
     status: held
 
+req_tw_053_gated_publication_release_authority:
+  decision_id: TW-OWNER-DECISION-2026-07-13-GATED-PUBLICATION-001
+  owner: Oxiom Systems
+  decision_source: explicit owner authorization on 2026-07-13
+  status: approved_for_implementation_review_release_and_vestro_dogfood
+  requirements:
+    - REQ-TW-053
+    - REQ-TW-059
+  trace_ids:
+    - TRACE-TW-033
+    - TRACE-TW-040
+  verification_ids:
+    - VER-TW-042
+    - VER-TW-052
+  allowed_scope:
+    - replace the packaged blanket publication hold with a single-use authorization capsule route
+    - keep direct CE invocation blocked
+    - permit exact branch, stage, commit, push, PR create or edit, and separately authorized merge operations only after all gates pass
+    - publish TraceWeaver Core 0.2.8 after review and dogfood the installed candidate
+    - rerun the reviewed Vestro TP publication route and separately authorized PR merges
+  must_not_change:
+    - no force push by default
+    - no stale, failed, split, unreviewed, or target-mismatched publication
+    - no merge without explicit operation authority and live PR gate recheck
+    - no deployment-success claim without downstream verification
+  validation_question: Can an owner publish an exact reviewed target after all TraceWeaver gates pass while direct CE invocation, stale evidence, target drift, missing credentials, and unapproved merges remain blocked?
+  held_claims:
+    - arbitrary autonomous publication without a current authorization capsule
+    - force push
+    - deployment success without downstream evidence
+    - clean CE replacement
+
 next_recommended_steps:
+  - Complete TraceWeaver Core 0.2.8 gated-publication implementation, review, release, reinstall, and Vestro dogfood under `TW-OWNER-DECISION-2026-07-13-GATED-PUBLICATION-001`.
   - Run `/tw-auto continue to the full tw-auto runtime-driver proof` while keeping full driver invocation, publication, release/package, clean replacement, Vestro/R31, unconstrained-host, and CE body-edit claims held unless separately proven.
   - Keep REQ-TW-064 runtime invocation, publication, Vestro/R31 dogfood, release/package/upstream readiness, clean replacement, unconstrained-host support, and CE body edit claims held until their own proof gates pass; active-host filesystem/hash currentness has passed and this scoped status/hash doc review is recorded as `TW-DOC-REVIEW-2026-05-18-REQ-TW-064-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`.
   - Treat the runtime trace-record decision-binding harness patch as reviewed after `TW-CODE-REVIEW-2026-05-18-TW-AUTO-RUNTIME-TRACE-RECORD-DECISION-BINDING-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-18-TW-AUTO-RUNTIME-TRACE-RECORD-DECISION-BINDING-STATUS-HASH-CLEAN-001` and full runtime-driver behavior remains held.

@@ -119,11 +119,16 @@ Contract policy.
 
 ## Commit, Push, And PR Boundary
 
-`tw-auto` alpha must stop before commit, push, or PR creation. It may recommend
-the next git or CE command, but it must not claim that autonomous publication is
-approved.
+`tw-auto` must stop before performing direct commit, push, or PR creation. When
+the exact work package has current approved authority, coherent traceability,
+passing verification, clean review, stable tree identity, verified target and
+credentials, and explicit human confirmation, it may route to
+`tw-commit-push-pr`. Only that wrapper may issue and consume the single-use
+publication capsule used by the packaged publication delegate. Any stale or
+changed field returns control to the appropriate gate.
 
-Commit/push/PR automation remains a later runtime/U9 claim.
+Arbitrary autonomous publication without a current exact-target capsule remains
+held.
 
 ## Compatibility Aliases
 
@@ -143,7 +148,8 @@ The following remain held:
 - dynamic no-forced discovery;
 - full Core 11 runtime suite;
 - release-ready, package-ready, or upstream-ready status;
-- autonomous commit, push, or PR publication.
+- arbitrary autonomous commit, push, PR, or merge publication without a
+  current exact-target capsule.
 
 ## Suggested Next Step Rule
 
@@ -154,7 +160,8 @@ Every `tw-auto` outcome must end with exactly one recommended next step:
   part of the current loop;
 - create or update a gap/change/exception/clarification;
 - request a human authority decision;
-- stop before commit/push/PR with required evidence named.
+- route an exact reviewed target to `tw-commit-push-pr`, or stop before
+  commit/push/PR with the missing evidence named.
 
 Do not present `/tw-code-review`, `/tw-doc-review`, or
 `/tw-traceability-check` as the sole manual next command after successful

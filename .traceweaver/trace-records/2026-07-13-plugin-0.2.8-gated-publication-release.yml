@@ -1,0 +1,92 @@
+trace_record_id: TW-TRACE-RECORD-2026-07-13-PLUGIN-0.2.8-GATED-PUBLICATION-001
+record_type: implementation_trace
+created_at: "2026-07-13"
+owner: Oxiom Systems
+status: implementation_verified_review_clean_publication_pending
+
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_source: requirements.md
+baseline_hash_sha256: c7f28db5ec503a2d0a84f48b0d40a939719a731141db99350e105eb24c8ef354
+authority_decision: TW-OWNER-DECISION-2026-07-13-GATED-PUBLICATION-001
+beads_issue: TraceWeaver-aw3y
+
+requirements:
+  - REQ-TW-015
+  - REQ-TW-016
+  - REQ-TW-020
+  - REQ-TW-021
+  - REQ-TW-053
+  - REQ-TW-059
+  - REQ-TW-068
+trace_ids:
+  - TRACE-TW-010
+  - TRACE-TW-033
+  - TRACE-TW-040
+  - TRACE-TW-053
+  - TRACE-TW-054
+verification_ids:
+  - VER-TW-042
+  - VER-TW-052
+  - VER-TW-079
+validation_ids:
+  - VAL-TW-011
+
+implementation:
+  wrapper: plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md
+  wrapper_sha256: 3739791e512b5cd1851ae51cb0378ae01557b1f3dbe56c3139e5cf0627e7ed64
+  delegate: plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md
+  delegate_sha256: ba548210fe3444ed9abcd7c133e00ad1f0ba0eee077e25b515440b8f60552fc5
+  validator: plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule
+  validator_sha256: b50b3603aa7a73cd956f735870069ee62a23af725f6f340d590794fe44eac41b
+  imported_component_overlay: .traceweaver/overlays/2026-07-13-ce-commit-push-pr-gated-publication.yml
+  behavior: >
+    The TraceWeaver wrapper issues a current single-use authorization capsule
+    only after authority, traceability, verification, review, tree, target,
+    credential, and human-confirmation gates pass. The packaged CE-derived
+    delegate rechecks the capsule before exact authorized mutations and blocks
+    direct invocation.
+
+test_first_evidence:
+  negative_case: fixtures/controlled-publication-route/real-remote-missing-capsule/state.txt
+  initial_observation: "expected blocked:missing_publication_authorization_capsule; observed blocked:credential_remote_uncertain before implementation"
+  positive_case: fixtures/controlled-publication-route/clean-real-remote-authorized/state.txt
+  focused_command: scripts/traceweaver-smoke-controlled-publication
+  focused_result: pass
+
+verification_observed:
+  status: focused_and_broader_changed_scope_pass_review_clean
+  controlled_publication_smoke: pass_with_schema_git_derived_canonical_ledger_capsule_digest_binding_replay_parallel_drift_merge_and_explicit_refspec_proof
+  tw_skill_behavior_static: pass_with_active_host_currentness
+  active_host_wrapper_sha256: 3739791e512b5cd1851ae51cb0378ae01557b1f3dbe56c3139e5cf0627e7ed64
+  active_host_delegate_sha256: ba548210fe3444ed9abcd7c133e00ad1f0ba0eee077e25b515440b8f60552fc5
+  active_host_validator_sha256: b50b3603aa7a73cd956f735870069ee62a23af725f6f340d590794fe44eac41b
+  active_host_install_source: reviewed_candidate_worktree_plugin
+  no_publication_regression_smoke: pass
+  codex_discovery_smoke: pass_runtime_execution_disabled
+  claude_plugin_validation: pass
+  ce_closure_audit: pass
+  broader_smokes: pass_except_two_preexisting_origin_main_failures
+  preexisting_origin_main_failures:
+    - traceweaver-smoke-ce-replacement-classifier stale historical classifier inventory
+    - traceweaver-smoke-systems-engineering-audit-closure tw-update required-inputs contract debt
+  clean_review_evidence_ids:
+    - TW-CODE-REVIEW-2026-07-13-GATED-PUBLICATION-SECURITY-CLEAN-001
+    - TW-CODE-REVIEW-2026-07-13-GATED-PUBLICATION-VERIFICATION-CLEAN-001
+    - TW-DOC-REVIEW-2026-07-13-GATED-PUBLICATION-AUTHORITY-RELEASE-CLEAN-001
+
+release:
+  version: "0.2.8"
+  intended_tag: traceweaver-core--v0.2.8
+  intended_release_name: TraceWeaver Core 0.2.8
+  route: >
+    Publish the exact reviewed branch through tw-commit-push-pr, merge only
+    after live PR gates pass, verify the release workflow, tag, and GitHub
+    Release, then reinstall the released artifact before Vestro dogfood.
+
+held_claims:
+  - arbitrary publication without a current capsule
+  - force push
+  - direct packaged CE publication
+  - merge without explicit operation authority and live gate recheck
+  - deployment success without downstream evidence
+  - clean CE replacement

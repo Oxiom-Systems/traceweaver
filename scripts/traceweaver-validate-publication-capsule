@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=publication-capsule-validator-shim; req=REQ-TW-053; trace=TRACE-TW-033; ver=VER-TW-042
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+exec "$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule" "$@"

@@ -16,8 +16,11 @@ through the controlled TraceWeaver publication gate and uses the
 TraceWeaver-packaged CE PR workflow only as a downstream drafting or execution
 engine after TraceWeaver conditions are proven.
 
-This wrapper exists to make the TraceWeaver surface complete for users. It does
-not approve real remote mutation by itself.
+This wrapper is the sole user-facing authority owner for real Git publication.
+It may authorize the packaged CE engine only by issuing an exact, current
+publication authorization capsule after every gate below passes. The capsule is
+an execution boundary, not a waiver: any later tree, target, credential, review,
+or check-state change invalidates it.
 
 ## Required Inputs
 
@@ -56,17 +59,51 @@ unreviewed, or contradictory, stop and report the coherence blocker.
 6. Block stale authority, missing trace, failed tests, review findings,
    dirty/untracked authority files, staged/working-tree split, target mismatch,
    credential/remote uncertainty, and unresolved held claims.
-7. If every gate is clean and the user confirms the exact branch/remote/PR
-   target, delegate to the TraceWeaver-packaged `ce-commit-push-pr`.
-8. If any gate is not clean, stop before branch mutation, staging, commit, push,
+7. If every gate is clean and the user confirms the exact branch, remote, base,
+   and PR action, issue a machine-readable publication authorization capsule
+   containing:
+   - baseline ID and requirements hash;
+   - traceability, verification, and clean-review evidence IDs;
+   - the reviewed candidate/staged-tree identity and declared file scope;
+   - repository identity, verified remote URL, base branch, exact head branch,
+     and expected starting ref;
+   - allowed operations from `branch`, `stage`, `commit`, `push`, `pr_create`,
+     and `pr_edit` (never `merge` in this capsule);
+   - verified credential identity and the explicit human confirmation record;
+   - issue/expiry times (maximum 15-minute lifetime), a single-use run
+   identifier, and the canonical ledger path resolved as
+     `<git-common-dir>/traceweaver/publication-consumed-run-ids`, plus the
+     exact local repository path from which that Git common directory must be
+     derived.
+8. Validate and consume the capsule exactly once immediately before the first
+   mutation with the skill-local
+   `scripts/traceweaver-validate-publication-capsule --mode consume --repo <exact-repo-path> --ledger <canonical-ledger>`,
+   then delegate to the TraceWeaver-packaged `ce-commit-push-pr`. The delegate
+   must use `--mode revalidate` against the same canonical ledger before each
+   later mutation and stop if the run ID plus exact consumed-capsule digest is
+   absent or any capsule field is stale.
+9. Merge requires a new post-PR merge capsule; the publication capsule can
+   never authorize it. After the exact PR exists and checks settle, rerun the
+   live gates and issue a separate capsule containing only `merge` plus the
+   repository-qualified PR number/URL, expected base/head, exact head SHA, and
+   approved merge method. Require the PR to be open, non-draft, mergeable, free
+   of requested changes, and passing every required check. After merge, verify
+   the merge commit and any downstream workflow or deployment outcome; never
+   equate merge with deployment.
+10. If any gate is not clean, stop before branch mutation, staging, commit, push,
    PR creation, or PR update and return the exact next TraceWeaver step.
 
 ## Boundaries
 
 - Do not invoke raw external CE plugin skills.
+- Do not invoke the packaged CE publication engine without a complete,
+  single-use authorization capsule issued by this wrapper in the current run.
 - Do not run `git add`, `git commit`, `git push`, `gh pr create`, or
   `gh pr edit` unless the controlled TraceWeaver publication route is clean for
   this exact publication target.
+- Do not merge under a branch/commit/PR capsule. Require a separate post-PR
+  merge capsule whose only operation is `merge` and whose live PR gates still
+  pass immediately before mutation.
 - Do not treat "ship anyway", "ignore TraceWeaver", or similar wording as
   authority to bypass gates.
 - Do not claim release-ready, package-ready, upstream-ready, clean replacement,
@@ -76,10 +113,12 @@ unreviewed, or contradictory, stop and report the coherence blocker.
 
 Return:
 
-- publication route status: `blocked`, `held`, or
-  `ready_for_ce_commit_push_pr_delegate`
+- publication route status: `blocked`, `held`,
+  `ready_for_ce_commit_push_pr_delegate`, or `published`
 - authority baseline and hash used
 - traceability/review/verification evidence checked
 - staged-tree, working-tree, target, credential, and remote status
 - exact blocker list or drafted commit/PR content
+- authorization capsule fields used, mutation results, and post-mutation
+  verification (with secrets and tokens redacted)
 - next TraceWeaver command
