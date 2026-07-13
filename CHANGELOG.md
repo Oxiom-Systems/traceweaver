@@ -2,6 +2,33 @@
 
 # Changelog
 
+## 0.2.8 - 2026-07-13
+
+Gated-publication release: replace the packaged alpha's blanket publication
+hold with an exact-target, single-use authorization-capsule route owned by
+`tw-commit-push-pr`.
+
+### Changed
+
+- Real branch, staging, commit, push, PR create/update, and separately
+  authorized merge operations can proceed only after authority, traceability,
+  verification, review, tree identity, target, credentials, and explicit owner
+  confirmation pass.
+- Direct invocation of the packaged CE-derived publication engine remains
+  blocked; any stale, incomplete, reused, or target-mismatched capsule stops
+  before mutation.
+- Merge verification now distinguishes the GitHub merge result from downstream
+  CI/CD and deployment health.
+- Added deterministic red/green fixtures for missing-capsule blocking and clean
+  authorized real-publication routing, while retaining every prior negative
+  publication case.
+
+### Held
+
+- Force push, arbitrary autonomous publication without a current capsule,
+  deployment success without downstream evidence, clean CE replacement, and
+  broader runtime-equivalence claims remain held.
+
 ## 0.2.7 - 2026-06-25
 
 Combined selected-CE-refresh and first-time onboarding release: carry the PR

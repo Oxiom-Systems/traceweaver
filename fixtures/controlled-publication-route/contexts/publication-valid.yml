@@ -1,0 +1,17 @@
+# TRACEWEAVER: file-role=publication-context-fixture; verifies=VER-TW-042; req=REQ-TW-053; trace=TRACE-TW-033
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_hash: fixture-baseline-hash
+traceability_evidence_ids: [TRACE-TW-033]
+verification_evidence_ids: [VER-TW-042]
+clean_review_evidence_ids: [TW-CODE-REVIEW-FIXTURE-CLEAN]
+repo_identity: Oxiom-Systems/traceweaver
+repo_path: /fixture/repository
+remote_name: origin
+remote_url: https://github.com/Oxiom-Systems/traceweaver.git
+base_branch: main
+head_branch: codex/gated-publication-fixture
+current_starting_ref: fixture-start-ref
+current_tree_sha256: fixture-tree-sha256
+current_file_scope: [src/a.rb, test/a_test.rb]
+credential_identity: jjziets
+human_confirmation_id: TW-OWNER-FIXTURE-001

@@ -1,0 +1,153 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=publication-capsule-validator; req=REQ-TW-053; trace=TRACE-TW-033; ver=VER-TW-042
+# TRACEWEAVER: entrypoint=validate_publication_capsule; req=REQ-TW-053; trace=TRACE-TW-033; ver=VER-TW-042
+
+require "fileutils"
+require "digest"
+require "open3"
+require "optparse"
+require "time"
+require "yaml"
+
+options = {}
+OptionParser.new do |parser|
+  parser.on("--capsule PATH") { |value| options[:capsule] = value }
+  parser.on("--context PATH") { |value| options[:context] = value }
+  parser.on("--mode MODE", %w[consume revalidate]) { |value| options[:mode] = value }
+  parser.on("--ledger PATH") { |value| options[:ledger] = value }
+  parser.on("--repo PATH") { |value| options[:repo] = value }
+end.parse!
+
+required_options = %i[capsule context mode ledger repo]
+abort "publication_capsule=blocked reason=missing_input" unless required_options.all? { |key| options[key] }
+
+capsule_source = File.binread(options[:capsule])
+capsule_digest = Digest::SHA256.hexdigest(capsule_source)
+capsule = YAML.safe_load(capsule_source, permitted_classes: [Time], aliases: false) || {}
+context = YAML.safe_load(File.read(options[:context]), aliases: false) || {}
+errors = []
+
+common = %w[
+  schema_version capsule_type issued_by issued_at expires_at run_id baseline_id
+  baseline_hash traceability_evidence_ids verification_evidence_ids
+  clean_review_evidence_ids reviewed_tree_sha256 file_scope repo_identity repo_path
+  remote_name remote_url base_branch head_branch expected_starting_ref
+  allowed_operations credential_identity human_confirmation_id ledger_path
+]
+common.each { |field| errors << "missing_#{field}" if !capsule.key?(field) || capsule[field].nil? || capsule[field] == "" || capsule[field] == [] }
+
+errors << "invalid_schema_version" unless capsule["schema_version"] == 1
+errors << "invalid_issuer" unless capsule["issued_by"] == "tw-commit-push-pr"
+errors << "invalid_capsule_type" unless %w[publication merge].include?(capsule["capsule_type"])
+
+begin
+  issued_at = Time.parse(capsule.fetch("issued_at").to_s)
+  expires_at = Time.parse(capsule.fetch("expires_at").to_s)
+  now = Time.now.utc
+  errors << "invalid_time_window" unless issued_at <= now && now <= expires_at
+  errors << "capsule_ttl_too_long" if expires_at - issued_at > 900
+rescue KeyError, ArgumentError
+  errors << "invalid_time_window"
+end
+
+expected_context = {
+  "baseline_id" => "baseline_id",
+  "baseline_hash" => "baseline_hash",
+  "repo_identity" => "repo_identity",
+  "repo_path" => "repo_path",
+  "remote_name" => "remote_name",
+  "remote_url" => "remote_url",
+  "base_branch" => "base_branch",
+  "head_branch" => "head_branch",
+  "expected_starting_ref" => "current_starting_ref",
+  "reviewed_tree_sha256" => "current_tree_sha256",
+  "credential_identity" => "credential_identity",
+  "human_confirmation_id" => "human_confirmation_id",
+  "ledger_path" => "ledger_path"
+}
+expected_context.each do |capsule_field, context_field|
+  errors << "mismatch_#{capsule_field}" unless capsule[capsule_field] == context[context_field]
+end
+
+repo_path = File.realpath(options[:repo]) rescue File.expand_path(options[:repo])
+capsule_repo_path = File.realpath(capsule["repo_path"].to_s) rescue File.expand_path(capsule["repo_path"].to_s)
+errors << "mismatch_repo_path" unless repo_path == capsule_repo_path
+git_common_dir, _git_error, git_status = Open3.capture3("git", "-C", repo_path, "rev-parse", "--git-common-dir")
+if !git_status.success?
+  errors << "git_common_dir_unresolved"
+else
+  canonical_ledger = File.join(File.expand_path(git_common_dir.strip, repo_path), "traceweaver", "publication-consumed-run-ids")
+  supplied_ledgers = [options[:ledger], capsule["ledger_path"], context["ledger_path"]].map { |path| File.expand_path(path.to_s) }
+  errors << "noncanonical_ledger_path" unless supplied_ledgers.all? { |path| path == canonical_ledger }
+end
+%w[traceability_evidence_ids verification_evidence_ids clean_review_evidence_ids].each do |field|
+  errors << "mismatch_#{field}" unless Array(capsule[field]).sort == Array(context[field]).sort
+end
+errors << "mismatch_file_scope" unless Array(capsule["file_scope"]).sort == Array(context["current_file_scope"]).sort
+
+publication_ops = %w[branch stage commit push pr_create pr_edit]
+operations = Array(capsule["allowed_operations"])
+
+if capsule["capsule_type"] == "merge"
+  errors << "merge_capsule_must_be_separate" unless operations == ["merge"]
+  %w[pr_repository pr_number pr_url expected_head_sha merge_method].each do |field|
+    errors << "missing_#{field}" if !capsule.key?(field) || capsule[field].nil? || capsule[field] == ""
+  end
+  %w[pr_repository pr_number pr_url merge_method].each do |field|
+    errors << "mismatch_#{field}" unless capsule[field] == context[field]
+  end
+  errors << "mismatch_expected_head_sha" unless capsule["expected_head_sha"] == context["current_head_sha"]
+  errors << "pr_not_open" unless context["pr_state"] == "OPEN"
+  errors << "pr_is_draft" unless context["is_draft"] == false
+  errors << "pr_not_mergeable" unless context["mergeable"] == true
+  errors << "changes_requested" if context["review_decision"] == "CHANGES_REQUESTED"
+  errors << "required_checks_not_passed" unless context["required_checks_passed"] == true
+else
+  errors << "invalid_allowed_operations" unless operations.all? { |operation| publication_ops.include?(operation) }
+  errors << "merge_requires_separate_capsule" if operations.include?("merge")
+  if operations.include?("pr_edit")
+    %w[pr_repository pr_number pr_url expected_head_sha].each do |field|
+      errors << "missing_#{field}" if !capsule.key?(field) || capsule[field].nil? || capsule[field] == ""
+    end
+    %w[pr_repository pr_number pr_url].each do |field|
+      errors << "mismatch_#{field}" unless capsule[field] == context[field]
+    end
+    errors << "mismatch_expected_head_sha" unless capsule["expected_head_sha"] == context["current_head_sha"]
+  end
+end
+
+ledger_path = File.expand_path(options[:ledger])
+unless errors.empty?
+  warn "publication_capsule=blocked reason=#{errors.uniq.join(',')}"
+  exit 1
+end
+
+FileUtils.mkdir_p(File.dirname(ledger_path))
+ledger_entry = "#{capsule.fetch('run_id')} #{capsule_digest}"
+File.open(ledger_path, File::RDWR | File::CREAT, 0o600) do |file|
+  file.flock(File::LOCK_EX)
+  file.rewind
+  used = file.each_line(chomp: true).to_a
+  used_run_ids = used.map { |entry| entry.split(" ", 2).first }
+  if options[:mode] == "consume"
+    errors << "reused_run_id" if used_run_ids.include?(capsule["run_id"])
+    if errors.empty?
+      file.seek(0, IO::SEEK_END)
+      file.puts(ledger_entry)
+      file.flush
+      file.fsync
+    end
+  else
+    errors << "capsule_digest_mismatch" if used_run_ids.include?(capsule["run_id"]) && !used.include?(ledger_entry)
+    errors << "run_id_not_consumed" unless used_run_ids.include?(capsule["run_id"])
+  end
+end
+
+unless errors.empty?
+  warn "publication_capsule=blocked reason=#{errors.uniq.join(',')}"
+  exit 1
+end
+
+puts "publication_capsule=authorized mode=#{options.fetch(:mode)} type=#{capsule.fetch('capsule_type')} run_id=#{capsule.fetch('run_id')}"

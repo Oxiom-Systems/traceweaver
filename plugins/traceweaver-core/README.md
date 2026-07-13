@@ -35,7 +35,7 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.2.7`
+Plugin version: `0.2.8`
 
 Included skills:
 
@@ -169,7 +169,7 @@ package. Bump every peer plugin manifest carried by the release:
 - `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.2.7`.
+`traceweaver-core--v0.2.8`.
 
 Tagging and the GitHub Release are automated: when a commit that bumps the
 plugin version lands on `main`, the `Release on version bump` workflow
@@ -224,9 +224,12 @@ This alpha installs skills, not slash commands. Slash-command or prompt
 surfaces require a later package record that adds command/prompt files and
 proves they install.
 
-`tw-auto` is a skill entrypoint, not a slash command. It must stop before commit,
-push, or PR creation in this alpha and report the next review, evidence, or
-human authority step.
+`tw-auto` is a skill entrypoint, not a slash command. It must stop before direct
+commit, push, or PR creation, but after all authority, verification, traceability,
+review, tree, target, credential, and confirmation gates pass it may hand the
+exact target to `tw-commit-push-pr`. The publication wrapper remains the sole
+authority owner and issues a validated single-use capsule for the packaged
+publication delegate.
 
 The selected CE-compatible skills are packaged under TraceWeaver's internal
 plugin skill store for wrapper delegation. They are not installed as the normal

@@ -1,0 +1,42 @@
+record_type: imported_ce_component_overlay
+overlay_id: TW-CE-OVERLAY-2026-07-13-GATED-PUBLICATION-001
+created_at: 2026-07-13
+owner: Oxiom Systems
+beads_issue: TraceWeaver-aw3y
+requirements:
+  - REQ-TW-053
+  - REQ-TW-059
+trace_ids:
+  - TRACE-TW-033
+  - TRACE-TW-040
+verification_ids:
+  - VER-TW-042
+  - VER-TW-052
+  - VER-TW-079
+upstream_source:
+  selected_ce_release: compound-engineering-v3.14.3
+  traceweaver_base_ref: cfbbd1bfb83fc1db5943b710390d30f52fe9bd32
+  base_artifact: plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md
+  base_sha256: bf7fed9a354e61069721be587d464fd36186e1ecd466312263e42d7759bb22f2
+local_change:
+  reason: The selected packaged component retained an alpha blanket hold even though approved REQ-TW-053 defines a clean controlled publication route.
+  affected_files:
+    - plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md
+    - plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md
+  allowed_scope:
+    - accept execution only from tw-commit-push-pr with a complete single-use authorization capsule
+    - recheck repository, tree, target, credential, PR, and check state before mutation
+    - keep direct CE invocation and stale or incomplete capsules blocked
+    - support separately authorized merge with downstream verification discipline
+  candidate_ce_skill_sha256: ba548210fe3444ed9abcd7c133e00ad1f0ba0eee077e25b515440b8f60552fc5
+verification:
+  red_result: real remote publication without capsule failed the new fixture before implementation
+  green_command: scripts/traceweaver-smoke-controlled-publication
+  green_result: pass
+  broader_regression_status: pass_for_changed_scope_and_all_non_baseline-failing_smokes; ce-replacement-classifier and systems-engineering-audit-closure failures reproduced unchanged on origin/main
+  review_status: clean_after_git_derived_canonical_ledger_security_repair
+removal_or_refresh_condition: Reconcile this overlay whenever the selected CE source changes or upstream provides an equivalent TraceWeaver authorization-capsule contract; any body refresh resets code review and publication evidence.
+held_claims:
+  - arbitrary direct CE publication
+  - force push
+  - deployment success without downstream evidence

@@ -493,9 +493,11 @@ assert_contains "$tw_commit_push_pr" "tw-code-review" "tw_commit_push_pr_code_re
 assert_contains "$tw_commit_push_pr" "tw-doc-review" "tw_commit_push_pr_doc_review_gate"
 assert_contains "$tw_commit_push_pr" "controlled publication route" "tw_commit_push_pr_publication_route"
 assert_contains "$tw_commit_push_pr" 'delegate to the TraceWeaver-packaged `ce-commit-push-pr`' "tw_commit_push_pr_delegates_packaged_ce_pr"
+assert_contains "$tw_commit_push_pr" "single-use authorization capsule" "tw_commit_push_pr_capsule_gate"
 assert_contains "$tw_commit_push_pr" 'Do not run `git add`' "tw_commit_push_pr_no_git_mutation_boundary"
 assert_contains "$ce_commit" "TraceWeaver Package Boundary" "tw_commit_packaged_ce_commit_boundary"
 assert_contains "$ce_commit_push_pr" "TraceWeaver Package Boundary" "tw_commit_push_pr_packaged_ce_pr_boundary"
+assert_contains "$ce_commit_push_pr" "Direct invocation" "tw_commit_push_pr_packaged_ce_direct_invocation_blocked"
 echo "tw_commit_publication_wrapper_static=pass"
 echo "tw_commit_push_pr_publication_wrapper_static=pass"
 
