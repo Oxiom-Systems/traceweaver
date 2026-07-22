@@ -91,10 +91,14 @@ delivery underrun. There is no in-task exception.
 
 ## V&V Definition Preflight
 
-Before any behavior-bearing mutation, `tw-work` must consume one of these
-preconditions for the exact work item:
+Before any mutation, `tw-work` uses the frozen profile's proportional
+precondition for the exact work item. L0 has no V&V capsule and no exception
+ceremony; it may proceed only with the profile's applicable deterministic check.
+L1 consumes exactly one compact work-item capsule (authority reference, focused
+verification, one validation question, expected evidence) and must not demand a
+per-requirement validation document. L2/L3 consume the full v1 preconditions:
 
-1. a V&V definition capsule produced by `tw-vv-define`, linked to the matrix,
+1. a full V&V definition capsule produced by `tw-vv-define`, linked to the matrix,
    and accepted by the skill-local checker with review evidence:
 
    ```sh
@@ -109,14 +113,19 @@ preconditions for the exact work item:
    expected-failing (RED) evidence, validation artifact, and review-passed
    evidence path. `tw-work` verifies this prior evidence; it does not create
    the RED artifact at work time.
-2. a recorded scoped not-applicable decision or approved exception under
-   REQ-TW-076, identifying its scope, reason, owner where applicable, review
-   condition, and next step.
+2. an L1 compact capsule accepted by the same checker. Its
+   `schema_version` is `tw-vv-compact/1`, its `workflow_profile` is `L1`, and
+   it has no `requirements[]` or `validation_artifact` fan-out fields.
 
-A missing, invalid, non-review-passed, or wrong-work-item capsule is a stop
-before mutation and before packaged `ce-work`. Return control to `tw-auto`,
-which routes the work item back to `tw-vv-define`; do not infer a capsule,
-backfill RED evidence, or treat a later test run as a substitute.
+3. for L3 only, the full capsule also contains non-empty rollback and
+   owner-decision high-risk controls; missing controls are
+   `held_missing_control`.
+
+For L1-L3, a missing, invalid, non-review-passed where required, or
+wrong-work-item capsule is a stop before mutation and before packaged `ce-work`.
+Return control to `tw-auto`, which routes the work item back to
+`tw-vv-define`; do not infer a capsule, backfill RED evidence, or treat a later
+test run as a substitute.
 
 <!-- Provenance: rigor mechanism adapted in original TraceWeaver wording from
 obra/superpowers test-driven-development and verification-before-completion,

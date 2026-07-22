@@ -85,8 +85,12 @@ Whenever `actual_process_minutes > actual_delivery_minutes`, return
 2. Create only the bounded capsule(s) permitted by its child roles and caps.
 3. Dispatch a child; record harness dispatch/return receipts and apply the
    projection guards before every dispatch.
-4. Route a builder capsule to `tw-work`; route verification, review, authorized
-   deployment, and dogfood only to their profiled child roles.
+4. Route proportional V&V before a builder: L0 has no capsule and no exception
+   ceremony; L1 routes one compact work-item capsule with focused verification
+   and one validation question; L2/L3 route the full v1 capsule, with L3
+   high-risk controls. Route a builder capsule to `tw-work`; route
+   verification, review, authorized deployment, and dogfood only to their
+   profiled child roles.
 5. At a hold, cap, unavailable-model, immutable-profile, or budget breach,
    return the precise held/refusal result. Do not expand the profile or take over
    child work.

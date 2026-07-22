@@ -281,6 +281,89 @@ assert_file_contains "$VALIDATION_EXAMPLE" "^## Evidence Path" \
 assert_file_contains "$EXAMPLE_CAPSULE" "vv-define-validation-definition.example.md" \
   "vv_define_smoke_example_capsule_validation_artifact_ref"
 
+# --- Step 4h: proportional L0-L3 routing ----------------------------------
+
+for expected in \
+  l0-not-applicable.expected \
+  l1-compact-capsule.expected \
+  l2-full-v1-capsule.expected \
+  l3-full-v1-capsule.expected \
+  missing-high-risk-control.expected; do
+  require_file "$FIXTURE_ROOT/$expected"
+done
+
+# L0 is genuinely no-capsule work: no V&V exception record or capsule is
+# manufactured merely to say that deterministic checking was sufficient.
+assert_file_contains "$FIXTURE_ROOT/l0-not-applicable.expected" "capsule=none" \
+  "vv_define_smoke_l0_no_capsule"
+assert_file_contains "$FIXTURE_ROOT/l0-not-applicable.expected" "exception=none" \
+  "vv_define_smoke_l0_no_exception_ceremony"
+assert_file_contains "$FIXTURE_ROOT/l1-compact-capsule.expected" "fanout=forbidden" \
+  "vv_define_smoke_l1_fixture_contract"
+assert_file_contains "$FIXTURE_ROOT/l2-full-v1-capsule.expected" "requirements=full_v1" \
+  "vv_define_smoke_l2_fixture_contract"
+assert_file_contains "$FIXTURE_ROOT/l3-full-v1-capsule.expected" "high_risk_controls=required" \
+  "vv_define_smoke_l3_fixture_contract"
+assert_file_contains "$FIXTURE_ROOT/missing-high-risk-control.expected" \
+  "VV-CAPSULE-L3-MISSING-HIGH-RISK-CONTROL" \
+  "vv_define_smoke_l3_missing_control_fixture_contract"
+
+compact_capsule="$TMP_DIR/l1-compact.json"
+cat > "$compact_capsule" <<JSON
+{
+  "schema_version": "tw-vv-compact/1",
+  "workflow_profile": "L1",
+  "work_item_id": "FIXTURE-L1-COMPACT",
+  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "authority_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "focused_verification": "fixtures/vv-define/valid-capsule/verification/red_test.sh",
+  "validation_question": "Does the narrow change meet its stated user need?",
+  "expected_evidence": "Focused verification passes after the bounded change."
+}
+JSON
+expect_pass "$compact_capsule" "vv_define_smoke_l1_compact_capsule"
+
+compact_fanout_capsule="$TMP_DIR/l1-compact-fanout.json"
+sed 's/}$/,"requirements":[]}/' "$compact_capsule" > "$compact_fanout_capsule"
+expect_blocked "$compact_fanout_capsule" "VV-COMPACT-FANOUT-FIELDS" \
+  "vv_define_smoke_l1_compact_no_fanout"
+
+write_full_profile_capsule() {
+  local out="$1"
+  local profile="$2"
+  local controls="${3:-}"
+  cat > "$out" <<JSON
+{
+  "schema_version": "tw-vv-capsule/1",
+  "workflow_profile": "$profile",
+  "work_item_id": "FIXTURE-$profile-FULL",
+  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "requirements": [{
+    "req_id": "REQ-FIXTURE-006",
+    "trace_id": "TRACE-FIXTURE-006",
+    "ver_id": "VER-FIXTURE-006",
+    "val_id": "VAL-FIXTURE-006",
+    "verification_artifact": "fixtures/vv-define/valid-capsule/verification/red_test.sh",
+    "red_evidence": "fixtures/vv-define/valid-capsule/red-evidence/red_run.txt",
+    "validation_artifact": "fixtures/vv-define/valid-capsule/validation/validation-definition.md"
+  }]$controls
+}
+JSON
+}
+
+l2_capsule="$TMP_DIR/l2-full-v1.json"
+write_full_profile_capsule "$l2_capsule" "L2"
+expect_pass "$l2_capsule" "vv_define_smoke_l2_full_v1_compatibility"
+
+l3_capsule="$TMP_DIR/l3-full-v1.json"
+write_full_profile_capsule "$l3_capsule" "L3" ',"high_risk_controls":{"rollback":"revert bounded change","owner_decision":"owner approval required"}'
+expect_pass "$l3_capsule" "vv_define_smoke_l3_full_v1_high_risk_controls"
+
+l3_missing_control_capsule="$TMP_DIR/l3-missing-high-risk-control.json"
+write_full_profile_capsule "$l3_missing_control_capsule" "L3"
+expect_blocked "$l3_missing_control_capsule" "VV-CAPSULE-L3-MISSING-HIGH-RISK-CONTROL" \
+  "vv_define_smoke_l3_missing_high_risk_control"
+
 # --- Step 5: held runtime notice (disabled by default) ---------------------
 
 if [[ "$RUNTIME_EXEC" == "1" ]]; then

@@ -13,6 +13,7 @@ require "optparse"
 require "pathname"
 
 SCHEMA_VERSION_LITERAL = "tw-vv-capsule/1"
+COMPACT_SCHEMA_VERSION_LITERAL = "tw-vv-compact/1"
 
 ID_FORMATS = {
   "req_id" => /\AREQ-[A-Z]+-[0-9]+\z/,
@@ -78,7 +79,25 @@ SCHEMA_TEMPLATE = <<~SCHEMA
     every verification-mode requirement must carry at least one reviews[]
     entry with status "passed" whose evidence_path is present and resolves to
     an existing file. Without this flag, reviews[] is only structurally
-    validated and its passed/not-passed status is not itself a finding.
+  validated and its passed/not-passed status is not itself a finding.
+
+  Compact L1 capsule (#{COMPACT_SCHEMA_VERSION_LITERAL}):
+    workflow_profile       - literal "L1"
+    work_item_id           - stable work item/task identifier
+    plan_ref               - relative accepted plan path within --root
+    authority_ref          - relative approved authority path within --root
+    focused_verification   - relative focused test/fixture/smoke within --root
+    validation_question    - one non-empty work-item validation question
+    expected_evidence      - non-empty expected-result description or path
+
+    The compact capsule intentionally has neither requirements[] nor a
+    validation_artifact field: it is one work-item record, not per-requirement
+    validation-document fan-out.
+
+  L3 full-capsule control:
+    A full capsule declaring workflow_profile "L3" requires
+    high_risk_controls.rollback and high_risk_controls.owner_decision.
+    L2 and historical full v1 capsules remain compatible.
 
   Example (also see docs/validation/examples/vv-define-capsule.example.json):
 
@@ -233,7 +252,63 @@ if data && !data.is_a?(Hash)
   data = nil
 end
 
-if data
+if data && data["schema_version"] == COMPACT_SCHEMA_VERSION_LITERAL
+  compact_fields = %w[workflow_profile work_item_id plan_ref authority_ref focused_verification validation_question expected_evidence]
+  compact_fields.each do |field|
+    next if present_string?(data[field])
+
+    emit.call(
+      id: "VV-COMPACT-MISSING-FIELD",
+      severity: "P1",
+      title: "Compact L1 capsule is missing a required field",
+      evidence: "missing=#{field} capsule=#{capsule_relative}",
+      remediation: "Populate #{field} for the compact work-item capsule."
+    )
+  end
+
+  if data["workflow_profile"] != "L1"
+    emit.call(
+      id: "VV-COMPACT-BAD-PROFILE",
+      severity: "P1",
+      title: "Compact capsule is reserved for L1 work",
+      evidence: "workflow_profile=#{data['workflow_profile'].inspect} capsule=#{capsule_relative}",
+      remediation: "Use workflow_profile L1, or the full tw-vv-capsule/1 format for L2/L3."
+    )
+  end
+
+  %w[plan_ref authority_ref focused_verification].each do |field|
+    raw_path = data[field]
+    next unless present_string?(raw_path)
+
+    if path_escapes_root?(root, raw_path)
+      emit.call(
+        id: "VV-CAPSULE-PATH-ESCAPES-ROOT",
+        severity: "P1",
+        title: "Compact capsule path escapes --root",
+        evidence: "field=#{field} path=#{raw_path} capsule=#{capsule_relative}",
+        remediation: "#{field} must be a relative path that resolves within --root."
+      )
+    elsif !resolve(root, raw_path).file?
+      emit.call(
+        id: "VV-COMPACT-ARTIFACT-NOT-FOUND",
+        severity: "P1",
+        title: "Compact capsule references a missing artifact",
+        evidence: "field=#{field} path=#{raw_path} capsule=#{capsule_relative}",
+        remediation: "Point #{field} at an existing repository file."
+      )
+    end
+  end
+
+  if data.key?("requirements") || data.key?("validation_artifact")
+    emit.call(
+      id: "VV-COMPACT-FANOUT-FIELDS",
+      severity: "P1",
+      title: "Compact L1 capsule includes full-capsule fan-out fields",
+      evidence: "capsule=#{capsule_relative}",
+      remediation: "Keep L1 as one work-item capsule; reserve tw-vv-capsule/1 for L2/L3."
+    )
+  end
+elsif data
   %w[schema_version work_item_id plan_ref].each do |field|
     next if present_string?(data[field])
 
@@ -591,6 +666,24 @@ if data
           remediation: "Add a reviews[] entry with status \"passed\" and an evidence_path that resolves to an existing file before --require-review-passed will accept this requirement."
         )
       end
+    end
+  end
+
+  if data["workflow_profile"] == "L3"
+    controls = data["high_risk_controls"]
+    missing_controls = if controls.is_a?(Hash)
+                         %w[rollback owner_decision].reject { |field| present_string?(controls[field]) }
+                       else
+                         %w[rollback owner_decision]
+                       end
+    unless missing_controls.empty?
+      emit.call(
+        id: "VV-CAPSULE-L3-MISSING-HIGH-RISK-CONTROL",
+        severity: "P1",
+        title: "L3 full capsule lacks required high-risk controls",
+        evidence: "missing=#{missing_controls.join(',')} capsule=#{capsule_relative}",
+        remediation: "Add high_risk_controls.rollback and high_risk_controls.owner_decision before L3 work proceeds."
+      )
     end
   end
 end
