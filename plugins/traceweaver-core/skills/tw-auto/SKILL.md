@@ -6,6 +6,7 @@ disable-model-invocation: false
 ---
 
 <!-- TRACEWEAVER: file-role=advisory-profile-router; req=REQ-TW-082; req=REQ-TW-083; req=REQ-TW-084 -->
+<!-- TRACEWEAVER: file-role=advisory-profile-router; req=REQ-TW-086; req=REQ-TW-087 -->
 
 # TraceWeaver Auto
 
@@ -90,10 +91,33 @@ Whenever `actual_process_minutes > actual_delivery_minutes`, return
    return the precise held/refusal result. Do not expand the profile or take over
    child work.
 
+## Scoped Review and Terminal Routing
+
+For a profiled review child, route only the review identity and fan-out defined
+by `references/scoped-review-protocol.md`. The identity is baseline hash,
+profile hash, changed-file digest, and verification digest. If it matches an
+accepted review, route receipt reuse rather than another generic review;
+matrix/status/projection-only changes do not create a new changed-file digest.
+
+The master routes, but never performs, review, repair, deployment, browser
+dogfood, or terminal acceptance. It enforces the profiled reviewer and repair
+caps in the child capsule: one routine independent reviewer, at most two active
+reviewers, at most three personas, validators only for P0/P1 or disputed P2,
+and no more than two repair cycles. It routes P0/P1 repair, the contested-P2
+path, and `held_no_progress`; routine P2/P3 do not gain an extra cycle.
+
+Route terminal reporting to `references/terminal-receipt-template.yml`. Report
+`ready_for_authorized_deploy` when only authorized deployment evidence remains,
+`held_dogfood` when required browser dogfood evidence remains, and `complete`
+only when every required fact has passed. Never infer deployment or dogfood from
+implementation, verification, or review.
+
 ## Output
 
 Return the profile revision/hash and selected fields, child capsule routing,
 monotonic receipts, estimate guards, actual accounting, and one truthful state:
-`routed`, `refused_profile_immutable`, `refused_estimated_process_ceiling`, or
-`held_process_budget`. Deployment and dogfood remain separate child receipts;
-neither is implied by implementation or verification.
+`routed`, `refused_profile_immutable`, `refused_estimated_process_ceiling`,
+`held_process_budget`, `held_no_progress`, `ready_for_authorized_deploy`, or
+`held_dogfood`. `complete` is a child-receipt result only, never a master
+inference. Deployment and dogfood remain separate child receipts; neither is
+implied by implementation or verification.

@@ -1,0 +1,28 @@
+profile: L1
+review_identity:
+  baseline_hash: sha256:baseline-l1
+  profile_hash: sha256:profile-l1
+  changed_file_digest: sha256:changed-l1
+  verification_digest: sha256:verification-l1
+identity_reuse:
+  matrix_status_projection_only_change: true
+  result: reuse_accepted_review
+fanout:
+  active_reviewers: [independent]
+  personas: [routine_independent]
+  specialist_triggered: false
+  validator_triggered: false
+finding:
+  severity: P3
+  route: record_without_extra_cycle
+repair_cycles: 0
+terminal_receipt:
+  facts:
+    implemented: { state: passed, evidence_refs: [implementation-l1] }
+    verified: { state: passed, evidence_refs: [verification-l1] }
+    reviewed: { state: passed, evidence_refs: [review-l1] }
+    deployed: { state: not_applicable, evidence_refs: [] }
+    dogfooded: { state: not_applicable, evidence_refs: [] }
+  requirements: { deploy_required: false, chrome_dogfood_required: false }
+  terminal_state: complete
+  accounting: { process_minutes: 1, delivery_minutes: 8 }

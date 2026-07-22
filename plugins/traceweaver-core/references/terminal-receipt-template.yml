@@ -1,0 +1,19 @@
+schema_version: tw-terminal-receipt/1
+review_identity:
+  baseline_hash: "sha256:<approved-baseline>"
+  profile_hash: "sha256:<frozen-profile>"
+  changed_file_digest: "sha256:<reviewed-behavior-and-authority-files>"
+  verification_digest: "sha256:<verification-evidence>"
+facts:
+  implemented: { state: held, evidence_refs: [] }
+  verified: { state: held, evidence_refs: [] }
+  reviewed: { state: held, evidence_refs: [] }
+  deployed: { state: not_applicable, evidence_refs: [] }
+  dogfooded: { state: not_applicable, evidence_refs: [] }
+requirements:
+  deploy_required: false
+  chrome_dogfood_required: false
+terminal_state: held
+accounting:
+  process_minutes: 0
+  delivery_minutes: 0

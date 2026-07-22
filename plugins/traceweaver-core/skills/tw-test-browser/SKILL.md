@@ -5,6 +5,7 @@ argument-hint: "[URL, route, feature, test target, or verification context]"
 ---
 
 <!-- TRACEWEAVER: file-role=verification-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-037; ver=VER-TW-047 -->
+<!-- TRACEWEAVER: file-role=verification-wrapper-skill; req=REQ-TW-087 -->
 
 # TraceWeaver Test Browser
 
@@ -38,9 +39,13 @@ Before delegating, load and cite:
 2. If accepted verification is intended, require a clear requirement ID, trace
    ID, verification ID, and expected acceptance signal.
 3. Delegate execution to the TraceWeaver-packaged `ce-test-browser` engine.
-4. Return commands, screenshots or artifacts, pass/fail status, and matrix
-   evidence that `tw-work` or `tw-code-review` can link.
-5. Mark evidence exploratory or held when IDs or acceptance criteria are
+4. For browser-facing work, collect delegated Chrome evidence: URL, build
+   identifier, journey, console result, network result, screenshot paths, and
+   pass/fail result. A browser-facing dogfood fact is held when any required
+   field is absent.
+5. Return commands, screenshots or artifacts, pass/fail status, and evidence
+   that the terminal receipt can link.
+6. Mark evidence exploratory or held when IDs or acceptance criteria are
    missing.
 
 ## Boundaries
@@ -60,4 +65,6 @@ Return:
 - verification or exploratory classification
 - requirement, trace, and verification IDs used
 - artifact paths and pass/fail evidence
+- Chrome URL/build/journey/console/network/screenshots/result when dogfood is
+  required
 - held claims and next TraceWeaver handoff

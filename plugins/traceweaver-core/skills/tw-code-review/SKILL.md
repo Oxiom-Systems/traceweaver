@@ -6,6 +6,7 @@ description: TraceWeaver-controlled code review wrapper. Use when reviewing code
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-049; trace=TRACE-TW-023; ver=VER-TW-032 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
+<!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-086; req=REQ-TW-087 -->
 
 # TraceWeaver Code Review
 
@@ -15,6 +16,22 @@ Run code review as a TraceWeaver-controlled review step instead of a raw CE
 review. This wrapper preserves the CE reviewer behavior while requiring
 authority, traceability, verification, validation, and held-claim checks before
 review findings can be treated as accepted TraceWeaver input.
+
+## Scoped Review Identity
+
+Use `references/scoped-review-protocol.md` to form the review identity from the
+baseline hash, frozen profile hash, changed-file digest, and verification
+digest. Reuse an accepted review when that identity is unchanged. A diff that
+only changes a matrix, status record, or derived projection is not a reason to
+start a generic duplicate review.
+
+Select the profile's deduplicated reviewers: one routine independent reviewer,
+at most two active reviewers, and at most three personas in a cycle. Add a
+specialist only when its profile trigger applies. Add a validator only for P0,
+P1, or disputed P2. P0/P1 findings route to a repair and identity-scoped rerun;
+routine P2/P3 findings do not create another cycle. A disputed P2 follows the
+contested-P2 decision path. Stop at two repair cycles or unchanged blocked work
+with `held_no_progress`.
 
 ## Required Authority Inputs
 
@@ -98,6 +115,9 @@ Return:
 - open gaps, dark behavior, held claims, and unsupported claims
 - whether the review may be used as accepted TraceWeaver input
 - highest-level next TraceWeaver wrapper command, review, or human decision
+- review identity and whether accepted review was reused
+- selected reviewer personas, active-reviewer count, and repair-cycle result
+- terminal receipt reference when this review contributes to terminal state
 
 ## Gate
 

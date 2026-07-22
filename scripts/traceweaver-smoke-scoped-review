@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+
+ruby - "$root" <<'RUBY'
+require "yaml"
+
+root = ARGV.fetch(0)
+fixtures = File.join(root, "fixtures/scoped-review")
+
+def load_yaml(path)
+  YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)
+end
+
+def fail!(message)
+  raise "scoped-review smoke: #{message}"
+end
+
+def fact_passed?(receipt, name)
+  receipt.dig("facts", name, "state") == "passed" &&
+    !receipt.dig("facts", name, "evidence_refs").to_a.empty?
+end
+
+def validate_receipt!(receipt)
+  %w[implemented verified reviewed deployed dogfooded].each do |name|
+    fact = receipt.dig("facts", name) || fail!("missing #{name} fact")
+    state = fact["state"]
+    fail!("invalid #{name} state") unless %w[passed held not_applicable].include?(state)
+    fail!("passed #{name} lacks evidence") if state == "passed" && fact["evidence_refs"].to_a.empty?
+  end
+
+  requirements = receipt.fetch("requirements")
+  state = receipt.fetch("terminal_state")
+  prerequisite = %w[implemented verified reviewed].all? { |name| fact_passed?(receipt, name) }
+  deploy_required = requirements.fetch("deploy_required")
+  dogfood_required = requirements.fetch("chrome_dogfood_required")
+
+  case state
+  when "ready_for_authorized_deploy"
+    fail!("ready deploy prerequisites") unless prerequisite && deploy_required
+    fail!("ready deploy must hold deployment") unless receipt.dig("facts", "deployed", "state") == "held"
+  when "held_dogfood"
+    fail!("held dogfood prerequisites") unless prerequisite && deploy_required && dogfood_required
+    fail!("held dogfood needs deployment evidence") unless fact_passed?(receipt, "deployed")
+    fail!("held dogfood must hold dogfood") unless receipt.dig("facts", "dogfooded", "state") == "held"
+  when "complete"
+    fail!("complete prerequisites") unless prerequisite
+    fail!("complete missing deploy") if deploy_required && !fact_passed?(receipt, "deployed")
+    fail!("complete missing Chrome dogfood") if dogfood_required && !fact_passed?(receipt, "dogfooded")
+  else
+    fail!("unknown terminal state #{state}")
+  end
+end
+
+protocol = File.read(File.join(root, "plugins/traceweaver-core/references/scoped-review-protocol.md"))
+%w[baseline_hash profile_hash changed_file_digest verification_digest reuse_accepted_review held_no_progress ready_for_authorized_deploy held_dogfood].each do |term|
+  fail!("protocol missing #{term}") unless protocol.include?(term)
+end
+
+template = load_yaml(File.join(root, "plugins/traceweaver-core/references/terminal-receipt-template.yml"))
+fail!("wrong receipt schema") unless template.fetch("schema_version") == "tw-terminal-receipt/1"
+%w[baseline_hash profile_hash changed_file_digest verification_digest].each do |field|
+  fail!("template missing review identity #{field}") unless template.fetch("review_identity").key?(field)
+end
+%w[implemented verified reviewed deployed dogfooded].each do |fact|
+  fail!("template missing #{fact}") unless template.fetch("facts").key?(fact)
+end
+
+items = %w[l1.expected l2.expected l3.expected contested-p2.expected].map do |name|
+  [name, load_yaml(File.join(fixtures, name))]
+end
+
+items.each do |name, item|
+  identity = item.fetch("review_identity")
+  %w[baseline_hash profile_hash changed_file_digest verification_digest].each do |field|
+    fail!("#{name} missing #{field}") if identity[field].to_s.empty?
+  end
+
+  fanout = item.fetch("fanout")
+  active = fanout.fetch("active_reviewers")
+  personas = fanout.fetch("personas")
+  fail!("#{name} missing routine independent reviewer") unless active.include?("independent") && personas.include?("routine_independent")
+  fail!("#{name} exceeds active reviewer cap") if active.length > 2
+  fail!("#{name} exceeds persona cap") if personas.length > 3
+  if fanout.fetch("specialist_triggered")
+    fail!("#{name} specialist lacks profile trigger") if fanout["specialist_profile_control"].to_s.empty?
+  end
+
+  finding = item.fetch("finding")
+  validator_allowed = %w[P0 P1].include?(finding.fetch("severity")) || finding["disputed"] == true
+  fail!("#{name} has disallowed validator") if fanout.fetch("validator_triggered") && !validator_allowed
+  case finding.fetch("severity")
+  when "P0", "P1"
+    fail!("#{name} P0/P1 route") unless finding.fetch("route") == "repair_then_rerun_scoped_review"
+  when "P2"
+    if finding["disputed"]
+      fail!("#{name} contested P2 route") unless finding.fetch("route") == "contested_p2_decision_path"
+    else
+      fail!("#{name} routine P2 cycle") unless finding.fetch("route") == "record_without_extra_cycle"
+    end
+  when "P3"
+    fail!("#{name} routine P3 cycle") unless finding.fetch("route") == "record_without_extra_cycle"
+  else
+    fail!("#{name} unknown severity")
+  end
+  fail!("#{name} exceeds repair cap") if item.fetch("repair_cycles") > 2
+  validate_receipt!(item.fetch("terminal_receipt"))
+  accounting = item.dig("terminal_receipt", "accounting")
+  fail!("#{name} missing fixed category elapsed") unless accounting.fetch("process_minutes") >= 0 && accounting.fetch("delivery_minutes") >= 0
+end
+
+l1 = items.to_h.fetch("l1.expected")
+fail!("matrix/status/projection-only identity not reused") unless l1.dig("identity_reuse", "matrix_status_projection_only_change") && l1.dig("identity_reuse", "result") == "reuse_accepted_review"
+l2 = items.to_h.fetch("l2.expected")
+fail!("two-cycle no-progress hold missing") unless l2.fetch("repair_cycles") == 2 && l2.fetch("repair_outcome") == "held_no_progress"
+
+premature_browser_complete = {
+  "facts" => {
+    "implemented" => { "state" => "passed", "evidence_refs" => ["implementation"] },
+    "verified" => { "state" => "passed", "evidence_refs" => ["verification"] },
+    "reviewed" => { "state" => "passed", "evidence_refs" => ["review"] },
+    "deployed" => { "state" => "passed", "evidence_refs" => ["deploy"] },
+    "dogfooded" => { "state" => "held", "evidence_refs" => [] }
+  },
+  "requirements" => { "deploy_required" => true, "chrome_dogfood_required" => true },
+  "terminal_state" => "complete"
+}
+begin
+  validate_receipt!(premature_browser_complete)
+  fail!("premature browser complete accepted")
+rescue RuntimeError => error
+  raise unless error.message.include?("complete missing Chrome dogfood")
+end
+
+premature_deploy_complete = Marshal.load(Marshal.dump(premature_browser_complete))
+premature_deploy_complete["facts"]["deployed"] = { "state" => "held", "evidence_refs" => [] }
+premature_deploy_complete["requirements"]["chrome_dogfood_required"] = false
+begin
+  validate_receipt!(premature_deploy_complete)
+  fail!("premature deployment complete accepted")
+rescue RuntimeError => error
+  raise unless error.message.include?("complete missing deploy")
+end
+
+auto = File.read(File.join(root, "plugins/traceweaver-core/skills/tw-auto/SKILL.md"))
+fail!("tw-auto direct implementation boundary missing") unless auto.include?("It has no direct implementation path.")
+fail!("tw-auto scoped review routing missing") unless auto.include?("Scoped Review and Terminal Routing")
+fail!("tw-auto claims direct review") if auto.include?("The master performs review")
+
+browser = File.read(File.join(root, "plugins/traceweaver-core/skills/tw-test-browser/SKILL.md"))
+%w[URL build journey console network screenshot].each do |term|
+  fail!("browser evidence missing #{term}") unless browser.downcase.include?(term.downcase)
+end
+
+puts "scoped-review smoke: PASS"
+RUBY

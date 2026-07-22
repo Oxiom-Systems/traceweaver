@@ -1,0 +1,26 @@
+profile: L3
+review_identity:
+  baseline_hash: sha256:baseline-l3
+  profile_hash: sha256:profile-l3
+  changed_file_digest: sha256:changed-l3
+  verification_digest: sha256:verification-l3
+fanout:
+  active_reviewers: [independent, security_specialist]
+  personas: [routine_independent, security_specialist, validator]
+  specialist_triggered: true
+  specialist_profile_control: security
+  validator_triggered: true
+finding:
+  severity: P0
+  route: repair_then_rerun_scoped_review
+repair_cycles: 1
+terminal_receipt:
+  facts:
+    implemented: { state: passed, evidence_refs: [implementation-l3] }
+    verified: { state: passed, evidence_refs: [verification-l3] }
+    reviewed: { state: passed, evidence_refs: [review-l3] }
+    deployed: { state: passed, evidence_refs: [deploy-l3] }
+    dogfooded: { state: held, evidence_refs: [] }
+  requirements: { deploy_required: true, chrome_dogfood_required: true }
+  terminal_state: held_dogfood
+  accounting: { process_minutes: 3, delivery_minutes: 16 }
