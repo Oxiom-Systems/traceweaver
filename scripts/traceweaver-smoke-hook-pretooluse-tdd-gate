@@ -57,6 +57,13 @@ run_positive() {
   echo "pretooluse_tdd_gate_vv_definition_present=pass"
 }
 
+run_schema_positive() {
+  local output="$TMP_DIR/vv-capsule-schema-present.json"
+  payload_for vv-capsule-schema-present | CLAUDE_PLUGIN_ROOT=fixture "$HOOK" >"$output"
+  assert_empty "$output"
+  echo "pretooluse_tdd_gate_vv_capsule_schema_present=pass"
+}
+
 run_warning_fixture_for_host() {
   local fixture="$1"
   local host="$2"
@@ -71,6 +78,8 @@ run_warning_fixture_for_host() {
 }
 
 run_positive
+run_schema_positive
+run_warning_fixture_for_host vv-capsule-schema-review-not-passed claude
 run_warning_fixture_for_host vv-definition-missing claude
 run_warning_fixture_for_host vv-definition-missing cursor
 run_warning_fixture_for_host vv-definition-present-red-path-missing claude
