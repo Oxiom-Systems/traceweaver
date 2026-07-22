@@ -115,11 +115,15 @@ return standalone `tw-requirements-review` as the normal next user command when
 accepted unchanged requirements can be cited and planning can proceed.
 
 After plan creation or update, recommend the highest-level executable next
-wrapper: normally `/tw-doc-review <plan>` for plan acceptance, `/tw-work <plan>`
-after an accepted plan, or `/tw-auto <plan-or-task>` for a multi-step closure
-loop. Recommend standalone `tw-requirements-review` only for explicit
-requirements diagnostics, baseline-authority review, or when planning is blocked
-because no higher wrapper can proceed without a human authority decision.
+wrapper: normally `/tw-doc-review <plan>` for plan acceptance. After an accepted
+behavior-bearing plan, the next wrapper is `/tw-vv-define <plan>`; route to
+`/tw-work <plan> --vv-capsule <capsule-path>` only when that phase supplies its
+review-passed capsule. For a docs-only plan, record the scoped REQ-TW-076
+not-applicable decision and route straight to the applicable review wrapper.
+Use `/tw-auto <plan-or-task>` for a multi-step closure loop. Recommend standalone
+`tw-requirements-review` only for explicit requirements diagnostics,
+baseline-authority review, or when planning is blocked because no higher wrapper
+can proceed without a human authority decision.
 
 ## Output
 
