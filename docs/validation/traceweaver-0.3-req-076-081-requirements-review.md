@@ -1,7 +1,7 @@
 ---
 id: TW-REQ-REVIEW-2026-07-22-REQ-TW-076-081-001
 title: TraceWeaver 0.3 Validation-First Candidate Requirements Review
-status: needs_revision_no_authority_promotion
+status: requirements_quality_passed_pending_scoped_doc_review_no_authority_promotion
 date: 2026-07-22
 owner: Oxiom Systems
 review_type: requirements_quality
@@ -20,8 +20,8 @@ Reviewed: 6 real requirements
 
 | Outcome | Count |
 | --- | ---: |
-| Can approve (quality only) | 5 |
-| Needs revision | 1 |
+| Can approve (quality only) | 6 |
+| Needs revision | 0 |
 | Blocked | 0 |
 | Human decision | 0 |
 | Reclassify | 0 |
@@ -43,10 +43,12 @@ allocation, verification method, validation question, and held-claim boundary
 are supplied by `requirements.md` and the proposed matrix rows
 (`requirements.md:385-390`; `docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md:27-32,47-85`).
 
-Five candidates are approval-quality statements. REQ-TW-079 needs revision:
-its required Codex fixture set is unconditional, while REQ-TW-081 forbids
-fixtures for any `unsupported-gap` or `unproven` host/hook cell. This is a
-set-level conflict in the proposed verification contract.
+All six candidates are approval-quality statements. The initial REQ-TW-079
+finding is closed by the revision recorded in the re-review section: its
+fixture, schema-validation, and smoke obligations now apply only to
+REQ-TW-081 `supported` SessionStart-equivalent cells; `unsupported-gap` and
+`unproven` cells require discovery/gap evidence and must not receive or claim
+fixtures. The same conditional contract appears in VER-TW-080.
 
 ## Authority Boundary
 
@@ -74,7 +76,7 @@ This record does **not**:
 | REQ-TW-076 | Workflow / V&V system requirement | 5/5 | Can approve | Clear mandatory pre-implementation V&V phase, objective review conditions, scoped exception route, named verification, and validation question. |
 | REQ-TW-077 | Software workflow-skill requirement | 5/5 | Can approve | Clear sequenced capability, capsule contents, verification artifacts, validation path, and non-authority boundary. |
 | REQ-TW-078 | Workflow-gate requirement | 5/5 | Can approve | Clear prerequisite/exception predicate and correct static/advisory-versus-runtime-held boundary. |
-| REQ-TW-079 | Interface / operational hook requirement | 3/5 | Needs revision | Clear advisory scope and host-gap intent, but its mandatory all-host fixture verification conflicts with REQ-TW-081's capability-state prohibition. |
+| REQ-TW-079 | Interface / operational hook requirement | 5/5 | Can approve | Clear advisory scope, host-gap intent, and capability-conditioned supported-cell fixture/schema/smoke contract; it now conforms to REQ-TW-081's non-supported-cell prohibition. |
 | REQ-TW-080 | Interface / operational hook requirement | 5/5 | Can approve | Clear non-blocking behavior, positive/negative pass criteria, and conditional Codex discovery boundary. |
 | REQ-TW-081 | Capability-matrix / evidence requirement | 5/5 | Can approve | Clear closed state vocabulary, supported-cell evidence rule, non-supported prohibition, and per-cell runtime-held boundary. |
 
@@ -120,18 +122,20 @@ A `Can approve` result is quality-only. It does not override the present
   verification, validation, and a held static-only boundary
   (`docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md:49,67,82`).
 
-### REQ-TW-079 — Needs revision (3/5)
+### REQ-TW-079 — Can approve (5/5; re-review)
 
 - **Classification:** interface / operational hook requirement.
 - **Quality:** The advisory-only scope, injected content, source pin,
   adapt/cherry-pick/no-rebase constraint, host-gap behavior, verification
-  method, and validation question are otherwise clear (`requirements.md:388`).
-- **Finding:** REQ-FIND-001 below. The conflict is confined to the all-host
-  fixture requirement and is resolvable without changing the stakeholder
-  outcome: capability discovery must allocate the fixture obligation only to
-  `supported` cells.
+  method, and validation question remain clear (`requirements.md:388`). The
+  revised verification contract makes fixture and schema-validation obligations
+  conditional on a REQ-TW-081 `supported` cell; a non-supported cell instead
+  requires discovery/gap evidence and cannot receive or claim a fixture.
+- **Finding:** REQ-FIND-001 is closed. `VER-TW-080` applies the same supported-
+  cell-only fixture and smoke rule (`docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md:68`).
 - **Held boundary:** The stated non-blocking/non-mutating/non-enforcing boundary
-  remains correct and must be preserved on revision.
+  remains correct. The revision does not claim hook authoring, live runtime
+  firing, enforcement, or coverage for `unsupported-gap`/`unproven` cells.
 
 ### REQ-TW-080 — Can approve (5/5)
 
@@ -208,6 +212,16 @@ traceability_impact: >
   implementation authority or be merged into the authoritative matrix until
   their capability-state-dependent verification contract is consistent.
 human_approval_required: false
+resolution_status: closed
+resolution_evidence:
+  - >
+    requirements.md:388 now requires fixtures, schema validation, and smoke
+    coverage only for REQ-TW-081 `supported` SessionStart-equivalent cells;
+    it requires discovery/gap records instead for `unsupported-gap` or
+    `unproven` cells and prohibits fixture coverage claims for them.
+  - >
+    docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md:68
+    applies the same supported-cell-only condition to VER-TW-080.
 ```
 
 ### Findings by severity
@@ -215,7 +229,7 @@ human_approval_required: false
 | Severity | Count |
 | --- | ---: |
 | Block | 0 |
-| Major | 1 |
+| Major | 0 |
 | Minor | 0 |
 | Note | 0 |
 
@@ -228,23 +242,29 @@ human_approval_required: false
 - **Held-claim boundary is sound** for static/advisory policy, non-blocking hooks,
   non-enforcement, and per-host runtime proof. The candidates do not claim that
   static fixture evidence proves live runtime behavior (`requirements.md:387-390`).
+- **Re-review conflict check:** The supported-cell condition is stated in both
+  REQ-TW-079 and VER-TW-080, matching REQ-TW-081. It introduces no new
+  ambiguity or set-level conflict: discovery/gap records are required for
+  `unsupported-gap`/`unproven` cells, and no fixture or coverage claim is
+  allowed for those cells.
 - **Proposed rows remain allocations, not matrix state.** The proposal says it
   neither amends the matrix nor makes IDs live (`docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md:3-10`), and requires both reviews before merge (`docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md:89-96`).
 
 ## Overall Verdict
 
-**NEEDS_REVISION — NOT AUTHORITY-READY.**
+**REQUIREMENTS-QUALITY PASSED — PENDING SCOPED `/tw-doc-review`; NOT YET
+IMPLEMENTATION AUTHORITY.**
 
-REQ-TW-079 must be revised to make its fixture obligations conditional on the
-REQ-TW-081 capability matrix, and the matching VER-TW-080 proposal must be kept
-consistent. Until then, the six-candidate set fails as a whole because the
-proposal's merge rule requires every candidate to pass requirements review.
+REQ-FIND-001 is closed: REQ-TW-079 and the matching VER-TW-080 proposal make
+fixture, schema-validation, and smoke obligations conditional on REQ-TW-081
+`supported` cells, while requiring a discovery/gap record rather than a fixture
+or coverage claim for `unsupported-gap`/`unproven` cells. All six candidates now
+pass the requirements-quality gate.
 
-After that revision, rerun `/tw-requirements-review` on REQ-TW-079 and the
-affected proposed rows, then run the required scoped `/tw-doc-review` across the
-candidate baseline and proposal. Only clean completion of both gates can make a
-later matrix merge and bounded implementation planning eligible; it still does
-not approve runtime, enforcing, release, or per-host live-hook claims.
+A clean scoped `/tw-doc-review` of the candidate baseline and proposal remains
+required before a later matrix merge or bounded implementation planning is
+eligible. This re-review does not approve runtime, enforcing, release, or
+per-host live-hook claims.
 
 ## Review Method
 
@@ -255,9 +275,34 @@ checked identity/source/owner/status/V&V/validation/held boundaries, applied the
 hook, skill, fixture, matrix-merge, or implementation claim was executed or
 made.
 
+## Re-Review — 2026-07-22
+
+- **Revision reviewed:** `aace524b505da764ed118061524382ebecca6ce8`
+  changed only `requirements.md` REQ-TW-079 and proposed VER-TW-080 in
+  `docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md`;
+  the reviewed post-revision hashes are `requirements.md`
+  `f77c3f5aa0747e825e7bb8ae2a5fb255c3fb847b04945682d9d1ef3357b108ab`
+  and proposed rows
+  `00aa96646838a830c1183b712d71b2330869c3010d696a70c1ccd237c5271c9b`.
+- **Evidence:** `requirements.md:388` limits fixtures, schema validation, and
+  smoke execution to REQ-TW-081 `supported` SessionStart-equivalent cells and
+  requires discovery/gap records instead for `unsupported-gap`/`unproven`
+  cells; VER-TW-080 applies the identical rule at the allocated verification
+  row (`docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md:68`).
+- **Finding result:** REQ-FIND-001 is **closed**. The revision eliminates the
+  unconditional three-host fixture conflict without diluting the required
+  supported-host verification or implying coverage for a non-supported cell.
+- **Regression check:** No wording ambiguity, new set-level conflict, or broken
+  held boundary was found. Static/advisory-only behavior, no enforcement,
+  per-host runtime-proof holds, and the prohibition on non-supported-cell
+  manifests/fixtures remain explicit.
+
 ## Suggested Next Step
 
-**Do not proceed to implementation or matrix merge.** Revise the REQ-TW-079
-fixture wording and VER-TW-080 proposed verification row to obey REQ-TW-081's
-capability-state rule, then rerun `/tw-requirements-review` followed by scoped
-`/tw-doc-review`.
+Run scoped `/tw-doc-review` over `requirements.md` REQ-TW-076..081 and
+`docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md`.
+Do not merge the proposed matrix rows or start `tw-vv-define`, `tw-work`, hook,
+or fixture implementation until that review passes. After it passes, start with
+the REQ-TW-081 capability/discovery matrix so only `supported` cells receive
+host-specific artifacts; runtime, enforcing, release, and per-host live-hook
+claims remain held.
