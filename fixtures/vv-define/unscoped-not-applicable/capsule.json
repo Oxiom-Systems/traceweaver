@@ -1,0 +1,13 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "work_item_id": "FIXTURE-UNSCOPED-NOT-APPLICABLE",
+  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "requirements": [
+    {
+      "req_id": "REQ-FIXTURE-003",
+      "not_applicable": {
+        "scope": "docs-only"
+      }
+    }
+  ]
+}
