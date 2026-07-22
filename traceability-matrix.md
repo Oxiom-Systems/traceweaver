@@ -26,7 +26,7 @@ Baseline or starting ref:
 
 - baseline ID: `REQ-BASELINE-2026-04-30-001`
 - baseline hash:
-  `4cec2a1b5bc27729ac433a6522ca144a47908141227c92156b8700260a16b78a`
+  `7166605b3bae8b56bba3d0d9e7e8095982826df719339a7b67d8a78b6cbb6b07`
 - requirements authority: `requirements.md`
 - Intent Contract: `.traceweaver/intent-contract.yml`
 

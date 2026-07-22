@@ -20,14 +20,14 @@ command-hook surfaces suitable for the advisory TraceWeaver hooks?
 | Check | Evidence | Result |
 | --- | --- | --- |
 | CLI surface | `codex --help` exposes plugin management and `--dangerously-bypass-hook-trust`; `codex plugin --help` exposes plugin management. | Hook support is an active CLI concern; CLI help does not itself document a plugin payload contract. |
-| Local configured hook surface | `~/.codex/hooks.json` defines `SessionStart`, `UserPromptSubmit`, and `Stop` command hooks. | SessionStart configuration is present on this host. |
+| Local configured hook surface | The user-level Codex hooks configuration (private path redacted) defines `SessionStart`, `UserPromptSubmit`, and `Stop` command hooks. | SessionStart configuration is present on this host. |
 | Existing SessionStart payload | The configured memsearch `session-start.sh` emits `hookSpecificOutput.hookEventName: SessionStart` and `hookSpecificOutput.additionalContext` (and `systemMessage`). | Session-start context injection is evidenced locally. |
 | PreToolUse binary-string evidence | The current `codex-darwin-arm64` vendor binary contains `PreToolUse*Wire` JSON-schema structs and `CLAUDE_PLUGIN_ROOT` strings. | Partial, insufficient binary-string evidence only. It exposes no documented or active schema/configuration surface and does not meet the supported bar. |
 | Pinned external source comparison | Superpowers at `d884ae04edebef577e82ff7c4e143debd0bbec99` declares `hooks: {}` in its Codex manifest. | This suppresses possible auto-discovery of its Claude-oriented `hooks/hooks.json`; it does not prove Codex installation or registration behavior. |
 
 The previously cited `planning-with-files/.codex/hooks.json` is a bundled
 template in the Claude Code plugin marketplace cache at
-`~/.claude/plugins/marketplaces/planning-with-files/.codex/hooks.json`. It was
+a bundled template inside a Claude Code plugin marketplace cache (private path redacted). It was
 never installed into an active `.codex/` project and is not evidence of an
 active Codex PreToolUse integration.
 
@@ -35,13 +35,13 @@ active Codex PreToolUse integration.
 
 | Cell | State | Basis |
 | --- | --- | --- |
-| Codex × SessionStart-equivalent | `supported` | Local `~/.codex/hooks.json`, actual configured SessionStart command, and observed local payload source. |
+| Codex × SessionStart-equivalent | `supported` | The user-level Codex hooks configuration (private path redacted), actual configured SessionStart command, and observed local payload source. |
 | Codex × PreToolUse-equivalent | `unproven` | Partial binary-string evidence only (`PreToolUse*Wire` JSON-schema structs and `CLAUDE_PLUGIN_ROOT`); no documented or active schema/configuration surface. |
 
 ## Scope and Held Status
 
 This discovery authorizes fixture-level SessionStart payload coverage only. Unit
-3 does not modify `~/.codex/`, create a Codex-specific TraceWeaver manifest,
+3 does not modify the user-level Codex configuration directory, create a Codex-specific TraceWeaver manifest,
 alter `.codex-plugin/plugin.json`, accept hook trust, or observe a live
 TraceWeaver hook firing. Codex PreToolUse fixture, manifest, and runtime claims
 are removed or held because the event is unproven. Therefore the following

@@ -9,9 +9,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `ede6874558718b7f445644e1b9d02344bab07cf24ddcd187ec06a41774376fe0` |
-| `requirements.md` | `2593ecfc530a3dda61d3c5d076878040cc137f76f354a163af1bc6b4c7151283` |
-| `.traceweaver/intent-contract.yml` | `ee71052cedcf1aa0fcfed939a04c69637e9b03026789d3e319447827de7021d6` |
+| `traceability-matrix.md` | `9963531026b39b73868974054df495b276b447c05dc7a135432d640febecbc0c` |
+| `requirements.md` | `78362b8b814d5ed1b5781c1ddde1e784fc42e5245f08d14a92747c3b75a3d026` |
+| `.traceweaver/intent-contract.yml` | `68ffd94f1067138a73b1e29e0c5125b96d9a8004f466129167d32ba3ae5d7b21` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
 
 ## Coverage Counts

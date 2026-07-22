@@ -20,7 +20,7 @@ live session. Runtime firing remains held for every supported cell.
 | --- | --- | --- | --- | --- |
 | Claude Code | `supported` | `supported` | Local Claude plugin-development documentation specifies plugin-root `hooks/hooks.json`, `SessionStart`, `PreToolUse`, stdin JSON, `${CLAUDE_PLUGIN_ROOT}`, and the `hookSpecificOutput.additionalContext` payload shape. The pinned superpowers `hooks/hooks.json` demonstrates the portable SessionStart manifest mechanism. | Held: fixture/schema verification only; no live TraceWeaver session observed. |
 | Cursor | `supported` | `supported` | Pinned superpowers `hooks/hooks-cursor.json` supplies the Cursor v1 lowercase `sessionStart` mechanism and `CURSOR_PLUGIN_ROOT` branch; its `session-start` source emits `additional_context`. The installed planning-with-files Cursor hook manifest also configures `preToolUse` for `Write|Edit`. | Held: fixture/schema verification only; no live TraceWeaver session observed. |
-| Codex | `supported` | `unproven` | Local `~/.codex/hooks.json` configures `SessionStart`; its installed command emits `hookSpecificOutput.additionalContext`. For PreToolUse, the current Codex binary contains only partial binary-string evidence: `PreToolUse*Wire` JSON-schema structs and `CLAUDE_PLUGIN_ROOT` strings. There is no documented or active schema/configuration surface for that event, so this does not meet the supported bar. See the Codex discovery record. | Held: SessionStart has local configuration and payload evidence but no live TraceWeaver session; PreToolUse is unproven and no write hook was observed. |
+| Codex | `supported` | `unproven` | A user-level Codex hooks configuration (private path redacted) configures `SessionStart`; its installed command emits `hookSpecificOutput.additionalContext`. For PreToolUse, the current Codex binary contains only partial binary-string evidence: `PreToolUse*Wire` JSON-schema structs and `CLAUDE_PLUGIN_ROOT` strings. There is no documented or active schema/configuration surface for that event, so this does not meet the supported bar. See the Codex discovery record. | Held: SessionStart has local configuration and payload evidence but no live TraceWeaver session; PreToolUse is unproven and no write hook was observed. |
 
 ## Static Artifact Boundary
 
@@ -29,7 +29,7 @@ Claude Code and Cursor are wired by the Unit 3 plugin artifacts
 `plugins/traceweaver-core/hooks/hooks-cursor.json`. Codex SessionStart is
 supported by the locally inspected user configuration mechanism, but this unit
 does not alter the existing `.codex-plugin/plugin.json` manifest or install a
-user-level `~/.codex/hooks.json` entry. Codex PreToolUse remains unproven: its
+user-level Codex hooks entry (private path redacted). Codex PreToolUse remains unproven: its
 binary strings do not establish a documented or active configuration/schema
 surface. Installation, trust registration, and runtime firing are separately
 held.
@@ -42,16 +42,16 @@ suppression versus adoption before any Codex install work.
 
 ## Evidence References
 
-- Pinned mechanism source: `~/.graphify/repos/obra/superpowers` at
+- Pinned mechanism source: local read-only superpowers clone (private path redacted) at
   `d884ae04edebef577e82ff7c4e143debd0bbec99`:
   `hooks/session-start`, `hooks/hooks.json`, `hooks/hooks-cursor.json`, and
   `hooks/run-hook.cmd`.
 - Claude Code local CLI: `claude plugin validate --help`; installed
   plugin-development hook documentation under
-  `~/.claude/plugins/marketplaces/claude-plugins-official/plugins/plugin-dev/`.
+  the user-level Claude plugin marketplace cache (private path redacted).
 - Cursor: pinned superpowers Cursor manifest and installed
   planning-with-files `.cursor/hooks.json`.
-- Codex: `codex --help`, `codex plugin --help`, local `~/.codex/hooks.json`,
+- Codex: `codex --help`, `codex plugin --help`, the user-level Codex hooks configuration (private path redacted),
   and current Codex binary strings. The PreToolUse strings are partial
   binary-string evidence only (`PreToolUse*Wire` JSON-schema structs and
   `CLAUDE_PLUGIN_ROOT`); they are not a documented or active schema surface.

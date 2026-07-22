@@ -3,7 +3,7 @@
 # Regenerate with: scripts/traceweaver-smoke-verify --write  (do not hand-edit).
 snapshot_id: TW-IC-CURRENT
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: c8579f35ac5362e772365fdae3b7153221fca6d3e5fe99118aa0e847e83ca25a
+baseline_hash_sha256: 7166605b3bae8b56bba3d0d9e7e8095982826df719339a7b67d8a78b6cbb6b07
 baseline_hash_consistent: true
 traceweaver_mode: advisory
 requirements:
