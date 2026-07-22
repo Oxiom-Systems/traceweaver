@@ -131,6 +131,73 @@ print("valid")
 PY
 }
 
+schema_v1_capsule_has_evidence() {
+  local capsule="$1"
+  local root="$2"
+  python3 - "$capsule" "$root" <<'PY'
+import json
+import os
+import sys
+
+try:
+    with open(sys.argv[1], encoding="utf-8") as source:
+        capsule = json.load(source)
+except (OSError, json.JSONDecodeError):
+    raise SystemExit(1)
+
+root = os.path.abspath(sys.argv[2])
+verification_fields = (
+    "trace_id", "ver_id", "val_id", "verification_artifact",
+    "red_evidence", "validation_artifact",
+)
+
+def present_string(value):
+    return isinstance(value, str) and bool(value.strip())
+
+def path_escapes_root(raw_path):
+    if os.path.isabs(raw_path):
+        return True
+    resolved = os.path.normpath(os.path.join(root, raw_path))
+    try:
+        return os.path.commonpath((root, resolved)) != root
+    except ValueError:
+        return True
+
+def nonempty_red_evidence(raw_path):
+    if not present_string(raw_path) or path_escapes_root(raw_path):
+        return False
+    resolved = os.path.normpath(os.path.join(root, raw_path))
+    return os.path.isfile(resolved) and os.path.getsize(resolved) > 0
+
+if not isinstance(capsule, dict) or capsule.get("schema_version") != "tw-vv-capsule/1":
+    raise SystemExit(1)
+
+requirements = capsule.get("requirements")
+if not isinstance(requirements, list) or not requirements:
+    raise SystemExit(1)
+
+for requirement in requirements:
+    if not isinstance(requirement, dict):
+        raise SystemExit(1)
+
+    is_verification_mode = any(present_string(requirement.get(field)) for field in verification_fields)
+    if not is_verification_mode:
+        if "not_applicable" in requirement:
+            continue
+        raise SystemExit(1)
+
+    reviews = requirement.get("reviews")
+    if not isinstance(reviews, list) or not any(
+        isinstance(review, dict) and review.get("status") == "passed"
+        for review in reviews
+    ):
+        raise SystemExit(1)
+
+    if not nonempty_red_evidence(requirement.get("red_evidence")):
+        raise SystemExit(1)
+PY
+}
+
 check_evidence() {
   local root="$1"
   local target="$2"
@@ -148,6 +215,17 @@ check_evidence() {
       fi
     done < <(find "$root/.traceweaver/task-capsules" -type f -name '*.json' -print0 2>/dev/null)
   fi
+
+  # The root search includes .traceweaver/ and docs/validation/ as well as
+  # any other repository location that may hold a tw-vv-capsule/1 artifact.
+  while IFS= read -r -d '' capsule; do
+    if schema_v1_capsule_has_evidence "$capsule" "$root"; then
+      has_reviewed_capsule=1
+      has_reviewed_definition=1
+      has_red_evidence=1
+      return
+    fi
+  done < <(find "$root" -type f -name '*.json' ! -path "$root/.git/*" -print0 2>/dev/null)
 }
 
 # Claude/Cursor-style payloads expose these keys. This intentionally fails
