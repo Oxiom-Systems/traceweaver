@@ -44,6 +44,15 @@ jobs:
       - name: Codex discovery smoke
         run: TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
 
+      - name: V&V definition smoke
+        run: scripts/traceweaver-smoke-vv-define
+
+      - name: SessionStart hook smoke
+        run: scripts/traceweaver-smoke-hook-session-start
+
+      - name: PreToolUse TDD gate hook smoke
+        run: scripts/traceweaver-smoke-hook-pretooluse-tdd-gate
+
       - name: Antigravity discovery smoke
         run: scripts/traceweaver-smoke-antigravity-discovery
 
