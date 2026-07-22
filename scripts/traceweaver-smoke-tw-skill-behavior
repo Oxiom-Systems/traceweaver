@@ -17,6 +17,8 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-061; req=REQ-TW-065; trace=TRACE-TW-048
 # TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063
 # TRACEWEAVER: verifies=VER-TW-063; req=REQ-TW-066; trace=TRACE-TW-050
+# TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-078; trace=TRACE-TW-059; ver=VER-TW-079
+# TRACEWEAVER: verifies=VER-TW-079; req=REQ-TW-078; trace=TRACE-TW-059
 # TRACEWEAVER: file-role=audit-wrapper-smoke; req=REQ-TW-061; trace=TRACE-TW-052; ver=VER-TW-065
 # TRACEWEAVER: verifies=VER-TW-065; req=REQ-TW-061; trace=TRACE-TW-052
 # TRACEWEAVER: file-role=audit-wrapper-smoke; req=REQ-TW-062; trace=TRACE-TW-052; ver=VER-TW-065
@@ -409,7 +411,7 @@ assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-debug-fix/next-step.txt" "ex
 assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-debug-fix/next-step.txt" "next_command_executable" "true" "wrapper_handoff_debug_executable_fixture"
 assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-plan-accepted/next-step.txt" "flow" "accepted_plan" "wrapper_handoff_plan_flow_fixture"
 assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-plan-accepted/next-step.txt" "forbidden_next" "standalone_tw_requirements_review" "wrapper_handoff_plan_forbidden_lower_gate_fixture"
-assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-plan-accepted/next-step.txt" "expected_next_wrapper" "tw-work" "wrapper_handoff_plan_next_wrapper_fixture"
+assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-plan-accepted/next-step.txt" "expected_next_wrapper" "tw-vv-define" "wrapper_handoff_plan_next_wrapper_fixture"
 assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-plan-accepted/next-step.txt" "next_command_executable" "true" "wrapper_handoff_plan_executable_fixture"
 assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-work-complete/next-step.txt" "flow" "work_complete" "wrapper_handoff_work_flow_fixture"
 assert_fixture_field "$FIXTURE_ROOT/wrapper-handoff-work-complete/next-step.txt" "forbidden_next" "standalone_tw_traceability_check" "wrapper_handoff_work_forbidden_lower_gate_fixture"
@@ -447,12 +449,12 @@ for ce_skill in "$ROOT_DIR"/plugins/traceweaver-core/skills/ce-*/SKILL.md; do
     imported_ce_unanchored_total=$((imported_ce_unanchored_total + 1))
   fi
 done
-if [[ "$skill_file_total" != "52" ]]; then
-  echo "traceweaver_skill_file_total=failed expected=52 actual=$skill_file_total" >&2
+if [[ "$skill_file_total" != "53" ]]; then
+  echo "traceweaver_skill_file_total=failed expected=53 actual=$skill_file_total" >&2
   exit 1
 fi
-if [[ "$anchored_skill_total" != "47" ]]; then
-  echo "traceweaver_skill_file_anchored=failed expected=47 actual=$anchored_skill_total" >&2
+if [[ "$anchored_skill_total" != "48" ]]; then
+  echo "traceweaver_skill_file_anchored=failed expected=48 actual=$anchored_skill_total" >&2
   exit 1
 fi
 assert_contains "$tw_authority_gate" "file-role=authority-gate-wrapper-skill" "tw_authority_gate_file_role_anchor"
@@ -642,14 +644,21 @@ assert_contains "$tw_work" "only files it changed" "tw_work_review_staging_scope
 assert_contains "$tw_work" "Include all changed implementation files, verification artifacts" "tw_work_review_staging_handoff_scope"
 assert_contains "$tw_work" "passes a work-package ID, review route, and exact scoped file list" "tw_work_accepts_tw_auto_review_stage_handoff"
 assert_contains "$tw_work" "returns the staged path list" "tw_work_returns_review_stage_result"
-assert_contains "$tw_work" "Test-First Evidence Gate" "tw_work_test_first_gate_section"
-assert_contains "$tw_work" "expected failing/current-failing evidence" "tw_work_test_first_expected_failure_required"
-assert_contains "$tw_work" "not-applicable decision" "tw_work_test_first_not_applicable_allowed"
-assert_contains "$tw_work" "approved non-test/post-implementation" "tw_work_test_first_exception_allowed"
-assert_contains "$tw_work" "stop before mutation" "tw_work_test_first_missing_blocks_mutation"
-assert_contains "$tw_work" "same focused test-first verification artifact" "tw_work_test_first_same_artifact_post_implementation"
-assert_contains "$tw_auto" "must establish test-first" "tw_auto_passes_test_first_gate_to_worker"
-assert_contains "$tw_auto" "before behavior mutation" "tw_auto_blocks_mutation_until_test_first_gate"
+assert_contains "$tw_work" "V&V Definition Preflight" "tw_work_vv_definition_preflight_section"
+assert_contains "$tw_work" "--require-review-passed" "tw_work_vv_capsule_review_passed_required"
+assert_contains "$tw_work" "Implementation Without V&V Definition: Refusal Rule" "tw_work_vv_refusal_rule"
+assert_contains "$tw_work" "V&V Preflight Red Flags" "tw_work_vv_red_flags_table"
+assert_contains "$tw_work" "the test can come after" "tw_work_vv_red_flag_test_after"
+assert_contains "$tw_work" "this change is too small" "tw_work_vv_red_flag_small_change"
+assert_contains "$tw_work" "I'll write the capsule retroactively" "tw_work_vv_red_flag_retroactive_capsule"
+assert_contains "$tw_work" "policy/skill-instruction contract, not runtime enforcement" "tw_work_vv_static_advisory_boundary"
+assert_contains "$tw_work" "expected-failing (RED) evidence" "tw_work_vv_red_evidence_pre_authored"
+assert_contains "$tw_work" "same focused verification artifact" "tw_work_vv_same_artifact_post_implementation"
+assert_contains "$tw_plan" "/tw-vv-define <plan>" "tw_plan_vv_define_next_wrapper"
+assert_contains "$tw_auto" "tw-vv-define" "tw_auto_vv_define_resolution"
+assert_contains "$tw_auto" "V&V Definition Phase" "tw_auto_vv_definition_phase"
+assert_line_before "$tw_auto" "6. Run or create the planning step" "V&V Definition Phase" "tw_auto_plan_before_vv_definition"
+assert_line_before "$tw_auto" "V&V Definition Phase" 'Run the resolved `tw-authority-gate`' "tw_auto_vv_definition_before_authority_gate"
 assert_contains "$ce_work" "tw-work" "ce_work_routes_back_to_tw_work"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "required_route" "tw-authority-gate,ce-work,traceweaver-check-code-anchors,traceweaver-author-code-anchors,traceweaver-check-code-anchors,tw-auto" "tw_work_clean_authoring_route_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-clean/worker-result.txt" "authority_gate_preflight" "pass" "tw_work_clean_authority_gate_preflight_fixture"
@@ -673,6 +682,11 @@ assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "pause_cases" "ambiguous_mapping,contradictory_authority,missing_verification,stale_requirement,material_requirement_change_needed" "tw_work_pause_cases_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "source_mutation" "false" "tw_work_pause_no_source_mutation_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-trace-authoring-pause/worker-result.txt" "matrix_mutation" "false" "tw_work_pause_no_matrix_mutation_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-missing-vv-definition/worker-result.txt" "vv_definition_capsule" "missing" "tw_work_missing_vv_definition_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-missing-vv-definition/worker-result.txt" "capsule_preflight" "blocked" "tw_work_missing_vv_definition_preflight_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-missing-vv-definition/worker-result.txt" "expected_behavior" "stop_before_mutation" "tw_work_missing_vv_definition_stop_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-missing-vv-definition/worker-result.txt" "required_route" "tw-auto_to_tw-vv-define" "tw_work_missing_vv_definition_route_fixture"
+assert_fixture_field "$FIXTURE_ROOT/tw-work-missing-vv-definition/worker-result.txt" "runtime_enforcement" "held_static_advisory_policy" "tw_work_missing_vv_definition_runtime_held_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-missing/worker-result.txt" "test_first_evidence" "missing" "tw_work_test_first_missing_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-missing/worker-result.txt" "expected_behavior" "stop_before_mutation" "tw_work_test_first_missing_stop_fixture"
 assert_fixture_field "$FIXTURE_ROOT/tw-work-test-first-missing/worker-result.txt" "structured_finding" "CTA-MISSING-TEST-FIRST-EVIDENCE" "tw_work_test_first_missing_finding_fixture"
