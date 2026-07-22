@@ -2,6 +2,80 @@
 
 # Changelog
 
+## 0.3.0 - 2026-07-22
+
+Validation-first V&V program: insert a mandatory, reviewed V&V definition
+phase between an accepted plan and implementation for behavior-bearing work
+(REQ-TW-076..081), so intent is validated before implementation exists
+instead of only at closure. Static/advisory implementation only; runtime,
+enforcing, and per-host hook-firing claims remain held.
+
+Note: the version bump and `traceweaver-core--v0.3.0` tag happen at
+merge-to-main per the branching/versioning policy; this entry is prepared on
+the `codex/traceweaver-0.3-validation-first` integration branch ahead of that
+route, and version manifests remain at 0.2.6 until the merge-to-main bump.
+
+### Added
+
+- New `tw-vv-define` skill owning the V&V definition phase: it produces
+  reviewed RED verification artifacts plus a `docs/validation/`
+  validation-definition artifact and hands a `tw-vv-capsule/1` capsule
+  (REQ/TRACE/VER/VAL IDs, artifact paths, RED evidence location) to
+  `tw-work`, without itself claiming implementation authority
+  (REQ-TW-076/077).
+- Capsule validator `traceweaver-check-vv-capsule` with schema, identity,
+  root-containment, and review-status hardening, plus a
+  `--require-review-passed` mode and the `tw-vv-capsule/1` schema consumed by
+  the PreToolUse hook.
+- `tw-work` hard V&V preflight: refuses to mutate behavior-bearing files
+  without a review-passed, matrix-linked V&V definition capsule and recorded
+  RED evidence, or a recorded scoped not-applicable decision/approved
+  exception (REQ-TW-078). This upgrades the prior advisory REQ-TW-065
+  test-first gate from work-time evidence to a prerequisite reviewed
+  artifact. Static/advisory policy-text and fixture evidence only; runtime
+  refusal/enforcement remains held.
+- `tw-plan` and `tw-auto` routing updated so accepted plans go through
+  `tw-vv-define` before `tw-work`.
+- Advisory SessionStart hook injecting `traceweaver_mode`, the Authority Rule
+  invariant, the current held-claims list, and the
+  plan -> tw-vv-define -> tw-work ordering into session context at session
+  start/resume/compact, with portable Claude Code, Cursor, and Codex JSON
+  payload shapes (REQ-TW-079). Never blocks, mutates files, or claims
+  enforcement.
+- Advisory, non-blocking PreToolUse TDD-gate hook: warns on behavior-bearing
+  Write/Edit calls that lack a linked, review-passed V&V definition and RED
+  evidence, always exiting 0 (REQ-TW-080).
+- Host x hook capability matrix
+  (`docs/validation/traceweaver-0.3-hook-host-capability-matrix.md`)
+  recording, per host/hook cell, `supported` / `unsupported-gap` / `unproven`
+  state (REQ-TW-081): Claude Code and Cursor are `supported` for both
+  SessionStart and PreToolUse; Codex SessionStart is `supported`; Codex
+  PreToolUse is `unproven` (partial binary-string evidence only, no
+  documented/active schema surface).
+- Superpowers mechanism provenance record: the hook mechanism is
+  adapted/cherry-picked from `obra/superpowers`, pinned at commit
+  `d884ae04edebef577e82ff7c4e143debd0bbec99`, without rebasing TraceWeaver
+  onto it.
+- Owner direction authorization record
+  (`docs/validation/traceweaver-0.3-owner-direction-authorization.md`)
+  authorizing static/advisory implementation of REQ-TW-076..081 on the 0.3
+  integration branch ahead of requirement promotion to approved.
+
+### Held
+
+- Runtime firing of any hook on any host (SessionStart or PreToolUse), for
+  every host/hook cell recorded `supported`, remains held pending its own
+  per-host runtime proof gate.
+- `traceweaver_mode: enforcing` and any blocking/refusal behavior for the
+  PreToolUse gate or the `tw-work` V&V preflight remain held.
+- Codex plugin installation, hook-trust registration, and the explicit
+  suppress-vs-adopt decision for `hooks/hooks.json` auto-adoption remain
+  held.
+- Promotion of REQ-TW-076 through REQ-TW-081 from `candidate_for_review` to
+  `approved` remains held pending baseline amendment.
+- Release, publication, package-ready, and clean-replacement claims remain
+  held; this entry is release preparation only.
+
 ## 0.2.6 - 2026-06-24
 
 README and docs landing-page release: publish the shorter GitHub README,
