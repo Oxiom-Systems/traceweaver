@@ -1,0 +1,13 @@
+task_id: TASK-L3
+profile_revision: 1
+risk: L3
+selection_rationale: security-sensitive external side effect
+selected_controls: [full_vv_capsule, focused_verification, strongest_independent_reviewer, explicit_rollback, owner_held_decisions]
+child_roles: { builder: terra, verifier: terra, reviewer: sol, deployer: terra, dogfooder: terra }
+model_selection: { availability: [terra, sol], choice: "terra builder/verifier/deploy/dogfood; sol reviewer", rationale: high-risk work needs strongest available independent review }
+reviewer_cap: 3
+repair_cycle_cap: 2
+requires_deploy: true
+requires_chrome_dogfood: true
+profile_hash: sha256:l3-frozen
+expected_profile: L3

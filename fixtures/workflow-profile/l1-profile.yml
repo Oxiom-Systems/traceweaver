@@ -1,0 +1,13 @@
+task_id: TASK-L1
+profile_revision: 1
+risk: L1
+selection_rationale: narrow low-consequence behavior
+selected_controls: [compact_authority_reference, focused_verification, fresh_verifier, independent_review]
+child_roles: { builder: terra, verifier: terra, reviewer: terra }
+model_selection: { availability: [terra], choice: terra, rationale: bounded behavior and one independent review }
+reviewer_cap: 1
+repair_cycle_cap: 2
+requires_deploy: false
+requires_chrome_dogfood: false
+profile_hash: sha256:l1-frozen
+expected_profile: L1

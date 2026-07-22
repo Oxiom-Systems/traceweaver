@@ -75,26 +75,38 @@ risk candidates, or clarification questions, but it must not approve them.
 
 ## Workflow
 
-1. Identify whether the request is Authority Baseline Mode, Implementation Gate
+1. Select the deterministic L0-L3 workflow profile before a builder may mutate:
+   - L0: documentation, generated, or mechanical no-behavior work;
+   - L1: narrow low-consequence behavior;
+   - L2: cross-module, API, data-flow, or deployment-facing behavior; and
+   - L3: money, security, destructive, release, external-side-effect, or
+     unclear-authority work.
+   Populate `references/workflow-profile-template.yml` with risk, selected
+   controls, child roles, available/selected model and rationale, reviewer and
+   repair caps, deploy/dogfood requirements, estimate-derived guards, and a
+   canonical `profile_hash`. The selected profile is revision 1 and is frozen
+   when the first builder is dispatched. An added control or reviewer after that
+   point is refused unless a new revision names an escalation reason.
+2. Identify whether the request is Authority Baseline Mode, Implementation Gate
    Mode planning, Review-Staging Mode, or Publication Mode using the skill-local
    operating-mode policy.
-2. Stop before planning implementation details when requirements, accepted
+3. Stop before planning implementation details when requirements, accepted
    scope, validation intent, verification method, or must-not-change boundaries
    are unclear or contradictory.
-3. Run the requirements-quality preflight above. Route requirements-quality
+4. Run the requirements-quality preflight above. Route requirements-quality
    problems to `tw-requirements-review`. `tw-plan` may propose gaps, changes,
    exceptions, accepted-risk candidates, or clarification questions, but must
    not approve them.
-4. Confirm the baseline ID/hash, requirement IDs, trace/matrix context,
+5. Confirm the baseline ID/hash, requirement IDs, trace/matrix context,
    verification target, validation question, and held claims that bound the
    planning run.
-5. Delegate planning to the TraceWeaver-packaged `ce-plan` engine only after the
+6. Delegate planning to the TraceWeaver-packaged `ce-plan` engine only after the
    requirements-quality preflight and authority context are passable, accepted
    as unchanged, or explicitly held with allowed use recorded.
-6. Keep `ce-plan` in no-publication mode. It may create or update a plan
+7. Keep `ce-plan` in no-publication mode. It may create or update a plan
    artifact, but it must not implement code, stage files, commit, push, open
    PRs, update PRs, claim runtime readiness, or claim publication readiness.
-7. Return the plan with its accepted authority scope, held claims, verification
+8. Return the plan with its accepted authority scope, held claims, verification
    targets, next TraceWeaver command, and any unresolved authority gaps.
 
 ## Gate Discipline
@@ -137,6 +149,8 @@ Return:
 - created or updated plan path when one exists
 - held claims and non-blocking review debt
 - highest-level next TraceWeaver wrapper command, review, or human decision
+- frozen workflow profile revision/hash and its selected controls, child roles,
+  model availability/choice/rationale, caps, and deploy/dogfood requirements
 
 ## Gate
 

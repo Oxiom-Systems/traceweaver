@@ -61,6 +61,34 @@ packaged `ce-work` in no-publication mode. Packaged `ce-work` remains the coding
 engine only; it does not approve authority, traceability, review completion, or
 publication.
 
+## Workflow Profile Preflight
+
+Before the first builder mutation, `tw-work` requires a frozen
+`tw-workflow-profile/1` profile created by `tw-plan`. It must identify the
+deterministically selected L0-L3 risk, selected controls, child roles, model
+availability/choice/rationale, reviewer cap, repair-cycle cap, deploy and
+dogfood requirements, estimate-derived process guards, revision, and canonical
+profile hash. The profile is immutable after the first builder dispatch.
+
+`tw-work` must not silently add controls, reviewers, or a model fallback after
+building starts. It returns `refused_profile_immutable` unless a new profile
+revision records the changed profile and an escalation reason. A model that is
+unavailable is a hold or delegated-child condition, never an implementation
+fallback.
+
+The orchestration harness, rather than a child, owns monotonic dispatch/return
+receipts. It classifies each child as `process`, `delivery`, or `unclassified`;
+unclassified elapsed time counts as process until a reviewer resolves it.
+Delivery is implementation, focused verification, build, authorized deployment,
+and dogfood. Process includes authority/planning/coordination, generic review,
+validators, matrix/registry administration, and release evidence. Before a
+dispatch the harness projects the candidate's full maximum timebox. At the
+estimated target it stops optional artifacts and duplicate review; at the
+estimated ceiling it refuses another process child. Terminal actuals always
+apply: `actual_process <= 0.25 * actual_delivery` meets target, and
+`actual_process > actual_delivery` returns `held_process_budget`, including a
+delivery underrun. There is no in-task exception.
+
 ## V&V Definition Preflight
 
 Before any behavior-bearing mutation, `tw-work` must consume one of these
@@ -153,8 +181,9 @@ complete/done/accepted wording.
 
 ## Workflow
 
-1. Confirm the run is Implementation Gate Mode. If it is Authority Baseline Mode
-   or Publication Mode, return control to `tw-auto` with that classification.
+1. Confirm the run is Implementation Gate Mode and a frozen workflow profile
+   exists. If it is Authority Baseline Mode or Publication Mode, return control
+   to `tw-auto` with that classification.
 2. Run the authority-gate preflight above before implementation.
 3. Run the V&V Definition Preflight for behavior-bearing changes. If the
    review-passed V&V capsule or recorded scoped not-applicable/approved
