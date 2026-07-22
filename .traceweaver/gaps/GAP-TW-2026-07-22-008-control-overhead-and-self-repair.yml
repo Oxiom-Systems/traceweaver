@@ -1,0 +1,53 @@
+gap_id: GAP-TW-2026-07-22-008
+status: open
+linked_intent: "INTENT-TW-001, INTENT-TW-002, INTENT-TW-003, INTENT-TW-005"
+linked_requirement: null
+proposed_requirement_ids:
+  - REQ-TW-082
+  - REQ-TW-083
+  - REQ-TW-084
+  - REQ-TW-085
+  - REQ-TW-086
+  - REQ-TW-087
+clarification_question_id: null
+reason: >
+  The frozen 0.3 candidate implements validation-first skills, hook surfaces,
+  fixtures, matrix rows, and release claims while REQ-TW-076 through REQ-TW-081
+  remain candidate_for_review and the requirements summary says the proposed
+  implementations do not exist. This is an authority/implementation conflict.
+  The same candidate applies universal pre-implementation V&V and fixed review
+  fan-out irrespective of risk, producing control work that can dominate actual
+  delivery work.
+bounded_evidence:
+  - session_id: 019f8a07-6980-7eb1-b71b-ca37737c44e5
+    use: plan-recorded U0 classification evidence of process/delivery overhead and candidate/implementation churn; not implementation authority
+  - session_id: 019f8a09-ba37-7283-8cd5-14bbffaae5c5
+    use: plan-recorded hotfix incident evidence, including the stashed-hotfix detour; commit 8806448 remains the code source
+  - source: docs/plans/2026-07-22-traceweaver-0.3-repair-plan.md
+    sha256: e24ce4feb81921d513d72ade0beee66d76f018805cb062ad03a4a2c0f07d84d5
+    use: owner-approved bounded recovery facts; no broad session audit was performed
+proposed_disposition: proposed_change_and_recovery_exception
+proposed_requirement_summary: >
+  Replace the universal 0.3 validation-first controls with frozen L0-L3 profiles,
+  measurable process ceilings, a read-only master, bounded children, scoped
+  review, truthful terminal receipts, and role-aware bootstrap. Preserve the
+  SQLite graph idea only as REQ-TW-088 candidate_follow_on.
+owner: Oxiom Systems
+review_gate: independent Sol U0 review of the final amended baseline and EXC-TW-011
+created_at: 2026-07-22
+implementation_rule: >
+  No meaningful implementation may use this gap, REQ-TW-082 through REQ-TW-087,
+  or CHG-TW-2026-07-22-001 as authority until active EXC-TW-011 contains the
+  exact Sol ACCEPT receipt and amendment-bound hashes/digest. REQ-TW-088 is
+  never U0-U7 authority.
+held_claims:
+  - runtime_enforcement
+  - release_ready
+  - installation
+  - deployment
+  - publication
+  - canonical_database_authority
+  - product_dogfood
+next_recommended_steps:
+  - Conduct the one independent Sol review of this exact U0 amendment.
+  - On ACCEPT only, activate EXC-TW-011 for its exact U1-U6 scope; otherwise retain held_authority.

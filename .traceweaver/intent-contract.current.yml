@@ -3,23 +3,23 @@
 # Regenerate with: scripts/traceweaver-smoke-verify --write  (do not hand-edit).
 snapshot_id: TW-IC-CURRENT
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 7166605b3bae8b56bba3d0d9e7e8095982826df719339a7b67d8a78b6cbb6b07
+baseline_hash_sha256: 5ccecdd12edf5afda27efb91f11d5b1948396325ff3dfcdaf956b8e95bbf6a99
 baseline_hash_consistent: true
 traceweaver_mode: advisory
 requirements:
-  total: 75
+  total: 88
   approved: 47
-  candidate: 9
+  candidate: 16
   held: 1
-  other: 18
+  other: 24
 validation_closure:
-  requirements_total: 75
+  requirements_total: 88
   acceptance_results_recorded: 1
   requirements_closed: 0
-  requirements_missing_acceptance: 74
-  closure_ratio: "0/75"
+  requirements_missing_acceptance: 87
+  closure_ratio: "0/88"
 authority_reviewability:
   longest_authority_line_chars: 8803
   authority_lines_over_2000_chars: 43
   human_reviewable: false
-open_gaps: 0
+open_gaps: 1

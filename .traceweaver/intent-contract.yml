@@ -5,10 +5,20 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 7166605b3bae8b56bba3d0d9e7e8095982826df719339a7b67d8a78b6cbb6b07
+baseline_hash_sha256: 5ccecdd12edf5afda27efb91f11d5b1948396325ff3dfcdaf956b8e95bbf6a99
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
+u0_repair_draft:
+  amendment_id: REQ-AMEND-2026-07-22-001
+  status: conditionally_approved_no_behavior_authority_until_active_EXC_TW_011
+  owner_plan_sha256: e24ce4feb81921d513d72ade0beee66d76f018805cb062ad03a4a2c0f07d84d5
+  owner_amendment_sha256: e2570bae27ff3787a4f7e41793aae314b14ff20858ed08ec75b178cada3dc657
+  corrective_requirements: REQ-TW-082, REQ-TW-083, REQ-TW-084, REQ-TW-085, REQ-TW-086, REQ-TW-087
+  historic_candidates_superseded_by: CHG-TW-2026-07-22-001
+  follow_on_only: REQ-TW-088
+  activation_condition: active_EXC_TW_011_with_exact_Sol_ACCEPT_receipt_original_plan_amendment_baseline_branch_base_and_reviewed_semantic_diff_digest
+  held_claims: runtime, release, installation, deployment, publication, graph_implementation, canonical_database_authority, product_dogfood
 current_amendment_id: REQ-AMEND-2026-05-03-001
 current_amendment_review_id: CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001
 current_amendment_authority_status: approved_static_advisory_source_evidence_runtime_held
@@ -2177,6 +2187,11 @@ held_claims:
     claim: tw_grill_implementation_authority
     reason: REQ-TW-048 is approved for static/advisory source-evidence behavior only; tw-grill output is source evidence, not implementation authority.
     close_condition: A later reviewed requirement explicitly changes the source-evidence-only boundary and runtime evidence proves the approved behavior.
+  - id: EXC-TW-011
+    linked_requirements: [REQ-TW-082, REQ-TW-083, REQ-TW-084, REQ-TW-085, REQ-TW-086, REQ-TW-087]
+    claim: one_time_0_3_recovery_bootstrap
+    reason: The U0 recovery exception is inactive until the owner original-plan and amendment hashes, final canonical baseline hash, exact U1-U6 allowlists, expiry, hard process ceiling, independent Sol ACCEPT receipt, and reviewed semantic diff digest are recorded in .traceweaver/exceptions/EXC-TW-011-0.3-recovery-bootstrap.yml.
+    close_condition: U1-U6 integrate with focused verification, the owner rejects the repair, or the process hard ceiling is reached; U7 and publication/install/deploy/product claims remain outside scope.
 
 closed_exceptions:
   - id: EXC-TW-005
