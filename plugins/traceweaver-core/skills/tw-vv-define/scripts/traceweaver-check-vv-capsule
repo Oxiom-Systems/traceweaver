@@ -1,0 +1,628 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=vv-capsule-validator; req=REQ-TW-077; trace=TRACE-TW-058; ver=VER-TW-078
+# TRACEWEAVER: entrypoint=vv_capsule_check_orchestrator; req=REQ-TW-077; trace=TRACE-TW-058; ver=VER-TW-078
+#
+# Deterministic validator for a tw-vv-define V&V definition capsule (REQ-TW-076,
+# REQ-TW-077). This script performs static, fixture-checkable validation only:
+# required fields, artifact-path existence, and RED-evidence non-emptiness. It
+# does not execute, prove, or claim any live-agent runtime behavior.
+
+require "json"
+require "optparse"
+require "pathname"
+
+SCHEMA_VERSION_LITERAL = "tw-vv-capsule/1"
+
+ID_FORMATS = {
+  "req_id" => /\AREQ-[A-Z]+-[0-9]+\z/,
+  "trace_id" => /\ATRACE-[A-Z]+-[0-9]+\z/,
+  "ver_id" => /\AVER-[A-Z]+-[0-9]+\z/,
+  "val_id" => /\AVAL-[A-Z]+-[0-9]+\z/
+}.freeze
+
+SCHEMA_TEMPLATE = <<~SCHEMA
+  V&V Definition Capsule Schema (tw-vv-define, REQ-TW-076 / REQ-TW-077)
+  =====================================================================
+
+  Top-level required fields:
+    schema_version   - string, must equal the literal "#{SCHEMA_VERSION_LITERAL}"
+    work_item_id     - string, stable identifier for the work item/task
+    plan_ref         - string, path to the accepted plan; must be relative and
+                       resolve to an existing file within --root (absolute
+                       paths and ".." escapes are rejected)
+    requirements     - non-empty array of requirement entries (see below)
+
+  Each requirements[] entry requires:
+    req_id           - string, the requirement ID this entry closes V&V-definition
+                       for; must match ^REQ-[A-Z]+-[0-9]+$
+
+  ...and then exactly one of the following two modes:
+
+    Verification mode (executable V&V artifacts exist for this requirement):
+      trace_id             - string, must match ^TRACE-[A-Z]+-[0-9]+$
+      ver_id               - string, must match ^VER-[A-Z]+-[0-9]+$
+      val_id               - string, must match ^VAL-[A-Z]+-[0-9]+$
+      verification_artifact - string path to the executable verification
+                               artifact (test/fixture/smoke); must exist
+      red_evidence          - string path to the recorded expected-failing
+                               (RED) evidence file; must exist and be non-empty
+      validation_artifact   - string path to the docs/validation/ validation
+                               definition artifact; must exist
+
+    Not-applicable mode (scoped exception per REQ-TW-076, e.g. pure
+    documentation/mechanical/generated/vendored changes):
+      not_applicable:
+        scope   - string, the scoped exception category (e.g. "docs-only")
+        reason  - string, why no V&V definition phase artifact is required
+
+  A requirement entry must use exactly one mode. Mixing both, or omitting
+  both, is a structured finding.
+
+  Each requirements[] entry may also optionally carry (regardless of mode):
+    matrix_row_ref  - string, names the proposed traceability-matrix row this
+                       entry corresponds to, or the literal "pending-merge"
+                       when no row has been proposed/merged yet
+    reviews         - array of {gate, id, status, evidence_path} objects
+                       recording review/matrix linkage for this requirement:
+                         gate           - string, e.g. "tw-doc-review" or
+                                          "tw-code-review"
+                         id             - string, the review record's ID
+                         status         - string, e.g. "passed", "pending",
+                                          "held"
+                         evidence_path  - optional string; when present, must
+                                          be relative, resolve within --root,
+                                          and resolve to an existing file
+
+  --require-review-passed mode (consumed by tw-work's REQ-TW-078 preflight):
+    every verification-mode requirement must carry at least one reviews[]
+    entry with status "passed" whose evidence_path is present and resolves to
+    an existing file. Without this flag, reviews[] is only structurally
+    validated and its passed/not-passed status is not itself a finding.
+
+  Example (also see docs/validation/examples/vv-define-capsule.example.json):
+
+  {
+    "schema_version": "#{SCHEMA_VERSION_LITERAL}",
+    "work_item_id": "WORK-EXAMPLE-001",
+    "plan_ref": "docs/plans/example-plan.md",
+    "requirements": [
+      {
+        "req_id": "REQ-TW-XXX",
+        "trace_id": "TRACE-TW-XXX",
+        "ver_id": "VER-TW-XXX",
+        "val_id": "VAL-TW-XXX",
+        "verification_artifact": "path/to/red_test.sh",
+        "red_evidence": "path/to/red_run.txt",
+        "validation_artifact": "docs/validation/example-validation-definition.md",
+        "matrix_row_ref": "pending-merge",
+        "reviews": [
+          {
+            "gate": "tw-doc-review",
+            "id": "TW-DOC-REVIEW-EXAMPLE-001",
+            "status": "passed",
+            "evidence_path": "docs/validation/example-doc-review.md"
+          }
+        ]
+      },
+      {
+        "req_id": "REQ-TW-YYY",
+        "not_applicable": {
+          "scope": "docs-only",
+          "reason": "Pure documentation change; no behavior-bearing artifact."
+        }
+      }
+    ]
+  }
+
+  Exit codes:
+    0  pass (no findings)
+    1  blocked (one or more structured findings)
+    2  usage error (missing/invalid --root or --capsule, unreadable file)
+SCHEMA
+
+options = {
+  root: Dir.pwd,
+  capsule: nil,
+  jsonl: nil,
+  markdown: nil,
+  schema: false,
+  require_review_passed: false
+}
+
+OptionParser.new do |opts|
+  opts.on("--root PATH") { |value| options[:root] = value }
+  opts.on("--capsule PATH") { |value| options[:capsule] = value }
+  opts.on("--jsonl PATH") { |value| options[:jsonl] = value }
+  opts.on("--markdown PATH") { |value| options[:markdown] = value }
+  opts.on("--schema") { options[:schema] = true }
+  opts.on("--require-review-passed") { options[:require_review_passed] = true }
+end.parse!
+
+if options[:schema]
+  puts SCHEMA_TEMPLATE
+  exit 0
+end
+
+if options[:capsule].nil?
+  warn "vv_capsule_missing_capsule_option=true"
+  exit 2
+end
+
+root = Pathname.new(options[:root]).expand_path
+unless root.directory?
+  warn "vv_capsule_invalid_root=#{root}"
+  exit 2
+end
+root = root.realpath
+
+def present_string?(value)
+  value.is_a?(String) && !value.strip.empty?
+end
+
+def repo_relative(root, path)
+  Pathname.new(path).expand_path.relative_path_from(root).to_s
+rescue ArgumentError
+  path.to_s
+end
+
+def resolve(root, raw_path)
+  candidate = Pathname.new(raw_path)
+  candidate.absolute? ? candidate : root.join(raw_path)
+end
+
+# A capsule-supplied path (plan_ref, artifact/red_evidence/validation_artifact,
+# reviews[].evidence_path) is untrusted input and must never be allowed to
+# resolve outside --root. Absolute paths and ".." escapes are both rejected;
+# only the string prefix of the cleaned path is used, so this does not depend
+# on the target actually existing on disk.
+def path_escapes_root?(root, raw_path)
+  candidate = Pathname.new(raw_path)
+  return true if candidate.absolute?
+
+  resolved = root.join(candidate).cleanpath
+  root_str = root.cleanpath.to_s
+  resolved_str = resolved.to_s
+  !(resolved_str == root_str || resolved_str.start_with?("#{root_str}#{File::SEPARATOR}"))
+end
+
+findings = []
+
+emit = lambda do |id:, severity:, title:, evidence:, req_id: nil, remediation:|
+  findings << {
+    id: id,
+    severity: severity,
+    title: title,
+    evidence: evidence,
+    req_id: req_id,
+    remediation: remediation
+  }
+end
+
+capsule_candidate = Pathname.new(options[:capsule])
+capsule_path = capsule_candidate.absolute? ? capsule_candidate : root.join(capsule_candidate)
+
+unless capsule_path.file?
+  warn "vv_capsule_missing_file=#{options[:capsule]}"
+  exit 2
+end
+
+capsule_relative = repo_relative(root, capsule_path)
+
+begin
+  data = JSON.parse(capsule_path.read)
+rescue JSON::ParserError => e
+  emit.call(
+    id: "VV-CAPSULE-INVALID-JSON",
+    severity: "P1",
+    title: "Capsule file is not valid JSON",
+    evidence: "#{capsule_relative}: #{e.message}",
+    remediation: "Fix the capsule JSON syntax."
+  )
+  data = nil
+end
+
+if data && !data.is_a?(Hash)
+  emit.call(
+    id: "VV-CAPSULE-NOT-OBJECT",
+    severity: "P1",
+    title: "Capsule top level is not a JSON object",
+    evidence: "capsule=#{capsule_relative} class=#{data.class}",
+    remediation: "The capsule must be a single JSON object."
+  )
+  data = nil
+end
+
+if data
+  %w[schema_version work_item_id plan_ref].each do |field|
+    next if present_string?(data[field])
+
+    emit.call(
+      id: "VV-CAPSULE-MISSING-FIELD",
+      severity: "P1",
+      title: "Capsule is missing a required top-level field",
+      evidence: "missing=#{field} capsule=#{capsule_relative}",
+      remediation: "Populate the #{field} field before handing the capsule to tw-work."
+    )
+  end
+
+  if present_string?(data["schema_version"]) && data["schema_version"] != SCHEMA_VERSION_LITERAL
+    emit.call(
+      id: "VV-CAPSULE-BAD-SCHEMA-VERSION",
+      severity: "P1",
+      title: "Capsule schema_version does not match the required literal",
+      evidence: "schema_version=#{data['schema_version'].inspect} expected=#{SCHEMA_VERSION_LITERAL.inspect} capsule=#{capsule_relative}",
+      remediation: "Set schema_version to the literal string #{SCHEMA_VERSION_LITERAL.inspect}."
+    )
+  end
+
+  if present_string?(data["plan_ref"])
+    if path_escapes_root?(root, data["plan_ref"])
+      emit.call(
+        id: "VV-CAPSULE-PATH-ESCAPES-ROOT",
+        severity: "P1",
+        title: "Capsule plan_ref escapes --root",
+        evidence: "field=plan_ref path=#{data['plan_ref']} capsule=#{capsule_relative}",
+        remediation: "plan_ref must be a relative path that resolves within --root; remove absolute paths and \"..\" escapes."
+      )
+    else
+      resolved_plan_ref = resolve(root, data["plan_ref"])
+      unless resolved_plan_ref.file?
+        emit.call(
+          id: "VV-CAPSULE-PLAN-REF-NOT-FOUND",
+          severity: "P1",
+          title: "Capsule plan_ref does not resolve to an existing file",
+          evidence: "plan_ref=#{data['plan_ref']} capsule=#{capsule_relative}",
+          remediation: "Point plan_ref at the accepted plan file's path relative to --root, or create the file."
+        )
+      end
+    end
+  end
+
+  requirements = data["requirements"]
+  if !requirements.is_a?(Array) || requirements.empty?
+    emit.call(
+      id: "VV-CAPSULE-MISSING-REQUIREMENTS",
+      severity: "P1",
+      title: "Capsule has no requirements entries",
+      evidence: "requirements=#{requirements.inspect} capsule=#{capsule_relative}",
+      remediation: "Add at least one requirements[] entry covering the work item's in-scope requirements."
+    )
+    requirements = []
+  end
+
+  requirements.each_with_index do |entry, index|
+    unless entry.is_a?(Hash)
+      emit.call(
+        id: "VV-CAPSULE-REQUIREMENT-NOT-OBJECT",
+        severity: "P1",
+        title: "requirements[] entry is not a JSON object",
+        evidence: "index=#{index} class=#{entry.class}",
+        remediation: "Each requirements[] entry must be a JSON object."
+      )
+      next
+    end
+
+    req_id = entry["req_id"]
+    if present_string?(req_id)
+      unless ID_FORMATS["req_id"].match?(req_id)
+        emit.call(
+          id: "VV-CAPSULE-BAD-ID-FORMAT",
+          severity: "P1",
+          title: "requirements[] entry has a malformed req_id",
+          evidence: "field=req_id value=#{req_id.inspect} index=#{index}",
+          req_id: req_id,
+          remediation: "req_id must match #{ID_FORMATS['req_id'].inspect} (e.g. REQ-TW-076)."
+        )
+      end
+    else
+      emit.call(
+        id: "VV-CAPSULE-REQUIREMENT-MISSING-REQ-ID",
+        severity: "P1",
+        title: "requirements[] entry is missing req_id",
+        evidence: "index=#{index}",
+        remediation: "Add the req_id field naming the approved requirement this entry closes V&V definition for."
+      )
+    end
+
+    verification_fields = %w[trace_id ver_id val_id verification_artifact red_evidence validation_artifact]
+    has_any_verification_field = verification_fields.any? { |field| present_string?(entry[field]) }
+    not_applicable = entry["not_applicable"]
+    has_not_applicable = entry.key?("not_applicable")
+
+    if has_not_applicable && has_any_verification_field
+      emit.call(
+        id: "VV-CAPSULE-REQUIREMENT-AMBIGUOUS-MODE",
+        severity: "P1",
+        title: "requirements[] entry mixes not_applicable and verification-mode fields",
+        evidence: "req_id=#{req_id.inspect} index=#{index}",
+        req_id: req_id,
+        remediation: "Use exactly one mode: verification-mode fields, or a not_applicable{scope,reason} object, not both."
+      )
+    elsif !has_not_applicable && !has_any_verification_field
+      emit.call(
+        id: "VV-CAPSULE-REQUIREMENT-MISSING-MODE",
+        severity: "P1",
+        title: "requirements[] entry has neither verification-mode fields nor not_applicable",
+        evidence: "req_id=#{req_id.inspect} index=#{index}",
+        req_id: req_id,
+        remediation: "Add verification-mode fields (trace_id/ver_id/val_id/verification_artifact/red_evidence/validation_artifact) or a scoped not_applicable{scope,reason} object."
+      )
+    elsif has_not_applicable
+      if not_applicable.is_a?(Hash)
+        missing_na_fields = %w[scope reason].reject { |field| present_string?(not_applicable[field]) }
+        unless missing_na_fields.empty?
+          emit.call(
+            id: "VV-CAPSULE-UNSCOPED-NOT-APPLICABLE",
+            severity: "P1",
+            title: "not_applicable decision is missing scope and/or reason",
+            evidence: "req_id=#{req_id.inspect} missing=#{missing_na_fields.join(',')}",
+            req_id: req_id,
+            remediation: "Record both not_applicable.scope and not_applicable.reason before treating this requirement as out of V&V-definition scope."
+          )
+        end
+      else
+        emit.call(
+          id: "VV-CAPSULE-NOT-APPLICABLE-MALFORMED",
+          severity: "P1",
+          title: "not_applicable is not a JSON object",
+          evidence: "req_id=#{req_id.inspect} class=#{not_applicable.class}",
+          req_id: req_id,
+          remediation: "not_applicable must be an object with scope and reason fields."
+        )
+      end
+    else
+      missing_fields = verification_fields.reject { |field| present_string?(entry[field]) }
+      unless missing_fields.empty?
+        emit.call(
+          id: "VV-CAPSULE-MISSING-REQUIREMENT-FIELD",
+          severity: "P1",
+          title: "requirements[] entry is missing required verification-mode field(s)",
+          evidence: "req_id=#{req_id.inspect} missing=#{missing_fields.join(',')}",
+          req_id: req_id,
+          remediation: "Populate the missing field(s), or switch to a scoped not_applicable decision if no executable V&V artifact applies."
+        )
+      end
+
+      %w[trace_id ver_id val_id].each do |field|
+        value = entry[field]
+        next unless present_string?(value)
+        next if ID_FORMATS[field].match?(value)
+
+        emit.call(
+          id: "VV-CAPSULE-BAD-ID-FORMAT",
+          severity: "P1",
+          title: "requirements[] entry has a malformed #{field}",
+          evidence: "field=#{field} value=#{value.inspect} req_id=#{req_id.inspect} index=#{index}",
+          req_id: req_id,
+          remediation: "#{field} must match #{ID_FORMATS[field].inspect}."
+        )
+      end
+
+      [
+        ["verification_artifact", entry["verification_artifact"]],
+        ["validation_artifact", entry["validation_artifact"]]
+      ].each do |field, raw_path|
+        next unless present_string?(raw_path)
+
+        if path_escapes_root?(root, raw_path)
+          emit.call(
+            id: "VV-CAPSULE-PATH-ESCAPES-ROOT",
+            severity: "P1",
+            title: "Capsule references a #{field} path that escapes --root",
+            evidence: "req_id=#{req_id.inspect} field=#{field} path=#{raw_path}",
+            req_id: req_id,
+            remediation: "#{field} must be a relative path that resolves within --root; remove absolute paths and \"..\" escapes."
+          )
+          next
+        end
+
+        resolved = resolve(root, raw_path)
+        next if resolved.file?
+
+        emit.call(
+          id: "VV-CAPSULE-ARTIFACT-NOT-FOUND",
+          severity: "P1",
+          title: "Capsule references an artifact path that does not exist",
+          evidence: "req_id=#{req_id.inspect} field=#{field} path=#{raw_path}",
+          req_id: req_id,
+          remediation: "Create the artifact at the referenced path, or correct the path in the capsule."
+        )
+      end
+
+      red_evidence_path = entry["red_evidence"]
+      if present_string?(red_evidence_path)
+        if path_escapes_root?(root, red_evidence_path)
+          emit.call(
+            id: "VV-CAPSULE-PATH-ESCAPES-ROOT",
+            severity: "P1",
+            title: "Capsule references a red_evidence path that escapes --root",
+            evidence: "req_id=#{req_id.inspect} field=red_evidence path=#{red_evidence_path}",
+            req_id: req_id,
+            remediation: "red_evidence must be a relative path that resolves within --root; remove absolute paths and \"..\" escapes."
+          )
+        else
+          resolved = resolve(root, red_evidence_path)
+          if !resolved.file?
+            emit.call(
+              id: "VV-CAPSULE-ARTIFACT-NOT-FOUND",
+              severity: "P1",
+              title: "Capsule references a red_evidence path that does not exist",
+              evidence: "req_id=#{req_id.inspect} field=red_evidence path=#{red_evidence_path}",
+              req_id: req_id,
+              remediation: "Record the expected-failing (RED) evidence at the referenced path before handing the capsule to tw-work."
+            )
+          elsif resolved.size.zero?
+            emit.call(
+              id: "VV-CAPSULE-RED-EVIDENCE-EMPTY",
+              severity: "P1",
+              title: "red_evidence file is empty",
+              evidence: "req_id=#{req_id.inspect} path=#{red_evidence_path}",
+              req_id: req_id,
+              remediation: "Record actual expected-failing (RED) run output in the red_evidence file; an empty file is not evidence."
+            )
+          end
+        end
+      end
+    end
+
+    reviews = entry["reviews"]
+    if entry.key?("reviews")
+      if reviews.is_a?(Array)
+        reviews.each_with_index do |review, review_index|
+          unless review.is_a?(Hash)
+            emit.call(
+              id: "VV-CAPSULE-REVIEW-NOT-OBJECT",
+              severity: "P1",
+              title: "reviews[] entry is not a JSON object",
+              evidence: "req_id=#{req_id.inspect} review_index=#{review_index} class=#{review.class}",
+              req_id: req_id,
+              remediation: "Each reviews[] entry must be an object with gate, id, and status fields."
+            )
+            next
+          end
+
+          missing_review_fields = %w[gate id status].select do |field|
+            value = review[field]
+            !review.key?(field) || value.nil? || (value.is_a?(String) && value.strip.empty?)
+          end
+          unless missing_review_fields.empty?
+            emit.call(
+              id: "VV-CAPSULE-REVIEW-MISSING-FIELD",
+              severity: "P1",
+              title: "reviews[] entry is missing required field(s)",
+              evidence: "req_id=#{req_id.inspect} review_index=#{review_index} missing=#{missing_review_fields.join(',')}",
+              req_id: req_id,
+              remediation: "Populate gate, id, and status for each reviews[] entry."
+            )
+          end
+
+          wrong_type_review_fields = %w[gate id status].select do |field|
+            value = review[field]
+            review.key?(field) && !value.nil? && !value.is_a?(String)
+          end
+          unless wrong_type_review_fields.empty?
+            emit.call(
+              id: "VV-CAPSULE-REVIEW-FIELD-TYPE",
+              severity: "P1",
+              title: "reviews[] entry has non-string value(s) for gate/id/status",
+              evidence: "req_id=#{req_id.inspect} review_index=#{review_index} fields=#{wrong_type_review_fields.join(',')}",
+              req_id: req_id,
+              remediation: "gate, id, and status must each be a string when present."
+            )
+          end
+
+          if review.key?("evidence_path") && !review["evidence_path"].nil?
+            review_evidence_path = review["evidence_path"]
+            if !review_evidence_path.is_a?(String)
+              emit.call(
+                id: "VV-CAPSULE-REVIEW-EVIDENCE-PATH-TYPE",
+                severity: "P1",
+                title: "reviews[] entry evidence_path is present but is not a string",
+                evidence: "req_id=#{req_id.inspect} review_index=#{review_index} class=#{review_evidence_path.class}",
+                req_id: req_id,
+                remediation: "evidence_path must be a string path when present."
+              )
+            elsif present_string?(review_evidence_path)
+              if path_escapes_root?(root, review_evidence_path)
+                emit.call(
+                  id: "VV-CAPSULE-PATH-ESCAPES-ROOT",
+                  severity: "P1",
+                  title: "reviews[] entry evidence_path escapes --root",
+                  evidence: "req_id=#{req_id.inspect} review_index=#{review_index} evidence_path=#{review_evidence_path}",
+                  req_id: req_id,
+                  remediation: "evidence_path must be a relative path that resolves within --root; remove absolute paths and \"..\" escapes."
+                )
+              else
+                resolved_review_evidence = resolve(root, review_evidence_path)
+                unless resolved_review_evidence.file?
+                  emit.call(
+                    id: "VV-CAPSULE-REVIEW-EVIDENCE-NOT-FOUND",
+                    severity: "P1",
+                    title: "reviews[] entry evidence_path does not resolve to an existing file",
+                    evidence: "req_id=#{req_id.inspect} review_index=#{review_index} evidence_path=#{review_evidence_path}",
+                    req_id: req_id,
+                    remediation: "Point evidence_path at an existing file, or omit it if no evidence is recorded yet."
+                  )
+                end
+              end
+            end
+          end
+        end
+      else
+        emit.call(
+          id: "VV-CAPSULE-REVIEWS-NOT-ARRAY",
+          severity: "P1",
+          title: "reviews is present but is not a JSON array",
+          evidence: "req_id=#{req_id.inspect} class=#{reviews.class}",
+          req_id: req_id,
+          remediation: "reviews must be an array of {gate, id, status, evidence_path} objects."
+        )
+        reviews = []
+      end
+    end
+
+    if entry.key?("matrix_row_ref") && !entry["matrix_row_ref"].is_a?(String)
+      emit.call(
+        id: "VV-CAPSULE-MATRIX-ROW-REF-NOT-STRING",
+        severity: "P1",
+        title: "matrix_row_ref is present but is not a string",
+        evidence: "req_id=#{req_id.inspect} class=#{entry['matrix_row_ref'].class}",
+        req_id: req_id,
+        remediation: 'matrix_row_ref must be a string naming the proposed matrix row or "pending-merge".'
+      )
+    end
+
+    if options[:require_review_passed] && !has_not_applicable && has_any_verification_field
+      passing_reviews = Array(reviews).select do |review|
+        review.is_a?(Hash) &&
+          review["status"] == "passed" &&
+          present_string?(review["evidence_path"]) &&
+          resolve(root, review["evidence_path"]).file?
+      end
+
+      if passing_reviews.empty?
+        emit.call(
+          id: "VV-CAPSULE-REVIEW-NOT-PASSED",
+          severity: "P1",
+          title: "requirements[] entry lacks a passed review with existing evidence",
+          evidence: "req_id=#{req_id.inspect} index=#{index}",
+          req_id: req_id,
+          remediation: "Add a reviews[] entry with status \"passed\" and an evidence_path that resolves to an existing file before --require-review-passed will accept this requirement."
+        )
+      end
+    end
+  end
+end
+
+if options[:jsonl]
+  jsonl_path = resolve(root, options[:jsonl])
+  File.open(jsonl_path, "w") do |file|
+    findings.each { |finding| file.puts(JSON.generate(finding)) }
+  end
+end
+
+if options[:markdown]
+  markdown_path = resolve(root, options[:markdown])
+  File.open(markdown_path, "w") do |file|
+    file.puts("# V&V Capsule Findings")
+    file.puts
+    if findings.empty?
+      file.puts("No findings.")
+    else
+      findings.each do |finding|
+        file.puts("- #{finding[:severity]} #{finding[:id]} req_id=#{finding[:req_id]}: #{finding[:title]}")
+      end
+    end
+  end
+end
+
+status = findings.empty? ? "pass" : "blocked"
+puts "vv_capsule_status=#{status}"
+puts "vv_capsule_capsule=#{capsule_relative}"
+puts "vv_capsule_findings=#{findings.length}"
+findings.each do |finding|
+  puts "vv_capsule_finding=#{finding[:id]} req_id=#{finding[:req_id]} evidence=#{finding[:evidence]}"
+end
+
+exit(findings.empty? ? 0 : 1)

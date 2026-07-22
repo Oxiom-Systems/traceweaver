@@ -1,0 +1,25 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "work_item_id": "FIXTURE-REVIEW-ENTRY-MALFORMED",
+  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "requirements": [
+    {
+      "req_id": "REQ-FIXTURE-012",
+      "trace_id": "TRACE-FIXTURE-012",
+      "ver_id": "VER-FIXTURE-012",
+      "val_id": "VAL-FIXTURE-012",
+      "verification_artifact": "fixtures/vv-define/valid-capsule/verification/red_test.sh",
+      "red_evidence": "fixtures/vv-define/valid-capsule/red-evidence/red_run.txt",
+      "validation_artifact": "fixtures/vv-define/valid-capsule/validation/validation-definition.md",
+      "matrix_row_ref": 42,
+      "reviews": [
+        {
+          "gate": 111,
+          "id": 222,
+          "status": true,
+          "evidence_path": 123
+        }
+      ]
+    }
+  ]
+}

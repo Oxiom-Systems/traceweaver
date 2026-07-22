@@ -1,0 +1,14 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "work_item_id": "FIXTURE-PATH-ESCAPES-ROOT-DOTDOT",
+  "plan_ref": "../../../../../../../../../../etc/passwd",
+  "requirements": [
+    {
+      "req_id": "REQ-FIXTURE-011",
+      "not_applicable": {
+        "scope": "docs-only",
+        "reason": "Fixture isolates ../ escape plan_ref path-escape validation only."
+      }
+    }
+  ]
+}

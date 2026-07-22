@@ -1,0 +1,32 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "work_item_id": "TW-UNIT2-TW-VV-DEFINE",
+  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "requirements": [
+    {
+      "req_id": "REQ-TW-077",
+      "trace_id": "TRACE-TW-058",
+      "ver_id": "VER-TW-078",
+      "val_id": "VAL-TW-020",
+      "verification_artifact": "scripts/traceweaver-smoke-vv-define",
+      "red_evidence": "fixtures/vv-define/valid-capsule/red-evidence/red_run.txt",
+      "validation_artifact": "docs/validation/examples/vv-define-validation-definition.example.md",
+      "matrix_row_ref": "pending-merge",
+      "reviews": [
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-07-22-REQ-TW-076-081-001",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-0.3-req-076-081-doc-review.md"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-999",
+      "not_applicable": {
+        "scope": "docs-only",
+        "reason": "Illustrative row for a documentation-only change in this example capsule (REQ-TW-999 is a placeholder ID chosen only to satisfy the req_id format check, not a real requirement); no behavior-bearing code, script, skill, fixture, or smoke exists for it, so no executable verification artifact or validation-definition artifact is required per REQ-TW-076's scoped not-applicable pattern."
+      }
+    }
+  ]
+}
