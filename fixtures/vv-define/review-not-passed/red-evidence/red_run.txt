@@ -1,0 +1,14 @@
+V&V definition RED evidence (fixture)
+=====================================
+
+command: fixtures/vv-define/review-not-passed/verification/red_test.sh
+date: 2026-07-22
+tested_ref: fixture-only, no real commit
+
+output:
+fixture_vv_define_review_not_passed_red_test: asserting not-yet-implemented behavior
+FAIL: expected behavior does not exist yet (RED)
+exit_code=1
+
+interpretation: expected-failing (RED) run recorded before implementation
+started, per REQ-TW-076(a).

@@ -1,0 +1,9 @@
+work_package=behavior_bearing_client_change
+requirement=REQ-TW-078
+vv_definition_capsule=missing
+capsule_preflight=blocked
+expected_behavior=stop_before_mutation
+required_route=tw-auto_to_tw-vv-define
+ce_work_invocation=blocked
+review_acceptance=blocked
+runtime_enforcement=held_static_advisory_policy

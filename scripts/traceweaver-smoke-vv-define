@@ -1,0 +1,295 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=vv-define-smoke; req=REQ-TW-076; trace=TRACE-TW-057; ver=VER-TW-077
+# TRACEWEAVER: verifies=VER-TW-077; req=REQ-TW-076; trace=TRACE-TW-057
+# TRACEWEAVER: file-role=vv-define-smoke; req=REQ-TW-077; trace=TRACE-TW-058; ver=VER-TW-078
+# TRACEWEAVER: verifies=VER-TW-078; req=REQ-TW-077; trace=TRACE-TW-058
+#
+# Deterministic fixture smoke for the tw-vv-define skill and its
+# traceweaver-check-vv-capsule validator. Static/advisory only: this smoke
+# proves fixture-based validator behavior and SKILL.md shape. It does not
+# claim, exercise, or prove any live-agent runtime invocation of tw-vv-define.
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILL_DIR="$ROOT_DIR/plugins/traceweaver-core/skills/tw-vv-define"
+SKILL_MD="$SKILL_DIR/SKILL.md"
+CHECKER="$SKILL_DIR/scripts/traceweaver-check-vv-capsule"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/vv-define"
+EXAMPLE_CAPSULE="$ROOT_DIR/docs/validation/examples/vv-define-capsule.example.json"
+
+# Runtime is disabled by default. This smoke never claims live-agent runtime
+# proof; the flag exists only so a future runtime-proof unit can opt in
+# without changing this smoke's static contract. Today, enabling it only
+# prints an explicit held-runtime notice -- it never fabricates a runtime
+# result.
+RUNTIME_EXEC="${TRACEWEAVER_VV_DEFINE_RUNTIME:-0}"
+
+require_file() {
+  local path="$1"
+  if [[ ! -f "$path" ]]; then
+    echo "vv_define_smoke_missing_required_file=$path" >&2
+    exit 1
+  fi
+}
+
+require_executable() {
+  local path="$1"
+  require_file "$path"
+  if [[ ! -x "$path" ]]; then
+    echo "vv_define_smoke_not_executable=$path" >&2
+    exit 1
+  fi
+}
+
+assert_contains() {
+  local text="$1"
+  local expected="$2"
+  local label="$3"
+  if [[ "$text" != *"$expected"* ]]; then
+    echo "$label=failed_missing_pattern pattern=$expected" >&2
+    echo "$text" >&2
+    exit 1
+  fi
+}
+
+assert_file_contains() {
+  local path="$1"
+  local pattern="$2"
+  local label="$3"
+  if ! grep -q -- "$pattern" "$path"; then
+    echo "$label=failed_missing_pattern pattern=$pattern file=$path" >&2
+    exit 1
+  fi
+}
+
+expect_pass() {
+  local capsule="$1"
+  local label="$2"
+  shift 2
+  local output
+  output="$("$CHECKER" --root "$ROOT_DIR" --capsule "$capsule" "$@")"
+  assert_contains "$output" "vv_capsule_status=pass" "$label"
+  assert_contains "$output" "vv_capsule_findings=0" "$label"
+}
+
+expect_blocked() {
+  local capsule="$1"
+  local finding="$2"
+  local label="$3"
+  shift 3
+  local output status
+  set +e
+  output="$("$CHECKER" --root "$ROOT_DIR" --capsule "$capsule" "$@" 2>&1)"
+  status=$?
+  set -e
+  if [[ "$status" -eq 0 ]]; then
+    echo "$label=failed_expected_nonzero_exit capsule=$capsule" >&2
+    echo "$output" >&2
+    exit 1
+  fi
+  assert_contains "$output" "vv_capsule_status=blocked" "$label"
+  assert_contains "$output" "$finding" "$label"
+}
+
+# --- Step 1: required files exist ------------------------------------------
+
+require_file "$SKILL_MD"
+require_executable "$CHECKER"
+require_file "$EXAMPLE_CAPSULE"
+require_file "$FIXTURE_ROOT/valid-capsule/capsule.json"
+require_file "$FIXTURE_ROOT/missing-red-evidence/capsule.json"
+require_file "$FIXTURE_ROOT/unscoped-not-applicable/capsule.json"
+require_file "$FIXTURE_ROOT/valid-not-applicable/capsule.json"
+require_file "$FIXTURE_ROOT/review-not-passed/capsule.json"
+require_file "$FIXTURE_ROOT/invalid-identity/capsule.json"
+
+VALIDATION_EXAMPLE="$ROOT_DIR/docs/validation/examples/vv-define-validation-definition.example.md"
+require_file "$VALIDATION_EXAMPLE"
+
+# --- Step 2: SKILL.md required anchors and sections ------------------------
+
+assert_file_contains "$SKILL_MD" "^name: tw-vv-define$" "vv_define_smoke_frontmatter_name"
+assert_file_contains "$SKILL_MD" "^argument-hint:" "vv_define_smoke_frontmatter_argument_hint"
+assert_file_contains "$SKILL_MD" "file-role=vv-definition-gate-skill; req=REQ-TW-077; trace=TRACE-TW-058; ver=VER-TW-078" \
+  "vv_define_smoke_required_anchor"
+assert_file_contains "$SKILL_MD" "^## Purpose$" "vv_define_smoke_section_purpose"
+assert_file_contains "$SKILL_MD" "^## Required Inputs$" "vv_define_smoke_section_required_inputs"
+assert_file_contains "$SKILL_MD" "^## Workflow$" "vv_define_smoke_section_workflow"
+assert_file_contains "$SKILL_MD" "^## Boundaries$" "vv_define_smoke_section_boundaries"
+assert_file_contains "$SKILL_MD" "^## Output$" "vv_define_smoke_section_output"
+
+# Static/advisory-only wording must be present; no runtime-enforcement claim.
+assert_file_contains "$SKILL_MD" "static/advisory" "vv_define_smoke_static_advisory_wording"
+assert_file_contains "$SKILL_MD" "does not approve implementation authority" \
+  "vv_define_smoke_boundary_wording"
+
+# --- Step 3: --schema mode --------------------------------------------------
+
+schema_output="$("$CHECKER" --schema)"
+assert_contains "$schema_output" "schema_version" "vv_define_smoke_schema_field_schema_version"
+assert_contains "$schema_output" "work_item_id" "vv_define_smoke_schema_field_work_item_id"
+assert_contains "$schema_output" "plan_ref" "vv_define_smoke_schema_field_plan_ref"
+assert_contains "$schema_output" "not_applicable" "vv_define_smoke_schema_field_not_applicable"
+assert_contains "$schema_output" "reviews" "vv_define_smoke_schema_field_reviews"
+assert_contains "$schema_output" "matrix_row_ref" "vv_define_smoke_schema_field_matrix_row_ref"
+assert_contains "$schema_output" "tw-vv-capsule/1" "vv_define_smoke_schema_field_schema_version_literal"
+assert_contains "$schema_output" "--require-review-passed" "vv_define_smoke_schema_field_require_review_passed"
+
+# --- Step 4: validator over fixtures + example -----------------------------
+
+expect_pass "$FIXTURE_ROOT/valid-capsule/capsule.json" "vv_define_smoke_valid_capsule"
+expect_pass "$FIXTURE_ROOT/valid-not-applicable/capsule.json" "vv_define_smoke_valid_not_applicable"
+expect_pass "$EXAMPLE_CAPSULE" "vv_define_smoke_example_capsule"
+
+expect_blocked "$FIXTURE_ROOT/missing-red-evidence/capsule.json" \
+  "VV-CAPSULE-RED-EVIDENCE-EMPTY" "vv_define_smoke_missing_red_evidence"
+expect_blocked "$FIXTURE_ROOT/unscoped-not-applicable/capsule.json" \
+  "VV-CAPSULE-UNSCOPED-NOT-APPLICABLE" "vv_define_smoke_unscoped_not_applicable"
+
+# --- Step 4b: P1-a reviews/matrix_row_ref + --require-review-passed mode ---
+
+# Structurally valid reviews entry (gate/id/status present) with status
+# "pending" passes in default mode...
+expect_pass "$FIXTURE_ROOT/review-not-passed/capsule.json" \
+  "vv_define_smoke_review_not_passed_default_mode"
+
+# ...but is blocked once tw-work's preflight consumption mode is requested,
+# because no reviews[] entry has status "passed" with existing evidence.
+expect_blocked "$FIXTURE_ROOT/review-not-passed/capsule.json" \
+  "VV-CAPSULE-REVIEW-NOT-PASSED" "vv_define_smoke_review_not_passed_strict_mode" \
+  --require-review-passed
+
+# The example capsule's verification-mode requirement carries a passed
+# tw-doc-review entry with existing evidence, so it must pass strict mode too.
+expect_pass "$EXAMPLE_CAPSULE" "vv_define_smoke_example_capsule_strict_mode" \
+  --require-review-passed
+
+# --- Step 4c: P1-b garbage-identity hardening (schema_version/IDs/plan_ref) -
+
+invalid_identity_output="$("$CHECKER" --root "$ROOT_DIR" --capsule "$FIXTURE_ROOT/invalid-identity/capsule.json" 2>&1 || true)"
+assert_contains "$invalid_identity_output" "vv_capsule_status=blocked" "vv_define_smoke_invalid_identity_blocked"
+assert_contains "$invalid_identity_output" "VV-CAPSULE-BAD-SCHEMA-VERSION" "vv_define_smoke_invalid_identity_schema_version"
+assert_contains "$invalid_identity_output" "field=req_id" "vv_define_smoke_invalid_identity_req_id_format"
+assert_contains "$invalid_identity_output" "field=trace_id" "vv_define_smoke_invalid_identity_trace_id_format"
+assert_contains "$invalid_identity_output" "field=ver_id" "vv_define_smoke_invalid_identity_ver_id_format"
+assert_contains "$invalid_identity_output" "field=val_id" "vv_define_smoke_invalid_identity_val_id_format"
+assert_contains "$invalid_identity_output" "VV-CAPSULE-PLAN-REF-NOT-FOUND" "vv_define_smoke_invalid_identity_plan_ref"
+
+# --- Step 4d: reviews[]/matrix_row_ref structural validation (inline cases) -
+
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+write_reviews_structure_capsule() {
+  local out="$1"
+  local reviews_json="$2"
+  local matrix_row_ref_json="${3:-\"pending-merge\"}"
+  cat > "$out" <<JSON
+{
+  "schema_version": "tw-vv-capsule/1",
+  "work_item_id": "FIXTURE-REVIEWS-STRUCTURE",
+  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "requirements": [
+    {
+      "req_id": "REQ-FIXTURE-006",
+      "trace_id": "TRACE-FIXTURE-006",
+      "ver_id": "VER-FIXTURE-006",
+      "val_id": "VAL-FIXTURE-006",
+      "verification_artifact": "fixtures/vv-define/valid-capsule/verification/red_test.sh",
+      "red_evidence": "fixtures/vv-define/valid-capsule/red-evidence/red_run.txt",
+      "validation_artifact": "fixtures/vv-define/valid-capsule/validation/validation-definition.md",
+      "matrix_row_ref": $matrix_row_ref_json,
+      "reviews": $reviews_json
+    }
+  ]
+}
+JSON
+}
+
+reviews_missing_field_capsule="$TMP_DIR/reviews-missing-field.json"
+write_reviews_structure_capsule "$reviews_missing_field_capsule" '[{"id":"R-1","status":"passed"}]'
+expect_blocked "$reviews_missing_field_capsule" "VV-CAPSULE-REVIEW-MISSING-FIELD" \
+  "vv_define_smoke_review_missing_field"
+
+reviews_bad_evidence_capsule="$TMP_DIR/reviews-bad-evidence.json"
+write_reviews_structure_capsule "$reviews_bad_evidence_capsule" \
+  '[{"gate":"tw-code-review","id":"R-2","status":"passed","evidence_path":"fixtures/vv-define/does-not-exist.txt"}]'
+expect_blocked "$reviews_bad_evidence_capsule" "VV-CAPSULE-REVIEW-EVIDENCE-NOT-FOUND" \
+  "vv_define_smoke_review_evidence_not_found"
+
+matrix_row_ref_capsule="$TMP_DIR/matrix-row-ref-bad-type.json"
+write_reviews_structure_capsule "$matrix_row_ref_capsule" \
+  '[{"gate":"tw-code-review","id":"R-3","status":"passed","evidence_path":"fixtures/vv-define/valid-capsule/red-evidence/red_run.txt"}]' \
+  '12345'
+expect_blocked "$matrix_row_ref_capsule" "VV-CAPSULE-MATRIX-ROW-REF-NOT-STRING" \
+  "vv_define_smoke_matrix_row_ref_type"
+
+# --- Step 4f: P1 root-containment hardening for plan_ref (path-escapes-root) --
+
+PATH_ESCAPES_ROOT_DIR="$FIXTURE_ROOT/path-escapes-root"
+require_file "$PATH_ESCAPES_ROOT_DIR/capsule-absolute-plan-ref.json"
+require_file "$PATH_ESCAPES_ROOT_DIR/capsule-dotdot-plan-ref.json"
+
+expect_blocked "$PATH_ESCAPES_ROOT_DIR/capsule-absolute-plan-ref.json" \
+  "VV-CAPSULE-PATH-ESCAPES-ROOT" "vv_define_smoke_path_escapes_root_absolute_plan_ref"
+expect_blocked "$PATH_ESCAPES_ROOT_DIR/capsule-dotdot-plan-ref.json" \
+  "VV-CAPSULE-PATH-ESCAPES-ROOT" "vv_define_smoke_path_escapes_root_dotdot_plan_ref"
+
+# An absolute plan_ref must never be silently accepted as "found" just
+# because the absolute path happens to exist on disk.
+absolute_plan_ref_output="$("$CHECKER" --root "$ROOT_DIR" --capsule "$PATH_ESCAPES_ROOT_DIR/capsule-absolute-plan-ref.json" 2>&1 || true)"
+if [[ "$absolute_plan_ref_output" == *"vv_capsule_status=pass"* ]]; then
+  echo "vv_define_smoke_path_escapes_root_absolute_plan_ref=failed_accepted_absolute_path" >&2
+  echo "$absolute_plan_ref_output" >&2
+  exit 1
+fi
+
+# --- Step 4g: P1 non-string reviews[] entry field hardening -----------------
+
+REVIEW_ENTRY_MALFORMED_CAPSULE="$FIXTURE_ROOT/review-entry-malformed/capsule.json"
+require_file "$REVIEW_ENTRY_MALFORMED_CAPSULE"
+
+review_entry_malformed_output="$("$CHECKER" --root "$ROOT_DIR" --capsule "$REVIEW_ENTRY_MALFORMED_CAPSULE" 2>&1 || true)"
+assert_contains "$review_entry_malformed_output" "vv_capsule_status=blocked" \
+  "vv_define_smoke_review_entry_malformed_blocked"
+assert_contains "$review_entry_malformed_output" "VV-CAPSULE-REVIEW-EVIDENCE-PATH-TYPE" \
+  "vv_define_smoke_review_entry_malformed_evidence_path_type"
+assert_contains "$review_entry_malformed_output" "VV-CAPSULE-REVIEW-FIELD-TYPE" \
+  "vv_define_smoke_review_entry_malformed_field_type"
+assert_contains "$review_entry_malformed_output" "VV-CAPSULE-MATRIX-ROW-REF-NOT-STRING" \
+  "vv_define_smoke_review_entry_malformed_matrix_row_ref_type"
+
+# A non-string evidence_path must never be silently treated as "absent" and
+# allowed to pass validation.
+review_evidence_path_type_capsule="$TMP_DIR/review-evidence-path-type.json"
+write_reviews_structure_capsule "$review_evidence_path_type_capsule" \
+  '[{"gate":"tw-code-review","id":"R-4","status":"passed","evidence_path":123}]'
+expect_blocked "$review_evidence_path_type_capsule" "VV-CAPSULE-REVIEW-EVIDENCE-PATH-TYPE" \
+  "vv_define_smoke_review_evidence_path_type_isolated"
+
+# --- Step 4e: P2 cheap content-gate check for the example validation artifact
+
+assert_file_contains "$VALIDATION_EXAMPLE" "^## Validation Question$" \
+  "vv_define_smoke_validation_example_question"
+assert_file_contains "$VALIDATION_EXAMPLE" "Acceptance Criteria" \
+  "vv_define_smoke_validation_example_acceptance"
+assert_file_contains "$VALIDATION_EXAMPLE" "Rater" \
+  "vv_define_smoke_validation_example_rater"
+assert_file_contains "$VALIDATION_EXAMPLE" "^## Evidence Path" \
+  "vv_define_smoke_validation_example_evidence_path"
+assert_file_contains "$EXAMPLE_CAPSULE" "vv-define-validation-definition.example.md" \
+  "vv_define_smoke_example_capsule_validation_artifact_ref"
+
+# --- Step 5: held runtime notice (disabled by default) ---------------------
+
+if [[ "$RUNTIME_EXEC" == "1" ]]; then
+  echo "vv_define_smoke_runtime=held reason=no_live_agent_runtime_proof_exists_yet"
+else
+  echo "vv_define_smoke_runtime=disabled_by_default"
+fi
+
+echo "vv_define_smoke=pass"
+echo "vv_define_smoke_checker_valid_fixtures=pass"
+echo "vv_define_smoke_checker_invalid_fixtures=pass"
+echo "vv_define_smoke_skill_shape=pass"

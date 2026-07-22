@@ -11,6 +11,7 @@ disable-model-invocation: false
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=strategy-ideation-orchestrator; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
+<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-078; trace=TRACE-TW-059; ver=VER-TW-079 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-023; trace=TRACE-TW-046; ver=VER-TW-059 -->
 
@@ -94,6 +95,7 @@ Required resolutions:
 - `tw-ideate`
 - `tw-brainstorm`
 - `tw-plan`
+- `tw-vv-define`
 - `tw-authority-gate`
 - `tw-audit`
 - `tw-work`
@@ -185,16 +187,25 @@ review completion.
    `tw-brainstorm` or requirements review. Skip these source-evidence wrappers
    when the request already names an approved implementation plan or accepted
    requirement and does not ask for strategy or ideation.
-6. Run or create the planning step using the resolved TraceWeaver planning
-   wrapper (`tw-plan`) and keep the plan bounded to approved authority. The
-   wrapper may delegate to packaged `ce-plan` only after TraceWeaver authority
-   and requirements-quality preflight pass or are explicitly held.
-7. When the request needs brainstorming, project audit, session history,
+   When the request instead needs brainstorming, project audit, session history,
    learning capture, PR feedback repair, setup, worktree creation, browser
    verification, or Xcode verification, route through `tw-brainstorm`,
    `tw-audit`, `tw-sessions`, `tw-compound`, `tw-compound-refresh`,
    `tw-resolve-pr-feedback`, `tw-setup`, `tw-worktree`, `tw-test-browser`, or
    `tw-test-xcode` instead of raw CE skills.
+6. Run or create the planning step using the resolved TraceWeaver planning
+   wrapper (`tw-plan`) and keep the plan bounded to approved authority. The
+   wrapper may delegate to packaged `ce-plan` only after TraceWeaver authority
+   and requirements-quality preflight pass or are explicitly held.
+7. **V&V Definition Phase.** For an Implementation Gate Mode run with
+   behavior-bearing scope, route the accepted plan through resolved
+   `tw-vv-define` before authority-gate/work. Require its review-passed V&V
+   definition capsule, including pre-authored RED evidence and validation
+   definition artifacts, and pass that capsule to `tw-work`. For docs-only,
+   mechanical, generated, or vendored scope, require the recorded scoped
+   REQ-TW-076 not-applicable or approved exception decision instead. Missing or
+   invalid V&V input stops the loop and routes back to `tw-vv-define`; it does
+   not permit implementation from a later or inferred test result.
 8. Run the resolved `tw-authority-gate` before implementation.
 9. If authority is missing, stop and create a gap, change, exception candidate,
    accepted-risk candidate, or clarification record. Do not implement from an
@@ -205,16 +216,17 @@ review completion.
    `ce-work` coding engine, but `tw-auto` must treat `tw-work` as the work-loop
    owner for authority visibility, trace-anchor authoring, verification,
    matrix-evidence updates, and no-publication handoff. Pass the authority
-   capsule, verification target, matrix-update requirement, changed-file scope,
-   and the explicit instruction that `tw-work` must establish test-first
-   evidence, a scoped not-applicable decision, or approved exception evidence
-   before behavior mutation, detect requirement closure claims and route them
+   capsule, review-passed V&V definition capsule, verification target,
+   matrix-update requirement, and changed-file scope, with the explicit
+   instruction that `tw-work` must verify the V&V preflight or a scoped
+   not-applicable/approved exception before behavior mutation, detect
+   requirement closure claims and route them
    through structured acceptance evidence or held-validation records before
    complete/done wording, then run automatic trace-anchor authoring before
    review: scanner on changed behavior-bearing files and linked
    tests/fixtures/smokes, helper-applied source anchors plus matching Code
    Anchor Evidence rows for unambiguous mappings, scanner rerun, focused
-   verification that makes the same test-first artifact pass or records the
+   verification that makes the same `tw-vv-define` artifact pass or records the
    approved exception/not-applicable evidence, and review-staging of only the
    completed work/evidence scope needed for coherent `tw-code-review` /
    `tw-doc-review` handoff. Neither `tw-work` nor its
@@ -274,9 +286,10 @@ review completion.
     when requirements, authority, validation intent, release claims, or
     publication policy changed; normal code publication does not need a new
     requirements gate when approved authority is unchanged. The publication
-    route must prove matrix/trace coherence, test-first verification evidence,
-    a scoped not-applicable decision, or an approved non-test/post-implementation
-    verification exception; blocking-review closure; staged-tree identity;
+    route must prove matrix/trace coherence, the review-passed V&V definition
+    capsule with its pre-authored RED verification evidence, a scoped
+    not-applicable decision, or an approved exception; blocking-review closure;
+    staged-tree identity;
     explicit target; credential/remote boundary; and human confirmation for that
     target or a reviewed Intent Contract publication override. Report the
     evidence status and the next command, review, or human decision required.
@@ -288,9 +301,10 @@ terminal state. In the normal task/plan flow, `tw-auto` continues from
 `tw-work` into post-work review closure without asking the user to manually run
 the next wrapper command.
 
-After `tw-work` returns changed files, test-first verification evidence, scoped
-not-applicable evidence, approved exception evidence, post-implementation
-verification evidence, structured acceptance result status, trace-anchor
+After `tw-work` returns changed files, V&V-definition capsule status and its
+pre-authored RED verification evidence, scoped not-applicable evidence, approved
+exception evidence, post-implementation verification evidence, structured
+acceptance result status, trace-anchor
 authoring status, matrix evidence changes, or review-staging output, `tw-auto`
 must:
 
@@ -507,9 +521,10 @@ Stop immediately when any of these are true:
 - no approved requirement or approved exception authorizes the change;
 - stakeholder intent or validation question is missing;
 - required authority files cannot be found or bootstrapped;
-- a meaningful behavior-bearing unit cannot be linked to authority and
-  verification evidence, including test-first evidence for behavior-bearing
-  client changes, except that a per-artifact trace-anchor mapping ambiguity may
+- a meaningful behavior-bearing unit cannot be linked to authority and a
+  review-passed V&V definition capsule with pre-authored RED evidence for
+  behavior-bearing client changes, except that a per-artifact trace-anchor
+  mapping ambiguity may
   be skipped by `tw-work` and surfaced by `tw-traceability-check` as a blocking
   unresolved-mapping finding;
 - behavior appears useful or logical but no approved requirement captures it;
@@ -517,9 +532,9 @@ Stop immediately when any of these are true:
   authority change before implementation can continue;
 - behavior duplicates or expands existing behavior without authority;
 - tests or approved verification fail twice for the same work cycle;
-- behavior-bearing client implementation lacks requirement-linked
-  failing/current-failing test-first evidence, a scoped not-applicable decision,
-  or an approved non-test/post-implementation verification exception;
+- behavior-bearing client implementation lacks a requirement-linked,
+  review-passed V&V definition capsule with expected-failing (RED) evidence, a
+  scoped not-applicable decision, or an approved exception;
 - a closure claim lacks a passing structured acceptance result, a scaffolded
   validation result template with matrix proposal under clear authority, or a
   complete held-validation record with owner, boundary, evidence location, and
@@ -551,7 +566,8 @@ Always return:
 - authority status;
 - matrix status;
 - implementation files changed or proposed;
-- test-first evidence, verification evidence, and result;
+- V&V-definition capsule status, pre-authored RED evidence, verification
+  evidence, and result;
 - structured acceptance evidence status when closure claims are detected;
 - the validation-closure ratio (requirements with recorded acceptance evidence
   versus total) when authority files are loaded, so intent fidelity stays
