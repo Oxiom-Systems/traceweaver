@@ -60,6 +60,15 @@ Authoring may proceed only when all of these are true:
   owned unless the matrix or an approved exception records why it may be omitted
   or carry an exception anchor.
 
+For an explicit entrypoint anchor, require a named entrypoint plus requirement,
+trace, and verification selectors. Select exactly one reviewed typed row from
+the canonical `## Traceability Matrix` table; escaped pipes remain cell data,
+and narrative or lookalike tables are not authority. The row must bind the
+exact target in an `Implementation` or `Artifact Path` cell. Emit its complete
+normalized ID sets rather than caller subsets. Ignore unrelated anchors, but
+pause on missing target binding or an incomplete or different same-named
+entrypoint anchor. The helper-exception flag is not entrypoint authority.
+
 ## Skip Criteria
 
 Skip a single anchor mutation and continue clear work when all of these are
@@ -92,7 +101,10 @@ true:
 ## Matrix Evidence
 
 Source anchors and matrix Code Anchor Evidence updates are one authoring
-transaction. A proposal or apply result must include:
+transaction. Apply stages the computed source and matrix outputs beside their
+originals, preserves their exact permission modes, and restores both with those
+modes after a handled failure; it does not claim power-loss atomicity. A
+proposal or apply result must include:
 
 - artifact path;
 - anchor type;

@@ -1,6 +1,6 @@
 # Code/Test Trace Anchor Contract
 
-<!-- TRACEWEAVER: file-role=code-anchor-contract; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041 -->
+<!-- TRACEWEAVER: file-role=code-anchor-contract; req=REQ-TW-054,REQ-TW-057,REQ-TW-065; trace=TRACE-TW-032,TRACE-TW-035,TRACE-TW-048; ver=VER-TW-041,VER-TW-044,VER-TW-061 -->
 
 Status: static scanner contract
 
@@ -25,6 +25,13 @@ High-level entrypoint anchor:
 
 ```text
 TRACEWEAVER: entrypoint=<name>; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
+```
+
+For an explicit multi-authority entrypoint, source serialization contains the
+complete selected sets, not only the caller selectors:
+
+```text
+TRACEWEAVER: entrypoint=<name>; req=REQ-TW-054,REQ-TW-057; trace=TRACE-TW-032,TRACE-TW-035; ver=VER-TW-041,VER-TW-044
 ```
 
 Verification artifact anchor:
@@ -85,3 +92,16 @@ mutating source or matrix files; the scanner consumes that file and emits
 done, publication, and release claims. Fixture proof may apply anchors inside
 temporary or fixture workspaces. Real project writes remain held until the
 deterministic authoring helper, review, and narrow project-write gates pass.
+
+For the explicit entrypoint route, the helper reads selectors only from typed
+reviewed Trace/Requirement/Verification/Status cells in the canonical
+`## Traceability Matrix` table; escaped pipes remain cell content. Exactly one
+row must contain all selectors and must map the exact repository-relative
+target through an `Implementation` or `Artifact Path` cell. Decoy tables,
+narrative or basename matches, caller assertions, and unrelated evidence do not
+bind the target. Missing target binding and zero or multiple selector matches
+pause without mutation. Only same-named entrypoint anchors participate in
+conflict detection, and Code Anchor Evidence idempotence compares the complete
+target, requirement set, trace set, verification set, anchor type, and role
+tuple. Pair replacement preserves exact destination permission modes and is
+rollback-safe for handled failures; it does not claim power-loss atomicity.

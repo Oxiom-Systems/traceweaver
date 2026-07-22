@@ -46,3 +46,13 @@ ambiguous, call the helper with `--skip-ambiguous-mapping` and
 matrix mutation, then rerun the scanner with that unresolved mapping file. If it
 pauses or refuses, do not hand-edit around it; return to `tw-auto` for user
 input or requirements review.
+
+For an explicit entrypoint, pass a name plus requirement, trace, and
+verification selectors. The helper must use only one reviewed typed row from
+the canonical `## Traceability Matrix` table, parse escaped pipes as cell data,
+and bind the exact target through `Implementation` or `Artifact Path`. It
+preserves the row's complete normalized ID sets, ignores narrative, basename,
+decoy-table, and unrelated-anchor matches, and pauses missing target binding or
+an incomplete or different same-named entrypoint anchor. Its paired
+source/matrix write preserves exact destination permission modes, is
+rollback-safe for handled failures, and does not claim power-loss atomicity.

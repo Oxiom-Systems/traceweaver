@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# TRACEWEAVER: file-role=smoke-harness; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044
-# TRACEWEAVER: verifies=VER-TW-044; req=REQ-TW-054; trace=TRACE-TW-035
+# TRACEWEAVER: file-role=smoke-harness; req=REQ-TW-054,REQ-TW-056,REQ-TW-057,REQ-TW-065; trace=TRACE-TW-032,TRACE-TW-035,TRACE-TW-048; ver=VER-TW-041,VER-TW-044,VER-TW-061
+# TRACEWEAVER: verifies=VER-TW-041,VER-TW-044,VER-TW-061; req=REQ-TW-054,REQ-TW-056,REQ-TW-057,REQ-TW-065; trace=TRACE-TW-032,TRACE-TW-035,TRACE-TW-048
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/code-trace-authoring"
@@ -23,6 +23,14 @@ fixture_ver() {
 
 sha256_file() {
   shasum -a 256 "$1" | awk '{print $1}'
+}
+
+file_mode() {
+  if stat -f '%Lp' "$1" >/dev/null 2>&1; then
+    stat -f '%Lp' "$1"
+  else
+    stat -c '%a' "$1"
+  fi
 }
 
 authority_fingerprint() {
@@ -53,6 +61,14 @@ copy_fixture() {
   local dest="$TMP_DIR/$name"
   cp -R "$FIXTURE_ROOT/$name" "$dest"
   printf '%s' "$dest"
+}
+
+copy_isolated_fixture() {
+  local name="$1"
+  local dest
+  dest="$(mktemp -d "$TMP_DIR/${name}.XXXXXX")"
+  cp -R "$FIXTURE_ROOT/$name" "$dest/fixture"
+  printf '%s' "$dest/fixture"
 }
 
 run_pause() {
@@ -101,14 +117,18 @@ run_scanner_pass() {
   echo "trace_anchor_authoring_${label}_scanner=pass"
 }
 
-# TRACEWEAVER: entrypoint=trace_anchor_authoring_smoke; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044
+# TRACEWEAVER: entrypoint=trace_anchor_authoring_smoke; req=REQ-TW-054,REQ-TW-056,REQ-TW-057,REQ-TW-065; trace=TRACE-TW-032,TRACE-TW-035,TRACE-TW-048; ver=VER-TW-041,VER-TW-044,VER-TW-061
 
 TMP_DIR="$(mktemp -d)"
 repo_before="$(authority_fingerprint)"
 
 code_dir="$(copy_fixture unambiguous-code-anchor)"
+chmod 0751 "$code_dir/src/feature.sh"
+chmod 0640 "$code_dir/traceability-matrix.md"
 code_before="$(sha256_file "$code_dir/src/feature.sh")"
 matrix_before="$(sha256_file "$code_dir/traceability-matrix.md")"
+code_mode_before="$(file_mode "$code_dir/src/feature.sh")"
+code_matrix_mode_before="$(file_mode "$code_dir/traceability-matrix.md")"
 "$AUTHOR" \
   --root "$code_dir" \
   --mode propose \
@@ -187,6 +207,11 @@ grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/code.file.apply.out"
   --role feature_message >"$TMP_DIR/code.entrypoint.apply.out"
 grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/code.entrypoint.apply.out"
 grep -Fq "entrypoint=feature_message" "$code_dir/src/feature.sh"
+if [[ "$code_mode_before" != "$(file_mode "$code_dir/src/feature.sh")" ||
+      "$code_matrix_mode_before" != "$(file_mode "$code_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_legacy_pair=failed_permission_mode_changed" >&2
+  exit 1
+fi
 if grep -Fq "private_helper" "$TMP_DIR/code.entrypoint.apply.out"; then
   echo "trace_anchor_authoring_helper_sprawl=failed_private_helper_anchor" >&2
   exit 1
@@ -646,6 +671,204 @@ run_pause helper_density helper_anchor_requires_approved_exception \
   --verification "$(fixture_ver HELPER)" \
   --role private_helper
 [[ "$helper_before" == "$(sha256_file "$helper_dir/src/feature.sh")" ]]
+
+multi_authority_dir="$(copy_isolated_fixture multi-authority-entrypoint)"
+multi_requirement_primary="$(fixture_req MULTI-PRIMARY)"
+multi_requirement_alternate="$(fixture_req MULTI-ALTERNATE)"
+multi_trace_primary="$(fixture_trace MULTI-PRIMARY)"
+multi_trace_alternate="$(fixture_trace MULTI-ALTERNATE)"
+multi_verification_primary="$(fixture_ver MULTI-PRIMARY)"
+multi_verification_alternate="$(fixture_ver MULTI-ALTERNATE)"
+unrelated_requirement="$(fixture_req UNRELATED)"
+unrelated_trace="$(fixture_trace UNRELATED)"
+unrelated_verification="$(fixture_ver UNRELATED)"
+traceweaver_marker="TRACEWEAVER:"
+chmod 0751 "$multi_authority_dir/src/feature.sh"
+chmod 0640 "$multi_authority_dir/traceability-matrix.md"
+multi_source_before="$(sha256_file "$multi_authority_dir/src/feature.sh")"
+multi_matrix_before="$(sha256_file "$multi_authority_dir/traceability-matrix.md")"
+multi_source_mode_before="$(file_mode "$multi_authority_dir/src/feature.sh")"
+multi_matrix_mode_before="$(file_mode "$multi_authority_dir/traceability-matrix.md")"
+
+unmapped_dir="$(copy_isolated_fixture multi-authority-entrypoint)"
+unmapped_source_before="$(sha256_file "$unmapped_dir/src/unmapped_feature.sh")"
+unmapped_matrix_before="$(sha256_file "$unmapped_dir/traceability-matrix.md")"
+run_pause multi_authority_unmapped_same_function_target missing_entrypoint_target_mapping \
+  --root "$unmapped_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/unmapped_feature.sh \
+  --anchor-level entrypoint \
+  --entrypoint multi_authority_entrypoint \
+  --requirement "$multi_requirement_primary" \
+  --trace "$multi_trace_primary" \
+  --verification "$multi_verification_primary" \
+  --role multi-authority-entrypoint
+if [[ "$unmapped_source_before" != "$(sha256_file "$unmapped_dir/src/unmapped_feature.sh")" ||
+      "$unmapped_matrix_before" != "$(sha256_file "$unmapped_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_multi_authority_unmapped_same_function_target=failed_mutated_files" >&2
+  exit 1
+fi
+"$AUTHOR" \
+  --root "$multi_authority_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level entrypoint \
+  --entrypoint multi_authority_entrypoint \
+  --requirement "$multi_requirement_alternate" \
+  --trace "$multi_trace_primary" \
+  --verification "$multi_verification_primary" \
+  --role multi-authority-entrypoint >"$TMP_DIR/multi-authority-entrypoint.apply.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/multi-authority-entrypoint.apply.out"
+grep -Fq "req=$multi_requirement_alternate,$multi_requirement_primary; trace=$multi_trace_alternate,$multi_trace_primary; ver=$multi_verification_alternate,$multi_verification_primary" "$multi_authority_dir/src/feature.sh"
+grep -Fq "| src/feature.sh | $multi_requirement_alternate; $multi_requirement_primary | $multi_trace_alternate; $multi_trace_primary | $multi_verification_alternate; $multi_verification_primary | entrypoint | multi-authority-entrypoint |" "$multi_authority_dir/traceability-matrix.md"
+if [[ "$multi_source_before" == "$(sha256_file "$multi_authority_dir/src/feature.sh")" ||
+      "$multi_matrix_before" == "$(sha256_file "$multi_authority_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_multi_authority_entrypoint=failed_missing_paired_write" >&2
+  exit 1
+fi
+if [[ "$multi_source_mode_before" != "$(file_mode "$multi_authority_dir/src/feature.sh")" ||
+      "$multi_matrix_mode_before" != "$(file_mode "$multi_authority_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_multi_authority_entrypoint=failed_permission_mode_changed" >&2
+  exit 1
+fi
+multi_source_after="$(sha256_file "$multi_authority_dir/src/feature.sh")"
+multi_matrix_after="$(sha256_file "$multi_authority_dir/traceability-matrix.md")"
+"$AUTHOR" \
+  --root "$multi_authority_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level entrypoint \
+  --entrypoint multi_authority_entrypoint \
+  --requirement "$multi_requirement_primary" \
+  --trace "$multi_trace_alternate" \
+  --verification "$multi_verification_alternate" \
+  --role multi-authority-entrypoint >"$TMP_DIR/multi-authority-entrypoint.rerun.out"
+grep -Fq "trace_anchor_authoring_status=applied" "$TMP_DIR/multi-authority-entrypoint.rerun.out"
+if [[ "$multi_source_after" != "$(sha256_file "$multi_authority_dir/src/feature.sh")" ||
+      "$multi_matrix_after" != "$(sha256_file "$multi_authority_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_multi_authority_entrypoint=failed_rerun_not_byte_idempotent" >&2
+  exit 1
+fi
+if [[ "$multi_source_mode_before" != "$(file_mode "$multi_authority_dir/src/feature.sh")" ||
+      "$multi_matrix_mode_before" != "$(file_mode "$multi_authority_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_multi_authority_entrypoint=failed_rerun_permission_mode_changed" >&2
+  exit 1
+fi
+echo "trace_anchor_authoring_multi_authority_entrypoint=pass_complete_set_preserved_and_rerun_byte_idempotent"
+
+for conflict_kind in complete incomplete; do
+  conflict_dir="$(copy_isolated_fixture multi-authority-entrypoint)"
+  if [[ "$conflict_kind" == "complete" ]]; then
+    printf '%s\n' "# $traceweaver_marker entrypoint=multi_authority_entrypoint; req=$unrelated_requirement; trace=$unrelated_trace; ver=$unrelated_verification" >>"$conflict_dir/src/feature.sh"
+  else
+    printf '%s\n' "# $traceweaver_marker entrypoint=multi_authority_entrypoint; req=$unrelated_requirement" >>"$conflict_dir/src/feature.sh"
+  fi
+  conflict_source_before="$(sha256_file "$conflict_dir/src/feature.sh")"
+  conflict_matrix_before="$(sha256_file "$conflict_dir/traceability-matrix.md")"
+  run_pause "multi_authority_${conflict_kind}_same_entrypoint_conflict" conflicting_existing_entrypoint_anchor \
+    --root "$conflict_dir" \
+    --mode apply \
+    --work-loop \
+    --target src/feature.sh \
+    --anchor-level entrypoint \
+    --entrypoint multi_authority_entrypoint \
+    --requirement "$multi_requirement_primary" \
+    --trace "$multi_trace_primary" \
+    --verification "$multi_verification_primary" \
+    --role multi-authority-entrypoint
+  if [[ "$conflict_source_before" != "$(sha256_file "$conflict_dir/src/feature.sh")" ||
+        "$conflict_matrix_before" != "$(sha256_file "$conflict_dir/traceability-matrix.md")" ]]; then
+    echo "trace_anchor_authoring_multi_authority_${conflict_kind}_same_entrypoint_conflict=failed_mutated_files" >&2
+    exit 1
+  fi
+done
+echo "trace_anchor_authoring_multi_authority_same_entrypoint_conflicts=pass"
+
+selector_ambiguity_dir="$(copy_isolated_fixture multi-authority-entrypoint)"
+selector_ambiguity_row="| $multi_trace_primary; $(fixture_trace MULTI-AMBIGUOUS) | $multi_requirement_primary; $(fixture_req MULTI-AMBIGUOUS) | src/feature.sh | $multi_verification_primary; $(fixture_ver MULTI-AMBIGUOUS) | reviewed | A second typed reviewed row must pause selection. |"
+SELECTOR_AMBIGUITY_ROW="$selector_ambiguity_row" perl -0pi -e 's{(\| TRACE-AUTH-UNRELATED[^\n]*\n)}{$1 . $ENV{SELECTOR_AMBIGUITY_ROW} . "\n"}e' "$selector_ambiguity_dir/traceability-matrix.md"
+selector_ambiguity_source_before="$(sha256_file "$selector_ambiguity_dir/src/feature.sh")"
+selector_ambiguity_matrix_before="$(sha256_file "$selector_ambiguity_dir/traceability-matrix.md")"
+run_pause multi_authority_selector_ambiguity ambiguous_entrypoint_authority_mapping \
+  --root "$selector_ambiguity_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level entrypoint \
+  --entrypoint multi_authority_entrypoint \
+  --requirement "$multi_requirement_primary" \
+  --trace "$multi_trace_primary" \
+  --verification "$multi_verification_primary" \
+  --role multi-authority-entrypoint
+if [[ "$selector_ambiguity_source_before" != "$(sha256_file "$selector_ambiguity_dir/src/feature.sh")" ||
+      "$selector_ambiguity_matrix_before" != "$(sha256_file "$selector_ambiguity_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_multi_authority_selector_ambiguity=failed_mutated_files" >&2
+  exit 1
+fi
+
+helper_flag_dir="$(copy_isolated_fixture multi-authority-entrypoint)"
+helper_flag_source_before="$(sha256_file "$helper_flag_dir/src/feature.sh")"
+helper_flag_matrix_before="$(sha256_file "$helper_flag_dir/traceability-matrix.md")"
+run_pause multi_authority_helper_flag_not_authority helper_exception_not_authority_for_entrypoint \
+  --root "$helper_flag_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level entrypoint \
+  --entrypoint multi_authority_entrypoint \
+  --requirement "$multi_requirement_primary" \
+  --trace "$multi_trace_primary" \
+  --verification "$multi_verification_primary" \
+  --role multi-authority-entrypoint \
+  --helper-exception-approved
+if [[ "$helper_flag_source_before" != "$(sha256_file "$helper_flag_dir/src/feature.sh")" ||
+      "$helper_flag_matrix_before" != "$(sha256_file "$helper_flag_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_multi_authority_helper_flag_not_authority=failed_mutated_files" >&2
+  exit 1
+fi
+echo "trace_anchor_authoring_multi_authority_selector_ambiguity_and_helper_flag=pass"
+
+transaction_dir="$(copy_isolated_fixture multi-authority-entrypoint)"
+chmod 0751 "$transaction_dir/src/feature.sh"
+chmod 0640 "$transaction_dir/traceability-matrix.md"
+transaction_source_before="$(sha256_file "$transaction_dir/src/feature.sh")"
+transaction_matrix_before="$(sha256_file "$transaction_dir/traceability-matrix.md")"
+transaction_source_mode_before="$(file_mode "$transaction_dir/src/feature.sh")"
+transaction_matrix_mode_before="$(file_mode "$transaction_dir/traceability-matrix.md")"
+set +e
+TRACEWEAVER_TEST_FORCE_SECOND_REPLACE_FAILURE=1 "$AUTHOR" \
+  --root "$transaction_dir" \
+  --mode apply \
+  --work-loop \
+  --target src/feature.sh \
+  --anchor-level entrypoint \
+  --entrypoint multi_authority_entrypoint \
+  --requirement "$multi_requirement_primary" \
+  --trace "$multi_trace_primary" \
+  --verification "$multi_verification_primary" \
+  --role multi-authority-entrypoint >"$TMP_DIR/multi-authority-transaction-failure.out"
+transaction_status=$?
+set -e
+if [[ "$transaction_status" -eq 0 ]]; then
+  echo "trace_anchor_authoring_multi_authority_transaction=failed_expected_second_replace_failure" >&2
+  exit 1
+fi
+grep -Fq "trace_anchor_authoring_status=pause" "$TMP_DIR/multi-authority-transaction-failure.out"
+grep -Fq "trace_anchor_authoring_reason=paired_write_failed" "$TMP_DIR/multi-authority-transaction-failure.out"
+if [[ "$transaction_source_before" != "$(sha256_file "$transaction_dir/src/feature.sh")" ||
+      "$transaction_matrix_before" != "$(sha256_file "$transaction_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_multi_authority_transaction=failed_rollback_hash_mismatch" >&2
+  exit 1
+fi
+if [[ "$transaction_source_mode_before" != "$(file_mode "$transaction_dir/src/feature.sh")" ||
+      "$transaction_matrix_mode_before" != "$(file_mode "$transaction_dir/traceability-matrix.md")" ]]; then
+  echo "trace_anchor_authoring_multi_authority_transaction=failed_rollback_permission_mode_mismatch" >&2
+  exit 1
+fi
+echo "trace_anchor_authoring_multi_authority_transaction=pass_second_replace_failure_rolled_back"
 
 repo_after="$(authority_fingerprint)"
 if [[ "$repo_before" != "$repo_after" ]]; then

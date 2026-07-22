@@ -105,7 +105,7 @@ FIXTURE_REQUIREMENTS
   cat >"$target/traceability-matrix.md" <<'FIXTURE_MATRIX'
 # Runtime Driver Fixture Matrix
 
-## Trace Authority
+## Traceability Matrix
 
 | ID | Artifact Path | Requirement | Trace | Verification | Status |
 | --- | --- | --- | --- | --- | --- |

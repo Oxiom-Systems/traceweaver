@@ -56,6 +56,35 @@ Authoring may proceed only when all of these are true:
   owned unless the matrix or an approved exception records why it may be omitted
   or carry an exception anchor.
 
+## Explicit Entrypoint Multi-Authority Mapping
+
+An explicit behavior-entrypoint request requires `anchor-level=entrypoint`, a
+named entrypoint, and all three caller selectors: requirement, trace, and
+verification. The helper may select authority only from a typed Markdown
+row in the canonical `## Traceability Matrix` section with `Trace` (or
+`Trace ID`), `Requirement`, `Verification` (or `Verification ID`), `Status`,
+and `Implementation` or `Artifact Path` columns. Escaped Markdown pipes remain
+cell content. Lookalike tables outside that section and narrative cells never
+authorize an entrypoint anchor.
+
+Exactly one reviewed row must contain all three selectors in their respective
+typed columns and map the exact requested repository-relative target in an
+approved path-bearing cell. Rows mapping other artifacts are not candidates.
+The selectors are assertions, not an instruction to narrow the result: the
+emitted source anchor contains the selected row's complete, normalized
+requirement, trace, and verification sets, comma-separated. The matching Code
+Anchor Evidence row contains the same complete sets, semicolon-separated. Zero
+or multiple matching rows pause without mutation. Basename matches, narrative
+mentions, caller assertions, and unrelated Code Anchor Evidence do not
+establish target authority; a missing exact target mapping pauses without
+mutation.
+
+Unrelated file, verification, and differently named entrypoint anchors do not
+conflict with this route. Only same-named entrypoint anchors are inspected: an
+exact complete tuple is idempotent; an incomplete or different tuple pauses
+without mutation. `--helper-exception-approved` is not entrypoint authority and
+does not override this route.
+
 ## Pause Criteria
 
 Pause with a human-decision output and no file changes when any of these are
@@ -75,7 +104,11 @@ true:
 ## Matrix Evidence
 
 Source anchors and matrix Code Anchor Evidence updates are one authoring
-transaction. A proposal or apply result must include:
+transaction. Apply computes both outputs first, stages each beside its original,
+preserves each destination's exact permission mode, and restores both originals
+with those modes after a handled staging or replacement failure. This is
+rollback-safe pair handling, not a claim of power-loss atomicity. A proposal or
+apply result must include:
 
 - artifact path;
 - anchor type;
