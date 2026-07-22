@@ -1,0 +1,124 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=project-bootstrap-helper; req=REQ-TW-084; req=REQ-TW-085
+# Project-local static bootstrap only: no global configuration or runtime claim.
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PLUGIN_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+MASTER_TEMPLATE="${TRACEWEAVER_MASTER_TEMPLATE:-$PLUGIN_ROOT/references/master-orchestrator-prompt-template.md}"
+PROFILE_TEMPLATE="$PLUGIN_ROOT/references/workflow-profile-template.yml"
+REQ_TEMPLATE="$PLUGIN_ROOT/references/requirements-baseline-template.md"
+MATRIX_TEMPLATE="$PLUGIN_ROOT/references/traceability-matrix-bootstrap-template.md"
+INTENT_TEMPLATE="$PLUGIN_ROOT/references/intent-contract-template.yml"
+root=""; owner=0; role=""; capsule=""; native=0; master_mutation=0; managed=0; deploy=0; dogfood=0
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --root) root="${2:-}"; shift 2 ;; --owner-authorized) owner=1; shift ;;
+    --role) role="${2:-}"; shift 2 ;; --delegation-capsule) capsule="${2:-}"; shift 2 ;;
+    --native-child-dispatch) native=1; shift ;; --request-mutation) master_mutation=1; shift ;;
+    --host-activation) [[ "${2:-}" == managed ]] && managed=1 || [[ "${2:-}" == manual ]] || { echo "bootstrap_usage_error=host_activation"; exit 2; }; shift 2 ;;
+    --allow-deploy) deploy=1; shift ;; --allow-chrome-dogfood) dogfood=1; shift ;;
+    --help|-h) echo "usage: traceweaver-bootstrap-project --root PATH [options]"; exit 0 ;;
+    *) echo "bootstrap_usage_error=unknown_option:$1"; exit 2 ;;
+  esac
+done
+[[ -n "$root" && -d "$root" ]] || { echo "bootstrap_usage_error=valid_root_required"; exit 2; }
+root="$(cd -P "$root" && pwd -P)"
+if [[ ! -f "$MASTER_TEMPLATE" || ! -f "$PROFILE_TEMPLATE" ]] || grep -Eq '\{\{[^}]+\}\}' "$MASTER_TEMPLATE"; then
+  echo "bootstrap_result=held_missing_master_contract"; echo "project_ready=false"; exit 1
+fi
+
+held_unsafe() { echo "bootstrap_result=held_unsafe_project_path"; echo "bootstrap_finding=$1"; echo "project_ready=false"; exit 1; }
+within_root() { [[ "$1" == "$root/"* ]]; }
+validate_future_path() {
+  local path="$1" parent
+  within_root "$path" || held_unsafe "outside_project_root"
+  [[ ! -L "$path" ]] || held_unsafe "symlink_destination:$path"
+  parent="$(dirname "$path")"
+  while [[ "$parent" != "$root" ]]; do
+    [[ ! -L "$parent" ]] || held_unsafe "symlink_parent:$parent"
+    [[ ! -e "$parent" || -d "$parent" ]] || held_unsafe "non_directory_parent:$parent"
+    parent="$(dirname "$parent")"
+  done
+  return 0
+}
+
+tw="$root/.traceweaver"
+validate_future_path "$tw"
+for path in "$tw/master-orchestrator.md" "$tw/bootstrap.yml" "$tw/workflow-profile.yml"; do validate_future_path "$path"; done
+if [[ "$owner" -eq 1 ]]; then for path in "$root/requirements.md" "$root/traceability-matrix.md" "$tw/intent-contract.yml"; do validate_future_path "$path"; done; fi
+if [[ "$managed" -eq 1 ]]; then validate_future_path "$root/AGENTS.md"; fi
+if [[ -n "$role" && -n "$capsule" ]]; then
+  [[ "$capsule" == /* ]] || capsule="$root/$capsule"
+  [[ ! -L "$capsule" && -f "$capsule" ]] || held_unsafe "unsafe_delegation_capsule"
+  capsule="$(cd -P "$(dirname "$capsule")" && pwd -P)/$(basename "$capsule")"
+  within_root "$capsule" || held_unsafe "outside_delegation_capsule"
+fi
+
+if [[ "$native" -eq 1 ]]; then luna=available; model=luna; receipt=luna_dispatch_eligible; consequence=bounded_luna_child_may_be_dispatched_by_host; else luna=unavailable; model=terra; receipt=luna_dispatch_unavailable; consequence=terra_fallback_without_investigation; fi
+tmp_boot="$(mktemp)"; tmp_profile="$(mktemp)"; trap 'rm -f "$tmp_boot" "$tmp_profile"' EXIT
+cat >"$tmp_boot" <<EOF
+schema_version: tw-bootstrap/1
+bootstrap_status: template_manual_launch_only
+project_ready: false
+master_contract: .traceweaver/master-orchestrator.md
+workflow_profile: .traceweaver/workflow-profile.yml
+automatic_host_activation: held_fresh_task_runtime_proof_required
+model_routing:
+  luna_availability: $luna
+  selected_model: $model
+  rationale: native_child_dispatch_is_required_for_luna
+  unavailable_consequence: $consequence
+receipts: [$receipt]
+deployment: { permission: $([[ "$deploy" -eq 1 ]] && echo explicitly_authorized || echo not_authorized), receipt: not_executed }
+chrome_dogfood: { permission: $([[ "$dogfood" -eq 1 ]] && echo explicitly_authorized || echo not_authorized), receipt: not_executed }
+EOF
+cat >"$tmp_profile" <<EOF
+schema_version: tw-workflow-profile/1
+task_id: BOOTSTRAP-PROJECT-001
+profile_revision: 1
+profile_status: planned
+risk: L0
+selection_rationale: deterministic project-local bootstrap; authority remains held pending owner action
+process_budget: { target_total_effort_percent: 20, hard_ceiling_total_effort_percent: 50, target_process_to_delivery_ratio_percent: 25, hard_ceiling_process_to_delivery_ratio_percent: 100, estimated_delivery_minutes: 0, estimated_process_target_minutes: 0, estimated_process_ceiling_minutes: 0 }
+selected_controls: [project_local_contract, manual_launch_only]
+child_roles:
+  builder: { model: $model, maximum_timebox_minutes: 0 }
+  verifier: { model: $model, maximum_timebox_minutes: 0 }
+  reviewer: { model: $model, maximum_timebox_minutes: 0 }
+  deployer: { model: not_applicable, maximum_timebox_minutes: 0 }
+  dogfooder: { model: not_applicable, maximum_timebox_minutes: 0 }
+model_selection: { availability: [luna:$luna, terra:available], choice: $model, rationale: native child dispatch determines Luna eligibility, unavailable_consequence: $consequence }
+reviewer_cap: 0
+repair_cycle_cap: 0
+requires_deploy: false
+requires_chrome_dogfood: false
+profile_hash: sha256:bootstrap-template-manual-launch-only
+immutable_after_building: { fields: [risk, process_budget, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, requires_deploy, requires_chrome_dogfood, profile_hash], expansion_rule: create_new_revision }
+accounting: { observer: orchestration_harness, clock: monotonic, child_self_report: advisory_only, fixed_categories: [process, delivery, unclassified], unclassified_rule: counts_as_process_until_reviewer_resolves, receipts: [] }
+EOF
+
+conflict=0
+preflight_copy() { [[ -e "$2" && ! -L "$2" ]] && ! cmp -s "$1" "$2" && { echo "bootstrap_conflict=$3"; conflict=1; }; return 0; }
+preflight_copy "$MASTER_TEMPLATE" "$tw/master-orchestrator.md" master_orchestrator
+preflight_copy "$tmp_boot" "$tw/bootstrap.yml" bootstrap
+preflight_copy "$tmp_profile" "$tw/workflow-profile.yml" workflow_profile
+if [[ "$owner" -eq 1 ]]; then for template in "$REQ_TEMPLATE" "$MATRIX_TEMPLATE" "$INTENT_TEMPLATE"; do [[ -f "$template" ]] || { echo "bootstrap_result=held_missing_authority_template"; echo "project_ready=false"; exit 1; }; done; fi
+if [[ -n "$role" && ! "$role" =~ ^(builder|verifier|reviewer|deployer|dogfooder|registrar)$ ]]; then echo "bootstrap_result=denied_roleless_child"; echo "project_ready=false"; exit 1; fi
+if [[ -n "$role" && -z "$capsule" ]]; then echo "bootstrap_role=top_level_master_read_only"; echo "bootstrap_result=held_missing_delegation_capsule"; echo "project_ready=false"; exit 1; fi
+[[ "$conflict" -eq 0 ]] || { echo "bootstrap_result=held_bootstrap_conflict"; echo "project_ready=false"; exit 1; }
+
+[[ -e "$tw" ]] || mkdir "$tw"
+copy_new() { local temp; [[ -e "$2" ]] && return; temp="$(mktemp "$tw/.bootstrap.XXXXXX")"; cp "$1" "$temp"; mv "$temp" "$2"; }
+copy_new "$MASTER_TEMPLATE" "$tw/master-orchestrator.md"
+copy_new "$tmp_boot" "$tw/bootstrap.yml"
+copy_new "$tmp_profile" "$tw/workflow-profile.yml"
+if [[ "$owner" -eq 1 ]]; then
+  for spec in "$REQ_TEMPLATE:requirements.md" "$MATRIX_TEMPLATE:traceability-matrix.md" "$INTENT_TEMPLATE:.traceweaver/intent-contract.yml"; do template="${spec%%:*}"; destination="$root/${spec#*:}"; if [[ ! -e "$destination" ]]; then temp="$(mktemp "$tw/.bootstrap.XXXXXX")"; cp "$template" "$temp"; mv "$temp" "$destination"; fi; done
+else echo "bootstrap_authority=held_owner_authorization_required"; fi
+if [[ "$managed" -eq 1 ]]; then pointer='<!-- TRACEWEAVER: project-local-contract=.traceweaver/master-orchestrator.md; activation=manual-until-fresh-runtime-proof -->'; [[ -e "$root/AGENTS.md" ]] || : >"$root/AGENTS.md"; grep -Fqx "$pointer" "$root/AGENTS.md" || printf '\n%s\n' "$pointer" >>"$root/AGENTS.md"; echo "bootstrap_host_activation=managed_pointer_added"; else echo "bootstrap_host_activation=manual_launch_only"; fi
+echo "bootstrap_model_receipt=$receipt"
+if [[ "$master_mutation" -eq 1 && -z "$role" ]]; then echo "bootstrap_role=top_level_master_read_only"; echo "bootstrap_result=refused_master_mutation"; echo "project_ready=false"; exit 1; fi
+if [[ -n "$role" ]]; then echo "bootstrap_role=bounded_child:$role"; echo "bootstrap_result=bounded_child_activated"; else echo "bootstrap_role=top_level_master_read_only"; echo "bootstrap_result=bootstrapped_template_manual_launch_only"; fi
+echo "project_ready=false"

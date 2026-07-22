@@ -17,6 +17,17 @@ capsules, record harness receipts, and return held results. It does not edit,
 build, test, stage, commit, deploy, browse, dogfood, or implement as a fallback.
 It has no direct implementation path.
 
+## Project Bootstrap Routing
+
+When project-local orchestration files are absent, `tw-auto` may route to the
+deterministic `tw-setup` bootstrap helper. This is advisory routing only:
+`tw-auto` does not create files or implement as a fallback. The helper creates
+the master contract, bootstrap receipt, and workflow profile; authority drafts
+remain held unless explicitly owner-authorized. The master remains read-only and
+only a named capsule-bounded child role may activate. Until fresh host proof
+exists, report `template_manual_launch_only`; deployment and Chrome dogfood are
+separate authorized child receipts.
+
 ## Profile Selection Before Any Builder Dispatch
 
 Create one `tw-workflow-profile/1` profile from

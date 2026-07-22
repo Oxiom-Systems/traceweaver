@@ -61,11 +61,18 @@ records under `.traceweaver/`.
    docs/guides/starting-a-new-project-with-traceweaver.md
    ```
 
-3. Ask TraceWeaver to bootstrap authority:
+3. Bootstrap the reusable project-local orchestration contract. It is a
+   `template_manual_launch_only` until a particular host has fresh top-level
+   runtime proof, and it never changes host-global configuration:
 
    ```text
-   tw-auto "bootstrap TraceWeaver authority for this project"
+   tw-setup "bootstrap locally; preserve instructions; do not create authority drafts without my explicit authorization"
    ```
+
+   Bootstrap creates `.traceweaver/master-orchestrator.md`,
+   `.traceweaver/bootstrap.yml`, and `.traceweaver/workflow-profile.yml`. The
+   master is read-only. Building, verification, review, deployment, and browser
+   dogfood require separately bounded child roles and receipts.
 
 4. In an existing project, audit before changing code:
 
