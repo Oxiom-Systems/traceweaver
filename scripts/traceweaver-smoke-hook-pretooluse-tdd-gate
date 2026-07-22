@@ -79,6 +79,7 @@ run_warning_fixture_for_host() {
 
 run_positive
 run_schema_positive
+run_warning_fixture_for_host vv-capsule-schema-unrelated-target claude
 run_warning_fixture_for_host vv-capsule-schema-review-not-passed claude
 run_warning_fixture_for_host vv-definition-missing claude
 run_warning_fixture_for_host vv-definition-missing cursor
