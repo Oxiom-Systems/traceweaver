@@ -1,0 +1,9 @@
+{
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Write",
+  "cwd": "__FIXTURE_ROOT__",
+  "tool_input": {
+    "file_path": "plugins/foo/hooks/bar",
+    "content": "#!/usr/bin/env bash"
+  }
+}

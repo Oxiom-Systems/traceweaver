@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "hooks": {
+    "sessionStart": [
+      {
+        "command": "./hooks/run-hook.cmd session-start"
+      }
+    ],
+    "preToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "command": "./hooks/run-hook.cmd pretooluse-tdd-gate"
+      }
+    ]
+  }
+}

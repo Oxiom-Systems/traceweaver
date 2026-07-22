@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=hook-pretooluse-tdd-gate-smoke; req=REQ-TW-080; trace=TRACE-TW-061; ver=VER-TW-081
+# TRACEWEAVER: verifies=VER-TW-081; req=REQ-TW-080; trace=TRACE-TW-061
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/hooks/pretooluse"
+HOOK="$ROOT_DIR/plugins/traceweaver-core/hooks/pretooluse-tdd-gate"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+[[ -x "$HOOK" ]] || { echo "missing_pretooluse_tdd_gate=$HOOK" >&2; exit 1; }
+
+payload_for() {
+  local fixture="$1"
+  python3 - "$FIXTURE_ROOT/$fixture/input.json" "$FIXTURE_ROOT/$fixture" <<'PY'
+import sys
+text = open(sys.argv[1], encoding="utf-8").read()
+print(text.replace("__FIXTURE_ROOT__", sys.argv[2]))
+PY
+}
+
+assert_empty() {
+  python3 - "$1" <<'PY'
+import json
+import sys
+assert json.load(open(sys.argv[1], encoding="utf-8")) == {}
+PY
+}
+
+assert_warning() {
+  local actual="$1"
+  local host="$2"
+  python3 - "$actual" "$host" <<'PY'
+import json
+import sys
+payload = json.load(open(sys.argv[1], encoding="utf-8"))
+host = sys.argv[2]
+if host == "claude":
+    context = payload["hookSpecificOutput"]["additionalContext"]
+    assert payload["hookSpecificOutput"]["hookEventName"] == "PreToolUse"
+elif host == "cursor":
+    context = payload["additional_context"]
+else:
+    context = payload["additionalContext"]
+assert "TraceWeaver advisory" in context
+assert "V&V definition" in context
+assert "RED evidence" in context
+PY
+}
+
+run_positive() {
+  local output="$TMP_DIR/present.json"
+  payload_for vv-definition-present | CLAUDE_PLUGIN_ROOT=fixture "$HOOK" >"$output"
+  assert_empty "$output"
+  echo "pretooluse_tdd_gate_vv_definition_present=pass"
+}
+
+run_warning_fixture_for_host() {
+  local fixture="$1"
+  local host="$2"
+  local output="$TMP_DIR/${fixture}-${host}.json"
+  case "$host" in
+    claude) payload_for "$fixture" | CLAUDE_PLUGIN_ROOT=fixture "$HOOK" >"$output" ;;
+    cursor) payload_for "$fixture" | CURSOR_PLUGIN_ROOT=fixture "$HOOK" >"$output" ;;
+    codex) payload_for "$fixture" | env -u CLAUDE_PLUGIN_ROOT -u CURSOR_PLUGIN_ROOT "$HOOK" >"$output" ;;
+  esac
+  assert_warning "$output" "$host"
+  echo "pretooluse_tdd_gate_${fixture}_${host}=advisory_exit_0"
+}
+
+run_positive
+run_warning_fixture_for_host vv-definition-missing claude
+run_warning_fixture_for_host vv-definition-missing cursor
+run_warning_fixture_for_host vv-definition-present-red-path-missing claude
+run_warning_fixture_for_host plugin-hook-without-vv-definition claude
+run_warning_fixture_for_host extensionless-executable-without-vv-definition claude
+
+docs_payload="$TMP_DIR/docs-only.json"
+printf '{"tool_name":"Write","cwd":"%s","tool_input":{"file_path":"docs/guide.md"}}\n' "$FIXTURE_ROOT/vv-definition-missing" | CLAUDE_PLUGIN_ROOT=fixture "$HOOK" >"$docs_payload"
+assert_empty "$docs_payload"
+echo "pretooluse_tdd_gate_docs_only_ignored=pass"
+echo "pretooluse_tdd_gate_smoke=pass"
