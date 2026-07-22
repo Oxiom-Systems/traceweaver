@@ -6,15 +6,15 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "bc2bb0671bb8b4e44cd9c22c7a4ce200644f33150a607208b4e6df12de7adfa0"
+      "sha256": "ede6874558718b7f445644e1b9d02344bab07cf24ddcd187ec06a41774376fe0"
     },
     {
       "path": "requirements.md",
-      "sha256": "0ccba1007290b907a594c2b99e3112b8da5726d1c7bdf05dddd95e0035142762"
+      "sha256": "2593ecfc530a3dda61d3c5d076878040cc137f76f354a163af1bc6b4c7151283"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "8ce4a84ed22626494b32d146e643980807ded7114a80c7b6375d3fba95cffb29"
+      "sha256": "ee71052cedcf1aa0fcfed939a04c69637e9b03026789d3e319447827de7021d6"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -23,11 +23,11 @@
   ],
   "row_counts": {
     "requirements": 75,
-    "trace_rows": 54,
+    "trace_rows": 60,
     "atp_entries": 37,
     "result_records": 38,
-    "verification_records": 73,
-    "validation_records": 18,
+    "verification_records": 79,
+    "validation_records": 24,
     "code_anchor_records": 261,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 75,
@@ -1807,6 +1807,72 @@
       "validation": "VAL-TW-018",
       "status": "Owner approved promotion 2026-06-12; verify, distilled-coverage, and full local smoke suite pass; scoped doc review of the amended baseline is the next gate",
       "next_step": "Lifecycle-orchestrator domain remains private-only by owner decision 2026-06-12; validation-closure backlog on the pre-existing baseline remains open; runtime, enforcing, publication, release-ready, and clean-replacement claims remain held"
+    },
+    {
+      "id": "TRACE-TW-057",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "requirements": "REQ-TW-076",
+      "artifact": "`plugins/traceweaver-core/skills/tw-vv-define/SKILL.md` implements the phase workflow; `docs/validation/examples/vv-define-capsule.example.json`; `fixtures/vv-define/`",
+      "verification": "VER-TW-077",
+      "validation": "VAL-TW-019",
+      "status": "Requirements-quality review and scoped doc review passed 2026-07-22; static/advisory implementation added; fixture smoke green on integration branch",
+      "next_step": "Requirement remains candidate_for_review pending baseline amendment; phase-gating claim on `tw-work` is REQ-TW-078 scope; runtime/enforcing held"
+    },
+    {
+      "id": "TRACE-TW-058",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-003; NEED-TW-004; NEED-TW-008",
+      "requirements": "REQ-TW-077",
+      "artifact": "`plugins/traceweaver-core/skills/tw-vv-define/SKILL.md`; `plugins/traceweaver-core/skills/tw-vv-define/scripts/traceweaver-check-vv-capsule`; `docs/validation/examples/vv-define-capsule.example.json`; `fixtures/vv-define/`; `scripts/traceweaver-smoke-vv-define`",
+      "verification": "VER-TW-078",
+      "validation": "VAL-TW-020",
+      "status": "Requirements-quality review and scoped doc review passed 2026-07-22; skill, validator, fixtures, example capsule, and smoke implemented and green; adversarial review cycle closed after validator hardening",
+      "next_step": "Install/discovery-smoke enumeration updated in Unit 4; packaged-skill install claim and capsule-handoff runtime behavior held"
+    },
+    {
+      "id": "TRACE-TW-059",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "requirements": "REQ-TW-078",
+      "artifact": "`plugins/traceweaver-core/skills/tw-work/SKILL.md` V&V Definition Preflight + refusal/red-flag policy; `tw-plan`/`tw-auto` routing to `tw-vv-define`; `fixtures/tw-skill-behavior/tw-work-missing-vv-definition/`",
+      "verification": "VER-TW-079",
+      "validation": "VAL-TW-021",
+      "status": "Requirements-quality review and scoped doc review passed 2026-07-22; static/advisory fixture and instruction evidence added; adversarial review ACCEPT",
+      "next_step": "Runtime refusal/enforcement claims held; requirement remains candidate_for_review pending baseline amendment"
+    },
+    {
+      "id": "TRACE-TW-060",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-005; NEED-TW-007",
+      "requirements": "REQ-TW-079",
+      "artifact": "`plugins/traceweaver-core/hooks/session-start`; `plugins/traceweaver-core/hooks/hooks.json`; `plugins/traceweaver-core/hooks/hooks-cursor.json`; `fixtures/hooks/session-start/{claude,cursor,codex}/`",
+      "verification": "VER-TW-080",
+      "validation": "VAL-TW-022",
+      "status": "Static/fixture-verified only; per-host payload-shape smoke green; adversarial review cycle closed",
+      "next_step": "Live SessionStart firing held per host; Codex registration/install held; requirement remains candidate_for_review"
+    },
+    {
+      "id": "TRACE-TW-061",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005",
+      "requirements": "REQ-TW-080",
+      "artifact": "`plugins/traceweaver-core/hooks/pretooluse-tdd-gate`; Claude Code and Cursor manifest entries; `fixtures/hooks/pretooluse/` (present/missing/red-path-missing/plugin-hook cases)",
+      "verification": "VER-TW-081",
+      "validation": "VAL-TW-023",
+      "status": "Static/fixture-verified only; smoke proves silent positive path, advisory warning negative paths, exit 0; adversarial review ACCEPT after RED-evidence-chain fix",
+      "next_step": "Blocking/enforcing behavior held; Codex PreToolUse coverage unproven per capability matrix; requirement remains candidate_for_review"
+    },
+    {
+      "id": "TRACE-TW-062",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-002; NEED-TW-005; NEED-TW-007",
+      "requirements": "REQ-TW-081",
+      "artifact": "Capability matrix record; Codex discovery record; `fixtures/hooks/host-payloads/{claude,cursor}/`",
+      "verification": "VER-TW-082",
+      "validation": "VAL-TW-024",
+      "status": "Matrix recorded: Claude Code SessionStart+PreToolUse supported; Cursor SessionStart+PreToolUse supported; Codex SessionStart supported, Codex PreToolUse unproven; plugin-loader auto-adopt risk recorded held",
+      "next_step": "Runtime proof remains a separate held gate per supported cell; no manifests/fixtures for non-supported cells; requirement remains candidate_for_review"
     }
   ],
   "atp_entries": [
@@ -3291,6 +3357,72 @@
       "Evidence Path": "`docs/validation/candidate-baseline-review-*.md`; `docs/distilled/promotion-status.md`; CI smoke workflow",
       "Date / Session": "2026-06-12",
       "Notes": "Scoped doc review of the amended baseline remains the next gate; runtime and publication claims stay held."
+    },
+    {
+      "ID": "VER-TW-077",
+      "Requirement": "REQ-TW-076",
+      "Method": "Fixture smoke / doc-review-shape inspection",
+      "Procedure / Command": "`scripts/traceweaver-smoke-vv-define` (RED-evidence non-emptiness, scoped not-applicable handling, validation-definition artifact existence plus four-section content gate on the example)",
+      "Tested Ref": "V&V definition phase policy, RED-before-implementation ordering, validation-definition artifact sections",
+      "Result": "Pass: RED confirmed before implementation (smoke failed on missing skill/example files); GREEN after (`vv_define_smoke=pass`, valid/invalid fixture checks pass, skill-shape check pass, exit 0) on integration branch",
+      "Evidence Path": "`scripts/traceweaver-smoke-vv-define`; `fixtures/vv-define/`; `docs/validation/examples/vv-define-validation-definition.example.md`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Fixture/smoke evidence only; does not validate full schema conformance of arbitrary docs/validation artifacts beyond the example; runtime held."
+    },
+    {
+      "ID": "VER-TW-078",
+      "Requirement": "REQ-TW-077",
+      "Method": "Skill instruction inspection / fixture smoke / capsule validator",
+      "Procedure / Command": "`traceweaver-check-vv-capsule` over `fixtures/vv-define/` (pass cases: valid-capsule, valid-not-applicable; blocked cases: missing-red-evidence, unscoped-not-applicable, invalid-identity, path-escapes-root, review-entry-malformed; `--require-review-passed` blocks review-not-passed); example capsule passes; smoke asserts SKILL.md anchors/sections",
+      "Tested Ref": "`tw-vv-define` skill, capsule schema `tw-vv-capsule/1`, validator finding IDs, capsule handoff shape",
+      "Result": "Pass: all fixture cases behave as designed after adversarial-review hardening (schema_version const, ID regexes, plan_ref root containment, reviews[] structure, `--require-review-passed` mode); `--schema` prints documented fields",
+      "Evidence Path": "`plugins/traceweaver-core/skills/tw-vv-define/`; `docs/validation/examples/vv-define-capsule.example.json`; `fixtures/vv-define/`; `scripts/traceweaver-smoke-vv-define`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Static/advisory evidence; packaged install/discovery enumeration added in Unit 4 (`traceweaver-smoke-codex-discovery` green runtime-disabled); runtime capsule-handoff held."
+    },
+    {
+      "ID": "VER-TW-079",
+      "Requirement": "REQ-TW-078",
+      "Method": "Static wrapper-instruction inspection / deterministic fixture smoke",
+      "Procedure / Command": "`TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior`",
+      "Tested Ref": "`tw-work` V&V Definition Preflight, refusal rule/red-flag table, `tw-plan`/`tw-auto` vv-define routing, missing-capsule fixture",
+      "Result": "Pass for static/advisory fixture evidence: smoke proves `tw-work` stops before mutation without a review-passed capsule (`stop_before_mutation`, routes via `tw-auto` to `tw-vv-define`) and that `tw-plan`/`tw-auto` order vv-define before work",
+      "Evidence Path": "`scripts/traceweaver-smoke-tw-skill-behavior`; `fixtures/tw-skill-behavior/tw-work-missing-vv-definition/worker-result.txt`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Policy-text/fixture behavior only; does not prove a live host blocks writes; runtime refusal/enforcement held."
+    },
+    {
+      "ID": "VER-TW-080",
+      "Requirement": "REQ-TW-079",
+      "Method": "Hook manifest/payload fixture smoke",
+      "Procedure / Command": "`scripts/traceweaver-smoke-hook-session-start` over `fixtures/hooks/session-start/{claude,cursor,codex}/` (supported cells)",
+      "Tested Ref": "SessionStart hook JSON per host shape (claude `hookSpecificOutput.additionalContext`, cursor `additional_context`, SDK-standard `additionalContext`), mode/Authority Rule/held-claims/ordering content, graceful non-TW-project behavior, mode override",
+      "Result": "Pass: supported-host payload shapes and required content fields verified; non-TW-project degradation verified; smoke green on integration branch",
+      "Evidence Path": "`plugins/traceweaver-core/hooks/session-start`; `plugins/traceweaver-core/hooks/hooks.json`; `plugins/traceweaver-core/hooks/hooks-cursor.json`; `fixtures/hooks/session-start/`; `scripts/traceweaver-smoke-hook-session-start`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Static/fixture-verified only; live SessionStart firing held per host; Codex registration/install held."
+    },
+    {
+      "ID": "VER-TW-081",
+      "Requirement": "REQ-TW-080",
+      "Method": "Hook fixture payload smoke",
+      "Procedure / Command": "`scripts/traceweaver-smoke-hook-pretooluse-tdd-gate` over `fixtures/hooks/pretooluse/` (vv-definition-present: silent exit 0; vv-definition-missing: advisory warning exit 0; vv-definition-present-red-path-missing: advisory warning exit 0; plugin-hook and extensionless-executable cases)",
+      "Tested Ref": "PreToolUse advisory gate behavior: capsule -> V&V definition -> red_evidence path chain with non-empty verification; behavior-bearing path classification; never-blocking exit codes",
+      "Result": "Pass: positive path silent, all negative paths warn with exit 0; credentials.env substring attack defeated by path-chain verification; malformed/empty stdin graceful; smoke green on integration branch",
+      "Evidence Path": "`plugins/traceweaver-core/hooks/pretooluse-tdd-gate`; `fixtures/hooks/pretooluse/`; `scripts/traceweaver-smoke-hook-pretooluse-tdd-gate`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Advisory only; blocking/enforcing held; Codex PreToolUse coverage unproven; runtime firing held."
+    },
+    {
+      "ID": "VER-TW-082",
+      "Requirement": "REQ-TW-081",
+      "Method": "Capability matrix / discovery record inspection",
+      "Procedure / Command": "Inspection of `docs/validation/traceweaver-0.3-hook-host-capability-matrix.md` and `docs/validation/traceweaver-0.3-codex-hook-capability-discovery.md`; payload fixtures limited to supported cells",
+      "Tested Ref": "Host x hook grid states, per-cell evidence, Codex discovery method, held auto-adopt risk",
+      "Result": "Pass: matrix records claude SessionStart+PreToolUse supported, cursor SessionStart+PreToolUse supported, codex SessionStart supported (real ~/.codex/hooks.json evidence), codex PreToolUse unproven (binary-string evidence insufficient; mischaracterized template claim retracted); no artifacts for non-supported cells",
+      "Evidence Path": "`docs/validation/traceweaver-0.3-hook-host-capability-matrix.md`; `docs/validation/traceweaver-0.3-codex-hook-capability-discovery.md`; `fixtures/hooks/host-payloads/`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Runtime proof separate held gate per supported cell; Codex install/registration and auto-adopt decision held."
     }
   ],
   "validation_evidence": [
@@ -3491,6 +3623,72 @@
       "Result": "Owner approval recorded 2026-06-12; representative real-project validation of the promoted knowledge skills remains open",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "Validation of the promoted skills in real consuming-project use (R31 family) remains deferred under the existing held claims."
+    },
+    {
+      "ID": "VAL-TW-019",
+      "Source Need": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "Scenario / Intended Use": "Intent validation (FAT/ATP-style acceptance) happens before implementation exists, not only at closure.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "A reviewer can see RED verification evidence and a reviewed validation-definition artifact recorded before any implementation diff for the work item.",
+      "Evidence Path": "`docs/validation/` validation-definition artifacts; matrix rows; `fixtures/vv-define/`",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Fixture evidence exists (VER-TW-077); representative real-use validation awaits first consuming work item; requirement candidate_for_review."
+    },
+    {
+      "ID": "VAL-TW-020",
+      "Source Need": "NEED-TW-001; NEED-TW-003; NEED-TW-004; NEED-TW-008",
+      "Scenario / Intended Use": "A user can run one TraceWeaver-owned step after plan acceptance and get a reviewed capsule handed to `tw-work`.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "`tw-vv-define` output names REQ/TRACE/VER/VAL IDs, artifact paths, and RED evidence location, and does not itself claim implementation authority.",
+      "Evidence Path": "`plugins/traceweaver-core/skills/tw-vv-define/SKILL.md`; `docs/validation/examples/vv-define-capsule.example.json`",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Static skill/validator evidence exists (VER-TW-078); live handoff and representative validation held."
+    },
+    {
+      "ID": "VAL-TW-021",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "Scenario / Intended Use": "A behavior-bearing work item reaches `tw-work` without its V&V definition capsule.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "The fixture states `stop_before_mutation`, blocks `ce-work`, and routes through `tw-auto` to `tw-vv-define`; the smoke verifies the static policy text.",
+      "Evidence Path": "`fixtures/tw-skill-behavior/tw-work-missing-vv-definition/worker-result.txt`; `scripts/traceweaver-smoke-tw-skill-behavior`",
+      "Result": "Held for representative/live validation",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Static/advisory evidence only (VER-TW-079); host-runtime proof and representative user validation are separate held gates."
+    },
+    {
+      "ID": "VAL-TW-022",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-005; NEED-TW-007",
+      "Scenario / Intended Use": "An agent session starts already reminded of TraceWeaver mode, the Authority Rule, and held claims.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Per-host dry-run fixture shows correct injected payload content for supported hosts, or an honest capability gap record where a host lacks the surface.",
+      "Evidence Path": "`plugins/traceweaver-core/hooks/session-start`; `fixtures/hooks/session-start/`; capability matrix record",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Fixture evidence exists (VER-TW-080); live session-start firing validation held per host."
+    },
+    {
+      "ID": "VAL-TW-023",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005",
+      "Scenario / Intended Use": "A behavior-bearing write/edit surfaces an advisory warning when no linked V&V evidence exists, without being blocked.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Fixture proof shows the warning firing on missing evidence and staying silent when evidence is linked, for Claude Code and Cursor; Codex recorded as unproven.",
+      "Evidence Path": "`plugins/traceweaver-core/hooks/pretooluse-tdd-gate`; `fixtures/hooks/pretooluse/`",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Fixture evidence exists (VER-TW-081); live PreToolUse firing and any blocking behavior held."
+    },
+    {
+      "ID": "VAL-TW-024",
+      "Source Need": "NEED-TW-002; NEED-TW-005; NEED-TW-007",
+      "Scenario / Intended Use": "A reviewer can tell, per host x hook cell, whether it is supported/unsupported-gap/unproven, and whether a supported cell is statically proven only or has also passed live runtime proof.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Capability matrix record clearly separates capability state from static proof and from runtime proof status; non-supported Codex cells carry discovery evidence instead of implied coverage.",
+      "Evidence Path": "`docs/validation/traceweaver-0.3-hook-host-capability-matrix.md`; `docs/validation/traceweaver-0.3-codex-hook-capability-discovery.md`",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Matrix recorded (VER-TW-082); per-host runtime proof gates remain separately held."
     }
   ],
   "code_anchor_evidence": [
