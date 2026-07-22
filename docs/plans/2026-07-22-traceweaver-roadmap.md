@@ -16,16 +16,19 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
 
 ## Now — 0.3.0 Release Route
 
-1. **Controlled PR to `main`.** Open a feature-branch PR from the
-   `codex/traceweaver-0.3-validation-first` integration branch (or its
-   docs-unit branch) into `dev`/`main` per the branching policy. Do not
-   commit directly to `main`.
+1. **Controlled PR to `main`.** Open a feature-branch PR from
+   `codex/traceweaver-0.3-validation-first` into `main`. This repo has no
+   `dev` branch; its established convention (0.2.x precedent) is a
+   controlled feature-branch PR directly into `main`, with the version bump
+   and tag cut at merge via the release workflow. The AGENTS.md dev-branch
+   policy is satisfied here by an explicit owner routing decision for this
+   repo. Do not commit directly to `main`.
 2. **Version bump at merge only.** Bump plugin/marketplace manifests and
    `CHANGELOG.md`'s implicit version reference to `0.3.0` as part of the
    merge-to-main commit, consistent with "no version bumps on feature
    branches or `dev`". Cut the `traceweaver-core--v0.3.0` tag via the
    existing `Release on version bump` workflow, following the
-   `traveweaver-plugin-0.2-release.md` pattern.
+   `docs/validation/traceweaver-plugin-0.2-release.md` pattern.
 3. **Post-release evidence records.** After the tag/GitHub Release publish,
    record post-release publication evidence (tag, release URL, release
    commit) in a new `.traceweaver/trace-records/2026-07-22-plugin-0.3-
@@ -74,7 +77,7 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
    suppress or adopt Codex plugin-loader auto-discovery of
    `hooks/hooks.json` at install time (open/held risk in the capability
    matrix record): either add `"hooks": {}` to
-   `.codex-plugin/plugin.json` to suppress it (the pinned-superpowers
+   `plugins/traceweaver-core/.codex-plugin/plugin.json` to suppress it (the pinned-superpowers
    pattern), or explicitly adopt it with its own reviewed evidence. Do this
    before any Codex hook-installation work.
 
@@ -139,8 +142,11 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
 
 ## Suggested Next Step
 
-Start with item 1 (open the controlled PR from the integration branch into
-`dev`/`main`); do not bump the version or tag before that PR merges. In
+Start with item 1 (open the controlled PR from
+`codex/traceweaver-0.3-validation-first` into `main`; this repo has no
+`dev` branch, so per the established 0.2.x convention and explicit owner
+routing decision, the route is directly into `main`); do not bump the
+version or tag before that PR merges. In
 parallel, item 5 (baseline-amendment promotion of REQ-TW-076..081) can
 proceed once a `tw-requirements-review`/`tw-authority-gate` pass is
 scheduled, since both prerequisite reviews are already clean. Runtime,

@@ -91,10 +91,10 @@ subagents with cross-model adversarial build/review pairing
 
 | Unit | Scope | Builder | Reviewer | Verdict |
 | --- | --- | --- | --- | --- |
-| Unit 1 | Formal requirements review + scoped doc review for REQ-TW-076..081 | claude-sonnet-5 | gpt-5.6-terra | Both clean (requirements-quality passed after REQ-FIND-001 closure; doc review clean) |
+| Unit 1 | Formal requirements review + scoped doc review for REQ-TW-076..081 | claude-sonnet-5 | claude-sonnet-5 | Both clean (requirements-quality passed after REQ-FIND-001 closure; doc review clean) |
 | Unit 2 | `tw-vv-define` skill + capsule validator + smokes (REQ-TW-076/077) | claude-sonnet-5 | gpt-5.6-terra | REJECT -> fix round -> micro-fix -> verified; P0 authority-ordering finding resolved by orchestrator owner-direction record at integration |
 | Unit 3 | Advisory SessionStart + PreToolUse hooks, host capability matrix (REQ-TW-079/080/081) | gpt-5.6-terra | claude-sonnet-5 | B1/M1/S2/S4 findings fixed and re-reviewed ACCEPT; B2 authority-ordering finding resolved by orchestrator owner-direction record at integration |
-| Unit 4 | `tw-work` hard V&V preflight, `tw-plan`/`tw-auto` routing, superpowers rigor port (REQ-TW-078) | claude-sonnet-5 | gpt-5.6-terra | ACCEPT, no blocking findings |
+| Unit 4 | `tw-work` hard V&V preflight, `tw-plan`/`tw-auto` routing, superpowers rigor port (REQ-TW-078) | gpt-5.6-terra | claude-sonnet-5 | ACCEPT, no blocking findings |
 | Integration fix 1 | PreToolUse hook made to consume the `tw-vv-capsule/1` schema (hook<->capsule contract mismatch) | orchestrator | — | Fixed; smokes extended and green |
 | Integration fix 2 | Schema-v1 capsule target linkage (advisory-bypass closure) | orchestrator | — | Fixed; smokes extended and green |
 
@@ -240,10 +240,14 @@ program.
 
 Route this reviewed unit (CHANGELOG entry, this release record, and the
 0.3.x roadmap at `docs/plans/2026-07-22-traceweaver-roadmap.md`) through a
-controlled PR from the integration branch into `dev`/`main` per the
-branching policy; bump the version to `0.3.0` and cut the
-`traceweaver-core--v0.3.0` tag only at that merge, then record post-release
-publication evidence following the `traceweaver-plugin-0.2-release.md`
-pattern. Runtime, enforcing, requirement-promotion, and per-host hook
-runtime-proof claims remain held regardless of this record until their own
-proof gates pass.
+controlled PR from `codex/traceweaver-0.3-validation-first` into `main`
+(this repo has no `dev` branch; its established convention, per the 0.2.x
+precedent, is a controlled feature-branch PR directly into `main` with the
+version bump and tag cut at merge). Bump the version to `0.3.0` and cut the
+`traceweaver-core--v0.3.0` tag only at that merge via the existing `Release
+on version bump` workflow, then record post-release publication evidence
+following the `traceweaver-plugin-0.2-release.md` pattern. The AGENTS.md
+dev-branch policy is satisfied here by an explicit owner routing decision
+for this repo: route to `main` directly, no `dev` branch. Runtime,
+enforcing, requirement-promotion, and per-host hook runtime-proof claims
+remain held regardless of this record until their own proof gates pass.
