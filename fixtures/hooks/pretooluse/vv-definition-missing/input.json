@@ -1,0 +1,10 @@
+{
+  "hook_event_name": "PreToolUse",
+  "tool_name": "Edit",
+  "cwd": "__FIXTURE_ROOT__",
+  "tool_input": {
+    "file_path": "src/feature.sh",
+    "old_string": "old",
+    "new_string": "new"
+  }
+}
