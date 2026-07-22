@@ -1,1 +1,0 @@
-RED evidence: the behavior test failed before implementation.

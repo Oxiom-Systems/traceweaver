@@ -1,3 +1,0 @@
-#!/usr/bin/env bash
-# Extensionless plugin hook fixture.
-echo hook

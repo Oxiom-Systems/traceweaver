@@ -9,11 +9,18 @@ set -u
 project_root="${PWD:-.}"
 mode="advisory"
 intent_contract="$project_root/.traceweaver/intent-contract.yml"
+workflow_profile="$project_root/.traceweaver/workflow-profile.yml"
 if [[ -f "$intent_contract" ]]; then
   candidate="$(sed -nE 's/^[[:space:]]*traceweaver_mode:[[:space:]]*([A-Za-z_-]+).*/\1/p' "$intent_contract" | head -n 1)"
   case "$candidate" in
     off|advisory|enforcing) mode="$candidate" ;;
   esac
+fi
+
+profile="not_configured"
+if [[ -f "$workflow_profile" ]]; then
+  candidate="$(sed -nE 's/^[[:space:]]*risk:[[:space:]]*([A-Za-z0-9_-]+).*/\1/p' "$workflow_profile" | head -n 1)"
+  [[ -n "$candidate" ]] && profile="$candidate"
 fi
 
 escape_for_json() {
@@ -26,7 +33,7 @@ escape_for_json() {
   printf '%s' "$value"
 }
 
-context="TraceWeaver mode: ${mode}. Authority Rule: no implementation without approved requirement or exception, verification method, validation question, and current baseline. Held claims: runtime, enforcing mode, publication, clean replacement. Order: plan -> tw-vv-define -> tw-work; define V&V and RED evidence before implementation. This advisory reminder does not block or mutate files."
+context="Optional TraceWeaver advisory context (mode: ${mode}; workflow profile: ${profile}). If this project has opted in, consult .traceweaver/master-orchestrator.md and .traceweaver/workflow-profile.yml before selecting a bounded child role. This static reminder does not prove host execution, block actions, or mutate files."
 escaped_context="$(escape_for_json "$context")"
 
 # Cursor can also set CLAUDE_PLUGIN_ROOT, so test it first. Claude Code reads

@@ -1,6 +1,0 @@
-{
-  "task_id": "TASK-HOOK-RED-PATH-001",
-  "work_context": "src/feature.sh",
-  "vv_definition": "docs/validation/vv-definition-TASK-HOOK-RED-PATH-001.json",
-  "review_status": "review_passed"
-}

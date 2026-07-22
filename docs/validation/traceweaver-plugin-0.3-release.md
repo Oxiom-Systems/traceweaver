@@ -1,6 +1,6 @@
 # TraceWeaver Plugin 0.3 Release Validation Record
 
-Status: `VALIDATION_FIRST_PROGRAM_STATIC_ADVISORY_IMPLEMENTED_REVIEWS_CLEAN_RUNTIME_ENFORCING_PUBLICATION_HELD`
+Status: `REPAIR_IN_PROGRESS_STATIC_ARTIFACTS_ONLY_U7_DOGFOOD_REQUIRED_BEFORE_RELEASE_OR_PUBLICATION`
 
 Date/session: 2026-07-22, integration branch
 `codex/traceweaver-0.3-validation-first` (this record prepared on
@@ -31,10 +31,10 @@ definition must exist and be handed to `tw-work` via a `tw-vv-capsule/1`
 capsule before implementation may start mutating behavior-bearing files.
 The program adds a new `tw-vv-define` skill and capsule validator, a hard
 `tw-work` V&V preflight, `tw-plan`/`tw-auto` routing through
-`tw-vv-define`, and two advisory-only plugin hooks (SessionStart discipline
-injection, PreToolUse TDD-gate warning) whose mechanism is adapted from
-`obra/superpowers` (pinned `d884ae04edebef577e82ff7c4e143debd0bbec99`, no
-rebase), plus a host x hook capability matrix.
+`tw-vv-define`, a short optional SessionStart advisory reminder, and a host x
+hook capability matrix. The default PreToolUse TDD-gate registration, hook,
+smoke, and fixtures have been removed during the 0.3 repair: no default
+PreToolUse behavior is part of the current product surface.
 
 This release does **not** claim: any hook firing in a live agent session on
 any host; `traceweaver_mode: enforcing` or any blocking/refusal behavior;
@@ -52,8 +52,8 @@ publication record.
 | REQ-TW-076 | Mandatory V&V definition phase between accepted plan and implementation | `candidate_for_review`; requirements-quality passed, doc review clean |
 | REQ-TW-077 | `tw-vv-define` skill owning the V&V definition phase and capsule handoff | `candidate_for_review`; requirements-quality passed, doc review clean |
 | REQ-TW-078 | `tw-work` hard V&V preflight (refuse mutation without reviewed capsule + RED evidence) | `candidate_for_review`; requirements-quality passed, doc review clean |
-| REQ-TW-079 | Advisory SessionStart discipline-injection hook, adapted from superpowers | `candidate_for_review`; requirements-quality passed after REQ-FIND-001 closure (capability-conditioned revision), doc review clean |
-| REQ-TW-080 | Advisory, non-blocking PreToolUse TDD-gate hook | `candidate_for_review`; requirements-quality passed, doc review clean |
+| REQ-TW-079 | Optional advisory SessionStart reminder | `candidate_for_review`; static artifact only, no live-host claim |
+| REQ-TW-080 | Advisory, non-blocking PreToolUse TDD-gate hook | `candidate_for_review`; not delivered in the repaired default surface |
 | REQ-TW-081 | Host x hook capability matrix (`supported`/`unsupported-gap`/`unproven`) | `candidate_for_review`; requirements-quality passed, doc review clean |
 
 Review records:
@@ -93,15 +93,22 @@ subagents with cross-model adversarial build/review pairing
 | --- | --- | --- | --- | --- |
 | Unit 1 | Formal requirements review + scoped doc review for REQ-TW-076..081 | claude-sonnet-5 | claude-sonnet-5 | Both clean (requirements-quality passed after REQ-FIND-001 closure; doc review clean) |
 | Unit 2 | `tw-vv-define` skill + capsule validator + smokes (REQ-TW-076/077) | claude-sonnet-5 | gpt-5.6-terra | REJECT -> fix round -> micro-fix -> verified; P0 authority-ordering finding resolved by orchestrator owner-direction record at integration |
-| Unit 3 | Advisory SessionStart + PreToolUse hooks, host capability matrix (REQ-TW-079/080/081) | gpt-5.6-terra | claude-sonnet-5 | B1/M1/S2/S4 findings fixed and re-reviewed ACCEPT; B2 authority-ordering finding resolved by orchestrator owner-direction record at integration |
+| Unit 3 | Original advisory hook work and host capability matrix (REQ-TW-079/080/081) | gpt-5.6-terra | claude-sonnet-5 | Historical static evidence only; U5 removes the default PreToolUse surface |
 | Unit 4 | `tw-work` hard V&V preflight, `tw-plan`/`tw-auto` routing, superpowers rigor port (REQ-TW-078) | gpt-5.6-terra | claude-sonnet-5 | ACCEPT, no blocking findings |
 | Integration fix 1 | PreToolUse hook made to consume the `tw-vv-capsule/1` schema (hook<->capsule contract mismatch) | orchestrator | — | Fixed; smokes extended and green |
 | Integration fix 2 | Schema-v1 capsule target linkage (advisory-bypass closure) | orchestrator | — | Fixed; smokes extended and green |
 
-All four unit builds and the two integration fix rounds are static/advisory
-only; none claims runtime hook firing, enforcement, or publication.
+All four unit builds and the two integration fix rounds are historical
+static/advisory evidence only; none claims runtime hook firing, enforcement,
+release readiness, or publication.
 
-## Adversarial Findings Caught And Fixed
+## Superseded PreToolUse History
+
+The former PreToolUse findings and fixes below describe removed work only. They
+must not be used to infer a registered hook, host capability, enforcement,
+runtime firing, or release readiness in the repaired 0.3 surface.
+
+## Historical Adversarial Findings
 
 - **Capsule validator root-escape and identity hardening (Unit 2).** The
   adversarial ("terra") review issued a REJECT on the initial
@@ -155,19 +162,20 @@ only; none claims runtime hook firing, enforcement, or publication.
 
 ## Verification Evidence
 
-Local smoke run on the integration branch state (2026-07-22), 11/11 green:
+Historical local smoke run on the integration branch state (2026-07-22),
+11/11 green. Its PreToolUse result is superseded by U5 removal and is not
+current verification evidence; the ten remaining historical results were:
 
 1. `scripts/traceweaver-smoke-vv-define` — `vv_define_smoke=pass`
 2. `scripts/traceweaver-smoke-hook-session-start` — `hook_session_start_smoke=pass`
-3. `scripts/traceweaver-smoke-hook-pretooluse-tdd-gate` — `pretooluse_tdd_gate_smoke=pass`
-4. `TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior` — `tw_skill_behavior_smoke=pass`
-5. `scripts/traceweaver-smoke-code-traceability` — `code_traceability_smoke=pass`
-6. `scripts/traceweaver-smoke-traceability-generated-views` — `traceability_generated_views_smoke=pass`
-7. `scripts/traceweaver-smoke-verify` — `traceweaver_verify=pass hash_ok=1`
-8. `scripts/traceweaver-smoke-controlled-publication` — `controlled_publication_route_smoke=pass`
-9. `scripts/traceweaver-smoke-distilled-coverage` — `distilled_coverage=pass`
-10. `TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery` — `codex_discovery_smoke=pass`
-11. `scripts/traceweaver-smoke-antigravity-discovery` — `antigravity_discovery_smoke=pass`
+3. `TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior` — `tw_skill_behavior_smoke=pass`
+4. `scripts/traceweaver-smoke-code-traceability` — `code_traceability_smoke=pass`
+5. `scripts/traceweaver-smoke-traceability-generated-views` — `traceability_generated_views_smoke=pass`
+6. `scripts/traceweaver-smoke-verify` — `traceweaver_verify=pass hash_ok=1`
+7. `scripts/traceweaver-smoke-controlled-publication` — `controlled_publication_route_smoke=pass`
+8. `scripts/traceweaver-smoke-distilled-coverage` — `distilled_coverage=pass`
+9. `TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery` — `codex_discovery_smoke=pass`
+10. `scripts/traceweaver-smoke-antigravity-discovery` — `antigravity_discovery_smoke=pass`
 
 Verify gate detail: `traceweaver_verify=pass hash_ok=1 closure=0/75
 longest_line=8803 over2000=43`. Canonical baseline hash
@@ -210,14 +218,11 @@ program.
 
 ## Held Claims
 
-- Runtime firing of the SessionStart hook or the PreToolUse hook, on any
-  host, for any `supported` cell (Claude Code, Cursor, Codex SessionStart);
-  a live agent session observing either hook has not been demonstrated.
-- Codex x PreToolUse capability: `unproven`, not `supported` or
-  `unsupported-gap`; no fixture, manifest, or coverage claim is made for
-  this cell.
-- `traceweaver_mode: enforcing` and any blocking/refusal behavior for the
-  PreToolUse gate; the hook always exits 0.
+- Runtime firing of the optional SessionStart reminder on any host;
+  a live agent session observing it has not been demonstrated.
+- Codex x PreToolUse capability and any default PreToolUse behavior; the
+  removed hook supplies no current fixture, manifest, or coverage claim.
+- `traceweaver_mode: enforcing` and any blocking/refusal behavior.
 - `tw-work`'s V&V preflight "refuse" behavior: a static/advisory
   policy-and-fixture contract only, not a demonstrated live-host block.
 - Codex plugin installation, hook-trust registration, and the explicit
@@ -225,9 +230,9 @@ program.
   by the Codex plugin loader.
 - Promotion of REQ-TW-076 through REQ-TW-081 from `candidate_for_review` to
   `approved`; no baseline amendment has occurred.
-- Representative/real-use validation for VAL-TW-019 through VAL-TW-024;
-  current evidence is fixture-level only, pending a first consuming
-  real work item (dogfood).
+- Measured product dogfood U7 for VAL-TW-019 through VAL-TW-024; current
+  evidence is fixture-level only. U7 and its separate review must pass before
+  any release, publication, version bump, tag, or release-ready claim.
 - Release, publication, package-ready, release-ready, upstream-ready, clean
   CE replacement, slash-command support, unconstrained-host support, R31/
   Vestro validation, and autonomous publication, consistent with the
@@ -238,16 +243,8 @@ program.
 
 ## Suggested Next Step
 
-Route this reviewed unit (CHANGELOG entry, this release record, and the
-0.3.x roadmap at `docs/plans/2026-07-22-traceweaver-roadmap.md`) through a
-controlled PR from `codex/traceweaver-0.3-validation-first` into `main`
-(this repo has no `dev` branch; its established convention, per the 0.2.x
-precedent, is a controlled feature-branch PR directly into `main` with the
-version bump and tag cut at merge). Bump the version to `0.3.0` and cut the
-`traceweaver-core--v0.3.0` tag only at that merge via the existing `Release
-on version bump` workflow, then record post-release publication evidence
-following the `traceweaver-plugin-0.2-release.md` pattern. The AGENTS.md
-dev-branch policy is satisfied here by an explicit owner routing decision
-for this repo: route to `main` directly, no `dev` branch. Runtime,
-enforcing, requirement-promotion, and per-host hook runtime-proof claims
-remain held regardless of this record until their own proof gates pass.
+Run measured product dogfood U7 on one real work item, then obtain a separate
+review of that evidence. Do not open a release PR, bump a version, tag,
+publish, or claim release readiness until U7 is accepted and an owner makes a
+new release decision. Runtime, enforcing, requirement-promotion, and per-host
+hook runtime-proof claims remain held regardless of this record.

@@ -32,11 +32,10 @@ else:
     context = payload["additionalContext"]
     assert "additional_context" not in payload
 for expected in (
-    "TraceWeaver mode: advisory",
-    "Authority Rule: no implementation without approved requirement or exception, verification method, validation question, and current baseline",
-    "Held claims: runtime, enforcing mode, publication, clean replacement",
-    "plan -> tw-vv-define -> tw-work",
-    "before implementation",
+    "Optional TraceWeaver advisory context (mode: advisory; workflow profile: not_configured)",
+    ".traceweaver/master-orchestrator.md",
+    ".traceweaver/workflow-profile.yml",
+    "does not prove host execution, block actions, or mutate files",
 ):
     assert expected in context, expected
 PY
@@ -66,11 +65,17 @@ run_host codex
 mode_project="$TMP_DIR/mode-project"
 mkdir -p "$mode_project/.traceweaver"
 printf 'traceweaver_mode: off\n' >"$mode_project/.traceweaver/intent-contract.yml"
+(cat <<'EOF'
+schema_version: tw-workflow-profile/1
+risk: L2
+EOF
+) >"$mode_project/.traceweaver/workflow-profile.yml"
 (cd "$mode_project" && CURSOR_PLUGIN_ROOT=fixture "$HOOK") >"$TMP_DIR/mode.json"
 python3 - "$TMP_DIR/mode.json" <<'PY'
 import json
 import sys
-assert "TraceWeaver mode: off" in json.load(open(sys.argv[1]))["additional_context"]
+context = json.load(open(sys.argv[1]))["additional_context"]
+assert "mode: off; workflow profile: L2" in context
 PY
 
 echo "hook_session_start_mode_override=pass"

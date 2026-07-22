@@ -14,31 +14,9 @@ capability-matrix, requirements-review, and doc-review records under
 TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
 `docs/validation/traceweaver-plugin-0.3-release.md`.
 
-## Now — 0.3.0 Release Route
+## Now — Measured Product Dogfood Gate (U7)
 
-1. **Controlled PR to `main`.** Open a feature-branch PR from
-   `codex/traceweaver-0.3-validation-first` into `main`. This repo has no
-   `dev` branch; its established convention (0.2.x precedent) is a
-   controlled feature-branch PR directly into `main`, with the version bump
-   and tag cut at merge via the release workflow. The AGENTS.md dev-branch
-   policy is satisfied here by an explicit owner routing decision for this
-   repo. Do not commit directly to `main`.
-2. **Version bump at merge only.** Bump plugin/marketplace manifests and
-   `CHANGELOG.md`'s implicit version reference to `0.3.0` as part of the
-   merge-to-main commit, consistent with "no version bumps on feature
-   branches or `dev`". Cut the `traceweaver-core--v0.3.0` tag via the
-   existing `Release on version bump` workflow, following the
-   `docs/validation/traceweaver-plugin-0.2-release.md` pattern.
-3. **Post-release evidence records.** After the tag/GitHub Release publish,
-   record post-release publication evidence (tag, release URL, release
-   commit) in a new `.traceweaver/trace-records/2026-07-22-plugin-0.3-
-   release-publication.yml`-style record, and update
-   `docs/validation/traceweaver-plugin-0.3-release.md` with the confirmed
-   publication result, following the 0.2 record's running-log convention.
-
-## Next — Validation Of The Validators
-
-4. **Dogfood `tw-vv-define` on one real work item.** VAL-TW-019 through
+1. **Dogfood `tw-vv-define` on one real work item.** VAL-TW-019 through
    VAL-TW-024 currently have fixture-level evidence only (per
    `docs/validation/traceweaver-plugin-0.3-release.md`, "Held Claims"). Pick
    one real, behavior-bearing work item and run it through
@@ -46,8 +24,10 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
    (not just fixture) RED evidence, a real `docs/validation/` validation
    definition artifact, a real capsule handoff, and a passed
    `tw-code-review`/`tw-doc-review` pair, so VAL-TW-019..024 can cite
-   real-use evidence instead of fixtures alone.
-5. **Promote REQ-TW-076..081 from `candidate_for_review` to `approved`.**
+   real-use evidence instead of fixtures alone. This is U7 and is a hard
+   prerequisite for any release, publication, version bump, tag, or release-
+   ready claim.
+2. **Promote REQ-TW-076..081 from `candidate_for_review` to `approved`.**
    Both requirements-quality review (`docs/validation/traceweaver-0.3-req-
    076-081-requirements-review.md`) and scoped doc review
    (`docs/validation/traceweaver-0.3-req-076-081-doc-review.md`) are already
@@ -56,24 +36,26 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
    with how REQ-TW-070..075 were promoted in the 0.2.5 cycle. This is a
    `tw-requirements-review`/`tw-authority-gate` gate, not a code change.
 
-## Per-Host Runtime Proof Gates
+## Only After U7 — Controlled Release Route
 
-6. **SessionStart live-firing proofs.** For each host recorded `supported`
+3. **Controlled PR and release decision.** After U7 has measured product
+   dogfood evidence and its separate review accepts that evidence, a project
+   owner may decide whether to open a controlled feature-branch PR into
+   `main`. That decision is not authorized by this roadmap.
+4. **Version bump, tag, and publication evidence.** Only after the U7 gate
+   and an explicit release decision: bump manifests, create the version tag,
+   and record publication evidence. Until then versions remain unchanged and
+   there is no release-ready or publication claim.
+
+## Later Runtime Proof Gates
+
+5. **SessionStart live-firing proofs.** For each host recorded `supported`
    in `docs/validation/traceweaver-0.3-hook-host-capability-matrix.md`
    (Claude Code, Cursor, Codex), run the existing per-host U9-style runtime
    proof route to demonstrate the SessionStart hook actually fires and is
    observed in a live agent session, and record the result per host. Static
    fixture/schema evidence (VER-TW-080) does not substitute for this.
-7. **Codex PreToolUse capability resolution.** Codex x PreToolUse is
-   currently `unproven`
-   (`docs/validation/traceweaver-0.3-codex-hook-capability-discovery.md`):
-   only partial binary-string evidence exists (`PreToolUse*Wire` structs,
-   `CLAUDE_PLUGIN_ROOT`), with no documented/active schema surface. Rerun
-   discovery against a current Codex release; resolve the cell to either
-   `supported` (with fixture/schema/smoke evidence, then queued for its own
-   runtime proof gate) or `unsupported-gap` (with a discovery-evidence
-   record closing the question) per REQ-TW-081's rules.
-8. **Codex plugin auto-adopt decision.** Decide, and record, whether to
+6. **Codex plugin auto-adopt decision.** Decide, and record, whether to
    suppress or adopt Codex plugin-loader auto-discovery of
    `hooks/hooks.json` at install time (open/held risk in the capability
    matrix record): either add `"hooks": {}` to
@@ -83,27 +65,20 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
 
 ## Enforcing Mode
 
-9. **Blocking PreToolUse variant behind its own runtime proof gate.** Any
-   future blocking/enforcing PreToolUse behavior is out of scope for 0.3 and
-   remains held per REQ-TW-080 and the project-wide
-   `traceweaver_mode: enforcing` hold. Treat it as a separate future
-   candidate requirement requiring its own requirements review, doc review,
-   and runtime proof route once the advisory hook has runtime-proof evidence
-   on at least one host.
-10. **`traceweaver_mode: enforcing` policy work.** Define what "enforcing"
+7. **`traceweaver_mode: enforcing` policy work.** Define what "enforcing"
     would mean project-wide (not just for this one hook) as its own
     candidate requirement before any implementation, consistent with the
     existing held-claim boundary.
 
 ## Debt / Beads
 
-11. **Cross-skill wording consistency (bead `TraceWeaver-6h3u`).**
+8. **Cross-skill wording consistency (bead `TraceWeaver-6h3u`).**
     `tw-code-review`, `tw-audit`, and `tw-traceability-check` still
     reference "test-first evidence" without the newer V&V capsule
     terminology (`tw-vv-capsule/1`, `red_evidence`, capsule reviews). Align
     their wording with the 0.3 vocabulary so reviewers see one consistent
     term set across skills.
-12. **Pre-existing main smoke failures (bead `TraceWeaver-ybhr`).**
+9. **Pre-existing main smoke failures (bead `TraceWeaver-ybhr`).**
     `scripts/traceweaver-smoke-no-publication` (missing "## Phase 5:
     TraceWeaver Alpha Stop Before Commit" marker in
     `ce-compound-refresh/SKILL.md`) and
@@ -111,8 +86,8 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
     "## Required Inputs"/"## Required Authority Inputs" section in
     `tw-update/SKILL.md`) both fail on `main` independent of the 0.3
     program. Fix both as a small, separate, reviewed change.
-13. **Code Anchor Evidence rows for 0.3 artifacts.** Confirm every new 0.3
-    file (the `tw-vv-define` skill and validator, both hooks, the capability
+10. **Code Anchor Evidence rows for 0.3 artifacts.** Confirm every new 0.3
+    file (the `tw-vv-define` skill and validator, optional SessionStart hook, the capability
     matrix, and their fixtures/smokes) carries the code-anchor coverage
     `scripts/traceweaver-smoke-code-traceability` expects, and extend the
     generated Code Anchor Evidence views if any 0.3 artifact is not yet
@@ -120,19 +95,19 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
 
 ## Later Candidates
 
-14. **Subagent-driven-development adaptation.** Evaluate whether the
+11. **Subagent-driven-development adaptation.** Evaluate whether the
     cross-model adversarial build/review pairing pattern used for the 0.3
     program's four implementation units (builder/reviewer subagent pairs,
     orchestrator-mediated authority resolution) should become a named,
     reusable TraceWeaver workflow pattern, distinct from ad hoc per-release
     use.
-15. **Stop-hook verification-before-completion hook.** Consider a further
-    advisory hook, in the same non-blocking family as the SessionStart and
-    PreToolUse hooks, that reminds an agent session at a stop/completion
+12. **Stop-hook verification-before-completion hook.** Consider a further
+    optional advisory hook, in the same non-blocking family as SessionStart,
+    that reminds an agent session at a stop/completion
     event to check verification evidence exists before declaring work done.
     Would need its own requirements review, doc review, and capability
     matrix entry before any implementation.
-16. **Graphify-based traceability visualization.** Evaluate using
+13. **Graphify-based traceability visualization.** Evaluate using
     Graphify (or an equivalent graph-based tool) to render
     `traceability-matrix.md` relationships (REQ -> TRACE -> VER/VAL, and the
     0.3 program's REQ-TW-076..081 chain specifically) as an additional
@@ -142,14 +117,10 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
 
 ## Suggested Next Step
 
-Start with item 1 (open the controlled PR from
-`codex/traceweaver-0.3-validation-first` into `main`; this repo has no
-`dev` branch, so per the established 0.2.x convention and explicit owner
-routing decision, the route is directly into `main`); do not bump the
-version or tag before that PR merges. In
-parallel, item 5 (baseline-amendment promotion of REQ-TW-076..081) can
-proceed once a `tw-requirements-review`/`tw-authority-gate` pass is
-scheduled, since both prerequisite reviews are already clean. Runtime,
-enforcing, and Codex-installation claims (items 6-9) remain held until their
-own proof gates pass; do not treat any roadmap item here as pre-authorized
+Start with item 1: measured U7 product dogfood on one real work item. Do not
+open a PR, bump a version, tag, publish, or claim release readiness before its
+separate review accepts the dogfood evidence and an owner makes a new release
+decision. In parallel, item 2 can proceed through its separate
+`tw-requirements-review`/`tw-authority-gate` gate. Runtime, enforcing, and
+Codex-installation claims remain held; no roadmap item pre-authorizes their
 implementation.

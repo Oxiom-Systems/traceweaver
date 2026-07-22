@@ -1,6 +1,0 @@
-{
-  "capsule_id": "VV-HOOK-001",
-  "work_context": "src/feature.sh",
-  "red_evidence": "tests/feature.red.txt",
-  "review_status": "review_passed"
-}
