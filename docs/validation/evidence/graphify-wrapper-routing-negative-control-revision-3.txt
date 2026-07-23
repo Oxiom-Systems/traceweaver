@@ -1,0 +1,15 @@
+evidence_id: NEG-TW-2026-07-23-GRAPHIFY-WRAPPERS-REV3-001
+requirement_ids: REQ-TW-089, REQ-TW-090
+trace_id: TRACE-TW-064
+verification_id: VER-TW-084
+baseline_ref: fe31df6d9cf8547a57a4cdeb647d2105cdf4f7e3
+verification_artifact_sha256: 5bc9ef8e2a91112e9550ec73c0a6778f2b97314edc9b4ca84721cfccb1d501e2
+workflow_profile_revision: 3
+workflow_profile_hash: sha256:357113a85480e16e849973dcbf2d978964e323329f434a8d4d76eaefa07eb83c
+command: TRACEWEAVER_GRAPHIFY_HELPER=/private/tmp/traceweaver-graphify-helper-not-present scripts/traceweaver-smoke-graphify-wrapper-routing
+expected_result: non-zero negative control when the current helper path is explicitly replaced with a nonexistent path
+actual_result: graphify_wrapper_routing=failed reason=missing_executable_helper helper=/private/tmp/traceweaver-graphify-helper-not-present
+exit_status: 1
+outcome: expected_failure_negative_control
+date: 2026-07-23
+boundary: post-implementation regression negative control; not historical pre-implementation RED evidence

@@ -6,6 +6,8 @@ argument-hint: "[feature description, requirements doc path, or plan path]"
 
 <!-- TRACEWEAVER: file-role=planning-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-036; ver=VER-TW-046 -->
 <!-- TRACEWEAVER: file-role=planning-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
+<!-- TRACEWEAVER: file-role=optional-graphify-planning-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: entrypoint=graphify_planning_orientation; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
 # TraceWeaver Plan
 
@@ -108,6 +110,24 @@ risk candidates, or clarification questions, but it must not approve them.
    PRs, update PRs, claim runtime readiness, or claim publication readiness.
 8. Return the plan with its accepted authority scope, held claims, verification
    targets, next TraceWeaver command, and any unresolved authority gaps.
+
+## Optional Graphify Planning Context
+
+For a repository relationship or impact question, locate the packaged sibling
+`tw-auto/scripts/traceweaver-graphify-advisory` helper and run its scoped search
+before direct source inspection:
+
+```sh
+<skills-root>/tw-auto/scripts/traceweaver-graphify-advisory query --root <project-root> --question "<relationship question>"
+```
+
+The helper may report `installed_uninitialized` and initialize the local code
+graph before searching. Treat `ready` context as a navigation lead that must be
+corroborated against authoritative repository sources. For
+`not_installed`, `no_useful_graph_context`, or `graphify_status=degraded`,
+continue planning from those authoritative sources and include the helper's
+recommendation or failure receipt. Graphify output is derived and is not authority.
+It is not requirements, verification, validation, or a planning gate.
 
 ## Gate Discipline
 

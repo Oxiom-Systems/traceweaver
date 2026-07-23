@@ -8,6 +8,8 @@ description: TraceWeaver adapter for checking whether plans, code, PRs, docs, or
 <!-- TRACEWEAVER: file-role=traceability-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=traceability-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 <!-- TRACEWEAVER: file-role=traceability-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
+<!-- TRACEWEAVER: file-role=optional-graphify-traceability-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: entrypoint=graphify_trace_relationship_search; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
 # TraceWeaver Traceability Check
 
@@ -123,6 +125,18 @@ held-validation boundary.
    stable line anchor.
 11. Record the overall result as `Pass`, `Needs revision`, `Blocked`,
    `Approved gap required`, or `Human decision`.
+
+## Optional Graphify Trace Context
+
+For cross-file trace, impact, path, duplicate, or dark-behavior questions,
+locate the packaged sibling
+`tw-auto/scripts/traceweaver-graphify-advisory` helper and run an applicable
+`path --root`, `affected --root`, or `query --root` search before direct source inspection.
+Confirm any candidate through authoritative requirements, matrix
+rows, source, tests, and evidence. On `graphify_status=degraded`,
+`not_installed`, or `no_useful_graph_context`, continue the normal scanners and
+source inspection and retain the advisory receipt. Graphify output is derived and is not authority.
+It is not a trace row or verification evidence.
 
 ## Highest-Level Handoff Discipline
 

@@ -9,24 +9,26 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `b2555e0b41b984c2d960d20de72fce943878784fa588d78c9384096f5bfc27a8` |
-| `requirements.md` | `091d2f815c6adfa34590b0cd0a9556b52a51470f4062f2fce5faad11e1a2a69e` |
-| `.traceweaver/intent-contract.yml` | `fb81692f19aea895ef0ad3b91d791260ad8ca164b851b380e0b8fc7b301144af` |
+| `traceability-matrix.md` | `cdec63d5be223e55239aec371b1f535d2687d8dec203ac839b3ef2825eed9a44` |
+| `requirements.md` | `7bf9b5be12ba687d61ca8f3c04da18ea18b07a006ce614a091c3dda3c883e7f4` |
+| `.traceweaver/intent-contract.yml` | `7e0fff1c819ae0afc42b64f75548c88e0f714fca4f6c27308b19d1efa69e6012` |
+| `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md` | `c7406e067ddd994077a72fdfdc8dbcb2f9f2dcaec229d170935a540e74637b62` |
+| `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md` | `6a83c1136739926d7c8cbcb3a45ce41c003683d11468c081c4cef802c3b128ab` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
 
 ## Coverage Counts
 
 | View | Count |
 | --- | ---: |
-| requirements | 88 |
-| trace rows | 61 |
-| atp entries | 37 |
-| result records | 38 |
-| verification records | 82 |
-| validation records | 31 |
-| code anchor records | 279 |
-| structured acceptance results | 1 |
-| structured acceptance coverage | 88 |
+| requirements | 90 |
+| trace rows | 62 |
+| atp entries | 38 |
+| result records | 39 |
+| verification records | 83 |
+| validation records | 32 |
+| code anchor records | 291 |
+| structured acceptance results | 3 |
+| structured acceptance coverage | 90 |
 | structured acceptance missing requirements | 87 |
 | structured acceptance non closed requirements | 88 |
 
@@ -34,6 +36,8 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Requirement | Status | Validation | Trace Rows |
 | --- | --- | --- | --- |
+| REQ-TW-090 | Approved for bounded static/advisory wrapper behavior; representative owner validation accepted 2026-07-23; live-host invocation, semantic extraction freshness, global graph mutation, general productivity, merge, release, and deployment held | VAL-TW-032 | TRACE-TW-064 |
+| REQ-TW-089 | Approved for bounded static/advisory wrapper behavior; representative owner validation accepted and exact controlled PR publication authorized 2026-07-23; live-host invocation, provider-backed semantic extraction, graph publication, merge, release, deployment, and the REQ-TW-088 internal mirror held | VAL-TW-032 | TRACE-TW-064 |
 | REQ-TW-088 | Candidate follow-on only; never U0-U7 authority | VAL-TW-031 | TRACE-TW-063 |
 | REQ-TW-087 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-030 | TRACE-TW-063 |
 | REQ-TW-086 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-029 | TRACE-TW-063 |
@@ -44,13 +48,12 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | REQ-TW-081 | Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority | VAL-TW-024 | TRACE-TW-063; TRACE-TW-062 |
 | REQ-TW-080 | Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority | VAL-TW-023 | TRACE-TW-063; TRACE-TW-061 |
 | REQ-TW-079 | Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority | VAL-TW-022 | TRACE-TW-063; TRACE-TW-060 |
-| REQ-TW-078 | Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority | VAL-TW-021 | TRACE-TW-063; TRACE-TW-059 |
-| REQ-TW-077 | Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority | VAL-TW-020 | TRACE-TW-063; TRACE-TW-058 |
 
 ## Latest Trace Rows
 
 | Trace | Requirements | Artifact | Verification | Validation | Status |
 | --- | --- | --- | --- | --- | --- |
+| TRACE-TW-064 | REQ-TW-089; REQ-TW-090 | ART-TW-071 | VER-TW-084 | VAL-TW-032 | Static/advisory implementation complete; focused and regression verification pass; post-verificat... |
 | TRACE-TW-063 | REQ-TW-076; REQ-TW-077; REQ-TW-078; REQ-TW-079; REQ-TW-080; REQ-TW-081; REQ-T... | requirements.md; Intent Contract; matrix; GAP-TW-2026-07-22-008; CHG-TW-2026-07-22-001;... | VER-TW-083 | VAL-TW-025; VAL-TW-026; VAL-TW-027; VAL-TW-028; VAL-TW-02... | Conditionally approved only; no behavior authority until active EXC-TW-011 contains the exact req... |
 | TRACE-TW-062 | REQ-TW-081 | Capability matrix record; Codex discovery record; `fixtures/hooks/host-payloads/{claude... | VER-TW-082 | VAL-TW-024 | Matrix recorded: Claude Code SessionStart+PreToolUse supported; Cursor SessionStart+PreToolUse su... |
 | TRACE-TW-061 | REQ-TW-080 | Historical hook/manifest/fixture evidence was deleted in U5. Current evidence is the ne... | VER-TW-081 | VAL-TW-023 | Superseded historical evidence only; current smoke verifies the deleted default hook, registratio... |
@@ -62,12 +65,12 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | TRACE-TW-055 | REQ-TW-069; REQ-TW-010; REQ-TW-050; REQ-TW-061 | ART-TW-069 | VER-TW-070; VER-TW-071; VER-TW-072 | VAL-TW-017 | Requirements review passed; scoped doc review passed; static wrapper update added; deterministic ... |
 | TRACE-TW-054 | REQ-TW-068 | ART-TW-068 | VER-TW-069 | VAL-TW-016 | Static packaging/install verified / runtime invocation held |
 | TRACE-TW-053 | REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-T... | ART-TW-067 | VER-TW-068; VER-TW-076; VER-TW-077 | VAL-TW-015 | Implementation added; verification passed; scoped review passed; PR #42 merged; 0.2.6 release met... |
-| TRACE-TW-052 | REQ-TW-061; REQ-TW-062; REQ-TW-063; REQ-TW-052; REQ-TW-057; REQ-TW-066; REQ-T... | ART-TW-066 | VER-TW-065 | VAL-TW-014 | Static implementation added; deterministic verification passed; active-host filesystem/hash/promp... |
 
 ## Open Or Held Trace Rows
 
 | Trace | Requirements | Status | Next Step / Debt |
 | --- | --- | --- | --- |
+| TRACE-TW-064 | REQ-TW-089; REQ-TW-090 | Static/advisory implementation complete; focused and regression verification pass; post-verification code/A... | Live-host invocation, runtime enforcement, automatic semantic extraction, provider-key use, global graph mutation, general prod... |
 | TRACE-TW-063 | REQ-TW-076; REQ-TW-077; REQ-TW-078; REQ-TW-079; REQ-TW-080; REQ-TW-081; REQ-T... | Conditionally approved only; no behavior authority until active EXC-TW-011 contains the exact required rece... | Runtime, release, installation, deployment, publication, graph implementation, canonical database, and U7 dogfood remain held |
 | TRACE-TW-062 | REQ-TW-081 | Matrix recorded: Claude Code SessionStart+PreToolUse supported; Cursor SessionStart+PreToolUse supported; C... | Runtime proof remains a separate held gate per supported cell; no manifests/fixtures for non-supported cells; requirement remai... |
 | TRACE-TW-061 | REQ-TW-080 | Superseded historical evidence only; current smoke verifies the deleted default hook, registrations, and fi... | No current PreToolUse behavior, fixture, manifest, or runtime claim; blocking/enforcing and Codex PreToolUse coverage remain held. |
@@ -79,12 +82,13 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | TRACE-TW-055 | REQ-TW-069; REQ-TW-010; REQ-TW-050; REQ-TW-061 | Requirements review passed; scoped doc review passed; static wrapper update added; deterministic smoke pass... | Keep broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous p... |
 | TRACE-TW-054 | REQ-TW-068 | Static packaging/install verified / runtime invocation held | The reviewed 0.2.0 PR/release route is complete; keep website publication, runtime, clean replacement, and future or current re... |
 | TRACE-TW-053 | REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-T... | Implementation added; verification passed; scoped review passed; PR #42 merged; 0.2.6 release metadata prep... | Keep website publication, runtime, clean replacement, automatic CE 3.14.3 `ce-sessions` currentness, upstream-only CE skill pac... |
-| TRACE-TW-052 | REQ-TW-061; REQ-TW-062; REQ-TW-063; REQ-TW-052; REQ-TW-057; REQ-TW-066; REQ-T... | Static implementation added; deterministic verification passed; active-host filesystem/hash/prompt-registry... | Broader runtime behavior, automatic cleanup/removal/merge/deprecation authority, publication, release/package/upstream readines... |
 
 ## Structured Acceptance Results
 
 | Result | Requirement | Disposition | Owner | Next Trigger |
 | --- | --- | --- | --- | --- |
+| SAR-TW-2026-07-23-GRAPHIFY-WRAPPER-REQ-TW-089 | REQ-TW-089 | pass | Oxiom Systems | Wrapper fallback contract change, Graphify installation behavior change, or representative scenario regression. |
+| SAR-TW-2026-07-23-GRAPHIFY-WRAPPER-REQ-TW-090 | REQ-TW-090 | pass | Oxiom Systems | Wrapper lifecycle placement change, Graphify receipt contract change, semantic-refresh claim, or representative scena... |
 | SAR-TW-001 | REQ-TW-066 | partial | Oxiom Systems | Use the pack on the next real closure claim before marking it complete. |
 
 ## Structured Acceptance Coverage Gaps
@@ -116,6 +120,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Validation | Source Need | Result | Evidence |
 | --- | --- | --- | --- |
+| VAL-TW-032 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Passed - owner accepted representative scenario 2026-07-23 | `docs/validation/traceweaver-graphify-wrapper-validation-definition.md`; `docs/validation/traceweaver-graph... |
 | VAL-TW-031 | NEED-TW-003; NEED-TW-005 | Held candidate follow-on | None in this repair |
 | VAL-TW-030 | NEED-TW-001; NEED-TW-005 | Held | U3 focused fixtures |
 | VAL-TW-029 | NEED-TW-001; NEED-TW-003; NEED-TW-005 | Held | U3 focused fixtures |
@@ -123,4 +128,3 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | VAL-TW-027 | NEED-TW-001; NEED-TW-002; NEED-TW-005 | Held | U1/U2 focused fixtures |
 | VAL-TW-026 | NEED-TW-001; NEED-TW-003; NEED-TW-005 | Held | U1 focused fixtures |
 | VAL-TW-025 | NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005 | Held pending Sol ACCEPT | U0 authority records and generated projections |
-| VAL-TW-024 | NEED-TW-002; NEED-TW-005; NEED-TW-007 | Held | `docs/validation/traceweaver-0.3-hook-host-capability-matrix.md`; `docs/validation/traceweaver-0.3-codex-ho... |

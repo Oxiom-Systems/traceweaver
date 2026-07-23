@@ -1,0 +1,18 @@
+# Secrets and local environment
+.env
+.env.*
+*.key
+*.pem
+
+# Generated agent and issue state
+.context/
+.memsearch/
+.worktrees/
+.beads/
+.dolt/
+
+# Dependencies, caches, and generated graph output
+node_modules/
+vendor/
+graphify-out/
+.source-materials/

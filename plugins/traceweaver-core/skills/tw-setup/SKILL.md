@@ -5,6 +5,8 @@ argument-hint: "[setup check, environment issue, or tool diagnostic]"
 ---
 
 <!-- TRACEWEAVER: file-role=setup-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-037; ver=VER-TW-047 -->
+<!-- TRACEWEAVER: file-role=optional-graphify-setup-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: entrypoint=graphify_setup_detection; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
 # TraceWeaver Setup
 
@@ -36,6 +38,21 @@ adding a managed project pointer.
 5. Record Luna availability, choice, rationale, and consequence. Luna is only
    eligible with native child dispatch; otherwise record one
    `luna_dispatch_unavailable` receipt and Terra fallback without investigation.
+
+## Optional Graphify Setup
+
+At repository setup or diagnostics, run `command -v graphify`. When it is
+available, locate the packaged sibling
+`tw-auto/scripts/traceweaver-graphify-advisory` helper and run:
+
+```sh
+<skills-root>/tw-auto/scripts/traceweaver-graphify-advisory initialize --root <project-root>
+```
+
+When it is absent, record `graphify_status=not_installed`, recommend installing
+Graphify for optional repository relationship context, and continue the normal
+setup workflow. When initialization fails, record `graphify_status=degraded`
+and continue from repository sources. Graphify output is derived and is not authority.
 
 ## Boundaries
 

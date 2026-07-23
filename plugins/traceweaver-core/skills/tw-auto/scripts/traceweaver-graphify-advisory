@@ -1,0 +1,235 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=optional-graphify-advisory-helper; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084
+# TRACEWEAVER: entrypoint=graphify_advisory_route; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084
+#
+# Graphify is optional derived navigation context. Operational absence or
+# failure must never block the authoritative TraceWeaver source workflow.
+
+usage() {
+  echo "usage: traceweaver-graphify-advisory <status|initialize|query|affected|path|refresh> --root PATH [arguments]" >&2
+  exit 2
+}
+
+action="${1:-}"
+[[ -n "$action" ]] || usage
+shift
+
+root=""
+question=""
+term=""
+from_node=""
+to_node=""
+changed_files=()
+
+while [[ "$#" -gt 0 ]]; do
+  case "$1" in
+    --root)
+      [[ "$#" -ge 2 ]] || usage
+      root="$2"
+      shift 2
+      ;;
+    --question)
+      [[ "$#" -ge 2 ]] || usage
+      question="$2"
+      shift 2
+      ;;
+    --term)
+      [[ "$#" -ge 2 ]] || usage
+      term="$2"
+      shift 2
+      ;;
+    --from)
+      [[ "$#" -ge 2 ]] || usage
+      from_node="$2"
+      shift 2
+      ;;
+    --to)
+      [[ "$#" -ge 2 ]] || usage
+      to_node="$2"
+      shift 2
+      ;;
+    --changed-file)
+      [[ "$#" -ge 2 ]] || usage
+      changed_files+=("$2")
+      shift 2
+      ;;
+    *)
+      usage
+      ;;
+  esac
+done
+
+[[ -n "$root" ]] || usage
+
+if ! resolved_root="$(cd "$root" 2>/dev/null && pwd -P)"; then
+  echo "graphify_status=degraded"
+  echo "graphify_reason=invalid_repository_root"
+  echo "graphify_authority=derived_context_only"
+  exit 0
+fi
+
+graph_path="$resolved_root/graphify-out/graph.json"
+graphify_bin="${TRACEWEAVER_GRAPHIFY_BIN:-}"
+if [[ -z "$graphify_bin" ]]; then
+  graphify_bin="$(command -v graphify 2>/dev/null || true)"
+fi
+
+receipt_base() {
+  echo "graphify_root=$resolved_root"
+  echo "graphify_graph=$graph_path"
+  echo "graphify_authority=derived_context_only"
+}
+
+not_installed() {
+  echo "graphify_status=not_installed"
+  receipt_base
+  echo "graphify_recommendation=install Graphify to add optional repository relationship context"
+  exit 0
+}
+
+[[ -n "$graphify_bin" && -x "$graphify_bin" ]] || not_installed
+
+run_update() {
+  if (cd "$resolved_root" && "$graphify_bin" update . >/dev/null 2>&1); then
+    echo "graphify_command=graphify update ."
+    [[ -f "$graph_path" ]] || return 1
+    return 0
+  fi
+
+  echo "graphify_command=graphify update ."
+  return 1
+}
+
+ensure_graph() {
+  if [[ -f "$graph_path" ]]; then
+    return 0
+  fi
+
+  echo "graphify_initial_status=installed_uninitialized"
+  echo "graphify_recommendation=initialize the repository code graph before using relationship context"
+  run_update
+}
+
+degraded() {
+  local reason="$1"
+  echo "graphify_status=degraded"
+  receipt_base
+  echo "graphify_reason=$reason"
+  echo "graphify_fallback=continue from authoritative repository sources"
+  exit 0
+}
+
+case "$action" in
+  status)
+    if [[ -f "$graph_path" ]]; then
+      echo "graphify_status=ready"
+    else
+      echo "graphify_status=installed_uninitialized"
+    fi
+    receipt_base
+    if [[ ! -f "$graph_path" ]]; then
+      echo "graphify_recommendation=initialize the repository code graph before using relationship context"
+    fi
+    ;;
+  initialize)
+    if [[ -f "$graph_path" ]]; then
+      echo "graphify_status=ready"
+      receipt_base
+      echo "graphify_initialization=already_present"
+    elif run_update; then
+      echo "graphify_status=ready"
+      receipt_base
+      echo "graphify_initialization=updated"
+    else
+      degraded "initialization_failed"
+    fi
+    ;;
+  query|affected|path)
+    case "$action" in
+      query)
+        [[ -n "$question" ]] || usage
+        ;;
+      affected)
+        [[ -n "$term" ]] || usage
+        ;;
+      path)
+        [[ -n "$from_node" && -n "$to_node" ]] || usage
+        ;;
+    esac
+
+    ensure_graph || degraded "initialization_failed"
+
+    search_output=""
+    search_ok=0
+    case "$action" in
+      query)
+        if search_output="$(cd "$resolved_root" && "$graphify_bin" query "$question" --graph "$graph_path" 2>&1)"; then
+          search_ok=1
+        fi
+        echo "graphify_command=graphify query"
+        ;;
+      affected)
+        if search_output="$(cd "$resolved_root" && "$graphify_bin" affected "$term" --graph "$graph_path" 2>&1)"; then
+          search_ok=1
+        fi
+        echo "graphify_command=graphify affected"
+        ;;
+      path)
+        if search_output="$(cd "$resolved_root" && "$graphify_bin" path "$from_node" "$to_node" --graph "$graph_path" 2>&1)"; then
+          search_ok=1
+        fi
+        echo "graphify_command=graphify path"
+        ;;
+    esac
+
+    [[ "$search_ok" -eq 1 ]] || degraded "search_failed"
+
+    if [[ -z "${search_output//[[:space:]]/}" ]] ||
+      printf '%s\n' "$search_output" |
+        grep -Eiq "^[[:space:]]*No (matching nodes|affected nodes|path|unique node match|node matching)"; then
+      echo "graphify_status=no_useful_graph_context"
+      receipt_base
+      echo "graphify_fallback=continue from authoritative repository sources"
+    else
+      echo "graphify_status=ready"
+      receipt_base
+      echo "graphify_context_begin"
+      printf '%s\n' "$search_output"
+      echo "graphify_context_end"
+      echo "graphify_corroboration=required against authoritative repository sources"
+    fi
+    ;;
+  refresh)
+    if [[ "${#changed_files[@]}" -eq 0 ]]; then
+      echo "graphify_status=not_applicable"
+      receipt_base
+      echo "graphify_reason=no_behavior_or_trace_change"
+      exit 0
+    fi
+
+    semantic_refresh=0
+    for changed_file in "${changed_files[@]}"; do
+      case "$changed_file" in
+        *.md|*.mdx|*.txt|*.yaml|*.yml|*.json|*.pdf|*.png|*.jpg|*.jpeg|*.gif|*.webp)
+          semantic_refresh=1
+          ;;
+      esac
+    done
+
+    run_update || degraded "refresh_failed"
+    receipt_base
+    echo "code_graph_status=updated"
+    if [[ "$semantic_refresh" -eq 1 ]]; then
+      echo "graphify_status=semantic_refresh_held"
+      echo "graphify_reason=changed_semantic_backed_content_not_proven_fresh_by_code_ast_update"
+      echo "graphify_fallback=continue from authoritative repository sources"
+    else
+      echo "graphify_status=ready"
+    fi
+    ;;
+  *)
+    usage
+    ;;
+esac

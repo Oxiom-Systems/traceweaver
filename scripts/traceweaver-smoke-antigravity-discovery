@@ -3,6 +3,8 @@ set -euo pipefail
 
 # TRACEWEAVER: file-role=antigravity-discovery-smoke; req=REQ-TW-068; trace=TRACE-TW-054; ver=VER-TW-069
 # TRACEWEAVER: verifies=VER-TW-069; req=REQ-TW-068; trace=TRACE-TW-054
+# TRACEWEAVER: file-role=optional-graphify-antigravity-discovery-smoke; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084
+# TRACEWEAVER: verifies=VER-TW-084; req=REQ-TW-090; trace=TRACE-TW-064
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_root="$(mktemp -d)"
@@ -112,6 +114,15 @@ for skill in "${expected_skills[@]}"; do
   assert_dir "$skills_root/$skill"
   assert_file "$skills_root/$skill/SKILL.md"
 done
+
+graphify_helper="$skills_root/tw-auto/scripts/traceweaver-graphify-advisory"
+graphify_helper_root="$tmp_root/graphify-helper-root"
+assert_file "$graphify_helper"
+test -x "$graphify_helper"
+mkdir -p "$graphify_helper_root"
+graphify_status="$(TRACEWEAVER_GRAPHIFY_BIN="$tmp_root/not-installed" "$graphify_helper" status --root "$graphify_helper_root")"
+grep -Fq "graphify_status=not_installed" <<<"$graphify_status"
+echo "installed_graphify_advisory_helper=pass"
 
 # Verify unexpected skills do NOT exist in target
 for skill in "${unexpected_skills[@]}"; do

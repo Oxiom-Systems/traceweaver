@@ -10,6 +10,8 @@ argument-hint: "[approved task or plan path]"
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-078; trace=TRACE-TW-059; ver=VER-TW-079 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
+<!-- TRACEWEAVER: file-role=optional-graphify-work-refresh-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: entrypoint=graphify_post_verification_refresh; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
 # TraceWeaver Work
 
@@ -328,6 +330,22 @@ structured pause reason to `tw-auto`. If the helper returns
 `skipped_unresolved_mapping`, keep the recorded JSONL evidence and rerun
 `traceweaver-check-code-anchors --unresolved-mappings <path>` so the unresolved
 mapping blocks acceptance as a structured finding.
+
+## Optional Graphify Post-Verification Refresh
+
+After focused verification passes, and only when the work package changed
+behavior-bearing or trace-bearing artifacts, locate the packaged sibling
+`tw-auto/scripts/traceweaver-graphify-advisory` helper and run `refresh --root
+<project-root>` with one `--changed-file` argument per relevant changed path.
+The helper owns exactly one root-bound `graphify update .` before review handoff.
+Include its root, explicit graph path, command, and outcome in the work receipt.
+
+Graphify failure does not block verification, traceability, or review: record
+`graphify_status=degraded` or `not_installed` and continue from authoritative
+repository sources. If semantic-backed documents changed, retain
+`semantic_refresh_held`; a code/AST update does not prove those documents are
+fresh. Graphify output is derived and is not authority. It is not verification,
+validation, review evidence, or a completion gate.
 
 ## Review-Staging Boundary
 

@@ -1,0 +1,75 @@
+schema_version: tw-workflow-profile/1
+task_id: TraceWeaver-srpk
+profile_revision: 3
+profile_status: implementation_verification_reviews_and_owner_validation_passed_publication_authorized
+escalation_reason: "Revision 2 exhausted its two repair cycles on real Graphify exit-zero no-result message classification. Revision 3 preserves scope, controls, reviewer cap, and repair cap while reviewing a generalized no-result classifier and deterministic query/affected fixtures under a new immutable identity."
+risk: L2
+selection_rationale: "Cross-wrapper routing and optional external CLI integration; no deployment, publication, credentials, data mutation, or external service effect."
+
+process_budget:
+  target_total_effort_percent: 20
+  hard_ceiling_total_effort_percent: 50
+  target_process_to_delivery_ratio_percent: 25
+  hard_ceiling_process_to_delivery_ratio_percent: 100
+  estimated_delivery_minutes: 120
+  estimated_process_target_minutes: 30
+  estimated_process_ceiling_minutes: 120
+
+selected_controls:
+  - requirements_quality_review
+  - authority_gate
+  - full_vv_definition_with_red_evidence
+  - focused_deterministic_smoke
+  - traceability_check
+  - one_independent_code_reviewer
+  - scoped_document_review
+child_roles:
+  builder: { model: "current Codex session", maximum_timebox_minutes: 120 }
+  verifier: { model: "fresh bounded verifier", maximum_timebox_minutes: 20 }
+  reviewer: { model: "independent bounded reviewer", maximum_timebox_minutes: 30 }
+  deployer: { model: "not_applicable", maximum_timebox_minutes: 0 }
+  dogfooder: { model: "not_applicable", maximum_timebox_minutes: 0 }
+model_selection:
+  availability:
+    - "current Codex session"
+    - "fresh bounded verifier"
+    - "independent bounded reviewer"
+  choice: "current Codex session for bounded implementation; fresh bounded verifier for focused verification; independent bounded reviewer for scoped review"
+  rationale: "The change is prompt-contract and deterministic-smoke work; no specialist model or deployment actor is required."
+  unavailable_consequence: "hold or delegate; never implement as fallback"
+reviewer_cap: 1
+repair_cycle_cap: 2
+requires_deploy: false
+requires_chrome_dogfood: false
+
+profile_hash_method: "SHA-256 of canonical UTF-8 JSON containing only task_id, profile_revision, risk, process_budget, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, requires_deploy, and requires_chrome_dogfood; object keys are sorted recursively and array order is preserved"
+profile_hash: "sha256:357113a85480e16e849973dcbf2d978964e323329f434a8d4d76eaefa07eb83c"
+immutable_after_building:
+  fields: [risk, process_budget, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, requires_deploy, requires_chrome_dogfood, profile_hash]
+  expansion_rule: "After the first builder dispatch, create a new profile_revision with escalation_reason; never silently add a control or reviewer."
+
+profile_history:
+  - revision: "1-red-execution"
+    embedded_profile_revision: 1
+    artifact: "docs/plans/2026-07-23-graphify-wrapper-workflow-profile-red-execution.yml"
+    hash: "sha256:46a6b73dfbf222954117ff594151701f269eb43ba2c89dd1e0a3e7a62c231bfe"
+    disposition: "historical RED execution identity; superseded before building when the profile hash method and review identity were corrected"
+  - revision: "1-review"
+    embedded_profile_revision: 1
+    hash: "sha256:44ee587491fd082dd5db7ce8d8d081b5e9b63b5a140e484609eef10405c9a8c9"
+    disposition: "held_no_progress after two RED-smoke matcher repair cycles"
+  - revision: 2
+    hash: "sha256:a1c60cf5ffd7bda229ed2b87e280d57bab870cbd9af5aff21fe8b6cad5eb22bc"
+    disposition: "held_no_progress after two real Graphify no-result classification repair cycles"
+
+accounting:
+  observer: orchestration_harness
+  clock: monotonic
+  child_self_report: advisory_only
+  fixed_categories: [process, delivery, unclassified]
+  unclassified_rule: counts_as_process_until_reviewer_resolves
+  receipts: []
+  terminal_rules:
+    target: "actual_process_minutes <= 0.25 * actual_delivery_minutes"
+    hard_hold: "actual_process_minutes > actual_delivery_minutes => held_process_budget"
+    no_in_task_exception: true

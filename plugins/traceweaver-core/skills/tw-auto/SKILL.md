@@ -8,6 +8,8 @@ disable-model-invocation: false
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-082; req=REQ-TW-083; req=REQ-TW-084 -->
 <!-- TRACEWEAVER: file-role=advisory-profile-router; req=REQ-TW-086; req=REQ-TW-087 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-031; ver=VER-TW-040 -->
+<!-- TRACEWEAVER: file-role=optional-graphify-receipt-router; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: entrypoint=graphify_child_receipt_carry; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
 # TraceWeaver Auto
 
@@ -185,6 +187,20 @@ separate capsule explicitly permits the action.
 For behavior anchors, the implementation child may skip per-artifact ambiguous anchor writes and return `CTA-UNRESOLVED-ANCHOR-MAPPING`; that finding remains
 visible while clear scoped work can continue. It is not permission for the
 master to infer an anchor or claim completion.
+
+## Optional Graphify Receipt Routing
+
+The read-only master must not execute Graphify. It only carries a Graphify receipt
+returned by the child wrapper that owns setup, orientation, diagnosis,
+audit, impact review, traceability analysis, or post-verification refresh. The
+receipt records the resolved root, explicit graph path, observed state,
+operation outcome, source-corroboration boundary, and any
+`semantic_refresh_held` condition.
+
+Missing, empty, or degraded graph context does not change child authority,
+verification, review, or terminal status. The master must preserve the child's
+source-based result and must not turn derived Graphify context into authority,
+evidence, a gate, or a new child task.
 
 ## Review-Staging Closure Loop
 

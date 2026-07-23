@@ -7,6 +7,8 @@ description: TraceWeaver-controlled code review wrapper. Use when reviewing code
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-086; req=REQ-TW-087 -->
+<!-- TRACEWEAVER: file-role=optional-graphify-code-review-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: entrypoint=graphify_review_impact_search; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
 # TraceWeaver Code Review
 
@@ -85,6 +87,19 @@ reviewed change, stop and report the missing authority. Do not run raw
 9. Report code-review findings together with the traceability result, test-first
    evidence, verification evidence, validation path, held claims, and next
    required review or human decision.
+
+## Optional Graphify Review Context
+
+When review scope includes cross-file impact, dependency, call-path, or
+relationship claims, locate the packaged sibling
+`tw-auto/scripts/traceweaver-graphify-advisory` helper and run an applicable
+`affected --root`, `path --root`, or `query --root` search before direct source inspection.
+Verify every candidate against the diff, source, tests, and
+authority evidence before reporting a finding. On
+`graphify_status=degraded`, `not_installed`, or
+`no_useful_graph_context`, continue the review without downgrading its normal
+source-based coverage and retain the receipt. Graphify output is derived and is not authority.
+It is not a review finding or review-pass evidence.
 
 ## Highest-Level Handoff Discipline
 

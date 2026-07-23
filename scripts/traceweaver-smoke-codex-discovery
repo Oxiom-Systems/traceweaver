@@ -9,6 +9,8 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-055; req=REQ-TW-060; trace=TRACE-TW-043
 # TRACEWEAVER: file-role=systems-engineering-audit-install-discovery-smoke; req=REQ-TW-061; trace=TRACE-TW-044; ver=VER-TW-056
 # TRACEWEAVER: verifies=VER-TW-056; req=REQ-TW-061; trace=TRACE-TW-044
+# TRACEWEAVER: file-role=optional-graphify-install-discovery-smoke; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084
+# TRACEWEAVER: verifies=VER-TW-084; req=REQ-TW-090; trace=TRACE-TW-064
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_root="$(mktemp -d)"
@@ -264,6 +266,7 @@ required_skill_local_files=(
   "tw-traceability-check/scripts/traceweaver-check-code-anchors"
   "tw-traceability-check/scripts/traceweaver-author-code-anchors"
   "tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
+  "tw-auto/scripts/traceweaver-graphify-advisory"
 )
 
 codex_home="$tmp_root/codex-home"
@@ -394,6 +397,18 @@ test -x "$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-pu
 test -x "$callable_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
 "$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule" --help >/dev/null
 echo "installed_publication_capsule_validator=pass"
+
+graphify_helper_root="$tmp_root/graphify-helper-root"
+mkdir -p "$graphify_helper_root"
+packaged_graphify_helper="$packaged_skills_root/tw-auto/scripts/traceweaver-graphify-advisory"
+callable_graphify_helper="$callable_skills_root/tw-auto/scripts/traceweaver-graphify-advisory"
+test -x "$packaged_graphify_helper"
+test -x "$callable_graphify_helper"
+packaged_graphify_status="$(TRACEWEAVER_GRAPHIFY_BIN="$tmp_root/not-installed" "$packaged_graphify_helper" status --root "$graphify_helper_root")"
+callable_graphify_status="$(TRACEWEAVER_GRAPHIFY_BIN="$tmp_root/not-installed" "$callable_graphify_helper" status --root "$graphify_helper_root")"
+grep -Fq "graphify_status=not_installed" <<<"$packaged_graphify_status"
+grep -Fq "graphify_status=not_installed" <<<"$callable_graphify_status"
+echo "installed_graphify_advisory_helper=pass"
 
 assert_file "$references_root/traceweaver-model-defaults.md"
 grep -Fq "codex_model: gpt-5.5" "$references_root/traceweaver-model-defaults.md"
