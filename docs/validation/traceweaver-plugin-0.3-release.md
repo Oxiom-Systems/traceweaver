@@ -1,12 +1,31 @@
 # TraceWeaver Plugin 0.3 Release Validation Record
 
-Status: `REPAIR_IN_PROGRESS_STATIC_ARTIFACTS_ONLY_U7_DOGFOOD_REQUIRED_BEFORE_RELEASE_OR_PUBLICATION`
+Status: `ONE_TIME_0_3_0_RELEASE_RATIFIED_BEHAVIORAL_REPAIR_VERIFIED_U7_PROSPECTIVE`
 
 Date/session: 2026-07-22, integration branch
 `codex/traceweaver-0.3-validation-first` (this record prepared on
 `codex/tw03-0.3.0-docs`)
 
 Record ID: `TWCORE-PLUGIN-0.3-RELEASE-VALIDATION-2026-07-22-001`
+
+## Release Ratification
+
+The owner approved the one-time PR, merge, tag, and GitHub release route for
+TraceWeaver Core `0.3.0` under
+`docs/plans/2026-07-23-traceweaver-0.3-repair-amendment-2-release-ratification.md`
+(whole-file SHA-256
+`0b67c4bfeaf23e849a261976011e0f537437170cb2ee370fff4d0d947d8dbf1f`; Sol
+receipt `SOL-AMEND2-2026-07-23-9F1BEAEF`). The repaired behavior is verified,
+but historical or general TraceWeaver overhead is not proven or guaranteed.
+The historical EXC-TW-011 activation remains invalid and is not rewritten.
+Amendment 3 (approved SHA-256
+`2b079a94b94d5878201c5efd0d4badcfd3297682c64f30bdf19ad438465e7e7e`; Sol
+receipt `SOL-AMEND3-2026-07-23-2B079A94`) restores the `tw-auto` planning-child
+route to `tw-plan` while retaining the read-only master and held-claim bounds.
+
+U7/product dogfood is prospective post-release measurement. This release does
+not claim deployment, installation, runtime enforcement, universal-host
+activation, dogfood completion, or an overhead guarantee.
 
 Baseline:
 
@@ -39,11 +58,10 @@ PreToolUse behavior is part of the current product surface.
 This release does **not** claim: any hook firing in a live agent session on
 any host; `traceweaver_mode: enforcing` or any blocking/refusal behavior;
 promotion of REQ-TW-076..081 to `approved`; Codex plugin installation or
-hook-trust registration; or publication, release, package-ready, or
-clean-replacement status. Version manifests remain at `0.2.6`; the version
-bump and `traceweaver-core--v0.3.0` tag occur only at merge-to-main per the
-branching/versioning policy. This record is release preparation, not a
-publication record.
+hook-trust registration; deployment, dogfood completion, package-ready, or
+clean-replacement status. The `0.3.0` version bump and
+`traceweaver-core--v0.3.0` tag occur only through the reviewed merge-to-main
+workflow; this record does not itself claim that publication has completed.
 
 ## Requirements And Review Records
 
@@ -231,20 +249,19 @@ program.
 - Promotion of REQ-TW-076 through REQ-TW-081 from `candidate_for_review` to
   `approved`; no baseline amendment has occurred.
 - Measured product dogfood U7 for VAL-TW-019 through VAL-TW-024; current
-  evidence is fixture-level only. U7 and its separate review must pass before
-  any release, publication, version bump, tag, or release-ready claim.
-- Release, publication, package-ready, release-ready, upstream-ready, clean
+  evidence is fixture-level only. U7 is prospective post-release measurement,
+  not a claim that dogfood has completed.
+- Package-ready, release-ready, upstream-ready, clean
   CE replacement, slash-command support, unconstrained-host support, R31/
   Vestro validation, and autonomous publication, consistent with the
   existing project-wide held-claim baseline.
-- The version bump to `0.3.0` and the `traceweaver-core--v0.3.0` tag; both
-  occur only at merge-to-main per the branching/versioning policy. Version
-  manifests remain at `0.2.6` as of this record.
+- Deployment, installation, universal-host activation, runtime enforcement,
+  and any claim that TraceWeaver overhead is generally reduced, proven, or
+  guaranteed.
 
 ## Suggested Next Step
 
-Run measured product dogfood U7 on one real work item, then obtain a separate
-review of that evidence. Do not open a release PR, bump a version, tag,
-publish, or claim release readiness until U7 is accepted and an owner makes a
-new release decision. Runtime, enforcing, requirement-promotion, and per-host
-hook runtime-proof claims remain held regardless of this record.
+After the one-time `0.3.0` publication completes, run measured product dogfood
+U7 on one real work item and obtain a separate review of that evidence. Runtime,
+enforcing, requirement-promotion, and per-host hook runtime-proof claims remain
+held regardless of this record.

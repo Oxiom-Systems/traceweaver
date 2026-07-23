@@ -35,7 +35,7 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.2.6`
+Plugin version: `0.3.0`
 
 Included skills:
 
@@ -68,11 +68,12 @@ Included skills:
 - `tw-worktree`
 - `tw-update`
 - selected CE-compatible workflow skills refreshed from Compound Engineering
-  `3.12.0`, including `ce-strategy`, `ce-ideate`, `ce-brainstorm`,
+  `3.14.3`, including `ce-strategy`, `ce-ideate`, `ce-brainstorm`,
   `ce-plan`, `ce-work`, `ce-code-review`, `ce-doc-review`, `ce-compound`,
   `ce-resolve-pr-feedback`, `ce-commit`, `ce-commit-push-pr`,
-  `ce-compound-refresh`, `ce-sessions`, `ce-test-browser`, `ce-test-xcode`,
-  `ce-worktree`, `ce-setup`, `ce-debug`, and `lfg`
+  `ce-compound-refresh`, `ce-test-browser`, `ce-test-xcode`, `ce-worktree`,
+  `ce-setup`, `ce-debug`, and `lfg`; `ce-sessions` remains the selected
+  internal compatibility engine held at the prior reviewed surface
 
 Included references:
 
@@ -168,7 +169,7 @@ package. Bump every peer plugin manifest carried by the release:
 - `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.2.6`.
+`traceweaver-core--v0.3.0`.
 
 Tagging and the GitHub Release are automated: when a commit that bumps the
 plugin version lands on `main`, the `Release on version bump` workflow
@@ -209,7 +210,8 @@ only manual step.
   refresh workflows as source evidence, not authority rewrites.
 - `tw-sessions` wraps packaged `ce-sessions`; the older CE 3.5.0
   `ce-session-inventory` and `ce-session-extract` split helpers are not part of
-  the selected 3.12.0 package surface.
+  the selected package surface, and top-level `ce-sessions` currentness with CE
+  3.14.3 remains held.
 - `tw-test-browser` and `tw-test-xcode` wrap packaged verification engines and
   require requirement/trace/verification context for gate-closing evidence.
 - `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree` wrap local repair,
@@ -222,9 +224,12 @@ This alpha installs skills, not slash commands. Slash-command or prompt
 surfaces require a later package record that adds command/prompt files and
 proves they install.
 
-`tw-auto` is a skill entrypoint, not a slash command. It must stop before commit,
-push, or PR creation in this alpha and report the next review, evidence, or
-human authority step.
+`tw-auto` is a skill entrypoint, not a slash command. It must stop before direct
+commit, push, or PR creation, but after all authority, verification, traceability,
+review, tree, target, credential, and confirmation gates pass it may hand the
+exact target to `tw-commit-push-pr`. The publication wrapper remains the sole
+authority owner and issues a validated single-use capsule for the packaged
+publication delegate.
 
 The selected CE-compatible skills are packaged under TraceWeaver's internal
 plugin skill store for wrapper delegation. They are not installed as the normal
@@ -298,7 +303,8 @@ selected packaged CE continuity entrypoints users are expected to call directly:
 `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree`. Packaged
 `ce-sessions` is the selected internal session component; the older CE 3.5.0
 `ce-session-inventory` and `ce-session-extract` split helpers are not part of
-the selected CE 3.12.0 package surface.
+the selected package surface, and CE 3.14.3 currentness for `ce-sessions`
+remains held.
 Runtime-equivalent CE replacement, agent-backed behavior, slash commands, and
 enforcing mode remain held until U9 or a later accepted runtime proof.
 

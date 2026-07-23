@@ -5,7 +5,7 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 5ccecdd12edf5afda27efb91f11d5b1948396325ff3dfcdaf956b8e95bbf6a99
+baseline_hash_sha256: 8ec3480f14c77eeca046b6d85b011b784b7e43434c4be4de216a249252511f9c
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
@@ -19,6 +19,17 @@ u0_repair_draft:
   follow_on_only: REQ-TW-088
   activation_condition: active_EXC_TW_011_with_exact_Sol_ACCEPT_receipt_original_plan_amendment_baseline_branch_base_and_reviewed_semantic_diff_digest
   held_claims: runtime, release, installation, deployment, publication, graph_implementation, canonical_database_authority, product_dogfood
+u0_repair_release_ratification:
+  amendment_path: docs/plans/2026-07-23-traceweaver-0.3-repair-amendment-2-release-ratification.md
+  approved_whole_file_sha256: 0b67c4bfeaf23e849a261976011e0f537437170cb2ee370fff4d0d947d8dbf1f
+  sol_receipt: SOL-AMEND2-2026-07-23-9F1BEAEF
+  status: owner_ratified_one_time_release_authority
+  scope: PR_merge_tag_and_GitHub_release_for_traceweaver_core_0_3_0_only
+  historical_exc_tw_011_activation: not_valid_and_not_retroactively_rewritten
+  canonical_exc_tw_011_digest: a411eec472341b197c0b0a5743cb487d26d6232dfefe1358d501496a4d2cbc2d
+  overhead_claim: behavioral_repair_verified_historical_or_general_overhead_not_proven_or_guaranteed
+  post_release_measurement: U7_and_product_dogfood_prospective_only
+  held_claims: deployment, installation, runtime_enforcement, universal_host_activation, product_dogfood
 current_amendment_id: REQ-AMEND-2026-05-03-001
 current_amendment_review_id: CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001
 current_amendment_authority_status: approved_static_advisory_source_evidence_runtime_held
@@ -2336,7 +2347,40 @@ open_gaps:
     review_gate: U7/U9
     status: held
 
+req_tw_053_gated_publication_release_authority:
+  decision_id: TW-OWNER-DECISION-2026-07-13-GATED-PUBLICATION-001
+  owner: Oxiom Systems
+  decision_source: explicit owner authorization on 2026-07-13
+  status: approved_for_implementation_review_release_and_vestro_dogfood
+  requirements:
+    - REQ-TW-053
+    - REQ-TW-059
+  trace_ids:
+    - TRACE-TW-033
+    - TRACE-TW-040
+  verification_ids:
+    - VER-TW-042
+    - VER-TW-052
+  allowed_scope:
+    - replace the packaged blanket publication hold with a single-use authorization capsule route
+    - keep direct CE invocation blocked
+    - permit exact branch, stage, commit, push, PR create or edit, and separately authorized merge operations only after all gates pass
+    - publish TraceWeaver Core 0.2.8 after review and dogfood the installed candidate
+    - rerun the reviewed Vestro TP publication route and separately authorized PR merges
+  must_not_change:
+    - no force push by default
+    - no stale, failed, split, unreviewed, or target-mismatched publication
+    - no merge without explicit operation authority and live PR gate recheck
+    - no deployment-success claim without downstream verification
+  validation_question: Can an owner publish an exact reviewed target after all TraceWeaver gates pass while direct CE invocation, stale evidence, target drift, missing credentials, and unapproved merges remain blocked?
+  held_claims:
+    - arbitrary autonomous publication without a current authorization capsule
+    - force push
+    - deployment success without downstream evidence
+    - clean CE replacement
+
 next_recommended_steps:
+  - Complete TraceWeaver Core 0.2.8 gated-publication implementation, review, release, reinstall, and Vestro dogfood under `TW-OWNER-DECISION-2026-07-13-GATED-PUBLICATION-001`.
   - Run `/tw-auto continue to the full tw-auto runtime-driver proof` while keeping full driver invocation, publication, release/package, clean replacement, Vestro/R31, unconstrained-host, and CE body-edit claims held unless separately proven.
   - Keep REQ-TW-064 runtime invocation, publication, Vestro/R31 dogfood, release/package/upstream readiness, clean replacement, unconstrained-host support, and CE body edit claims held until their own proof gates pass; active-host filesystem/hash currentness has passed and this scoped status/hash doc review is recorded as `TW-DOC-REVIEW-2026-05-18-REQ-TW-064-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`.
   - Treat the runtime trace-record decision-binding harness patch as reviewed after `TW-CODE-REVIEW-2026-05-18-TW-AUTO-RUNTIME-TRACE-RECORD-DECISION-BINDING-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-18-TW-AUTO-RUNTIME-TRACE-RECORD-DECISION-BINDING-STATUS-HASH-CLEAN-001` and full runtime-driver behavior remains held.

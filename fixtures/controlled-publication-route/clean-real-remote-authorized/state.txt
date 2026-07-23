@@ -1,0 +1,19 @@
+# TRACEWEAVER: verifies=VER-TW-042; req=REQ-TW-053; trace=TRACE-TW-033
+case_id=clean_real_remote_authorized
+authority_status=current
+trace_status=complete
+verification_status=passed
+review_status=clean
+authority_tree_status=clean
+staged_tree_status=coherent
+target_status=confirmed
+credential_status=verified
+remote_status=verified
+human_confirmation=confirmed
+capsule_file=${TRACEWEAVER_PUBLICATION_CAPSULE:?}
+context_file=${TRACEWEAVER_PUBLICATION_CONTEXT:?}
+ledger_path=${TRACEWEAVER_PUBLICATION_LEDGER:?}
+repo_path=${TRACEWEAVER_PUBLICATION_REPO:?}
+publication_mode=real_remote
+expected_status=allowed
+expected_reason=real_remote_publication

@@ -1,4 +1,4 @@
-# TraceWeaver Roadmap: 0.3.x -> 0.4+ (2026-07-22)
+# TraceWeaver Roadmap: 0.3.x -> 0.4+ (2026-07-23)
 
 Status: controlled planning input only. This is not an approved requirement,
 not an authority record, and not an Intent Contract entry. It sequences
@@ -12,9 +12,17 @@ Source basis: `requirements.md` REQ-TW-076..081; the 0.3 owner-direction,
 capability-matrix, requirements-review, and doc-review records under
 `docs/validation/`; `traceability-matrix.md` rows
 TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
-`docs/validation/traceweaver-plugin-0.3-release.md`.
+`docs/validation/traceweaver-plugin-0.3-release.md`. The one-time 0.3.0
+publication route is separately owner-ratified by
+`docs/plans/2026-07-23-traceweaver-0.3-repair-amendment-2-release-ratification.md`
+(approved SHA-256 `0b67c4bfeaf23e849a261976011e0f537437170cb2ee370fff4d0d947d8dbf1f`,
+Sol receipt `SOL-AMEND2-2026-07-23-9F1BEAEF`). It does not make the historical
+EXC-TW-011 activation valid. Amendment 3 (approved SHA-256
+`2b079a94b94d5878201c5efd0d4badcfd3297682c64f30bdf19ad438465e7e7e`, Sol
+receipt `SOL-AMEND3-2026-07-23-2B079A94`) narrowly restores the required
+`tw-auto` -> `tw-plan` route without broadening the release authority.
 
-## Now — Measured Product Dogfood Gate (U7)
+## Now — Post-Release Prospective Measurement (U7)
 
 1. **Dogfood `tw-vv-define` on one real work item.** VAL-TW-019 through
    VAL-TW-024 currently have fixture-level evidence only (per
@@ -24,9 +32,8 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
    (not just fixture) RED evidence, a real `docs/validation/` validation
    definition artifact, a real capsule handoff, and a passed
    `tw-code-review`/`tw-doc-review` pair, so VAL-TW-019..024 can cite
-   real-use evidence instead of fixtures alone. This is U7 and is a hard
-   prerequisite for any release, publication, version bump, tag, or release-
-   ready claim.
+   real-use evidence instead of fixtures alone. This is prospective post-release
+   measurement, not evidence that the 0.3.0 publication has completed dogfood.
 2. **Promote REQ-TW-076..081 from `candidate_for_review` to `approved`.**
    Both requirements-quality review (`docs/validation/traceweaver-0.3-req-
    076-081-requirements-review.md`) and scoped doc review
@@ -36,16 +43,17 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
    with how REQ-TW-070..075 were promoted in the 0.2.5 cycle. This is a
    `tw-requirements-review`/`tw-authority-gate` gate, not a code change.
 
-## Only After U7 — Controlled Release Route
+## One-Time 0.3.0 Release Route
 
-3. **Controlled PR and release decision.** After U7 has measured product
-   dogfood evidence and its separate review accepts that evidence, a project
-   owner may decide whether to open a controlled feature-branch PR into
-   `main`. That decision is not authorized by this roadmap.
-4. **Version bump, tag, and publication evidence.** Only after the U7 gate
-   and an explicit release decision: bump manifests, create the version tag,
-   and record publication evidence. Until then versions remain unchanged and
-   there is no release-ready or publication claim.
+3. **Controlled PR, merge, tag, and release.** Amendment 2 is the sole
+   authority for this exact `0.3.0` route. It permits the reviewed integration
+   branch to merge through the controlled 0.2.8 publication route; the
+   version-bump workflow then creates `traceweaver-core--v0.3.0` and its GitHub
+   release. It does not authorize deployment, installation, runtime enforcement,
+   universal-host activation, dogfood completion, or a general overhead claim.
+4. **Future release decisions.** A later release requires its own authority and
+   evidence; Amendment 2 is neither reusable publication authority nor a
+   release-ready claim.
 
 ## Later Runtime Proof Gates
 
@@ -117,10 +125,9 @@ TRACE-TW-057..062/VER-TW-077..082/VAL-TW-019..024; and
 
 ## Suggested Next Step
 
-Start with item 1: measured U7 product dogfood on one real work item. Do not
-open a PR, bump a version, tag, publish, or claim release readiness before its
-separate review accepts the dogfood evidence and an owner makes a new release
-decision. In parallel, item 2 can proceed through its separate
+After the one-time 0.3.0 release, start with item 1: measured U7 product dogfood
+on one real work item. In parallel, item 2 can proceed through its separate
 `tw-requirements-review`/`tw-authority-gate` gate. Runtime, enforcing, and
 Codex-installation claims remain held; no roadmap item pre-authorizes their
-implementation.
+implementation or turns historical repair evidence into a guaranteed overhead
+result.

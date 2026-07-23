@@ -1,0 +1,24 @@
+# TRACEWEAVER: file-role=publication-capsule-fixture; verifies=VER-TW-042; req=REQ-TW-053; trace=TRACE-TW-033
+schema_version: 1
+capsule_type: publication
+issued_by: tw-commit-push-pr
+issued_at: "2026-07-13T00:00:00Z"
+expires_at: "2026-07-14T00:00:00Z"
+run_id: PUB-FIXTURE-001
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_hash: fixture-baseline-hash
+traceability_evidence_ids: [TRACE-TW-033]
+verification_evidence_ids: [VER-TW-042]
+clean_review_evidence_ids: [TW-CODE-REVIEW-FIXTURE-CLEAN]
+reviewed_tree_sha256: fixture-tree-sha256
+file_scope: [src/a.rb, test/a_test.rb]
+repo_identity: Oxiom-Systems/traceweaver
+repo_path: /fixture/repository
+remote_name: origin
+remote_url: https://github.com/Oxiom-Systems/traceweaver.git
+base_branch: main
+head_branch: codex/gated-publication-fixture
+expected_starting_ref: fixture-start-ref
+allowed_operations: [branch, stage, commit, push, pr_create]
+credential_identity: jjziets
+human_confirmation_id: TW-OWNER-FIXTURE-001

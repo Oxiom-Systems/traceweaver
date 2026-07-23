@@ -1,0 +1,266 @@
+trace_record_id: TW-TRACE-RECORD-2026-06-24-CE-3.14.3-SELECTED-REFRESH-HOLD-SESSIONS-001
+date: 2026-06-24
+owner: Oxiom Systems
+record_type: ce_source_refresh
+status: ce_selected_surface_refreshed_to_3_14_3_pr_readiness_closure_passed_publication_held
+
+scope:
+  requirements:
+    - REQ-TW-017
+    - REQ-TW-018
+    - REQ-TW-021
+    - REQ-TW-029
+    - REQ-TW-041
+    - REQ-TW-043
+    - REQ-TW-051
+    - REQ-TW-052
+    - REQ-TW-059
+  trace:
+    - TRACE-TW-005
+    - TRACE-TW-009
+    - TRACE-TW-046
+  verification:
+    - VER-TW-009
+    - VER-TW-010
+
+authority:
+  baseline: requirements.md
+  intent_contract: .traceweaver/intent-contract.yml
+  source_pin: plugins/traceweaver-core/references/ce-upstream-source-inventory.md
+  inventory: docs/validation/traceweaver-core-11-ce-runtime-inventory.md
+  allowed_use: >
+    Static selected CE package-refresh evidence only. This record supports the
+    refreshed selected-file hashes and closure audit. It does not authorize
+    clean replacement, runtime-equivalent CE behavior, package-ready status,
+    release-ready status, upstream-ready status, tag/release creation, PR
+    publication, deploy, or autonomous publication claims.
+
+source_pin_change:
+  from_version: 3.12.0
+  from_tag: compound-engineering-v3.12.0
+  from_commit: 4719dc509fdc45656a830e3ed6060f674e206076
+  to_version: 3.14.3
+  to_tag: compound-engineering-v3.14.3
+  to_commit: e176a6db46b3de9c4e724a3ab5d7dd1d0bf60a33
+  observed_upstream_main_commit: 1284290af27139c2df192488099626688fd4898b
+  repository: https://github.com/EveryInc/compound-engineering-plugin
+  license: MIT
+  capture_date: 2026-06-24
+  source_tree_entries: 527
+  regular_file_count: 526
+  symlink_count: 1
+  skills_file_count: 196
+  skill_local_agent_persona_reference_count: 57
+  full_regular_file_aggregate_fingerprint: eaea83aa1ba3c5cdc43f6710a595b038d9193ad841ba59441230c1c61dab9994
+
+selected_surface:
+  selected_skill_support_files: 151
+  refreshed_or_overlaid_files: 143
+  held_ce_sessions_files: 8
+  legacy_standalone_agent_files_retained: 43
+  selected_dirs_refreshed:
+    - ce-brainstorm
+    - ce-code-review
+    - ce-commit
+    - ce-commit-push-pr
+    - ce-compound
+    - ce-compound-refresh
+    - ce-debug
+    - ce-doc-review
+    - ce-ideate
+    - ce-plan
+    - ce-resolve-pr-feedback
+    - ce-setup
+    - ce-strategy
+    - ce-test-browser
+    - ce-test-xcode
+    - ce-work
+    - ce-worktree
+  selected_dirs_held:
+    - ce-sessions
+  traceweaver_aliases_preserved:
+    - lfg
+  upstream_only_skills_held:
+    - ce-dogfood-beta
+    - ce-optimize
+    - ce-polish
+    - ce-product-pulse
+    - ce-promote
+    - ce-proof
+    - ce-riffrec-feedback-analysis
+    - ce-simplify-code
+    - ce-work-beta
+    - upstream-lfg
+
+method:
+  approach: three_way_merge
+  base: compound-engineering-v3.12.0
+  theirs: compound-engineering-v3.14.3
+  ours: TraceWeaver packaged CE surface with TraceWeaver overlays
+  added_upstream_files: 60
+  clean_updates: 32
+  removed_upstream_files: 1
+  conflicts_resolved_with_traceweaver_boundaries:
+    - skills/ce-brainstorm/references/handoff.md
+    - skills/ce-brainstorm/references/universal-brainstorming.md
+    - skills/ce-commit/SKILL.md
+    - skills/ce-commit-push-pr/SKILL.md
+    - skills/ce-compound-refresh/SKILL.md
+    - skills/ce-debug/SKILL.md
+    - skills/ce-plan/SKILL.md
+    - skills/ce-plan/references/plan-handoff.md
+    - skills/ce-plan/references/universal-planning.md
+    - skills/ce-resolve-pr-feedback/SKILL.md
+    - skills/ce-resolve-pr-feedback/references/full-mode.md
+    - skills/ce-resolve-pr-feedback/references/targeted-mode.md
+    - skills/ce-worktree/SKILL.md
+  explicit_holds_preserved:
+    - ce-proof publication is not packaged in TraceWeaver alpha routes.
+    - Direct issue creation from ce-plan remains draft-only.
+    - Direct ce-work starts from ce-plan route through tw-authority-gate first.
+    - ce-commit and ce-commit-push-pr stop before branch mutation, staging, commit, push, PR creation, PR update, and remote gh mutation.
+    - ce-resolve-pr-feedback PR reply/resolve scripts remain draft-only.
+    - TraceWeaver lfg delegates to tw-auto instead of upstream raw CE autopilot.
+
+verification_observed:
+  - result: pass
+    command: git fetch/upstream tag inspection
+    observed: compound-engineering-v3.14.3 at e176a6db46b3de9c4e724a3ab5d7dd1d0bf60a33; upstream main at 1284290af27139c2df192488099626688fd4898b
+  - result: pass
+    command: selected merge dry run
+    observed: 60 adds, 32 updates, 1 delete, 8 content conflicts resolved with TraceWeaver package boundaries
+  - result: pass
+    command: ruby scripts/traceweaver-audit-ce-closure
+    observed: skill_entrypoints=18; selected_ce_files_scanned=149; support_references_checked=90; missing=none; untracked=none
+  - result: pass
+    command: scripts/traceweaver-generate-traceability-views --root .
+    observed: traceability_generated_views=pass; sources=traceability-matrix.md,requirements.md,.traceweaver/intent-contract.yml,docs/validation/traceweaver-system-acceptance-results.md
+  - result: pass
+    command: scripts/traceweaver-smoke-traceability-generated-views
+    observed: traceability_generated_views_smoke=pass; compared=traceability-dashboard.md,traceability-data.json,traceability-graph.mmd
+  - result: pass
+    command: scripts/traceweaver-smoke-code-traceability
+    observed: code_traceability_smoke=pass
+  - result: pass
+    command: TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior
+    observed: tw_skill_behavior_smoke=pass; active host CE selected skill hashes remain stale relative to repo for refreshed CE skills; ce-sessions repo and host hash match because ce-sessions was held
+  - result: pass
+    command: scripts/traceweaver-smoke-controlled-publication
+    observed: controlled_publication_route_smoke=pass; controlled_publication_no_external_mutation=pass
+  - result: pass
+    command: scripts/traceweaver-smoke-no-publication
+    observed: no_publication_smoke=pass; reply/resolve helpers blocked_before_gh; publication_stop_static_markers=present
+  - result: pass
+    command: git diff --check
+    observed: no whitespace errors
+  - result: pass
+    command: claude plugin validate --strict plugins/traceweaver-core
+    observed: Validation passed for plugins/traceweaver-core/.claude-plugin/plugin.json
+  - result: pass
+    command: conflict-marker scan
+    observed: no `<<<<<<<` or `>>>>>>>` markers under selected CE skills
+  - result: pass
+    command: scoped implementation-mode code-anchor scan
+    observed: code_traceability_status=pass; code_traceability_targets=plugins/traceweaver-core/references/ce-upstream-source-inventory.md; code_traceability_findings=0; selected imported CE paths covered by CE closure audit
+  - result: pass
+    command: native Codex review subagents
+    observed: initial correctness P1 fixed; project-standards artifact exclusion bounded; doc coherence currentness findings fixed; focused correctness and doc coherence re-reviews clean
+  - result: pass
+    command: scoped PR-ready file boundary generation
+    observed: pr_ready_staging_files=107; excluded_untracked_artifacts=1; pycache_in_staging=0; session_history_files=4; artifacts/social/traceweaver-html5-slides/animated-render/traceweaver-prompt-to-proof-html5-animated-video.mp4 excluded
+  - result: pass
+    command: PR 44 CodeQL stored-XSS repair
+    observed: plugins/traceweaver-core/skills/ce-brainstorm/scripts/visual-probe-server.js now keeps stored screen HTML and screen metadata out of the server-rendered page, loads screen payloads through JSON into a sandboxed iframe boundary, blocks direct /files/*.html serving, and records refreshed selected-file hash 48b89b552efa8657a0dc6b9a01a489885f24e114db54a8dc4264f90038a803b3
+
+pr_readiness_closure:
+  date: 2026-06-24
+  mode: tw_auto_post_work_review_closure
+  result: ready_for_controlled_pr_route_no_publication
+  scoped_file_boundary:
+    prepared_file_list: /tmp/tw-pr-ready-staging-files.txt
+    scoped_file_count: 107
+    excluded_untracked_artifacts:
+      - path: artifacts/social/traceweaver-html5-slides/animated-render/traceweaver-prompt-to-proof-html5-animated-video.mp4
+        reason: pre_existing_unrelated_artifact_outside_selected_ce_refresh_scope
+    pycache_in_staging: 0
+    removed_generated_cache:
+      - plugins/traceweaver-core/skills/ce-compound/scripts/session-history/__pycache__
+    scoped_new_support_files:
+      - plugins/traceweaver-core/skills/ce-compound/scripts/session-history/discover-sessions.sh
+      - plugins/traceweaver-core/skills/ce-compound/scripts/session-history/extract-errors.py
+      - plugins/traceweaver-core/skills/ce-compound/scripts/session-history/extract-metadata.py
+      - plugins/traceweaver-core/skills/ce-compound/scripts/session-history/extract-skeleton.py
+  review_coverage:
+    native_codex_subagents_used: true
+    first_pass_correctness: P1 direct ce-work commit and shipping path repaired
+    first_pass_project_standards: P2 unrelated artifact risk bounded by exact scoped file list and artifact exclusion
+    first_pass_doc_coherence: stale CE 3.5.0 and review-next language repaired
+    focused_correctness_rereview: clean for repaired ce-work publication holds
+    focused_doc_coherence_rereview: clean for controlled PR route with exact scoped staging
+    main_thread_checks: generated views, code anchors, CE closure audit, no-publication smoke, controlled-publication smoke, YAML parse, plugin validation, and diff whitespace checks passed
+    limitations: reviewers were read-only and did not mutate files; active-host runtime currentness remains held
+  held_after_closure:
+    - active-host selected CE currentness for refreshed CE skills
+    - ce-sessions currentness with CE 3.14.3
+    - upstream-only CE 3.14.3 skill packaging or wrapping
+    - runtime-equivalent CE behavior
+    - clean CE replacement
+    - enforcing mode
+    - slash-command behavior
+    - package-ready status
+    - release-ready status
+    - upstream-ready status
+    - tag, release, deploy, or publication beyond the controlled draft PR route
+    - autonomous publication
+
+held_claims:
+  - ce-sessions currentness with CE 3.14.3
+  - upstream-only CE 3.14.3 skill packaging or wrapping
+  - runtime-equivalent CE behavior
+  - clean CE replacement
+  - enforcing mode
+  - slash-command behavior
+  - package-ready status
+  - release-ready status
+  - upstream-ready status
+  - tag, release, deploy, or publication beyond the controlled draft PR route
+  - autonomous publication
+
+publication_route_preflight:
+  date: 2026-06-25
+  mode: tw_commit_push_pr_controlled_route
+  result: ready_for_controlled_draft_pr_route
+  branch: codex/ce-3.14.3-selected-refresh-hold-sessions
+  remote: origin
+  base: main
+  staged_file_count: 107
+  excluded_untracked_artifacts:
+    - artifacts/social/traceweaver-html5-slides/animated-render/traceweaver-prompt-to-proof-html5-animated-video.mp4
+  allowed_publication_action: draft_pr_only
+  held_claims:
+    - tag
+    - release
+    - deploy
+    - release-ready
+    - package-ready
+    - runtime-driver
+    - clean-replacement
+    - active-host selected CE currentness for refreshed CE skills
+    - ce-sessions currentness with CE 3.14.3
+    - publication beyond the controlled draft PR route
+  codeql_followup:
+    date: 2026-06-25
+    pr: 44
+    alert: stored cross-site scripting in ce-brainstorm visual probe server
+    file: plugins/traceweaver-core/skills/ce-brainstorm/scripts/visual-probe-server.js
+    mitigation: stored screen HTML and metadata are not embedded in the server-rendered page; the client loads screen payloads from JSON into a sandboxed iframe srcdoc; direct HTML file serving from /files is blocked
+    selected_file_hash_sha256: 48b89b552efa8657a0dc6b9a01a489885f24e114db54a8dc4264f90038a803b3
+
+next_step: >
+  The local package is ready for the controlled PR route only. Next command:
+  /tw-commit-push-pr "prepare controlled PR route for selected CE 3.14.3
+  refresh; stage only files listed in the scoped PR-ready file set; exclude
+  artifacts/social/traceweaver-html5-slides/animated-render/traceweaver-prompt-to-proof-html5-animated-video.mp4;
+  no tag, release, deploy, release-ready, package-ready, runtime-driver,
+  clean-replacement, or publication claims beyond the draft PR route unless
+  explicitly approved"

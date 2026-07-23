@@ -5,8 +5,9 @@ argument-hint: "[task or accepted plan path]"
 disable-model-invocation: false
 ---
 
-<!-- TRACEWEAVER: file-role=advisory-profile-router; req=REQ-TW-082; req=REQ-TW-083; req=REQ-TW-084 -->
+<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-082; req=REQ-TW-083; req=REQ-TW-084 -->
 <!-- TRACEWEAVER: file-role=advisory-profile-router; req=REQ-TW-086; req=REQ-TW-087 -->
+<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-031; ver=VER-TW-040 -->
 
 # TraceWeaver Auto
 
@@ -79,19 +80,138 @@ next-child projection. At terminal evaluation,
 Whenever `actual_process_minutes > actual_delivery_minutes`, return
 `held_process_budget`, including delivery underrun. No in-task exception exists.
 
+## Planning-Wrapper Route
+
+Before any V&V or builder dispatch, the read-only master must route meaningful
+work through a named planning child running `tw-plan`; it must not invoke raw
+`ce-plan` directly or synthesize an implementation plan itself. Freeze the
+selected profile revision/hash, permitted child roles, and selected model before
+creating that planning capsule. The capsule must bind the baseline/authority
+identity, requested scope, verification method, validation question, and held
+claims to the same frozen profile used by later children.
+
+The `tw-plan` child performs the requirements-quality and authority preflight,
+then may delegate planning to the TraceWeaver-packaged `ce-plan` engine under
+its own no-publication boundary. It returns either an authority-held result or a
+plan whose accepted scope, verification/validation intent, and held claims are
+bound to the frozen profile. The master records the child receipt and may route
+proportional V&V only after that result is passable. A failed, unclear, stale,
+or broadened planning result returns a held state; the master does not repair,
+reinterpret authority, or bypass `tw-plan`.
+
+## V&V Definition Phase
+
+After a passable `tw-plan` result and before a builder or authority handoff, the
+master dispatches a profiled `tw-vv-define` child. L0 records that V&V is not
+applicable without exception ceremony; L1 creates one compact work-item capsule
+with focused verification and one validation question; L2/L3 create the full
+v1 capsule with L3 high-risk controls. The `tw-vv-define` child returns the
+reviewed capsule and RED evidence reference bound to the frozen profile.
+
+Only then may the master route the resolved `tw-authority-gate` child for the
+specific builder handoff. Missing, unreviewed, or mismatched V&V evidence is a
+held result; it never permits the master to implement, weaken the preflight, or
+claim runtime enforcement.
+
+## Delegated Workflow Routes
+
+The master selects only the frozen, profile-permitted child route below. It
+does not perform that route's work itself, and a child may not broaden the
+approved scope, mutate authority, publish, deploy, or dogfood unless its
+separate capsule explicitly permits the action.
+
+- For unclear product direction, route a source-evidence child to `tw-strategy`
+  before `tw-brainstorm`; for ideation requests, route `tw-ideate` before
+  `tw-grill` or `tw-brainstorm`. An already approved implementation request may
+  skip those source-evidence routes. Never invoke raw CE strategy or ideation.
+- For a project assessment, route `tw-audit`; for unclear, contradictory, or
+  changed requirements, route `tw-requirements-review` and/or
+  `tw-authority-gate`. The master must not edit, reinterpret, or silently broaden requirements; when authority cannot be resolved, pause the loop and ask the stakeholder for the required decision.
+- Use the planning child `tw-plan`, then the profile-proportional V&V child,
+  then `tw-work` for a capsule-bounded implementation child. `tw-work` may use
+  its packaged CE implementation engine, but the master never implements as a
+  fallback.
+- Route behavior/authority evidence to `tw-traceability-check`; route
+  investigation to `tw-debug`; route learning evidence to `tw-compound` or
+  `tw-compound-refresh`; route historical-session evidence to `tw-sessions`;
+  and route browser or Xcode verification only to `tw-test-browser` or
+  `tw-test-xcode` with requirement, trace, and verification IDs. Unlinked
+  verification is exploratory or held, not completion evidence.
+- Route code findings to `tw-code-review`, authority/document findings to
+  `tw-doc-review`, and review feedback to `tw-resolve-pr-feedback`. A bounded finding repair is a new frozen child capsule; it never authorizes the master
+  to repair code or authoring evidence itself.
+- Route project bootstrap/diagnostics to `tw-setup` and isolated local workspace
+  setup to `tw-worktree`. Host mutation, commits, pushes, PRs, tags, releases,
+  deployments, and dogfood require their own authority and child role.
+- `tw-commit` and `tw-commit-push-pr` are publication routes only. This master
+  returns their held boundary and never stages, commits, pushes, opens a PR,
+  tags, releases, or mutates a remote.
+
+For behavior anchors, the implementation child may skip per-artifact ambiguous anchor writes and return `CTA-UNRESOLVED-ANCHOR-MAPPING`; that finding remains
+visible while clear scoped work can continue. It is not permission for the
+master to infer an anchor or claim completion.
+
+## Review-Staging Closure Loop
+
+After a child changes an approved work package, the master routes its bounded
+traceability, code-review, and document-review children in profile order. The
+master does not review; it carries only the frozen identity and receipts.
+
+### Artifact-identity blockers
+
+Review staging is allowed only after the relevant evidence is present in the
+exact scoped file list and the review identity is coherent. Untracked authority
+or plan files, split authority/evidence identities, or blocking findings return
+held. The master records the clean review once when that identical review passes;
+it does not repeat a clean review without a changed identity. A
+housekeeping-only repair may run once within the frozen repair cap, but the
+master must not review-stage around real blockers.
+
+## Post-Work Review Closure
+
+The master treats a successful `tw-work` return as a transition, not a terminal
+state. Unless an authority or verification blocker is returned, continue after
+the implementation child. Run or require `tw-traceability-check` through its
+named child, then Run `tw-code-review` through its review child for
+behavior-bearing changes. Run scoped `tw-doc-review` only when authority, plan,
+matrix, status, hash, validation, or review evidence changed. These are child
+routes, not user handoffs; returning only a manual review command is a post-work closure regression.
+
+An explicit stop override such as "stop after implementation" stops those child
+routes, reports review as held, and forbids a done or release-ready claim.
+The publication-boundary wording such as "stop before commit/push/PR" is not that
+override: review closure continues, then the master holds publication. It must not end with only the implementation summary; it returns the receipt facts, held boundary, and highest permitted next route.
+
+## Approval-Only Stop Handoff
+
+When the request is approval-only, the master records an approval-only authority stop and does not dispatch implementation. It returns the explicit boundary, authority state, and the highest-level next wrapper command that continues from the approved authority, or the human blocker when no child may proceed.
+
+## Closure-Claim Validation Loop
+
+For a request, plan, receipt, or review that uses complete, done, or accepted wording, the master routes the claim through the `tw-work` child, the structured acceptance result checker, `tw-traceability-check`, and the scoped review child. The required result must identify the requirement, evidence, owner, boundary, and next trigger. If the acceptance result is missing, invalid, or held, refuse complete/done/accepted wording and return a held validation receipt; creating runtime artifacts or treating fixture evidence as live proof remains held.
+
+## Highest-Level Handoff Discipline
+
+Normal flow keeps gates embedded in their owning wrapper: do not emit a lower
+gate as a substitute for an executable child route. Standalone
+`tw-requirements-review`, `tw-authority-gate`, or `tw-traceability-check` is
+reserved for the diagnostic or authority exceptions above. Every terminal receipt
+names the next permitted wrapper or the held condition.
+
 ## Routing
 
-1. Load approved authority and select/freeze the profile.
-2. Create only the bounded capsule(s) permitted by its child roles and caps.
-3. Dispatch a child; record harness dispatch/return receipts and apply the
-   projection guards before every dispatch.
-4. Route proportional V&V before a builder: L0 has no capsule and no exception
+1. Load approved authority, select/freeze the profile, permitted child roles,
+   and selected model, then create only the bounded capsules allowed by them.
+2. Dispatch the planning child to `tw-plan`; record its dispatch/return receipt
+   and apply the projection guards before every dispatch.
+3. After a passable `tw-plan` result, route proportional V&V before a builder:
+   L0 has no capsule and no exception
    ceremony; L1 routes one compact work-item capsule with focused verification
    and one validation question; L2/L3 route the full v1 capsule, with L3
    high-risk controls. Route a builder capsule to `tw-work`; route
    verification, review, authorized deployment, and dogfood only to their
    profiled child roles.
-5. At a hold, cap, unavailable-model, immutable-profile, or budget breach,
+4. At a hold, cap, unavailable-model, immutable-profile, or budget breach,
    return the precise held/refusal result. Do not expand the profile or take over
    child work.
 

@@ -2,79 +2,95 @@
 
 # Changelog
 
-## 0.3.0 - 2026-07-22
+## 0.3.0 - 2026-07-23
 
-Validation-first V&V program: insert a mandatory, reviewed V&V definition
-phase between an accepted plan and implementation for behavior-bearing work
-(REQ-TW-076..081), so intent is validated before implementation exists
-instead of only at closure. Static/advisory implementation only; runtime,
-enforcing, and per-host hook-firing claims remain held.
+Owner-ratified repair release for the TraceWeaver Core 0.3 behavioral surface.
+This release is authorized only by
+`docs/plans/2026-07-23-traceweaver-0.3-repair-amendment-2-release-ratification.md`
+(approved SHA-256 `0b67c4bfeaf23e849a261976011e0f537437170cb2ee370fff4d0d947d8dbf1f`,
+Sol receipt `SOL-AMEND2-2026-07-23-9F1BEAEF`). It preserves the 0.2.8
+gated-publication route and does not rewrite the historically invalid
+EXC-TW-011 activation.
 
-Note: the version bump and `traceweaver-core--v0.3.0` tag happen at
-merge-to-main per the branching/versioning policy; this entry is prepared on
-the `codex/traceweaver-0.3-validation-first` integration branch ahead of that
-route, and version manifests remain at 0.2.6 until the merge-to-main bump.
+### Changed
 
-### Added
-
-- New `tw-vv-define` skill owning the V&V definition phase: it produces
-  reviewed RED verification artifacts plus a `docs/validation/`
-  validation-definition artifact and hands a `tw-vv-capsule/1` capsule
-  (REQ/TRACE/VER/VAL IDs, artifact paths, RED evidence location) to
-  `tw-work`, without itself claiming implementation authority
-  (REQ-TW-076/077).
-- Capsule validator `traceweaver-check-vv-capsule` with schema, identity,
-  root-containment, and review-status hardening, plus a
-  `--require-review-passed` mode and the `tw-vv-capsule/1` schema consumed by
-  the PreToolUse hook.
-- `tw-work` hard V&V preflight: refuses to mutate behavior-bearing files
-  without a review-passed, matrix-linked V&V definition capsule and recorded
-  RED evidence, or a recorded scoped not-applicable decision/approved
-  exception (REQ-TW-078). This upgrades the prior advisory REQ-TW-065
-  test-first gate from work-time evidence to a prerequisite reviewed
-  artifact. Static/advisory policy-text and fixture evidence only; runtime
-  refusal/enforcement remains held.
-- `tw-plan` and `tw-auto` routing updated so accepted plans go through
-  `tw-vv-define` before `tw-work`.
-- Advisory SessionStart hook injecting `traceweaver_mode`, the Authority Rule
-  invariant, the current held-claims list, and the
-  plan -> tw-vv-define -> tw-work ordering into session context at session
-  start/resume/compact, with portable Claude Code, Cursor, and Codex JSON
-  payload shapes (REQ-TW-079). Never blocks, mutates files, or claims
-  enforcement.
-- Advisory, non-blocking PreToolUse TDD-gate hook: warns on behavior-bearing
-  Write/Edit calls that lack a linked, review-passed V&V definition and RED
-  evidence, always exiting 0 (REQ-TW-080).
-- Host x hook capability matrix
-  (`docs/validation/traceweaver-0.3-hook-host-capability-matrix.md`)
-  recording, per host/hook cell, `supported` / `unsupported-gap` / `unproven`
-  state (REQ-TW-081): Claude Code and Cursor are `supported` for both
-  SessionStart and PreToolUse; Codex SessionStart is `supported`; Codex
-  PreToolUse is `unproven` (partial binary-string evidence only, no
-  documented/active schema surface).
-- Superpowers mechanism provenance record: the hook mechanism is
-  adapted/cherry-picked from `obra/superpowers`, pinned at commit
-  `d884ae04edebef577e82ff7c4e143debd0bbec99`, without rebasing TraceWeaver
-  onto it.
-- Owner direction authorization record
-  (`docs/validation/traceweaver-0.3-owner-direction-authorization.md`)
-  authorizing static/advisory implementation of REQ-TW-076..081 on the 0.3
-  integration branch ahead of requirement promotion to approved.
+- Added proportional workflow profiles, project-local read-only orchestration
+  bootstrap, risk-proportional review receipts, and risk-proportional V&V
+  definition behavior.
+- Removed default PreToolUse registration and its associated default hook
+  overhead; SessionStart remains optional and advisory.
+- Recovered the Air Router multi-authority trace-anchor hotfix with its
+  verified 16-path scope.
+- Kept generated traceability views derived from the controlled requirements,
+  Intent Contract, and matrix sources.
 
 ### Held
 
-- Runtime firing of any hook on any host (SessionStart or PreToolUse), for
-  every host/hook cell recorded `supported`, remains held pending its own
-  per-host runtime proof gate.
-- `traceweaver_mode: enforcing` and any blocking/refusal behavior for the
-  PreToolUse gate or the `tw-work` V&V preflight remain held.
-- Codex plugin installation, hook-trust registration, and the explicit
-  suppress-vs-adopt decision for `hooks/hooks.json` auto-adoption remain
-  held.
-- Promotion of REQ-TW-076 through REQ-TW-081 from `candidate_for_review` to
-  `approved` remains held pending baseline amendment.
-- Release, publication, package-ready, and clean-replacement claims remain
-  held; this entry is release preparation only.
+- Behavioral repair verification does not prove or guarantee historical or
+  general TraceWeaver overhead; U7/product dogfood is prospective post-release
+  measurement.
+- Publication is not deployment, installation, runtime enforcement, universal
+  host activation, or dogfood. Those claims remain held.
+
+## 0.2.8 - 2026-07-13
+
+Gated-publication release: replace the packaged alpha's blanket publication
+hold with an exact-target, single-use authorization-capsule route owned by
+`tw-commit-push-pr`.
+
+### Changed
+
+- Real branch, staging, commit, push, PR create/update, and separately
+  authorized merge operations can proceed only after authority, traceability,
+  verification, review, tree identity, target, credentials, and explicit owner
+  confirmation pass.
+- Direct invocation of the packaged CE-derived publication engine remains
+  blocked; any stale, incomplete, reused, or target-mismatched capsule stops
+  before mutation.
+- Merge verification now distinguishes the GitHub merge result from downstream
+  CI/CD and deployment health.
+- Added deterministic red/green fixtures for missing-capsule blocking and clean
+  authorized real-publication routing, while retaining every prior negative
+  publication case.
+
+### Held
+
+- Force push, arbitrary autonomous publication without a current capsule,
+  deployment success without downstream evidence, clean CE replacement, and
+  broader runtime-equivalence claims remain held.
+
+## 0.2.7 - 2026-06-25
+
+Combined selected-CE-refresh and first-time onboarding release: carry the PR
+#44 selected Compound Engineering `3.14.3` package refresh together with the PR
+#45 README/docs bootstrap clarity pass, intro video, setup video, and worked
+authority-bootstrap example.
+
+### Changed
+
+- Bumped Codex, Claude Code, Antigravity, Cursor, and Claude marketplace
+  metadata to `0.2.7`.
+- Updated README, usage guide, prompt-to-proof guide, and plugin README current
+  release and pinned install examples to `traceweaver-core--v0.2.7`.
+- Refreshed selected CE-compatible package surfaces to upstream Compound
+  Engineering `compound-engineering-v3.14.3`, while keeping `ce-sessions` held
+  at the prior reviewed selected surface because upstream CE no longer exposes
+  it as a top-level skill.
+- Added first-time user clarity: a shorter README entry path, a worked
+  authority bootstrap example, clearer expected bootstrap-stop wording, and
+  intro/setup video links in the README and guides.
+
+### Held
+
+- Tag and GitHub Release publication remain held until the reviewed version-bump
+  state lands on `main` and the release workflow creates
+  `traceweaver-core--v0.2.7`.
+- Runtime-driver binding, enforcing mode, release-ready, package-ready,
+  upstream-ready, clean CE replacement, runtime-equivalent CE behavior,
+  slash-command support, unconstrained-host support, R31/Vestro validation,
+  `ce-sessions` CE 3.14.3 currentness, upstream-only CE 3.14.3 skill
+  packaging, future publication, and autonomous publication remain held until
+  their own controlled evidence gates pass.
 
 ## 0.2.6 - 2026-06-24
 

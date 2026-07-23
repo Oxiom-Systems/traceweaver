@@ -6,15 +6,15 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "176bee1858edc30afc6369383c7437d0729b9e6be3061b136eabb1542c21629c"
+      "sha256": "2353599a35e0310432aa1e9d12f99d378bdd2ba73b6d76e0e8659c754e9489b6"
     },
     {
       "path": "requirements.md",
-      "sha256": "151f5eb80f8ac222bced09b7494dbd14d5637a83757c48ff65d6cbdc54a582e0"
+      "sha256": "091d2f815c6adfa34590b0cd0a9556b52a51470f4062f2fce5faad11e1a2a69e"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "177dcc13c5c449e98911aa5b3b6992775dac8e945feb931753044b242356554f"
+      "sha256": "fb81692f19aea895ef0ad3b91d791260ad8ca164b851b380e0b8fc7b301144af"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -26,9 +26,9 @@
     "trace_rows": 61,
     "atp_entries": 37,
     "result_records": 38,
-    "verification_records": 80,
+    "verification_records": 82,
     "validation_records": 31,
-    "code_anchor_records": 261,
+    "code_anchor_records": 279,
     "structured_acceptance_results": 1,
     "structured_acceptance_coverage": 88,
     "structured_acceptance_missing_requirements": 87,
@@ -666,7 +666,8 @@
       "trace_ids": [
         "TRACE-TW-009",
         "TRACE-TW-011",
-        "TRACE-TW-012"
+        "TRACE-TW-012",
+        "TRACE-TW-053"
       ]
     },
     {
@@ -855,7 +856,7 @@
       "verification_method": "Requirements review / publication-route fixture smoke / per-target `tw-commit-push-pr` gate check",
       "validation_path": "VAL-TW-011",
       "owner": "Oxiom Systems",
-      "status": "Candidate reviewed / deterministic fixture smoke passed / real publication allowed only per exact clean controlled route",
+      "status": "Approved by owner 2026-07-13 for gated publication implementation, 0.2.8 release, reinstall, and Vestro dogfood; scoped code, verification, and authority/release review clean; live publication evidence pending",
       "trace_ids": [
         "TRACE-TW-026",
         "TRACE-TW-030",
@@ -982,7 +983,7 @@
       "verification_method": "Requirements review / source inventory diff / overlay record inspection / upstream refresh dry run / wrapper fixture proof",
       "validation_path": "VAL-TW-011",
       "owner": "Oxiom Systems",
-      "status": "Requirements review passed / authority doc review passed / behavior held",
+      "status": "Owner-approved for exact gated-publication overlay and 0.2.8 release / scoped review clean / live publication evidence pending",
       "trace_ids": [
         "TRACE-TW-040",
         "TRACE-TW-041",
@@ -1441,8 +1442,8 @@
       "artifact": "ART-TW-010; ART-TW-011; ART-TW-013",
       "verification": "VER-TW-009; VER-TW-010",
       "validation": "VAL-TW-007; VAL-TW-009",
-      "status": "Static provenance and closure accepted",
-      "next_step": "Release/upstream claims remain held by U7/U9/R31 gates."
+      "status": "Static provenance and selected-file closure accepted for refreshed selected CE 3.14.3 surface with `ce-sessions` held",
+      "next_step": "Runtime, release, upstream-ready, package-ready, clean replacement, and publication claims remain held by review/U9/R31 gates."
     },
     {
       "id": "TRACE-TW-006",
@@ -1749,8 +1750,8 @@
       "artifact": "ART-TW-047",
       "verification": "VER-TW-042",
       "validation": "VAL-TW-011",
-      "status": "Fixture smoke passed for stale authority, missing trace, failed tests, review findings, dirty/untracked authority, target mismatch, credential/remote uncertainty, and clean verified no-real-remote dry-run allow; current per-target publication still requires a clean exact `tw-commit-push-pr` gate",
-      "next_step": "Do not claim real staging, commit, push, PR, tag, GitHub Release, remote mutation, or runtime publication until the exact target route passes"
+      "status": "Fixture smoke passes for stale authority, missing trace, failed verification, review findings, dirty/untracked authority, target mismatch, credential/remote uncertainty, missing capsule, clean no-real-remote dry run, and clean exact-target capsule authorization; external publication remains gated to the live per-target `tw-commit-push-pr` checks",
+      "next_step": "Do not claim arbitrary publication, force push, merge without explicit authority, or deployment success without downstream evidence"
     },
     {
       "id": "TRACE-TW-034",
@@ -1801,11 +1802,11 @@
       "owner": "Oxiom Systems",
       "needs": "NEED-TW-004; NEED-TW-005; NEED-TW-007; NEED-TW-008",
       "requirements": "REQ-TW-041; REQ-TW-043; REQ-TW-051; REQ-TW-052; REQ-TW-059",
-      "artifact": "ART-TW-054",
-      "verification": "VER-TW-052",
+      "artifact": "ART-TW-054; ART-TW-047",
+      "verification": "VER-TW-052; VER-TW-079",
       "validation": "VAL-TW-011",
-      "status": "Requirements review passed; authority doc review passed",
-      "next_step": "Use as reviewed static authority input for the imported CE component boundary only; no CE body edit, clean replacement, or upstream-ready claim is accepted"
+      "status": "Prior requirements/authority review passed; exact `ce-commit-push-pr` overlay owner-approved with hash/provenance, Git-derived canonical-ledger regression proof, refresh trigger, and clean scoped review recorded; live publication pending",
+      "next_step": "Use only for the exact recorded publication delegate overlay; unrecorded CE body edits, clean replacement, and upstream-ready claims remain held"
     },
     {
       "id": "TRACE-TW-041",
@@ -1943,12 +1944,12 @@
       "id": "TRACE-TW-053",
       "owner": "Oxiom Systems",
       "needs": "NEED-TW-004; NEED-TW-005; NEED-TW-006; NEED-TW-007; NEED-TW-008",
-      "requirements": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
+      "requirements": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-042; REQ-TW-043; REQ-TW-065",
       "artifact": "ART-TW-067",
-      "verification": "VER-TW-068; VER-TW-076",
+      "verification": "VER-TW-068; VER-TW-076; VER-TW-077",
       "validation": "VAL-TW-015",
-      "status": "Implementation added; verification passed; scoped review passed; PR #42 merged; 0.2.6 release metadata prepared after upstream CE fetch/currentness check; tag and GitHub Release remain routed through main version-bump workflow",
-      "next_step": "Keep website publication, runtime, clean replacement, automatic CE 3.14.2 refresh, and future release tags/GitHub Releases beyond explicitly confirmed controlled targets held."
+      "status": "Implementation added; verification passed; scoped review passed; PR #42 merged; 0.2.6 release metadata prepared after upstream CE fetch/currentness check; 2026-06-25 bootstrap-doc clarity plus intro/setup video update verification and scoped doc review passed; 0.2.7 combined selected-CE-refresh plus onboarding release metadata prepared with tag/GitHub Release publication held",
+      "next_step": "Keep website publication, runtime, clean replacement, automatic CE 3.14.3 `ce-sessions` currentness, upstream-only CE skill packaging, and future release tags/GitHub Releases beyond explicitly confirmed controlled targets held."
     },
     {
       "id": "TRACE-TW-054",
@@ -2210,10 +2211,10 @@
       "ID": "ATP-TW-017",
       "Requirement": "REQ-TW-053",
       "Procedure / Scenario": "Run `scripts/traceweaver-smoke-controlled-publication` against deterministic publication-route fixtures.",
-      "Setup / Context": "`fixtures/controlled-publication-route/`; fake local `git` and `gh` commands; no-real-remote dry-run clean case.",
-      "Expected Result": "Block stale authority, missing trace, failed tests, review findings, dirty/untracked authority, target mismatch, and credential/remote uncertainty before mutation; allow only the clean verified no-real-remote dry-run fixture; prove no fake external mutation marker is written.",
+      "Setup / Context": "`fixtures/controlled-publication-route/`; fake local `git` and `gh` commands; clean dry-run and real-publication decision cases.",
+      "Expected Result": "Block stale authority, missing trace, failed verification, review findings, dirty/untracked authority, target mismatch, credential uncertainty, and missing authorization capsule; allow clean no-real-remote dry run and clean authorized real publication; prove fixtures perform no external mutation.",
       "Owner": "Oxiom Systems",
-      "Status": "Fixture smoke passed / code review passed / status-hash doc review passed / fixture-only publication-gate evidence / real publication held until exact clean per-target tw-commit-push-pr route"
+      "Status": "Expanded red-green capsule fixture passed; review and active-host dogfood pending"
     },
     {
       "ID": "ATP-TW-018",
@@ -2546,9 +2547,9 @@
       "Requirement / Need": "REQ-TW-053",
       "ATP / Method": "Controlled publication route deterministic fixture smoke",
       "Tested Ref / Context": "`scripts/traceweaver-smoke-controlled-publication`",
-      "Evidence Artifact": "`fixtures/controlled-publication-route/`; `plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md`; `plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md`",
-      "Result": "Smoke passed. It emits blocked results for stale authority, missing trace, failed tests, review findings, dirty/untracked authority, target mismatch, and credential/remote uncertainty; emits allowed `no_real_remote_dry_run` for the clean verified fixture; and emits `controlled_publication_no_external_mutation=pass`. Current scoped `tw-commit-push-pr` preflight for 0.2.2 reverified the fixture, confirmed the packaged CE delegate still stops before raw alpha publication mutation, and keeps real stage, commit, push, PR, tag, GitHub Release, credential, remote, and active-host publication behavior gated to the exact clean per-target `tw-commit-push-pr` route.",
-      "Date / Session": "2026-05-27"
+      "Evidence Artifact": "`scripts/traceweaver-validate-publication-capsule`; `fixtures/controlled-publication-route/`; publication wrapper/delegate; reviewed overlay",
+      "Result": "Expanded smoke passed. It blocks prior gate failures plus missing/malformed/escalated/expired-or-stale/replayed capsules; proves exclusive-lock concurrent replay permits exactly one consumer; detects authority, evidence, tree, target, credential, PR head/review/check drift; requires a separate exact-PR merge capsule; validates the clean publication and merge capsules; and pushes only an explicit authorized refspec to a temporary local bare remote with matching SHA. Real external mutation still requires the live exact-target wrapper gate.",
+      "Date / Session": "2026-07-13"
     },
     {
       "ID": "RESULT-TW-018",
@@ -2836,9 +2837,9 @@
       "Procedure / Command": "Record CE source pin or accepted local-cache-only limitation.",
       "Tested Ref": "CE source inventory",
       "Result": "Pass for source-pinned static materialization",
-      "Evidence Path": "`docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `docs/validation/traceweaver-core-11-u6b-plugin-runtime.md`",
-      "Date / Session": "2026-05-01",
-      "Notes": "Source repository, version, tags, commit, license, and aggregate fingerprint recorded."
+      "Evidence Path": "`docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `.traceweaver/trace-records/2026-06-24-ce-3.14.3-selected-refresh-hold-sessions.yml`",
+      "Date / Session": "2026-06-24",
+      "Notes": "Source repository, version, tag, commit `e176a6db46b3de9c4e724a3ab5d7dd1d0bf60a33`, license, 527 source tree entries, 526 regular-file aggregate fingerprint `eaea83aa1ba3c5cdc43f6710a595b038d9193ad841ba59441230c1c61dab9994`, selected 151 packaged skill/support file hashes, and `ce-sessions` hold are recorded."
     },
     {
       "ID": "VER-TW-010",
@@ -2847,9 +2848,9 @@
       "Procedure / Command": "Parse selected CE `SKILL.md` references/scripts/assets and confirm installed path/hash closure.",
       "Tested Ref": "selected CE skills",
       "Result": "Pass for static closure",
-      "Evidence Path": "`docs/plans/2026-05-01-001-feat-u6b-unit2-materialization-plan.md`; `docs/validation/traceweaver-core-11-u6b-plugin-runtime.md`",
-      "Date / Session": "2026-05-01",
-      "Notes": "Closure audit records `missing=none` and `untracked=none`."
+      "Evidence Path": "`docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `.traceweaver/trace-records/2026-06-24-ce-3.14.3-selected-refresh-hold-sessions.yml`",
+      "Date / Session": "2026-06-24",
+      "Notes": "`ruby scripts/traceweaver-audit-ce-closure` passed with `skill_entrypoints=18`, `selected_ce_files_scanned=149`, `support_references_checked=90`, `missing=none`, and `untracked=none`."
     },
     {
       "ID": "VER-TW-011",
@@ -3195,13 +3196,13 @@
     {
       "ID": "VER-TW-042",
       "Requirement": "REQ-TW-053",
-      "Method": "Controlled publication route deterministic fixture smoke",
+      "Method": "Controlled publication capsule validator and stateful route smoke",
       "Procedure / Command": "`scripts/traceweaver-smoke-controlled-publication`",
-      "Tested Ref": "Publication-route fixtures and fake local `git`/`gh` mutation controls",
-      "Result": "Smoke passed for `controlled_publication_stale_authority=blocked`, `controlled_publication_missing_trace=blocked`, `controlled_publication_failed_tests=blocked`, `controlled_publication_review_findings=blocked`, `controlled_publication_dirty_untracked_authority=blocked`, `controlled_publication_target_mismatch=blocked`, `controlled_publication_credential_remote_uncertainty=blocked`, `controlled_publication_clean_no_real_remote=allowed`, `controlled_publication_no_external_mutation=pass`, and `controlled_publication_route_smoke=pass`.",
-      "Evidence Path": "`fixtures/controlled-publication-route/`; `scripts/traceweaver-smoke-controlled-publication`; `plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md`",
-      "Date / Session": "2026-05-27",
-      "Notes": "Fixture-only negative-route proof plus current publication-wrapper preflight input; real publication, remote, credential, push, PR, tag, and GitHub Release mutation require the exact clean per-target `tw-commit-push-pr` route."
+      "Tested Ref": "Machine-readable capsules/contexts, atomic consumption ledger, drift mutations, wrapper/delegate assertions, fake external commands, and temporary local bare Git remote",
+      "Result": "Pass: prior negative routes remain blocked; clean dry-run/publication decisions validate; malformed, operation-escalated, authority/evidence/tree/target/credential drift, replay, and concurrent replay are blocked; clean separate merge capsule validates while PR/check/head drift blocks; explicit `HEAD:refs/heads/<authorized-head>` local-remote push produces the expected remote SHA; external fake git/gh mutation remains absent.",
+      "Evidence Path": "`scripts/traceweaver-validate-publication-capsule`; `scripts/traceweaver-smoke-controlled-publication`; fixtures; wrapper/delegate; overlay",
+      "Date / Session": "2026-07-13",
+      "Notes": "Executable capsule proof for the exact controlled route; real external publication still requires live current inputs, and merge/deployment outcomes require separate evidence."
     },
     {
       "ID": "VER-TW-043",
@@ -3436,14 +3437,14 @@
     },
     {
       "ID": "VER-TW-068",
-      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-043; REQ-TW-065",
-      "Method": "First-time documentation, public guide, website integration, and trace evidence verification",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-041; REQ-TW-042; REQ-TW-043; REQ-TW-065",
+      "Method": "First-time documentation, intro and setup videos, public guide, website integration, and trace evidence verification",
       "Procedure / Command": "`scripts/traceweaver-generate-traceability-views --root .`; `scripts/traceweaver-smoke-traceability-generated-views`; implementation-mode code-anchor scanner over changed TraceWeaver docs/evidence; `TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery`; `claude plugin validate --strict .`; `git diff --check`; Oxiom Systems website local static/render check",
-      "Tested Ref": "Root README, public guide, docs landing page, usage guide, plan, validation record, trace record, Intent Contract scope, generated views, and Oxiom Systems website guide section",
-      "Result": "Passed for original first-time guide and refreshed 2026-06-24 README/docs landing-page record. Generated views and drift smoke passed; scoped implementation-mode code-anchor scanner passed with `code_traceability_findings=0`; Codex discovery smoke passed with runtime execution disabled; Claude strict validation passed; diff whitespace check passed; local docs landing review passed.",
-      "Evidence Path": "`README.md`; `docs/README.md`; `docs/guides/using-traceweaver.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; `.traceweaver/trace-records/2026-06-24-readme-docs-landing-doc-review.yml`; generated views; Oxiom Systems website source; redacted local desktop/mobile render screenshots",
-      "Date / Session": "2026-06-24",
-      "Notes": "Verification passed for docs landing review state; no release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, website publication, automatic CE 3.14.2 refresh, or autonomous-publication claim is accepted."
+      "Tested Ref": "Root README, intro video, setup video, public guide, docs landing page, usage guide, worked authority bootstrap example, plan, validation record, trace record, Intent Contract scope, generated views, and Oxiom Systems website guide section",
+      "Result": "Passed for original first-time guide and refreshed 2026-06-24 README/docs landing-page record. Generated views and drift smoke passed; scoped implementation-mode code-anchor scanner passed with `code_traceability_findings=0`; Codex discovery smoke passed with runtime execution disabled; Claude strict validation passed; diff whitespace check passed; local docs landing review passed. 2026-06-25 bootstrap-doc clarity plus intro/setup video updates passed `git diff --check`, generated-view refresh, generated-view smoke, scoped implementation-mode code-anchor scanner with `code_traceability_findings=0`, and scoped doc review `TW-DOC-REVIEW-2026-06-25-FIRST-TIME-BOOTSTRAP-DOCS-CLARITY-CLEAN-001`.",
+      "Evidence Path": "`README.md`; `docs/README.md`; `docs/guides/using-traceweaver.md`; `docs/guides/worked-authority-bootstrap-example.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/plans/2026-05-23-001-docs-first-time-readme-oxiomsystems-guide-plan.md`; `docs/validation/traceweaver-first-time-docs-guide.md`; `.traceweaver/trace-records/2026-05-23-first-time-docs-guide.yml`; `.traceweaver/trace-records/2026-06-24-readme-docs-landing-doc-review.yml`; `.traceweaver/trace-records/2026-06-25-first-time-bootstrap-docs-clarity.yml`; generated views; Oxiom Systems website source; redacted local desktop/mobile render screenshots",
+      "Date / Session": "2026-06-25",
+      "Notes": "Verification and scoped doc review passed for bootstrap-doc clarity plus intro/setup video updates; no release-ready, package-ready, runtime-driver, clean replacement, enforcing-mode, slash-command, unconstrained-host, website publication, automatic CE 3.14.2 refresh, or autonomous-publication claim is accepted."
     },
     {
       "ID": "VER-TW-070",
@@ -3510,6 +3511,28 @@
       "Evidence Path": "`.traceweaver/trace-records/2026-06-24-plugin-0.2.6-release-metadata.yml`; `.traceweaver/trace-records/2026-06-24-ce-3.14.2-currentness-pre-0.2.6.yml`; `.traceweaver/trace-records/2026-06-24-readme-docs-landing-doc-review.yml`; `README.md`; `docs/README.md`; `docs/guides/using-traceweaver.md`; `plugins/traceweaver-core/README.md`; `CHANGELOG.md`; manifests; `docs/validation/traceweaver-plugin-0.2-release.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; generated views",
       "Date / Session": "2026-06-24",
       "Notes": "Release metadata verified; exact tag/GitHub Release publication remains pending workflow execution after merge. Release-ready, package-ready, broad runtime, runtime-equivalent CE behavior, CE 3.14.2 refresh, clean replacement, R31/Vestro validation, future publication, and autonomous publication claims remain held."
+    },
+    {
+      "ID": "VER-TW-077",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-017; REQ-TW-018; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-029; REQ-TW-041; REQ-TW-042; REQ-TW-043; REQ-TW-051; REQ-TW-052; REQ-TW-059; REQ-TW-060; REQ-TW-065; REQ-TW-068",
+      "Method": "TraceWeaver Core 0.2.7 combined PR #44/#45 release metadata",
+      "Procedure / Command": "JSON/plugin validation; YAML validation; Claude plugin validation and tag dry-run; Codex discovery smoke; Antigravity discovery smoke; controlled-publication smoke; CE closure audit; verify gate; generated-view refresh and drift smoke; implementation-mode code-anchor scan; `git diff --check`; read-only tag/GitHub Release absence check before merge",
+      "Tested Ref": "0.2.7 manifests, README/plugin README pinned install docs, CHANGELOG release notes, selected CE 3.14.3 source inventory and closure record, first-time bootstrap clarity record, release metadata trace record, matrix, generated views, and pre-publication remote tag/release absence proof",
+      "Result": "Prepared for local combined release-prep verification. The exact verification command results are recorded in `.traceweaver/trace-records/2026-06-25-plugin-0.2.7-combined-release-metadata.yml`; tag and GitHub Release publication remain held until a reviewed version-bump state lands on `main` and the release workflow runs.",
+      "Evidence Path": "`.traceweaver/trace-records/2026-06-25-plugin-0.2.7-combined-release-metadata.yml`; `.traceweaver/trace-records/2026-06-24-ce-3.14.3-selected-refresh-hold-sessions.yml`; `.traceweaver/trace-records/2026-06-25-first-time-bootstrap-docs-clarity.yml`; `README.md`; `docs/README.md`; `docs/guides/using-traceweaver.md`; `docs/guides/traceweaver-from-prompt-to-proof.md`; `docs/guides/worked-authority-bootstrap-example.md`; `plugins/traceweaver-core/README.md`; `CHANGELOG.md`; manifests; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; generated views",
+      "Date / Session": "2026-06-25",
+      "Notes": "Release metadata prepared; tag, GitHub Release, deploy, release-ready/package-ready/upstream-ready, broad runtime, runtime-equivalent CE behavior, `ce-sessions` CE 3.14.3 currentness, upstream-only CE 3.14.3 skill packaging, clean replacement, R31/Vestro validation, future publication, and autonomous publication claims remain held."
+    },
+    {
+      "ID": "VER-TW-079",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-053; REQ-TW-059; REQ-TW-068",
+      "Method": "TraceWeaver Core 0.2.8 gated-publication implementation and release metadata",
+      "Procedure / Command": "Capsule validator with Git-derived canonical-ledger enforcement, exact consumed-capsule digest binding, and replay/drift/merge fixture smoke; temporary local bare-remote explicit-refspec proof; JSON/YAML/plugin validation; Claude tag dry-run; Codex and Antigravity install/discovery smoke; generated-view and bounded-snapshot drift checks; code-anchor scan; CE closure audit; `git diff --check`; read-only tag/GitHub Release absence check",
+      "Tested Ref": "Publication wrapper and delegate, machine-readable capsule validator, deterministic fixtures, reviewed CE overlay, authority/trace/release record, 0.2.8 manifests/docs/changelog, generated views, candidate install, and pre-publication remote absence proof",
+      "Result": "Focused capsule and broader mechanical verification passed locally, scoped security, verification, and authority/release review is clean, and candidate active-host wrapper/delegate/validator hashes are current; PR publication, merge, release workflow, remote tag/GitHub Release, and released-artifact reinstall remain pending.",
+      "Evidence Path": "`.traceweaver/trace-records/2026-07-13-plugin-0.2.8-gated-publication-release.yml`; `.traceweaver/overlays/2026-07-13-ce-commit-push-pr-gated-publication.yml`; `scripts/traceweaver-validate-publication-capsule`; `scripts/traceweaver-smoke-controlled-publication`; `plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md`; `plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md`; manifests; docs; generated views",
+      "Date / Session": "2026-07-13",
+      "Notes": "Exact 0.2.8 publication is authorized only through a live valid capsule; arbitrary publication, force push, deployment success without proof, broad runtime equivalence, and clean CE replacement remain held."
     },
     {
       "ID": "VER-TW-056",
@@ -4351,12 +4374,36 @@
       "Role": "plugin-0.2.6-release-metadata"
     },
     {
+      "Artifact Path": ".traceweaver/trace-records/2026-06-25-plugin-0.2.7-combined-release-metadata.yml",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-017; REQ-TW-018; REQ-TW-020; REQ-TW-021; REQ-TW-023; REQ-TW-029; REQ-TW-041; REQ-TW-042; REQ-TW-043; REQ-TW-051; REQ-TW-052; REQ-TW-059; REQ-TW-060; REQ-TW-065; REQ-TW-068",
+      "Trace": "TRACE-TW-005; TRACE-TW-009; TRACE-TW-010; TRACE-TW-046; TRACE-TW-053; TRACE-TW-054",
+      "Verification": "VER-TW-009; VER-TW-010; VER-TW-012; VER-TW-068; VER-TW-069; VER-TW-074; VER-TW-076; VER-TW-077",
+      "Anchor Type": "trace-record",
+      "Role": "plugin-0.2.7-combined-release-metadata"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-07-13-plugin-0.2.8-gated-publication-release.yml",
+      "Requirement": "REQ-TW-015; REQ-TW-016; REQ-TW-020; REQ-TW-021; REQ-TW-053; REQ-TW-059; REQ-TW-068",
+      "Trace": "TRACE-TW-010; TRACE-TW-033; TRACE-TW-040; TRACE-TW-053; TRACE-TW-054",
+      "Verification": "VER-TW-042; VER-TW-052; VER-TW-079",
+      "Anchor Type": "trace-record",
+      "Role": "plugin-0.2.8-gated-publication-release"
+    },
+    {
       "Artifact Path": ".traceweaver/trace-records/2026-06-24-ce-3.14.2-currentness-pre-0.2.6.yml",
       "Requirement": "REQ-TW-017; REQ-TW-020; REQ-TW-052; REQ-TW-059; REQ-TW-060",
       "Trace": "TRACE-TW-005; TRACE-TW-046",
       "Verification": "VER-TW-009; VER-TW-074; VER-TW-076",
       "Anchor Type": "trace-record",
       "Role": "ce-3.14.2-currentness-pre-0.2.6"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-06-24-ce-3.14.3-selected-refresh-hold-sessions.yml",
+      "Requirement": "REQ-TW-017; REQ-TW-018; REQ-TW-021; REQ-TW-029; REQ-TW-041; REQ-TW-043; REQ-TW-051; REQ-TW-052; REQ-TW-059",
+      "Trace": "TRACE-TW-005; TRACE-TW-009; TRACE-TW-046",
+      "Verification": "VER-TW-009; VER-TW-010",
+      "Anchor Type": "trace-record",
+      "Role": "ce-3.14.3-selected-refresh-hold-sessions"
     },
     {
       "Artifact Path": "README.md",
@@ -4381,6 +4428,14 @@
       "Verification": "VER-TW-068",
       "Anchor Type": "file-role",
       "Role": "deep-usage-guide"
+    },
+    {
+      "Artifact Path": "docs/guides/worked-authority-bootstrap-example.md",
+      "Requirement": "REQ-TW-042; REQ-TW-015",
+      "Trace": "TRACE-TW-021; TRACE-TW-053",
+      "Verification": "VER-TW-030; VER-TW-068",
+      "Anchor Type": "file-role",
+      "Role": "worked-bootstrap-example"
     },
     {
       "Artifact Path": "docs/guides/traceweaver-from-prompt-to-proof.md",
@@ -4421,6 +4476,14 @@
       "Verification": "VER-TW-068",
       "Anchor Type": "trace-record",
       "Role": "readme-docs-landing-doc-review-record"
+    },
+    {
+      "Artifact Path": ".traceweaver/trace-records/2026-06-25-first-time-bootstrap-docs-clarity.yml",
+      "Requirement": "REQ-TW-042; REQ-TW-015",
+      "Trace": "TRACE-TW-021; TRACE-TW-053",
+      "Verification": "VER-TW-030; VER-TW-068",
+      "Anchor Type": "trace-record",
+      "Role": "first-time-bootstrap-docs-clarity"
     },
     {
       "Artifact Path": ".traceweaver/trace-records/2026-05-25-new-project-start-guide-doc-review.yml",
@@ -5711,6 +5774,22 @@
       "Role": "Current implementation-gate anchor for controlled publication route fixture smoke"
     },
     {
+      "Artifact Path": "`scripts/traceweaver-validate-publication-capsule`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "file-role",
+      "Role": "Repository convenience shim to the installed skill-local validator"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042; VER-TW-079",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "Installed machine-readable capsule schema, context, expiry, canonical-ledger replay, authority, target, PR-edit, and merge-gate validator"
+    },
+    {
       "Artifact Path": "`scripts/traceweaver-smoke-code-trace-authoring`",
       "Requirement": "REQ-TW-054; REQ-TW-056; REQ-TW-057",
       "Trace": "TRACE-TW-035",
@@ -5780,7 +5859,95 @@
       "Trace": "TRACE-TW-033",
       "Verification": "VER-TW-042",
       "Anchor Type": "file-role",
-      "Role": "Current implementation-gate anchor for TraceWeaver commit/push/PR publication wrapper surface"
+      "Role": "Controlled publication authority owner and authorization-capsule issuer"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md`",
+      "Requirement": "REQ-TW-053; REQ-TW-059",
+      "Trace": "TRACE-TW-033; TRACE-TW-040",
+      "Verification": "VER-TW-042; VER-TW-052; VER-TW-079",
+      "Anchor Type": "file-role",
+      "Role": "Imported CE-derived publication delegate overlay; direct invocation remains blocked"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/real-remote-missing-capsule/state.txt`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "verifies",
+      "Role": "Negative fixture proving real remote publication is blocked without a capsule"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/clean-real-remote-authorized/state.txt`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "verifies",
+      "Role": "Positive decision fixture proving a clean exact-target capsule route is allowed without performing external mutation"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/capsules/merge-valid.yml`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "file-role",
+      "Role": "Valid separate merge-capsule fixture"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/capsules/publication-valid.yml`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "file-role",
+      "Role": "Valid branch, commit, push, and PR publication-capsule fixture"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/contexts/merge-check-drift.yml`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "file-role",
+      "Role": "Merge live-check drift context fixture"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/contexts/merge-valid.yml`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "file-role",
+      "Role": "Valid merge live-context fixture"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/contexts/publication-credential-drift.yml`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "file-role",
+      "Role": "Publication credential-drift context fixture"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/contexts/publication-target-drift.yml`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "file-role",
+      "Role": "Publication target-drift context fixture"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/contexts/publication-tree-drift.yml`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "file-role",
+      "Role": "Publication tree-drift context fixture"
+    },
+    {
+      "Artifact Path": "`fixtures/controlled-publication-route/contexts/publication-valid.yml`",
+      "Requirement": "REQ-TW-053",
+      "Trace": "TRACE-TW-033",
+      "Verification": "VER-TW-042",
+      "Anchor Type": "file-role",
+      "Role": "Valid publication live-context fixture"
     },
     {
       "Artifact Path": "`plugins/traceweaver-core/skills/tw-debug/SKILL.md`",

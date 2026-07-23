@@ -263,6 +263,7 @@ required_skill_local_files=(
   "tw-auto/references/trace-anchor-authoring.md"
   "tw-traceability-check/scripts/traceweaver-check-code-anchors"
   "tw-traceability-check/scripts/traceweaver-author-code-anchors"
+  "tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
 )
 
 codex_home="$tmp_root/codex-home"
@@ -388,6 +389,11 @@ for skill_local_file in "${required_skill_local_files[@]}"; do
   assert_equal "${label}_callable_hash" "$source_hash" "$callable_hash"
   echo "skill_local_file_hash_${label}=${source_hash}"
 done
+
+test -x "$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
+test -x "$callable_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
+"$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule" --help >/dev/null
+echo "installed_publication_capsule_validator=pass"
 
 assert_file "$references_root/traceweaver-model-defaults.md"
 grep -Fq "codex_model: gpt-5.5" "$references_root/traceweaver-model-defaults.md"
