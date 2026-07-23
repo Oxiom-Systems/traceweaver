@@ -17,7 +17,7 @@ Use it when you want Codex, Claude Code, or other agent tools to move quickly
 without losing the proof behind what changed, why it changed, and whether it is
 ready to publish.
 
-Current release: TraceWeaver Core `0.2.8` is an alpha advisory plugin for Codex
+Current release: TraceWeaver Core `0.3.0` is an alpha advisory plugin for Codex
 and Claude Code. Antigravity support is limited to static local
 install/discovery metadata. Runtime-driver binding, enforcing mode, clean CE
 replacement, slash-command support, unconstrained-host support, and autonomous
@@ -69,7 +69,7 @@ codex plugin marketplace upgrade traceweaver
 For a pinned local alpha install:
 
 ```sh
-git clone --branch traceweaver-core--v0.2.8 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.3.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```

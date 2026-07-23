@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# TRACEWEAVER: file-role=advisory-session-start-hook; req=REQ-TW-079; trace=TRACE-TW-060; ver=VER-TW-080
+# TRACEWEAVER: verifies=VER-TW-080; req=REQ-TW-079; trace=TRACE-TW-060
+# Portable JSON-emission mechanism adapted from obra/superpowers at
+# d884ae04edebef577e82ff7c4e143debd0bbec99; TraceWeaver content is original.
+
+set -u
+
+project_root="${PWD:-.}"
+mode="advisory"
+intent_contract="$project_root/.traceweaver/intent-contract.yml"
+workflow_profile="$project_root/.traceweaver/workflow-profile.yml"
+if [[ -f "$intent_contract" ]]; then
+  candidate="$(sed -nE 's/^[[:space:]]*traceweaver_mode:[[:space:]]*([A-Za-z_-]+).*/\1/p' "$intent_contract" | head -n 1)"
+  case "$candidate" in
+    off|advisory|enforcing) mode="$candidate" ;;
+  esac
+fi
+
+profile="not_configured"
+if [[ -f "$workflow_profile" ]]; then
+  candidate="$(sed -nE 's/^[[:space:]]*risk:[[:space:]]*([A-Za-z0-9_-]+).*/\1/p' "$workflow_profile" | head -n 1)"
+  [[ -n "$candidate" ]] && profile="$candidate"
+fi
+
+escape_for_json() {
+  local value="$1"
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  value="${value//$'\n'/\\n}"
+  value="${value//$'\r'/\\r}"
+  value="${value//$'\t'/\\t}"
+  printf '%s' "$value"
+}
+
+context="Optional TraceWeaver advisory context (mode: ${mode}; workflow profile: ${profile}). If this project has opted in, consult .traceweaver/master-orchestrator.md and .traceweaver/workflow-profile.yml before selecting a bounded child role. This static reminder does not prove host execution, block actions, or mutate files."
+escaped_context="$(escape_for_json "$context")"
+
+# Cursor can also set CLAUDE_PLUGIN_ROOT, so test it first. Claude Code reads
+# both Cursor-style and nested output without de-duplicating; emit one shape.
+if [[ -n "${CURSOR_PLUGIN_ROOT:-}" ]]; then
+  printf '{"additional_context":"%s"}\n' "$escaped_context"
+elif [[ -n "${CLAUDE_PLUGIN_ROOT:-}" ]]; then
+  printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}\n' "$escaped_context"
+else
+  # SDK-standard fallback; static fixture coverage only for Codex.
+  printf '{"additionalContext":"%s"}\n' "$escaped_context"
+fi
+
+exit 0

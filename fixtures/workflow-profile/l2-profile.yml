@@ -1,0 +1,13 @@
+task_id: TASK-L2
+profile_revision: 1
+risk: L2
+selection_rationale: cross-module deployment-facing behavior
+selected_controls: [full_work_item_capsule, focused_verification, fresh_verifier, independent_review, justified_specialist]
+child_roles: { builder: terra, verifier: terra, reviewer: sol, deployer: terra }
+model_selection: { availability: [terra, sol], choice: "terra builder/verifier; sol reviewer", rationale: cross-module scope needs independent specialist review }
+reviewer_cap: 2
+repair_cycle_cap: 2
+requires_deploy: true
+requires_chrome_dogfood: false
+profile_hash: sha256:l2-frozen
+expected_profile: L2

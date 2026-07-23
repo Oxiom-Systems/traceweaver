@@ -1,0 +1,14 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "work_item_id": "FIXTURE-VALID-NOT-APPLICABLE",
+  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "requirements": [
+    {
+      "req_id": "REQ-FIXTURE-004",
+      "not_applicable": {
+        "scope": "docs-only",
+        "reason": "Pure documentation change with no behavior-bearing code, script, skill, fixture, or smoke; no executable verification artifact or validation-definition artifact is required per REQ-TW-076's scoped not-applicable pattern."
+      }
+    }
+  ]
+}

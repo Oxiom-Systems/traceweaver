@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+
+ruby - "$root" <<'RUBY'
+require "yaml"
+
+root = ARGV.fetch(0)
+fixtures = File.join(root, "fixtures/workflow-profile")
+
+def load_yaml(path)
+  YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)
+end
+
+def require_field(value, field, source)
+  raise "#{source}: missing #{field}" if value.nil? || value == "" || value == [] || value == {}
+end
+
+template = load_yaml(File.join(root, "plugins/traceweaver-core/references/workflow-profile-template.yml"))
+%w[schema_version task_id profile_revision profile_status risk selection_rationale selected_controls child_roles model_selection reviewer_cap repair_cycle_cap requires_deploy requires_chrome_dogfood profile_hash immutable_after_building accounting].each do |field|
+  raise "workflow-profile-template: missing #{field}" unless template.key?(field)
+end
+raise "workflow-profile-template: wrong schema" unless template.fetch("schema_version") == "tw-workflow-profile/1"
+raise "workflow-profile-template: missing immutable building boundary" unless template.dig("immutable_after_building", "fields").include?("profile_hash")
+raise "workflow-profile-template: missing fixed accounting categories" unless template.dig("accounting", "fixed_categories") == %w[process delivery unclassified]
+profile_budget = template.fetch("process_budget")
+%w[target_total_effort_percent hard_ceiling_total_effort_percent target_process_to_delivery_ratio_percent hard_ceiling_process_to_delivery_ratio_percent estimated_delivery_minutes estimated_process_target_minutes estimated_process_ceiling_minutes].each do |field|
+  raise "workflow-profile-template: missing process_budget.#{field}" unless profile_budget.key?(field)
+end
+raise "workflow-profile-template: target representations differ" unless profile_budget.fetch("target_total_effort_percent") == (100.0 * profile_budget.fetch("target_process_to_delivery_ratio_percent") / (100 + profile_budget.fetch("target_process_to_delivery_ratio_percent"))).round
+raise "workflow-profile-template: ceiling representations differ" unless profile_budget.fetch("hard_ceiling_total_effort_percent") == (100.0 * profile_budget.fetch("hard_ceiling_process_to_delivery_ratio_percent") / (100 + profile_budget.fetch("hard_ceiling_process_to_delivery_ratio_percent"))).round
+
+expected = {
+  "l0-profile.yml" => { risk: "L0", cap: 0, repair: 0, deploy: false, dogfood: false },
+  "l1-profile.yml" => { risk: "L1", cap: 1, repair: 2, deploy: false, dogfood: false },
+  "l2-profile.yml" => { risk: "L2", cap: 2, repair: 2, deploy: true, dogfood: false },
+  "l3-profile.yml" => { risk: "L3", cap: 3, repair: 2, deploy: true, dogfood: true }
+}
+
+expected.each do |name, rule|
+  item = load_yaml(File.join(fixtures, name))
+  raise "#{name}: non-deterministic profile" unless item.fetch("risk") == rule[:risk] && item.fetch("expected_profile") == rule[:risk]
+  %w[selection_rationale selected_controls child_roles model_selection profile_hash].each { |field| require_field(item[field], field, name) }
+  %w[availability choice rationale].each { |field| require_field(item.fetch("model_selection")[field], field, name) }
+  raise "#{name}: reviewer cap" unless item.fetch("reviewer_cap") == rule[:cap]
+  raise "#{name}: repair cap" unless item.fetch("repair_cycle_cap") == rule[:repair]
+  raise "#{name}: deploy requirement" unless item.fetch("requires_deploy") == rule[:deploy]
+  raise "#{name}: dogfood requirement" unless item.fetch("requires_chrome_dogfood") == rule[:dogfood]
+end
+
+expansion = load_yaml(File.join(fixtures, "profile-expansion-after-start.expected"))
+raise "expansion: started profile not frozen" unless expansion.dig("initial", "profile_status") == "building"
+raise "expansion: silent expansion accepted" unless expansion.dig("attempted_silent_expansion", "result") == "refused_profile_immutable"
+raise "expansion: new revision missing" unless expansion.dig("escalated_revision", "profile_revision") > expansion.dig("initial", "profile_revision")
+raise "expansion: reason missing" if expansion.dig("escalated_revision", "escalation_reason").to_s.empty?
+
+budget = load_yaml(File.join(fixtures, "process-budget-boundaries.expected"))
+raise "budget: target total-effort representation wrong" unless budget.fetch("target_total_effort_percent") == (100.0 * budget.fetch("target_process_to_delivery_ratio_percent") / (100 + budget.fetch("target_process_to_delivery_ratio_percent"))).round
+raise "budget: ceiling total-effort representation wrong" unless budget.fetch("hard_ceiling_total_effort_percent") == (100.0 * budget.fetch("hard_ceiling_process_to_delivery_ratio_percent") / (100 + budget.fetch("hard_ceiling_process_to_delivery_ratio_percent"))).round
+raise "budget: target policy differs from profile template" unless budget.fetch("target_total_effort_percent") == profile_budget.fetch("target_total_effort_percent") && budget.fetch("target_process_to_delivery_ratio_percent") == profile_budget.fetch("target_process_to_delivery_ratio_percent")
+raise "budget: ceiling policy differs from profile template" unless budget.fetch("hard_ceiling_total_effort_percent") == profile_budget.fetch("hard_ceiling_total_effort_percent") && budget.fetch("hard_ceiling_process_to_delivery_ratio_percent") == profile_budget.fetch("hard_ceiling_process_to_delivery_ratio_percent")
+raise "budget: target guard wrong" unless budget.fetch("estimated_process_target_minutes") == budget.fetch("target_process_to_delivery_ratio_percent") / 100.0 * budget.fetch("estimated_delivery_minutes")
+raise "budget: ceiling guard wrong" unless budget.fetch("estimated_process_ceiling_minutes") == budget.fetch("hard_ceiling_process_to_delivery_ratio_percent") / 100.0 * budget.fetch("estimated_delivery_minutes")
+times = budget.fetch("receipts").map { |receipt| receipt.fetch("monotonic_elapsed_minutes") }
+raise "budget: non-monotonic receipt time" unless times == times.sort
+raise "budget: missing dispatch/return accounting" unless budget.fetch("receipts").map { |receipt| receipt.fetch("boundary") }.uniq.sort == %w[dispatch return]
+raise "budget: target action wrong" unless budget.dig("receipts", 3, "action") == "stop_optional_artifacts_and_duplicate_review"
+raise "budget: full-timebox projection omitted" unless budget.dig("projected_ceiling_breach", "projected_process_minutes") == budget.dig("projected_ceiling_breach", "current_process_minutes") + budget.dig("projected_ceiling_breach", "next_child_maximum_timebox_minutes")
+raise "budget: ceiling breach not refused" unless budget.dig("projected_ceiling_breach", "result") == "refused_estimated_process_ceiling"
+raise "budget: unclassified not charged as process" unless budget.dig("unclassified_until_resolved", "raw_minutes") == budget.dig("unclassified_until_resolved", "counts_as_process_minutes")
+raise "budget: delivery-underrun hold missing" unless budget.dig("delivery_underrun_terminal", "result") == "held_process_budget"
+raise "budget: terminal hard hold wrong" unless budget.dig("delivery_underrun_terminal", "actual_process_minutes") > budget.dig("delivery_underrun_terminal", "actual_delivery_minutes")
+
+auto = File.read(File.join(root, "plugins/traceweaver-core/skills/tw-auto/SKILL.md"))
+raise "tw-auto: direct implementation route present" unless auto.include?("It has no direct implementation path.")
+raise "tw-auto: profile router missing" unless auto.include?("advisory profile and capsule router")
+raise "tw-auto: direct coding engine present" if auto.include?("ce-work")
+puts "workflow-profile smoke: PASS"
+RUBY

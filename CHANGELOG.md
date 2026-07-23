@@ -2,6 +2,36 @@
 
 # Changelog
 
+## 0.3.0 - 2026-07-23
+
+Owner-ratified repair release for the TraceWeaver Core 0.3 behavioral surface.
+This release is authorized only by
+`docs/plans/2026-07-23-traceweaver-0.3-repair-amendment-2-release-ratification.md`
+(approved SHA-256 `0b67c4bfeaf23e849a261976011e0f537437170cb2ee370fff4d0d947d8dbf1f`,
+Sol receipt `SOL-AMEND2-2026-07-23-9F1BEAEF`). It preserves the 0.2.8
+gated-publication route and does not rewrite the historically invalid
+EXC-TW-011 activation.
+
+### Changed
+
+- Added proportional workflow profiles, project-local read-only orchestration
+  bootstrap, risk-proportional review receipts, and risk-proportional V&V
+  definition behavior.
+- Removed default PreToolUse registration and its associated default hook
+  overhead; SessionStart remains optional and advisory.
+- Recovered the Air Router multi-authority trace-anchor hotfix with its
+  verified 16-path scope.
+- Kept generated traceability views derived from the controlled requirements,
+  Intent Contract, and matrix sources.
+
+### Held
+
+- Behavioral repair verification does not prove or guarantee historical or
+  general TraceWeaver overhead; U7/product dogfood is prospective post-release
+  measurement.
+- Publication is not deployment, installation, runtime enforcement, universal
+  host activation, or dogfood. Those claims remain held.
+
 ## 0.2.8 - 2026-07-13
 
 Gated-publication release: replace the packaged alpha's blanket publication

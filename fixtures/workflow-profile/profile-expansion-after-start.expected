@@ -1,0 +1,13 @@
+initial:
+  profile_revision: 1
+  profile_status: building
+  profile_hash: sha256:l1-frozen
+  selected_controls: [compact_authority_reference, focused_verification, fresh_verifier, independent_review]
+attempted_silent_expansion:
+  result: refused_profile_immutable
+  added_control: specialist_reviewer
+escalated_revision:
+  profile_revision: 2
+  parent_profile_hash: sha256:l1-frozen
+  escalation_reason: cross-module risk discovered after builder dispatch
+  profile_hash: sha256:l2-escalated

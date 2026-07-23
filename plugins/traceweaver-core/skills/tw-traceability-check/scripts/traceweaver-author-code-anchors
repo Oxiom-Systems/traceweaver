@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
-# TRACEWEAVER: file-role=trace-anchor-authoring-helper; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044
+# TRACEWEAVER: file-role=trace-anchor-authoring-helper; req=REQ-TW-054,REQ-TW-056,REQ-TW-057,REQ-TW-065; trace=TRACE-TW-032,TRACE-TW-035,TRACE-TW-048; ver=VER-TW-041,VER-TW-044,VER-TW-061
 
 require "fileutils"
 require "json"
@@ -302,6 +302,324 @@ def matrix_text_with_anchor_row(matrix_text, matrix_row)
   lines.join
 end
 
+def typed_table_cells(row)
+  content = row.strip.sub(/\A\|/, "").sub(/\|\z/, "")
+  parsed = [String.new]
+  index = 0
+
+  while index < content.length
+    if content[index] == "\\" && content[index + 1] == "|"
+      parsed.last << "|"
+      index += 2
+    elsif content[index] == "|"
+      parsed << String.new
+      index += 1
+    else
+      parsed.last << content[index]
+      index += 1
+    end
+  end
+
+  parsed.map(&:strip)
+end
+
+def typed_table_separator?(row)
+  row.start_with?("|") && typed_table_cells(row).all? { |cell| cell.match?(/\A:?-+:?\z/) }
+end
+
+def markdown_tables(matrix_text)
+  lines = matrix_text.lines
+  section = nil
+  tables = []
+  index = 0
+
+  while index < lines.length
+    if lines[index].start_with?("## ")
+      section = lines[index].strip.sub(/\A##\s+/, "")
+    end
+
+    if lines[index].start_with?("|") && index + 1 < lines.length && typed_table_separator?(lines[index + 1])
+      headers = typed_table_cells(lines[index])
+      rows = []
+      index += 2
+      while index < lines.length && lines[index].start_with?("|") && !typed_table_separator?(lines[index])
+        values = typed_table_cells(lines[index])
+        rows << { line: lines[index], cells: values, values: headers.zip(values).to_h } if values.length == headers.length
+        index += 1
+      end
+      tables << { section: section, headers: headers, rows: rows }
+      next
+    end
+
+    index += 1
+  end
+
+  tables
+end
+
+def normalized_header(header)
+  header.to_s.downcase.strip.gsub(/\s+/, " ")
+end
+
+def typed_column_index(headers, *names)
+  normalized_headers = headers.map { |header| normalized_header(header) }
+  names.map { |name| normalized_headers.index(normalized_header(name)) }.compact.first
+end
+
+def normalized_ids(value, prefix)
+  value.to_s.scan(/\b#{prefix}-[A-Z0-9]+-[A-Z0-9-]+\b/).uniq.sort
+end
+
+def reviewed_status?(status)
+  normalized = status.to_s.downcase
+  return false if normalized.match?(/\b(stale|pending|candidate|blocked|failed|rejected|unreviewed|held)\b/)
+
+  normalized.match?(/\b(approved|reviewed|accepted|passed)\b/)
+end
+
+def reviewed_typed_traceability_rows(matrix_text)
+  markdown_tables(matrix_text).flat_map do |table|
+    next [] unless table[:section] == "Traceability Matrix"
+
+    trace_index = typed_column_index(table[:headers], "Trace", "Trace ID")
+    requirement_index = typed_column_index(table[:headers], "Requirement")
+    verification_index = typed_column_index(table[:headers], "Verification", "Verification ID")
+    status_index = typed_column_index(table[:headers], "Status")
+    target_indices = [
+      typed_column_index(table[:headers], "Implementation"),
+      typed_column_index(table[:headers], "Artifact Path")
+    ].compact.uniq
+    next [] unless [trace_index, requirement_index, verification_index, status_index].all?
+
+    table[:rows].select { |row| reviewed_status?(row[:cells][status_index]) }.map do |row|
+      {
+        requirements: normalized_ids(row[:cells][requirement_index], "REQ"),
+        traces: normalized_ids(row[:cells][trace_index], "TRACE"),
+        verifications: normalized_ids(row[:cells][verification_index], "VER"),
+        target_cells: target_indices.map { |target_index| row[:cells][target_index] }
+      }
+    end
+  end
+end
+
+def exact_target_mapping?(row, target)
+  row[:target_cells].any? do |cell|
+    value = cell.to_s.strip
+    delimited_values = value.split(/\s*(?:;|,|<br\s*\/?\s*>)\s*/i).map do |candidate|
+      candidate.strip.sub(/\A`/, "").sub(/`\z/, "")
+    end
+    backtick_values = value.scan(/`([^`]+)`/).flatten.map(&:strip)
+
+    delimited_values.include?(target) || backtick_values.include?(target)
+  end
+end
+
+def source_set(ids)
+  ids.join(",")
+end
+
+def matrix_set(ids)
+  ids.join("; ")
+end
+
+def same_named_entrypoint_anchors(target_text, entrypoint)
+  target_text.lines.each_with_object([]) do |line, anchors|
+    next unless line.include?("TRACEWEAVER:")
+
+    body = line.split("TRACEWEAVER:", 2).last.to_s
+    name = body[/\bentrypoint=([^;\s]+)/, 1]
+    next unless name == entrypoint
+
+    requirement = body[/(?:\A|;)\s*req=([^;\n]+)/, 1]
+    trace = body[/(?:\A|;)\s*trace=([^;\n]+)/, 1]
+    verification = body[/(?:\A|;)\s*ver=([^;\n]+)/, 1]
+    requirements = normalized_ids(requirement, "REQ")
+    traces = normalized_ids(trace, "TRACE")
+    verifications = normalized_ids(verification, "VER")
+    anchors << {
+      complete: !requirements.empty? && !traces.empty? && !verifications.empty?,
+      requirements: requirements,
+      traces: traces,
+      verifications: verifications
+    }
+  end
+end
+
+def matching_code_anchor_evidence_tuple?(matrix_text, target:, requirements:, traces:, verifications:, anchor_type:, role:)
+  markdown_tables(matrix_text).any? do |table|
+    next false unless table[:section] == "Code Anchor Evidence"
+
+    artifact_index = typed_column_index(table[:headers], "Artifact Path")
+    requirement_index = typed_column_index(table[:headers], "Requirement")
+    trace_index = typed_column_index(table[:headers], "Trace")
+    verification_index = typed_column_index(table[:headers], "Verification")
+    type_index = typed_column_index(table[:headers], "Anchor Type")
+    role_index = typed_column_index(table[:headers], "Role")
+    next false unless [artifact_index, requirement_index, trace_index, verification_index, type_index, role_index].all?
+
+    table[:rows].any? do |row|
+      row[:cells][artifact_index] == target &&
+        normalized_ids(row[:cells][requirement_index], "REQ") == requirements &&
+        normalized_ids(row[:cells][trace_index], "TRACE") == traces &&
+        normalized_ids(row[:cells][verification_index], "VER") == verifications &&
+        row[:cells][type_index] == anchor_type &&
+        row[:cells][role_index] == role
+    end
+  end
+end
+
+def stage_text(path, text, mode:)
+  temporary = path.dirname.join(".#{path.basename}.traceweaver-#{Process.pid}-#{rand(1 << 30)}.tmp")
+  begin
+    File.open(temporary, File::WRONLY | File::CREAT | File::EXCL, 0o600) do |file|
+      file.write(text)
+      file.flush
+      file.fsync
+    end
+    File.chmod(mode, temporary)
+    temporary
+  rescue StandardError
+    FileUtils.rm_f(temporary)
+    raise
+  end
+end
+
+def cleanup_staged(*paths)
+  paths.compact.each { |path| FileUtils.rm_f(path) }
+end
+
+def restore_pair(target_path:, target_original:, target_mode:, matrix_path:, matrix_original:, matrix_mode:)
+  target_restore = stage_text(target_path, target_original, mode: target_mode)
+  matrix_restore = stage_text(matrix_path, matrix_original, mode: matrix_mode)
+  File.rename(target_restore, target_path)
+  File.rename(matrix_restore, matrix_path)
+ensure
+  cleanup_staged(target_restore, matrix_restore)
+end
+
+def write_pair(target_path:, target_text:, target_original:, matrix_path:, matrix_text:, matrix_original:)
+  target_stage = nil
+  matrix_stage = nil
+  target_mode = File.stat(target_path).mode & 0o7777
+  matrix_mode = File.stat(matrix_path).mode & 0o7777
+  begin
+    target_stage = stage_text(target_path, target_text, mode: target_mode)
+    matrix_stage = stage_text(matrix_path, matrix_text, mode: matrix_mode)
+  rescue StandardError
+    cleanup_staged(target_stage, matrix_stage)
+    return false
+  end
+
+  begin
+    File.rename(target_stage, target_path)
+    target_stage = nil
+    raise IOError, "forced second replace failure" if ENV["TRACEWEAVER_TEST_FORCE_SECOND_REPLACE_FAILURE"] == "1"
+
+    File.rename(matrix_stage, matrix_path)
+    matrix_stage = nil
+    true
+  rescue StandardError
+    begin
+      restore_pair(
+        target_path: target_path,
+        target_original: target_original,
+        target_mode: target_mode,
+        matrix_path: matrix_path,
+        matrix_original: matrix_original,
+        matrix_mode: matrix_mode
+      )
+    rescue StandardError
+      # The caller reports a handled paired-write failure; recovery is best effort when the filesystem itself is failing.
+    end
+    false
+  ensure
+    cleanup_staged(target_stage, matrix_stage)
+  end
+end
+
+if options[:anchor_level] == "entrypoint"
+  pause("missing_entrypoint_name") if options[:entrypoint].to_s.empty?
+  pause("missing_explicit_entrypoint_authority") unless options[:requirement] && options[:trace] && options[:verification]
+  pause("helper_exception_not_authority_for_entrypoint") if options[:helper_exception]
+
+  selector_rows = reviewed_typed_traceability_rows(matrix_text).select do |row|
+    row[:requirements].include?(options[:requirement]) &&
+      row[:traces].include?(options[:trace]) &&
+      row[:verifications].include?(options[:verification])
+  end
+  pause("missing_entrypoint_authority_mapping") if selector_rows.empty?
+
+  selected_rows = selector_rows.select { |row| exact_target_mapping?(row, target) }
+  pause("missing_entrypoint_target_mapping") if selected_rows.empty?
+  pause("ambiguous_entrypoint_authority_mapping") unless selected_rows.length == 1
+
+  selected = selected_rows.first
+  requirements = selected[:requirements]
+  traces = selected[:traces]
+  verifications = selected[:verifications]
+  pause("requirement_absent_from_authority") unless requirements.all? { |id| requirements_text.include?(id) }
+
+  existing_entrypoints = same_named_entrypoint_anchors(target_text, options[:entrypoint])
+  existing_entrypoints.each do |anchor|
+    exact = anchor[:complete] &&
+      anchor[:requirements] == requirements &&
+      anchor[:traces] == traces &&
+      anchor[:verifications] == verifications
+    pause("conflicting_existing_entrypoint_anchor") unless exact
+  end
+
+  role = options[:role] || "trace-anchor-target"
+  reason = options[:reason] || "TraceWeaver reviewed hierarchy maps this artifact to #{source_set(requirements)}."
+  anchor_type = "entrypoint"
+  anchor_body = "TRACEWEAVER: entrypoint=#{options[:entrypoint]}; req=#{source_set(requirements)}; trace=#{source_set(traces)}; ver=#{source_set(verifications)}"
+  anchor_comment = comment_line(target, anchor_body)
+  matrix_row = "| #{target} | #{matrix_set(requirements)} | #{matrix_set(traces)} | #{matrix_set(verifications)} | #{anchor_type} | #{role} |"
+  file_needs_change = existing_entrypoints.empty?
+  matrix_needs_change = !matching_code_anchor_evidence_tuple?(
+    matrix_text,
+    target: target,
+    requirements: requirements,
+    traces: traces,
+    verifications: verifications,
+    anchor_type: anchor_type,
+    role: role
+  )
+
+  if mode == "apply" && !options[:work_loop]
+    puts "trace_anchor_authoring_status=refused"
+    puts "trace_anchor_authoring_reason=apply_requires_traceweaver_work_loop"
+    puts "trace_anchor_authoring_file_changed=false"
+    puts "trace_anchor_authoring_matrix_changed=false"
+    exit 1
+  end
+
+  if mode == "apply" && (file_needs_change || matrix_needs_change)
+    new_target_text = file_needs_change ? insert_before_entrypoint(target_text, anchor_comment, options[:entrypoint]) : target_text
+    new_matrix_text = matrix_needs_change ? matrix_text_with_anchor_row(matrix_text, matrix_row) : matrix_text
+    pause("paired_write_failed") unless write_pair(
+      target_path: target_path,
+      target_text: new_target_text,
+      target_original: target_text,
+      matrix_path: matrix_path,
+      matrix_text: new_matrix_text,
+      matrix_original: matrix_text
+    )
+  end
+
+  puts "trace_anchor_authoring_status=#{mode == "apply" ? "applied" : "proposed"}"
+  puts "trace_anchor_authoring_target=#{target}"
+  puts "trace_anchor_authoring_anchor_type=#{anchor_type}"
+  puts "trace_anchor_authoring_requirement=#{source_set(requirements)}"
+  puts "trace_anchor_authoring_trace=#{source_set(traces)}"
+  puts "trace_anchor_authoring_verification=#{source_set(verifications)}"
+  puts "trace_anchor_authoring_anchor=#{anchor_comment.lines.map(&:strip).join(" | ")}"
+  puts "trace_anchor_authoring_matrix_row=#{matrix_row}"
+  puts "trace_anchor_authoring_file_changed=#{mode == "apply" && file_needs_change}"
+  puts "trace_anchor_authoring_matrix_changed=#{mode == "apply" && matrix_needs_change}"
+  puts "trace_anchor_authoring_reason=#{reason}"
+  exit 0
+end
+
 candidate_rows = find_matrix_candidates(matrix_text, target)
 explicit_mapping = options[:requirement] && options[:trace] && options[:verification]
 if candidate_rows.length > 1 && !explicit_mapping
@@ -407,10 +725,16 @@ if mode == "apply"
     else
       target_text
     end
-  target_path.write(new_target_text)
-
-  if matrix_needs_change
-    matrix_path.write(matrix_text_with_anchor_row(matrix_text, matrix_row))
+  new_matrix_text = matrix_needs_change ? matrix_text_with_anchor_row(matrix_text, matrix_row) : matrix_text
+  if file_needs_change || matrix_needs_change
+    pause("paired_write_failed") unless write_pair(
+      target_path: target_path,
+      target_text: new_target_text,
+      target_original: target_text,
+      matrix_path: matrix_path,
+      matrix_text: new_matrix_text,
+      matrix_original: matrix_text
+    )
   end
 end
 

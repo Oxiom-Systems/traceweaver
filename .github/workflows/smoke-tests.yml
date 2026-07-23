@@ -1,3 +1,4 @@
+# TRACEWEAVER: file-role=code-traceability-ci-workflow; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
 name: Smoke tests
 
 # Runs the TraceWeaver discovery/traceability smokes on pull requests and on
@@ -44,6 +45,15 @@ jobs:
       - name: Codex discovery smoke
         run: TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
 
+      - name: V&V definition smoke
+        run: scripts/traceweaver-smoke-vv-define
+
+      - name: SessionStart hook smoke
+        run: scripts/traceweaver-smoke-hook-session-start
+
+      - name: PreToolUse TDD gate hook smoke
+        run: scripts/traceweaver-smoke-hook-pretooluse-tdd-gate
+
       - name: Antigravity discovery smoke
         run: scripts/traceweaver-smoke-antigravity-discovery
 
@@ -52,6 +62,9 @@ jobs:
 
       - name: Code traceability smoke
         run: scripts/traceweaver-smoke-code-traceability
+
+      - name: Code trace-anchor authoring smoke
+        run: scripts/traceweaver-smoke-code-trace-authoring
 
       - name: Controlled-publication smoke
         run: scripts/traceweaver-smoke-controlled-publication

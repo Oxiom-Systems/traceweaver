@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "work_item_id": "FIXTURE-INVALID-IDENTITY",
+  "plan_ref": "docs/plans/does-not-exist-plan.md",
+  "requirements": [
+    {
+      "req_id": "REQ-076",
+      "trace_id": "trace-tw-058",
+      "ver_id": "VER-TW-078-EXTRA-SEGMENT",
+      "val_id": "VAL_TW_020",
+      "verification_artifact": "fixtures/vv-define/valid-capsule/verification/red_test.sh",
+      "red_evidence": "fixtures/vv-define/valid-capsule/red-evidence/red_run.txt",
+      "validation_artifact": "fixtures/vv-define/valid-capsule/validation/validation-definition.md"
+    }
+  ]
+}

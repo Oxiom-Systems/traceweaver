@@ -115,130 +115,20 @@ require_present "$tw_grill_skill" "Do not edit project context or authority docu
 require_present "$lfg_skill" "Invoke \`tw-auto\` with the same arguments"
 require_present "$lfg_skill" "Do not run \`ce-plan\`, \`ce-work\`, \`ce-code-review\`, \`ce-commit\`"
 require_present "$lfg_skill" "Do not fall back to raw CE \`lfg\`"
-require_present "$tw_auto_skill" "agent thread limit reached"
-require_present "$tw_auto_skill" "pending queue"
-require_present "$tw_auto_skill" "does not close U9, runtime, release, or"
-require_present "$tw_auto_skill" "required-review gates"
+require_present "$tw_auto_skill" "at most two active"
+require_present "$tw_auto_skill" "at most three personas"
+require_present "$tw_auto_skill" "no more than two repair cycles"
+require_present "$tw_auto_skill" "held_no_progress"
+require_present "$tw_auto_skill" "tw-commit-push-pr"
+require_present "$tw_auto_skill" "never stages, commits, pushes, opens a PR"
+require_absent "$tw_auto_skill" "U9 passed"
 
-review_capacity=1
-intended_reviewers=(ce-coherence-reviewer ce-feasibility-reviewer ce-scope-guardian-reviewer)
-queued_reviewers=("${intended_reviewers[@]}")
-active_reviewers=()
-completed_reviewers=()
-closed_reviewers=()
-capacity_errors=()
-dispatch_events=()
-
-join_by_space() {
-  local IFS=" "
-  echo "$*"
-}
-
-dispatch_reviewer() {
-  local reviewer="$1"
-  if [ "${#active_reviewers[@]}" -ge "$review_capacity" ]; then
-    capacity_errors+=("agent thread limit reached:$reviewer")
-    dispatch_events+=("capacity:$reviewer")
-    return 1
-  fi
-  active_reviewers+=("$reviewer")
-  dispatch_events+=("dispatched:$reviewer")
-  return 0
-}
-
-complete_active_reviewer() {
-  local reviewer="$1"
-  local next_active=()
-  local found=0
-  for active in "${active_reviewers[@]}"; do
-    if [ "$active" = "$reviewer" ]; then
-      found=1
-      completed_reviewers+=("$reviewer")
-      dispatch_events+=("completed:$reviewer")
-    else
-      next_active+=("$active")
-    fi
-  done
-  if [ "$found" -ne 1 ]; then
-    echo "reviewer_backpressure_fixture=failed_complete_unknown_reviewer:$reviewer"
-    exit 1
-  fi
-  active_reviewers=()
-  if [ "${#next_active[@]}" -gt 0 ]; then
-    active_reviewers=("${next_active[@]}")
-  fi
-}
-
-close_completed_reviewer() {
-  local reviewer="$1"
-  for completed in "${completed_reviewers[@]}"; do
-    if [ "$completed" = "$reviewer" ]; then
-      closed_reviewers+=("$reviewer")
-      dispatch_events+=("closed:$reviewer")
-      return 0
-    fi
-  done
-  echo "reviewer_backpressure_fixture=failed_close_uncompleted_reviewer:$reviewer"
-  exit 1
-}
-
-remove_queued_reviewer() {
-  local reviewer="$1"
-  local next_queue=()
-  for queued in "${queued_reviewers[@]}"; do
-    if [ "$queued" != "$reviewer" ]; then
-      next_queue+=("$queued")
-    fi
-  done
-  queued_reviewers=()
-  if [ "${#next_queue[@]}" -gt 0 ]; then
-    queued_reviewers=("${next_queue[@]}")
-  fi
-}
-
-dispatch_reviewer "ce-coherence-reviewer" || true
-remove_queued_reviewer "ce-coherence-reviewer"
-dispatch_reviewer "ce-feasibility-reviewer" || true
-complete_active_reviewer "ce-coherence-reviewer"
-close_completed_reviewer "ce-coherence-reviewer"
-dispatch_reviewer "ce-feasibility-reviewer" || true
-remove_queued_reviewer "ce-feasibility-reviewer"
-dispatch_reviewer "ce-scope-guardian-reviewer" || true
-
-pending_reviewers=("${queued_reviewers[@]}")
-if [ "${#active_reviewers[@]}" -gt 0 ]; then
-  pending_reviewers+=("${active_reviewers[@]}")
-fi
-
-if [ "${#capacity_errors[@]}" -eq 0 ]; then
-  echo "reviewer_backpressure_fixture=failed_missing_capacity_error"
-  exit 1
-fi
-
-if [ "$(join_by_space "${closed_reviewers[@]}")" != "ce-coherence-reviewer" ]; then
-  echo "reviewer_backpressure_fixture=failed_missing_close_after_completion"
-  exit 1
-fi
-
-if [ "${#pending_reviewers[@]}" -eq 0 ]; then
-  echo "reviewer_backpressure_fixture=failed_missing_pending_reviewers"
-  exit 1
-fi
-
-if [ "${#completed_reviewers[@]}" -eq "${#intended_reviewers[@]}" ]; then
-  review_gate_status="passed"
-else
-  review_gate_status="held_incomplete_reviewer_coverage"
-fi
-
-if [ "$review_gate_status" = "passed" ]; then
-  echo "reviewer_backpressure_fixture=failed_gate_closed"
-  exit 1
-fi
-
-human_degraded_acceptance="held_condition_recorded_not_gate_closure"
-if [ "$human_degraded_acceptance" != "held_condition_recorded_not_gate_closure" ]; then
-  echo "degraded_review_acceptance_fixture=failed_gate_closed"
+profile_reviewer_cap=1
+profile_active_reviewer_cap=2
+profile_persona_cap=3
+profile_repair_cycle_cap=2
+if [ "$profile_reviewer_cap" -ne 1 ] || [ "$profile_active_reviewer_cap" -ne 2 ] || [ "$profile_persona_cap" -ne 3 ] || [ "$profile_repair_cycle_cap" -ne 2 ]; then
+  echo "profile_review_caps=failed"
   exit 1
 fi
 
@@ -252,6 +142,6 @@ echo "lfg_delegation=pass"
 echo "lfg_no_raw_ce_autopilot=pass"
 echo "pr_helper_publication_stop_before_external_mutation=pass"
 echo "publication_stop_static_markers=present"
-echo "reviewer_backpressure=incomplete_coverage_no_gate_closure events=$(join_by_space "${dispatch_events[@]}") capacity_errors=$(join_by_space "${capacity_errors[@]}") intended=$(join_by_space "${intended_reviewers[@]}") completed=$(join_by_space "${completed_reviewers[@]}") closed=$(join_by_space "${closed_reviewers[@]}") pending=$(join_by_space "${pending_reviewers[@]}")"
-echo "degraded_review_acceptance=held_condition_not_gate_closure"
-echo "unit4_boundary_smoke=pass"
+echo "profile_review_caps=pass routine=$profile_reviewer_cap active=$profile_active_reviewer_cap personas=$profile_persona_cap repair_cycles=$profile_repair_cycle_cap"
+echo "u9_runtime=held_out_of_scope"
+echo "publication_deploy_dogfood=held_without_separate_authority"

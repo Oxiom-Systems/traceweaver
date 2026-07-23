@@ -5,6 +5,7 @@ description: TraceWeaver-controlled document review wrapper. Use when reviewing 
 
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-050; trace=TRACE-TW-023; ver=VER-TW-032 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
+<!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-086; req=REQ-TW-087 -->
 
 # TraceWeaver Document Review
 
@@ -14,6 +15,21 @@ Run document review as a TraceWeaver-controlled review step instead of a raw CE
 document review. This wrapper preserves the CE document-review behavior while
 requiring requirement-quality and authority/traceability checks when a document
 can affect implementation authority or accepted evidence.
+
+## Scoped Review Identity
+
+Use `references/scoped-review-protocol.md` to identify a review by baseline
+hash, frozen profile hash, changed-file digest, and verification digest. Reuse
+an accepted review when all four values match. Matrix-only, status-only, and
+derived-projection-only changes do not alter the reviewed changed-file digest
+and must not trigger a generic duplicate document review.
+
+Use the frozen profile's deduplicated fan-out: one routine independent reviewer,
+at most two active reviewers, and no more than three personas. A specialist is
+profile-triggered only; a validator is limited to P0, P1, or disputed P2. Route
+P0/P1 through repair and a scoped rerun, route disputed P2 through its decision
+path, and record routine P2/P3 without an extra review cycle. Stop after two
+repair cycles or unchanged blocked work as `held_no_progress`.
 
 ## Required Authority Inputs
 
@@ -94,6 +110,9 @@ Return:
 - accepted scope and held claims
 - whether the document may be used as accepted TraceWeaver input
 - highest-level next TraceWeaver wrapper command, review, or human decision
+- review identity and accepted-review reuse result
+- selected reviewer personas, active-reviewer count, and repair-cycle result
+- terminal receipt reference when this review contributes to terminal state
 
 ## Gate
 

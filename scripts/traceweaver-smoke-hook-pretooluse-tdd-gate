@@ -1,0 +1,27 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Regression guard: the repaired default surface must not register or ship
+# a PreToolUse gate. This smoke deliberately does not invoke, install, or
+# otherwise exercise a hook.
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+MANIFEST="$ROOT_DIR/plugins/traceweaver-core/hooks/hooks.json"
+CURSOR_MANIFEST="$ROOT_DIR/plugins/traceweaver-core/hooks/hooks-cursor.json"
+
+if rg -n 'PreToolUse|preToolUse' "$MANIFEST" "$CURSOR_MANIFEST"; then
+  echo "pretooluse_default_removed=fail reason=manifest_registration_present" >&2
+  exit 1
+fi
+
+if [[ -e "$ROOT_DIR/plugins/traceweaver-core/hooks/pretooluse-tdd-gate" ]]; then
+  echo "pretooluse_default_removed=fail reason=hook_present" >&2
+  exit 1
+fi
+
+if [[ -e "$ROOT_DIR/fixtures/hooks/pretooluse" ]]; then
+  echo "pretooluse_default_removed=fail reason=fixture_content_present" >&2
+  exit 1
+fi
+
+echo "pretooluse_default_removed=pass"

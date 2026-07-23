@@ -62,7 +62,7 @@ records under `.traceweaver/`.
 ## What A First-Time User Does
 
 1. Install the TraceWeaver Core plugin for Codex or Claude Code, or use the
-   0.2.8 Antigravity metadata for static local install/discovery only.
+   0.3.0 Antigravity metadata for static local install/discovery only.
 2. In a blank project, use the new-project guide to choose the right route for
    the project size:
 
@@ -70,11 +70,18 @@ records under `.traceweaver/`.
    docs/guides/starting-a-new-project-with-traceweaver.md
    ```
 
-3. Ask TraceWeaver to bootstrap authority:
+3. Bootstrap the reusable project-local orchestration contract. It is a
+   `template_manual_launch_only` until a particular host has fresh top-level
+   runtime proof, and it never changes host-global configuration:
 
    ```text
-   tw-auto "bootstrap TraceWeaver authority for this project"
+   tw-setup "bootstrap locally; preserve instructions; do not create authority drafts without my explicit authorization"
    ```
+
+   Bootstrap creates `.traceweaver/master-orchestrator.md`,
+   `.traceweaver/bootstrap.yml`, and `.traceweaver/workflow-profile.yml`. The
+   master is read-only. Building, verification, review, deployment, and browser
+   dogfood require separately bounded child roles and receipts.
 
 4. In an existing project, audit before changing code:
 
@@ -113,7 +120,7 @@ instead of letting it leak into release notes or customer-facing copy.
 
 ## Current Alpha Boundary
 
-TraceWeaver Core `0.2.8` is an alpha advisory plugin. It can guide first-time
+TraceWeaver Core `0.3.0` is an alpha advisory plugin. It can guide first-time
 authority setup, requirements review, planning, work handoffs, traceability
 checks, audits, and controlled review flows in Codex and Claude Code.
 Antigravity support is limited to static local install/discovery metadata until

@@ -1,578 +1,282 @@
 ---
 name: tw-auto
-description: TraceWeaver-controlled autonomous alpha workflow. Use when you want CE-style plan/work/review/publication iteration with Intent Contract, authority, traceability, verification, and publication-route controls.
-argument-hint: "[feature description or plan path]"
+description: Advisory TraceWeaver workflow-profile and capsule router. It selects bounded child work but never implements directly.
+argument-hint: "[task or accepted plan path]"
 disable-model-invocation: false
 ---
 
+<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-082; req=REQ-TW-083; req=REQ-TW-084 -->
+<!-- TRACEWEAVER: file-role=advisory-profile-router; req=REQ-TW-086; req=REQ-TW-087 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-031; ver=VER-TW-040 -->
-<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-042; ver=VER-TW-054 -->
-<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-045; ver=VER-TW-057 -->
-<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059 -->
-<!-- TRACEWEAVER: file-role=strategy-ideation-orchestrator; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
-<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
-<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
-<!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-023; trace=TRACE-TW-046; ver=VER-TW-059 -->
 
 # TraceWeaver Auto
 
 ## Purpose
 
-Run a bounded CE-style engineering loop while preserving TraceWeaver authority
-control. This alpha is advisory and static: it coordinates the workflow,
-bootstraps missing authority files for new projects, records trace evidence, and
-defaults to stopping before publication unless the controlled TraceWeaver
-publication route explicitly passes.
+`tw-auto` is an advisory profile and capsule router. It is a read-only master:
+it may inspect authority, select/freeze a workflow profile, create bounded child
+capsules, record harness receipts, and return held results. It does not edit,
+build, test, stage, commit, deploy, browse, dogfood, or implement as a fallback.
+It has no direct implementation path.
 
-Use `tw-auto` instead of `lfg` when the work must preserve stakeholder intent,
-approved requirements, traceability, verification, validation questions, and
-next-step handoffs.
+## Required Inputs
 
-The goal is to preserve the useful CE rhythm while adding TraceWeaver authority:
-idea and brainstorm produce reviewed requirements, plans/work/reviews cite
-authority, and every meaningful behavior-bearing unit updates trace evidence or
-is routed as dark behavior, a proposed requirement, a gap, a change, an
-exception, an accepted risk, a clarification, or a removal candidate.
+Before it dispatches any child, the read-only master must have or explicitly
+hold the following interface inputs. It may inspect them, bind their identities
+into a child capsule, and report missing inputs; it must not manufacture or
+mutate them itself.
 
-## Required Authority Inputs
+- **Intent and authority source:** the applicable `requirements.md`,
+  `traceability-matrix.md`, and `.traceweaver/intent-contract.yml`, or an
+  explicit authority-bootstrap/source-evidence hold when those controlled
+  artifacts do not yet exist. The master binds the baseline identity and
+  approved scope; it does not promote drafts or source evidence into authority.
+- **Frozen workflow profile:** one valid `tw-workflow-profile/1` profile from
+  `references/workflow-profile-template.yml`, including its revision/hash,
+  risk, permitted child roles, model selection, reviewer/repair caps, and
+  release/deploy/dogfood conditions. A missing or changed profile is a hold,
+  not permission to choose controls ad hoc.
+- **Planning receipt:** a passable, profile-bound `tw-plan` child receipt that
+  states scope, authority outcome, verification method, validation question,
+  and held claims. Without it, the master cannot route V&V, a builder, or a
+  closure claim.
+- **Proportional V&V handoff:** the L0 not-applicable record or the matching
+  reviewed `tw-vv-define` capsule and RED verification-evidence reference for
+  L1/L2/L3. The capsule identity must match the frozen profile and plan receipt
+  before `tw-authority-gate` or `tw-work` can be routed.
+- **Available bounded children:** named child roles and their selected models
+  must be available within the frozen profile. An unavailable child or model is
+  recorded with its consequence and returns a held/bounded route; the master
+  never performs that child work as a fallback.
+- **Verification and release boundary evidence:** linked verification receipts
+  for the requested work, plus explicit held conditions for release,
+  deployment, and dogfood. Missing evidence or authority keeps those outcomes
+  held; implementation, review, or a fixture pass never implies publication,
+  deployment, or dogfood completion.
 
-Before planning or implementation, load and cite:
+## Project Bootstrap Routing
 
-- `requirements.md`
-- `traceability-matrix.md`
-- `.traceweaver/intent-contract.yml`
-- skill-local `references/traceweaver-operating-modes.md`
-- skill-local `references/trace-anchor-authoring.md` when behavior-bearing code
-  or verification artifacts are changed
-- skill-local `references/traceweaver-wrapper-handoff-discipline.md`
-- relevant task capsule, gap, change, or exception records under `.traceweaver/`
+When project-local orchestration files are absent, `tw-auto` may route to the
+deterministic `tw-setup` bootstrap helper. This is advisory routing only:
+`tw-auto` does not create files or implement as a fallback. The helper creates
+the master contract, bootstrap receipt, and workflow profile; authority drafts
+remain held unless explicitly owner-authorized. The master remains read-only and
+only a named capsule-bounded child role may activate. Until fresh host proof
+exists, report `template_manual_launch_only`; deployment and Chrome dogfood are
+separate authorized child receipts.
 
-If `requirements.md` or `.traceweaver/intent-contract.yml` is missing, enter
-authority bootstrap mode before planning or implementation:
+## Profile Selection Before Any Builder Dispatch
 
-1. Summarize the user's request into stakeholder needs, candidate requirements,
-   assumptions, exclusions, risks, validation questions, and open decisions.
-   Redact secrets, credentials, personal data, private file paths, proprietary
-   transcript text, and unrelated project details before writing root authority
-   files. Do not copy raw chat, session, transcript, or private source material
-   into likely tracked files.
-2. Ask for human confirmation before creating or overwriting root
-   `requirements.md`, `traceability-matrix.md`, or
-   `.traceweaver/intent-contract.yml`. If confirmation is unavailable, stop and
-   report a bootstrap gap instead of writing files.
-3. Create a root `requirements.md` draft baseline from the redacted summary and
-   the skill-local `references/requirements-baseline-template.md` bundled with
-   `tw-auto`.
-4. Create `.traceweaver/intent-contract.yml` from the draft baseline and the
-   skill-local `references/intent-contract-template.yml` bundled with
-   `tw-auto`.
-5. Create a root `traceability-matrix.md` from the draft baseline and Intent
-   Contract using the skill-local
-   `references/traceability-matrix-bootstrap-template.md` bundled with
-   `tw-auto`.
-6. Store any raw prompt/source material only in an explicitly private ignored
-   evidence location or external record chosen by the user; never persist it in
-   public docs, PR bodies, issues, or root authority files.
-7. Stop with suggested next step: run `tw-requirements-review`, then review or
-   approve the baseline before implementation.
+Create one `tw-workflow-profile/1` profile from
+`references/workflow-profile-template.yml` before dispatching a builder. Select
+the first applicable profile deterministically:
 
-If only `traceability-matrix.md` is missing, create a bootstrap matrix from the
-project's accepted `requirements.md` and `.traceweaver/intent-contract.yml`
-before implementation starts, then run `tw-traceability-check` before continuing.
+| Profile | Selection | Required controls |
+| --- | --- | --- |
+| L0 | Documentation, generated, or mechanical no-behavior change | Deterministic check when applicable; no V&V and no multi-agent review. |
+| L1 | Narrow low-consequence behavior | Compact authority reference, focused verification, fresh verifier, one independent reviewer. |
+| L2 | Cross-module, API, data-flow, or deployment-facing behavior | Full work-item capsule, fresh verifier, one reviewer and at most one justified specialist. |
+| L3 | Money, security, destructive action, release, external side effect, or unclear authority | Full V&V, strongest independent reviewer, explicit rollback, owner-held decisions; no more than three reviewer personas. |
 
-## Skill Resolution
+The profile records risk, selected controls, child roles, model availability,
+choice and rationale, reviewer cap, repair-cycle cap, deploy requirement,
+dogfood requirement, estimated delivery, derived target/ceiling, revision, and
+canonical hash. An unavailable model is recorded with its consequence and routes
+to hold or a bounded child; `tw-auto` never implements as a fallback.
 
-Before invoking any workflow skill, resolve its name against the host
-available-skills list. The accepted resolution must be the TraceWeaver-packaged
-entry for that skill, whether the host exposes it as a bare name or a
-plugin-scoped/namespaced name. Do not guess a bare short name if the host exposes
-a plugin-scoped or namespaced entry.
+The profile becomes immutable at the first builder dispatch. A later control or
+reviewer expansion returns `refused_profile_immutable`. Escalation creates a
+new revision with an explicit reason and a new profile hash; it never mutates
+the started revision silently.
 
-Required resolutions:
+## Harness Accounting
 
-- `tw-strategy`
-- `tw-ideate`
-- `tw-brainstorm`
-- `tw-plan`
-- `tw-authority-gate`
-- `tw-audit`
-- `tw-work`
-- `tw-traceability-check`
-- `tw-debug`
-- `tw-code-review`
-- `tw-doc-review`
-- `tw-compound`
-- `tw-compound-refresh`
-- `tw-resolve-pr-feedback`
-- `tw-sessions`
-- `tw-test-browser`
-- `tw-test-xcode`
-- `tw-setup`
-- `tw-worktree`
+The orchestration harness, not a child, records monotonic time at every child
+dispatch and return. Each child capsule declares its fixed category and maximum
+timebox:
 
-Publication intent must resolve TraceWeaver-owned publication wrappers before
-any CE publication engine is considered:
+- `delivery`: implementation, focused verification, build, authorized
+  deployment, or dogfood;
+- `process`: authority, planning, coordination, generic review, validation,
+  matrix/registry administration, or release evidence; and
+- `unclassified`: counted as process until a reviewer resolves it.
 
-- `tw-commit`
-- `tw-commit-push-pr`
+Before dispatch, project the candidate's *full* timebox into its category.
+`estimated_process_target_minutes = 0.25 * estimated_delivery_minutes`; at that
+target, stop optional artifacts and duplicate reviews and choose delivery or a
+held result. `estimated_process_ceiling_minutes = estimated_delivery_minutes`;
+refuse a process child whose full-timebox projection crosses it. These are
+in-flight planning guards, not terminal acceptance calculations.
 
-If any required skill is unavailable as a TraceWeaver-packaged entry in the
-host's available-skills list, stop and report the missing skill as an
-install/package gap. Do not fall back to an external raw CE path, globally
-installed CE plugin, or unlisted skill name.
+Every receipt records profile revision/hash, category, child timebox, monotonic
+elapsed time, cumulative process/delivery/unclassified time, actual ratio, and
+next-child projection. At terminal evaluation,
+`actual_process_minutes <= 0.25 * actual_delivery_minutes` meets the target.
+Whenever `actual_process_minutes > actual_delivery_minutes`, return
+`held_process_budget`, including delivery underrun. No in-task exception exists.
 
-`tw-plan` may delegate to the TraceWeaver-packaged `ce-plan` engine after it
-loads authority and requirements are plan-ready. `tw-auto` must not invoke raw
-`ce-plan` directly as the planning wrapper.
+## Planning-Wrapper Route
 
-Source-evidence, audit, learning, session, verification, setup, worktree, and PR
-feedback routes must also use TraceWeaver wrappers. `tw-strategy` and
-`tw-ideate` delegate to packaged CE-derived strategy and ideation engines as
-source evidence only; `tw-brainstorm` delegates to packaged `ce-brainstorm` as
-source evidence; `tw-audit` delegates lower traceability, acceptance, and
-generated-view checks to TraceWeaver-owned gates and scripts without granting
-cleanup or publication authority; `tw-compound` and
-`tw-compound-refresh` delegate to packaged learning engines without approving
-authority changes; `tw-sessions` delegates to packaged `ce-sessions` and may
-use hidden/internal packaged `ce-session-inventory` and `ce-session-extract`
-helpers; `tw-test-browser` and `tw-test-xcode` produce linked verification
-evidence through packaged CE test engines; `tw-setup` and `tw-worktree` keep
-host and git mutation local/held; and `tw-resolve-pr-feedback` handles local
-feedback repair while remote mutation and publication remain routed through
-controlled publication wrappers.
+Before any V&V or builder dispatch, the read-only master must route meaningful
+work through a named planning child running `tw-plan`; it must not invoke raw
+`ce-plan` directly or synthesize an implementation plan itself. Freeze the
+selected profile revision/hash, permitted child roles, and selected model before
+creating that planning capsule. The capsule must bind the baseline/authority
+identity, requested scope, verification method, validation question, and held
+claims to the same frozen profile used by later children.
 
-## Reviewer Subagent Capacity
+The `tw-plan` child performs the requirements-quality and authority preflight,
+then may delegate planning to the TraceWeaver-packaged `ce-plan` engine under
+its own no-publication boundary. It returns either an authority-held result or a
+plan whose accepted scope, verification/validation intent, and held claims are
+bound to the frozen profile. The master records the child receipt and may route
+proportional V&V only after that result is passable. A failed, unclear, stale,
+or broadened planning result returns a held state; the master does not repair,
+reinterpret authority, or bypass `tw-plan`.
 
-When a resolved review skill dispatches reviewer subagents, manage reviewer
-capacity as part of the TraceWeaver loop instead of treating capacity errors as
-review completion.
+## V&V Definition Phase
 
-- Before starting review, record the intended reviewer set and the host's
-  observed active-agent limit when it can be discovered.
-- Dispatch reviewers with bounded parallelism. Keep undispatched reviewers in a
-  pending queue rather than dropping them.
-- If dispatch returns an active-agent or thread-limit error such as
-  "agent thread limit reached", classify it as backpressure. Do not mark that
-  reviewer as failed and do not claim the review is clean.
-- When a reviewer completes, collect its findings, close that reviewer agent if
-  the host exposes an agent-close action, then start the next pending reviewer.
-- Continue until every intended reviewer is completed, explicitly skipped by a
-  human decision, or the host cannot free capacity after completed reviewers are
-  closed.
-- If capacity cannot be freed, stop the automation before commit, push, PR, U9,
-  runtime, or release claims. Report partial review coverage, the reviewers that
-  completed, reviewers still pending, and the exact capacity blocker.
-- Main-thread fallback is allowed only as degraded evidence. It must be labeled
-  as degraded coverage and cannot close a gate that requires the missing
-  reviewer persona. A human may accept the limitation only by recording an
-  explicit limitation or held condition with owner, scope, affected gate, and
-  next review condition; that acceptance does not close U9, runtime, release, or
-  required-review gates.
+After a passable `tw-plan` result and before a builder or authority handoff, the
+master dispatches a profiled `tw-vv-define` child. L0 records that V&V is not
+applicable without exception ceremony; L1 creates one compact work-item capsule
+with focused verification and one validation question; L2/L3 create the full
+v1 capsule with L3 high-risk controls. The `tw-vv-define` child returns the
+reviewed capsule and RED evidence reference bound to the frozen profile.
 
-## Workflow
+Only then may the master route the resolved `tw-authority-gate` child for the
+specific builder handoff. Missing, unreviewed, or mismatched V&V evidence is a
+held result; it never permits the master to implement, weaken the preflight, or
+claim runtime enforcement.
 
-1. Read the request and identify the intended stakeholder outcome.
-2. Load or bootstrap the required authority files.
-3. Classify the run as Authority Baseline Mode, Implementation Gate Mode, or
-   Publication Mode using the skill-local operating-mode policy. Pause for
-   human clarification when requirements are unclear, contradictory,
-   incomplete, missing, or require material authority change.
-4. Confirm the current baseline ID, baseline hash, requirements authority, and
-   Intent Contract authority.
-5. When the request is about product direction, strategy, possible ideas,
-   idea generation, ranking, critique, or an existing `STRATEGY.md`, route first
-   through `tw-strategy` and/or `tw-ideate` as source evidence before
-   `tw-brainstorm` or requirements review. Skip these source-evidence wrappers
-   when the request already names an approved implementation plan or accepted
-   requirement and does not ask for strategy or ideation.
-6. Run or create the planning step using the resolved TraceWeaver planning
-   wrapper (`tw-plan`) and keep the plan bounded to approved authority. The
-   wrapper may delegate to packaged `ce-plan` only after TraceWeaver authority
-   and requirements-quality preflight pass or are explicitly held.
-7. When the request needs brainstorming, project audit, session history,
-   learning capture, PR feedback repair, setup, worktree creation, browser
-   verification, or Xcode verification, route through `tw-brainstorm`,
-   `tw-audit`, `tw-sessions`, `tw-compound`, `tw-compound-refresh`,
-   `tw-resolve-pr-feedback`, `tw-setup`, `tw-worktree`, `tw-test-browser`, or
-   `tw-test-xcode` instead of raw CE skills.
-8. Run the resolved `tw-authority-gate` before implementation.
-9. If authority is missing, stop and create a gap, change, exception candidate,
-   accepted-risk candidate, or clarification record. Do not implement from an
-   assumption.
-10. Run implementation using the resolved TraceWeaver implementation worker
-   (`tw-work`) only in TraceWeaver controlled publication-gated mode and only
-   while authority remains clear. `tw-work` may invoke the TraceWeaver-packaged
-   `ce-work` coding engine, but `tw-auto` must treat `tw-work` as the work-loop
-   owner for authority visibility, trace-anchor authoring, verification,
-   matrix-evidence updates, and no-publication handoff. Pass the authority
-   capsule, verification target, matrix-update requirement, changed-file scope,
-   and the explicit instruction that `tw-work` must establish test-first
-   evidence, a scoped not-applicable decision, or approved exception evidence
-   before behavior mutation, detect requirement closure claims and route them
-   through structured acceptance evidence or held-validation records before
-   complete/done wording, then run automatic trace-anchor authoring before
-   review: scanner on changed behavior-bearing files and linked
-   tests/fixtures/smokes, helper-applied source anchors plus matching Code
-   Anchor Evidence rows for unambiguous mappings, scanner rerun, focused
-   verification that makes the same test-first artifact pass or records the
-   approved exception/not-applicable evidence, and review-staging of only the
-   completed work/evidence scope needed for coherent `tw-code-review` /
-   `tw-doc-review` handoff. Neither `tw-work` nor its
-   underlying `ce-work` step may create commits, push, open PRs, update plan
-   status to completed, or load `ce-commit`, `ce-commit-push-pr`, or Phase 4
-   shipping unless the controlled TraceWeaver publication route authorizes that
-   specific publication target.
-11. For changed behavior-bearing implementation or verification artifacts, run
-   trace-anchor authoring as part of the work loop: scan changed files, propose
-   anchors and Code Anchor Evidence rows, apply only unambiguous mappings in an
-   authorized work-loop context, skip per-artifact ambiguous anchor writes while
-   recording unresolved mapping candidates, rerun the scanner with those records,
-   and pause for human input only when task authority, requirement meaning,
-   verification authority, accepted scope, or material authority is unclear,
-   contradictory, incomplete, missing, stale, or implies a material authority
-   change. Unresolved per-artifact mapping findings must block
-   traceability-complete, review acceptance, done, publication, and release
-   claims until resolved or explicitly held.
-12. After each meaningful work cycle, update:
-   - `.traceweaver/trace-records/<task-or-run-id>-trace.yml`
-   - `traceability-matrix.md`
-   - loop-state evidence shaped by the skill-local
-     `references/automation-loop-state-template.yml` when a run record is
-     created
-13. Unless the user explicitly asked to stop after `tw-work`, continue after
-   the `tw-work` handoff and run the resolved `tw-traceability-check` before
-   claiming work/review completion.
-13. Run the resolved relevant TraceWeaver review wrapper:
-   - `tw-debug` for debugging, failing-test, regression, incident, or broken
-     behavior investigation. It delegates to TraceWeaver-packaged `ce-debug`
-     under no-publication mode and returns changed files, verification evidence,
-     traceability status, and held claims back to this loop;
-   - `tw-code-review` for code-like skill, script, policy, manifest,
-     validation, runtime, or behavior-bearing changes. It must run or require
-     `tw-traceability-check` before delegating to `ce-code-review`;
-   - `tw-doc-review` for requirements, plans, docs, evidence, and matrix
-     changes. It must run or require `tw-requirements-review` for
-     requirements/authority text and trace/hash/status consistency checks for
-     authority records before delegating to `ce-doc-review`.
-14. During review, apply the reviewer subagent capacity rules above so pending
-    reviewer personas are queued, completed agents are closed, and capacity
-    backpressure is reported instead of mistaken for success.
-15. Classify findings with the severity policy in the skill-local
-    `references/traceweaver-controlled-autonomy-policy.md`.
-16. Continue review-fix cycles only while:
-    - authority remains clear;
-    - verification can pass;
-    - matrix and trace records can be updated;
-    - no repeated blocking finding or no-progress state occurs;
-    - the review-fix cycle budget is not exceeded.
-17. Stop before publication by default. Review-staging a scoped completed work
-    set for review identity is allowed under `tw-work`, but commit, push, branch
-    creation, or PR create/update actions are publication and may run only
-    through the controlled TraceWeaver publication route and the TraceWeaver-owned
-    publication wrappers: `tw-commit` for commit intent and `tw-commit-push-pr`
-    for push/PR intent. Requirements review is required
-    when requirements, authority, validation intent, release claims, or
-    publication policy changed; normal code publication does not need a new
-    requirements gate when approved authority is unchanged. The publication
-    route must prove matrix/trace coherence, test-first verification evidence,
-    a scoped not-applicable decision, or an approved non-test/post-implementation
-    verification exception; blocking-review closure; staged-tree identity;
-    explicit target; credential/remote boundary; and human confirmation for that
-    target or a reviewed Intent Contract publication override. Report the
-    evidence status and the next command, review, or human decision required.
+## Delegated Workflow Routes
 
-## Post-Work Review Closure
+The master selects only the frozen, profile-permitted child route below. It
+does not perform that route's work itself, and a child may not broaden the
+approved scope, mutate authority, publish, deploy, or dogfood unless its
+separate capsule explicitly permits the action.
 
-`tw-auto` must treat a successful `tw-work` return as a transition, not a
-terminal state. In the normal task/plan flow, `tw-auto` continues from
-`tw-work` into post-work review closure without asking the user to manually run
-the next wrapper command.
+- For unclear product direction, route a source-evidence child to `tw-strategy`
+  before `tw-brainstorm`; for ideation requests, route `tw-ideate` before
+  `tw-grill` or `tw-brainstorm`. An already approved implementation request may
+  skip those source-evidence routes. Never invoke raw CE strategy or ideation.
+- For a project assessment, route `tw-audit`; for unclear, contradictory, or
+  changed requirements, route `tw-requirements-review` and/or
+  `tw-authority-gate`. The master must not edit, reinterpret, or silently broaden requirements; when authority cannot be resolved, pause the loop and ask the stakeholder for the required decision.
+- Use the planning child `tw-plan`, then the profile-proportional V&V child,
+  then `tw-work` for a capsule-bounded implementation child. `tw-work` may use
+  its packaged CE implementation engine, but the master never implements as a
+  fallback.
+- Route behavior/authority evidence to `tw-traceability-check`; route
+  investigation to `tw-debug`; route learning evidence to `tw-compound` or
+  `tw-compound-refresh`; route historical-session evidence to `tw-sessions`;
+  and route browser or Xcode verification only to `tw-test-browser` or
+  `tw-test-xcode` with requirement, trace, and verification IDs. Unlinked
+  verification is exploratory or held, not completion evidence.
+- Route code findings to `tw-code-review`, authority/document findings to
+  `tw-doc-review`, and review feedback to `tw-resolve-pr-feedback`. A bounded finding repair is a new frozen child capsule; it never authorizes the master
+  to repair code or authoring evidence itself.
+- Route project bootstrap/diagnostics to `tw-setup` and isolated local workspace
+  setup to `tw-worktree`. Host mutation, commits, pushes, PRs, tags, releases,
+  deployments, and dogfood require their own authority and child role.
+- `tw-commit` and `tw-commit-push-pr` are publication routes only. This master
+  returns their held boundary and never stages, commits, pushes, opens a PR,
+  tags, releases, or mutates a remote.
 
-After `tw-work` returns changed files, test-first verification evidence, scoped
-not-applicable evidence, approved exception evidence, post-implementation
-verification evidence, structured acceptance result status, trace-anchor
-authoring status, matrix evidence changes, or review-staging output, `tw-auto`
-must:
-
-1. Run or require `tw-traceability-check` on the exact changed work package.
-   When a closure claim is present, this includes running or requiring the
-   structured acceptance result checker before accepting complete, done, or
-   accepted wording.
-2. Run `tw-code-review` when behavior-bearing code, skills, scripts, fixtures,
-   tests, manifests, runtime harnesses, or validation surfaces changed.
-3. Route repairable code-review findings through one bounded `tw-work` repair
-   pass when authority remains clear, then rerun the same scoped review.
-4. Record a clean code review once when it passes. Do not rerun clean reviews
-   only to polish historical wording.
-5. Run scoped `tw-doc-review` only when requirements, plans, matrix, Intent
-   Contract, validation evidence, status fields, hash fields, or review-result
-   records changed for the current gate.
-6. Record a clean scoped doc review once when it passes, then stop clean or
-   continue to the next already-approved gate.
-
-For a `tw-auto`-owned run, those review steps are internal continuation steps,
-not user handoffs. If authority remains clear and the next required action is
-`tw-traceability-check`, `tw-code-review`, or scoped `tw-doc-review`, `tw-auto`
-must run or require that wrapper as part of the current loop and must not end
-with only "run /tw-code-review" or "run /tw-doc-review" as the user-facing next
-step. Returning a manual lower-review next step after successful `tw-work`, or
-after a clean code review when scoped document review is already required, is a
-post-work closure regression unless one of the stop conditions below applies.
-
-The explicit stop override is narrow. If the user says "run only through
-tw-work", "stop after implementation", "do not review", or equivalent,
-`tw-auto` stops after `tw-work`, reports review as held, and must not claim
-done, traceability-complete, review-complete, publication-ready, release-ready,
-runtime-equivalent, or clean replacement.
-
-"Stop before commit/push/PR", "stop before publication", "do not commit",
-"do not push", "do not open a PR", and equivalent publication-boundary wording
-are not stop-after-work or do-not-review instructions. They mean `tw-auto` must
-continue through the internal post-work traceability and review closure above,
-then stop before any publication action. That final stop must name the exact
-publication boundary, the review/traceability state reached, held claims, and
-the highest-level next wrapper for the next allowed action, normally `tw-work`
-to record clean held-review state, `tw-commit` for an explicitly requested local
-commit path, or `tw-commit-push-pr` for an explicitly requested push/PR path.
-It must not end with only the implementation summary, verification list, changed
-files, or held scope.
-
-`tw-auto` must stop instead of continuing post-work closure when `tw-work`
-reports unclear, missing, contradictory, incomplete, stale, or changed
-authority; unresolved P0/P1 traceability findings that need human authority;
-failed verification that is not repairable within the bounded cycle; missing or
-invalid structured acceptance evidence for a closure claim; reviewer
-capacity or missing skill availability that prevents trustworthy review; or any
-next action that would commit, branch, push, open/update a PR, deploy, release,
-mutate a remote, or publish. Those actions remain controlled publication route
-work only.
-
-## Approval-Only Stop Handoff
-
-When the user asks `tw-auto` to approve, accept, record, or update an authority
-decision, plan, stack choice, task capsule, gap, change, exception, validation
-record, or review result and explicitly says "do not implement", "approval
-only", "record only", or equivalent, `tw-auto` must classify the run as an
-approval-only authority stop.
-
-An approval-only authority stop is a valid stop condition for implementation,
-but it is not a valid reason to leave the user without a continuation route.
-The output must name:
-
-- the explicit stop reason, including the user's no-implementation boundary;
-- the approved or updated authority artifacts and any held implementation,
-  review, runtime, publication, release, or validation claims;
-- whether the approved authority is sufficient to start a later implementation
-  loop;
-- the highest-level next wrapper command that continues from the approved
-  authority, normally `/tw-auto "implement <approved plan or task capsule>;
-  run TraceWeaver closure; stop before publication"`; or
-- the exact blocker or human decision if no implementation loop can proceed.
-
-Do not end an approval-only stop with only "approved", "done", artifact paths,
-or verification summaries. Even when the requested work was non-implementation,
-the final output must still carry the next TraceWeaver step or the blocker that
-prevents one.
-
-## Closure-Claim Validation Loop
-
-`tw-auto` treats closure claims as part of the normal TraceWeaver closure loop,
-not as a prose status update. It must detect claims in user requests, plans,
-worker output, review summaries, matrix/status updates, and PR/release wording
-that say a requirement, task, implementation, review, PR, or release is
-`complete`, `closed`, `done`, `accepted`, in `closure`, or `requirement
-satisfied`.
-
-When a closure claim is detected, `tw-auto` must:
-
-1. pass the claim and known requirement/need/trace/ATP/result/verification/
-   validation IDs to `tw-work`;
-2. require an existing structured acceptance result that passes
-   `traceweaver-check-acceptance-results`, or let `tw-work` scaffold a
-   validation result template plus matrix-row proposal when authority is clear;
-3. stop with a held-validation record requirement when owner, requirement ID,
-   evidence location, closure boundary, or next trigger are missing;
-4. continue through `tw-traceability-check`, `tw-code-review` for code-like
-   changes, and scoped `tw-doc-review` for authority/status/hash/evidence docs;
-5. refuse complete/done/accepted wording while the checker reports structured
-   acceptance findings or held-validation fields are incomplete.
-
-This is static/advisory fixture behavior until a later runtime or dogfood slice
-reviews live artifact creation. Arbitrary new-project runtime artifact creation,
-release claims, publication, and enforcement remain held.
-
-## Planned Closure Loop
-
-REQ-TW-056 candidate behavior: `tw-auto` should be the user-facing orchestrator
-for a task or plan, not another manual handoff in the
-work/review/fix/review chain. When implemented and proven, `tw-auto` should run
-the closure loop itself: authority gate, `tw-work`, TraceWeaver-packaged
-`ce-work` as the underlying implementation engine,
-trace/matrix/evidence updates, `tw-traceability-check`, `tw-code-review`,
-`tw-doc-review`, bounded finding repair, refreshed hashes, and final clean or
-held-state reporting.
-
-`tw-auto` must not edit, reinterpret, or silently broaden requirements to keep
-the loop moving. If requirements are unclear, contradictory, incomplete,
-missing, or require a material authority change, pause the loop and ask the
-user for clarification or route to requirements review. Resume implementation
-only after the authority source, allowed scope, verification method, and
-validation question are clear.
-
-Ambiguous per-artifact trace-anchor mappings are not unclear requirements. When
-task authority, requirement meaning, verification authority, and accepted scope
-are clear, `tw-auto` must let `tw-work` skip that specific anchor mutation,
-continue other unambiguous anchors, and require `tw-traceability-check` to report
-the unresolved mapping as a blocking `CTA-UNRESOLVED-ANCHOR-MAPPING` structured
-finding before review, done, publication, or release claims can pass.
-
-Until deterministic fixtures and runtime proof accept REQ-TW-056, treat this as
-a design note only. Do not claim autonomous closure, automatic review repair,
-project-level trace writes, publication, clean CE replacement, release
-readiness, human-decision pause behavior, or runtime parity from this note.
+For behavior anchors, the implementation child may skip per-artifact ambiguous anchor writes and return `CTA-UNRESOLVED-ANCHOR-MAPPING`; that finding remains
+visible while clear scoped work can continue. It is not permission for the
+master to infer an anchor or claim completion.
 
 ## Review-Staging Closure Loop
 
-When the current work package has passed implementation verification and
-`tw-traceability-check`, but review acceptance is blocked only by artifact
-identity, `tw-auto` must keep driving the loop instead of handing the next
-command back to the user. Artifact-identity blockers include scoped files that
-are untracked, staged files with additional unstaged changes, required review
-files missing from the index, stale staged hashes for reviewed artifacts, or a
-review target that changed after a clean review was recorded.
+After a child changes an approved work package, the master routes its bounded
+traceability, code-review, and document-review children in profile order. The
+master does not review; it carries only the frozen identity and receipts.
 
-For those identity-only blockers, `tw-auto` routes to `tw-work` Review-Staging
-Mode with the exact scoped file list and the intended review route. The scoped
-file list may contain only files from the current work package: changed
-behavior-bearing files, linked tests/fixtures/smokes, `traceability-matrix.md`
-Code Anchor Evidence rows, and status/evidence/hash files for the same review
-gate. `tw-auto` must then rerun the correct TraceWeaver review wrapper:
-`tw-code-review` for code-like skill/script/fixture changes, `tw-doc-review`
-for authority/status/hash/evidence changes, or both when both surfaces changed.
+### Artifact-identity blockers
 
-If the scoped review passes, `tw-auto` records the clean review once, refreshes
-only the required status/hash fields for that gate, asks `tw-work` to
-review-stage that exact recording set when needed, and stops clean or proceeds
-to the next already-approved gate. If the review returns housekeeping-only
-findings, `tw-auto` may perform one bounded repair/record pass and rerun the
-same scoped review once. Repeated status churn or no material progress is a
-stop condition.
+Review staging is allowed only after the relevant evidence is present in the
+exact scoped file list and the review identity is coherent. Untracked authority
+or plan files, split authority/evidence identities, or blocking findings return
+held. The master records the clean review once when that identical review passes;
+it does not repeat a clean review without a changed identity. A
+housekeeping-only repair may run once within the frozen repair cap, but the
+master must not review-stage around real blockers.
 
-`tw-auto` must not review-stage around real blockers: unclear requirements,
-contradictory authority, changed accepted scope, unapproved runtime or
-publication claims, unsafe behavior, failed verification, unresolved
-traceability blockers, imported CE component body drift, or any finding that
-requires requirements review. Those cases stop with the blocking finding and
-the exact human or authority decision needed.
+## Post-Work Review Closure
+
+The master treats a successful `tw-work` return as a transition, not a terminal
+state. Unless an authority or verification blocker is returned, continue after
+the implementation child. Run or require `tw-traceability-check` through its
+named child, then Run `tw-code-review` through its review child for
+behavior-bearing changes. Run scoped `tw-doc-review` only when authority, plan,
+matrix, status, hash, validation, or review evidence changed. These are child
+routes, not user handoffs; returning only a manual review command is a post-work closure regression.
+
+An explicit stop override such as "stop after implementation" stops those child
+routes, reports review as held, and forbids a done or release-ready claim.
+The publication-boundary wording such as "stop before commit/push/PR" is not that
+override: review closure continues, then the master holds publication. It must not end with only the implementation summary; it returns the receipt facts, held boundary, and highest permitted next route.
+
+## Approval-Only Stop Handoff
+
+When the request is approval-only, the master records an approval-only authority stop and does not dispatch implementation. It returns the explicit boundary, authority state, and the highest-level next wrapper command that continues from the approved authority, or the human blocker when no child may proceed.
+
+## Closure-Claim Validation Loop
+
+For a request, plan, receipt, or review that uses complete, done, or accepted wording, the master routes the claim through the `tw-work` child, the structured acceptance result checker, `tw-traceability-check`, and the scoped review child. The required result must identify the requirement, evidence, owner, boundary, and next trigger. If the acceptance result is missing, invalid, or held, refuse complete/done/accepted wording and return a held validation receipt; creating runtime artifacts or treating fixture evidence as live proof remains held.
 
 ## Highest-Level Handoff Discipline
 
-`tw-auto` owns the normal TraceWeaver loop. It must not hand the user a
-standalone lower gate as the next action when it can continue through a
-higher-level wrapper itself.
+Normal flow keeps gates embedded in their owning wrapper: do not emit a lower
+gate as a substitute for an executable child route. Standalone
+`tw-requirements-review`, `tw-authority-gate`, or `tw-traceability-check` is
+reserved for the diagnostic or authority exceptions above. Every terminal receipt
+names the next permitted wrapper or the held condition.
 
-When a scoped review passes after an identity-only repair, `tw-auto` continues
-to the next approved wrapper step instead of stopping with that command as a
-manual instruction. When `tw-work` completes, `tw-auto` continues to
-`tw-traceability-check`, `tw-code-review`, and scoped `tw-doc-review` when the
-changed files require those reviews.
+## Workflow
 
-In `tw-auto` output, a lower review wrapper may be named as executed,
-internally required, held, or blocked, but not as the sole next manual command
-when the loop itself can still continue. If the loop cannot continue, the output
-must name the concrete blocker: unclear or changed authority, unresolved P0/P1
-traceability or review findings, failed verification, missing wrapper
-availability, reviewer-capacity backpressure, explicit stop-after-work, or a
-publication/remote-mutation boundary.
+1. Load approved authority, select/freeze the profile, permitted child roles,
+   and selected model, then create only the bounded capsules allowed by them.
+2. Dispatch the planning child to `tw-plan`; record its dispatch/return receipt
+   and apply the projection guards before every dispatch.
+3. After a passable `tw-plan` result, route proportional V&V before a builder:
+   L0 has no capsule and no exception
+   ceremony; L1 routes one compact work-item capsule with focused verification
+   and one validation question; L2/L3 route the full v1 capsule, with L3
+   high-risk controls. Route a builder capsule to `tw-work`; route
+   verification, review, authorized deployment, and dogfood only to their
+   profiled child roles.
+4. At a hold, cap, unavailable-model, immutable-profile, or budget breach,
+   return the precise held/refusal result. Do not expand the profile or take over
+   child work.
 
-Normal next commands must be the highest-level executable wrapper:
+## Scoped Review and Terminal Routing
 
-- `/tw-auto ...` for multi-step task closure;
-- `/tw-work ...` for bounded implementation or review-staging repair;
-- `/tw-code-review ...` for code-like review;
-- `/tw-doc-review ...` for authority/status/hash acceptance;
-- `/tw-commit-push-pr ...` only for explicit publication intent after
-  publication gates are in scope.
+For a profiled review child, route only the review identity and fan-out defined
+by `references/scoped-review-protocol.md`. The identity is baseline hash,
+profile hash, changed-file digest, and verification digest. If it matches an
+accepted review, route receipt reuse rather than another generic review;
+matrix/status/projection-only changes do not create a new changed-file digest.
 
-Standalone `tw-requirements-review`, `tw-authority-gate`, or
-`tw-traceability-check` may be recommended only when the user explicitly asks
-for that diagnostic/audit/baseline gate, or when no higher wrapper can proceed
-without a human authority decision. In that case, state why the lower gate is
-standalone.
+The master routes, but never performs, review, repair, deployment, browser
+dogfood, or terminal acceptance. It enforces the profiled reviewer and repair
+caps in the child capsule: one routine independent reviewer, at most two active
+reviewers, at most three personas, validators only for P0/P1 or disputed P2,
+and no more than two repair cycles. It routes P0/P1 repair, the contested-P2
+path, and `held_no_progress`; routine P2/P3 do not gain an extra cycle.
 
-## Stop Conditions
-
-Stop immediately when any of these are true:
-
-- no approved requirement or approved exception authorizes the change;
-- stakeholder intent or validation question is missing;
-- required authority files cannot be found or bootstrapped;
-- a meaningful behavior-bearing unit cannot be linked to authority and
-  verification evidence, including test-first evidence for behavior-bearing
-  client changes, except that a per-artifact trace-anchor mapping ambiguity may
-  be skipped by `tw-work` and surfaced by `tw-traceability-check` as a blocking
-  unresolved-mapping finding;
-- behavior appears useful or logical but no approved requirement captures it;
-- requirements are unclear, contradictory, incomplete, or need a material
-  authority change before implementation can continue;
-- behavior duplicates or expands existing behavior without authority;
-- tests or approved verification fail twice for the same work cycle;
-- behavior-bearing client implementation lacks requirement-linked
-  failing/current-failing test-first evidence, a scoped not-applicable decision,
-  or an approved non-test/post-implementation verification exception;
-- a closure claim lacks a passing structured acceptance result, a scaffolded
-  validation result template with matrix proposal under clear authority, or a
-  complete held-validation record with owner, boundary, evidence location, and
-  next trigger;
-- required reviewer personas remain pending because host agent capacity could
-  not be freed;
-- P0/P1 review findings remain open;
-- a P2 finding affects authority, test coverage, traceability, validation,
-  release claims, security, data integrity, or runtime safety;
-- the same blocking finding repeats after a fix cycle;
-- no material diff or trace update occurs in a fix cycle;
-- gap/change/exception/trace-record writes fail;
-- unapproved commit, push, PR, release, clean-replacement, slash-command,
-  enforcing-mode, or runtime-equivalence claims would be required to proceed.
-
-## Severity Policy
-
-- P0 and P1 always block completion.
-- P2 blocks when related to authority, requirements, tests, traceability,
-  validation, release claims, security, data integrity, or runtime safety.
-- P3 may be recorded as non-blocking debt only when authority is clear,
-  verification passed, an owner is named, and the next step is recorded.
+Route terminal reporting to `references/terminal-receipt-template.yml`. Report
+`ready_for_authorized_deploy` when only authorized deployment evidence remains,
+`held_dogfood` when required browser dogfood evidence remains, and `complete`
+only when every required fact has passed. Never infer deployment or dogfood from
+implementation, verification, or review.
 
 ## Output
 
-Always return:
-
-- baseline ID and hash used;
-- authority status;
-- matrix status;
-- implementation files changed or proposed;
-- test-first evidence, verification evidence, and result;
-- structured acceptance evidence status when closure claims are detected;
-- the validation-closure ratio (requirements with recorded acceptance evidence
-  versus total) when authority files are loaded, so intent fidelity stays
-  visible rather than implied by verification pass counts;
-- review coverage, including completed reviewers, pending reviewers, skipped
-  reviewers, capacity backpressure, and any degraded main-thread fallback;
-- validation question carried forward;
-- open gaps, dark behavior, held claims, and review findings;
-- stop reason or continue reason;
-- highest-level next TraceWeaver wrapper command, or the exact human decision
-  that blocks continuation.
-
-## Alpha Boundary
-
-The packaged TraceWeaver `lfg` skill is a compatibility alias for `tw-auto`.
-It must not run the raw CE autopilot path. Direct selected `ce-*` skills remain
-manual-continuity implementation components for alpha, but invoking them does
-not close TraceWeaver authority, traceability, verification, or validation gates
-by itself.
-
-`tw-auto` and the `lfg` alias must not claim clean CE replacement, enforcing
-behavior, slash commands, dynamic discovery, runtime equivalence, release
-readiness, or commit/push/PR automation until later evidence gates approve
-those claims.
+Return the profile revision/hash and selected fields, child capsule routing,
+monotonic receipts, estimate guards, actual accounting, and one truthful state:
+`routed`, `refused_profile_immutable`, `refused_estimated_process_ceiling`,
+`held_process_budget`, `held_no_progress`, `ready_for_authorized_deploy`, or
+`held_dogfood`. `complete` is a child-receipt result only, never a master
+inference. Deployment and dogfood remain separate child receipts; neither is
+implied by implementation or verification.

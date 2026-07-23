@@ -1,0 +1,26 @@
+profile: L2
+review_identity:
+  baseline_hash: sha256:baseline-contested-p2
+  profile_hash: sha256:profile-l2
+  changed_file_digest: sha256:changed-contested-p2
+  verification_digest: sha256:verification-contested-p2
+fanout:
+  active_reviewers: [independent, validator]
+  personas: [routine_independent, validator]
+  specialist_triggered: false
+  validator_triggered: true
+finding:
+  severity: P2
+  disputed: true
+  route: contested_p2_decision_path
+repair_cycles: 0
+terminal_receipt:
+  facts:
+    implemented: { state: passed, evidence_refs: [implementation-contested-p2] }
+    verified: { state: passed, evidence_refs: [verification-contested-p2] }
+    reviewed: { state: passed, evidence_refs: [review-contested-p2] }
+    deployed: { state: not_applicable, evidence_refs: [] }
+    dogfooded: { state: not_applicable, evidence_refs: [] }
+  requirements: { deploy_required: false, chrome_dogfood_required: false }
+  terminal_state: complete
+  accounting: { process_minutes: 1, delivery_minutes: 8 }

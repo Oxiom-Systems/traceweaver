@@ -1,0 +1,13 @@
+task_id: TASK-L0
+profile_revision: 1
+risk: L0
+selection_rationale: documentation-only correction with no behavior effect
+selected_controls: [deterministic_check]
+child_roles: { builder: terra, verifier: terra }
+model_selection: { availability: [terra], choice: terra, rationale: focused deterministic change }
+reviewer_cap: 0
+repair_cycle_cap: 0
+requires_deploy: false
+requires_chrome_dogfood: false
+profile_hash: sha256:l0-frozen
+expected_profile: L0

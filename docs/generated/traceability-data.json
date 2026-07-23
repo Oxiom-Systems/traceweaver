@@ -6,15 +6,15 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "29ebbbc664739fdbbcfdc5deaccda072ac5c3b00e905c24a021be255761e3149"
+      "sha256": "b2555e0b41b984c2d960d20de72fce943878784fa588d78c9384096f5bfc27a8"
     },
     {
       "path": "requirements.md",
-      "sha256": "26c898f1ca929991dfa4a430eba723d67079923e15a665696ec0750545c13ca5"
+      "sha256": "091d2f815c6adfa34590b0cd0a9556b52a51470f4062f2fce5faad11e1a2a69e"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "74774711f716c36fd4054903deed67b8bb805ba7ebc5154841e30a72bdba3eee"
+      "sha256": "fb81692f19aea895ef0ad3b91d791260ad8ca164b851b380e0b8fc7b301144af"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -22,17 +22,17 @@
     }
   ],
   "row_counts": {
-    "requirements": 75,
-    "trace_rows": 54,
+    "requirements": 88,
+    "trace_rows": 61,
     "atp_entries": 37,
     "result_records": 38,
-    "verification_records": 75,
-    "validation_records": 18,
+    "verification_records": 82,
+    "validation_records": 31,
     "code_anchor_records": 279,
     "structured_acceptance_results": 1,
-    "structured_acceptance_coverage": 75,
-    "structured_acceptance_missing_requirements": 74,
-    "structured_acceptance_non_closed_requirements": 75
+    "structured_acceptance_coverage": 88,
+    "structured_acceptance_missing_requirements": 87,
+    "structured_acceptance_non_closed_requirements": 88
   },
   "requirements": [
     {
@@ -1212,6 +1212,181 @@
       "trace_ids": [
         "TRACE-TW-056"
       ]
+    },
+    {
+      "id": "REQ-TW-076",
+      "type": "Constraint",
+      "summary": "Historic universal mandatory V&V proposal retained only as non-authoritative history.",
+      "source_need": "NEED-TW-001; NEED-TW-003; NEED-TW-005",
+      "verification_method": "U0 correction inspection",
+      "validation_path": "VAL-TW-019",
+      "owner": "Oxiom Systems",
+      "status": "Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority",
+      "trace_ids": [
+        "TRACE-TW-063",
+        "TRACE-TW-057"
+      ]
+    },
+    {
+      "id": "REQ-TW-077",
+      "type": "System",
+      "summary": "Historic universal `tw-vv-define` proposal retained only as non-authoritative history.",
+      "source_need": "NEED-TW-001; NEED-TW-003",
+      "verification_method": "U0 correction inspection",
+      "validation_path": "VAL-TW-020",
+      "owner": "Oxiom Systems",
+      "status": "Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority",
+      "trace_ids": [
+        "TRACE-TW-063",
+        "TRACE-TW-058"
+      ]
+    },
+    {
+      "id": "REQ-TW-078",
+      "type": "Constraint",
+      "summary": "Historic universal V&V refusal proposal retained only as non-authoritative history.",
+      "source_need": "NEED-TW-001; NEED-TW-002; NEED-TW-005",
+      "verification_method": "U0 correction inspection",
+      "validation_path": "VAL-TW-021",
+      "owner": "Oxiom Systems",
+      "status": "Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority",
+      "trace_ids": [
+        "TRACE-TW-063",
+        "TRACE-TW-059"
+      ]
+    },
+    {
+      "id": "REQ-TW-079",
+      "type": "Constraint",
+      "summary": "Historic SessionStart workflow proposal retained only as non-authoritative history.",
+      "source_need": "NEED-TW-001; NEED-TW-005",
+      "verification_method": "U0 correction inspection",
+      "validation_path": "VAL-TW-022",
+      "owner": "Oxiom Systems",
+      "status": "Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority",
+      "trace_ids": [
+        "TRACE-TW-063",
+        "TRACE-TW-060"
+      ]
+    },
+    {
+      "id": "REQ-TW-080",
+      "type": "Constraint",
+      "summary": "Historic default PreToolUse proposal retained only as non-authoritative history.",
+      "source_need": "NEED-TW-002; NEED-TW-005",
+      "verification_method": "U0 correction inspection",
+      "validation_path": "VAL-TW-023",
+      "owner": "Oxiom Systems",
+      "status": "Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority",
+      "trace_ids": [
+        "TRACE-TW-063",
+        "TRACE-TW-061"
+      ]
+    },
+    {
+      "id": "REQ-TW-081",
+      "type": "Constraint",
+      "summary": "Historic host-hook matrix proposal retained only as evidence, not a workflow or release prerequisite.",
+      "source_need": "NEED-TW-002; NEED-TW-005",
+      "verification_method": "U0 correction inspection",
+      "validation_path": "VAL-TW-024",
+      "owner": "Oxiom Systems",
+      "status": "Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority",
+      "trace_ids": [
+        "TRACE-TW-063",
+        "TRACE-TW-062"
+      ]
+    },
+    {
+      "id": "REQ-TW-082",
+      "type": "System",
+      "summary": "Freeze L0-L3 profile, risk controls, child roles, model rationale, review caps, deploy, and dogfood before mutation.",
+      "source_need": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005",
+      "verification_method": "Future routing fixtures for all profiles and immutable post-start profile scope",
+      "validation_path": "VAL-TW-025",
+      "owner": "Oxiom Systems",
+      "status": "Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest",
+      "trace_ids": [
+        "TRACE-TW-063"
+      ]
+    },
+    {
+      "id": "REQ-TW-083",
+      "type": "Constraint",
+      "summary": "Measure monotonic process and delivery time; target 20% total process effort and hold when process exceeds delivery.",
+      "source_need": "NEED-TW-001; NEED-TW-003; NEED-TW-005",
+      "verification_method": "Future boundary fixtures for timestamps, classification, projected guards, and held_process_budget",
+      "validation_path": "VAL-TW-026",
+      "owner": "Oxiom Systems",
+      "status": "Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest",
+      "trace_ids": [
+        "TRACE-TW-063"
+      ]
+    },
+    {
+      "id": "REQ-TW-084",
+      "type": "Constraint",
+      "summary": "Master is read-only; bounded children build, verify, review, deploy, and dogfood with receipts.",
+      "source_need": "NEED-TW-001; NEED-TW-002; NEED-TW-005",
+      "verification_method": "Future contract fixtures reject master mutation and require child receipts",
+      "validation_path": "VAL-TW-027",
+      "owner": "Oxiom Systems",
+      "status": "Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest",
+      "trace_ids": [
+        "TRACE-TW-063"
+      ]
+    },
+    {
+      "id": "REQ-TW-085",
+      "type": "System",
+      "summary": "Bootstrap canonical project-local role-aware orchestration without overwriting host instructions.",
+      "source_need": "NEED-TW-001; NEED-TW-002; NEED-TW-003",
+      "verification_method": "Future empty/existing/idempotency fixtures and fresh-task proof per automatic host",
+      "validation_path": "VAL-TW-028",
+      "owner": "Oxiom Systems",
+      "status": "Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest",
+      "trace_ids": [
+        "TRACE-TW-063"
+      ]
+    },
+    {
+      "id": "REQ-TW-086",
+      "type": "Constraint",
+      "summary": "Select and deduplicate review fan-out; cap routine reviewers, personas, validators, and repair cycles.",
+      "source_need": "NEED-TW-001; NEED-TW-003; NEED-TW-005",
+      "verification_method": "Future routing fixtures prove caps, identity reuse, and held_no_progress",
+      "validation_path": "VAL-TW-029",
+      "owner": "Oxiom Systems",
+      "status": "Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest",
+      "trace_ids": [
+        "TRACE-TW-063"
+      ]
+    },
+    {
+      "id": "REQ-TW-087",
+      "type": "System",
+      "summary": "Separate implemented, verified, reviewed, deployed, and dogfooded terminal truth.",
+      "source_need": "NEED-TW-001; NEED-TW-005",
+      "verification_method": "Future fixtures reject premature complete and distinguish held/deploy-ready/complete states",
+      "validation_path": "VAL-TW-030",
+      "owner": "Oxiom Systems",
+      "status": "Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest",
+      "trace_ids": [
+        "TRACE-TW-063"
+      ]
+    },
+    {
+      "id": "REQ-TW-088",
+      "type": "Follow-on",
+      "summary": "Candidate local SQLite graph mirror while Markdown remains authoritative.",
+      "source_need": "NEED-TW-003; NEED-TW-005",
+      "verification_method": "Separate post-U7 owner-approved plan only",
+      "validation_path": "VAL-TW-031",
+      "owner": "Oxiom Systems",
+      "status": "Candidate follow-on only; never U0-U7 authority",
+      "trace_ids": [
+        "TRACE-TW-063"
+      ]
     }
   ],
   "traces": [
@@ -1808,6 +1983,83 @@
       "validation": "VAL-TW-018",
       "status": "Owner approved promotion 2026-06-12; verify, distilled-coverage, and full local smoke suite pass; scoped doc review of the amended baseline is the next gate",
       "next_step": "Lifecycle-orchestrator domain remains private-only by owner decision 2026-06-12; validation-closure backlog on the pre-existing baseline remains open; runtime, enforcing, publication, release-ready, and clean-replacement claims remain held"
+    },
+    {
+      "id": "TRACE-TW-063",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005",
+      "requirements": "REQ-TW-076; REQ-TW-077; REQ-TW-078; REQ-TW-079; REQ-TW-080; REQ-TW-081; REQ-TW-082; REQ-TW-083; REQ-TW-084; REQ-TW-085; REQ-TW-086; REQ-TW-087; REQ-TW-088",
+      "artifact": "requirements.md; Intent Contract; matrix; GAP-TW-2026-07-22-008; CHG-TW-2026-07-22-001; EXC-TW-011",
+      "verification": "VER-TW-083",
+      "validation": "VAL-TW-025; VAL-TW-026; VAL-TW-027; VAL-TW-028; VAL-TW-029; VAL-TW-030; VAL-TW-031",
+      "status": "Conditionally approved only; no behavior authority until active EXC-TW-011 contains the exact required receipt/hashes/digest",
+      "next_step": "Runtime, release, installation, deployment, publication, graph implementation, canonical database, and U7 dogfood remain held"
+    },
+    {
+      "id": "TRACE-TW-057",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "requirements": "REQ-TW-076",
+      "artifact": "`plugins/traceweaver-core/skills/tw-vv-define/SKILL.md` implements the phase workflow; `docs/validation/examples/vv-define-capsule.example.json`; `fixtures/vv-define/`",
+      "verification": "VER-TW-077",
+      "validation": "VAL-TW-019",
+      "status": "Requirements-quality review and scoped doc review passed 2026-07-22; static/advisory implementation added; fixture smoke green on integration branch",
+      "next_step": "Requirement remains candidate_for_review pending baseline amendment; phase-gating claim on `tw-work` is REQ-TW-078 scope; runtime/enforcing held"
+    },
+    {
+      "id": "TRACE-TW-058",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-003; NEED-TW-004; NEED-TW-008",
+      "requirements": "REQ-TW-077",
+      "artifact": "`plugins/traceweaver-core/skills/tw-vv-define/SKILL.md`; `plugins/traceweaver-core/skills/tw-vv-define/scripts/traceweaver-check-vv-capsule`; `docs/validation/examples/vv-define-capsule.example.json`; `fixtures/vv-define/`; `scripts/traceweaver-smoke-vv-define`",
+      "verification": "VER-TW-078",
+      "validation": "VAL-TW-020",
+      "status": "Requirements-quality review and scoped doc review passed 2026-07-22; skill, validator, fixtures, example capsule, and smoke implemented and green; adversarial review cycle closed after validator hardening",
+      "next_step": "Install/discovery-smoke enumeration updated in Unit 4; packaged-skill install claim and capsule-handoff runtime behavior held"
+    },
+    {
+      "id": "TRACE-TW-059",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "requirements": "REQ-TW-078",
+      "artifact": "`plugins/traceweaver-core/skills/tw-work/SKILL.md` V&V Definition Preflight + refusal/red-flag policy; `tw-plan`/`tw-auto` routing to `tw-vv-define`; `fixtures/tw-skill-behavior/tw-work-missing-vv-definition/`",
+      "verification": "VER-TW-079",
+      "validation": "VAL-TW-021",
+      "status": "Requirements-quality review and scoped doc review passed 2026-07-22; static/advisory fixture and instruction evidence added; adversarial review ACCEPT",
+      "next_step": "Runtime refusal/enforcement claims held; requirement remains candidate_for_review pending baseline amendment"
+    },
+    {
+      "id": "TRACE-TW-060",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-005; NEED-TW-007",
+      "requirements": "REQ-TW-079",
+      "artifact": "`plugins/traceweaver-core/hooks/session-start`; `plugins/traceweaver-core/hooks/hooks.json`; `plugins/traceweaver-core/hooks/hooks-cursor.json`; `fixtures/hooks/session-start/{claude,cursor,codex}/`",
+      "verification": "VER-TW-080",
+      "validation": "VAL-TW-022",
+      "status": "Static/fixture-verified only; per-host payload-shape smoke green; adversarial review cycle closed",
+      "next_step": "Live SessionStart firing held per host; Codex registration/install held; requirement remains candidate_for_review"
+    },
+    {
+      "id": "TRACE-TW-061",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005",
+      "requirements": "REQ-TW-080",
+      "artifact": "Historical hook/manifest/fixture evidence was deleted in U5. Current evidence is the negative removal-regression smoke `scripts/traceweaver-smoke-hook-pretooluse-tdd-gate` plus `docs/validation/traceweaver-plugin-0.3-release.md`.",
+      "verification": "VER-TW-081",
+      "validation": "VAL-TW-023",
+      "status": "Superseded historical evidence only; current smoke verifies the deleted default hook, registrations, and fixtures do not exist.",
+      "next_step": "No current PreToolUse behavior, fixture, manifest, or runtime claim; blocking/enforcing and Codex PreToolUse coverage remain held."
+    },
+    {
+      "id": "TRACE-TW-062",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-002; NEED-TW-005; NEED-TW-007",
+      "requirements": "REQ-TW-081",
+      "artifact": "Capability matrix record; Codex discovery record; `fixtures/hooks/host-payloads/{claude,cursor}/`",
+      "verification": "VER-TW-082",
+      "validation": "VAL-TW-024",
+      "status": "Matrix recorded: Claude Code SessionStart+PreToolUse supported; Cursor SessionStart+PreToolUse supported; Codex SessionStart supported, Codex PreToolUse unproven; plugin-loader auto-adopt risk recorded held",
+      "next_step": "Runtime proof remains a separate held gate per supported cell; no manifests/fixtures for non-supported cells; requirement remains candidate_for_review"
     }
   ],
   "atp_entries": [
@@ -3314,6 +3566,83 @@
       "Evidence Path": "`docs/validation/candidate-baseline-review-*.md`; `docs/distilled/promotion-status.md`; CI smoke workflow",
       "Date / Session": "2026-06-12",
       "Notes": "Scoped doc review of the amended baseline remains the next gate; runtime and publication claims stay held."
+    },
+    {
+      "ID": "VER-TW-077",
+      "Requirement": "REQ-TW-076",
+      "Method": "Fixture smoke / doc-review-shape inspection",
+      "Procedure / Command": "`scripts/traceweaver-smoke-vv-define` (RED-evidence non-emptiness, scoped not-applicable handling, validation-definition artifact existence plus four-section content gate on the example)",
+      "Tested Ref": "V&V definition phase policy, RED-before-implementation ordering, validation-definition artifact sections",
+      "Result": "Pass: RED confirmed before implementation (smoke failed on missing skill/example files); GREEN after (`vv_define_smoke=pass`, valid/invalid fixture checks pass, skill-shape check pass, exit 0) on integration branch",
+      "Evidence Path": "`scripts/traceweaver-smoke-vv-define`; `fixtures/vv-define/`; `docs/validation/examples/vv-define-validation-definition.example.md`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Fixture/smoke evidence only; does not validate full schema conformance of arbitrary docs/validation artifacts beyond the example; runtime held."
+    },
+    {
+      "ID": "VER-TW-078",
+      "Requirement": "REQ-TW-077",
+      "Method": "Skill instruction inspection / fixture smoke / capsule validator",
+      "Procedure / Command": "`traceweaver-check-vv-capsule` over `fixtures/vv-define/` (pass cases: valid-capsule, valid-not-applicable; blocked cases: missing-red-evidence, unscoped-not-applicable, invalid-identity, path-escapes-root, review-entry-malformed; `--require-review-passed` blocks review-not-passed); example capsule passes; smoke asserts SKILL.md anchors/sections",
+      "Tested Ref": "`tw-vv-define` skill, capsule schema `tw-vv-capsule/1`, validator finding IDs, capsule handoff shape",
+      "Result": "Pass: all fixture cases behave as designed after adversarial-review hardening (schema_version const, ID regexes, plan_ref root containment, reviews[] structure, `--require-review-passed` mode); `--schema` prints documented fields",
+      "Evidence Path": "`plugins/traceweaver-core/skills/tw-vv-define/`; `docs/validation/examples/vv-define-capsule.example.json`; `fixtures/vv-define/`; `scripts/traceweaver-smoke-vv-define`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Static/advisory evidence; packaged install/discovery enumeration added in Unit 4 (`traceweaver-smoke-codex-discovery` green runtime-disabled); runtime capsule-handoff held."
+    },
+    {
+      "ID": "VER-TW-079",
+      "Requirement": "REQ-TW-078",
+      "Method": "Static wrapper-instruction inspection / deterministic fixture smoke",
+      "Procedure / Command": "`TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior`",
+      "Tested Ref": "`tw-work` V&V Definition Preflight, refusal rule/red-flag table, `tw-plan`/`tw-auto` vv-define routing, missing-capsule fixture",
+      "Result": "Pass for static/advisory fixture evidence: smoke proves `tw-work` stops before mutation without a review-passed capsule (`stop_before_mutation`, routes via `tw-auto` to `tw-vv-define`) and that `tw-plan`/`tw-auto` order vv-define before work",
+      "Evidence Path": "`scripts/traceweaver-smoke-tw-skill-behavior`; `fixtures/tw-skill-behavior/tw-work-missing-vv-definition/worker-result.txt`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Policy-text/fixture behavior only; does not prove a live host blocks writes; runtime refusal/enforcement held."
+    },
+    {
+      "ID": "VER-TW-080",
+      "Requirement": "REQ-TW-079",
+      "Method": "Hook manifest/payload fixture smoke",
+      "Procedure / Command": "`scripts/traceweaver-smoke-hook-session-start` over `fixtures/hooks/session-start/{claude,cursor,codex}/` (supported cells)",
+      "Tested Ref": "SessionStart hook JSON per host shape (claude `hookSpecificOutput.additionalContext`, cursor `additional_context`, SDK-standard `additionalContext`), mode/Authority Rule/held-claims/ordering content, graceful non-TW-project behavior, mode override",
+      "Result": "Pass: supported-host payload shapes and required content fields verified; non-TW-project degradation verified; smoke green on integration branch",
+      "Evidence Path": "`plugins/traceweaver-core/hooks/session-start`; `plugins/traceweaver-core/hooks/hooks.json`; `plugins/traceweaver-core/hooks/hooks-cursor.json`; `fixtures/hooks/session-start/`; `scripts/traceweaver-smoke-hook-session-start`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Static/fixture-verified only; live SessionStart firing held per host; Codex registration/install held."
+    },
+    {
+      "ID": "VER-TW-081",
+      "Requirement": "REQ-TW-080",
+      "Method": "Superseded historical hook/fixture evidence; current negative removal-regression smoke",
+      "Procedure / Command": "Historical fixture payload smoke and its hook/fixtures were removed in U5. Current check: `scripts/traceweaver-smoke-hook-pretooluse-tdd-gate` asserts no PreToolUse registration in manifests and no hook or fixture directory exists.",
+      "Tested Ref": "The default PreToolUse surface remains absent from the repaired product.",
+      "Result": "Pass: `pretooluse_default_removed=pass`; this does not assert the deleted hook behaved correctly or fired.",
+      "Evidence Path": "`scripts/traceweaver-smoke-hook-pretooluse-tdd-gate`; `docs/validation/traceweaver-plugin-0.3-release.md`",
+      "Date / Session": "2026-07-23",
+      "Notes": "Superseded historical evidence; no current hook/fixture/manifest/runtime claim. Blocking/enforcing and Codex PreToolUse coverage remain held."
+    },
+    {
+      "ID": "VER-TW-082",
+      "Requirement": "REQ-TW-081",
+      "Method": "Capability matrix / discovery record inspection",
+      "Procedure / Command": "Inspection of `docs/validation/traceweaver-0.3-hook-host-capability-matrix.md` and `docs/validation/traceweaver-0.3-codex-hook-capability-discovery.md`; payload fixtures limited to supported cells",
+      "Tested Ref": "Host x hook grid states, per-cell evidence, Codex discovery method, held auto-adopt risk",
+      "Result": "Pass: matrix records claude SessionStart+PreToolUse supported, cursor SessionStart+PreToolUse supported, codex SessionStart supported (real ~/.codex/hooks.json evidence), codex PreToolUse unproven (binary-string evidence insufficient; mischaracterized template claim retracted); no artifacts for non-supported cells",
+      "Evidence Path": "`docs/validation/traceweaver-0.3-hook-host-capability-matrix.md`; `docs/validation/traceweaver-0.3-codex-hook-capability-discovery.md`; `fixtures/hooks/host-payloads/`",
+      "Date / Session": "2026-07-22",
+      "Notes": "Runtime proof separate held gate per supported cell; Codex install/registration and auto-adopt decision held."
+    },
+    {
+      "ID": "VER-TW-083",
+      "Requirement": "REQ-TW-076; REQ-TW-077; REQ-TW-078; REQ-TW-079; REQ-TW-080; REQ-TW-081; REQ-TW-082; REQ-TW-083; REQ-TW-084; REQ-TW-085; REQ-TW-086; REQ-TW-087; REQ-TW-088",
+      "Method": "U0 deterministic authority-baseline check",
+      "Procedure / Command": "Verify original/amendment plan hashes, canonical requirements hash, YAML syntax, exact U0 changed paths, normalized EXC-TW-011 semantic digest, and regenerated projection drift.",
+      "Tested Ref": "U0 correction records and generated views",
+      "Result": "Pending independent Sol review; no behavior verification or runtime claim.",
+      "Evidence Path": "Owner-approved original plan and Amendment 1; U0 allowlisted authority records; generated projections",
+      "Date / Session": "2026-07-23",
+      "Notes": "Draft verification only. Sol ACCEPT and active EXC-TW-011 remain the activation condition; U7 and all publication/install/deploy/product claims remain held."
     }
   ],
   "validation_evidence": [
@@ -3514,6 +3843,149 @@
       "Result": "Owner approval recorded 2026-06-12; representative real-project validation of the promoted knowledge skills remains open",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "Validation of the promoted skills in real consuming-project use (R31 family) remains deferred under the existing held claims."
+    },
+    {
+      "ID": "VAL-TW-019",
+      "Source Need": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "Scenario / Intended Use": "Intent validation (FAT/ATP-style acceptance) happens before implementation exists, not only at closure.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "A reviewer can see RED verification evidence and a reviewed validation-definition artifact recorded before any implementation diff for the work item.",
+      "Evidence Path": "`docs/validation/` validation-definition artifacts; matrix rows; `fixtures/vv-define/`",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Fixture evidence exists (VER-TW-077); representative real-use validation awaits first consuming work item; requirement candidate_for_review."
+    },
+    {
+      "ID": "VAL-TW-020",
+      "Source Need": "NEED-TW-001; NEED-TW-003; NEED-TW-004; NEED-TW-008",
+      "Scenario / Intended Use": "A user can run one TraceWeaver-owned step after plan acceptance and get a reviewed capsule handed to `tw-work`.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "`tw-vv-define` output names REQ/TRACE/VER/VAL IDs, artifact paths, and RED evidence location, and does not itself claim implementation authority.",
+      "Evidence Path": "`plugins/traceweaver-core/skills/tw-vv-define/SKILL.md`; `docs/validation/examples/vv-define-capsule.example.json`",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Static skill/validator evidence exists (VER-TW-078); live handoff and representative validation held."
+    },
+    {
+      "ID": "VAL-TW-021",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "Scenario / Intended Use": "A behavior-bearing work item reaches `tw-work` without its V&V definition capsule.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "The fixture states `stop_before_mutation`, blocks `ce-work`, and routes through `tw-auto` to `tw-vv-define`; the smoke verifies the static policy text.",
+      "Evidence Path": "`fixtures/tw-skill-behavior/tw-work-missing-vv-definition/worker-result.txt`; `scripts/traceweaver-smoke-tw-skill-behavior`",
+      "Result": "Held for representative/live validation",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Static/advisory evidence only (VER-TW-079); host-runtime proof and representative user validation are separate held gates."
+    },
+    {
+      "ID": "VAL-TW-022",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-005; NEED-TW-007",
+      "Scenario / Intended Use": "An agent session starts already reminded of TraceWeaver mode, the Authority Rule, and held claims.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Per-host dry-run fixture shows correct injected payload content for supported hosts, or an honest capability gap record where a host lacks the surface.",
+      "Evidence Path": "`plugins/traceweaver-core/hooks/session-start`; `fixtures/hooks/session-start/`; capability matrix record",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Fixture evidence exists (VER-TW-080); live session-start firing validation held per host."
+    },
+    {
+      "ID": "VAL-TW-023",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005",
+      "Scenario / Intended Use": "Superseded historical validation target for the removed advisory PreToolUse warning.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Current validation evidence is limited to confirming the default hook surface is absent; it does not validate advisory warning behavior.",
+      "Evidence Path": "`scripts/traceweaver-smoke-hook-pretooluse-tdd-gate`; `docs/validation/traceweaver-plugin-0.3-release.md`",
+      "Result": "Held / superseded historical evidence",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "The removal regression passes (VER-TW-081). No current PreToolUse fixture, hook, manifest, or runtime firing claim exists; any future behavior requires separate authority and validation."
+    },
+    {
+      "ID": "VAL-TW-024",
+      "Source Need": "NEED-TW-002; NEED-TW-005; NEED-TW-007",
+      "Scenario / Intended Use": "A reviewer can tell, per host x hook cell, whether it is supported/unsupported-gap/unproven, and whether a supported cell is statically proven only or has also passed live runtime proof.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Capability matrix record clearly separates capability state from static proof and from runtime proof status; non-supported Codex cells carry discovery evidence instead of implied coverage.",
+      "Evidence Path": "`docs/validation/traceweaver-0.3-hook-host-capability-matrix.md`; `docs/validation/traceweaver-0.3-codex-hook-capability-discovery.md`",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Matrix recorded (VER-TW-082); per-host runtime proof gates remain separately held."
+    },
+    {
+      "ID": "VAL-TW-025",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005",
+      "Scenario / Intended Use": "A reviewer can distinguish historic 0.3 candidates from profile-based corrective authority before any behavior starts.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Independent Sol reviews the exact U0 diff, plan hash, final canonical baseline hash, and inactive exception.",
+      "Evidence Path": "U0 authority records and generated projections",
+      "Result": "Held pending Sol ACCEPT",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "No U1-U6 behavior, U7, runtime, release, installation, deployment, publication, graph implementation, or product dogfood is validated or authorized by this row."
+    },
+    {
+      "ID": "VAL-TW-026",
+      "Source Need": "NEED-TW-001; NEED-TW-003; NEED-TW-005",
+      "Scenario / Intended Use": "Process-budget controls are measured against actual delivery, not agent self-report.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Future U1 boundary fixtures and terminal receipts.",
+      "Evidence Path": "U1 focused fixtures",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Not U0 authority until EXC-TW-011 is active."
+    },
+    {
+      "ID": "VAL-TW-027",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-005",
+      "Scenario / Intended Use": "Master/child roles prevent the coordinating master from acquiring mutation authority.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Future U1/U2 contract fixtures.",
+      "Evidence Path": "U1/U2 focused fixtures",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Not U0 authority until EXC-TW-011 is active."
+    },
+    {
+      "ID": "VAL-TW-028",
+      "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-003",
+      "Scenario / Intended Use": "Bootstrap is additive, idempotent, and truthful about automatic-host proof.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Future U2 fixtures and fresh-task evidence per host.",
+      "Evidence Path": "U2 focused fixtures",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Not U0 authority until EXC-TW-011 is active."
+    },
+    {
+      "ID": "VAL-TW-029",
+      "Source Need": "NEED-TW-001; NEED-TW-003; NEED-TW-005",
+      "Scenario / Intended Use": "Review effort stays risk-proportional and stops without progress.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Future U3 routing fixtures.",
+      "Evidence Path": "U3 focused fixtures",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Not U0 authority until EXC-TW-011 is active."
+    },
+    {
+      "ID": "VAL-TW-030",
+      "Source Need": "NEED-TW-001; NEED-TW-005",
+      "Scenario / Intended Use": "Terminal claims do not conflate build, verification, review, deployment, and dogfood.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Future U3 receipt fixtures and delegated browser evidence when required.",
+      "Evidence Path": "U3 focused fixtures",
+      "Result": "Held",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Not U0 authority until EXC-TW-011 is active."
+    },
+    {
+      "ID": "VAL-TW-031",
+      "Source Need": "NEED-TW-003; NEED-TW-005",
+      "Scenario / Intended Use": "Any future graph mirror remains derived from Markdown authority.",
+      "Stakeholder / Representative": "Oxiom Systems",
+      "Acceptance Signal": "Separate owner-approved post-U7 plan.",
+      "Evidence Path": "None in this repair",
+      "Result": "Held candidate follow-on",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "No U0-U7 implementation, runtime, Graphify, database, or projection work is authorized."
     }
   ],
   "code_anchor_evidence": [
@@ -6948,6 +7420,214 @@
     },
     {
       "requirement_id": "REQ-TW-075",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-076",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-077",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-078",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-079",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-080",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-081",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-082",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-083",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-084",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-085",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-086",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-087",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [
+
+      ],
+      "final_dispositions": [
+
+      ],
+      "owners": [
+
+      ],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-088",
       "coverage_status": "missing_structured_acceptance_result",
       "structured_acceptance_result_ids": [
 

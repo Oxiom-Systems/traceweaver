@@ -121,6 +121,7 @@ expected_direct_skills=(
   tw-strategy
   tw-ideate
   tw-plan
+  tw-vv-define
   tw-brainstorm
   tw-audit
   lfg
@@ -150,6 +151,7 @@ expected_visible_skills=(
   tw-strategy
   tw-ideate
   tw-plan
+  tw-vv-define
   tw-brainstorm
   tw-audit
   lfg
@@ -179,6 +181,7 @@ identity_skills=(
   tw-strategy
   tw-ideate
   tw-plan
+  tw-vv-define
   tw-brainstorm
   tw-audit
   lfg
@@ -411,7 +414,7 @@ if grep -R -nE 'REQ-TW-060|gpt-5\.5|TRACEWEAVER_CODEX_MODEL|TRACEWEAVER_CODEX_RE
 fi
 
 HOME="$codex_home" CODEX_HOME="$codex_root" codex debug prompt-input \
-  "Use all TraceWeaver direct skills: tw-auto tw-strategy tw-ideate tw-plan tw-brainstorm tw-audit tw-authority-gate tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-grill lfg." \
+  "Use all TraceWeaver direct skills: tw-auto tw-strategy tw-ideate tw-plan tw-vv-define tw-brainstorm tw-audit tw-authority-gate tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-grill lfg." \
   | jq -r '.. | strings' \
   | perl -ne 'print "$1\n" if /^- ([A-Za-z0-9_.:-]+): /' \
   | sort -u >"$visible_skills"

@@ -1,0 +1,83 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=hook-session-start-smoke; req=REQ-TW-079; trace=TRACE-TW-060; ver=VER-TW-080
+# TRACEWEAVER: verifies=VER-TW-080; req=REQ-TW-079; trace=TRACE-TW-060
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FIXTURE_ROOT="$ROOT_DIR/fixtures/hooks/session-start"
+HOOK="$ROOT_DIR/plugins/traceweaver-core/hooks/session-start"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+[[ -x "$HOOK" ]] || { echo "missing_session_start_hook=$HOOK" >&2; exit 1; }
+
+assert_json_payload() {
+  local actual="$1"
+  local host="$2"
+  python3 - "$actual" "$host" <<'PY'
+import json
+import sys
+
+payload = json.load(open(sys.argv[1], encoding="utf-8"))
+host = sys.argv[2]
+if host == "claude":
+    context = payload["hookSpecificOutput"]["additionalContext"]
+    assert payload["hookSpecificOutput"]["hookEventName"] == "SessionStart"
+    assert "additional_context" not in payload
+elif host == "cursor":
+    context = payload["additional_context"]
+    assert "additionalContext" not in payload
+else:
+    context = payload["additionalContext"]
+    assert "additional_context" not in payload
+for expected in (
+    "Optional TraceWeaver advisory context (mode: advisory; workflow profile: not_configured)",
+    ".traceweaver/master-orchestrator.md",
+    ".traceweaver/workflow-profile.yml",
+    "does not prove host execution, block actions, or mutate files",
+):
+    assert expected in context, expected
+PY
+}
+
+run_host() {
+  local host="$1"
+  local env_file="$FIXTURE_ROOT/$host/input.env"
+  local output="$TMP_DIR/$host.json"
+  local non_tw="$TMP_DIR/$host-non-tw"
+  mkdir -p "$non_tw"
+  # shellcheck disable=SC1090
+  source "$env_file"
+  case "$host" in
+    claude) (cd "$non_tw" && CLAUDE_PLUGIN_ROOT="${CLAUDE_PLUGIN_ROOT:-fixture}" "$HOOK") >"$output" ;;
+    cursor) (cd "$non_tw" && CURSOR_PLUGIN_ROOT="${CURSOR_PLUGIN_ROOT:-fixture}" "$HOOK") >"$output" ;;
+    codex) (cd "$non_tw" && env -u CLAUDE_PLUGIN_ROOT -u CURSOR_PLUGIN_ROOT "$HOOK") >"$output" ;;
+  esac
+  assert_json_payload "$output" "$host"
+  echo "hook_session_start_${host}=pass"
+}
+
+run_host claude
+run_host cursor
+run_host codex
+
+mode_project="$TMP_DIR/mode-project"
+mkdir -p "$mode_project/.traceweaver"
+printf 'traceweaver_mode: off\n' >"$mode_project/.traceweaver/intent-contract.yml"
+(cat <<'EOF'
+schema_version: tw-workflow-profile/1
+risk: L2
+EOF
+) >"$mode_project/.traceweaver/workflow-profile.yml"
+(cd "$mode_project" && CURSOR_PLUGIN_ROOT=fixture "$HOOK") >"$TMP_DIR/mode.json"
+python3 - "$TMP_DIR/mode.json" <<'PY'
+import json
+import sys
+context = json.load(open(sys.argv[1]))["additional_context"]
+assert "mode: off; workflow profile: L2" in context
+PY
+
+echo "hook_session_start_mode_override=pass"
+echo "hook_session_start_graceful_non_tw_project=pass"
+echo "hook_session_start_smoke=pass"

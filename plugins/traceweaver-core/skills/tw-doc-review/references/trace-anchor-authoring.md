@@ -16,6 +16,14 @@ authority path. Multiple candidate requirements, missing verification, stale
 authority, conflicting anchors, unclear file role, or helper/subfunction-only
 requests without an approved exception must pause without changing files.
 
+For explicit entrypoints, only typed cells in the canonical `## Traceability
+Matrix` table may select authority. All three caller selectors plus an exact
+target in `Implementation` or `Artifact Path` must match one reviewed row,
+while escaped pipes remain cell data. Narrative, basename, and decoy table matches
+are not authority. Source and matrix evidence preserve the row's complete ID
+sets, while missing target binding and incomplete or different same-named
+anchors pause.
+
 Anchor hierarchy:
 
 - module/file premise anchors explain artifact purpose;
@@ -23,6 +31,7 @@ Anchor hierarchy:
 - verification anchors mark tests, fixtures, and smokes;
 - helper/subfunction anchors are approved exceptions only.
 
-Source anchors and matrix Code Anchor Evidence updates are one transaction. Real
-project writes remain held until deterministic authoring fixtures, review, and a
-narrow project-write allowance pass.
+Source anchors and matrix Code Anchor Evidence updates are a rollback-safe pair
+that preserves exact destination permission modes for handled failures, not a
+power-loss-atomicity claim. Real project writes remain held until deterministic
+authoring fixtures, review, and a narrow project-write allowance pass.

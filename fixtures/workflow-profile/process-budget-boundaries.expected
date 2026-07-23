@@ -1,0 +1,30 @@
+estimated_delivery_minutes: 100
+target_total_effort_percent: 20
+hard_ceiling_total_effort_percent: 50
+target_process_to_delivery_ratio_percent: 25
+hard_ceiling_process_to_delivery_ratio_percent: 100
+estimated_process_target_minutes: 25
+estimated_process_ceiling_minutes: 100
+receipts:
+  - { boundary: dispatch, child: builder, category: delivery, maximum_timebox_minutes: 60, monotonic_elapsed_minutes: 0, process_minutes: 0, delivery_minutes: 0, unclassified_minutes: 0, next_projected_process_minutes: 0, next_projected_delivery_minutes: 60 }
+  - { boundary: return, child: builder, category: delivery, monotonic_elapsed_minutes: 60, process_minutes: 0, delivery_minutes: 60, unclassified_minutes: 0 }
+  - { boundary: dispatch, child: reviewer, category: process, maximum_timebox_minutes: 25, monotonic_elapsed_minutes: 60, process_minutes: 0, delivery_minutes: 60, unclassified_minutes: 0, next_projected_process_minutes: 25, next_projected_delivery_minutes: 60 }
+  - { boundary: return, child: reviewer, category: process, monotonic_elapsed_minutes: 85, process_minutes: 25, delivery_minutes: 60, unclassified_minutes: 0, action: stop_optional_artifacts_and_duplicate_review }
+target_breach:
+  process_minutes: 25
+  delivery_minutes: 60
+  result: delivery_or_held
+projected_ceiling_breach:
+  category: process
+  current_process_minutes: 25
+  next_child_maximum_timebox_minutes: 80
+  projected_process_minutes: 105
+  result: refused_estimated_process_ceiling
+unclassified_until_resolved:
+  raw_minutes: 6
+  counts_as_process_minutes: 6
+  result: counts_as_process_until_reviewer_resolves
+delivery_underrun_terminal:
+  actual_process_minutes: 30
+  actual_delivery_minutes: 25
+  result: held_process_budget

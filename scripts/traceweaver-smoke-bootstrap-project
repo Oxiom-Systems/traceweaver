@@ -1,0 +1,93 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=bootstrap-project-smoke; req=REQ-TW-084; req=REQ-TW-085
+# Fixture proof only: no automatic-host or live child-dispatch claim.
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+HELPER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-setup/scripts/traceweaver-bootstrap-project"
+FIXTURES="$ROOT_DIR/fixtures/bootstrap-project"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+[[ -x "$HELPER" ]] || { echo "bootstrap_smoke_missing_helper=$HELPER" >&2; exit 1; }
+contains() { [[ "$1" == *"$2"* ]] || { echo "$3=failed" >&2; exit 1; }; }
+fails() { set +e; result="$("$@" 2>&1)"; status=$?; set -e; [[ "$status" -ne 0 ]] || { echo "bootstrap_smoke_expected_failure=false" >&2; exit 1; }; }
+expect_files() { while IFS= read -r f; do [[ -f "$1/$f" ]] || { echo "bootstrap_smoke_missing=$f" >&2; exit 1; }; done <"$2"; }
+
+empty="$TMP_DIR/empty"; mkdir -p "$empty"
+out="$("$HELPER" --root "$empty")"
+contains "$out" "bootstrap_result=bootstrapped_template_manual_launch_only" empty_result
+contains "$out" "bootstrap_host_activation=manual_launch_only" manual_claim
+expect_files "$empty" "$FIXTURES/empty-project/expected-files.txt"
+grep -Fq "template_manual_launch_only" "$empty/.traceweaver/bootstrap.yml"
+echo "bootstrap_smoke_empty_project=pass"
+
+existing="$TMP_DIR/existing"; mkdir -p "$existing"; cp "$FIXTURES/existing-project/AGENTS.md" "$existing/AGENTS.md"
+before="$(shasum -a 256 "$existing/AGENTS.md" | awk '{print $1}')"
+"$HELPER" --root "$existing" >/dev/null
+expect_files "$existing" "$FIXTURES/existing-project/expected-files.txt"
+[[ "$before" == "$(shasum -a 256 "$existing/AGENTS.md" | awk '{print $1}')" ]] || { echo "bootstrap_smoke_overwrite_agents=true" >&2; exit 1; }
+echo "bootstrap_smoke_existing_project_preserved=pass"
+
+before="$(find "$empty/.traceweaver" -type f -exec shasum -a 256 {} \; | sort)"
+"$HELPER" --root "$empty" >/dev/null
+after="$(find "$empty/.traceweaver" -type f -exec shasum -a 256 {} \; | sort)"
+[[ "$before" == "$after" ]] || { echo "bootstrap_smoke_idempotent=false" >&2; exit 1; }
+echo "bootstrap_smoke_idempotent_rerun=pass"
+
+unsafe="$TMP_DIR/unsafe"; template="$TMP_DIR/template.md"; mkdir -p "$unsafe"; printf 'unsafe {{PLACEHOLDER}}\n' >"$template"
+fails env TRACEWEAVER_MASTER_TEMPLATE="$template" "$HELPER" --root "$unsafe"
+contains "$result" "held_missing_master_contract" unsafe_contract
+[[ ! -e "$unsafe/.traceweaver/master-orchestrator.md" ]] || { echo "bootstrap_smoke_unsafe_created=true" >&2; exit 1; }
+echo "bootstrap_smoke_unresolved_placeholder_rejected=pass"
+
+fails "$HELPER" --root "$empty" --request-mutation
+contains "$result" "refused_master_mutation" master_mutation
+echo "bootstrap_smoke_master_mutation_rejected=pass"
+
+worker="$TMP_DIR/worker"; mkdir -p "$worker"; capsule="$worker/capsule.yml"; printf 'role: builder\n' >"$capsule"
+out="$("$HELPER" --root "$worker" --role builder --delegation-capsule "$capsule" --native-child-dispatch)"
+contains "$out" "bounded_child:builder" worker_role
+echo "bootstrap_smoke_worker_role_activated=pass"
+
+roleless="$TMP_DIR/roleless"; mkdir -p "$roleless"; roleless_capsule="$roleless/capsule.yml"; printf 'role: roleless\n' >"$roleless_capsule"
+fails "$HELPER" --root "$roleless" --role roleless --delegation-capsule "$roleless_capsule"
+while IFS= read -r line; do contains "$result" "$line" roleless; done <"$FIXTURES/roleless-child.expected"
+echo "bootstrap_smoke_roleless_child_denied=pass"
+
+out="$("$HELPER" --root "$empty")"
+contains "$out" "luna_dispatch_unavailable" luna_fallback
+grep -Fq "selected_model: terra" "$empty/.traceweaver/bootstrap.yml"
+echo "bootstrap_smoke_luna_fallback=pass"
+
+grep -Fq "automatic_host_activation: held_fresh_task_runtime_proof_required" "$empty/.traceweaver/bootstrap.yml"
+grep -Fq "template_manual_launch_only" "$ROOT_DIR/docs/guides/traceweaver-from-prompt-to-proof.md"
+echo "bootstrap_smoke_manual_launch_claim_without_runtime_proof=pass"
+
+symlink_tw="$TMP_DIR/symlink-tw"; outside_tw="$TMP_DIR/outside-tw"; mkdir -p "$symlink_tw" "$outside_tw"; ln -s "$outside_tw" "$symlink_tw/.traceweaver"
+fails "$HELPER" --root "$symlink_tw"; contains "$result" "held_unsafe_project_path" symlink_tw_result
+[[ ! -e "$outside_tw/master-orchestrator.md" ]] || { echo "bootstrap_smoke_symlink_tw_write=true" >&2; exit 1; }
+echo "bootstrap_smoke_symlink_traceweaver_rejected=pass"
+
+managed_link="$TMP_DIR/managed-link"; managed_target="$TMP_DIR/managed-target"; mkdir -p "$managed_link"; : >"$managed_target"; ln -s "$managed_target" "$managed_link/AGENTS.md"
+fails "$HELPER" --root "$managed_link" --host-activation managed; contains "$result" "held_unsafe_project_path" managed_symlink_result
+[[ ! -e "$managed_link/.traceweaver" ]] || { echo "bootstrap_smoke_managed_symlink_partial=true" >&2; exit 1; }
+echo "bootstrap_smoke_symlink_managed_agents_rejected=pass"
+
+authority_link="$TMP_DIR/authority-link"; mkdir -p "$authority_link"; ln -s "$authority_link/missing-requirements.md" "$authority_link/requirements.md"
+fails "$HELPER" --root "$authority_link" --owner-authorized; contains "$result" "held_unsafe_project_path" authority_symlink_result
+[[ ! -e "$authority_link/.traceweaver" ]] || { echo "bootstrap_smoke_authority_symlink_partial=true" >&2; exit 1; }
+echo "bootstrap_smoke_dangling_authority_symlink_rejected=pass"
+
+capsule_root="$TMP_DIR/capsule-root"; outside_capsule="$TMP_DIR/outside-capsule.yml"; mkdir -p "$capsule_root"; printf 'role: builder\n' >"$outside_capsule"
+fails "$HELPER" --root "$capsule_root" --role builder --delegation-capsule "$outside_capsule"; contains "$result" "outside_delegation_capsule" outside_capsule_result
+[[ ! -e "$capsule_root/.traceweaver" ]] || { echo "bootstrap_smoke_outside_capsule_partial=true" >&2; exit 1; }
+ln -s "$outside_capsule" "$capsule_root/link-capsule.yml"
+fails "$HELPER" --root "$capsule_root" --role builder --delegation-capsule link-capsule.yml; contains "$result" "unsafe_delegation_capsule" symlink_capsule_result
+echo "bootstrap_smoke_outside_and_symlink_capsules_rejected=pass"
+
+conflict_root="$TMP_DIR/conflict"; mkdir -p "$conflict_root/.traceweaver"; printf 'conflicting master\n' >"$conflict_root/.traceweaver/master-orchestrator.md"
+fails "$HELPER" --root "$conflict_root"; contains "$result" "held_bootstrap_conflict" conflict_result
+[[ ! -e "$conflict_root/.traceweaver/bootstrap.yml" && ! -e "$conflict_root/.traceweaver/workflow-profile.yml" ]] || { echo "bootstrap_smoke_conflict_partial_write=true" >&2; exit 1; }
+echo "bootstrap_smoke_master_conflict_has_zero_partial_outputs=pass"
+echo "bootstrap_project_smoke=pass"

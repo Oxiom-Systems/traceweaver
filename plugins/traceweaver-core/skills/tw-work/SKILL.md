@@ -8,6 +8,7 @@ argument-hint: "[approved task or plan path]"
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-057; trace=TRACE-TW-042; ver=VER-TW-054 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
+<!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-078; trace=TRACE-TW-059; ver=VER-TW-079 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
 
 # TraceWeaver Work
@@ -19,7 +20,7 @@ TraceWeaver implementation facade that `tw-auto` calls instead of raw `ce-work`.
 It keeps the familiar CE worker as the underlying coding engine, but adds the
 TraceWeaver responsibilities that must happen during implementation: authority
 visibility, trace-anchor authoring, verification evidence, matrix evidence, and
-test-first/no-publication handoff back to `tw-auto`.
+V&V-definition/preflight/no-publication handoff back to `tw-auto`.
 
 Use `tw-work` for behavior-bearing code, scripts, skill instructions, fixtures,
 smokes, manifests, runtime harnesses, and validation artifacts. Do not use it to
@@ -60,27 +61,101 @@ packaged `ce-work` in no-publication mode. Packaged `ce-work` remains the coding
 engine only; it does not approve authority, traceability, review completion, or
 publication.
 
-## Test-First Evidence Gate
+## Workflow Profile Preflight
 
-For behavior-bearing changes in client repositories, `tw-work` must establish
-test-first evidence before implementation starts:
+Before the first builder mutation, `tw-work` requires a frozen
+`tw-workflow-profile/1` profile created by `tw-plan`. It must identify the
+deterministically selected L0-L3 risk, selected controls, child roles, model
+availability/choice/rationale, reviewer cap, repair-cycle cap, deploy and
+dogfood requirements, estimate-derived process guards, revision, and canonical
+profile hash. The profile is immutable after the first builder dispatch.
 
-- identify, create, or update a requirement-linked test, fixture, smoke, or
-  equivalent executable verification artifact for the intended behavior;
-- record the expected failing/current-failing evidence, or the concrete reason
-  the verification would fail against the current behavior when a live failing
-  run is unsafe or impractical;
-- link the verification artifact to the requirement, trace ID, and verification
-  ID in the matrix before claiming implementation closure;
-- after implementation, rerun the same focused verification and record the
-  passing result.
+`tw-work` must not silently add controls, reviewers, or a model fallback after
+building starts. It returns `refused_profile_immutable` unless a new profile
+revision records the changed profile and an escalation reason. A model that is
+unavailable is a hold or delegated-child condition, never an implementation
+fallback.
 
-Do not fake TDD evidence for pure documentation, mechanical formatting,
-generated, vendored, or no-behavior refactor changes. Record a scoped
-not-applicable decision for those cases. Non-test or post-implementation-only
-verification is allowed only when the approved requirement permits it or an
-approved gap/exception records owner, scope, reason, review condition, and next
-step.
+The orchestration harness, rather than a child, owns monotonic dispatch/return
+receipts. It classifies each child as `process`, `delivery`, or `unclassified`;
+unclassified elapsed time counts as process until a reviewer resolves it.
+Delivery is implementation, focused verification, build, authorized deployment,
+and dogfood. Process includes authority/planning/coordination, generic review,
+validators, matrix/registry administration, and release evidence. Before a
+dispatch the harness projects the candidate's full maximum timebox. At the
+estimated target it stops optional artifacts and duplicate review; at the
+estimated ceiling it refuses another process child. Terminal actuals always
+apply: `actual_process <= 0.25 * actual_delivery` meets target, and
+`actual_process > actual_delivery` returns `held_process_budget`, including a
+delivery underrun. There is no in-task exception.
+
+## V&V Definition Preflight
+
+Before any mutation, `tw-work` uses the frozen profile's proportional
+precondition for the exact work item. L0 has no V&V capsule and no exception
+ceremony; it may proceed only with the profile's applicable deterministic check.
+L1 consumes exactly one compact work-item capsule (authority reference, focused
+verification, one validation question, expected evidence) and must not demand a
+per-requirement validation document. L2/L3 consume the full v1 preconditions:
+
+1. a full V&V definition capsule produced by `tw-vv-define`, linked to the matrix,
+   and accepted by the skill-local checker with review evidence:
+
+   ```sh
+   plugins/traceweaver-core/skills/tw-vv-define/scripts/traceweaver-check-vv-capsule \
+     --root <repo-root> \
+     --capsule <capsule-path> \
+     --require-review-passed
+   ```
+
+   The capsule must satisfy the checker schema: each behavior-bearing
+   requirement has its REQ/TRACE/VER/VAL IDs, executable verification artifact,
+   expected-failing (RED) evidence, validation artifact, and review-passed
+   evidence path. `tw-work` verifies this prior evidence; it does not create
+   the RED artifact at work time.
+2. an L1 compact capsule accepted by the same checker. Its
+   `schema_version` is `tw-vv-compact/1`, its `workflow_profile` is `L1`, and
+   it has no `requirements[]` or `validation_artifact` fan-out fields.
+
+3. for L3 only, the full capsule also contains non-empty rollback and
+   owner-decision high-risk controls; missing controls are
+   `held_missing_control`.
+
+For L1-L3, a missing, invalid, non-review-passed where required, or
+wrong-work-item capsule is a stop before mutation and before packaged `ce-work`.
+Return control to `tw-auto`, which routes the work item back to
+`tw-vv-define`; do not infer a capsule, backfill RED evidence, or treat a later
+test run as a substitute.
+
+<!-- Provenance: rigor mechanism adapted in original TraceWeaver wording from
+obra/superpowers test-driven-development and verification-before-completion,
+pinned d884ae04; source text is not copied. -->
+
+### Implementation Without V&V Definition: Refusal Rule
+
+For this static/advisory alpha contract, a behavior-bearing implementation has
+no authorized work-loop entry when its reviewed V&V definition or scoped
+exception is absent. Stop and name the missing capsule or decision. This is a
+policy/skill-instruction contract, not runtime enforcement; any claim of a
+mechanically enforced host block remains held pending runtime proof.
+
+### V&V Preflight Red Flags
+
+| Rationalization | TraceWeaver gate consequence |
+| --- | --- |
+| "the test can come after" | Stop: the expected-failing verification evidence belongs to `tw-vv-define`; route back before mutation. |
+| "this change is too small" | Stop unless the recorded scope is genuinely docs-only, mechanical, generated, vendored, or otherwise covered by a scoped REQ-TW-076 decision. |
+| "I'll write the capsule retroactively" | Stop: a capsule assembled after mutation cannot demonstrate the required pre-mutation V&V definition sequence. |
+| "the implementation is obvious" | Stop: obviousness does not replace linked acceptance criteria, RED evidence, validation definition, or review evidence. |
+
+After the preflight passes, preserve the existing test-first evidence discipline:
+use the same pre-authored verification artifact to confirm its RED evidence and
+then rerun the same focused verification artifact after implementation to record
+the passing result. Do not fake evidence for pure documentation, mechanical
+formatting, generated, vendored, or no-behavior refactor changes; record the
+scoped decision instead. Non-test or post-implementation-only verification is
+allowed only when the approved requirement permits it or an approved
+exception records owner, scope, reason, review condition, and next step.
 
 ## Closure-Claim Validation Gate
 
@@ -115,14 +190,14 @@ complete/done/accepted wording.
 
 ## Workflow
 
-1. Confirm the run is Implementation Gate Mode. If it is Authority Baseline Mode
-   or Publication Mode, return control to `tw-auto` with that classification.
+1. Confirm the run is Implementation Gate Mode and a frozen workflow profile
+   exists. If it is Authority Baseline Mode or Publication Mode, return control
+   to `tw-auto` with that classification.
 2. Run the authority-gate preflight above before implementation.
-3. Establish the test-first evidence gate for behavior-bearing changes. If
-   requirement-linked failing/current-failing verification evidence, a valid
-   not-applicable decision, or an approved non-test/post-implementation
-   verification exception is absent, stop before mutation and return control to
-   `tw-auto`.
+3. Run the V&V Definition Preflight for behavior-bearing changes. If the
+   review-passed V&V capsule or recorded scoped not-applicable/approved
+   exception is absent or invalid, stop before mutation and return control to
+   `tw-auto` for routing to `tw-vv-define`.
 4. Apply the closure-claim validation gate when the work package claims a
    requirement, task, PR, or implementation is complete, accepted, closed, or
    done. Missing or invalid structured acceptance evidence blocks completion
@@ -145,8 +220,8 @@ complete/done/accepted wording.
    scanner remains blocked, stop with the structured traceability finding and
    return control to `tw-auto`.
 10. Run the required verification commands for the implemented slice, including
-   the same focused test-first verification artifact established before
-   implementation.
+   the same focused verification artifact whose expected-failing (RED) evidence
+   was recorded during `tw-vv-define`.
 11. When implementation, verification, scanner, and trace/matrix updates are
    complete, `tw-work` may perform review-staging for an explicit scoped file
    list that belongs to this work item. Review-staging is allowed only to make
@@ -164,9 +239,10 @@ complete/done/accepted wording.
   carries requirement-level behavior or a reviewed finding requires it.
 - Write source anchors and matrix Code Anchor Evidence together, or accept
   neither as complete.
-- Treat test-first verification artifacts as first-class verification anchors for
-  behavior-bearing changes. Tests added only after implementation may close the
-  work only when an approved exception explains why test-first was not practical.
+- Treat V&V-definition verification artifacts as first-class verification
+  anchors for behavior-bearing changes. Tests added only after implementation
+  may close the work only when an approved exception explains why the
+  pre-mutation V&V definition was not applicable.
 - Pause without mutation when task authority, requirement meaning, verification
   authority, accepted scope, or material authority is unclear, contradictory,
   incomplete, stale, missing, or implies a requirements change. When only one

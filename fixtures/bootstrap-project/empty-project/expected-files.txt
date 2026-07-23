@@ -1,0 +1,3 @@
+.traceweaver/bootstrap.yml
+.traceweaver/master-orchestrator.md
+.traceweaver/workflow-profile.yml

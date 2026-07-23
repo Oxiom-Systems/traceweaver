@@ -1,0 +1,4 @@
+profile=L0
+capsule=none
+exception=none
+result=deterministic_check_only
