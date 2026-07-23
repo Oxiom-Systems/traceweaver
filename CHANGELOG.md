@@ -2,6 +2,30 @@
 
 # Changelog
 
+## 0.3.1 - 2026-07-23
+
+Optional Graphify integration for the TraceWeaver wrapper lifecycle.
+
+### Changed
+
+- Added a packaged advisory Graphify helper with explicit repository-root and
+  local-graph receipts.
+- Added optional Graphify orientation and impact searches to `tw-plan`,
+  `tw-debug`, `tw-audit`, `tw-code-review`, and `tw-traceability-check`.
+- Added optional Graphify detection/initialization to `tw-setup` and one
+  non-blocking post-verification code/AST refresh to `tw-work`.
+- Kept `tw-auto` receipt-only and preserved direct repository sources and
+  controlled TraceWeaver artifacts as authority.
+- Added deterministic absent, uninitialized, ready, no-result, degraded, and
+  semantic-refresh-held verification plus representative owner acceptance.
+
+### Held
+
+- Graph publication, live-host invocation, automatic semantic freshness,
+  provider-key use, global graph mutation, measured productivity, runtime
+  enforcement, deployment, dogfood, and the REQ-TW-088 internal graph mirror
+  remain outside this release.
+
 ## 0.3.0 - 2026-07-23
 
 Owner-ratified repair release for the TraceWeaver Core 0.3 behavioral surface.
