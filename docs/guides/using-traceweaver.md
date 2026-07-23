@@ -30,7 +30,7 @@ Watch the setup guide for the install, bootstrap, and first-cycle flow.
 TraceWeaver Core releases from `main`. Each release bumps the plugin version
 and publishes a `traceweaver-core--v<version>` git tag with a matching GitHub
 Release. The marketplace tracks the current release. Use the
-`traceweaver-core--v0.3.0` tag when you need a reproducible alpha snapshot.
+`traceweaver-core--v0.3.1` tag when you need a reproducible alpha snapshot.
 
 ### Codex
 
@@ -46,7 +46,7 @@ Install `traceweaver-core` from the Codex plugin UI.
 Pinned local install:
 
 ```sh
-git clone --branch traceweaver-core--v0.3.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.3.1 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
@@ -94,11 +94,11 @@ a fresh session.
 
 ### Antigravity
 
-Antigravity support in `0.3.0` is local alpha install/discovery metadata only.
+Antigravity support in `0.3.1` is local alpha install/discovery metadata only.
 Runtime workflow invocation remains held.
 
 ```sh
-git clone --branch traceweaver-core--v0.3.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.3.1 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
 ```
@@ -120,7 +120,7 @@ scripts/traceweaver-smoke-antigravity-discovery
 TraceWeaver includes a Cursor peer manifest at
 `plugins/traceweaver-core/.cursor-plugin/plugin.json`.
 
-Cursor install/update is compatibility-preview only in `0.3.0`. The manifest is
+Cursor install/update is compatibility-preview only in `0.3.1`. The manifest is
 versioned with the Codex and Claude manifests, but TraceWeaver does not claim a
 proven Cursor marketplace or runtime install path yet.
 

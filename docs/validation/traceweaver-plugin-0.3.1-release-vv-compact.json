@@ -1,0 +1,13 @@
+{
+  "schema_version": "tw-vv-compact/1",
+  "workflow_profile": "L1",
+  "work_item_id": "TW-RELEASE-0.3.1-GRAPHIFY",
+  "plan_ref": "docs/plans/2026-07-23-traceweaver-core-0.3.1-release-plan.md",
+  "authority_ref": "requirements.md",
+  "traceability_refs": ["TRACE-TW-006", "TRACE-TW-033", "TRACE-TW-064"],
+  "verification_refs": ["VER-TW-012", "VER-TW-042", "VER-TW-084"],
+  "validation_refs": ["VAL-TW-008", "VAL-TW-011", "VAL-TW-032"],
+  "focused_verification": ".github/workflows/release-on-version-bump.yml",
+  "validation_question": "Does the 0.3.1 release publish the accepted optional Graphify wrapper behavior while retaining every runtime, semantic-freshness, productivity, deployment, and internal-graph hold?",
+  "expected_evidence": "Coherent 0.3.1 manifests and public references, clean release record and exact-diff review, green PR checks, successful automatic release workflow, and a peeled traceweaver-core--v0.3.1 tag equal to the release merge commit."
+}

@@ -6,7 +6,7 @@
   },
   "metadata": {
     "description": "TraceWeaver alpha plugin marketplace — systems-engineering authority and traceability controls for agentic engineering.",
-    "version": "0.3.0"
+    "version": "0.3.1"
   },
   "plugins": [
     {

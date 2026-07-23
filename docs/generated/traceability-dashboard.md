@@ -9,9 +9,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `cdec63d5be223e55239aec371b1f535d2687d8dec203ac839b3ef2825eed9a44` |
-| `requirements.md` | `7bf9b5be12ba687d61ca8f3c04da18ea18b07a006ce614a091c3dda3c883e7f4` |
-| `.traceweaver/intent-contract.yml` | `7e0fff1c819ae0afc42b64f75548c88e0f714fca4f6c27308b19d1efa69e6012` |
+| `traceability-matrix.md` | `d63d0011ab2007d8724738b2cb4ece8651385535272053215e100e2b52ffc1b6` |
+| `requirements.md` | `21fcb46b9e4e9e8c56acafbb592213b5acd94d2b24098da365bb117e96d70a13` |
+| `.traceweaver/intent-contract.yml` | `a3e5ab7a05fd173692b0bade4cc7808374614d4d808dbab95bd3968aed624607` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md` | `c7406e067ddd994077a72fdfdc8dbcb2f9f2dcaec229d170935a540e74637b62` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md` | `6a83c1136739926d7c8cbcb3a45ce41c003683d11468c081c4cef802c3b128ab` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
@@ -36,8 +36,8 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Requirement | Status | Validation | Trace Rows |
 | --- | --- | --- | --- |
-| REQ-TW-090 | Approved for bounded static/advisory wrapper behavior; representative owner validation accepted 2026-07-23; live-host invocation, semantic extraction freshness, global graph mutation, general productivity, merge, release, and deployment held | VAL-TW-032 | TRACE-TW-064 |
-| REQ-TW-089 | Approved for bounded static/advisory wrapper behavior; representative owner validation accepted and exact controlled PR publication authorized 2026-07-23; live-host invocation, provider-backed semantic extraction, graph publication, merge, release, deployment, and the REQ-TW-088 internal mirror held | VAL-TW-032 | TRACE-TW-064 |
+| REQ-TW-090 | Approved for bounded static/advisory wrapper behavior; owner validation passed, PR #49 merged, and exact TraceWeaver Core 0.3.1 release authorized 2026-07-23; live-host invocation, semantic extraction freshness, global graph mutation, general productivity, deployment, dogfood, and future releases held | VAL-TW-032 | TRACE-TW-064 |
+| REQ-TW-089 | Approved for bounded static/advisory wrapper behavior; owner validation passed, PR #49 merged, and exact TraceWeaver Core 0.3.1 release authorized 2026-07-23; live-host invocation, provider-backed semantic extraction, graph publication, deployment, dogfood, future releases, and the REQ-TW-088 internal mirror held | VAL-TW-032 | TRACE-TW-064 |
 | REQ-TW-088 | Candidate follow-on only; never U0-U7 authority | VAL-TW-031 | TRACE-TW-063 |
 | REQ-TW-087 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-030 | TRACE-TW-063 |
 | REQ-TW-086 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-029 | TRACE-TW-063 |
@@ -120,7 +120,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Validation | Source Need | Result | Evidence |
 | --- | --- | --- | --- |
-| VAL-TW-032 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Passed - owner accepted representative scenario 2026-07-23 | `docs/validation/traceweaver-graphify-wrapper-validation-definition.md`; `docs/validation/traceweaver-graph... |
+| VAL-TW-032 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Passed - owner accepted representative scenario and authorized exact 0.3.1 release 2026-07-23 | `docs/validation/traceweaver-graphify-wrapper-validation-definition.md`; `docs/validation/traceweaver-graph... |
 | VAL-TW-031 | NEED-TW-003; NEED-TW-005 | Held candidate follow-on | None in this repair |
 | VAL-TW-030 | NEED-TW-001; NEED-TW-005 | Held | U3 focused fixtures |
 | VAL-TW-029 | NEED-TW-001; NEED-TW-003; NEED-TW-005 | Held | U3 focused fixtures |

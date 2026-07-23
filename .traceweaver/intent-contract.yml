@@ -5,7 +5,7 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 22d0e0d0b531ab02fa1756c7e9a09337c86f843622c0c58c1fa8a0d67d53ddfb
+baseline_hash_sha256: bc79fb669626f1cfddfdd98ac883d4abd90ba05c4a6e2f532b891d00fac68d7a
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
@@ -2384,7 +2384,11 @@ req_tw_089_090_optional_graphify_wrapper_authority:
   decision_id: TW-OWNER-DECISION-2026-07-23-GRAPHIFY-WRAPPERS-001
   owner: Oxiom Systems
   decision_source: explicit owner direction on 2026-07-23
-  status: bounded_static_advisory_implementation_and_representative_owner_validation_passed_publication_authorized
+  status: bounded_static_advisory_implementation_owner_validation_and_PR49_merge_passed_exact_0_3_1_release_authorized
+  merged_pull_request: https://github.com/Oxiom-Systems/traceweaver/pull/49
+  merged_feature_commit: 7ba5814133d3787b21e7b8f92c6b89177fac9cf0
+  main_merge_commit: 99ee6d8e2bc27c3837d938c40553879db5e5b3b0
+  exact_release_authority: TraceWeaver Core 0.3.1 only, owner authorized 2026-07-23
   requirements:
     - REQ-TW-089
     - REQ-TW-090
@@ -2404,7 +2408,8 @@ req_tw_089_090_optional_graphify_wrapper_authority:
   must_not_change:
     - Markdown authority and direct source corroboration
     - tw-auto read-only master boundary
-    - no automatic install, provider-key use, semantic extraction, global graph mutation, hook install, graph publication, commit, push, PR, release, deploy, or dogfood
+    - no automatic Graphify install, provider-key use, semantic extraction, global graph mutation, hook install, or graph publication
+    - publication remains separately authorized, exact-target, gated, and non-autonomous
     - REQ-TW-088 internal SQLite graph mirror remains unauthorized
   validation_question: Can optional Graphify searches and one post-work refresh reduce orientation drift without creating a hidden dependency, authority source, or extra manual loop?
   held_claims:
@@ -2412,7 +2417,7 @@ req_tw_089_090_optional_graphify_wrapper_authority:
     - provider-backed semantic extraction or automatic semantic refresh
     - graph correctness beyond Graphify output
     - measured time or token savings
-    - merge, release, deployment, dogfood, or internal graph-mirror readiness
+    - deployment, dogfood, future release, or internal graph-mirror readiness
 
 next_recommended_steps:
   - Complete TraceWeaver Core 0.2.8 gated-publication implementation, review, release, reinstall, and Vestro dogfood under `TW-OWNER-DECISION-2026-07-13-GATED-PUBLICATION-001`.
