@@ -222,15 +222,16 @@ the real, unchanged 0.3 program files.
 tree (`no_publication_smoke=pass`); it is not a pre-existing failure.
 
 The independently rerun exact-tree
-`scripts/traceweaver-smoke-systems-engineering-audit-closure` currently exits
-1 with `systems_engineering_audit_closure_contract=pass`, followed by
-`skill_prompt_contract_tw-auto_required_inputs=failed_missing_pattern` for
-the required `## Required Inputs` or `## Required Authority Inputs` heading in
-`tw-auto/SKILL.md`. This is a current held audit finding, not the earlier
-`tw-update` failure, and it is not silently converted into a release-ready
-claim. The current release evidence therefore records the audit as
-held/failing while retaining the other listed static checks and held
-runtime/publication boundaries.
+`scripts/traceweaver-smoke-systems-engineering-audit-closure` advances past
+the repaired `tw-auto` input/workflow contract but currently exits 1 with
+`skill_prompt_contract_tw-setup_intent_context=failed_missing_pattern`: the
+separate `tw-setup/SKILL.md` path lacks the required
+`.traceweaver/intent-contract.yml`, authority-bootstrap, or source-evidence
+context. This is a current held audit finding, not the earlier `tw-update`
+failure and not a `tw-auto` failure. It requires authority for that separate
+path; it is not silently converted into a release-ready claim. The current
+release evidence therefore records the audit as held/failing while retaining
+the other listed static checks and held runtime/publication boundaries.
 
 ## Held Claims
 

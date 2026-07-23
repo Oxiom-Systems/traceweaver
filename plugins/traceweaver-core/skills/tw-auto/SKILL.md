@@ -19,6 +19,41 @@ capsules, record harness receipts, and return held results. It does not edit,
 build, test, stage, commit, deploy, browse, dogfood, or implement as a fallback.
 It has no direct implementation path.
 
+## Required Inputs
+
+Before it dispatches any child, the read-only master must have or explicitly
+hold the following interface inputs. It may inspect them, bind their identities
+into a child capsule, and report missing inputs; it must not manufacture or
+mutate them itself.
+
+- **Intent and authority source:** the applicable `requirements.md`,
+  `traceability-matrix.md`, and `.traceweaver/intent-contract.yml`, or an
+  explicit authority-bootstrap/source-evidence hold when those controlled
+  artifacts do not yet exist. The master binds the baseline identity and
+  approved scope; it does not promote drafts or source evidence into authority.
+- **Frozen workflow profile:** one valid `tw-workflow-profile/1` profile from
+  `references/workflow-profile-template.yml`, including its revision/hash,
+  risk, permitted child roles, model selection, reviewer/repair caps, and
+  release/deploy/dogfood conditions. A missing or changed profile is a hold,
+  not permission to choose controls ad hoc.
+- **Planning receipt:** a passable, profile-bound `tw-plan` child receipt that
+  states scope, authority outcome, verification method, validation question,
+  and held claims. Without it, the master cannot route V&V, a builder, or a
+  closure claim.
+- **Proportional V&V handoff:** the L0 not-applicable record or the matching
+  reviewed `tw-vv-define` capsule and RED verification-evidence reference for
+  L1/L2/L3. The capsule identity must match the frozen profile and plan receipt
+  before `tw-authority-gate` or `tw-work` can be routed.
+- **Available bounded children:** named child roles and their selected models
+  must be available within the frozen profile. An unavailable child or model is
+  recorded with its consequence and returns a held/bounded route; the master
+  never performs that child work as a fallback.
+- **Verification and release boundary evidence:** linked verification receipts
+  for the requested work, plus explicit held conditions for release,
+  deployment, and dogfood. Missing evidence or authority keeps those outcomes
+  held; implementation, review, or a fixture pass never implies publication,
+  deployment, or dogfood completion.
+
 ## Project Bootstrap Routing
 
 When project-local orchestration files are absent, `tw-auto` may route to the
@@ -198,7 +233,7 @@ gate as a substitute for an executable child route. Standalone
 reserved for the diagnostic or authority exceptions above. Every terminal receipt
 names the next permitted wrapper or the held condition.
 
-## Routing
+## Workflow
 
 1. Load approved authority, select/freeze the profile, permitted child roles,
    and selected model, then create only the bounded capsules allowed by them.
