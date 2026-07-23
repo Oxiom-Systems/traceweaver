@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "2353599a35e0310432aa1e9d12f99d378bdd2ba73b6d76e0e8659c754e9489b6"
+      "sha256": "b2555e0b41b984c2d960d20de72fce943878784fa588d78c9384096f5bfc27a8"
     },
     {
       "path": "requirements.md",
@@ -2044,11 +2044,11 @@
       "owner": "Oxiom Systems",
       "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005",
       "requirements": "REQ-TW-080",
-      "artifact": "`plugins/traceweaver-core/hooks/pretooluse-tdd-gate`; Claude Code and Cursor manifest entries; `fixtures/hooks/pretooluse/` (present/missing/red-path-missing/plugin-hook cases)",
+      "artifact": "Historical hook/manifest/fixture evidence was deleted in U5. Current evidence is the negative removal-regression smoke `scripts/traceweaver-smoke-hook-pretooluse-tdd-gate` plus `docs/validation/traceweaver-plugin-0.3-release.md`.",
       "verification": "VER-TW-081",
       "validation": "VAL-TW-023",
-      "status": "Static/fixture-verified only; smoke proves silent positive path, advisory warning negative paths, exit 0; adversarial review ACCEPT after RED-evidence-chain fix",
-      "next_step": "Blocking/enforcing behavior held; Codex PreToolUse coverage unproven per capability matrix; requirement remains candidate_for_review"
+      "status": "Superseded historical evidence only; current smoke verifies the deleted default hook, registrations, and fixtures do not exist.",
+      "next_step": "No current PreToolUse behavior, fixture, manifest, or runtime claim; blocking/enforcing and Codex PreToolUse coverage remain held."
     },
     {
       "id": "TRACE-TW-062",
@@ -3614,13 +3614,13 @@
     {
       "ID": "VER-TW-081",
       "Requirement": "REQ-TW-080",
-      "Method": "Hook fixture payload smoke",
-      "Procedure / Command": "`scripts/traceweaver-smoke-hook-pretooluse-tdd-gate` over `fixtures/hooks/pretooluse/` (vv-definition-present: silent exit 0; vv-definition-missing: advisory warning exit 0; vv-definition-present-red-path-missing: advisory warning exit 0; plugin-hook and extensionless-executable cases)",
-      "Tested Ref": "PreToolUse advisory gate behavior: capsule -> V&V definition -> red_evidence path chain with non-empty verification; behavior-bearing path classification; never-blocking exit codes",
-      "Result": "Pass: positive path silent, all negative paths warn with exit 0; credentials.env substring attack defeated by path-chain verification; malformed/empty stdin graceful; smoke green on integration branch",
-      "Evidence Path": "`plugins/traceweaver-core/hooks/pretooluse-tdd-gate`; `fixtures/hooks/pretooluse/`; `scripts/traceweaver-smoke-hook-pretooluse-tdd-gate`",
-      "Date / Session": "2026-07-22",
-      "Notes": "Advisory only; blocking/enforcing held; Codex PreToolUse coverage unproven; runtime firing held."
+      "Method": "Superseded historical hook/fixture evidence; current negative removal-regression smoke",
+      "Procedure / Command": "Historical fixture payload smoke and its hook/fixtures were removed in U5. Current check: `scripts/traceweaver-smoke-hook-pretooluse-tdd-gate` asserts no PreToolUse registration in manifests and no hook or fixture directory exists.",
+      "Tested Ref": "The default PreToolUse surface remains absent from the repaired product.",
+      "Result": "Pass: `pretooluse_default_removed=pass`; this does not assert the deleted hook behaved correctly or fired.",
+      "Evidence Path": "`scripts/traceweaver-smoke-hook-pretooluse-tdd-gate`; `docs/validation/traceweaver-plugin-0.3-release.md`",
+      "Date / Session": "2026-07-23",
+      "Notes": "Superseded historical evidence; no current hook/fixture/manifest/runtime claim. Blocking/enforcing and Codex PreToolUse coverage remain held."
     },
     {
       "ID": "VER-TW-082",
@@ -3891,13 +3891,13 @@
     {
       "ID": "VAL-TW-023",
       "Source Need": "NEED-TW-001; NEED-TW-002; NEED-TW-003; NEED-TW-005",
-      "Scenario / Intended Use": "A behavior-bearing write/edit surfaces an advisory warning when no linked V&V evidence exists, without being blocked.",
+      "Scenario / Intended Use": "Superseded historical validation target for the removed advisory PreToolUse warning.",
       "Stakeholder / Representative": "Oxiom Systems",
-      "Acceptance Signal": "Fixture proof shows the warning firing on missing evidence and staying silent when evidence is linked, for Claude Code and Cursor; Codex recorded as unproven.",
-      "Evidence Path": "`plugins/traceweaver-core/hooks/pretooluse-tdd-gate`; `fixtures/hooks/pretooluse/`",
-      "Result": "Held",
+      "Acceptance Signal": "Current validation evidence is limited to confirming the default hook surface is absent; it does not validate advisory warning behavior.",
+      "Evidence Path": "`scripts/traceweaver-smoke-hook-pretooluse-tdd-gate`; `docs/validation/traceweaver-plugin-0.3-release.md`",
+      "Result": "Held / superseded historical evidence",
       "Owner": "Oxiom Systems",
-      "Deferred Trigger / Notes": "Fixture evidence exists (VER-TW-081); live PreToolUse firing and any blocking behavior held."
+      "Deferred Trigger / Notes": "The removal regression passes (VER-TW-081). No current PreToolUse fixture, hook, manifest, or runtime firing claim exists; any future behavior requires separate authority and validation."
     },
     {
       "ID": "VAL-TW-024",

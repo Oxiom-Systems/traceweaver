@@ -31,7 +31,7 @@ Baseline:
 
 - baseline ID: `REQ-BASELINE-2026-04-30-001`
 - authority source: `requirements.md`
-- canonical baseline hash: `7166605b3bae8b56bba3d0d9e7e8095982826df719339a7b67d8a78b6cbb6b07`
+- canonical baseline hash: `8ec3480f14c77eeca046b6d85b011b784b7e43434c4be4de216a249252511f9c`
   (matches `.traceweaver/intent-contract.yml` and
   `.traceweaver/intent-contract.current.yml`; `baseline_hash_consistent: true`)
 - relevant requirements: REQ-TW-076, REQ-TW-077, REQ-TW-078, REQ-TW-079,
@@ -195,9 +195,9 @@ current verification evidence; the ten remaining historical results were:
 9. `TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery` — `codex_discovery_smoke=pass`
 10. `scripts/traceweaver-smoke-antigravity-discovery` — `antigravity_discovery_smoke=pass`
 
-Verify gate detail: `traceweaver_verify=pass hash_ok=1 closure=0/75
-longest_line=8803 over2000=43`. Canonical baseline hash
-`7166605b3bae8b56bba3d0d9e7e8095982826df719339a7b67d8a78b6cbb6b07` is
+Verify gate detail: `traceweaver_verify=pass hash_ok=1 closure=0/88
+longest_line=8803 over2000=45`. Canonical baseline hash
+`8ec3480f14c77eeca046b6d85b011b784b7e43434c4be4de216a249252511f9c` is
 consistent across `requirements.md`, `.traceweaver/intent-contract.yml`, and
 the regenerated bounded snapshot
 `.traceweaver/intent-contract.current.yml` (`baseline_hash_consistent:
@@ -216,23 +216,21 @@ dead-TDD, generated-file exceptions, unsafe-changed-file-path, and both
 audit-mode and implementation-mode blocking cases), plus a clean pass over
 the real, unchanged 0.3 program files.
 
-## Pre-Existing Main Failures (Out Of Scope)
+## Exact-Tree Audit And Pre-Existing Debt
 
-Two smoke failures pre-date this release and are unrelated to the
-validation-first program; both are tracked by a filed bead
-(`TraceWeaver-ybhr`) rather than fixed as part of 0.3 scope:
+`scripts/traceweaver-smoke-no-publication` now passes on the exact repaired
+tree (`no_publication_smoke=pass`); it is not a pre-existing failure.
 
-- `scripts/traceweaver-smoke-no-publication` — fails on a missing
-  `## Phase 5: TraceWeaver Alpha Stop Before Commit` marker in
-  `plugins/traceweaver-core/skills/ce-compound-refresh/SKILL.md`.
-- `scripts/traceweaver-smoke-systems-engineering-audit-closure` — fails on a
-  missing `## Required Inputs` / `## Required Authority Inputs` section in
-  `plugins/traceweaver-core/skills/tw-update/SKILL.md`.
-
-Both were confirmed still failing against the current tree during this
-release's verification pass and are recorded here as known, tracked,
-out-of-scope debt rather than release blockers for the validation-first
-program.
+The independently rerun exact-tree
+`scripts/traceweaver-smoke-systems-engineering-audit-closure` currently exits
+1 with `systems_engineering_audit_closure_contract=pass`, followed by
+`skill_prompt_contract_tw-auto_required_inputs=failed_missing_pattern` for
+the required `## Required Inputs` or `## Required Authority Inputs` heading in
+`tw-auto/SKILL.md`. This is a current held audit finding, not the earlier
+`tw-update` failure, and it is not silently converted into a release-ready
+claim. The current release evidence therefore records the audit as
+held/failing while retaining the other listed static checks and held
+runtime/publication boundaries.
 
 ## Held Claims
 

@@ -9,7 +9,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `2353599a35e0310432aa1e9d12f99d378bdd2ba73b6d76e0e8659c754e9489b6` |
+| `traceability-matrix.md` | `b2555e0b41b984c2d960d20de72fce943878784fa588d78c9384096f5bfc27a8` |
 | `requirements.md` | `091d2f815c6adfa34590b0cd0a9556b52a51470f4062f2fce5faad11e1a2a69e` |
 | `.traceweaver/intent-contract.yml` | `fb81692f19aea895ef0ad3b91d791260ad8ca164b851b380e0b8fc7b301144af` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
@@ -53,7 +53,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | --- | --- | --- | --- | --- | --- |
 | TRACE-TW-063 | REQ-TW-076; REQ-TW-077; REQ-TW-078; REQ-TW-079; REQ-TW-080; REQ-TW-081; REQ-T... | requirements.md; Intent Contract; matrix; GAP-TW-2026-07-22-008; CHG-TW-2026-07-22-001;... | VER-TW-083 | VAL-TW-025; VAL-TW-026; VAL-TW-027; VAL-TW-028; VAL-TW-02... | Conditionally approved only; no behavior authority until active EXC-TW-011 contains the exact req... |
 | TRACE-TW-062 | REQ-TW-081 | Capability matrix record; Codex discovery record; `fixtures/hooks/host-payloads/{claude... | VER-TW-082 | VAL-TW-024 | Matrix recorded: Claude Code SessionStart+PreToolUse supported; Cursor SessionStart+PreToolUse su... |
-| TRACE-TW-061 | REQ-TW-080 | `plugins/traceweaver-core/hooks/pretooluse-tdd-gate`; Claude Code and Cursor manifest e... | VER-TW-081 | VAL-TW-023 | Static/fixture-verified only; smoke proves silent positive path, advisory warning negative paths,... |
+| TRACE-TW-061 | REQ-TW-080 | Historical hook/manifest/fixture evidence was deleted in U5. Current evidence is the ne... | VER-TW-081 | VAL-TW-023 | Superseded historical evidence only; current smoke verifies the deleted default hook, registratio... |
 | TRACE-TW-060 | REQ-TW-079 | `plugins/traceweaver-core/hooks/session-start`; `plugins/traceweaver-core/hooks/hooks.j... | VER-TW-080 | VAL-TW-022 | Static/fixture-verified only; per-host payload-shape smoke green; adversarial review cycle closed |
 | TRACE-TW-059 | REQ-TW-078 | `plugins/traceweaver-core/skills/tw-work/SKILL.md` V&V Definition Preflight + refusal/r... | VER-TW-079 | VAL-TW-021 | Requirements-quality review and scoped doc review passed 2026-07-22; static/advisory fixture and ... |
 | TRACE-TW-058 | REQ-TW-077 | `plugins/traceweaver-core/skills/tw-vv-define/SKILL.md`; `plugins/traceweaver-core/skil... | VER-TW-078 | VAL-TW-020 | Requirements-quality review and scoped doc review passed 2026-07-22; skill, validator, fixtures, ... |
@@ -70,7 +70,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | --- | --- | --- | --- |
 | TRACE-TW-063 | REQ-TW-076; REQ-TW-077; REQ-TW-078; REQ-TW-079; REQ-TW-080; REQ-TW-081; REQ-T... | Conditionally approved only; no behavior authority until active EXC-TW-011 contains the exact required rece... | Runtime, release, installation, deployment, publication, graph implementation, canonical database, and U7 dogfood remain held |
 | TRACE-TW-062 | REQ-TW-081 | Matrix recorded: Claude Code SessionStart+PreToolUse supported; Cursor SessionStart+PreToolUse supported; C... | Runtime proof remains a separate held gate per supported cell; no manifests/fixtures for non-supported cells; requirement remai... |
-| TRACE-TW-061 | REQ-TW-080 | Static/fixture-verified only; smoke proves silent positive path, advisory warning negative paths, exit 0; a... | Blocking/enforcing behavior held; Codex PreToolUse coverage unproven per capability matrix; requirement remains candidate_for_r... |
+| TRACE-TW-061 | REQ-TW-080 | Superseded historical evidence only; current smoke verifies the deleted default hook, registrations, and fi... | No current PreToolUse behavior, fixture, manifest, or runtime claim; blocking/enforcing and Codex PreToolUse coverage remain held. |
 | TRACE-TW-060 | REQ-TW-079 | Static/fixture-verified only; per-host payload-shape smoke green; adversarial review cycle closed | Live SessionStart firing held per host; Codex registration/install held; requirement remains candidate_for_review |
 | TRACE-TW-059 | REQ-TW-078 | Requirements-quality review and scoped doc review passed 2026-07-22; static/advisory fixture and instructio... | Runtime refusal/enforcement claims held; requirement remains candidate_for_review pending baseline amendment |
 | TRACE-TW-058 | REQ-TW-077 | Requirements-quality review and scoped doc review passed 2026-07-22; skill, validator, fixtures, example ca... | Install/discovery-smoke enumeration updated in Unit 4; packaged-skill install claim and capsule-handoff runtime behavior held |
