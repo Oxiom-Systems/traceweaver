@@ -17,6 +17,10 @@ SKILL_MD="$SKILL_DIR/SKILL.md"
 CHECKER="$SKILL_DIR/scripts/traceweaver-check-vv-capsule"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/vv-define"
 EXAMPLE_CAPSULE="$ROOT_DIR/docs/validation/examples/vv-define-capsule.example.json"
+RETIRED_PLAN_REF="docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md"
+RETAINED_PLAN_REF="docs/plans/2026-07-22-traceweaver-roadmap.md"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
 
 # Runtime is disabled by default. This smoke never claims live-agent runtime
 # proof; the flag exists only so a future runtime-proof unit can opt in
@@ -103,9 +107,49 @@ require_file "$FIXTURE_ROOT/unscoped-not-applicable/capsule.json"
 require_file "$FIXTURE_ROOT/valid-not-applicable/capsule.json"
 require_file "$FIXTURE_ROOT/review-not-passed/capsule.json"
 require_file "$FIXTURE_ROOT/invalid-identity/capsule.json"
+require_file "$ROOT_DIR/$RETAINED_PLAN_REF"
 
 VALIDATION_EXAMPLE="$ROOT_DIR/docs/validation/examples/vv-define-validation-definition.example.md"
 require_file "$VALIDATION_EXAMPLE"
+
+# U5 retired the superseded unit-2 proposal. Preserve the historical fixture
+# bodies as stored, but validate temporary compatibility copies against the
+# retained 0.3 roadmap. The round-trip comparison proves that this helper
+# changes only that one exact plan_ref literal; unrelated missing plan refs
+# remain negative findings.
+materialize_compat_capsule() {
+  local source="$1"
+  local name="$2"
+  local destination="$TMP_DIR/compat-$name.json"
+  local roundtrip="$TMP_DIR/compat-$name.roundtrip.json"
+
+  if [[ "$(grep -F -c -- "\"plan_ref\": \"$RETIRED_PLAN_REF\"" "$source")" -ne 1 ]]; then
+    echo "vv_define_smoke_compat_source_ref=failed source=$source" >&2
+    exit 1
+  fi
+  sed "s#\"plan_ref\": \"$RETIRED_PLAN_REF\"#\"plan_ref\": \"$RETAINED_PLAN_REF\"#" \
+    "$source" > "$destination"
+  if grep -F -q -- "$RETIRED_PLAN_REF" "$destination" || \
+    [[ "$(grep -F -c -- "\"plan_ref\": \"$RETAINED_PLAN_REF\"" "$destination")" -ne 1 ]]; then
+    echo "vv_define_smoke_compat_remap=failed source=$source" >&2
+    exit 1
+  fi
+  sed "s#\"plan_ref\": \"$RETAINED_PLAN_REF\"#\"plan_ref\": \"$RETIRED_PLAN_REF\"#" \
+    "$destination" > "$roundtrip"
+  if ! cmp -s "$source" "$roundtrip"; then
+    echo "vv_define_smoke_compat_scope=failed source=$source" >&2
+    exit 1
+  fi
+  printf '%s\n' "$destination"
+}
+
+VALID_CAPSULE_COMPAT="$(materialize_compat_capsule "$FIXTURE_ROOT/valid-capsule/capsule.json" valid-capsule)"
+MISSING_RED_COMPAT="$(materialize_compat_capsule "$FIXTURE_ROOT/missing-red-evidence/capsule.json" missing-red-evidence)"
+UNSCOPED_NA_COMPAT="$(materialize_compat_capsule "$FIXTURE_ROOT/unscoped-not-applicable/capsule.json" unscoped-not-applicable)"
+VALID_NA_COMPAT="$(materialize_compat_capsule "$FIXTURE_ROOT/valid-not-applicable/capsule.json" valid-not-applicable)"
+REVIEW_NOT_PASSED_COMPAT="$(materialize_compat_capsule "$FIXTURE_ROOT/review-not-passed/capsule.json" review-not-passed)"
+REVIEW_ENTRY_MALFORMED_COMPAT="$(materialize_compat_capsule "$FIXTURE_ROOT/review-entry-malformed/capsule.json" review-entry-malformed)"
+EXAMPLE_CAPSULE_COMPAT="$(materialize_compat_capsule "$EXAMPLE_CAPSULE" example)"
 
 # --- Step 2: SKILL.md required anchors and sections ------------------------
 
@@ -138,31 +182,31 @@ assert_contains "$schema_output" "--require-review-passed" "vv_define_smoke_sche
 
 # --- Step 4: validator over fixtures + example -----------------------------
 
-expect_pass "$FIXTURE_ROOT/valid-capsule/capsule.json" "vv_define_smoke_valid_capsule"
-expect_pass "$FIXTURE_ROOT/valid-not-applicable/capsule.json" "vv_define_smoke_valid_not_applicable"
-expect_pass "$EXAMPLE_CAPSULE" "vv_define_smoke_example_capsule"
+expect_pass "$VALID_CAPSULE_COMPAT" "vv_define_smoke_valid_capsule"
+expect_pass "$VALID_NA_COMPAT" "vv_define_smoke_valid_not_applicable"
+expect_pass "$EXAMPLE_CAPSULE_COMPAT" "vv_define_smoke_example_capsule"
 
-expect_blocked "$FIXTURE_ROOT/missing-red-evidence/capsule.json" \
+expect_blocked "$MISSING_RED_COMPAT" \
   "VV-CAPSULE-RED-EVIDENCE-EMPTY" "vv_define_smoke_missing_red_evidence"
-expect_blocked "$FIXTURE_ROOT/unscoped-not-applicable/capsule.json" \
+expect_blocked "$UNSCOPED_NA_COMPAT" \
   "VV-CAPSULE-UNSCOPED-NOT-APPLICABLE" "vv_define_smoke_unscoped_not_applicable"
 
 # --- Step 4b: P1-a reviews/matrix_row_ref + --require-review-passed mode ---
 
 # Structurally valid reviews entry (gate/id/status present) with status
 # "pending" passes in default mode...
-expect_pass "$FIXTURE_ROOT/review-not-passed/capsule.json" \
+expect_pass "$REVIEW_NOT_PASSED_COMPAT" \
   "vv_define_smoke_review_not_passed_default_mode"
 
 # ...but is blocked once tw-work's preflight consumption mode is requested,
 # because no reviews[] entry has status "passed" with existing evidence.
-expect_blocked "$FIXTURE_ROOT/review-not-passed/capsule.json" \
+expect_blocked "$REVIEW_NOT_PASSED_COMPAT" \
   "VV-CAPSULE-REVIEW-NOT-PASSED" "vv_define_smoke_review_not_passed_strict_mode" \
   --require-review-passed
 
 # The example capsule's verification-mode requirement carries a passed
 # tw-doc-review entry with existing evidence, so it must pass strict mode too.
-expect_pass "$EXAMPLE_CAPSULE" "vv_define_smoke_example_capsule_strict_mode" \
+expect_pass "$EXAMPLE_CAPSULE_COMPAT" "vv_define_smoke_example_capsule_strict_mode" \
   --require-review-passed
 
 # --- Step 4c: P1-b garbage-identity hardening (schema_version/IDs/plan_ref) -
@@ -178,9 +222,6 @@ assert_contains "$invalid_identity_output" "VV-CAPSULE-PLAN-REF-NOT-FOUND" "vv_d
 
 # --- Step 4d: reviews[]/matrix_row_ref structural validation (inline cases) -
 
-TMP_DIR="$(mktemp -d)"
-trap 'rm -rf "$TMP_DIR"' EXIT
-
 write_reviews_structure_capsule() {
   local out="$1"
   local reviews_json="$2"
@@ -189,7 +230,7 @@ write_reviews_structure_capsule() {
 {
   "schema_version": "tw-vv-capsule/1",
   "work_item_id": "FIXTURE-REVIEWS-STRUCTURE",
-  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "plan_ref": "$RETAINED_PLAN_REF",
   "requirements": [
     {
       "req_id": "REQ-FIXTURE-006",
@@ -247,7 +288,7 @@ fi
 
 # --- Step 4g: P1 non-string reviews[] entry field hardening -----------------
 
-REVIEW_ENTRY_MALFORMED_CAPSULE="$FIXTURE_ROOT/review-entry-malformed/capsule.json"
+REVIEW_ENTRY_MALFORMED_CAPSULE="$REVIEW_ENTRY_MALFORMED_COMPAT"
 require_file "$REVIEW_ENTRY_MALFORMED_CAPSULE"
 
 review_entry_malformed_output="$("$CHECKER" --root "$ROOT_DIR" --capsule "$REVIEW_ENTRY_MALFORMED_CAPSULE" 2>&1 || true)"
@@ -314,8 +355,8 @@ cat > "$compact_capsule" <<JSON
   "schema_version": "tw-vv-compact/1",
   "workflow_profile": "L1",
   "work_item_id": "FIXTURE-L1-COMPACT",
-  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
-  "authority_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "plan_ref": "$RETAINED_PLAN_REF",
+  "authority_ref": "$RETAINED_PLAN_REF",
   "focused_verification": "fixtures/vv-define/valid-capsule/verification/red_test.sh",
   "validation_question": "Does the narrow change meet its stated user need?",
   "expected_evidence": "Focused verification passes after the bounded change."
@@ -337,7 +378,7 @@ write_full_profile_capsule() {
   "schema_version": "tw-vv-capsule/1",
   "workflow_profile": "$profile",
   "work_item_id": "FIXTURE-$profile-FULL",
-  "plan_ref": "docs/plans/2026-07-22-traceweaver-0.3-unit2-matrix-proposals.md",
+  "plan_ref": "$RETAINED_PLAN_REF",
   "requirements": [{
     "req_id": "REQ-FIXTURE-006",
     "trace_id": "TRACE-FIXTURE-006",
