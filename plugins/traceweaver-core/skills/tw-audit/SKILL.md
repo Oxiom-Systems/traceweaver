@@ -7,6 +7,8 @@ argument-hint: "[audit scope, branch, changed files, or requirement closure clai
 <!-- TRACEWEAVER: file-role=audit-wrapper-skill; req=REQ-TW-061; trace=TRACE-TW-052; ver=VER-TW-065 -->
 <!-- TRACEWEAVER: file-role=audit-wrapper-skill; req=REQ-TW-062; trace=TRACE-TW-052; ver=VER-TW-065 -->
 <!-- TRACEWEAVER: file-role=audit-wrapper-skill; req=REQ-TW-063; trace=TRACE-TW-052; ver=VER-TW-065 -->
+<!-- TRACEWEAVER: file-role=optional-graphify-audit-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: entrypoint=graphify_audit_relationship_search; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
 # TraceWeaver Audit
 
@@ -132,6 +134,18 @@ If any authority file is missing, report an authority bootstrap gap and route to
 8. Emit structured findings before summaries. Preserve severity, affected IDs,
    evidence path, file/line anchor when available, claim impact, remediation,
    allowed claims, held claims, and the next TraceWeaver wrapper.
+
+## Optional Graphify Audit Context
+
+For relationship, similarity, dependency, or impact questions in the audit
+scope, locate the packaged sibling
+`tw-auto/scripts/traceweaver-graphify-advisory` helper and run an applicable
+`query --root`, `affected --root`, or `path --root` search before direct source inspection.
+Corroborate returned candidates against the authority triad,
+source, tests, and recorded evidence. `graphify_status=degraded`,
+`not_installed`, and `no_useful_graph_context` are non-blocking audit receipts;
+continue the audit from authoritative sources. Graphify output is derived and is not authority.
+It is not a finding by itself or closure evidence.
 
 ## Highest-Level Handoff Discipline
 

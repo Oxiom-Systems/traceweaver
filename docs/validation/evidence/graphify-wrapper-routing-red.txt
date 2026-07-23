@@ -1,0 +1,14 @@
+evidence_id: RED-TW-2026-07-23-GRAPHIFY-WRAPPERS-001
+requirement_ids: REQ-TW-089, REQ-TW-090
+trace_id: TRACE-TW-064
+verification_id: VER-TW-084
+tested_ref: fe31df6d9cf8547a57a4cdeb647d2105cdf4f7e3
+verification_artifact_sha256: 220deb856cd7a964fc9a4b8bc8152c26c3ec3b0acf7b234ffbf875108d378c37
+workflow_profile_hash: sha256:46a6b73dfbf222954117ff594151701f269eb43ba2c89dd1e0a3e7a62c231bfe
+command: scripts/traceweaver-smoke-graphify-wrapper-routing
+expected_result: non-zero before wrapper implementation because required Graphify routing anchors are absent
+actual_result: graphify_wrapper_routing=failed reason=missing_executable_helper helper=plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory
+exit_status: 1
+outcome: expected_failure_red
+date: 2026-07-23
+boundary: static/advisory skill-contract evidence only; no live host invocation claimed

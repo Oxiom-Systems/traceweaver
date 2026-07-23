@@ -6,15 +6,23 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "b2555e0b41b984c2d960d20de72fce943878784fa588d78c9384096f5bfc27a8"
+      "sha256": "cdec63d5be223e55239aec371b1f535d2687d8dec203ac839b3ef2825eed9a44"
     },
     {
       "path": "requirements.md",
-      "sha256": "091d2f815c6adfa34590b0cd0a9556b52a51470f4062f2fce5faad11e1a2a69e"
+      "sha256": "7bf9b5be12ba687d61ca8f3c04da18ea18b07a006ce614a091c3dda3c883e7f4"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "fb81692f19aea895ef0ad3b91d791260ad8ca164b851b380e0b8fc7b301144af"
+      "sha256": "7e0fff1c819ae0afc42b64f75548c88e0f714fca4f6c27308b19d1efa69e6012"
+    },
+    {
+      "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md",
+      "sha256": "c7406e067ddd994077a72fdfdc8dbcb2f9f2dcaec229d170935a540e74637b62"
+    },
+    {
+      "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md",
+      "sha256": "6a83c1136739926d7c8cbcb3a45ce41c003683d11468c081c4cef802c3b128ab"
     },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
@@ -22,15 +30,15 @@
     }
   ],
   "row_counts": {
-    "requirements": 88,
-    "trace_rows": 61,
-    "atp_entries": 37,
-    "result_records": 38,
-    "verification_records": 82,
-    "validation_records": 31,
-    "code_anchor_records": 279,
-    "structured_acceptance_results": 1,
-    "structured_acceptance_coverage": 88,
+    "requirements": 90,
+    "trace_rows": 62,
+    "atp_entries": 38,
+    "result_records": 39,
+    "verification_records": 83,
+    "validation_records": 32,
+    "code_anchor_records": 291,
+    "structured_acceptance_results": 3,
+    "structured_acceptance_coverage": 90,
     "structured_acceptance_missing_requirements": 87,
     "structured_acceptance_non_closed_requirements": 88
   },
@@ -1387,6 +1395,32 @@
       "trace_ids": [
         "TRACE-TW-063"
       ]
+    },
+    {
+      "id": "REQ-TW-089",
+      "type": "Constraint",
+      "summary": "Optional Graphify context must never become a hidden dependency: wrappers continue from authoritative repository sources when Graphify is absent, uninitialized, degraded, empty, or not useful, and report an actionable advisory state.",
+      "source_need": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "verification_method": "Deterministic absent/uninitialized/ready/no-result/degraded/not-applicable routing smoke, source-authority inspection, and representative owner walkthrough",
+      "validation_path": "VAL-TW-032",
+      "owner": "Oxiom Systems",
+      "status": "Approved for bounded static/advisory wrapper behavior; representative owner validation accepted and exact controlled PR publication authorized 2026-07-23; live-host invocation, provider-backed semantic extraction, graph publication, merge, release, deployment, and the REQ-TW-088 internal mirror held",
+      "trace_ids": [
+        "TRACE-TW-064"
+      ]
+    },
+    {
+      "id": "REQ-TW-090",
+      "type": "System",
+      "summary": "Installed Graphify is used only by the child wrapper owning orientation, diagnosis, audit, impact, traceability, or post-verification refresh; operations are repository-root-bound with an explicit graph, `tw-work` refreshes code/AST context before review, semantic freshness is held honestly, and `tw-auto` carries receipts without execution.",
+      "source_need": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "verification_method": "Deterministic root/graph/search/update/semantic-hold/read-only-master smoke, package discovery, changed-file anchor scan, scoped code/doc review, and representative owner walkthrough",
+      "validation_path": "VAL-TW-032",
+      "owner": "Oxiom Systems",
+      "status": "Approved for bounded static/advisory wrapper behavior; representative owner validation accepted 2026-07-23; live-host invocation, semantic extraction freshness, global graph mutation, general productivity, merge, release, and deployment held",
+      "trace_ids": [
+        "TRACE-TW-064"
+      ]
     }
   ],
   "traces": [
@@ -2060,6 +2094,17 @@
       "validation": "VAL-TW-024",
       "status": "Matrix recorded: Claude Code SessionStart+PreToolUse supported; Cursor SessionStart+PreToolUse supported; Codex SessionStart supported, Codex PreToolUse unproven; plugin-loader auto-adopt risk recorded held",
       "next_step": "Runtime proof remains a separate held gate per supported cell; no manifests/fixtures for non-supported cells; requirement remains candidate_for_review"
+    },
+    {
+      "id": "TRACE-TW-064",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "requirements": "REQ-TW-089; REQ-TW-090",
+      "artifact": "ART-TW-071",
+      "verification": "VER-TW-084",
+      "validation": "VAL-TW-032",
+      "status": "Static/advisory implementation complete; focused and regression verification pass; post-verification code/AST graph refreshed with semantic freshness held; profile revision 3 code review, final scoped document review, and bounded representative owner validation passed",
+      "next_step": "Live-host invocation, runtime enforcement, automatic semantic extraction, provider-key use, global graph mutation, general productivity, merge, release, deployment, and REQ-TW-088 internal-mirror claims remain held"
     }
   ],
   "atp_entries": [
@@ -2395,6 +2440,15 @@
       "Expected Result": "Verify gate and distilled-coverage gate exit zero; the snapshot is current; every promotion-state change has a per-domain review record; the README states intended scope and gate types; the `tw-auto` output contract names the validation-closure ratio.",
       "Owner": "Oxiom Systems",
       "Status": "Executed 2026-06-12 / pass / scoped doc review of amended baseline pending"
+    },
+    {
+      "ID": "ATP-TW-041",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Procedure / Scenario": "Run `scripts/traceweaver-smoke-graphify-wrapper-routing` against deterministic absent, installed-uninitialized, ready, empty-context, degraded-query, degraded-update, semantic-change, repository-root, and read-only-`tw-auto` fixtures; run shell syntax and existing TraceWeaver regression smokes; inspect changed wrapper/helper anchors and receipts.",
+      "Setup / Context": "`scripts/traceweaver-smoke-graphify-wrapper-routing`; optional advisory helper; selected `tw-setup`, `tw-plan`, `tw-debug`, `tw-audit`, `tw-code-review`, `tw-traceability-check`, `tw-work`, and `tw-auto` skill files; `.graphifyignore`; `.gitignore`",
+      "Expected Result": "TraceWeaver continues when Graphify is absent or fails; installed Graphify is initialized/searched only at the correct wrapper steps; commands are root-bound with an explicit graph; empty context is non-failing; `tw-work` performs exactly one post-verification code/AST refresh and holds semantic freshness; `tw-auto` executes no Graphify command; graph output never becomes authority.",
+      "Owner": "Oxiom Systems",
+      "Status": "Frozen RED recorded before implementation; focused GREEN, current negative control, regression suite, verify gate, generated-view drift check, changed-file anchor scan, scoped revision-3 code review, and final scoped document review pass"
     }
   ],
   "result_records": [
@@ -2739,6 +2793,15 @@
       "Evidence Artifact": "`scripts/traceweaver-smoke-verify` output; `scripts/traceweaver-smoke-distilled-coverage` output; full local smoke suite run; nine candidate baseline review records; `docs/distilled/promotion-status.md`",
       "Result": "Verify gate passed with the bounded snapshot current; distilled-coverage reported 11/11 guides packaged and referenced with a 7 runtime-skill / 3 guide-only / 1 private-only domain ratio; the full local smoke suite passed; the owner approved the gap promotions, the GAP-TW-2026-06-12-003 clarification resolution, and the lifecycle-orchestrator do-not-promote decision on 2026-06-12.",
       "Date / Session": "2026-06-12"
+    },
+    {
+      "ID": "RESULT-TW-041",
+      "Requirement / Need": "REQ-TW-089; REQ-TW-090",
+      "ATP / Method": "ATP-TW-041",
+      "Tested Ref / Context": "Optional Graphify wrapper routing implementation, bounded verification, and representative owner validation",
+      "Evidence Artifact": "`docs/validation/traceweaver-graphify-wrapper-results.md`; `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md`; `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md`; `docs/validation/evidence/graphify-wrapper-routing-red.txt`; `docs/plans/2026-07-23-graphify-wrapper-workflow-profile-red-execution.yml`; `docs/validation/evidence/graphify-wrapper-routing-negative-control-revision-3.txt`; `scripts/traceweaver-smoke-graphify-wrapper-routing`; `scripts/traceweaver-smoke-codex-discovery`; `scripts/traceweaver-smoke-antigravity-discovery`; `docs/validation/traceweaver-graphify-wrapper-vv-capsule.json`; `docs/validation/traceweaver-graphify-wrapper-implementation-code-review.md`; `docs/validation/traceweaver-graphify-wrapper-final-doc-review.md`",
+      "Result": "Historical RED recorded before implementation and preserved with its frozen `revision-1-red-execution` profile identity. Focused GREEN plus a current revision-3 negative control, runtime-disabled skill-behavior regression, code-traceability regression, implementation-mode anchor scan, verify gate, generated-view drift smoke, fresh package discovery with installed-helper execution, scoped revision-3 code review, and final document review pass. Post-verification Graphify code/AST refresh reports `semantic_refresh_held`. The owner accepted both representative walkthroughs at `2026-07-23T07:38:48Z`; broad-query noise is recorded, while live-host, general productivity, merge, release, and deployment remain held.",
+      "Date / Session": "2026-07-23"
     }
   ],
   "verification_evidence": [
@@ -3643,6 +3706,17 @@
       "Evidence Path": "Owner-approved original plan and Amendment 1; U0 allowlisted authority records; generated projections",
       "Date / Session": "2026-07-23",
       "Notes": "Draft verification only. Sol ACCEPT and active EXC-TW-011 remain the activation condition; U7 and all publication/install/deploy/product claims remain held."
+    },
+    {
+      "ID": "VER-TW-084",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Method": "Deterministic optional-Graphify routing smoke plus scoped regression and anchor checks",
+      "Procedure / Command": "Run `scripts/traceweaver-smoke-graphify-wrapper-routing`; validate shell syntax and the L2 V&V capsule; run runtime-disabled skill-behavior and code-traceability regressions, verify gate, generated-view drift smoke, fresh package discovery, and implementation-mode code-anchor checks over changed behavior-bearing files.",
+      "Tested Ref": "Optional Graphify advisory helper, selected wrapper instructions, repository hygiene, receipt/state contract, and read-only `tw-auto` boundary",
+      "Result": "Pass for frozen historical RED profile/receipt identity, focused GREEN, current negative control, regressions, verify gate, generated views, package discovery with installed-helper execution, changed-file anchor scan, live no-result probes, scoped revision-3 code review, final scoped document review, structured owner acceptance, and post-acceptance exact-tree document review. Post-verification code/AST refresh succeeded with `semantic_refresh_held`.",
+      "Evidence Path": "`docs/validation/traceweaver-graphify-wrapper-results.md`; `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md`; `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md`; `docs/validation/traceweaver-graphify-wrapper-implementation-code-review.md`; `docs/validation/traceweaver-graphify-wrapper-final-doc-review.md`; `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-doc-review.md`; `docs/validation/evidence/graphify-wrapper-routing-red.txt`; `docs/plans/2026-07-23-graphify-wrapper-workflow-profile-red-execution.yml`; `docs/validation/evidence/graphify-wrapper-routing-negative-control-revision-3.txt`; `scripts/traceweaver-smoke-graphify-wrapper-routing`; `scripts/traceweaver-smoke-codex-discovery`; `scripts/traceweaver-smoke-antigravity-discovery`; `docs/validation/traceweaver-graphify-wrapper-vv-capsule.json`",
+      "Date / Session": "2026-07-23",
+      "Notes": "Static/advisory scope only. Graphify absence and operational failure remain non-blocking. Representative owner validation passed; live-host productivity, semantic extraction freshness, provider-key use, global graph mutation, internal SQLite mirror, runtime enforcement, merge, release, and deployment remain held."
     }
   ],
   "validation_evidence": [
@@ -3986,6 +4060,17 @@
       "Result": "Held candidate follow-on",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "No U0-U7 implementation, runtime, Graphify, database, or projection work is authorized."
+    },
+    {
+      "ID": "VAL-TW-032",
+      "Source Need": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
+      "Scenario / Intended Use": "A contributor receives useful relationship context when Graphify is available without losing the normal source-based TraceWeaver workflow when it is absent, empty, or degraded.",
+      "Stakeholder / Representative": "TraceWeaver owner and primary workflow user, independent of the implementation agent",
+      "Acceptance Signal": "Two representative walkthroughs reach the same authority/review boundary; the installed case surfaces a useful relationship or honestly records `no_useful_graph_context`; receipts are concise; no graph output is treated as authority or completion evidence.",
+      "Evidence Path": "`docs/validation/traceweaver-graphify-wrapper-validation-definition.md`; `docs/validation/traceweaver-graphify-wrapper-results.md`; `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md`; `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md`",
+      "Result": "Passed - owner accepted representative scenario 2026-07-23",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Both walkthroughs were accepted at `2026-07-23T07:38:48Z`; the broad exploratory query's noise is recorded. Live-host behavior, semantic freshness, general productivity, merge, release, and deployment remain held."
     }
   ],
   "code_anchor_evidence": [
@@ -6220,9 +6305,123 @@
       "Verification": "VER-TW-047",
       "Anchor Type": "fixture; verifies",
       "Role": "Current implementation-gate anchor for deterministic `tw-worktree` delegation fixture"
+    },
+    {
+      "Artifact Path": "`scripts/traceweaver-smoke-graphify-wrapper-routing`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; verifies",
+      "Role": "Deterministic optional Graphify availability, routing, degradation, root-binding, refresh, and `tw-auto` boundary smoke"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "Packaged non-blocking Graphify availability, search, initialization, refresh, and receipt helper"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-setup/SKILL.md`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "Optional Graphify detection, initialization, and recommendation route"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-plan/SKILL.md`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "Optional repository-orientation search route before source corroboration"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-debug/SKILL.md`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "Optional diagnostic relationship and impact search route"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-audit/SKILL.md`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "Optional audit relationship, similarity, and impact search route"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-code-review/SKILL.md`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "Optional review impact and dependency search route"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-traceability-check/SKILL.md`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "Optional cross-file trace, impact, path, and dark-behavior search route"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-work/SKILL.md`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "One optional post-verification code/AST refresh before review handoff"
+    },
+    {
+      "Artifact Path": "`plugins/traceweaver-core/skills/tw-auto/SKILL.md`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "Read-only master carries child Graphify receipts without executing Graphify"
+    },
+    {
+      "Artifact Path": "`scripts/traceweaver-smoke-codex-discovery`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; verifies",
+      "Role": "Fresh Codex packaging preserves, hashes, executes, and exposes the optional Graphify advisory helper"
+    },
+    {
+      "Artifact Path": "`scripts/traceweaver-smoke-antigravity-discovery`",
+      "Requirement": "REQ-TW-089; REQ-TW-090",
+      "Trace": "TRACE-TW-064",
+      "Verification": "VER-TW-084",
+      "Anchor Type": "file-role; verifies",
+      "Role": "Fresh Antigravity packaging preserves and executes the optional Graphify advisory helper"
     }
   ],
   "structured_acceptance_results": [
+    {
+      "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md",
+      "result_id": "SAR-TW-2026-07-23-GRAPHIFY-WRAPPER-REQ-TW-089",
+      "requirement_id": "REQ-TW-089",
+      "status": "pass",
+      "final_disposition": "pass",
+      "owner": "Oxiom Systems",
+      "next_trigger": "Wrapper fallback contract change, Graphify installation behavior change, or representative scenario regression."
+    },
+    {
+      "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md",
+      "result_id": "SAR-TW-2026-07-23-GRAPHIFY-WRAPPER-REQ-TW-090",
+      "requirement_id": "REQ-TW-090",
+      "status": "pass",
+      "final_disposition": "pass",
+      "owner": "Oxiom Systems",
+      "next_trigger": "Wrapper lifecycle placement change, Graphify receipt contract change, semantic-refresh claim, or representative scenario regression."
+    },
     {
       "path": "docs/validation/traceweaver-system-acceptance-results.md",
       "result_id": "SAR-TW-001",
@@ -7640,6 +7839,38 @@
       ],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-089",
+      "coverage_status": "acceptance_passed",
+      "structured_acceptance_result_ids": [
+        "SAR-TW-2026-07-23-GRAPHIFY-WRAPPER-REQ-TW-089"
+      ],
+      "final_dispositions": [
+        "pass"
+      ],
+      "owners": [
+        "Oxiom Systems"
+      ],
+      "next_triggers": [
+        "Wrapper fallback contract change, Graphify installation behavior change, or representative scenario regression."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-090",
+      "coverage_status": "acceptance_passed",
+      "structured_acceptance_result_ids": [
+        "SAR-TW-2026-07-23-GRAPHIFY-WRAPPER-REQ-TW-090"
+      ],
+      "final_dispositions": [
+        "pass"
+      ],
+      "owners": [
+        "Oxiom Systems"
+      ],
+      "next_triggers": [
+        "Wrapper lifecycle placement change, Graphify receipt contract change, semantic-refresh claim, or representative scenario regression."
       ]
     }
   ]

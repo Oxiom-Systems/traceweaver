@@ -6,6 +6,8 @@ argument-hint: "[issue reference, error message, test path, or description of br
 
 <!-- TRACEWEAVER: file-role=debug-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-025; ver=VER-TW-034 -->
 <!-- TRACEWEAVER: file-role=debug-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
+<!-- TRACEWEAVER: file-role=optional-graphify-debug-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: entrypoint=graphify_debug_impact_search; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
 # TraceWeaver Debug
 
@@ -54,6 +56,18 @@ implementation. Do not rewrite requirements to make the fix possible.
    stale, or missing, pause for user input or requirements review.
 8. Return the root cause, causal chain, changed files, verification evidence,
    traceability status, held claims, and next TraceWeaver review command.
+
+## Optional Graphify Diagnostic Context
+
+When the defect raises a relationship, dependency, call-path, or impact
+question, locate the packaged sibling
+`tw-auto/scripts/traceweaver-graphify-advisory` helper and run an applicable
+`affected --root`, `path --root`, or `query --root` search before direct source inspection.
+Corroborate any returned lead in code, tests, logs, or other
+authoritative repository evidence. On `graphify_status=degraded`,
+`not_installed`, or `no_useful_graph_context`, keep diagnosing from those
+sources and retain the advisory receipt. Graphify output is derived and is not authority.
+It is not proof of root cause.
 
 ## Highest-Level Handoff Discipline
 

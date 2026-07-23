@@ -1,0 +1,241 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=graphify-wrapper-routing-smoke; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084
+# TRACEWEAVER: verifies=VER-TW-084; req=REQ-TW-090; trace=TRACE-TW-064
+#
+# Static/advisory contract proof only. This smoke verifies that Graphify
+# availability, search, update, receipt, and authority boundaries live in the
+# correct TW wrapper instructions. It does not claim live host invocation.
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SKILLS_DIR="$ROOT_DIR/plugins/traceweaver-core/skills"
+HELPER="${TRACEWEAVER_GRAPHIFY_HELPER:-$SKILLS_DIR/tw-auto/scripts/traceweaver-graphify-advisory}"
+TMP_DIR="$(mktemp -d)"
+trap 'rm -rf "$TMP_DIR"' EXIT
+
+fail() {
+  echo "graphify_wrapper_routing=failed reason=$1" >&2
+  exit 1
+}
+
+require_contains() {
+  local file="$1"
+  local pattern="$2"
+  local label="$3"
+  grep -Fq -- "$pattern" "$file" || fail "$label missing=$pattern file=$file"
+}
+
+require_regex() {
+  local file="$1"
+  local pattern="$2"
+  local label="$3"
+  grep -Eq -- "$pattern" "$file" || fail "$label pattern=$pattern file=$file"
+}
+
+for skill in tw-setup tw-plan tw-debug tw-audit tw-code-review tw-traceability-check tw-work tw-auto; do
+  [[ -f "$SKILLS_DIR/$skill/SKILL.md" ]] || fail "missing_skill skill=$skill"
+done
+
+[[ -f "$ROOT_DIR/.graphifyignore" ]] || fail "missing_graphifyignore"
+require_contains "$ROOT_DIR/.gitignore" "graphify-out/" "gitignore_graphify_output"
+require_contains "$ROOT_DIR/.graphifyignore" "graphify-out/" "graphifyignore_graphify_output"
+require_contains "$ROOT_DIR/.graphifyignore" ".env" "graphifyignore_environment"
+require_contains "$ROOT_DIR/.graphifyignore" ".memsearch/" "graphifyignore_agent_state"
+
+profile="$ROOT_DIR/docs/plans/2026-07-23-graphify-wrapper-workflow-profile.yml"
+profile_hash_output="$(ruby -ryaml -rjson -rdigest -e '
+  data = YAML.load_file(ARGV.fetch(0))
+  keys = %w[task_id profile_revision risk process_budget selected_controls child_roles model_selection reviewer_cap repair_cycle_cap requires_deploy requires_chrome_dogfood]
+  canonicalize = lambda do |value|
+    case value
+    when Hash
+      value.keys.map(&:to_s).sort.to_h do |key|
+        raw = value.key?(key) ? value[key] : value.fetch(key.to_sym)
+        [key, canonicalize.call(raw)]
+      end
+    when Array
+      value.map { |item| canonicalize.call(item) }
+    else
+      value
+    end
+  end
+  payload = keys.to_h { |key| [key, data.fetch(key)] }
+  computed = Digest::SHA256.hexdigest(JSON.generate(canonicalize.call(payload)))
+  recorded = data.fetch("profile_hash").sub(/\Asha256:/, "")
+  abort("profile hash mismatch computed=#{computed} recorded=#{recorded}") unless computed == recorded
+  puts "workflow_profile_hash=pass hash=#{computed}"
+' "$profile")"
+[[ "$profile_hash_output" == workflow_profile_hash=pass* ]] || fail "workflow_profile_hash"
+
+[[ -x "$HELPER" ]] || fail "missing_executable_helper helper=$HELPER"
+
+setup="$SKILLS_DIR/tw-setup/SKILL.md"
+plan="$SKILLS_DIR/tw-plan/SKILL.md"
+debug="$SKILLS_DIR/tw-debug/SKILL.md"
+audit="$SKILLS_DIR/tw-audit/SKILL.md"
+review="$SKILLS_DIR/tw-code-review/SKILL.md"
+trace="$SKILLS_DIR/tw-traceability-check/SKILL.md"
+work="$SKILLS_DIR/tw-work/SKILL.md"
+auto="$SKILLS_DIR/tw-auto/SKILL.md"
+
+for file in "$setup" "$plan" "$debug" "$audit" "$review" "$trace" "$work"; do
+  require_contains "$file" "traceweaver-graphify-advisory" "helper_route"
+  require_contains "$file" "graphify_status=degraded" "degraded_receipt"
+  require_regex "$file" "derived.*(not|never).*authorit|not.*authorit.*derived" "derived_authority_boundary"
+done
+
+require_contains "$setup" "command -v graphify" "setup_detection"
+require_contains "$setup" "initialize" "setup_initialization"
+require_contains "$setup" "graphify_status=not_installed" "setup_absent_receipt"
+
+require_contains "$plan" "query --root" "plan_query"
+require_contains "$plan" "installed_uninitialized" "plan_missing_graph_update"
+require_contains "$plan" "authoritative repository sources" "plan_source_corroboration"
+require_contains "$plan" "before direct source inspection" "plan_search_before_source"
+
+require_regex "$debug" "(query|path|affected) --root" "debug_search"
+require_regex "$audit" "(query|path|affected) --root" "audit_search"
+require_regex "$review" "(query|path|affected) --root" "review_search"
+require_regex "$trace" "(query|path|affected) --root" "traceability_search"
+for file in "$debug" "$audit" "$review" "$trace"; do
+  require_contains "$file" "before direct source inspection" "analysis_search_before_source"
+done
+
+require_contains "$work" "graphify update ." "work_update"
+update_count="$(grep -F -c -- "graphify update ." "$work")"
+[[ "$update_count" -eq 1 ]] || fail "work_update_count expected=1 actual=$update_count"
+require_contains "$work" "before review handoff" "work_update_boundary"
+require_contains "$work" "Graphify failure does not block" "work_non_blocking"
+require_contains "$work" "semantic_refresh_held" "work_semantic_refresh_boundary"
+
+require_contains "$auto" "must not execute Graphify" "auto_read_only_master"
+require_contains "$auto" "Graphify receipt" "auto_child_receipt"
+auto_executable_surface="$(grep -Ev '^[[:space:]]*<!--' "$auto")"
+if printf '%s\n' "$auto_executable_surface" |
+  grep -Eq -- 'graphify (query|path|affected|update)|traceweaver-graphify-advisory|TRACEWEAVER_GRAPHIFY_BIN|command -v graphify|((GRAPHIFY|graphify)[A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*(GRAPHIFY|graphify)[A-Za-z0-9_]*)[[:space:]]*=|[$][{]?((GRAPHIFY|graphify)[A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*(GRAPHIFY|graphify)[A-Za-z0-9_]*)'; then
+  fail "auto_contains_direct_graphify_command"
+fi
+
+fixture_root="$TMP_DIR/repo with spaces"
+mkdir -p "$fixture_root"
+fixture_root_resolved="$(cd "$fixture_root" && pwd -P)"
+stub="$TMP_DIR/graphify"
+stub_log="$TMP_DIR/graphify.log"
+
+cat > "$stub" <<'STUB'
+#!/usr/bin/env bash
+set -euo pipefail
+{
+  printf '%s\t%s' "$PWD" "${1:-}"
+  for arg in "$@"; do
+    printf '\t%s' "$arg"
+  done
+  printf '\n'
+} >> "${STUB_LOG:?}"
+case "${1:-}" in
+  update)
+    if [[ "${STUB_FAIL_UPDATE:-0}" == "1" ]]; then
+      echo "stub update failed" >&2
+      exit 7
+    fi
+    mkdir -p graphify-out
+    printf '{"directed":true,"nodes":[],"links":[]}\n' > graphify-out/graph.json
+    echo "Code graph updated."
+    ;;
+  query|affected|path)
+    if [[ "${STUB_FAIL_SEARCH:-0}" == "1" ]]; then
+      echo "stub search failed" >&2
+      exit 8
+    fi
+    if [[ "${STUB_AFFECTED_NO_RESULT:-0}" == "1" && "${1:-}" == "affected" ]]; then
+      echo "No unique node match for 'missing symbol'."
+    elif [[ "${STUB_TEXTUAL_NO_RESULT:-0}" == "1" ]]; then
+      echo "No matching nodes found."
+    elif [[ "${STUB_EMPTY_SEARCH:-0}" != "1" ]]; then
+      echo "NODE WrapperRelationship source_location=fixture"
+    fi
+    ;;
+  *)
+    echo "unsupported stub command: ${1:-}" >&2
+    exit 9
+    ;;
+esac
+STUB
+chmod +x "$stub"
+
+missing_output="$(TRACEWEAVER_GRAPHIFY_BIN="$TMP_DIR/not-installed" "$HELPER" status --root "$fixture_root")"
+[[ "$missing_output" == *"graphify_status=not_installed"* ]] || fail "absent_executable_state"
+[[ "$missing_output" == *"graphify_recommendation=install Graphify to add optional repository relationship context"* ]] || fail "absent_executable_recommendation"
+
+: > "$stub_log"
+uninitialized_status_output="$(STUB_LOG="$stub_log" TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" status --root "$fixture_root")"
+[[ "$uninitialized_status_output" == *"graphify_status=installed_uninitialized"* ]] || fail "uninitialized_status_state"
+[[ "$uninitialized_status_output" == *"graphify_recommendation=initialize the repository code graph before using relationship context"* ]] || fail "uninitialized_status_recommendation"
+
+ready_output="$(STUB_LOG="$stub_log" TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" query --root "$fixture_root" --question "wrapper relationships")"
+[[ "$ready_output" == *"graphify_status=ready"* ]] || fail "uninitialized_update_query_state"
+[[ "$ready_output" == *"graphify_initial_status=installed_uninitialized"* ]] || fail "uninitialized_state_receipt"
+[[ "$ready_output" == *"graphify_recommendation=initialize the repository code graph before using relationship context"* ]] || fail "uninitialized_recommendation"
+[[ "$ready_output" == *"NODE WrapperRelationship source_location=fixture"* ]] || fail "useful_context_not_preserved"
+awk -F '\t' -v root="$fixture_root_resolved" '
+  $1 == root && $2 == "update" && $3 == "update" && $4 == "." { found = 1 }
+  END { exit(found ? 0 : 1) }
+' "$stub_log" || fail "uninitialized_missing_root_bound_update"
+awk -F '\t' -v root="$fixture_root_resolved" -v graph="$fixture_root_resolved/graphify-out/graph.json" '
+  $1 == root && $2 == "query" {
+    scoped = ($3 == "query" && $4 == "wrapper relationships")
+    for (i = 3; i <= NF; i++) {
+      if (scoped && $i == "--graph" && $(i + 1) == graph) {
+        found = 1
+      }
+    }
+  }
+  END { exit(found ? 0 : 1) }
+' "$stub_log" || fail "query_missing_root_or_explicit_graph"
+
+empty_output="$(STUB_LOG="$stub_log" STUB_EMPTY_SEARCH=1 TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" query --root "$fixture_root" --question "nothing useful")"
+[[ "$empty_output" == *"graphify_status=no_useful_graph_context"* ]] || fail "empty_search_state"
+
+textual_no_result_output="$(STUB_LOG="$stub_log" STUB_TEXTUAL_NO_RESULT=1 TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" query --root "$fixture_root" --question "nothing useful")"
+[[ "$textual_no_result_output" == *"graphify_status=no_useful_graph_context"* ]] || fail "textual_no_result_state"
+
+affected_no_result_output="$(STUB_LOG="$stub_log" STUB_AFFECTED_NO_RESULT=1 TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" affected --root "$fixture_root" --term "missing symbol")"
+[[ "$affected_no_result_output" == *"graphify_status=no_useful_graph_context"* ]] || fail "affected_no_result_state"
+
+failed_query_output="$(STUB_LOG="$stub_log" STUB_FAIL_SEARCH=1 TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" query --root "$fixture_root" --question "failure")"
+[[ "$failed_query_output" == *"graphify_status=degraded"* ]] || fail "failed_query_state"
+
+rm -f "$fixture_root/graphify-out/graph.json"
+failed_update_output="$(STUB_LOG="$stub_log" STUB_FAIL_UPDATE=1 TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" query --root "$fixture_root" --question "failure")"
+[[ "$failed_update_output" == *"graphify_status=degraded"* ]] || fail "failed_update_state"
+
+STUB_LOG="$stub_log" TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" initialize --root "$fixture_root" >/dev/null
+: > "$stub_log"
+semantic_output="$(STUB_LOG="$stub_log" TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" refresh --root "$fixture_root" --changed-file "src/example.rb" --changed-file "plugins/example/SKILL.md")"
+[[ "$semantic_output" == *"graphify_status=semantic_refresh_held"* ]] || fail "semantic_refresh_held_state"
+[[ "$semantic_output" == *"code_graph_status=updated"* ]] || fail "semantic_refresh_missing_code_update"
+refresh_update_counts="$(awk -F '\t' -v root="$fixture_root_resolved" '
+  $2 == "update" { total += 1 }
+  $1 == root && $2 == "update" && $3 == "update" && $4 == "." { matching += 1 }
+  END { print total + 0, matching + 0 }
+' "$stub_log")"
+refresh_total_updates="${refresh_update_counts%% *}"
+refresh_matching_updates="${refresh_update_counts##* }"
+[[ "$refresh_total_updates" -eq 1 && "$refresh_matching_updates" -eq 1 ]] ||
+  fail "refresh_update_count expected_total=1 expected_root_bound=1 actual_total=$refresh_total_updates actual_root_bound=$refresh_matching_updates"
+
+: > "$stub_log"
+not_applicable_output="$(STUB_LOG="$stub_log" TRACEWEAVER_GRAPHIFY_BIN="$stub" "$HELPER" refresh --root "$fixture_root")"
+[[ "$not_applicable_output" == *"graphify_status=not_applicable"* ]] || fail "not_applicable_state"
+[[ ! -s "$stub_log" ]] || fail "not_applicable_invoked_graphify"
+
+echo "graphify_wrapper_routing=pass"
+echo "graphify_unavailable_fallback=pass"
+echo "graphify_search_lifecycle=pass"
+echo "graphify_post_work_update=pass"
+echo "graphify_read_only_master=pass"
+echo "graphify_authority_boundary=pass"
+echo "graphify_state_fixtures=pass"
+echo "graphify_root_binding=pass"
+echo "graphify_semantic_refresh_boundary=pass"

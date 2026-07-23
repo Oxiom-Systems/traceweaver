@@ -1,0 +1,84 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "workflow_profile": "L2",
+  "workflow_profile_revision": 3,
+  "workflow_profile_hash": "sha256:357113a85480e16e849973dcbf2d978964e323329f434a8d4d76eaefa07eb83c",
+  "work_item_id": "TraceWeaver-srpk",
+  "plan_ref": "docs/plans/2026-07-23-graphify-wrapper-integration-plan.md",
+  "requirements": [
+    {
+      "req_id": "REQ-TW-089",
+      "trace_id": "TRACE-TW-064",
+      "ver_id": "VER-TW-084",
+      "val_id": "VAL-TW-032",
+      "verification_artifact": "scripts/traceweaver-smoke-graphify-wrapper-routing",
+      "red_evidence": "docs/validation/evidence/graphify-wrapper-routing-red.txt",
+      "red_profile_artifact": "docs/plans/2026-07-23-graphify-wrapper-workflow-profile-red-execution.yml",
+      "validation_artifact": "docs/validation/traceweaver-graphify-wrapper-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-064 / VER-TW-084 / VAL-TW-032",
+      "reviews": [
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-07-23-GRAPHIFY-WRAPPER-PLAN-CLEAN-001",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-graphify-wrapper-plan-doc-review.md"
+        },
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-07-23-GRAPHIFY-WRAPPER-IMPLEMENTATION-CLEAN-003",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-graphify-wrapper-implementation-code-review.md"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-07-23-GRAPHIFY-WRAPPER-FINAL-CLEAN-002",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-graphify-wrapper-final-doc-review.md"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-07-23-GRAPHIFY-WRAPPER-OWNER-ACCEPTANCE-CLEAN-003",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-doc-review.md"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-090",
+      "trace_id": "TRACE-TW-064",
+      "ver_id": "VER-TW-084",
+      "val_id": "VAL-TW-032",
+      "verification_artifact": "scripts/traceweaver-smoke-graphify-wrapper-routing",
+      "red_evidence": "docs/validation/evidence/graphify-wrapper-routing-red.txt",
+      "red_profile_artifact": "docs/plans/2026-07-23-graphify-wrapper-workflow-profile-red-execution.yml",
+      "validation_artifact": "docs/validation/traceweaver-graphify-wrapper-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-064 / VER-TW-084 / VAL-TW-032",
+      "reviews": [
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-07-23-GRAPHIFY-WRAPPER-PLAN-CLEAN-001",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-graphify-wrapper-plan-doc-review.md"
+        },
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-07-23-GRAPHIFY-WRAPPER-IMPLEMENTATION-CLEAN-003",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-graphify-wrapper-implementation-code-review.md"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-07-23-GRAPHIFY-WRAPPER-FINAL-CLEAN-002",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-graphify-wrapper-final-doc-review.md"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-07-23-GRAPHIFY-WRAPPER-OWNER-ACCEPTANCE-CLEAN-003",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-doc-review.md"
+        }
+      ]
+    }
+  ]
+}

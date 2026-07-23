@@ -5,7 +5,7 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 8ec3480f14c77eeca046b6d85b011b784b7e43434c4be4de216a249252511f9c
+baseline_hash_sha256: 22d0e0d0b531ab02fa1756c7e9a09337c86f843622c0c58c1fa8a0d67d53ddfb
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
@@ -17,6 +17,7 @@ u0_repair_draft:
   corrective_requirements: REQ-TW-082, REQ-TW-083, REQ-TW-084, REQ-TW-085, REQ-TW-086, REQ-TW-087
   historic_candidates_superseded_by: CHG-TW-2026-07-22-001
   follow_on_only: REQ-TW-088
+  optional_external_graphify_adapter: REQ-TW-089, REQ-TW-090
   activation_condition: active_EXC_TW_011_with_exact_Sol_ACCEPT_receipt_original_plan_amendment_baseline_branch_base_and_reviewed_semantic_diff_digest
   held_claims: runtime, release, installation, deployment, publication, graph_implementation, canonical_database_authority, product_dogfood
 u0_repair_release_ratification:
@@ -2378,6 +2379,40 @@ req_tw_053_gated_publication_release_authority:
     - force push
     - deployment success without downstream evidence
     - clean CE replacement
+
+req_tw_089_090_optional_graphify_wrapper_authority:
+  decision_id: TW-OWNER-DECISION-2026-07-23-GRAPHIFY-WRAPPERS-001
+  owner: Oxiom Systems
+  decision_source: explicit owner direction on 2026-07-23
+  status: bounded_static_advisory_implementation_and_representative_owner_validation_passed_publication_authorized
+  requirements:
+    - REQ-TW-089
+    - REQ-TW-090
+  trace_ids:
+    - TRACE-TW-064
+  verification_ids:
+    - VER-TW-084
+  validation_ids:
+    - VAL-TW-032
+  allowed_scope:
+    - continue normal TraceWeaver workflows when Graphify is not installed or fails
+    - recommend Graphify installation or initialization without making it mandatory
+    - run root-bound local code-graph update and scoped query, path, or affected searches in the child wrappers that own repository orientation or impact analysis
+    - run one non-blocking root-bound graphify update after verified behavior or trace changes and before review handoff
+    - report semantic_refresh_held when changed semantic-backed documents are not refreshed by the code/AST update
+    - carry advisory Graphify receipts through the read-only tw-auto master
+  must_not_change:
+    - Markdown authority and direct source corroboration
+    - tw-auto read-only master boundary
+    - no automatic install, provider-key use, semantic extraction, global graph mutation, hook install, graph publication, commit, push, PR, release, deploy, or dogfood
+    - REQ-TW-088 internal SQLite graph mirror remains unauthorized
+  validation_question: Can optional Graphify searches and one post-work refresh reduce orientation drift without creating a hidden dependency, authority source, or extra manual loop?
+  held_claims:
+    - live host invocation
+    - provider-backed semantic extraction or automatic semantic refresh
+    - graph correctness beyond Graphify output
+    - measured time or token savings
+    - merge, release, deployment, dogfood, or internal graph-mirror readiness
 
 next_recommended_steps:
   - Complete TraceWeaver Core 0.2.8 gated-publication implementation, review, release, reinstall, and Vestro dogfood under `TW-OWNER-DECISION-2026-07-13-GATED-PUBLICATION-001`.
