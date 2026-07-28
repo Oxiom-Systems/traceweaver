@@ -1,0 +1,161 @@
+trace_record_id: TW-TRACE-RECORD-2026-07-28-CE-3.20.0-SELECTED-REFRESH-RELEASE-001
+date: 2026-07-28
+owner: Oxiom Systems
+record_type: ce_source_refresh_and_release
+status: local_verification_and_independent_review_clean_publication_pending
+
+scope:
+  requirements:
+    - REQ-TW-017
+    - REQ-TW-018
+    - REQ-TW-020
+    - REQ-TW-021
+    - REQ-TW-043
+    - REQ-TW-052
+    - REQ-TW-053
+    - REQ-TW-059
+  trace:
+    - TRACE-TW-005
+    - TRACE-TW-006
+    - TRACE-TW-009
+    - TRACE-TW-033
+    - TRACE-TW-046
+  verification:
+    - VER-TW-009
+    - VER-TW-010
+    - VER-TW-012
+    - VER-TW-042
+  validation:
+    - VAL-TW-008
+    - VAL-TW-011
+
+authority:
+  baseline: requirements.md
+  intent_contract: .traceweaver/intent-contract.yml
+  owner_instruction: check upstream, fold the update in, release tag, and merge
+  source_pin: plugins/traceweaver-core/references/ce-upstream-source-inventory.md
+  inventory: docs/validation/traceweaver-core-11-ce-runtime-inventory.md
+  release_plan: docs/plans/2026-07-28-traceweaver-core-0.3.2-release-plan.md
+  release_evidence: docs/validation/traceweaver-plugin-0.3.2-release.md
+  allowed_use: >
+    Selected static/advisory CE compatibility refresh and exact TraceWeaver
+    Core 0.3.2 publication only. Commit, push, PR, merge, tag, and release
+    mutations require the controlled exact-target route and live verification.
+
+source_pin_change:
+  repository: https://github.com/EveryInc/compound-engineering-plugin
+  from_version: 3.14.3
+  from_tag: compound-engineering-v3.14.3
+  from_commit: e176a6db46b3de9c4e724a3ab5d7dd1d0bf60a33
+  to_version: 3.20.0
+  to_tag: compound-engineering-v3.20.0
+  to_commit: 5c7cb347d0686663743b87cd7227246ba24f7fa7
+  observed_upstream_main_commit: a9f6d530d4446d805a3100387dedd86268d7e695
+  source_release_date: 2026-07-22
+  capture_date: 2026-07-28
+  source_tree_entries: 735
+  regular_file_count: 732
+  symlink_count: 3
+  skills_file_count: 277
+  skill_local_agent_persona_reference_count: 66
+  full_regular_file_aggregate_fingerprint: a8a6a89112106021edd7bd77d02f6048ba39c808f17579ac9d55a784c2d3aaa8
+
+selected_surface:
+  selected_dirs_refreshed: 17
+  upstream_delta_files: 128
+  upstream_delta_modified: 81
+  upstream_delta_added: 47
+  refreshed_or_overlaid_files: 188
+  held_ce_sessions_files: 8
+  selected_ce_files_scanned_with_alias: 198
+  selected_skill_support_files_with_legacy_agents: 241
+  retained_traceweaver_components:
+    - TraceWeaver-owned lfg alias
+  held_components:
+    - ce-sessions
+    - newly introduced upstream-only top-level skills
+    - off-host CE model execution
+
+method:
+  approach: three_way_merge
+  base: compound-engineering-v3.14.3
+  theirs: compound-engineering-v3.20.0
+  ours: TraceWeaver packaged CE surface with reviewed authority overlays
+  conflict_files: 21
+  resolution_rule: accept non-conflicting upstream changes and retain TraceWeaver boundaries in conflicting hunks
+  conflict_inventory:
+    - plugins/traceweaver-core/skills/ce-brainstorm/references/handoff.md
+    - plugins/traceweaver-core/skills/ce-code-review/SKILL.md
+    - plugins/traceweaver-core/skills/ce-code-review/references/review-output-template.md
+    - plugins/traceweaver-core/skills/ce-code-review/references/subagent-template.md
+    - plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md
+    - plugins/traceweaver-core/skills/ce-commit/SKILL.md
+    - plugins/traceweaver-core/skills/ce-debug/SKILL.md
+    - plugins/traceweaver-core/skills/ce-ideate/SKILL.md
+    - plugins/traceweaver-core/skills/ce-ideate/references/post-ideation-workflow.md
+    - plugins/traceweaver-core/skills/ce-ideate/references/universal-ideation.md
+    - plugins/traceweaver-core/skills/ce-ideate/references/web-research-cache.md
+    - plugins/traceweaver-core/skills/ce-plan/SKILL.md
+    - plugins/traceweaver-core/skills/ce-plan/references/plan-handoff.md
+    - plugins/traceweaver-core/skills/ce-resolve-pr-feedback/SKILL.md
+    - plugins/traceweaver-core/skills/ce-resolve-pr-feedback/references/full-mode.md
+    - plugins/traceweaver-core/skills/ce-resolve-pr-feedback/references/targeted-mode.md
+    - plugins/traceweaver-core/skills/ce-test-browser/SKILL.md
+    - plugins/traceweaver-core/skills/ce-work/SKILL.md
+    - plugins/traceweaver-core/skills/ce-work/references/review-findings-followup.md
+    - plugins/traceweaver-core/skills/ce-work/references/shipping-workflow.md
+    - plugins/traceweaver-core/skills/ce-work/references/tracker-defer.md
+
+verification_observed:
+  ce_closure: pass_missing_none_untracked_none
+  plugin_validation: pass
+  no_publication_smoke: pass
+  controlled_publication_smoke: pass
+  tw_skill_behavior_smoke: pass_active_host_currentness_held
+  scoped_review_smoke: pass
+  code_traceability_smoke: pass
+  exact_changed_file_scan: pass_zero_findings
+  syntax_and_whitespace: pass
+  baseline_known_failure:
+    check: scripts/traceweaver-smoke-systems-engineering-audit-closure
+    result: same_failure_on_origin_main_and_candidate
+    tracking_issue: TraceWeaver-ybhr
+
+independent_review_observed:
+  correctness:
+    evidence_id: TW-REVIEW-2026-07-28-CE-3.20.0-CORRECTNESS-CLEAN-003
+    result: clean_after_scoped_repairs_no_actionable_findings
+  security:
+    evidence_id: TW-REVIEW-2026-07-28-CE-3.20.0-SECURITY-CLEAN-003
+    result: clean_after_scoped_repairs_no_actionable_findings
+  documentation:
+    evidence_id: TW-REVIEW-2026-07-28-CE-3.20.0-DOCS-CLEAN-004
+    result: clean_after_scoped_repairs_no_actionable_findings
+
+release:
+  version: 0.3.2
+  tag: traceweaver-core--v0.3.2
+  branch: codex/ce-3.20.0-selected-refresh-release-0.3.2
+  remote: origin
+  base: main
+  mechanism: .github/workflows/release-on-version-bump.yml
+  publication_state: ready_for_single_use_publication_capsule
+
+held_claims:
+  - clean CE replacement
+  - full upstream parity
+  - ce-sessions currentness with CE 3.20.0
+  - upstream-only skill packaging
+  - off-host CE model execution, including code and document peer review, plan and brainstorm elevation, and cross-model unit-workspace implementation
+  - runtime-equivalent CE behavior
+  - active-host currentness
+  - dynamic discovery
+  - enforcing or slash-command behavior
+  - autonomous publication
+  - deployment, dogfood, or productivity improvement
+  - future merge or release authority
+
+next_step: >
+  Use /tw-commit-push-pr with a single-use publication capsule for the exact
+  reviewed tree. After live PR checks pass, issue and consume a separate
+  merge-only capsule, merge, and verify the automatic tag and GitHub Release.

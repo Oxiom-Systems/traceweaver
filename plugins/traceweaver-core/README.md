@@ -35,7 +35,7 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.3.1`
+Plugin version: `0.3.2`
 
 Included skills:
 
@@ -68,12 +68,14 @@ Included skills:
 - `tw-worktree`
 - `tw-update`
 - selected CE-compatible workflow skills refreshed from Compound Engineering
-  `3.14.3`, including `ce-strategy`, `ce-ideate`, `ce-brainstorm`,
+  `3.20.0`, including `ce-strategy`, `ce-ideate`, `ce-brainstorm`,
   `ce-plan`, `ce-work`, `ce-code-review`, `ce-doc-review`, `ce-compound`,
   `ce-resolve-pr-feedback`, `ce-commit`, `ce-commit-push-pr`,
   `ce-compound-refresh`, `ce-test-browser`, `ce-test-xcode`, `ce-worktree`,
-  `ce-setup`, `ce-debug`, and `lfg`; `ce-sessions` remains the selected
-  internal compatibility engine held at the prior reviewed surface
+  `ce-setup`, and `ce-debug`
+- TraceWeaver-owned `lfg` preserved as the `tw-auto` alias
+- `ce-sessions` retained as the selected internal compatibility engine held at
+  the prior reviewed CE 3.12.0 surface
 
 Included references:
 
@@ -169,7 +171,7 @@ package. Bump every peer plugin manifest carried by the release:
 - `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.3.1`.
+`traceweaver-core--v0.3.2`.
 
 Tagging and the GitHub Release are automated: when a commit that bumps the
 plugin version lands on `main`, the `Release on version bump` workflow
@@ -210,8 +212,9 @@ only manual step.
   refresh workflows as source evidence, not authority rewrites.
 - `tw-sessions` wraps packaged `ce-sessions`; the older CE 3.5.0
   `ce-session-inventory` and `ce-session-extract` split helpers are not part of
-  the selected package surface, and top-level `ce-sessions` currentness with CE
-  3.14.3 remains held.
+  the selected package surface. Packaged `ce-sessions` remains on the reviewed
+  CE 3.12.0 compatibility surface, and its currentness with CE 3.20.0 remains
+  held.
 - `tw-test-browser` and `tw-test-xcode` wrap packaged verification engines and
   require requirement/trace/verification context for gate-closing evidence.
 - `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree` wrap local repair,
@@ -303,8 +306,8 @@ selected packaged CE continuity entrypoints users are expected to call directly:
 `tw-resolve-pr-feedback`, `tw-setup`, and `tw-worktree`. Packaged
 `ce-sessions` is the selected internal session component; the older CE 3.5.0
 `ce-session-inventory` and `ce-session-extract` split helpers are not part of
-the selected package surface, and CE 3.14.3 currentness for `ce-sessions`
-remains held.
+the selected package surface. Packaged `ce-sessions` remains on the reviewed CE
+3.12.0 compatibility surface, and CE 3.20.0 currentness for it remains held.
 Runtime-equivalent CE replacement, agent-backed behavior, slash commands, and
 enforcing mode remain held until U9 or a later accepted runtime proof.
 

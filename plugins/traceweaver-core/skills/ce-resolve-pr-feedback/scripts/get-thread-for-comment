@@ -16,21 +16,38 @@ fi
 PR_NUMBER=$1
 COMMENT_NODE_ID=$2
 
-if [ -n "$3" ]; then
-    OWNER=$(echo "$3" | cut -d/ -f1)
-    REPO=$(echo "$3" | cut -d/ -f2)
-else
-    # `|| true` is load-bearing: under `set -e`, a failed command substitution
-    # in an assignment aborts the script immediately. Run outside a git repo,
-    # `gh repo view` exits 1, its stderr is swallowed by `2>/dev/null`, and the
-    # script would die here with rc=1 and no output -- making the friendly error
-    # below unreachable. Keep `|| true` so detection failure falls through to it.
-    OWNER=$(gh repo view --json owner -q .owner.login 2>/dev/null || true)
-    REPO=$(gh repo view --json name -q .name 2>/dev/null || true)
+ORIGIN_URL=$(git remote get-url origin 2>/dev/null || true)
+case "$ORIGIN_URL" in
+    https://*|http://*)
+        ORIGIN_HOST=$(printf '%s' "$ORIGIN_URL" | sed -E 's#^[a-z]+://([^/]+)/.*#\1#')
+        ORIGIN_REPOSITORY=$(printf '%s' "$ORIGIN_URL" | sed -E 's#^[a-z]+://[^/]+/##; s#\.git$##')
+        ;;
+    ssh://*)
+        ORIGIN_HOST=$(printf '%s' "$ORIGIN_URL" | sed -E 's#^ssh://([^@/]+@)?([^/:]+).*#\2#')
+        ORIGIN_REPOSITORY=$(printf '%s' "$ORIGIN_URL" | sed -E 's#^ssh://([^@/]+@)?[^/]+/##; s#\.git$##')
+        ;;
+    *@*:*)
+        ORIGIN_HOST=$(printf '%s' "$ORIGIN_URL" | sed -E 's#^[^@]+@([^:]+):.*#\1#')
+        ORIGIN_REPOSITORY=$(printf '%s' "$ORIGIN_URL" | sed -E 's#^[^:]+:##; s#\.git$##')
+        ;;
+    *) ORIGIN_HOST=""; ORIGIN_REPOSITORY="" ;;
+esac
+REQUEST_HOST=${GH_HOST:-github.com}
+if [ -z "$ORIGIN_HOST" ] || [ "$REQUEST_HOST" != "$ORIGIN_HOST" ]; then
+    echo "Error: GH_HOST '$REQUEST_HOST' must match the current checkout origin host '$ORIGIN_HOST'." >&2
+    exit 1
 fi
 
-if [ -z "$OWNER" ] || [ -z "$REPO" ]; then
-    echo "Error: could not resolve owner/repo. Run get-thread-for-comment from inside the target git repository, or pass OWNER/REPO as the third argument (e.g., get-thread-for-comment $PR_NUMBER $COMMENT_NODE_ID EveryInc/cora)." >&2
+REQUEST_REPOSITORY=${3:-$ORIGIN_REPOSITORY}
+if [ -z "$ORIGIN_REPOSITORY" ] || [ "$REQUEST_REPOSITORY" != "$ORIGIN_REPOSITORY" ]; then
+    echo "Error: requested repository '$REQUEST_REPOSITORY' must match the current checkout origin repository '$ORIGIN_REPOSITORY'." >&2
+    exit 1
+fi
+OWNER=${ORIGIN_REPOSITORY%%/*}
+REPO=${ORIGIN_REPOSITORY#*/}
+
+if [ -z "$OWNER" ] || [ -z "$REPO" ] || [ "$OWNER" = "$REPO" ] || printf '%s' "$REPO" | grep -q '/'; then
+    echo "Error: could not resolve an exact OWNER/REPO from the current checkout origin." >&2
     exit 1
 fi
 

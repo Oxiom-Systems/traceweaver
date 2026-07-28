@@ -1,6 +1,7 @@
 # Handoff
 
-This content is loaded when Phase 4 begins — after the requirements document is written.
+This content is loaded when Phase 4 begins — after the requirements-only
+unified plan is written.
 
 ---
 
@@ -8,8 +9,8 @@ This content is loaded when Phase 4 begins — after the requirements document i
 
 The Phase 4 menu's visible option count varies by state: no requirements doc hides the review and Proof options, unresolved `Resolve Before Planning` hides `Plan implementation` and `Build it now`, a failing direct-to-work gate hides `Build it now`. Count the visible options for the current state and choose the rendering mode accordingly:
 
-- **4 or fewer visible:** use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex; `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). This is the default.
-- **5 or more visible:** render as a numbered list in chat. This is the narrow option-overflow fallback; trimming would hide legitimate choices (plan, review, Proof, build, refine, pause are all distinct destinations). Include a hint that free-form input is accepted ("Pick a number or describe what you want.") so the numbered list retains the blocking tool's open-endedness.
+- **Visible count fits the current platform's option cap:** use the platform's blocking question tool (`AskUserQuestion` in Claude Code — call `ToolSearch` with `select:AskUserQuestion` first if its schema isn't loaded; `request_user_input` in Codex; `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi (requires the `pi-ask-user` extension)). Claude Code `AskUserQuestion` supports up to 4 explicit options, and Codex `request_user_input` supports only 2-3 explicit options.
+- **Visible count exceeds the current platform's option cap:** render as a numbered list in chat. This is the narrow option-overflow fallback; trimming would hide legitimate choices (plan, ship, review, Proof/browser, refine are all distinct destinations). Include a hint that free-form input is accepted ("Pick a number or describe what you want.") so the numbered list retains the blocking tool's open-endedness.
 
 Never silently skip the question.
 
@@ -17,7 +18,7 @@ If `Resolve Before Planning` contains any items:
 - Ask the blocking questions now, one at a time, by default
 - If the user explicitly wants to proceed anyway, first convert each remaining item into an explicit decision, assumption, or `Deferred to Planning` question
 - If the user chooses to pause instead, present the handoff as paused or blocked rather than complete
-- Do not offer the `Plan implementation` or `Build it now` options while `Resolve Before Planning` remains non-empty
+- Do not offer the `Create the implementation plan` or `Ship it autonomously with lfg` options while `Resolve Before Planning` remains non-empty
 
 In both preambles below, the "Pick a number or describe what you want." hint applies only in numbered-list mode. When using the blocking tool, omit that line and pass the remaining stem as the question.
 
@@ -28,7 +29,9 @@ In both preambles below, the "Pick a number or describe what you want." hint app
 ```
 Brainstorm complete.
 
-Requirements doc: <absolute path to requirements doc>  # omit line if no doc was created
+Plan artifact: <absolute path to requirements-only unified plan>  # omit line if no artifact was created
+
+Planning and shipping will use this artifact as the definition of what to build.  # omit line if no artifact was created
 
 What would you like to do next? (Pick a number or describe what you want.)
 ```
@@ -36,12 +39,14 @@ What would you like to do next? (Pick a number or describe what you want.)
 **Preamble when blocking questions remain and user wants to pause:**
 
 ```
-Brainstorm paused. Planning is blocked until the remaining questions are resolved.
+Brainstorm paused. I'm holding planning until the remaining questions are resolved — say the word and I'll proceed anyway, recording each open item as an explicit assumption or a question deferred to planning.
 
-Requirements doc: <absolute path to requirements doc>  # omit line if no doc was created
+Plan artifact: <absolute path to requirements-only unified plan>  # omit line if no artifact was created
 
 What would you like to do next? (Pick a number or describe what you want.)
 ```
+
+The override sentence is load-bearing, not padding: the planning options are hidden while `Resolve Before Planning` is non-empty, so without it the user is told planning is blocked and is never told the block is theirs to lift. `Resolve Before Planning` is your own judgment call — an over-cautious read of it must not silently strand the user with no visible way forward. Hiding the option withholds the *recommendation*; it never withholds the *choice*.
 
 Present only the options that apply. Renumber so visible options stay contiguous starting at 1.
 
@@ -70,11 +75,10 @@ summary first.
 
 **If user selects "Plan implementation with `ce-plan` (legacy/manual-continuity)":**
 
-Immediately load the `ce-plan` skill in the current session. Pass the requirements document path when one exists; otherwise pass a concise summary of the finalized brainstorm decisions. When the Phase 1.1 grounding scout produced a dossier and the file still exists, also pass its path (`/tmp/compound-engineering/ce-brainstorm/<run-id>/grounding.md`) — it gives planning verified quotes with `file:line` pointers to start from instead of re-scanning the repo. Do not print the closing summary first.
-
-**If user selects "Agent review of requirements doc with `ce-doc-review`":**
-
-Load the `ce-doc-review` skill, passing the requirements document path as the argument. When ce-doc-review returns "Review complete", return to the Phase 4 options and re-render the menu (the doc may have changed, so re-evaluate `Resolve Before Planning`, direct-to-work gate, and residual findings). If residual P0/P1 findings remain unaddressed, include the post-review nudge above the menu. Do not show the closing summary yet.
+Load the `ce-plan` skill, passing the unified plan path as the argument so it
+enriches the existing artifact rather than bootstrapping a second plan. This
+legacy/manual-continuity route does not close TraceWeaver authority or
+publication gates. Do not show the closing summary first.
 
 **If user selects "Build it now with `ce-work` (legacy/manual-continuity; skip planning)":**
 
@@ -85,7 +89,7 @@ only if the authority gate reports approved authority or an approved exception
 may `ce-work` be loaded, and it must be loaded in TraceWeaver no-publication
 mode. Do not print the closing summary first.
 
-**If user selects "More clarifying questions to sharpen the doc":** Return to Phase 1.3 (Collaborative Dialogue) and continue asking the user clarifying questions one at a time to further refine scope, edge cases, constraints, and preferences. Continue until the user is satisfied, then return to Phase 4. Do not show the closing summary yet.
+**If user selects "More clarifying questions to sharpen the scope":** Return to Phase 1.3 (Collaborative Dialogue) and continue asking the user clarifying questions one at a time to further refine scope, edge cases, constraints, and preferences. Continue until the user is satisfied, then return to Phase 4. Do not show the closing summary yet.
 
 **If user selects "External/manual review" or asks for "Open in Proof", "Publish to Proof", or HITL review:**
 
@@ -93,9 +97,9 @@ Stop and explain that `ce-proof` is not packaged in the current TraceWeaver
 alpha. Recommend external/manual review or a future package unit that explicitly
 adds and reviews the Proof surface.
 
-**If user selects "Open in browser":** Display the absolute path to the `.html` requirements file so the user can open it locally. Where the platform exposes a browser-opening primitive (e.g., `open` on macOS, `xdg-open` on Linux, `start` on Windows), the agent may invoke it directly; otherwise print the absolute path and let the user open it. After the path is displayed (or the browser is opened), return to the Phase 4 options so the user can pick a follow-up action.
+**If user selects "Open in browser":** Display the absolute path to the `.html` unified plan so the user can open it locally. Where the platform exposes a browser-opening primitive (e.g., `open` on macOS, `xdg-open` on Linux, `start` on Windows), the agent may invoke it directly; otherwise print the absolute path and let the user open it. After the path is displayed (or the browser is opened), return to the Phase 4 options so the user can pick a follow-up action.
 
-**If user selects "Done for now":** Display the closing summary (see 4.3) and end the turn.
+**If the user indicates they're finished** (says "done"/"that's all", or dismisses the menu without picking an option): display the closing summary (see 4.3) and end the turn.
 
 #### 4.3 Closing Summary
 
@@ -112,7 +116,7 @@ Key decisions:
 - [Decision 1]
 - [Decision 2]
 
-Recommended next step: `ce-plan`
+Recommended next step: `ce-plan <plan artifact path>`
 ```
 
 If the user pauses with `Resolve Before Planning` still populated, display:
@@ -122,9 +126,9 @@ Brainstorm paused.
 
 Requirements doc: docs/brainstorms/YYYY-MM-DD-<topic>-requirements.md  # if one was created
 
-Planning is blocked by:
+Planning is held on:
 - [Blocking question 1]
 - [Blocking question 2]
 
-Resume with `ce-brainstorm` when ready to resolve these before planning.
+Resume with `ce-brainstorm` to resolve these — or say to plan anyway, and I'll record each open item as an explicit assumption or a question deferred to planning.
 ```

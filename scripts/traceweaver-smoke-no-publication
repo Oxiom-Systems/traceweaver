@@ -83,6 +83,19 @@ ce_commit_skill="$repo_root/plugins/traceweaver-core/skills/ce-commit/SKILL.md"
 ce_debug_skill="$repo_root/plugins/traceweaver-core/skills/ce-debug/SKILL.md"
 ce_compound_refresh_skill="$repo_root/plugins/traceweaver-core/skills/ce-compound-refresh/SKILL.md"
 ce_resolve_pr_feedback_skill="$repo_root/plugins/traceweaver-core/skills/ce-resolve-pr-feedback/SKILL.md"
+ce_resolve_full_mode="$repo_root/plugins/traceweaver-core/skills/ce-resolve-pr-feedback/references/full-mode.md"
+ce_resolve_get_comments="$repo_root/plugins/traceweaver-core/skills/ce-resolve-pr-feedback/scripts/get-pr-comments"
+ce_resolve_get_thread="$repo_root/plugins/traceweaver-core/skills/ce-resolve-pr-feedback/scripts/get-thread-for-comment"
+ce_work_unit_state="$repo_root/plugins/traceweaver-core/skills/ce-work/scripts/unit_workspace_state.py"
+ce_work_unit_transaction="$repo_root/plugins/traceweaver-core/skills/ce-work/scripts/unit_workspace_transaction.py"
+ce_work_unit_jobs="$repo_root/plugins/traceweaver-core/skills/ce-work/scripts/unit_workspace_jobs.py"
+ce_work_unit_cli="$repo_root/plugins/traceweaver-core/skills/ce-work/scripts/unit-workspace.py"
+ce_work_cross_model="$repo_root/plugins/traceweaver-core/skills/ce-work/scripts/cross-model-work.sh"
+ce_doc_review_cross_model="$repo_root/plugins/traceweaver-core/skills/ce-doc-review/scripts/cross-model-doc-review.sh"
+ce_brainstorm_elevation="$repo_root/plugins/traceweaver-core/skills/ce-brainstorm/scripts/elevation-dispatch.sh"
+ce_plan_elevation="$repo_root/plugins/traceweaver-core/skills/ce-plan/scripts/elevation-dispatch.sh"
+ce_code_review_skill="$repo_root/plugins/traceweaver-core/skills/ce-code-review/SKILL.md"
+ce_code_review_cross_model="$repo_root/plugins/traceweaver-core/skills/ce-code-review/scripts/cross-model-adversarial-review.sh"
 tw_grill_skill="$repo_root/plugins/traceweaver-core/skills/tw-grill/SKILL.md"
 lfg_skill="$repo_root/plugins/traceweaver-core/skills/lfg/SKILL.md"
 tw_auto_skill="$repo_root/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
@@ -111,6 +124,28 @@ require_absent "$ce_compound_refresh_skill" "committed as part of (or immediatel
 require_absent "$ce_compound_refresh_skill" "clean up citations in the same commit"
 
 require_present "$ce_resolve_pr_feedback_skill" "posting PR comments, or resolving review threads"
+require_absent "$ce_resolve_full_mode" "If the bundled script is missing, reply with"
+require_present "$ce_resolve_full_mode" "Draft reply only."
+require_present "$ce_resolve_full_mode" "Never fall back to a mutating"
+require_present "$ce_resolve_get_comments" "must match the current checkout origin host"
+require_present "$ce_resolve_get_comments" "must match the current checkout origin repository"
+require_present "$ce_resolve_get_thread" "must match the current checkout origin host"
+require_present "$ce_resolve_get_thread" "must match the current checkout origin repository"
+require_present "$ce_work_unit_state" "TraceWeaver package forbids unit workspace commit or ref advancement"
+require_absent "$ce_work_unit_state" '"commit-tree"'
+require_absent "$ce_work_unit_state" '"update-ref"'
+require_present "$ce_work_unit_state" "plan-checkpoint-held-uncommitted"
+require_present "$ce_work_unit_cli" "HELD_NEW_WORK_COMMANDS"
+require_present "$ce_work_unit_cli" "TraceWeaver alpha holds external unit-workspace"
+require_present "$ce_work_unit_jobs" "TraceWeaver alpha holds external unit dispatch"
+require_present "$ce_work_unit_jobs" "TraceWeaver alpha holds external unit terminalization and synthetic transport refs"
+require_present "$ce_work_unit_transaction" "TraceWeaver alpha holds external unit integration"
+require_present "$ce_work_cross_model" "TraceWeaver alpha holds external work egress"
+require_present "$ce_doc_review_cross_model" "TraceWeaver packaged cross-model document egress is held"
+require_present "$ce_brainstorm_elevation" "TraceWeaver packaged off-host model elevation is held"
+require_present "$ce_plan_elevation" "TraceWeaver packaged off-host model elevation is held"
+require_present "$ce_code_review_skill" "Cross-model code egress is held and disabled"
+require_present "$ce_code_review_cross_model" "TraceWeaver packaged cross-model code egress is held"
 require_present "$tw_grill_skill" "Do not edit project context or authority documents"
 require_present "$lfg_skill" "Invoke \`tw-auto\` with the same arguments"
 require_present "$lfg_skill" "Do not run \`ce-plan\`, \`ce-work\`, \`ce-code-review\`, \`ce-commit\`"
@@ -122,6 +157,74 @@ require_present "$tw_auto_skill" "held_no_progress"
 require_present "$tw_auto_skill" "tw-commit-push-pr"
 require_present "$tw_auto_skill" "never stages, commits, pushes, opens a PR"
 require_absent "$tw_auto_skill" "U9 passed"
+
+refs_before="$(git -C "$repo_root" for-each-ref --format='%(refname) %(objectname)')"
+set +e
+PYTHONDONTWRITEBYTECODE=1 "$ce_work_unit_cli" init \
+  --run-id held-smoke \
+  --repo "$repo_root" \
+  --prompt-brief "$tmp_dir/nonexistent-brief" \
+  --prompt-digest "$(printf '0%.0s' {1..64})" \
+  >"$tmp_dir/unit-workspace.out" 2>"$tmp_dir/unit-workspace.err"
+unit_workspace_status=$?
+"$ce_work_cross_model" held-auth held-workspace held-packet held-digest held-result \
+  >"$tmp_dir/cross-model-work.out" 2>"$tmp_dir/cross-model-work.err"
+cross_model_work_status=$?
+"$ce_doc_review_cross_model" held-provider held-candidates held-lens held-doc held-type held-origin held-run \
+  >"$tmp_dir/cross-model-doc.out" 2>"$tmp_dir/cross-model-doc.err"
+cross_model_doc_status=$?
+"$ce_brainstorm_elevation" held-model held-prompt held-result \
+  >"$tmp_dir/brainstorm-elevation.out" 2>"$tmp_dir/brainstorm-elevation.err"
+brainstorm_elevation_status=$?
+"$ce_plan_elevation" held-model held-prompt held-result \
+  >"$tmp_dir/plan-elevation.out" 2>"$tmp_dir/plan-elevation.err"
+plan_elevation_status=$?
+GH_HOST=github.com bash "$ce_resolve_get_comments" 1 Unrelated/repository \
+  >"$tmp_dir/repository-mismatch.out" 2>"$tmp_dir/repository-mismatch.err"
+repository_mismatch_status=$?
+GH_HOST=github.com bash "$ce_resolve_get_thread" 1 PRRC_test Unrelated/repository \
+  >"$tmp_dir/thread-repository-mismatch.out" 2>"$tmp_dir/thread-repository-mismatch.err"
+thread_repository_mismatch_status=$?
+set -e
+refs_after="$(git -C "$repo_root" for-each-ref --format='%(refname) %(objectname)')"
+
+if [ "$unit_workspace_status" -ne 1 ] || ! grep -Fq "REFUSED" "$tmp_dir/unit-workspace.out"; then
+  echo "unit_workspace_alpha_hold=failed status=$unit_workspace_status"
+  exit 1
+fi
+if [ "$refs_before" != "$refs_after" ]; then
+  echo "unit_workspace_alpha_hold_changed_refs=failed"
+  exit 1
+fi
+if [ "$cross_model_work_status" -ne 2 ] || ! grep -Fq "holds external work egress" "$tmp_dir/cross-model-work.err"; then
+  echo "cross_model_work_alpha_hold=failed status=$cross_model_work_status"
+  exit 1
+fi
+if [ "$cross_model_doc_status" -ne 0 ] || ! grep -Fq "cross-model document egress is held" "$tmp_dir/cross-model-doc.err"; then
+  echo "cross_model_doc_alpha_hold=failed status=$cross_model_doc_status"
+  exit 1
+fi
+if [ "$brainstorm_elevation_status" -ne 2 ] || ! grep -Fq "off-host model elevation is held" "$tmp_dir/brainstorm-elevation.err"; then
+  echo "brainstorm_elevation_alpha_hold=failed status=$brainstorm_elevation_status"
+  exit 1
+fi
+if [ "$plan_elevation_status" -ne 2 ] || ! grep -Fq "off-host model elevation is held" "$tmp_dir/plan-elevation.err"; then
+  echo "plan_elevation_alpha_hold=failed status=$plan_elevation_status"
+  exit 1
+fi
+if [ "$repository_mismatch_status" -ne 1 ] || ! grep -Fq "must match the current checkout origin repository" "$tmp_dir/repository-mismatch.err"; then
+  echo "pr_repository_origin_binding=failed status=$repository_mismatch_status"
+  exit 1
+fi
+if [ "$thread_repository_mismatch_status" -ne 1 ] || ! grep -Fq "must match the current checkout origin repository" "$tmp_dir/thread-repository-mismatch.err"; then
+  echo "thread_repository_origin_binding=failed status=$thread_repository_mismatch_status"
+  exit 1
+fi
+if [ -f "$gh_marker" ]; then
+  echo "repository_origin_binding_called_gh=failed"
+  cat "$gh_marker"
+  exit 1
+fi
 
 profile_reviewer_cap=1
 profile_active_reviewer_cap=2
@@ -142,6 +245,9 @@ echo "lfg_delegation=pass"
 echo "lfg_no_raw_ce_autopilot=pass"
 echo "pr_helper_publication_stop_before_external_mutation=pass"
 echo "publication_stop_static_markers=present"
+echo "ce_work_external_engine=held_before_dispatch_or_repo_mutation"
+echo "ce_off_host_model_egress=held_code_doc_plan_brainstorm_work"
+echo "pr_feedback_repository_origin_binding=pass"
 echo "profile_review_caps=pass routine=$profile_reviewer_cap active=$profile_active_reviewer_cap personas=$profile_persona_cap repair_cycles=$profile_repair_cycle_cap"
 echo "u9_runtime=held_out_of_scope"
 echo "publication_deploy_dogfood=held_without_separate_authority"

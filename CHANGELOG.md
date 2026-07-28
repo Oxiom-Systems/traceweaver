@@ -2,6 +2,36 @@
 
 # Changelog
 
+## 0.3.2 - 2026-07-28
+
+Selected Compound Engineering compatibility refresh.
+
+### Changed
+
+- Refreshed the 17 selected CE-derived compatibility component directories
+  from upstream `compound-engineering-v3.14.3` to the released
+  `compound-engineering-v3.20.0` source.
+- Preserved the reviewed TraceWeaver authority, traceability, no-publication,
+  and wrapper-routing overlays while accepting non-conflicting upstream
+  improvements and support files.
+- Held imported CE 3.20.0 off-host model execution behind machine refusals:
+  code/document peer review, plan/brainstorm elevation, and cross-model
+  unit-workspace implementation. TraceWeaver alpha continues to use native
+  in-harness reviewers, planning, brainstorming, and inline/subagent work.
+- Refreshed the exact source provenance, support hashes, selected-file
+  inventory, and static closure evidence.
+- Kept the packaged `ce-sessions` compatibility engine and TraceWeaver-owned
+  `lfg` alias unchanged; newly introduced upstream top-level skills remain
+  outside the selected package surface.
+
+### Held
+
+- This compatibility refresh does not prove clean CE replacement, full
+  upstream parity, runtime-equivalent CE behavior, active-host currentness,
+  off-host CE model execution, dynamic discovery, enforcing or slash-command
+  behavior, autonomous publication, deployment, or general productivity
+  improvement.
+
 ## 0.3.1 - 2026-07-23
 
 Optional Graphify integration for the TraceWeaver wrapper lifecycle.

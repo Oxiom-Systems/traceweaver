@@ -1,14 +1,14 @@
 # Synthesis Summary
 
-**Synthesis ≠ requirements doc.** The synthesis is NOT a preview, draft, or substitute for the requirements doc — it's the scope checkpoint that doc-write consumes as input. The requirements doc itself is written in Phase 3 from the confirmed synthesis. Both the synthesis and the requirements doc stay scope-only — implementation detail (file paths, code shapes, exact error wording) is downstream (ce-plan's job), not the requirements doc.
+**Synthesis ≠ unified plan artifact.** The synthesis is NOT a preview, draft, or substitute for the requirements-only unified plan — it's the scope checkpoint that doc-write consumes as input. The Product Contract itself is written in Phase 3 from the confirmed synthesis. Both the synthesis and the Product Contract stay scope-only — implementation detail (file paths, code shapes, exact error wording) is downstream (ce-plan's job), not the Product Contract.
 
 **Two-stage shape: internal draft, then chat-time scoping synthesis.** The synthesis is composed in two stages. Stage 1 is an internal three-bucket draft (Stated / Inferred / Out of scope) the agent uses to think comprehensively about scope. Stage 2 is the scoping synthesis presented to the user — shaped like what two product collaborators would confirm before writing a PRD, not like a comprehensive audit and not like a one-line preview. The user only sees stage 2. The internal draft still informs the doc body via the doc-shape routing below; it just doesn't reach the user verbatim. This split exists because the comprehensive audit shape produced too much detail for the user to actually weigh in on, even when the granularity rules were followed.
 
 **Three-bucket structure is the internal draft, not the user-facing artifact.** It does its scope-thinking job during stage 1 and dissolves when Phase 3 writes the doc: Stated content informs Requirements, Inferred content informs Key Decisions, Out-of-scope content informs Scope Boundaries. The doc has no parallel `## Synthesis` section — only the scoping synthesis prose embeds, as `## Summary`. See "Doc shape after confirmation" below for the routing.
 
-This content is loaded when Phase 2.5 fires — after Phase 2 (approaches chosen) and before Phase 3 (write requirements doc). The synthesis is the user's last opportunity to correct the agent's interpretation before the doc lands. It serves two purposes: synthesis confirmation (the user agreed to many individual things in dialogue but never saw the whole) and a transition checkpoint ("about to write a doc").
+This content is loaded when Phase 2.5 fires — after Phase 2 (approaches chosen) and before Phase 3 (write the requirements-only unified plan). The synthesis is the user's last opportunity to correct the agent's interpretation before the artifact lands. It serves two purposes: synthesis confirmation (the user agreed to many individual things in dialogue but never saw the whole) and a transition checkpoint ("about to write the Product Contract").
 
-Fires for **all tiers** including Lightweight. Skip Phase 2.5 entirely on the Phase 0.1b non-software (universal-brainstorming) route. The skill is interactive by design — brainstorming requires dialogue with a synchronous user. There is no non-interactive mode; if an automated workflow needs a requirements doc without dialogue, the right move is to write the doc from context directly, not to invoke `ce-brainstorm`.
+Fires for **all tiers** including Lightweight. Skip Phase 2.5 entirely on the Phase 0.1b non-software (universal-brainstorming) route. The skill is interactive by design — brainstorming requires dialogue with a synchronous user. There is no non-interactive mode; if an automated workflow needs a Product Contract without dialogue, the right move is to write the unified plan artifact from context directly, not to invoke `ce-brainstorm`.
 
 ---
 
@@ -19,6 +19,8 @@ The internal draft is structured in three labeled buckets. Items may appear in t
 - **Stated** — what the user said directly (in the original prompt, prior conversation, dialogue answers, approach selection in Phase 2). Items here have explicit user-language anchors.
 - **Inferred** — what the agent assumed to fill gaps. Scope boundaries the user never explicitly named, success criteria extrapolated from intent, technical assumptions made because the brief interview didn't probe them. The Inferred bucket is the most actionable surface for correction — items here are the agent's bets.
 - **Out of scope** — deliberately excluded items. Adjacent work the agent considered but decided not to include, refactors, nice-to-haves, future-work items. Making exclusions explicit lets the agent spot anything that should actually be included.
+
+A session-settled decision (per `references/settled-decisions.md`) is **Stated with provenance** — record it in the Stated bucket with its class, rejected alternative, and one-line reason, never in Inferred: it is the user's confirmed choice, not an agent bet.
 
 This draft is internal. Do not paste it verbatim into chat. Compose it as a thinking step, then derive stage 2 from it.
 
@@ -35,6 +37,8 @@ The scoping synthesis has up to four named sections, each **render-conditional**
 3. **What's not in scope** (conditional) — 1–3 bullets, or fold into a single sentence. Render only when deferred items would surprise a downstream reader if absent.
 4. **Call outs** (conditional) — 0–3 bullets. Residual forks the dialogue didn't resolve: post-dialogue consequences (combining user answers surfaced something they couldn't see during Q&A), silent agent inferences, or — in pre-loaded contexts with no dialogue — scope bets the user is seeing for the first time. **Not "questions the agent could have asked during Phase 1.3 but didn't"** — if a call-out reads like a missed dialogue question, Phase 1.3's integration check failed; flag the gap rather than padding the section.
 
+Session-settled decisions render as `Carrying forward:` lines — one line each, placed before Call outs (where Call outs would sit when none survive): `Carrying forward: <decision> over <rejected alternative> — <one-line reason>.` They are statements, never questions and never call-outs: the confirmation covers the overall shape, not decisions the user already made.
+
 Each section answers a different question:
 
 - **What's being built?** → shape
@@ -42,7 +46,11 @@ Each section answers a different question:
 - **What did we cut?** → deferred items a reader would expect to see acknowledged
 - **Where might you redirect?** → residual forks: post-dialogue consequences, silent inferences, late-cycle bets
 
-Then the confirmation: *"Confirm and I'll write the requirements doc next, drawing on our dialogue and this synthesis. Or tell me what to change."* The phrasing sets the expectation that confirm → doc-write, so the user knows what's about to happen and can interrupt without ambiguity.
+Then the confirmation, which names **what actually happens next** so the user knows what is coming and can interrupt without ambiguity. When a doc is expected — the common case — that is the artifact write: *"Confirm and I'll write the requirements-only plan next, drawing on our dialogue and this synthesis. Or tell me what to change."*
+
+When a doc is already ruled out — the user declined one, or `brainstorm-sections.md`'s "Decide whether a doc is warranted at all" criteria plainly hold — name where the decisions actually go instead, which is whichever of that rule's alternatives *this run* established (`ce-plan`, the user's commit message, `docs/solutions/`): *"Confirm and we're done here — the scope above carries straight into [the destination the dialogue established]. Or tell me what to change."* When the dialogue named none, drop the clause rather than picking one: *"Confirm and we're done here — no doc, as you asked. Or tell me what to change."*
+
+Do not hardcode a destination. This phase writes no commit message and hands off at Phase 4, so asserting a downstream action the run will not take is the same overreach as promising the doc. Phase 3, not this phase, owns the doc-warranted decision, so promising the write here makes a user who already declined a doc decline it a second time.
 
 ### Path A vs Path B: the gate that fires the confirmation question
 
@@ -68,11 +76,12 @@ Each conditional section has its own keep test. Sections are render-conditional 
 - **Real scope fork** — another reasonable agent might choose a different scope on this dimension (who the primary actor is, whether case X is in/out, in scope vs deferred)
 - **Non-obvious scope inclusion** — a behavior the agent assumed is in scope that the user might want excluded
 - **Non-obvious scope exclusion** — an item the agent moved to deferred that the user might want in scope
-- **Cheap-now-expensive-later correction** — a scope bet that's cheap to fix now but expensive after the requirements doc lands and ce-plan consumes it
+- **Cheap-now-expensive-later correction** — a scope bet that's cheap to fix now but expensive after the Product Contract lands and ce-plan consumes it
 - **Non-obvious consequence of multi-turn answers** — a downstream effect of combining user-stated answers that the user is unlikely to have tracked through dialogue. Surfaced forward-looking ("X means Y for the doc"), not retrospectively ("you said X"). This category is the multi-turn-dialogue reason call-outs exist at all in ce-brainstorm; do not filter these as "already implied by Stated"
 
 Cut anything that doesn't match a keep-test category, including:
 
+- Session-settled decisions — already chosen; they render as `Carrying forward:` lines, never call-outs
 - Mechanical items where there is no real alternative
 - Implementation choices that will be settled during planning
 - Items already implied by the scoping synthesis prose
@@ -98,7 +107,7 @@ A useful test: read the bullets aloud. If two or more sound like "and also" exte
 
 ### Detail level: conversational, not documentary
 
-Each bullet is **1 line ideally, 2 lines maximum**. The reference shape is what two collaborators would say to each other in conversation, not what a requirements doc would say in its body. The synthesis is a forcing function for shape confirmation; the requirements doc is where the substance lives. If a bullet reads like a doc paragraph, it's wrong-shaped — the agent has compressed horizontally (fewer bullets) without compressing vertically (less per bullet), and the cap is meaningless if individual bullets bloat to fill it.
+Each bullet is **1 line ideally, 2 lines maximum**. The reference shape is what two collaborators would say to each other in conversation, not what a Product Contract would say in its body. The synthesis is a forcing function for shape confirmation; the requirements-only unified plan is where the substance lives. If a bullet reads like a doc paragraph, it's wrong-shaped — the agent has compressed horizontally (fewer bullets) without compressing vertically (less per bullet), and the cap is meaningless if individual bullets bloat to fill it.
 
 Two tests:
 
@@ -136,7 +145,7 @@ This is directional guidance — adjust phrasing to fit dialogue context. Open-e
 ### Path B template (questions were asked)
 
 ```
-Based on our dialogue, here's the scope I'm proposing for the requirements doc:
+Based on our dialogue, here's the scope I'm proposing for the Product Contract:
 
 **What we're building:** [1–3 sentences — the shape that emerged from dialogue, forward-looking, plain words]
 
@@ -152,7 +161,7 @@ Based on our dialogue, here's the scope I'm proposing for the requirements doc:
 - [scope-level fork or non-obvious consequence the user can affirm or redirect]
 - [same]
 
-Confirm and I'll write the requirements doc next, drawing on our dialogue and this synthesis. Or tell me what to change — even something I captured correctly earlier is fair game to revise (you may have changed your mind or want to correct an unstated assumption).
+[Closing line — name what actually happens next, per "the confirmation" above. Doc expected (the common case):] Confirm and I'll write the requirements-only plan next, drawing on our dialogue and this synthesis. Or tell me what to change — even something I captured correctly earlier is fair game to revise (you may have changed your mind or want to correct an unstated assumption). [Doc already ruled out — user declined one, or the skip criteria plainly hold:] Confirm and we're done here — the scope above carries straight into [the destination this run established; drop this clause when none was named]. Or tell me what to change — even something I captured correctly earlier is fair game to revise.
 ```
 
 ### Path A template (no questions were asked — typically Phase 0.2 short-circuit)
@@ -160,7 +169,7 @@ Confirm and I'll write the requirements doc next, drawing on our dialogue and th
 ```
 Proposing: [1–3 line shape — what the doc will say in plain words].
 
-No open decisions — writing the requirements doc now. Interrupt if the shape is wrong.
+No open decisions — writing the requirements-only plan now. Interrupt if the shape is wrong.
 ```
 
 Proceed to Phase 3 doc-write in the same turn — do NOT end the turn waiting for an acknowledgment. The "interrupt if wrong" affordance means the user can revise after the doc lands, not before. Lightweight Path A docs are short, so post-hoc revision is cheap.
@@ -172,7 +181,7 @@ Ask the user open-ended on Path B (no `AskUserQuestion` menu). The justification
 For a notification-mute feature where the internal draft had 5 Stated items, 4 Inferred items, and 3 Out-of-scope items, the compressed Stage 2 looks like:
 
 ```
-Based on our dialogue, here's the scope I'm proposing for the requirements doc:
+Based on our dialogue, here's the scope I'm proposing for the Product Contract:
 
 **What we're building:** Per-channel mute on notification rules, with a 24h preset for the support team's 3 AM ping problem. Mute lives on the rule itself and survives rule edits.
 
@@ -187,7 +196,7 @@ Based on our dialogue, here's the scope I'm proposing for the requirements doc:
 **Call outs:**
 - Rule-delete silently loses pause state — confirm no warning needed
 
-Confirm and I'll write the requirements doc next, drawing on our dialogue and this synthesis. Or tell me what to change.
+Confirm and I'll write the requirements-only plan next, drawing on our dialogue and this synthesis. Or tell me what to change.
 ```
 
 What got cut from the 12-item internal draft and why:
@@ -206,7 +215,7 @@ What survived: a scoping synthesis with substance proportional to the dialogue, 
 
 Before emitting the scoping synthesis, re-read the draft as a user would read it. Two failure modes to catch:
 
-- **The scoping synthesis reads like a requirements-doc preview.** Prose enumerates what's in/out, bullets are documentary instead of conversational. The synthesis is a shape-confirmation checkpoint, not a doc preview — if it reads as preview, Phase 2.5 and Phase 3 have collapsed into one step. Revise to conversational shape, or accept that the requirements doc itself will contain the detail and the synthesis should be lighter.
+- **The scoping synthesis reads like a Product Contract preview.** Prose enumerates what's in/out, bullets are documentary instead of conversational. The synthesis is a shape-confirmation checkpoint, not a doc preview — if it reads as preview, Phase 2.5 and Phase 3 have collapsed into one step. Revise to conversational shape, or accept that the requirements-only unified plan itself will contain the detail and the synthesis should be lighter.
 - **The bullet count fits the cap but each bullet is over-detailed.** Hitting 5 bullets in Standard while each bullet is a paragraph means the agent met the count cap by compressing horizontally (fewer bullets) without compressing vertically (less per bullet). The cap is meaningless if individual bullets bloat to fill it. Re-cut to sentence-level bullets.
 
 This is one mental act — re-read as the user — not a checklist to mechanically run. The forcing function is putting yourself in the user's reading shoes briefly, with explicit attention to detail level alongside the keep tests. Revise before emitting if either failure mode fires.
@@ -233,7 +242,7 @@ Track which scoping synthesis items the user touched per round. The soft-cut blo
 
 When the soft-cut fires, use the platform's blocking question tool (`AskUserQuestion` in Claude Code, `request_user_input` in Codex, `ask_question` in Antigravity CLI (`agy`), `ask_user` in Pi) with two options:
 
-- `Proceed and write the requirements doc`
+- `Proceed and write the requirements-only plan`
 - `Hold off — keep discussing before the doc`
 
 Fall back to a numbered list in chat only when no blocking tool exists or the call errors. Never silently skip.
@@ -242,10 +251,10 @@ Fall back to a numbered list in chat only when no blocking tool exists or the ca
 
 ## Self-redirect
 
-If the user response indicates they're in the wrong skill or want a different workflow (e.g., "this is too small, just /ce-work it" or "this needs more thought, let me brainstorm differently"):
+If the user response indicates they're in the wrong skill or want a different workflow (e.g., "this is too small, just use `ce-work`" or "this needs more thought, let me brainstorm differently"):
 
 - Stop ce-brainstorm
-- Suggest the alternative skill the user appears to want (e.g., `/ce-work`, `/ce-debug`)
+- Suggest the alternative skill the user appears to want (e.g., `ce-work`, `ce-debug`)
 - Offer to load it in-session
 - Do not push back or argue — the user's redirect signal is the deliberate choice
 
@@ -255,7 +264,7 @@ This support exists because the scoping synthesis is an honest checkpoint. If th
 
 ## Doc shape after confirmation
 
-After user confirmation (or after the soft-cut decision proceeds), Phase 3 writes the requirements doc. The internal draft does NOT carry into the doc as a `## Synthesis` section. Only the "What we're building" prose embeds, as `## Summary` at the top. Internal-draft content dissolves into the doc's body sections:
+After user confirmation (or after the soft-cut decision proceeds), Phase 3 writes the requirements-only unified plan. The internal draft does NOT carry into the artifact as a `## Synthesis` section. Only the "What we're building" prose embeds, as `## Summary` inside the Product Contract. Internal-draft content dissolves into the Product Contract's body sections:
 
 | Internal-draft element | Where it goes in the doc |
 |---|---|
@@ -265,6 +274,8 @@ After user confirmation (or after the soft-cut decision proceeds), Phase 3 write
 | Out-of-scope bullets | `## Scope Boundaries` |
 
 The chat-time Trade-offs section dissolves into `## Key Decisions` (the explicit choices acknowledged in chat become documented decisions). The chat-time What's-not-in-scope section dissolves into `## Scope Boundaries`.
+
+Session-settled decisions are the exception to the Stated → Requirements row: each routes to `## Key Decisions` carrying its `session-settled:` annotation — a user-confirmed choice, never softened into an inferred bet or recorded as an assumption. This holds equally when the artifact is written from context without dialogue.
 
 No italic capture-context note (e.g., "Captured at Phase 2.5..."). It would leak engineering process into an artifact whose readers do not need that signal.
 

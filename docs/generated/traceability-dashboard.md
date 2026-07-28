@@ -9,9 +9,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `d63d0011ab2007d8724738b2cb4ece8651385535272053215e100e2b52ffc1b6` |
+| `traceability-matrix.md` | `ea38d6b22f54a67a01f7164734350b14fe8ffa1b3f8c79b093bc08bc28bc9567` |
 | `requirements.md` | `21fcb46b9e4e9e8c56acafbb592213b5acd94d2b24098da365bb117e96d70a13` |
-| `.traceweaver/intent-contract.yml` | `a3e5ab7a05fd173692b0bade4cc7808374614d4d808dbab95bd3968aed624607` |
+| `.traceweaver/intent-contract.yml` | `bc726b0b840cd93f5e3af929a790c993f950957fc70b2422b46b50f92e9072fc` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md` | `c7406e067ddd994077a72fdfdc8dbcb2f9f2dcaec229d170935a540e74637b62` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md` | `6a83c1136739926d7c8cbcb3a45ce41c003683d11468c081c4cef802c3b128ab` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
