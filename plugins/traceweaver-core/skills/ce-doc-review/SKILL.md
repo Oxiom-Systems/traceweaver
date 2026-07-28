@@ -10,6 +10,13 @@ argument-hint: "[mode:headless] [path/to/document.md]"
 
 Review requirements or plan documents through multi-persona analysis. Dispatches generic subagents seeded with skill-local reviewer prompt assets, auto-applies `safe_auto` fixes, and routes remaining findings through a four-option interaction (per-finding walk-through, auto-resolve with best judgment, Append-to-Open-Questions, Report-only) for user decision.
 
+## TraceWeaver Package Boundary
+
+Cross-model document egress is held and machine-refused in the TraceWeaver
+alpha package. Run the selected document lenses only through native in-harness
+subagents. Do not invoke `cross-model-doc-review.sh`; any later cross-model
+dispatch instruction is inactive imported CE provenance.
+
 ## Interactive mode rules
 
 - **Pre-load the platform question tool before any question fires.** In Claude Code, `AskUserQuestion` is a deferred tool — its schema is not available at session start. At the start of Interactive-mode work (before the routing question, per-finding walk-through questions, bulk-preview Proceed/Cancel, and Phase 5 terminal question), call `ToolSearch` with query `select:AskUserQuestion` to load the schema. Load it once, eagerly, at the top of the Interactive flow — do not wait for the first question site. On Codex, Gemini, and Pi this preload is not required.
@@ -17,11 +24,11 @@ Review requirements or plan documents through multi-persona analysis. Dispatches
 
 ## Phase 0: Detect Mode
 
-Check the skill arguments for `mode:headless`. Arguments may contain a document path, `mode:headless`, or both. Tokens starting with `mode:` are flags, not file paths — strip them from the arguments and use the remaining token (if any) as the document path for Phase 1.
+Check the invocation arguments for `mode:headless`. Arguments may contain a document path, `mode:headless`, or both. Tokens starting with `mode:` are flags, not file paths — strip them from the arguments and use the remaining token (if any) as the document path for Phase 1.
 
 If `mode:headless` is present, set **headless mode** for the rest of the workflow.
 
-**Headless mode** changes the interaction model, not the classification boundaries. ce-doc-review still applies the same judgment about which tier each finding belongs in. The only difference is how non-safe_auto findings are delivered:
+**Headless mode** changes the interaction model, not the classification boundaries. Apply the same judgment about which tier each finding belongs in. Only the delivery of non-`safe_auto` findings changes:
 
 - `safe_auto` fixes are applied silently (same as interactive)
 - `gated_auto`, `manual`, and FYI findings are returned as structured text for the caller to handle — no blocking-question prompts, no interactive routing
@@ -29,25 +36,33 @@ If `mode:headless` is present, set **headless mode** for the rest of the workflo
 
 The caller receives findings with their original classifications intact and decides what to do with them.
 
-Callers invoke headless mode by including `mode:headless` in the skill arguments, e.g.:
+**Headless argument contract:** Require `mode:headless <document-path>`, for example `mode:headless docs/plans/my-plan.md`.
 
-```
-Skill("ce-doc-review", "mode:headless docs/plans/my-plan.md")
-```
-
-If `mode:headless` is not present, the skill runs in its default interactive mode with the routing question, walk-through, and bulk-preview behaviors documented in `references/walkthrough.md` and `references/bulk-preview.md`.
+If `mode:headless` is not present, run in default interactive mode with the routing question, walk-through, and bulk-preview behaviors documented in `references/walkthrough.md` and `references/bulk-preview.md`.
 
 ## Phase 1: Get and Analyze Document
 
-**If a document path is provided:** Read it, then proceed.
+**If a document path is provided:** Read it, then proceed. If the Read fails or the file is not on disk, apply the missing-document gate below instead of continuing.
 
 **If no document is specified (interactive mode):** Ask which document to review, or find the most recent in `docs/brainstorms/` or `docs/plans/` using a file-search/glob tool (e.g., Glob in Claude Code).
 
-**If no document is specified (headless mode):** Output "Review failed: headless mode requires a document path. Re-invoke with: Skill(\"ce-doc-review\", \"mode:headless <path>\")" without dispatching agents.
+**If no document is specified (headless mode):** Output "Review failed: headless mode requires a document path. Expected arguments: mode:headless <path>" and stop without dispatching reviewers.
+
+**Missing-document gate — verify before any dispatch.** Persona reviewers read documents from the filesystem, and several run without Bash, so they cannot read git refs — a path that exists only on a branch that is not checked out wastes the entire persona team discovering they cannot proceed (issue #925). Before Phase 2, confirm every resolved document path is readable on disk (the Read above succeeded). Location does not matter: an absolute path outside the checkout (e.g. `/tmp/plan.md`) or a doc in another checkout reviews fine. If any path is not readable, do not dispatch any personas:
+
+- **Interactive mode:** stop and name the missing path(s): "Document(s) not found on disk: <paths>. Check out the branch containing them, use a worktree, or provide corrected readable paths before retrying the review."
+- **Headless mode:** output "Review failed: document(s) not found on disk: <paths>. Expected input: paths to readable files on disk; check out the branch containing them or provide corrected paths." and return without dispatching reviewers.
 
 ### Classify Document Type
 
 Classify the document by reading its **content shape**, not its file path. Path is a tie-breaker hint, not the primary signal — a brainstorm-style doc placed under `docs/plans/` should still classify as `requirements`, and a plan-shaped doc under `docs/brainstorms/` should still classify as `plan`. The reviewers below operate differently depending on this classification, so misclassifying a plan-shaped doc as a requirements doc (or vice versa) produces noisy or under-scrutinized findings.
+
+First check for the unified artifact contract:
+
+- `artifact_contract: ce-unified-plan/v1` plus `artifact_readiness: requirements-only` -> classify as `unified-requirements`. Review the Product Contract only; the absence of Planning Contract, Implementation Units, Verification Contract, or Definition of Done is expected and must not be flagged.
+- `artifact_contract: ce-unified-plan/v1` plus `artifact_readiness: implementation-ready` -> classify as `unified-plan`. Review Product Contract and Planning Contract with different lenses, then review Implementation Units/Verification/DoD for execution completeness.
+- HTML unified artifacts (`.html`) are read/reviewed in report-only mode. Do not apply markdown mutation paths to HTML. If a caller requested mutation/autofix behavior, skip with the existing markdown-only message or return report-only findings.
+- Invalid progress-like readiness values (`active`, `in_progress`, `completed`, `done`) are a document-contract finding, not an execution state to honor.
 
 Use these signals to decide:
 
@@ -59,14 +74,14 @@ Use these signals to decide:
 - No implementation units, no per-unit file lists, no test scenarios attached to units
 
 **`plan` signals (how-to-build documents):**
-- Frontmatter fields like `type: feat|fix|refactor`, `origin: docs/brainstorms/...`
+- Frontmatter fields like `type: feat|fix|refactor`, `origin: docs/brainstorms/...`, or `product_contract_source: ce-brainstorm|ce-plan-bootstrap|legacy-requirements`
 - Section headings such as `Implementation Units`, `Output Structure`, `Key Technical Decisions`, `Risks & Dependencies`, `System-Wide Impact`
 - Numbered identifiers in the form `U1`, `U2` — implementation unit IDs
 - Per-unit fields named `Goal`, `Files`, `Approach`, `Test scenarios`, `Verification`
 - Repo-relative file paths to create/modify/test
 - Prose framing focused on technical decisions, sequencing, and implementer-facing detail
 
-**Tie-breaker rule.** When the content signals are mixed or sparse, fall back to path: `docs/brainstorms/` → `requirements`, `docs/plans/` → `plan`. When neither path location applies, treat the dominant content shape as authoritative; if shape is genuinely ambiguous, default to `requirements` (the more conservative classification — it activates fewer plan-specific feasibility checks).
+**Tie-breaker rule.** When the content signals are mixed or sparse, fall back to path: legacy `docs/brainstorms/` → `requirements`, `docs/plans/` → `plan` unless unified metadata says otherwise. When neither path location applies, treat the dominant content shape as authoritative; if shape is genuinely ambiguous, default to `requirements` (the more conservative classification — it activates fewer plan-specific feasibility checks).
 
 Pass the classification result to each persona via the `{document_type}` slot in the subagent template. Personas read this and adapt their analysis accordingly.
 
@@ -112,11 +127,11 @@ Analyze the document content to determine which conditional personas to activate
 - The document is a **requirements document** with 2+ challengeable claims (problem framing, solution selection, prioritization, predicted outcomes) -- premise scrutiny is core to the brainstorm phase
 - The document touches a **high-stakes domain** -- auth, payments, billing, data migrations, privacy/compliance, external integrations, cryptography -- regardless of doc type or size
 - The document **proposes a new abstraction, framework, or significant architectural pattern** -- regardless of doc type
-- The document is a **plan with no `origin:` requirements doc** (greenfield bootstrap) -- premise wasn't validated upstream
+- The document is a **plan with no validated upstream Product Contract signal** (no legacy `origin:` requirements doc and no `product_contract_source: ce-brainstorm` or `legacy-requirements`) -- premise wasn't validated upstream
 - The document is a **plan that explicitly extends scope** beyond its origin requirements doc (new actors, new flows, deferred-then-restored features)
 - The document contains an **explicit alternatives section** or unresolved tradeoffs -- adversarial helps stress-test the chosen direction
 
-Do NOT activate adversarial on a routine plan document that derives from a validated origin requirements doc, stays within scope, and does not introduce high-stakes domains or new abstractions. The plan's structural decisions (more units, more rationale) are not by themselves adversarial signal -- those are the plan doing its job.
+Do NOT activate adversarial on a routine plan document that derives from a validated upstream Product Contract, stays within scope, and does not introduce high-stakes domains or new abstractions. Validated upstream provenance includes legacy `origin: docs/brainstorms/...`, `product_contract_source: ce-brainstorm`, and `product_contract_source: legacy-requirements`. A direct `product_contract_source: ce-plan-bootstrap` plan is greenfield and does not suppress premise-level techniques by itself. The plan's structural decisions (more units, more rationale) are not by themselves adversarial signal -- those are the plan doing its job.
 
 ## Phase 2: Announce and Dispatch Personas
 
@@ -154,8 +169,8 @@ For each selected reviewer, read the matching skill-local prompt asset at `refer
 **Model tiering lives here, not in prompt assets.** Local prompt files have no frontmatter and carry no model metadata. Apply these dispatch-time preferences when the platform exposes a known model override; otherwise omit the override and inherit the parent model rather than guessing a platform-specific model name:
 
 - `coherence-reviewer`: cheapest capable extraction/reasoning tier.
-- `design-lens-reviewer`, `security-lens-reviewer`, `scope-guardian-reviewer`: platform mid-tier model.
-- `feasibility-reviewer`, `product-lens-reviewer`, `adversarial-document-reviewer`: inherit the parent model unless the harness has an established high-capability review tier.
+- `design-lens-reviewer`, `scope-guardian-reviewer`: platform mid-tier model.
+- `security-lens-reviewer`, `feasibility-reviewer`, `product-lens-reviewer`, `adversarial-document-reviewer`: inherit the parent model unless the harness has an established high-capability review tier.
 
 Each subagent receives the prompt built from the subagent template included below with these variables filled:
 
@@ -163,13 +178,19 @@ Each subagent receives the prompt built from the subagent template included belo
 |----------|-------|
 | `{persona_file}` | Full content of the selected local prompt asset from `references/personas/` |
 | `{schema}` | Content of the findings schema included below |
-| `{document_type}` | "requirements" or "plan" from Phase 1 classification |
+| `{document_type}` | "requirements", "plan", "unified-requirements", or "unified-plan" from Phase 1 classification |
 | `{document_path}` | Path to the document |
-| `{origin_path}` | Value of the document's `origin:` frontmatter field if present, or the literal string `none` if absent. Personas that adapt on origin (product-lens, adversarial, scope-guardian) read this slot to gate technique suppression — they do NOT re-parse frontmatter themselves. Extract this once during Phase 1 reading. |
-| `{document_content}` | Full text of the document |
+| `{origin_path}` | Upstream Product Contract provenance extracted once during Phase 1: prefer the document's `origin:` frontmatter field when present; otherwise use `product_contract_source:<value>` when present; otherwise use `none`. Personas that adapt on origin/provenance (product-lens, adversarial, scope-guardian) read this slot to gate technique suppression — they do NOT re-parse frontmatter themselves. |
+| `{settled_ktds}` | Session-settled decisions extracted once during Phase 1: any Key Technical Decision **or Product Contract Key Decision** entries carrying a `session-settled:` annotation, listed as decision name, class (`user-directed` / `user-approved`), and rejected alternative; or the literal `none` when the document has no such entries. Personas read this slot — they do NOT re-parse the document for it. |
+| `{document_content}` | Reviewer-specific section slice. For unified artifacts, pass metadata, Goal Capsule, and only the relevant slice: product-lens/adversarial/scope reviewers get Product Contract; feasibility/coherence reviewers also get Planning Contract and active Implementation Units/Verification/DoD when `artifact_readiness: implementation-ready`. For legacy documents, pass the full document. |
 | `{decision_primer}` | Cumulative prior-round decisions in the current session, or an empty `<prior-decisions>` block on round 1. See "Decision primer" below. |
 
-Pass each subagent the **full document** — do not split into sections.
+For legacy requirements/plan documents, pass each subagent the **full
+document** — do not split into sections. For unified artifacts, do not pass the
+full artifact to every reviewer by default: unified plans can be large, so
+section slices (per the `{document_content}` slot above) are the default.
+Escalate to a broader slice only when the reviewer needs cross-section
+traceability that the initial slice cannot assess.
 
 ### Decision primer
 
@@ -196,6 +217,8 @@ Round 1 — rejected (M entries):
   Evidence: "{evidence_snippet}"
 - {section}: "{title}" — Acknowledged without applying because {reason or "no suggested_fix — user acknowledged"}
   Evidence: "{evidence_snippet}"
+- {section}: "{title}" — Withdrawn because {triggering decision}
+  Evidence: "{evidence_snippet}"
 
 Round 2 — applied (N entries):
 ...
@@ -204,17 +227,25 @@ Round 2 — applied (N entries):
 
 Each entry carries an `Evidence:` line because synthesis R29 (rejected-finding suppression) and R30 (fix-landed verification) both use an evidence-substring overlap check as part of their matching predicate — without the evidence snippet in the primer, the orchestrator cannot compute the `>50%` overlap test and has to fall back to fingerprint-only matching, which either re-surfaces rejected findings or suppresses too aggressively. The `{evidence_snippet}` is the first evidence quote from the finding, truncated to the first ~120 characters (preserving whole words at the boundary) and with internal quotes escaped. If a finding has multiple evidence entries, use the first one; the rest live in the run artifact and are not needed for the overlap check.
 
-Accumulate across all rounds in the current session. Skip, Defer, and Acknowledge actions all count as "rejected" for suppression purposes — each signals the user decided the finding wasn't worth actioning this round (Acknowledge is the no-fix-guard variant: the user saw a finding with no `suggested_fix`, chose not to defer or skip explicitly, and recorded acknowledgement instead; for round-to-round suppression that is semantically equivalent to Skip). Applied findings stay on the applied list so round-N+1 personas can verify fixes landed (see R30 in `references/synthesis-and-presentation.md`).
+Accumulate across all rounds in the current session. Skip, Defer, and Acknowledge actions all count as "rejected" for suppression purposes — each signals the user decided the finding wasn't worth actioning this round (Acknowledge is the no-fix-guard variant: the user saw a finding with no `suggested_fix`, chose not to defer or skip explicitly, and recorded acknowledgement instead; for round-to-round suppression that is semantically equivalent to Skip). **Withdraw is conditional** (it is the revalidation variant: an earlier decision resolved or contradicted the finding; see "Withdrawing findings the user's earlier answers resolved" in `references/walkthrough.md`): it counts as rejected-class **only when a user decision retired it — a settled premise (Skip/Defer) or a user-asserted fact. An Apply-triggered Withdraw never does** (its resolution depends on the staged edit both landing and semantically resolving the finding, which round N+1 re-synthesis checks — not R29; suppressing it would hide a fix that failed or landed ineffectively). Applied findings stay on the applied list so round-N+1 personas can verify fixes landed (see R30 in `references/synthesis-and-presentation.md`).
 
-Cross-session persistence is out of scope. A new invocation of ce-doc-review on the same document starts with a fresh round 1 and no carried primer, even if prior sessions deferred findings into the document's Open Questions section.
+Cross-session persistence is out of scope. A later review of the same document starts with a fresh round 1 and no carried primer, even if prior sessions deferred findings into the document's Open Questions section.
 
 **Error handling:** If a subagent fails or times out, proceed with findings from subagents that completed. Note the failed reviewer in the Coverage section. Do not block the entire review on a single reviewer failure.
 
 **Dispatch limit:** Even at maximum (7 agents), use bounded parallel dispatch. If the harness cap is lower than the selected team size, queue the remainder and launch them as active reviewers complete.
 
+### Cross-Model Judgment Pass
+
+In the TraceWeaver package, skip this pass and keep every activated judgment
+lens in-process. Record `cross_model_doc_review=held_by_package`. The imported
+route-selection and dispatch material below is inactive provenance.
+
+Launch one detached runner job per activated trio lens plus one `whole-doc` sweep in the same wave as the in-process reviewers, using the exact invocation contract in the reference. Every trio peer receives its twin's same reviewer-specific slice; `whole-doc` receives the full document. All calls use the same sanctioned target/route. Poll, reap, attribute, and clean up through the runner; a failure or timeout remains non-blocking and is named in Coverage. Fold findings into ordinary synthesis, but agreement promotion requires the artifact's top-level `independence_verified: true`; false or absent independence is useful evidence, not different-model corroboration. Feasibility and the convergent lenses (coherence, scope-guardian) do **not** run cross-model.
+
 ## Phases 3-5: Synthesis, Presentation, and Next Action
 
-After all dispatched agents return, read `references/synthesis-and-presentation.md` for the synthesis pipeline (validate, anchor-based gate, dedup, cross-persona agreement promotion, resolve contradictions, auto-promotion, route by three tiers with FYI subsection), `safe_auto` fix application, headless-envelope output, and the handoff to the routing question.
+After all dispatched agents return — **including any cross-model `<reviewer-name>-<provider>.json` returns** — read `references/synthesis-and-presentation.md` for the synthesis pipeline (validate, anchor-based gate, dedup, conditional agreement promotion, resolve contradictions, auto-promotion, route by three tiers with FYI subsection), `safe_auto` fix application, headless-envelope output, and the handoff to the routing question. Peer findings enter ordinary synthesis, but only an artifact with `independence_verified: true` counts as an independent reviewer for promotion.
 
 For the four-option routing question and per-finding walk-through (interactive mode), read `references/walkthrough.md`. For the bulk-action preview used by best-judgment routing, Append-to-Open-Questions, and walk-through `Auto-resolve with best judgment on the rest`, read `references/bulk-preview.md`. Do not load these files before agent dispatch completes.
 

@@ -1,0 +1,13 @@
+{
+  "schema_version": "tw-vv-compact/1",
+  "workflow_profile": "L1",
+  "work_item_id": "TW-RELEASE-0.3.2-CE-3.20.0-SELECTED-REFRESH",
+  "plan_ref": "docs/plans/2026-07-28-traceweaver-core-0.3.2-release-plan.md",
+  "authority_ref": "requirements.md",
+  "traceability_refs": ["TRACE-TW-005", "TRACE-TW-006", "TRACE-TW-009", "TRACE-TW-033", "TRACE-TW-046"],
+  "verification_refs": ["VER-TW-009", "VER-TW-010", "VER-TW-012", "VER-TW-042"],
+  "validation_refs": ["VAL-TW-008", "VAL-TW-011"],
+  "focused_verification": "scripts/traceweaver-audit-ce-closure",
+  "validation_question": "Does TraceWeaver Core 0.3.2 publish the selected CE 3.20.0 compatibility refresh while preserving TraceWeaver authority overlays and every off-host-model-execution, runtime, replacement, upstream-parity, active-host, deployment, and autonomous-publication hold?",
+  "expected_evidence": "Exact CE 3.20.0 provenance and selected inventory, clean closure and publication-control smokes, clean independent review, green PR checks, successful automatic release workflow, and a peeled traceweaver-core--v0.3.2 tag equal to the release merge commit."
+}

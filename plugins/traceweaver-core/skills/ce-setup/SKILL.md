@@ -28,14 +28,11 @@ Before running the script, display:
 Compound Engineering -- checking your environment...
 ```
 
-Run the bundled check script when the skill directory can be resolved:
+Run the bundled check script. Set `SKILL_DIR` to the absolute directory you loaded this `ce-setup` SKILL.md from — the Bash tool's CWD is the user's project, not the skill dir, so a bare `scripts/` path will not resolve:
 
 ```bash
-if [ -n "${CLAUDE_SKILL_DIR}" ] && [ -f "${CLAUDE_SKILL_DIR}/scripts/check-health" ]; then
-  bash "${CLAUDE_SKILL_DIR}/scripts/check-health" --version VERSION
-else
-  echo "Bundled health script is unavailable on this platform; run the inline checks from ce-setup instead."
-fi
+SKILL_DIR="<absolute path of the directory containing this SKILL.md>";
+if [ -f "$SKILL_DIR/scripts/check-health" ]; then bash "$SKILL_DIR/scripts/check-health" --version VERSION; else echo "Bundled health script not found at $SKILL_DIR/scripts/check-health; run the inline checks from ce-setup instead."; fi
 ```
 
 Use the same command without `--version VERSION` if Step 1 could not determine a version.
@@ -52,11 +49,14 @@ Display the diagnostic output to the user. Missing optional tools are not setup 
 
 ### Step 3: Decide Whether Fixes Are Needed
 
+**User-runnable invocation rendering.** In setup summaries, default to `/ce-setup`; use `$ce-setup` only when the active host is Codex or explicitly documents dollar-prefixed skill invocation. Render only the invocation as inline code and output one form only.
+
 Proceed to Phase 2 only if one or more repo-local project issues exist:
 
 - obsolete `compound-engineering.local.md`
 - `.compound-engineering/config.local.yaml` exists but is not safely gitignored
 - `.compound-engineering/config.local.example.yaml` is missing or outdated
+- the health report marks the `ce-work` skill implementation engine unavailable or invalid, detects retired scalar routing keys, or reports malformed dormant `work_engine_preferences`
 
 If no project issues exist, report:
 
@@ -66,7 +66,7 @@ If no project issues exist, report:
 Project config: ✅
 Optional capabilities: see diagnostic report above
 
-Run /ce-setup anytime to re-check.
+Run `<rendered invocation>` anytime to re-check.
 ```
 
 If optional tools are missing, do not offer a bulk install. The diagnostic already printed the relevant install command or project URL. Say: "Install optional tools only for the workflows you use."
@@ -93,7 +93,7 @@ If `.compound-engineering/config.local.yaml` does not exist, ask:
 
 ```text
 Set up a local config file for this project?
-This saves optional Compound Engineering preferences such as output formats, product pulse settings, and Codex delegation defaults.
+This saves optional Compound Engineering preferences such as output formats and product pulse settings.
 Everything starts commented out -- you only enable what you need.
 
 1. Yes, create it
@@ -101,6 +101,10 @@ Everything starts commented out -- you only enable what you need.
 ```
 
 If the user approves, copy `references/config-template.yaml` to `<repo-root>/.compound-engineering/config.local.yaml`.
+
+### Step 6a: Repair Invalid CE Work Preferences
+
+When the health report marks the CE Work implementation engine unavailable or invalid, detects retired scalar routing keys, or reports malformed dormant `work_engine_preferences`, do not guess the intended recipients. Explain the exact reported problem, derive a valid ordered `work_engine_preferences` block from the user's stated harness/model order (or remove malformed dormant preferences and use `work_engine_mode: off` when they want native-by-default), remove any retired scalar routing keys, and show the complete replacement block. Edit only those CE Work keys after the user approves the preview; preserve every unrelated local setting. Re-run the health check and require it to report either native or the intended normalized ordered list before setup is complete.
 
 ### Step 7: Ensure Local Config Is Gitignored
 
@@ -123,5 +127,5 @@ Fixed:     <repo-local fixes applied, or none>
 Skipped:   <repo-local fixes declined, or none>
 Optional:  <missing optional tools, or all available>
 
-Run /ce-setup anytime to re-check.
+Run `<rendered invocation>` anytime to re-check.
 ```

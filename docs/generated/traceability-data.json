@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "d63d0011ab2007d8724738b2cb4ece8651385535272053215e100e2b52ffc1b6"
+      "sha256": "ea38d6b22f54a67a01f7164734350b14fe8ffa1b3f8c79b093bc08bc28bc9567"
     },
     {
       "path": "requirements.md",
@@ -14,7 +14,7 @@
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "a3e5ab7a05fd173692b0bade4cc7808374614d4d808dbab95bd3968aed624607"
+      "sha256": "bc726b0b840cd93f5e3af929a790c993f950957fc70b2422b46b50f92e9072fc"
     },
     {
       "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md",
@@ -1476,8 +1476,8 @@
       "artifact": "ART-TW-010; ART-TW-011; ART-TW-013",
       "verification": "VER-TW-009; VER-TW-010",
       "validation": "VAL-TW-007; VAL-TW-009",
-      "status": "Static provenance and selected-file closure accepted for refreshed selected CE 3.14.3 surface with `ce-sessions` held",
-      "next_step": "Runtime, release, upstream-ready, package-ready, clean replacement, and publication claims remain held by review/U9/R31 gates."
+      "status": "Static provenance and selected-file closure accepted for refreshed selected CE 3.20.0 surface with `ce-sessions` held at the prior reviewed CE 3.12.0 surface",
+      "next_step": "Runtime, upstream-ready, package-ready, clean replacement, and publication beyond the exact controlled TraceWeaver Core 0.3.2 route remain held."
     },
     {
       "id": "TRACE-TW-006",
@@ -2900,9 +2900,9 @@
       "Procedure / Command": "Record CE source pin or accepted local-cache-only limitation.",
       "Tested Ref": "CE source inventory",
       "Result": "Pass for source-pinned static materialization",
-      "Evidence Path": "`docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `.traceweaver/trace-records/2026-06-24-ce-3.14.3-selected-refresh-hold-sessions.yml`",
-      "Date / Session": "2026-06-24",
-      "Notes": "Source repository, version, tag, commit `e176a6db46b3de9c4e724a3ab5d7dd1d0bf60a33`, license, 527 source tree entries, 526 regular-file aggregate fingerprint `eaea83aa1ba3c5cdc43f6710a595b038d9193ad841ba59441230c1c61dab9994`, selected 151 packaged skill/support file hashes, and `ce-sessions` hold are recorded."
+      "Evidence Path": "`docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `.traceweaver/trace-records/2026-07-28-ce-3.20.0-selected-refresh-and-0.3.2-release.yml`",
+      "Date / Session": "2026-07-28",
+      "Notes": "Source repository, version, tag, commit `5c7cb347d0686663743b87cd7227246ba24f7fa7`, license, 735 source tree entries, 732 regular-file aggregate fingerprint `a8a6a89112106021edd7bd77d02f6048ba39c808f17579ac9d55a784c2d3aaa8`, selected 196 packaged CE skill/support file hashes, 43 legacy agent files, and the `ce-sessions` hold are recorded."
     },
     {
       "ID": "VER-TW-010",
@@ -2911,9 +2911,9 @@
       "Procedure / Command": "Parse selected CE `SKILL.md` references/scripts/assets and confirm installed path/hash closure.",
       "Tested Ref": "selected CE skills",
       "Result": "Pass for static closure",
-      "Evidence Path": "`docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `.traceweaver/trace-records/2026-06-24-ce-3.14.3-selected-refresh-hold-sessions.yml`",
-      "Date / Session": "2026-06-24",
-      "Notes": "`ruby scripts/traceweaver-audit-ce-closure` passed with `skill_entrypoints=18`, `selected_ce_files_scanned=149`, `support_references_checked=90`, `missing=none`, and `untracked=none`."
+      "Evidence Path": "`docs/validation/traceweaver-core-11-ce-runtime-inventory.md`; `plugins/traceweaver-core/references/ce-upstream-source-inventory.md`; `.traceweaver/trace-records/2026-07-28-ce-3.20.0-selected-refresh-and-0.3.2-release.yml`",
+      "Date / Session": "2026-07-28",
+      "Notes": "`ruby scripts/traceweaver-audit-ce-closure` passed with `skill_entrypoints=19`, `selected_ce_files_scanned=198`, `support_references_checked=119`, `missing=none`, and `untracked=none`."
     },
     {
       "ID": "VER-TW-011",

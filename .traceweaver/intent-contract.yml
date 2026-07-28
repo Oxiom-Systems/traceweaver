@@ -2419,8 +2419,67 @@ req_tw_089_090_optional_graphify_wrapper_authority:
     - measured time or token savings
     - deployment, dogfood, future release, or internal graph-mirror readiness
 
+ce_3_20_0_selected_refresh_and_0_3_2_release_authority:
+  decision_id: TW-OWNER-DECISION-2026-07-28-CE-3.20.0-REFRESH-RELEASE-001
+  owner: Oxiom Systems
+  decision_source: explicit owner instruction on 2026-07-28 to check upstream, fold in the update, release a tag, and merge
+  status: selected_static_advisory_refresh_authorized_exact_0_3_2_publication_authorized_through_controlled_route
+  baseline_ref: f9c405816ea088716d282d1b906e7d57065a6dec
+  upstream_repository: https://github.com/EveryInc/compound-engineering-plugin
+  upstream_tag: compound-engineering-v3.20.0
+  upstream_commit: 5c7cb347d0686663743b87cd7227246ba24f7fa7
+  exact_release_authority: TraceWeaver Core 0.3.2 only
+  requirements:
+    - REQ-TW-017
+    - REQ-TW-018
+    - REQ-TW-020
+    - REQ-TW-021
+    - REQ-TW-043
+    - REQ-TW-052
+    - REQ-TW-053
+    - REQ-TW-059
+  trace_ids:
+    - TRACE-TW-005
+    - TRACE-TW-006
+    - TRACE-TW-009
+    - TRACE-TW-033
+    - TRACE-TW-046
+  verification_ids:
+    - VER-TW-009
+    - VER-TW-010
+    - VER-TW-012
+    - VER-TW-042
+  validation_ids:
+    - VAL-TW-008
+    - VAL-TW-011
+  allowed_scope:
+    - refresh the 17 already selected CE-derived component directories from released CE 3.14.3 to released CE 3.20.0
+    - preserve reviewed TraceWeaver authority, traceability, wrapper-routing, and publication-control overlays
+    - retain held ce-sessions and the TraceWeaver-owned lfg alias
+    - retain CE 3.20.0 off-host code and document review, plan and brainstorm elevation, and cross-model unit-workspace files only as inactive provenance behind machine refusals
+    - bump five release manifests and active release guidance to TraceWeaver Core 0.3.2
+    - create an exact reviewed PR, merge it after green checks under a separate merge-only capsule, and verify the automatic traceweaver-core--v0.3.2 tag and GitHub Release
+  must_not_change:
+    - no newly introduced upstream top-level skill becomes selected or user-facing without separate authority and review
+    - no direct CE publication route or weakening of TraceWeaver publication controls
+    - no off-host CE model egress, external unit dispatch, transport ref, or integration path becomes active
+    - no force push, unreviewed mutation, stale capsule, or merge before live check and review gates pass
+    - no future release authority beyond exact TraceWeaver Core 0.3.2
+  validation_question: Can users receive the selected CE 3.20.0 compatibility refresh through TraceWeaver Core 0.3.2 while the TraceWeaver authority model and every unsupported off-host-model-execution, runtime, replacement, parity, host-currentness, deployment, dogfood, and autonomous-publication claim remain held?
+  held_claims:
+    - clean CE replacement or full upstream parity
+    - ce-sessions currentness with CE 3.20.0
+    - packaging or wrapping newly introduced upstream-only skills
+    - off-host CE model execution, including code and document peer review, plan and brainstorm elevation, and cross-model unit-workspace implementation
+    - runtime-equivalent CE behavior or active-host currentness
+    - dynamic discovery, enforcing mode, or slash-command behavior
+    - autonomous publication
+    - deployment, dogfood, productivity improvement, or future release authority
+
 next_recommended_steps:
-  - Complete TraceWeaver Core 0.2.8 gated-publication implementation, review, release, reinstall, and Vestro dogfood under `TW-OWNER-DECISION-2026-07-13-GATED-PUBLICATION-001`.
+  - Close the exact-tree reviews for the selected CE 3.20.0 refresh, then publish the exact TraceWeaver Core 0.3.2 branch and PR under a single-use publication capsule.
+  - After green live PR checks, issue a separate merge-only capsule, merge the exact reviewed head, and verify the automatic traceweaver-core--v0.3.2 tag and GitHub Release against the merge commit.
+  - Keep runtime-equivalence, clean replacement, ce-sessions 3.20.0 currentness, upstream-only skill packaging, active-host currentness, deployment, dogfood, productivity, and future release claims held.
   - Run `/tw-auto continue to the full tw-auto runtime-driver proof` while keeping full driver invocation, publication, release/package, clean replacement, Vestro/R31, unconstrained-host, and CE body-edit claims held unless separately proven.
   - Keep REQ-TW-064 runtime invocation, publication, Vestro/R31 dogfood, release/package/upstream readiness, clean replacement, unconstrained-host support, and CE body edit claims held until their own proof gates pass; active-host filesystem/hash currentness has passed and this scoped status/hash doc review is recorded as `TW-DOC-REVIEW-2026-05-18-REQ-TW-064-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`.
   - Treat the runtime trace-record decision-binding harness patch as reviewed after `TW-CODE-REVIEW-2026-05-18-TW-AUTO-RUNTIME-TRACE-RECORD-DECISION-BINDING-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-18-TW-AUTO-RUNTIME-TRACE-RECORD-DECISION-BINDING-STATUS-HASH-CLEAN-001` and full runtime-driver behavior remains held.

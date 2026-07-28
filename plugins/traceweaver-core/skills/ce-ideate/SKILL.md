@@ -12,7 +12,7 @@ argument-hint: "[feature, focus area, or constraint] [output:md]"
 `ce-ideate` precedes `ce-brainstorm`.
 
 - `ce-ideate` answers: "What are the strongest ideas worth exploring?"
-- `ce-brainstorm` answers: "What exactly should one chosen idea mean?"
+- `ce-brainstorm` answers: "What exactly should one chosen idea mean?" and writes a requirements-only unified plan under `docs/plans/`.
 - `ce-plan` answers: "How should it be built?"
 
 This workflow produces a ranked ideation artifact — written to `docs/ideation/` when present, else a CE temp path (see Phase 4). It does **not** produce requirements, plans, or code.
@@ -25,7 +25,7 @@ Ask one question at a time. Prefer concise single-select choices when natural op
 
 ## Focus Hint
 
-<focus_hint> #$ARGUMENTS </focus_hint>
+The **focus hint** is any optional context this skill was invoked with — present in the current prompt or conversation, whether the user gave it directly or a calling skill passed it. The rest of this skill refers to it as `{focus_hint}` (empty if none was given).
 
 Interpret any provided argument as optional context. It may be:
 
@@ -63,29 +63,27 @@ When the subject, mode, and format are already clear from the prompt, resolve th
 
 #### 0.0 Resolve Output Mode
 
-Determine `OUTPUT_FORMAT` for the ideation artifact this run might persist. Output mode is **exclusive** — the ideation doc is written as either HTML (`.html`) OR markdown (`.md`), never both. Precedence: CLI arg > config > default (`html`), with a hard pipeline-mode override.
+Determine `OUTPUT_FORMAT` for the ideation artifact this run might persist. Output mode is **exclusive** — the ideation doc is written as either HTML (`.html`) OR markdown (`.md`), never both. Precedence: in-prompt request > user-stated preference > config > default (`html`), with a hard pipeline-mode override.
 
 Unlike `ce-plan` and `ce-brainstorm` (which default to `md`), ce-ideate defaults to **`html`** — ideation artifacts are read mainly by humans weighing candidate directions, and a rich self-contained HTML file (with illustrative diagrams for the top candidates) makes the ideas easier to approach.
 
-**Read config.** The repo root is pre-resolved at skill load:
-!`git rev-parse --show-toplevel 2>/dev/null || true`
-
-If the line above is an absolute path, use it as `<repo-root>`. If it is empty or still shows a backtick command string (a non-Claude harness that did not run the pre-resolution), resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.compound-engineering/config.local.yaml` with the native file-read tool. If the root cannot be resolved (not a git repo) or the file does not exist, fall through to the defaults below.
+**Read config.** Resolve `<repo-root>` at runtime by running `git rev-parse --show-toplevel` with the shell tool. Then read `<repo-root>/.compound-engineering/config.local.yaml` with the native file-read tool. If the root cannot be resolved (not a git repo) or the file does not exist, fall through to the defaults below.
 
 Resolution steps:
 
-1. **CLI arg.** Scan `$ARGUMENTS` for a token starting with the literal prefix `output:`. If found, strip it from arguments before treating the remainder as the focus hint, and match its value case-insensitively against `md` and `html`.
+1. **In-prompt request.** Reason over the user's prompt for this run for a request about *this document's* output format, expressed either as the `output:` shorthand or in plain language ("give me this as markdown", "I want a webpage"). On an explicit format, match it case-insensitively to `md`/`html`, and ignore the `output:` shorthand token when reading the rest of the prompt as the focus hint. Distinguish a request about the document's format from a format named as subject matter: "ideate on an HTML export feature" is the work, not a doc-format request — do not switch on it.
    - `output:` alone (no value) → no-op, fall through to step 2.
-   - `output:<unknown>` (e.g., `output:pdf`) → drop the token, fall through to step 2, and remember to emit a one-line note above the post-ideation menu after final resolution: `Ignored unknown output: value '<value>' — using <resolved_format> instead.` where `<resolved_format>` is the value `OUTPUT_FORMAT` actually resolved to after steps 2-4. Do not hardcode a format in the note — that misleads users when config or the default differs from what you assume.
-2. **Config.** If step 1 did not resolve and the config file read above has an **active (non-commented)** `ideate_output:` key whose value matches `md` or `html` (case-insensitive), use it. Missing, invalid, or commented values fall through silently. Critical: lines starting with `#` are YAML comments and must be ignored — the shipped config template includes a commented example like `# ideate_output: md` to document the option, and matching that as an active setting would silently override the default on every run without the user having opted in.
-3. **Default.** Otherwise `OUTPUT_FORMAT=html`.
-4. **Pipeline override.** When invoked from any pipeline or `disable-model-invocation` context, force `OUTPUT_FORMAT=md` regardless of steps 1-3 — automated downstream consumers parse markdown reliably and HTML in pipeline runs is unnecessary friction.
+   - `output:<unknown>` (e.g., `output:pdf`) → drop the token, fall through to step 2, and remember to emit a one-line note above the post-ideation menu after final resolution: `Ignored unknown output: value '<value>' — using <resolved_format> instead.` where `<resolved_format>` is the value `OUTPUT_FORMAT` actually resolved to after the remaining precedence steps. Do not hardcode a format in the note — that misleads users when config or the default differs from what you assume.
+2. **User-stated preference.** If this prompt holds no format request, honor an output-format preference (markdown vs HTML) the user established earlier — earlier in this session, in your memory, or written into their active instructions — that is already in your context (match `md`/`html` case-insensitively). A remembered preference is more current than the rarely-edited config, so it **overrides** the config in step 3. Do not open or search instruction files to find it — act only on a preference already present in your context; if none is, fall through to the config.
+3. **Config.** If steps 1-2 did not resolve and the config file read above has an **active (non-commented)** `ideate_output:` key whose value matches `md` or `html` (case-insensitive), use it. Missing, invalid, or commented values fall through silently. Critical: lines starting with `#` are YAML comments and must be ignored — the shipped config template includes a commented example like `# ideate_output: md` to document the option, and matching that as an active setting would silently override the default on every run without the user having opted in.
+4. **Default.** Otherwise `OUTPUT_FORMAT=html`.
+5. **Pipeline override.** When invoked from any pipeline or `disable-model-invocation` context, force `OUTPUT_FORMAT=md` regardless of steps 1-4 — automated downstream consumers parse markdown reliably and HTML in pipeline runs is unnecessary friction.
 
 **Token-parsing convention:** only literal-prefix flag tokens (`output:`, `mode:` where applicable) are consumed and stripped. Other `<word>:<word>` tokens — including conventional commit prefixes like `feat:`, `fix:`, `chore:` that may appear inside a focus hint — pass through verbatim.
 
 **Defer loading the format-rendering reference.** The deliverable is written at Phase 4 (after generation), so `references/ideation-sections.md` and the format-rendering references (`markdown-rendering.md` / `html-rendering.md`) are only needed then — loading them at Phase 0.0 would carry them through the entire grounding and ideation dispatch for no benefit. Resolve `OUTPUT_FORMAT` now, but load the section contract and the matching rendering reference at write time (see `references/post-ideation-workflow.md` §4.1).
 
-The `output:` preference does NOT auto-propagate to `ce-brainstorm` on handoff (Phase 5) — ce-brainstorm re-resolves its own `brainstorm_output` config independently. Asymmetric output (`ideation.html` + `requirements.md`) is acceptable; users who want HTML for both set both keys in `.compound-engineering/config.local.yaml`.
+The `output:` preference does NOT auto-propagate to `ce-brainstorm` on handoff (Phase 5) — ce-brainstorm re-resolves its own `brainstorm_output` config independently. Asymmetric output (`ideation.html` + unified-plan markdown) is acceptable; users who want HTML for both set both keys in `.compound-engineering/config.local.yaml`.
 
 #### 0.1 Check for Recent Ideation Work
 
@@ -120,11 +118,11 @@ Before classifying mode or dispatching any grounding, check whether the subject 
 - Questions exist only to supply what sub-agents need to operate: an identifiable subject (this phase) and enough context for the agent to say something specific about it (0.4, elsewhere modes only). Nothing else.
 - Never ask about solution direction, constraints, audience, tone, success criteria, or anything that characterizes the subject — those belong to `ce-brainstorm`.
 - Always keep "Surprise me" (letting the agent decide the focus) as a real option, not a fallback for when the user can't name a subject. Ideation is allowed to be greenfield by design.
-- Stop as soon as the subject is identifiable or the user has delegated to "Surprise me." More than 3 total questions across 0.2 and 0.4 is a smell that ideation is not the right workflow — consider suggesting `ce-brainstorm`.
+- Stop as soon as the subject is identifiable or the user has delegated to "Surprise me." More than 3 total questions across 0.2, 0.3 (mode confirmation), 0.4, and the Phase 1 issue-scoping gate is a smell that ideation is not the right workflow — consider suggesting `ce-brainstorm`.
 
 **Detection — issue-tracker intent (repo mode only; subject-identifying).**
 
-Issue-tracker intent requires an explicit reference to the tracker or to reports filed in it. Trigger only when the prompt uses phrases like `github issues`, `open issues`, `issue patterns`, `issue themes`, `what users are reporting`, or `bug reports` — the subject is "issues in the tracker." Proceed to 0.3 with issue-tracker intent flagged.
+Issue-tracker intent requires an explicit reference to the tracker or to reports filed in it. Trigger only when the prompt uses phrases like `open issues`, `issue patterns`, `issue themes`, `what users are reporting`, `bug reports`, or a named tracker (`github issues`, `linear issues`, `jira tickets`) — the subject is "issues in the tracker." The lens works against whichever tracker is reachable (GitHub, Linear, Jira); do not require GitHub. Proceed to 0.3 with issue-tracker intent flagged.
 
 Do NOT trigger on arguments that merely mention bugs as a focus: `bug in auth`, `fix the login issue`, `the signup bug`, `top 3 bugs in authentication` — these are focus hints on regular ideation, not requests to analyze the issue tracker. A bare `bugs` with no tracker phrasing is handled by the vagueness check below, not here.
 
@@ -227,13 +225,13 @@ Use reasonable interpretation rather than formal parsing.
 
 #### 0.6 Cost Transparency Notice
 
-Before dispatching Phase 1, surface the agent count and cost shape for the inferred mode in one short line so multi-agent cost is not invisible. Compute the count from the actual dispatch decision: 1 grounding-context agent (codebase scan in repo mode; user-context synthesis in elsewhere) + 1 learnings (skip in elsewhere-non-software) + 1 web researcher + evidence scouts (repo mode only, one per Phase 1.5 axis, max 5, extraction tier) + user-research distillers (one per user-supplied research artifact needing distillation, extraction tier, all modes) + the ideation fleet (5 agents default: 3 generation-tier + 2 ceiling-tier; 6 all-ceiling in surprise-me or `go deep`; 4 in issue-tracker mode) + 1 basis verifier (generation tier). When issue-tracker intent triggers (repo mode only): add 1 for the issue-intelligence agent. Add 1 if the user opted into Slack research. Subtract 1 if the user issued a web-research skip phrase or V15 reuse will fire. In **surprise-me mode**, note "(surprise-me mode: deeper exploration per agent)". Phase 2's axis-coverage check may dispatch up to 2 additional recovery sub-agents when generation leaves any topic axis empty (skipped in surprise-me mode); when not in surprise-me, append "(+up to 2 if axis-coverage requires recovery)" to the count line.
+Before dispatching Phase 1, surface the agent count and cost shape for the inferred mode in one short line so multi-agent cost is not invisible. Compute the count from the actual dispatch decision: 1 grounding-context agent (codebase scan in repo mode; user-context synthesis in elsewhere) + 1 learnings (skip in elsewhere-non-software) + 1 web researcher + evidence scouts (repo mode only, one per Phase 1.5 axis, max 5, extraction tier) + user-research distillers (one per user-supplied research artifact needing distillation, extraction tier, all modes) + the ideation fleet (5 agents default: 3 generation-tier + 2 ceiling-tier; 6 all-ceiling in surprise-me or `go deep`; 4 in issue-tracker mode) + 1 basis verifier (generation tier). When issue-tracker intent triggers (repo mode only): add 2 for the issue-intelligence scan and cluster calls (the scan runs before the ideation fleet; the cluster call may add one scoping question). Add 1 if the user opted into Slack research. Subtract 1 if the user issued a web-research skip phrase or V15 reuse will fire. In **surprise-me mode**, note "(surprise-me mode: deeper exploration per agent)". Phase 2's axis-coverage check may dispatch up to 2 additional recovery sub-agents when generation leaves any topic axis empty (skipped in surprise-me mode); when not in surprise-me, append "(+up to 2 if axis-coverage requires recovery)" to the count line.
 
 Examples (defaults, no skips, no opt-ins):
 
 - **Repo mode, specified subject:** "Will dispatch ~13 agents, most on cheap tiers: codebase scan + learnings + web research + up to 5 evidence scouts (cheap) + 5 ideation (3 mid-tier, 2 top-tier) + 1 basis verifier (mid-tier). Skip phrases: 'no external research', 'no slack'."
 - **Repo mode, surprise-me:** "Will dispatch ~10 agents (surprise-me mode: deeper exploration per agent): codebase scan + learnings + web research + 6 ideation (top-tier) + 1 basis verifier. Skip phrases: 'no external research', 'no slack'."
-- **Repo mode, issue-tracker intent:** "Will dispatch ~13 agents: codebase scan + learnings + web research + issue intelligence + up to 5 evidence scouts + 4 ideation + 1 basis verifier. Skip phrases: 'no external research', 'no slack'." Reflects the successful-theme path; if issue intelligence returns insufficient signal (see Phase 1), ideation falls back to the default 5-agent fleet.
+- **Repo mode, issue-tracker intent:** "Will dispatch ~14 agents: codebase scan + learnings + web research + issue intelligence (scan + cluster) + up to 5 evidence scouts + 4 ideation + 1 basis verifier. Skip phrases: 'no external research', 'no slack'." Reflects the successful-theme path; if the issue scan returns insufficient signal (see Phase 1), the cluster call is skipped and ideation falls back to the default 5-agent fleet.
 - **Elsewhere-software:** "Will dispatch ~9 agents: context synthesis + learnings + web research + 5 ideation + 1 basis verifier. Skip phrases: 'no external research'."
 - **Elsewhere-non-software:** "Will dispatch ~8 agents: context synthesis + web research + 5 ideation + 1 basis verifier. Skip phrases: 'no external research'."
 
@@ -265,26 +263,25 @@ Run grounding agents in parallel in the **foreground** (do not background — re
 
 **Repo mode dispatch:**
 
+Use the project's active instructions already in context. Send the codebase scan directly to focus-specific current patterns, pain points, and leverage points. If the focus cannot be scoped from the supplied context, allow one targeted root or workspace probe.
+
 1. **Quick context scan** — dispatch a general-purpose subagent using the platform's cheapest capable model when the harness exposes a known override; otherwise inherit. Before dispatching, apply the routing test from "User-Supplied Research Artifacts" below to any root-level `*.md` file the focus hint names: research artifacts (evidence) take that subsection's distillation path, so list them on the prompt's research-artifacts line to keep the scan from duplicating them into `User-named references`. Dispatch with this prompt:
 
-   > Read the project's root agent-instruction file for this harness (e.g., `AGENTS.md`, `CLAUDE.md`, `GEMINI.md`, or `.cursor/rules`) and `README.md` when present, then discover the top-level directory layout using the native file-search/glob tool (e.g., `Glob` with pattern `*` or `*/*` in Claude Code). Also read `STRATEGY.md` if it exists — it captures the product's target problem, approach, persona, metrics, and tracks.
+   > **Grounding scope:** use the supplied project context and go directly to current patterns bearing on the focus, pain points, leverage points, applicable workflow constraints, and in surprise-me mode representative files plus recent activity. If the focus cannot be scoped, use one targeted root or workspace probe.
    >
-   > **Two paths for other root-level `*.md` files**, depending on whether the focus hint names them:
+   > Start with the files and areas named by the focus or caller context. Read the applicable current project instructions when operational rules affect the scan, `STRATEGY.md` when product alignment matters, and `CONCEPTS.md` when canonical vocabulary matters.
    >
-   > - **User-named references** — if the focus hint names a specific root-level `*.md` file (e.g., focus is "ideate based on FEEDBACK.md", "use NOTES.md as input", "review the gaps in TODO.md"), fully read that file and include its content under a heading `User-named references`. Phase 2 treats these as *constraint*, so sub-agents need actual content, not a gist. Quote or summarize substantive sections; keep one-line gists for files that are mentioned but not the actual subject. Exception: skip this path for any file listed on the research-artifacts line below — a separate agent distills those; give each only a one-line gist under `Additional context`.
-   > - **Additional context** — for any other root-level `*.md` files (not named in the focus), read briefly and include a one-line gist under a heading `Additional context`. Phase 2 treats these as *background*, so a gist is sufficient.
+   > If the focus names a root-level `*.md` file, read it and include its relevant content under `User-named references`. When that file is listed on the research-artifacts line below, leave its full distillation to the research agent and include only a one-line gist here.
    >
    > Return a concise summary (under 40 lines, longer if user-named references include substantive content) covering:
    >
-   > - project shape (language, framework, top-level directory layout)
-   > - notable patterns or conventions
-   > - obvious pain points or gaps
-   > - likely leverage points for improvement
-   > - product strategy summary, if `STRATEGY.md` was present — include the approach and active tracks verbatim so ideation can weight toward strategy-aligned directions
+   > - current patterns and conventions relevant to the focus
+   > - pain points or gaps relevant to the focus
+   > - likely leverage points
+   > - relevant product strategy, if `STRATEGY.md` was read
    > - `User-named references` section (when the focus hint named root-level `*.md` files)
-   > - `Additional context` section (when other root-level `*.md` files exist that the focus did not name)
    >
-   > Keep the scan shallow otherwise — read only top-level documentation and directory structure. Do not analyze GitHub issues, templates, or contribution guidelines. Do not do deep code search.
+   > Keep the scan shallow. Do not analyze unrelated issues, templates, contribution guidelines, or code.
    >
    > Focus hint: {focus_hint}
    >
@@ -294,11 +291,16 @@ Run grounding agents in parallel in the **foreground** (do not background — re
 
 3. **Web research** (always-on; see "Web research" subsection below for skip-phrase and V15 cache handling).
 
-4. **Issue intelligence** (conditional) — if issue-tracker intent was detected in Phase 0.3, read `references/agents/issue-intelligence-analyst.md` and dispatch a generic subagent seeded with that local prompt plus the focus hint. Run in parallel with the other subagents.
+4. **Issue intelligence** (conditional, orchestrator-gated two-call protocol) — if issue-tracker intent was detected in Phase 0.3, run the issue lens as below. Unlike the other grounding agents this one is **not** fire-and-forget parallel: it may need a scoping question, and a subagent cannot block for user input, so you (the orchestrator) own the question between the analyst's two calls.
 
-   If the agent returns an error (gh not installed, no remote, auth failure), log a warning to the user ("Issue analysis unavailable: {reason}. Proceeding with standard ideation.") and continue with the remaining grounding.
+   **a. Scan call.** Read `references/agents/issue-intelligence-analyst.md` and dispatch a generic subagent seeded with that prompt, the focus hint, the `<scratch-dir>` from earlier in Phase 1, and the instruction that it is in **SCAN mode**. It probes tracker access (GitHub / Linear / Jira by capability, not by assuming a binary), does one bounded fetch, persists that fetched set to `<scratch-dir>/issue-scan.json`, and returns the distribution, a signal count, and an ambiguity assessment — it does **not** cluster.
 
-   If the agent reports fewer than 5 total issues, note "Insufficient issue signal for theme analysis" and proceed with default ideation frames in Phase 2.
+   - If its **first line is the `Issue analysis unavailable:` marker** (no reachable tracker), log a warning ("{that message}. Proceeding with standard ideation.") and continue with the remaining grounding — no cluster call.
+   - If it reports fewer than 5 eligible issues, note "Insufficient issue signal for theme analysis" and proceed with default ideation frames in Phase 2 — no scoping question, no cluster call.
+
+   **b. Scoping gate (you decide; ask at most one question).** Read the scan's ambiguity assessment. Auto-scope **silently** by default — compose the scope from focus hint → priority (when populated) → workflow-state → recency. Fire **one** blocking scoping question (per Interaction Method) **only** when the scan reports irreducible ambiguity: two or more coherent, materially-different scopes that no single deliberately-varied sample could fairly represent. Its options are the scan's distribution-derived slices plus an always-present "analyze a representative sample of everything," so the user can decline to narrow. When the slices plus that representative-sample option would exceed the platform's blocking-tool option cap (e.g., Codex `request_user_input`'s 2-3 explicit options, vs `AskUserQuestion`'s 4), show the highest-mass slices that fit and fold the rest into the representative-sample option, or fall back to a numbered chat list per Interaction Method — never drop the representative-sample option. This is a **grounding / subject-scoping** question — the same kind as the Phase 0.2 subject gate ("what should the agent work on") — **not** a Phase 0.4 solution-constraint question; it counts toward the ≤3-question grain, and "Surprise me" stays available. Skip it entirely when the scan is unambiguous.
+
+   **c. Cluster call.** Dispatch the analyst again in **CLUSTER mode**, passing the resolved scope **and the same `<scratch-dir>`** so it reuses the scan's persisted `issue-scan.json` rather than re-fetching. It returns the leverage-ranked themes plus coverage accounting. The scan call can run alongside the other grounding agents, but this cluster call — and the consolidation and Phase 1.5 that depend on its themes — must **await** it: do not treat the issue lens as fire-and-forget, and do not close consolidation before the cluster result lands.
 
 **Elsewhere mode dispatch (skip the codebase scan; user-supplied context is the primary grounding):**
 
@@ -347,7 +349,7 @@ Consolidate all dispatched results into a short grounding summary using these se
 - **User-named references** *(repo mode, when the focus hint named root-level `*.md` files)* — full content from directive files the user explicitly named in their prompt or focus (research artifacts route through `User-supplied research` instead). Phase 2 treats these as constraint
 - **Additional context** *(repo mode, when other root-level markdown was discovered but not named)* — one-line gists per file. Phase 2 treats these as background, not direction
 - **Past learnings** — relevant institutional knowledge from `docs/solutions/`
-- **Issue intelligence** *(when present, repo mode only)* — theme summaries with titles, descriptions, issue counts, and trend directions
+- **Issue intelligence** *(when present, repo mode only)* — theme summaries with titles, descriptions, issue counts, leverage, and trend directions, **plus the cluster call's coverage accounting** (fetched / eligible / analyzed / excluded / unknown-remainder, with any `>N` lower bound) so the non-exhaustive-coverage disclosure reaches Phase 2 ideation and the Phase 4 artifact rather than being dropped here
 - **External context** *(when web research ran)* — prior art, adjacent solutions, market signals, cross-domain analogies. Note "(reused from earlier dispatch)" when V15 reuse fired
 - **User-supplied research** *(when the user provided research artifacts)* — dossier gists with paths, or inline content for small artifacts; kept distinct from External context so source provenance stays visible
 - **Slack context** *(when present)* — organizational context
@@ -397,4 +399,4 @@ Generate the full candidate list before critiquing any idea.
 
 Read `references/divergent-ideation.md` now — before building any ideation dispatch prompt. This load is non-optional. The file contains the fleet tiering and dispatch counts, the dispatch payload structure, the ambition charter (included verbatim in every dispatch), the six ideation frames, the per-idea output contract, the generation rules, the issue-tracker and surprise-me variants, and the post-merge synthesis and checkpoint steps — none of which appear in this main body. Dispatch prompts cannot be correctly constructed without it, and improvising them from memory produces unverifiable candidates — the precise failure this skill exists to prevent. The fleet counts in Phase 0.6 are cost transparency, not the dispatch spec. "Quickly" means smaller volume targets, not skipping the reference.
 
-After the merge, synthesis, and axis-coverage steps in that reference complete — and before writing and presenting the deliverable — load `references/post-ideation-workflow.md`. This load is non-optional. The file contains the adversarial filtering rubric, the auto-write + concise-summary flow (Phase 4), the artifact section contract, the quality bar, and the canonical Phase 5 next-steps menu (Open, Brainstorm one idea, Iterate on one idea, Done) — these details do not appear anywhere in this main body. Skipping the load silently degrades every subsequent step; the agent improvises the flow and menu from memory instead of following the documented ones. "Quickly" means fewer Phase 2 sub-agents, not skipping references. Do not load this file before Phase 2 agent dispatch completes.
+After the merge, synthesis, and axis-coverage steps in that reference complete — and before writing and presenting the deliverable — load `references/post-ideation-workflow.md`. This load is non-optional. The file contains the adversarial filtering rubric, the auto-write + concise-summary flow (Phase 4), the artifact section contract, the quality bar, and the canonical Phase 5 next-steps menu (Open, Brainstorm one idea, Discuss or refine the ideas first, Done) — these details do not appear anywhere in this main body. Skipping the load silently degrades every subsequent step; the agent improvises the flow and menu from memory instead of following the documented ones. "Quickly" means fewer Phase 2 sub-agents, not skipping references. Do not load this file before Phase 2 agent dispatch completes.
