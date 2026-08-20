@@ -1,0 +1,50 @@
+schema_version: tw-workflow-profile/1
+task_id: TASK-YYYY-MM-DD-NNN
+profile_revision: 1
+profile_status: planned # planned becomes building at the first builder dispatch
+risk: L1 # deterministic selection: L0 documentation/mechanical; L1 narrow low consequence; L2 cross-module/API/data/deploy; L3 money/security/destructive/release/external/unclear authority
+selection_rationale: "<facts selecting this risk level>"
+
+process_budget:
+  target_total_effort_percent: 20 # process / (process + delivery)
+  hard_ceiling_total_effort_percent: 50 # process / (process + delivery)
+  target_process_to_delivery_ratio_percent: 25 # process / delivery
+  hard_ceiling_process_to_delivery_ratio_percent: 100 # process / delivery
+  estimated_delivery_minutes: 0
+  estimated_process_target_minutes: 0 # target ratio * estimated_delivery_minutes
+  estimated_process_ceiling_minutes: 0 # ceiling ratio * estimated_delivery_minutes
+
+selected_controls: []
+child_roles:
+  builder: { model: "<available model>", maximum_timebox_minutes: 0 }
+  verifier: { model: "<available model>", maximum_timebox_minutes: 0 }
+  reviewer: { model: "<available model>", maximum_timebox_minutes: 0 }
+  deployer: { model: "<available model or not_applicable>", maximum_timebox_minutes: 0 }
+  dogfooder: { model: "<available model or not_applicable>", maximum_timebox_minutes: 0 }
+model_selection:
+  availability: []
+  choice: "<chosen available model for each child role>"
+  rationale: "<why this available model is proportionate>"
+  unavailable_consequence: "hold or delegate; never implement as fallback"
+reviewer_cap: 1
+repair_cycle_cap: 2
+requires_deploy: false
+requires_chrome_dogfood: false
+
+# The canonical serialized planned fields above are hashed before building.
+profile_hash: "sha256:<canonical-profile-hash>"
+immutable_after_building:
+  fields: [risk, process_budget, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, requires_deploy, requires_chrome_dogfood, profile_hash]
+  expansion_rule: "After the first builder dispatch, create a new profile_revision with escalation_reason; never silently add a control or reviewer."
+
+accounting:
+  observer: orchestration_harness
+  clock: monotonic
+  child_self_report: advisory_only
+  fixed_categories: [process, delivery, unclassified]
+  unclassified_rule: counts_as_process_until_reviewer_resolves
+  receipts: [] # append only at every dispatch and return
+  terminal_rules:
+    target: "actual_process_minutes <= 0.25 * actual_delivery_minutes"
+    hard_hold: "actual_process_minutes > actual_delivery_minutes => held_process_budget"
+    no_in_task_exception: true
