@@ -243,6 +243,9 @@ required_skill_local_files=(
   "tw-code-review/references/traceweaver-operating-modes.md"
   "tw-doc-review/references/traceweaver-operating-modes.md"
   "tw-auto/references/traceweaver-operating-modes.md"
+  "tw-auto/references/workflow-profile-template.yml"
+  "tw-auto/references/scoped-review-protocol.md"
+  "tw-auto/references/terminal-receipt-template.yml"
   "tw-audit/references/traceweaver-operating-modes.md"
   "tw-strategy/references/traceweaver-operating-modes.md"
   "tw-ideate/references/traceweaver-operating-modes.md"
@@ -391,6 +394,16 @@ for skill_local_file in "${required_skill_local_files[@]}"; do
   assert_equal "${label}_packaged_hash" "$source_hash" "$packaged_hash"
   assert_equal "${label}_callable_hash" "$source_hash" "$callable_hash"
   echo "skill_local_file_hash_${label}=${source_hash}"
+done
+
+for reference_name in workflow-profile-template.yml scoped-review-protocol.md terminal-receipt-template.yml; do
+  canonical_reference="$repo_root/plugins/traceweaver-core/references/$reference_name"
+  skill_local_reference="$repo_root/plugins/traceweaver-core/skills/tw-auto/references/$reference_name"
+  canonical_hash="$(hash_file "$canonical_reference")"
+  skill_local_hash="$(hash_file "$skill_local_reference")"
+  label="$(printf '%s' "$reference_name" | tr '.-' '__')"
+  assert_equal "tw_auto_${label}_canonical_parity" "$canonical_hash" "$skill_local_hash"
+  echo "tw_auto_canonical_reference_hash_${label}=${canonical_hash}"
 done
 
 test -x "$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
