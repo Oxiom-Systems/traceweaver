@@ -15,6 +15,15 @@ under TraceWeaver controls. It delegates to the TraceWeaver-packaged
 `ce-resolve-pr-feedback` engine, but does not give that engine publication or
 remote-mutation authority.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex child call, run the packaged sibling
+`tw-auto/scripts/traceweaver-route-native-child` against the canonical workflow-
+profile contract. Use only its explicit dispatch parameters and finalize its
+receipt with independent host/execution attestation. A held route makes child
+output ineligible; never inherit a model, fall back, or edit an imported
+CE-derived body to bypass the overlay.
+
 ## Required Inputs
 
 Before delegating, load and cite:

@@ -20,6 +20,15 @@ review. This wrapper preserves the CE reviewer behavior while requiring
 authority, traceability, verification, validation, and held-claim checks before
 review findings can be treated as accepted TraceWeaver input.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex reviewer call, run the packaged
+sibling `tw-auto/scripts/traceweaver-route-native-child` against the canonical
+workflow-profile contract. Use only its explicit dispatch parameters and
+finalize its receipt with independent host/execution attestation. A held route
+makes reviewer output ineligible for acceptance; never inherit a model, fall
+back, or edit an imported CE-derived body to bypass the overlay.
+
 ## Scoped Review Identity
 
 Resolve the packaged sibling
@@ -119,9 +128,9 @@ the user explicitly asked for a traceability diagnostic or audit.
 If review is blocked by missing unambiguous anchors, route the next action to
 `/tw-work ...` or `/tw-auto ...` so the work loop can author anchors and rerun
 review. If review is clean, record the accepted review and its bookkeeping
-atomically. Route scoped `/tw-doc-review ...` only when normative semantic
-authority changed, never for status/hash/receipt/projection/index bookkeeping
-alone.
+atomically. Route scoped
+`/tw-doc-review ...` only when normative semantic authority changed, never for
+status/hash/receipt/projection/index bookkeeping alone.
 If unresolved mappings or authority problems block acceptance, return the exact
 human decision or highest-level wrapper needed to repair the work.
 

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 # TRACEWEAVER: file-role=project-bootstrap-helper; req=REQ-TW-084; req=REQ-TW-085
+# TRACEWEAVER: entrypoint=bootstrap_model_route_projection; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
 # Project-local static bootstrap only: no global configuration or runtime claim.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -56,7 +57,19 @@ if [[ -n "$role" && -n "$capsule" ]]; then
   within_root "$capsule" || held_unsafe "outside_delegation_capsule"
 fi
 
-if [[ "$native" -eq 1 ]]; then luna=available; model=luna; receipt=luna_dispatch_eligible; consequence=bounded_luna_child_may_be_dispatched_by_host; else luna=unavailable; model=terra; receipt=luna_dispatch_unavailable; consequence=terra_fallback_without_investigation; fi
+main_model="$(awk '$1 == "codex_main_model:" { print $2; exit }' "$PROFILE_TEMPLATE")"
+child_model="$(awk '$1 == "codex_subagent_model:" { print $2; exit }' "$PROFILE_TEMPLATE")"
+child_effort="$(awk '$1 == "L0:" { print $2; exit }' "$PROFILE_TEMPLATE")"
+route_adapter="$(awk '$1 == "adapter:" { print $2; exit }' "$PROFILE_TEMPLATE")"
+unavailable_consequence="$(awk '$1 == "terra_unavailable_consequence:" { print $2; exit }' "$PROFILE_TEMPLATE")"
+[[ -n "$main_model" && -n "$child_model" && -n "$child_effort" && -n "$route_adapter" && -n "$unavailable_consequence" ]] \
+  || { echo "bootstrap_result=held_invalid_model_routing_contract"; echo "project_ready=false"; exit 1; }
+if [[ "$native" -eq 1 ]]; then
+  native_capability=caller_reported_available_unattested
+else
+  native_capability=not_reported
+fi
+receipt=bootstrap_model_route_not_dispatched
 tmp_boot="$(mktemp)"; tmp_profile="$(mktemp)"; trap 'rm -f "$tmp_boot" "$tmp_profile"' EXIT
 cat >"$tmp_boot" <<EOF
 schema_version: tw-bootstrap/1
@@ -66,10 +79,16 @@ master_contract: .traceweaver/master-orchestrator.md
 workflow_profile: .traceweaver/workflow-profile.yml
 automatic_host_activation: held_fresh_task_runtime_proof_required
 model_routing:
-  luna_availability: $luna
-  selected_model: $model
-  rationale: native_child_dispatch_is_required_for_luna
-  unavailable_consequence: $consequence
+  contract: workflow-profile-template.yml#model_routing
+  adapter: $route_adapter
+  main_model: $main_model
+  requested_child_model: $child_model
+  requested_reasoning_effort: $child_effort
+  native_child_dispatch_capability: $native_capability
+  served_model: unattested
+  outcome: not_dispatched_bootstrap_profile_only
+  unavailable_consequence: $unavailable_consequence
+  unattested_consequence: held_model_unattested
 receipts: [$receipt]
 deployment: { permission: $([[ "$deploy" -eq 1 ]] && echo explicitly_authorized || echo not_authorized), receipt: not_executed }
 chrome_dogfood: { permission: $([[ "$dogfood" -eq 1 ]] && echo explicitly_authorized || echo not_authorized), receipt: not_executed }
@@ -82,20 +101,30 @@ profile_status: planned
 risk: L0
 selection_rationale: deterministic project-local bootstrap; authority remains held pending owner action
 process_budget: { target_total_effort_percent: 20, hard_ceiling_total_effort_percent: 50, target_process_to_delivery_ratio_percent: 25, hard_ceiling_process_to_delivery_ratio_percent: 100, estimated_delivery_minutes: 0, estimated_process_target_minutes: 0, estimated_process_ceiling_minutes: 0 }
+model_routing:
+  contract: workflow-profile-template.yml#model_routing
+  adapter: $route_adapter
+  codex_main_model: $main_model
+  codex_subagent_model: $child_model
+  codex_subagent_reasoning_effort: risk_selected
+  risk_level: L0
+  requested_reasoning_effort: $child_effort
+  served_model: unattested
+  dispatch_state: not_dispatched_bootstrap_profile_only
 selected_controls: [project_local_contract, manual_launch_only]
 child_roles:
-  builder: { model: $model, maximum_timebox_minutes: 0 }
-  verifier: { model: $model, maximum_timebox_minutes: 0 }
-  reviewer: { model: $model, maximum_timebox_minutes: 0 }
+  builder: { model: $child_model, reasoning_effort: $child_effort, maximum_timebox_minutes: 0 }
+  verifier: { model: $child_model, reasoning_effort: $child_effort, maximum_timebox_minutes: 0 }
+  reviewer: { model: $child_model, reasoning_effort: $child_effort, maximum_timebox_minutes: 0 }
   deployer: { model: not_applicable, maximum_timebox_minutes: 0 }
   dogfooder: { model: not_applicable, maximum_timebox_minutes: 0 }
-model_selection: { availability: [luna:$luna, terra:available], choice: $model, rationale: native child dispatch determines Luna eligibility, unavailable_consequence: $consequence }
+model_selection: { availability: [$child_model:$native_capability], choice: $child_model, rationale: central contract selects the child model and L0 effort, unavailable_consequence: $unavailable_consequence }
 reviewer_cap: 0
 repair_cycle_cap: 0
 requires_deploy: false
 requires_chrome_dogfood: false
 profile_hash: sha256:bootstrap-template-manual-launch-only
-immutable_after_building: { fields: [risk, process_budget, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, requires_deploy, requires_chrome_dogfood, profile_hash], expansion_rule: create_new_revision }
+immutable_after_building: { fields: [risk, process_budget, model_routing, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, requires_deploy, requires_chrome_dogfood, profile_hash], expansion_rule: create_new_revision }
 accounting: { observer: orchestration_harness, clock: monotonic, child_self_report: advisory_only, fixed_categories: [process, delivery, unclassified], unclassified_rule: counts_as_process_until_reviewer_resolves, receipts: [] }
 EOF
 

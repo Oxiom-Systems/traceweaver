@@ -43,6 +43,12 @@ jobs:
           echo "bun: $(bun --version)"
           echo "codex: $(codex --version)"
 
+      - name: Skill Execution Contract smoke
+        run: scripts/traceweaver-smoke-skill-execution-contract
+
+      - name: Terra native-child routing contract
+        run: scripts/traceweaver-smoke-terra-routing
+
       - name: Codex discovery smoke
         run: TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
 

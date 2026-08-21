@@ -16,6 +16,14 @@ Use `tw-setup` for local diagnostics and deterministic project bootstrap. The
 bootstrap helper creates project-local contract files; it does not change global
 host configuration or claim a host automatically loads them.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex child call, run the packaged sibling
+`tw-auto/scripts/traceweaver-route-native-child` against the canonical workflow-
+profile contract. Use only its explicit dispatch parameters and finalize its
+receipt with independent host/execution attestation. A held route makes child
+output ineligible; never inherit a model or silently fall back.
+
 ## Required Inputs
 
 Before bootstrap, require a project root, explicit owner authorization before
@@ -35,9 +43,10 @@ adding a managed project pointer.
 4. The master is read-only. A named role needs a delegation capsule and is
    limited to builder, verifier, reviewer, deployer, dogfooder, or registrar.
    Roleless children are denied.
-5. Record Luna availability, choice, rationale, and consequence. Luna is only
-   eligible with native child dispatch; otherwise record one
-   `luna_dispatch_unavailable` receipt and Terra fallback without investigation.
+5. Record the central adapter's capability evidence and receipt. If its planned
+   route is held, do not dispatch a child or attempt another model. If the host
+   cannot independently attest the served model, retain the unattested hold and
+   keep formal evidence on the main route.
 
 ## Optional Graphify Setup
 

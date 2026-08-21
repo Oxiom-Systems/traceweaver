@@ -270,6 +270,8 @@ required_skill_local_files=(
   "tw-traceability-check/scripts/traceweaver-author-code-anchors"
   "tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
   "tw-auto/scripts/traceweaver-graphify-advisory"
+  "tw-auto/scripts/traceweaver-route-native-child"
+  "tw-auto/scripts/traceweaver-resolve-skill-execution-contract"
 )
 
 codex_home="$tmp_root/codex-home"
@@ -331,19 +333,30 @@ assert_equal "installed_callable_skill_count" "${#expected_direct_skills[@]}" "$
 assert_equal "manifest_standalone" "true" "$(json_bool "$manifest" standalone)"
 assert_equal "manifest_external_ce_plugin_required" "false" "$(json_bool "$manifest" externalCePluginRequired)"
 assert_equal "manifest_ce_derived_components_owner" "traceweaver-core" "$(json_query "$manifest" ceDerivedComponentsOwner)"
-assert_equal "manifest_model_default_codex_model" "gpt-5.5" "$(json_query "$manifest" modelDefaults.codex.model)"
-assert_equal "manifest_model_default_codex_reasoning_effort" "medium" "$(json_query "$manifest" modelDefaults.codex.reasoningEffort)"
-assert_equal "manifest_model_default_codex_model_override_env" "TRACEWEAVER_CODEX_MODEL" "$(json_query "$manifest" modelDefaults.codex.overrideEnvironment.model)"
-assert_equal "manifest_model_default_codex_reasoning_override_env" "TRACEWEAVER_CODEX_REASONING_EFFORT" "$(json_query "$manifest" modelDefaults.codex.overrideEnvironment.reasoningEffort)"
-assert_equal "manifest_model_default_claude_model" "sonnet" "$(json_query "$manifest" modelDefaults.claude.model)"
-assert_equal "manifest_model_default_claude_enforcement" "policy_recorded_runtime_enforcement_held" "$(json_query "$manifest" modelDefaults.claude.enforcement)"
-assert_equal "manifest_model_default_ce_body_policy" "no_model_default_edits_without_reviewed_overlay_fork_record" "$(json_query "$manifest" modelDefaults.importedCeComponentBodyPolicy)"
+assert_equal "manifest_model_routing_contract" "references/workflow-profile-template.yml" "$(json_query "$manifest" modelRouting.contractReference)"
+assert_equal "manifest_model_routing_schema" "tw-codex-model-routing/1" "$(json_query "$manifest" modelRouting.schemaVersion)"
+assert_equal "manifest_model_routing_main" "gpt-5.6-sol" "$(json_query "$manifest" modelRouting.codexMainModel)"
+assert_equal "manifest_model_routing_subagent" "gpt-5.6-terra" "$(json_query "$manifest" modelRouting.codexSubagentModel)"
+assert_equal "manifest_model_routing_effort" "risk_selected" "$(json_query "$manifest" modelRouting.codexSubagentReasoningEffort)"
+assert_equal "manifest_model_routing_sol_subagents" "false" "$(json_bool "$manifest" modelRouting.solAllowedForSubagents)"
+assert_equal "manifest_model_routing_unavailable" "held_model_unavailable" "$(json_query "$manifest" modelRouting.terraUnavailableConsequence)"
+assert_equal "manifest_model_routing_l0" "low" "$(json_query "$manifest" modelRouting.riskReasoningEffort.L0)"
+assert_equal "manifest_model_routing_l1" "medium" "$(json_query "$manifest" modelRouting.riskReasoningEffort.L1)"
+assert_equal "manifest_model_routing_l2" "high" "$(json_query "$manifest" modelRouting.riskReasoningEffort.L2)"
+assert_equal "manifest_model_routing_l3" "xhigh" "$(json_query "$manifest" modelRouting.riskReasoningEffort.L3)"
+assert_equal "manifest_model_routing_adapter" "tw-auto/scripts/traceweaver-route-native-child" "$(json_query "$manifest" modelRouting.adapter)"
+assert_equal "manifest_sec_registry" "references/skill-execution-contracts.yml" "$(json_query "$manifest" skillExecutionContracts.registryReference)"
+assert_equal "manifest_sec_schema" "tw-skill-execution-contract-registry/1" "$(json_query "$manifest" skillExecutionContracts.schemaVersion)"
+assert_equal "manifest_sec_callable_count" "27" "$(json_query "$manifest" skillExecutionContracts.callableCount)"
+assert_equal "manifest_sec_control_route" "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract" "$(json_query "$manifest" skillExecutionContracts.controlRoute)"
 if grep -Fq '"modelDefaults"' "$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json" \
-  || grep -Fq '"modelDefaults"' "$repo_root/plugins/traceweaver-core/.claude-plugin/plugin.json"; then
-  echo "plugin_manifest_model_defaults=failed_manifest_contains_loader_unsafe_policy"
+  || grep -Fq '"modelRouting"' "$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json" \
+  || grep -Fq '"modelDefaults"' "$repo_root/plugins/traceweaver-core/.claude-plugin/plugin.json" \
+  || grep -Fq '"modelRouting"' "$repo_root/plugins/traceweaver-core/.claude-plugin/plugin.json"; then
+  echo "plugin_manifest_model_routing=failed_manifest_contains_loader_unsafe_policy"
   exit 1
 fi
-echo "plugin_manifest_model_defaults=pass_policy_kept_in_reference_and_install_manifest"
+echo "plugin_manifest_model_routing=pass_contract_projected_only_to_install_manifest"
 grep -Fq "legacy_active_namespaced_skill_surface=absent" "$install_output"
 
 if find "$codex_root" -path '*compound-engineering*' -print -quit | grep -q .; then
@@ -408,8 +421,15 @@ done
 
 test -x "$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
 test -x "$callable_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
+test -x "$packaged_skills_root/tw-auto/scripts/traceweaver-route-review"
+test -x "$callable_skills_root/tw-auto/scripts/traceweaver-route-review"
+test -x "$packaged_skills_root/tw-auto/scripts/traceweaver-review-series"
+test -x "$callable_skills_root/tw-auto/scripts/traceweaver-review-series"
+test -x "$packaged_skills_root/tw-auto/scripts/traceweaver-route-native-child"
+test -x "$callable_skills_root/tw-auto/scripts/traceweaver-route-native-child"
 "$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule" --help >/dev/null
 echo "installed_publication_capsule_validator=pass"
+echo "installed_native_child_routing_adapter=pass"
 
 graphify_helper_root="$tmp_root/graphify-helper-root"
 mkdir -p "$graphify_helper_root"
@@ -424,16 +444,21 @@ grep -Fq "graphify_status=not_installed" <<<"$callable_graphify_status"
 echo "installed_graphify_advisory_helper=pass"
 
 assert_file "$references_root/traceweaver-model-defaults.md"
-grep -Fq "codex_model: gpt-5.5" "$references_root/traceweaver-model-defaults.md"
-grep -Fq "codex_reasoning_effort: medium" "$references_root/traceweaver-model-defaults.md"
-grep -Fq "claude_model_family: sonnet" "$references_root/traceweaver-model-defaults.md"
+grep -Fq "Compatibility pointer" "$references_root/traceweaver-model-defaults.md"
+grep -Fq "workflow-profile-template.yml" "$references_root/traceweaver-model-defaults.md"
+if grep -Fq "codex_model: gpt-5.5" "$references_root/traceweaver-model-defaults.md"; then
+  echo "installed_model_routing_compatibility_pointer=failed_historical_default_active"
+  exit 1
+fi
+assert_equal "manifest_model_routing_contract_digest" "sha256:$(hash_file "$references_root/workflow-profile-template.yml")" "$(json_query "$manifest" modelRouting.contractSha256)"
+echo "installed_model_routing_compatibility_pointer=pass"
 assert_file "$references_root/traceweaver-systems-engineering-audit-closure.md"
 grep -Fq "User-Facing Skill Prompt Contract" "$references_root/traceweaver-systems-engineering-audit-closure.md"
 grep -Fq "Requirement Closure Contract" "$references_root/traceweaver-systems-engineering-audit-closure.md"
 grep -Fq "Semantic Audit Mode Contract" "$references_root/traceweaver-systems-engineering-audit-closure.md"
 
 ce_policy_grep="$tmp_root/model-default-ce-body-grep.txt"
-if grep -R -nE 'REQ-TW-060|gpt-5\.5|TRACEWEAVER_CODEX_MODEL|TRACEWEAVER_CODEX_REASONING_EFFORT|model-default|model default' \
+if grep -R -nE 'REQ-TW-060|gpt-5\.5|gpt-5\.6-(sol|terra)|traceweaver-route-native-child|TRACEWEAVER_CODEX_MODEL|TRACEWEAVER_CODEX_REASONING_EFFORT|model-default|model default' \
   "$repo_root/plugins/traceweaver-core/skills"/ce-* \
   "$repo_root/plugins/traceweaver-core/agents"/ce-*.md >"$ce_policy_grep" 2>/dev/null; then
   echo "model_default_ce_body_drift_guard=failed_model_policy_marker_in_imported_ce_body"
@@ -584,11 +609,11 @@ echo "installed_manifest_standalone=true"
 echo "installed_external_ce_plugin_required=false"
 echo "installed_ce_derived_components_owner=traceweaver-core"
 echo "installed_ce_derived_components_direct_callable=false"
-echo "installed_model_default_codex_model=gpt-5.5"
-echo "installed_model_default_codex_reasoning_effort=medium"
-echo "installed_model_default_claude_model=sonnet"
-echo "installed_model_default_policy_reference=present"
-echo "model_default_ce_body_drift_guard=pass_no_req_tw_060_model_policy_in_imported_ce_bodies"
+echo "installed_model_routing_main=gpt-5.6-sol"
+echo "installed_model_routing_subagent=gpt-5.6-terra"
+echo "installed_model_routing_effort=risk_selected"
+echo "installed_model_routing_contract_reference=present"
+echo "model_routing_ce_body_drift_guard=pass_no_req_tw_060_model_policy_in_imported_ce_bodies"
 echo "external_compound_engineering_plugin_surface=absent"
 echo "external_compound_engineering_plugin_config=absent"
 echo "internal_packaged_skills_not_direct_callable=${expected_internal_packaged_skills[*]}"

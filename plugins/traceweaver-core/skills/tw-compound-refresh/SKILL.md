@@ -15,6 +15,15 @@ controls. It delegates to the TraceWeaver-packaged `ce-compound-refresh` engine
 and keeps refreshed learning as source evidence unless a separate review accepts
 authority changes.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex child call, run the packaged sibling
+`tw-auto/scripts/traceweaver-route-native-child` against the canonical workflow-
+profile contract. Use only its explicit dispatch parameters and finalize its
+receipt with independent host/execution attestation. A held route makes the
+child output ineligible; never inherit a model, fall back, or edit an imported
+CE-derived body to bypass the overlay.
+
 ## Required Inputs
 
 Before delegating, load and cite:

@@ -21,6 +21,15 @@ no-publication controls.
 This wrapper exists to keep the user-facing command surface TraceWeaver-owned.
 It does not broaden implementation or publication authority.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex investigation call, run the packaged
+sibling `tw-auto/scripts/traceweaver-route-native-child` against the canonical
+workflow-profile contract. Use only its explicit dispatch parameters and
+finalize its receipt with independent host/execution attestation. A held route
+makes child output ineligible; never inherit a model, fall back, or edit an
+imported CE-derived body to bypass the overlay.
+
 ## Required Inputs
 
 Before fixing or changing behavior, load and cite:

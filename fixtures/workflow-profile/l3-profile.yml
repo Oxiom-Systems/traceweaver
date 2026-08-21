@@ -1,11 +1,12 @@
 # TRACEWEAVER: file-role=review-series-workflow-profile-fixture; verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
+# TRACEWEAVER: terra-routing=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
 task_id: TASK-L3
 profile_revision: 1
 risk: L3
 selection_rationale: security-sensitive external side effect
 selected_controls: [full_vv_capsule, focused_verification, strongest_independent_reviewer, explicit_rollback, owner_held_decisions]
-child_roles: { builder: terra, verifier: terra, reviewer: sol, deployer: terra, dogfooder: terra }
-model_selection: { availability: [terra, sol], choice: "terra builder/verifier/deploy/dogfood; sol reviewer", rationale: high-risk work needs strongest available independent review }
+child_roles: { builder: { model: gpt-5.6-terra, reasoning_effort: xhigh }, verifier: { model: gpt-5.6-terra, reasoning_effort: xhigh }, reviewer: { model: gpt-5.6-terra, reasoning_effort: xhigh }, deployer: { model: gpt-5.6-terra, reasoning_effort: xhigh }, dogfooder: { model: gpt-5.6-terra, reasoning_effort: xhigh } }
+model_selection: { availability: [gpt-5.6-terra], choice: gpt-5.6-terra, rationale: high-risk work selects xhigh Terra reasoning without allowing a Sol child }
 reviewer_cap: 1
 repair_cycle_cap: 1
 severe_blocker_exception_cycle_cap: 1

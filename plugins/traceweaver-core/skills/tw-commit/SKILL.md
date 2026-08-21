@@ -19,6 +19,15 @@ any commit-capable workflow is considered.
 This wrapper exists to keep the user-facing command surface TraceWeaver-owned.
 It does not broaden publication authority.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex delegate call, run the packaged
+sibling `tw-auto/scripts/traceweaver-route-native-child` against the canonical
+workflow-profile contract. Use only its explicit dispatch parameters and
+finalize its receipt with independent host/execution attestation. A held route
+makes delegate output ineligible; never inherit a model, fall back, or edit an
+imported CE-derived body to bypass the overlay.
+
 ## Required Inputs
 
 Before preparing any commit, load and cite:

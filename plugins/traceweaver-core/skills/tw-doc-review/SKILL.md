@@ -17,6 +17,15 @@ document review. This wrapper preserves the CE document-review behavior while
 requiring requirement-quality and authority/traceability checks when a document
 can affect implementation authority or accepted evidence.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex reviewer call, run the packaged
+sibling `tw-auto/scripts/traceweaver-route-native-child` against the canonical
+workflow-profile contract. Use only its explicit dispatch parameters and
+finalize its receipt with independent host/execution attestation. A held route
+makes reviewer output ineligible for acceptance; never inherit a model, fall
+back, or edit an imported CE-derived body to bypass the overlay.
+
 ## Scoped Review Identity
 
 Resolve the packaged sibling

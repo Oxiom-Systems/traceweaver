@@ -34,7 +34,7 @@ ACTIVE_SKILLS_ROOT="$CODEX_HOME_DIR/skills"
 PACKAGED_SKILLS_ROOT="$CODEX_HOME_DIR/traceweaver-core/skills"
 RUNTIME_EXEC="${TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME:-1}"
 EXEC_TIMEOUT_SECONDS="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-60}"
-MODEL="${TRACEWEAVER_CODEX_MODEL:-gpt-5.5}"
+MODEL="${TRACEWEAVER_CODEX_MODEL:-gpt-5.6-sol}"
 REASONING_EFFORT="${TRACEWEAVER_CODEX_REASONING_EFFORT:-medium}"
 
 require_file() {
@@ -611,7 +611,8 @@ assert_contains "$tw_setup" "project-local contract files" "tw_setup_bootstrap_c
 assert_contains "$tw_setup" "The master is read-only" "tw_setup_read_only_master"
 assert_contains "$tw_setup" "template_manual_launch_only" "tw_setup_manual_launch_only"
 assert_contains "$tw_setup" "Roleless children are denied" "tw_setup_roleless_child_denied"
-assert_contains "$tw_setup" "Terra fallback without investigation" "tw_setup_luna_fallback"
+assert_contains "$tw_setup" "traceweaver-route-native-child" "tw_setup_central_routing_adapter"
+assert_contains "$tw_setup" "do not dispatch a child or attempt another model" "tw_setup_no_model_fallback"
 assert_fixture_field "$ROOT_DIR/fixtures/bootstrap-project/roleless-child.expected" "bootstrap_result" "denied_roleless_child" "tw_setup_roleless_child_fixture"
 echo "tw_setup_project_local_bootstrap_fixture=pass"
 

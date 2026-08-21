@@ -22,6 +22,26 @@ capsules, record harness receipts, and return held results. It does not edit,
 build, test, stage, commit, deploy, browse, dogfood, or implement as a fallback.
 It has no direct implementation path.
 
+## Native Child Routing
+
+Before every TraceWeaver-owned native Codex child call, resolve the canonical
+workflow-profile model-routing block and run
+`tw-auto/scripts/traceweaver-route-native-child`. Dispatch only with the
+adapter's explicit parameters, then finalize that receipt with independent
+host/execution attestation. A held route makes the child output ineligible;
+never inherit a model, fall back, or edit imported CE-derived bodies to bypass
+the overlay.
+
+## Skill Execution Contract
+
+Before control-path routing, resolve this callable's one static execution
+contract through `tw-auto/scripts/traceweaver-resolve-skill-execution-contract`.
+Use its bounded receipt rather than rediscovering authority, references,
+trace records, model route, graph action, V&V, holds, writes, or next wrapper
+across the repository. A missing, invalid, stale, or ambiguous contract is a
+terminal hold. The contract is advisory metadata only: it never promotes
+authority and PR1 has no `tw-graph` route.
+
 ## Required Inputs
 
 Before it dispatches any child, the read-only master must have or explicitly

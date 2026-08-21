@@ -24,6 +24,15 @@ planning when the resulting plan may become TraceWeaver implementation input.
 Do not use it to approve, rewrite, broaden, or silently reinterpret
 requirements.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex planning call, run the packaged
+sibling `tw-auto/scripts/traceweaver-route-native-child` against the canonical
+workflow-profile contract. Use only its explicit dispatch parameters and
+finalize its receipt with independent host/execution attestation. A held route
+makes child output ineligible; never inherit a model, fall back, or edit an
+imported CE-derived body to bypass the overlay.
+
 ## Required Authority Inputs
 
 Before planning meaningful behavior, load and cite:

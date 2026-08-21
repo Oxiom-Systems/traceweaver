@@ -5,8 +5,8 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
 # TRACEWEAVER: file-role=host-registry-smoke; req=REQ-TW-057; trace=TRACE-TW-032; ver=VER-TW-041
 # TRACEWEAVER: verifies=VER-TW-041; req=REQ-TW-057; trace=TRACE-TW-032
-# TRACEWEAVER: file-role=model-default-host-registry-smoke; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055
-# TRACEWEAVER: verifies=VER-TW-055; req=REQ-TW-060; trace=TRACE-TW-043
+# TRACEWEAVER: file-role=model-routing-host-registry-smoke; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
+# TRACEWEAVER: verifies=VER-TW-085; req=REQ-TW-060; trace=TRACE-TW-065
 # TRACEWEAVER: file-role=audit-wrapper-host-runtime-smoke; req=REQ-TW-061; trace=TRACE-TW-052; ver=VER-TW-065
 # TRACEWEAVER: verifies=VER-TW-065; req=REQ-TW-061; trace=TRACE-TW-052
 # TRACEWEAVER: file-role=requirements-quality-active-host-smoke; req=REQ-TW-069; trace=TRACE-TW-055; ver=VER-TW-071
@@ -19,12 +19,12 @@ codex_home="${CODEX_HOME:-$HOME/.codex}"
 skills_root="$codex_home/skills"
 references_root="$codex_home/traceweaver-core/references"
 config_file="$codex_home/config.toml"
-expected_codex_model="gpt-5.5"
+expected_codex_model="gpt-5.6-sol"
+expected_codex_subagent_model="gpt-5.6-terra"
 expected_codex_reasoning_effort="medium"
-expected_claude_model="sonnet"
-source_model_policy_reference="$repo_root/plugins/traceweaver-core/references/traceweaver-model-defaults.md"
-host_model_policy_reference="$references_root/traceweaver-model-defaults.md"
-model="${TRACEWEAVER_CODEX_MODEL:-gpt-5.5}"
+source_model_policy_reference="$repo_root/plugins/traceweaver-core/references/workflow-profile-template.yml"
+host_model_policy_reference="$references_root/workflow-profile-template.yml"
+model="${TRACEWEAVER_CODEX_MODEL:-gpt-5.6-sol}"
 reasoning_effort="${TRACEWEAVER_CODEX_REASONING_EFFORT:-medium}"
 exec_timeout_seconds="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-60}"
 host_runtime_exec="${TRACEWEAVER_HOST_RUNTIME_EXEC:-1}"
@@ -186,6 +186,8 @@ required_skill_local_files=(
   "tw-auto/references/trace-anchor-authoring.md"
   "tw-traceability-check/scripts/traceweaver-check-code-anchors"
   "tw-traceability-check/scripts/traceweaver-author-code-anchors"
+  "tw-auto/scripts/traceweaver-route-review"
+  "tw-auto/scripts/traceweaver-review-series"
 )
 
 missing=()
@@ -391,24 +393,24 @@ echo "codex_host_runtime_skill=$host_runtime_skill"
 echo "codex_host_runtime_proof=$host_runtime_proof"
 echo "codex_host_runtime_model=$model"
 echo "codex_host_runtime_reasoning_effort=$reasoning_effort"
-echo "codex_host_model_default_policy_codex_model=$expected_codex_model"
-echo "codex_host_model_default_policy_codex_reasoning_effort=$expected_codex_reasoning_effort"
-echo "codex_host_model_default_policy_claude_model=$expected_claude_model"
-echo "codex_host_model_default_policy_source_hash=${source_model_policy_hash:-missing}"
-echo "codex_host_model_default_policy_host_hash=${host_model_policy_hash:-missing}"
+echo "codex_host_model_routing_main=$expected_codex_model"
+echo "codex_host_model_routing_subagent=$expected_codex_subagent_model"
+echo "codex_host_model_routing_source_hash=${source_model_policy_hash:-missing}"
+echo "codex_host_model_routing_host_hash=${host_model_policy_hash:-missing}"
 if [ -n "$source_model_policy_hash" ] \
   && [ "$source_model_policy_hash" = "$host_model_policy_hash" ] \
-  && grep -Fq "codex_model: $expected_codex_model" "$host_model_policy_reference" \
-  && grep -Fq "codex_reasoning_effort: $expected_codex_reasoning_effort" "$host_model_policy_reference" \
-  && grep -Fq "claude_model_family: $expected_claude_model" "$host_model_policy_reference"; then
-  echo "codex_host_model_default_policy_reference=pass_source_host_hash_current"
+  && grep -Fq "codex_main_model: $expected_codex_model" "$host_model_policy_reference" \
+  && grep -Fq "codex_subagent_model: $expected_codex_subagent_model" "$host_model_policy_reference" \
+  && grep -Fq "codex_subagent_reasoning_effort: risk_selected" "$host_model_policy_reference" \
+  && grep -Fq "sol_allowed_for_subagents: false" "$host_model_policy_reference"; then
+  echo "codex_host_model_routing_reference=pass_source_host_hash_current"
 else
-  echo "codex_host_model_default_policy_reference=held_missing_or_stale"
+  echo "codex_host_model_routing_reference=held_missing_or_stale"
 fi
 if [ "$model" = "$expected_codex_model" ] && [ "$reasoning_effort" = "$expected_codex_reasoning_effort" ]; then
-  echo "codex_host_runtime_model_default_match=pass_default_runtime_args"
+  echo "codex_host_runtime_main_model_match=pass_default_runtime_args"
 else
-  echo "codex_host_runtime_model_default_match=pass_explicit_override_runtime_args"
+  echo "codex_host_runtime_main_model_match=pass_explicit_override_runtime_args"
 fi
 echo "codex_host_exec_events=$events"
 echo "codex_host_exec_stderr=$stderr_log"

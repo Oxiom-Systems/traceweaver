@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# TRACEWEAVER: file-role=bootstrap-model-route-projection-smoke; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
+# TRACEWEAVER: verifies=VER-TW-085; req=REQ-TW-060; trace=TRACE-TW-065
 # TRACEWEAVER: file-role=bootstrap-project-smoke; req=REQ-TW-084; req=REQ-TW-085
 # Fixture proof only: no automatic-host or live child-dispatch claim.
 
@@ -56,9 +58,10 @@ while IFS= read -r line; do contains "$result" "$line" roleless; done <"$FIXTURE
 echo "bootstrap_smoke_roleless_child_denied=pass"
 
 out="$("$HELPER" --root "$empty")"
-contains "$out" "luna_dispatch_unavailable" luna_fallback
-grep -Fq "selected_model: terra" "$empty/.traceweaver/bootstrap.yml"
-echo "bootstrap_smoke_luna_fallback=pass"
+contains "$out" "bootstrap_model_route_not_dispatched" model_route_not_dispatched
+grep -Fq "requested_child_model: gpt-5.6-terra" "$empty/.traceweaver/bootstrap.yml"
+grep -Fq "served_model: unattested" "$empty/.traceweaver/bootstrap.yml"
+echo "bootstrap_smoke_central_model_route_projection=pass"
 
 grep -Fq "automatic_host_activation: held_fresh_task_runtime_proof_required" "$empty/.traceweaver/bootstrap.yml"
 grep -Fq "template_manual_launch_only" "$ROOT_DIR/docs/guides/traceweaver-from-prompt-to-proof.md"

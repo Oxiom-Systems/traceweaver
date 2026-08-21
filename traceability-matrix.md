@@ -892,6 +892,32 @@ anchor is allocated for the authority-only REQ-TW-060/088 amendment.
 | VAL-TW-034 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | An owner follows one representative PR change from authoritative Markdown through reference-closure inventory, stale or incomplete manifest detection, one lifecycle refresh, a fresh `tw-graph check`, and source-located relationship navigation without repository-wide grep. | Oxiom Systems, independent of the implementation agent | A controlled source change or omitted reachable artifact causes the PR freshness check to fail, one refresh makes the complete derived manifest pass, canonical locators resolve to the unchanged authority sources, and the same workflow succeeds with Graphify absent; no graph or manifest output selects, writes, or attests authority. | Future reviewed V&V definition, deterministic projection fixtures, wrapper lifecycle receipts, and PR workflow evidence | Allocated / held pending implementation | Oxiom Systems | `tw-graph`, manifest/schema, wrapper lifecycle, PR CI, runtime, and host hooks remain held. Optional Graphify enrichment cannot satisfy this validation. |
 | VAL-TW-035 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | An owner starts one scoped review, leaves and resumes across commands, sessions, branches, wrappers, and publication preparation, records accepted review, applies bookkeeping, and—only if a blocker exists—uses one routine repair-verification cycle or one explicitly authorized severe exception. | Oxiom Systems, independent of the implementation agent | Unchanged accepted meaning and post-acceptance bookkeeping use zero reviewers while bookkeeping without a matching accepted review still requires review; applicable authority or behavior changes route once; repair verification revisits only retained findings and genuine regressions; non-blocking wording/style debt does not start a cycle; the routine series closes after one repair or stops held_no_progress; any second cycle visibly cites a complete external authority receipt; no series exceeds the absolute two-cycle cap; pending formal acceptance is never presented as publication authority. | `docs/validation/traceweaver-2026-08-21-review-series-convergence-validation-definition.md`; future owner-observed installed-host transcript | Held pending installed-host dogfood and owner observation; deterministic implementation prerequisite VER-TW-087 passed locally | Oxiom Systems | Static/local implementation proof is current, but VAL-TW-035 is not satisfied. Graphify is optional navigation only. Terra, tw-graph, semantic HTML, staging, publication, release, and deploy remain separately held. |
 
+## 0.4 PR1 Skill Execution Contract Chain
+
+| Artifact ID | Artifact | Linked Requirement | Role | Status |
+| --- | --- | --- | --- | --- |
+| ART-TW-077 | `plugins/traceweaver-core/references/skill-execution-contracts.yml`, resolver, packaged guide, installer projection, and focused SEC smoke | REQ-TW-092 | Deterministic advisory execution-contract registry and resolver for the 27 current callable skills/aliases. | Owner-approved bounded PR1 implementation candidate; no accepted review, runtime, or served-model attestation claimed. |
+
+| Trace ID | Need / requirement | Evidence / artifact | Current state |
+| --- | --- | --- | --- |
+| TRACE-TW-070 | REQ-TW-092; NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | ART-TW-077; ATP-TW-047; RESULT-TW-047; VER-TW-090; VAL-TW-038 | SEC resolution is static/advisory, must not promote authority, and carries explicit Terra request plus unattested evidence holds. |
+
+| Acceptance test ID | Requirement | Test boundary | Status |
+| --- | --- | --- | --- |
+| ATP-TW-047 | REQ-TW-092 | Exact callable inventory, alias, static hash vs invocation receipt, missing/stale/invalid/ambiguous terminal states, no repository-wide grep control path, no authority promotion, explicit request/served-model holds, risk mapping, installer/discovery, and Terra route smoke. | Executed only against this candidate worktree; active-host and independently attested served-model proof held. |
+
+| Result ID | Requirement | Acceptance test | Result | Status |
+| --- | --- | --- | --- | --- |
+| RESULT-TW-047 | REQ-TW-092 | ATP-TW-047 | Current-worktree deterministic SEC and recovered Terra routing implementation result. | Candidate only; no accepted-review identity, owner validation acceptance, runtime, publication, release, or deploy claim. |
+
+| Verification ID | Requirement | Verification | Evidence | Status |
+| --- | --- | --- | --- | --- |
+| VER-TW-090 | REQ-TW-092 | Run ATP-TW-047 plus focused installer/bootstrap/discovery/routing smokes, syntax checks, and diff hygiene. | Candidate command record under `docs/validation/`; receipt distinguishes static fixture execution from live service evidence. | Candidate verification only; independently attested served model remains held. |
+
+| Validation ID | Needs | Validation question | Evidence needed | Status |
+| --- | --- | --- | --- | --- |
+| VAL-TW-038 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Can an owner use the installed SEC to understand one callable route, its write boundary, and its held model evidence without authority inference or repository-wide rediscovery? | Future owner observation on an installed host with independent served-model attestation where a native child is used. | Held; local candidate fixtures do not satisfy owner validation or service attestation. |
+
 ## Traceability Diagram
 
 ```mermaid
