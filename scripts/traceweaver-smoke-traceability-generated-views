@@ -11,6 +11,63 @@ SCANNER="$ROOT_DIR/plugins/traceweaver-core/skills/tw-traceability-check/scripts
 # TRACEWEAVER: verifies=VER-TW-064; req=REQ-TW-067; trace=TRACE-TW-051
 "$ROOT_DIR/scripts/traceweaver-generate-traceability-views" --root "$ROOT_DIR" --out "$TMP_DIR" >/dev/null
 
+# JSON-determinism fixture: equivalent legacy/modern empty collections must
+# serialize to identical bytes without rewriting string values.
+cat > "$TMP_DIR/json-determinism-legacy.json" <<'EOF'
+{
+  "empty_array": [
+
+  ],
+  "empty_object": {
+
+  },
+  "nested": {
+    "items": [
+
+    ],
+    "metadata": {
+
+    }
+  },
+  "bracket_like_text": "literal [ ] and { } must remain unchanged"
+}
+EOF
+cat > "$TMP_DIR/json-determinism-modern.json" <<'EOF'
+{
+  "empty_array": [],
+  "empty_object": {},
+  "nested": {
+    "items": [],
+    "metadata": {}
+  },
+  "bracket_like_text": "literal [ ] and { } must remain unchanged"
+}
+EOF
+
+cp "$ROOT_DIR/docs/generated/traceability-data.json" "$TMP_DIR/traceability-data.before-fixture.json"
+if "$ROOT_DIR/scripts/traceweaver-generate-traceability-views" \
+  --json-fixture "$TMP_DIR/json-determinism-legacy.json" \
+  >"$TMP_DIR/json-fixture-missing-out.log" 2>&1; then
+  echo "expected --json-fixture without --out to fail" >&2
+  exit 1
+fi
+grep -q -- "--json-fixture requires --out PATH" "$TMP_DIR/json-fixture-missing-out.log"
+cmp "$ROOT_DIR/docs/generated/traceability-data.json" "$TMP_DIR/traceability-data.before-fixture.json"
+
+mkdir "$TMP_DIR/json-determinism-legacy" "$TMP_DIR/json-determinism-modern" "$TMP_DIR/json-determinism-idempotent"
+"$ROOT_DIR/scripts/traceweaver-generate-traceability-views" --json-fixture "$TMP_DIR/json-determinism-legacy.json" --out "$TMP_DIR/json-determinism-legacy" >/dev/null
+"$ROOT_DIR/scripts/traceweaver-generate-traceability-views" --json-fixture "$TMP_DIR/json-determinism-modern.json" --out "$TMP_DIR/json-determinism-modern" >/dev/null
+cmp "$TMP_DIR/json-determinism-legacy/traceability-data.json" "$TMP_DIR/json-determinism-modern/traceability-data.json"
+"$ROOT_DIR/scripts/traceweaver-generate-traceability-views" --json-fixture "$TMP_DIR/json-determinism-legacy/traceability-data.json" --out "$TMP_DIR/json-determinism-idempotent" >/dev/null
+cmp "$TMP_DIR/json-determinism-legacy/traceability-data.json" "$TMP_DIR/json-determinism-idempotent/traceability-data.json"
+ruby -rjson -e '
+  legacy = JSON.parse(File.read(ARGV.fetch(0)))
+  modern = JSON.parse(File.read(ARGV.fetch(1)))
+  output = JSON.parse(File.read(ARGV.fetch(2)))
+  abort "fixture semantics changed" unless legacy == modern && modern == output
+  abort "bracket-like string changed" unless output.fetch("bracket_like_text") == "literal [ ] and { } must remain unchanged"
+' "$TMP_DIR/json-determinism-legacy.json" "$TMP_DIR/json-determinism-modern.json" "$TMP_DIR/json-determinism-legacy/traceability-data.json"
+
 ruby -rjson -e '
   data = JSON.parse(File.read(File.join(ARGV.fetch(0), "traceability-data.json")))
   req_ids = data.fetch("requirements").map { |row| row.fetch("id") }
