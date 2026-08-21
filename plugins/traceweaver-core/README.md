@@ -35,7 +35,8 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.3.2`
+Plugin version: `0.4.0` (reconciled release candidate; publication occurs only
+after exact-merge-SHA smoke and CodeQL pass)
 
 Included skills:
 
@@ -171,15 +172,62 @@ package. Bump every peer plugin manifest carried by the release:
 - `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.3.2`.
+`traceweaver-core--v0.4.0`.
 
-Tagging and the GitHub Release are automated: when a commit that bumps the
-plugin version lands on `main`, the `Release on version bump` workflow
+The 0.4.0 tag is available only after its GitHub Release is published; this
+draft candidate does not claim that the tag exists.
+
+Tagging and the GitHub Release are automated: when the single release PR's
+commit that bumps the plugin version lands on `main`, the `Release on version bump` workflow
 (`.github/workflows/release-on-version-bump.yml`) creates the
 `traceweaver-core--v<version>` tag and a matching GitHub Release using the
 `CHANGELOG.md` section for that version. The job is idempotent, so non-version
-commits do not produce a release. Bumping the manifests and CHANGELOG is the
-only manual step.
+commits do not produce a release. The workflow first checks all five release
+manifests for exact equality and a repository-owned, fail-closed dated release
+receipt; PR1 and PR2 retain `0.3.2`, so only this 0.4.0 version-bump merge can
+mint the release. The receipt hashes a fixed candidate file set and does not
+predict its own commit SHA. On `main`, the serialized workflow waits for smoke
+and CodeQL on the exact merge SHA, rejects any tag-to-SHA conflict, and attaches
+its runtime evidence receipt to the GitHub Release.
+
+## What's New in 0.4.0
+
+The reconciled 0.4.0 package adds deterministic generated JSON, persistent
+bounded review convergence with accepted-review reuse, and deterministic Skill
+Execution Contracts for every callable `tw-*` skill and the `lfg` alias. Native
+Codex dispatch requests Sol for coordination and explicit Terra children with
+risk-selected effort; receipts keep requested and independently attested served
+model facts separate, holding the result when service is unattested.
+
+It also adds mandatory provider-independent `tw-graph` operations for duplicate
+discovery, impact, paths, relationship search, and freshness. Graphify remains
+optional enrichment. Static semantic-HTML templates and a deterministic derived
+preview improve navigation, but Markdown and YAML remain canonical authority.
+The accompanying Vestro/Air Router route is bounded and read-only: it does not
+run live router/broker operations or modify consumer repositories.
+
+Quick start after the integrated 0.4.0 release:
+
+```text
+tw-graph status
+tw-graph search REQ-TW-088
+tw-graph impact <canonical-source-locator>
+tw-graph check
+```
+
+Callable skills carry deterministic execution contracts for their inputs,
+receipts, evidence, and held boundaries; use the package's contract index to
+inspect a specific skill after installation. The release candidate includes
+the merged contract, Terra-routing, graph, and derived-preview implementations.
+
+Canonical filenames are case-sensitive across Git hosts. A legacy project that
+tracks uppercase `REQUIREMENTS.md` must perform an explicit, reviewed case-only
+rename to `requirements.md`; 0.4.0 does not silently reinterpret or rename an
+authority source.
+
+0.4.0 does not make HTML canonical, install Graphify, prove live consumer
+runtime behavior or independent served-model attestation, enforce workflows,
+or autonomously publish. Those claims remain separately gated.
 
 ## Skill Entry Points
 

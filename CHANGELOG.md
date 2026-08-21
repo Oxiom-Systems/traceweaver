@@ -2,6 +2,64 @@
 
 # Changelog
 
+## 0.4.0 - 2026-08-21
+
+One release train for the reconciled 0.4.0 control-plane and navigation
+increment.
+
+### Added
+
+- Deterministic generated JSON across supported runtimes.
+- Persistent bounded review convergence, including accepted-review reuse for an
+  unchanged semantic identity.
+- Deterministic Skill Execution Contracts for every callable `tw-*` skill and
+  the `lfg` alias.
+- Explicit Sol-main / Terra-child requests with risk-selected effort and
+  requested-versus-served model receipts.
+- Mandatory provider-independent `tw-graph` duplicate, impact, path, search,
+  related, and freshness operations; Graphify remains optional enrichment.
+- Strict static semantic-HTML templates and deterministic derived previews,
+  with Markdown and YAML retained as canonical authority.
+- A bounded, read-only Vestro/Air Router validation route and this single
+  five-manifest release preflight.
+
+### Changed
+
+- The release workflow now rejects any disagreement among the marketplace,
+  Claude, Codex, Cursor, and Antigravity plugin manifest versions before it
+  resolves a tag.
+- Only the reconciled 0.4.0 version-bump merge can mint
+  `traceweaver-core--v0.4.0`; ordinary merges, including PR1 and PR2, do not
+  create a release.
+- Release readiness now hashes a fixed candidate file set instead of requiring
+  a self-referential future commit identity. The main-only workflow waits for
+  smoke and CodeQL on the exact merge SHA, fails closed on tag conflicts, and
+  publishes a runtime evidence receipt with the GitHub Release.
+- Same-version main pushes exit as successful no-ops before tag resolution;
+  only a real manifest version change loads the matching dated release receipt.
+- Canonical authority filenames are enforced with portable Git casing.
+  Uppercase `REQUIREMENTS.md` consumers require an explicit, reviewed case-only
+  migration rather than silent source reinterpretation.
+
+### Validation
+
+- Read-only Git-inventory snapshots of Vestro and Air Router recovered 100% of
+  their accepted graph closures (1,912 and 1,202 records), reduced the selected
+  navigation task corpus to zero repository-wide searches, returned correct
+  impact paths, and surfaced actual duplicate requirement families.
+- Vestro validation required a temporary case-only normalization from tracked
+  `REQUIREMENTS.md` to canonical `requirements.md`; the source repository was
+  not changed and the migration caveat is documented above.
+- Deterministic Terra-routing and bounded review-convergence suites passed;
+  served-model attestation remains honestly unavailable without host evidence.
+
+### Held
+
+- Canonical HTML cutover, Graphify installation, live consumer runtime
+  validation, independent served-model attestation, workflow enforcement,
+  autonomous publication, and REQ-TW-091 every-merge releases are not delivered
+  by 0.4.0.
+
 ## 0.3.2 - 2026-07-28
 
 Selected Compound Engineering compatibility refresh.

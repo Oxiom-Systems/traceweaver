@@ -1,0 +1,102 @@
+#!/usr/bin/env ruby
+# Evaluate only the required GitHub check runs for one exact release SHA.
+require "json"
+
+USAGE = "usage: traceweaver-evaluate-release-check-runs --sha SHA --input PATH|-".freeze
+SUCCESS = %w[success].freeze
+FAILURE = %w[action_required cancelled failure startup_failure stale timed_out].freeze
+
+def fail_check(message)
+  warn "release-check-runs: #{message}"
+  exit 1
+end
+
+sha = nil
+input = nil
+until ARGV.empty?
+  flag = ARGV.shift
+  value = ARGV.shift
+  fail_check(USAGE) unless value
+
+  case flag
+  when "--sha" then sha = value
+  when "--input" then input = value
+  else fail_check(USAGE)
+  end
+end
+fail_check(USAGE) unless sha&.match?(/\A[0-9a-f]{40}\z/) && input
+
+payload = JSON.parse(input == "-" ? $stdin.read : File.read(input))
+runs = payload.fetch("check_runs")
+fail_check("check_runs must be an array") unless runs.is_a?(Array)
+
+exact = runs.select { |run| run.is_a?(Hash) && run["head_sha"] == sha }
+
+def app_slug(run)
+  run.fetch("app", {}).fetch("slug", "").to_s
+end
+
+def latest(runs)
+  runs.max_by do |run|
+    [run["started_at"].to_s, run["completed_at"].to_s, run["id"].to_i]
+  end
+end
+
+smoke = latest(exact.select do |run|
+  app_slug(run) == "github-actions" && run["name"].to_s == "smoke"
+end)
+
+codeql_candidates = exact.select do |run|
+  name = run["name"].to_s
+  app_slug(run) == "github-code-scanning" || name.match?(/\Acodeql(?:\b|\s|\/|:)/i)
+end
+codeql = codeql_candidates
+  .group_by { |run| [app_slug(run), run["name"].to_s] }
+  .values
+  .map { |group| latest(group) }
+  .compact
+  .sort_by { |run| [app_slug(run), run["name"].to_s] }
+
+required = [smoke, *codeql].compact
+failed = required.select do |run|
+  run["status"] == "completed" && FAILURE.include?(run["conclusion"].to_s)
+end
+
+missing = []
+missing << "smoke" unless smoke
+missing << "codeql" if codeql.empty?
+
+pending = required.select do |run|
+  run["status"] != "completed" || !SUCCESS.include?(run["conclusion"].to_s)
+end
+
+state = if failed.any?
+  "failed"
+elsif missing.empty? && pending.empty?
+  "ready"
+else
+  "pending"
+end
+
+def run_receipt(run)
+  return nil unless run
+
+  {
+    "name" => run["name"],
+    "app_slug" => app_slug(run),
+    "status" => run["status"],
+    "conclusion" => run["conclusion"],
+    "details_url" => run["details_url"] || run["html_url"],
+    "id" => run["id"]
+  }
+end
+
+puts JSON.generate(
+  "schema" => "traceweaver-release-check-runs/1",
+  "sha" => sha,
+  "state" => state,
+  "terminal_state" => state == "failed" ? "held_ci_failed" : nil,
+  "missing" => missing,
+  "smoke" => run_receipt(smoke),
+  "codeql" => codeql.map { |run| run_receipt(run) }
+)

@@ -1,0 +1,16 @@
+---
+id: FIXTURE-RELEASE-HELD-0.4.0
+status: ready_for_version_bump
+date: 2026-08-21
+version: 0.4.0
+release_readiness:
+  terminal_status: ready_for_version_bump
+  version: 0.4.0
+  candidate_scope:
+    algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
+    paths:
+      - fixtures/release-readiness/scope/alpha.txt
+    digest: sha256:0000000000000000000000000000000000000000000000000000000000000000
+  prerequisites:
+    pr1_merge_pr: held_pending_pr1_merge
+---

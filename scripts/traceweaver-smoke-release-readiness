@@ -1,0 +1,97 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+checker="scripts/traceweaver-check-release-readiness"
+evaluator="scripts/traceweaver-evaluate-release-check-runs"
+fixture_sha="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+worktree_head="$(git rev-parse HEAD)"
+temp_dir="$(mktemp -d)"
+trap 'rm -rf "$temp_dir"' EXIT
+
+ruby "$checker" \
+  --receipt fixtures/release-readiness/ready-0.4.0.yml \
+  --version 0.4.0 \
+  --root . \
+  --merge-sha "$worktree_head"
+
+if ruby "$checker" \
+  --receipt fixtures/release-readiness/held-0.4.0.yml \
+  --version 0.4.0 >/dev/null 2>&1; then
+  echo "release_readiness_held_fixture=unexpected_pass" >&2
+  exit 1
+fi
+
+if ruby "$checker" \
+  --receipt fixtures/release-readiness/ready-0.4.0.yml \
+  --version 0.4.1 >/dev/null 2>&1; then
+  echo "release_readiness_version_fixture=unexpected_pass" >&2
+  exit 1
+fi
+
+sed 's/sha256:[0-9a-f]\{64\}/sha256:0000000000000000000000000000000000000000000000000000000000000000/' \
+  fixtures/release-readiness/ready-0.4.0.yml > "$temp_dir/bad-scope.yml"
+if ruby "$checker" \
+  --receipt "$temp_dir/bad-scope.yml" \
+  --version 0.4.0 \
+  --root . >/dev/null 2>&1; then
+  echo "release_readiness_scope_fixture=unexpected_pass" >&2
+  exit 1
+fi
+
+if ruby "$checker" \
+  --receipt fixtures/release-readiness/ready-0.4.0.yml \
+  --version 0.4.0 \
+  --root . \
+  --merge-sha 0000000000000000000000000000000000000000 >/dev/null 2>&1; then
+  echo "release_readiness_merge_sha_fixture=unexpected_pass" >&2
+  exit 1
+fi
+
+ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/ready.json > "$temp_dir/ready.json"
+ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/pending.json > "$temp_dir/pending.json"
+ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/failed.json > "$temp_dir/failed.json"
+ruby "$evaluator" --sha bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb --input fixtures/release-check-runs/pending.json > "$temp_dir/wrong-sha.json"
+
+[ "$(jq -r .state "$temp_dir/ready.json")" = ready ]
+[ "$(jq -r .state "$temp_dir/pending.json")" = pending ]
+[ "$(jq -r .state "$temp_dir/failed.json")" = failed ]
+[ "$(jq -r .terminal_state "$temp_dir/failed.json")" = held_ci_failed ]
+[ "$(jq -r .state "$temp_dir/wrong-sha.json")" = pending ]
+[ "$(jq -r '.missing | sort | join(",")' "$temp_dir/wrong-sha.json")" = codeql,smoke ]
+
+workflow=.github/workflows/release-on-version-bump.yml
+grep -q '^  checks: read$' "$workflow"
+grep -q 'traceweaver-evaluate-release-check-runs' "$workflow"
+grep -q 'release-runtime-receipt.json' "$workflow"
+grep -q -- '--merge-sha "\$GITHUB_SHA"' "$workflow"
+grep -q 'previous_version=' "$workflow"
+grep -q 'should_release=false' "$workflow"
+grep -q "traceweaver-plugin-\$plugin_version-release-candidate.md" "$workflow"
+grep -q "steps.version.outputs.should_release == 'true'" "$workflow"
+grep -q 'held_ci_failed' "$workflow"
+grep -q 'held_tag_conflict' "$workflow"
+grep -q 'held_release_metadata_write_unavailable' "$workflow"
+if grep -Eq 'pr3_reconciled_head|pr3_ci_run|tag_absent_before_merge' "$checker"; then
+  echo "release_readiness_self_reference=unexpected_required_field" >&2
+  exit 1
+fi
+if grep -Eq 'tw-graph.*build|traceweaver-tw-graph build' "$workflow"; then
+  echo "release_workflow_graph_self_heal=unexpected_build" >&2
+  exit 1
+fi
+wait_line="$(grep -n 'Wait for exact-SHA smoke and CodeQL' "$workflow" | cut -d: -f1)"
+release_line="$(grep -n 'name: Create tag and GitHub Release' "$workflow" | cut -d: -f1)"
+if [ -z "$wait_line" ] || [ -z "$release_line" ] || [ "$wait_line" -ge "$release_line" ]; then
+  echo "release_workflow_order=invalid" >&2
+  exit 1
+fi
+
+echo "release_readiness_positive_fixture=pass"
+echo "release_readiness_negative_held_fixture=pass"
+echo "release_readiness_negative_version_fixture=pass"
+echo "release_readiness_negative_scope_fixture=pass"
+echo "release_readiness_negative_merge_sha_fixture=pass"
+echo "release_exact_sha_check_run_fixtures=pass"
+echo "release_workflow_exact_sha_gate=pass"
+echo "release_workflow_version_bump_only_gate=pass"
+echo "release_readiness_non_self_referential_scope=pass"

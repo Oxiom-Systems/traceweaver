@@ -1,0 +1,61 @@
+#!/usr/bin/env bash
+# Verify the one coherent release version carried by every supported manifest.
+# This is intentionally read-only so it can run in local preflight and CI.
+set -euo pipefail
+
+usage() {
+  echo "usage: traceweaver-check-release-manifest-versions [--expect VERSION]" >&2
+  exit 64
+}
+
+expected=""
+if [ "$#" -gt 0 ]; then
+  [ "$#" -eq 2 ] && [ "$1" = "--expect" ] || usage
+  expected="$2"
+fi
+
+manifest_paths=(
+  ".claude-plugin/marketplace.json"
+  "plugins/traceweaver-core/.claude-plugin/plugin.json"
+  "plugins/traceweaver-core/.codex-plugin/plugin.json"
+  "plugins/traceweaver-core/.cursor-plugin/plugin.json"
+  "plugins/traceweaver-core/.antigravity-plugin/plugin.json"
+)
+manifest_queries=(
+  ".metadata.version"
+  ".version"
+  ".version"
+  ".version"
+  ".version"
+)
+
+release_version=""
+for index in "${!manifest_paths[@]}"; do
+  path="${manifest_paths[$index]}"
+  query="${manifest_queries[$index]}"
+
+  if [ ! -f "$path" ]; then
+    echo "release-manifest-check: missing $path" >&2
+    exit 1
+  fi
+
+  version="$(jq -er "$query | select(type == \"string\" and length > 0)" "$path")" || {
+    echo "release-manifest-check: invalid version in $path" >&2
+    exit 1
+  }
+
+  printf '%s=%s\n' "$path" "$version"
+  if [ -z "$release_version" ]; then
+    release_version="$version"
+  elif [ "$version" != "$release_version" ]; then
+    echo "release-manifest-check: version mismatch: expected $release_version, found $version in $path" >&2
+    exit 1
+  fi
+done
+
+if [ -n "$expected" ] && [ "$release_version" != "$expected" ]; then
+  echo "release-manifest-check: expected $expected, found $release_version" >&2
+  exit 1
+fi
+
+printf 'release_version=%s\n' "$release_version"

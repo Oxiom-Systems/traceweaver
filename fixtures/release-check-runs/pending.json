@@ -1,0 +1,26 @@
+{
+  "total_count": 2,
+  "check_runs": [
+    {
+      "id": 201,
+      "name": "smoke",
+      "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "status": "in_progress",
+      "conclusion": null,
+      "started_at": "2026-08-21T08:00:00Z",
+      "details_url": "https://example.invalid/smoke/201",
+      "app": { "slug": "github-actions" }
+    },
+    {
+      "id": 202,
+      "name": "CodeQL",
+      "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+      "status": "completed",
+      "conclusion": "success",
+      "started_at": "2026-08-21T08:00:00Z",
+      "completed_at": "2026-08-21T08:06:00Z",
+      "details_url": "https://example.invalid/codeql/202",
+      "app": { "slug": "github-code-scanning" }
+    }
+  ]
+}
