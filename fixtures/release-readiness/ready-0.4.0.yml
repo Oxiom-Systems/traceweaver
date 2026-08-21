@@ -1,0 +1,30 @@
+---
+id: FIXTURE-RELEASE-READY-0.4.0
+status: ready_for_version_bump
+date: 2026-08-21
+version: 0.4.0
+release_readiness:
+  terminal_status: ready_for_version_bump
+  version: 0.4.0
+  candidate_scope:
+    algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
+    paths:
+      - fixtures/release-readiness/scope/alpha.txt
+      - fixtures/release-readiness/scope/beta.txt
+    digest: sha256:16dadfe99da47c8cd030886a2a56a2664ec1e6440141b5eacfe1834652096dd4
+  prerequisites:
+    pr1_merge_pr: https://github.com/Oxiom-Systems/traceweaver/pull/101
+    pr1_merge_sha: "1111111111111111111111111111111111111111"
+    pr1_ci_run: https://github.com/Oxiom-Systems/traceweaver/actions/runs/101
+    pr1_scoped_review: TW-CODE-REVIEW-FIXTURE-PR1-CLEAN
+    pr2_merge_pr: https://github.com/Oxiom-Systems/traceweaver/pull/102
+    pr2_merge_sha: "2222222222222222222222222222222222222222"
+    pr2_ci_run: https://github.com/Oxiom-Systems/traceweaver/actions/runs/102
+    pr2_scoped_review: TW-CODE-REVIEW-FIXTURE-PR2-CLEAN
+    pr3_scoped_review: TW-DOC-REVIEW-FIXTURE-PR3-CLEAN
+    integrated_validation: passed
+    graph_freshness: passed
+    consumer_validation: passed
+    manifest_equality: passed
+    changelog_release_notes: passed
+---

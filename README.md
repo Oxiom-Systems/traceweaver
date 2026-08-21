@@ -17,11 +17,13 @@ Use it when you want Codex, Claude Code, or other agent tools to move quickly
 without losing the proof behind what changed, why it changed, and whether it is
 ready to publish.
 
-Current release: TraceWeaver Core `0.3.2` is an alpha advisory plugin for Codex
-and Claude Code. Antigravity support is limited to static local
-install/discovery metadata. Runtime-driver binding, enforcing mode, clean CE
-replacement, slash-command support, unconstrained-host support, and autonomous
-publication remain held until separate evidence gates pass.
+TraceWeaver Core `0.4.0` is an alpha advisory plugin for Codex and Claude Code.
+Its release candidate is reconciled on the merged convergence, Skill Execution
+Contract/Terra, and graph/HTML-preview slices. Antigravity support remains
+limited to static local install/discovery metadata. Runtime-driver binding,
+enforcing mode, clean CE replacement, slash-command support,
+unconstrained-host support, and autonomous publication remain held until
+separate evidence gates pass.
 
 ## Intro Video
 
@@ -66,10 +68,10 @@ codex plugin marketplace add Oxiom-Systems/traceweaver
 codex plugin marketplace upgrade traceweaver
 ```
 
-For a pinned local alpha install:
+After the 0.4.0 GitHub Release is published, for a pinned local alpha install:
 
 ```sh
-git clone --branch traceweaver-core--v0.3.2 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.4.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
@@ -145,6 +147,71 @@ TraceWeaver expects these project authority files:
 Use the [worked bootstrap example](docs/guides/worked-authority-bootstrap-example.md)
 when you want to see what belongs in the first three files before reading the
 full reference templates.
+
+## What's New in 0.4.0
+
+Compared with 0.3.x, the reconciled 0.4.0 release adds deterministic
+control-plane artifacts and navigation:
+
+- generated JSON is deterministic across supported runtimes, and review series
+  persist within their bounded convergence budget, reusing an accepted review
+  when its semantic identity is unchanged;
+- every callable `tw-*` skill and the `lfg` alias has a deterministic Skill
+  Execution Contract, including explicit authority, verification, validation,
+  and no-publication boundaries;
+- native Codex work keeps Sol on the coordinating route and explicitly requests
+  Terra children with risk-selected effort. Receipts honestly distinguish the
+  requested model from an independently attested served model; no attestation
+  means `served_model: unattested` and remains held;
+- `tw-graph` provides provider-independent duplicate, impact, path, related,
+  search, and freshness operations over derived repository relationships.
+  Graphify remains optional enrichment, never a dependency or authority source;
+- static semantic-HTML templates and a deterministic derived preview improve
+  navigation while Markdown and YAML remain canonical authority; and
+- a bounded, read-only Vestro and Air Router validation route records consumer
+  evidence without changing consumer repositories or invoking live services.
+
+### 0.4.0 Quick Start
+
+After installing the reconciled 0.4.0 release, use the graph before falling
+back to repository-wide search:
+
+```text
+tw-graph status
+tw-graph search REQ-TW-088
+tw-graph duplicate-candidate <candidate-or-identifier>
+tw-graph impact <canonical-source-locator>
+tw-graph path <from-id> <to-id>
+tw-graph check
+```
+
+Use callable skills normally; their deterministic Skill Execution Contracts
+make the required inputs, requested/served-model receipt fields, evidence, and
+held boundaries inspectable rather than inferred. The contract index and exact
+artifact locations are supplied by the integrated 0.4.0 package, not by this
+flat release branch.
+
+### Compatibility and Migration
+
+- Existing `requirements.md`, `traceability-matrix.md`, and
+  `.traceweaver/intent-contract.yml` remain canonical. Do not promote a
+  generated HTML preview into an authority file.
+- Canonical filenames are case-sensitive across Git hosts. Existing projects
+  that track `REQUIREMENTS.md` must perform an explicit, reviewed case-only
+  rename to `requirements.md`; 0.4.0 will not silently reinterpret or rename
+  an authority source.
+- Existing Graphify users can retain it as optional context; 0.4.0 neither
+  installs Graphify nor uses it to satisfy `tw-graph` freshness.
+- Existing 0.3.x workflows remain advisory. 0.4.0 does not add enforcement,
+  live consumer-runtime validation, independent served-model attestation, or
+  autonomous publication by documentation alone.
+- A release is minted only when this one version-bump PR reaches `main`; PR1
+  and PR2 deliberately retain their pre-release version and cannot mint their
+  own release.
+- The committed release receipt covers a deterministic fixed file set rather
+  than predicting its own future commit. After merge, the serialized workflow
+  waits for smoke and CodeQL to pass on the exact checked-out `main` SHA,
+  rejects tag conflicts, and attaches a runtime receipt to the GitHub Release.
 
 ## Documentation
 

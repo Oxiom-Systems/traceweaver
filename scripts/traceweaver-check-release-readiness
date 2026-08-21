@@ -1,0 +1,125 @@
+#!/usr/bin/env ruby
+# Fail closed unless the dated release receipt proves this exact version is ready
+# to enter the existing main-only, version-bump release workflow.
+require "date"
+require "digest"
+require "open3"
+require "pathname"
+require "yaml"
+
+USAGE = "usage: traceweaver-check-release-readiness --receipt PATH --version VERSION [--root PATH] [--merge-sha SHA]".freeze
+REQUIRED_PREREQUISITES = {
+  "pr1_merge_pr" => /\A(?:#\d+|https:\/\/github\.com\/[^\/]+\/[^\/]+\/pull\/\d+)\z/,
+  "pr1_merge_sha" => /\A[0-9a-f]{40}\z/,
+  "pr1_ci_run" => /\Ahttps:\/\//,
+  "pr1_scoped_review" => /\A\S+/,
+  "pr2_merge_pr" => /\A(?:#\d+|https:\/\/github\.com\/[^\/]+\/[^\/]+\/pull\/\d+)\z/,
+  "pr2_merge_sha" => /\A[0-9a-f]{40}\z/,
+  "pr2_ci_run" => /\Ahttps:\/\//,
+  "pr2_scoped_review" => /\A\S+/,
+  "pr3_scoped_review" => /\A\S+/,
+  "integrated_validation" => /\A(?:passed|verified)\z/,
+  "graph_freshness" => /\A(?:passed|verified)\z/,
+  "consumer_validation" => /\A(?:passed|verified)\z/,
+  "manifest_equality" => /\A(?:passed|verified)\z/,
+  "changelog_release_notes" => /\A(?:passed|verified)\z/
+}.freeze
+SCOPE_ALGORITHM = "sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))".freeze
+UNREADY = /(?:pending|held|unreconciled|blocked)/i.freeze
+
+def fail_check(message)
+  warn "release-readiness-check: #{message}"
+  exit 1
+end
+
+receipt = nil
+version = nil
+root = "."
+merge_sha = nil
+until ARGV.empty?
+  flag = ARGV.shift
+  value = ARGV.shift
+  fail_check(USAGE) unless value
+
+  case flag
+  when "--receipt" then receipt = value
+  when "--version" then version = value
+  when "--root" then root = value
+  when "--merge-sha" then merge_sha = value
+  else fail_check(USAGE)
+  end
+end
+fail_check(USAGE) unless receipt && version
+
+root_path = Pathname.new(root).expand_path
+fail_check("root is not a directory: #{root}") unless root_path.directory?
+
+if merge_sha
+  fail_check("invalid merge SHA #{merge_sha.inspect}") unless merge_sha.match?(/\A[0-9a-f]{40}\z/)
+  repository_head, git_error, git_status = Open3.capture3("git", "-C", root_path.to_s, "rev-parse", "HEAD")
+  fail_check("could not resolve repository HEAD: #{git_error.strip}") unless git_status.success?
+  repository_head = repository_head.strip
+  fail_check("merge SHA #{merge_sha} does not match checked-out HEAD #{repository_head}") unless repository_head == merge_sha
+end
+
+source = File.read(receipt)
+front_matter = source.match(/\A---[ \t]*\n(.*?)\n---[ \t]*(?:\n|\z)/m)
+fail_check("missing YAML front matter in #{receipt}") unless front_matter
+
+data = YAML.safe_load(front_matter[1], permitted_classes: [Date], aliases: false)
+fail_check("front matter is not a mapping in #{receipt}") unless data.is_a?(Hash)
+
+receipt_version = data["version"].to_s
+fail_check("receipt version #{receipt_version.inspect} does not match #{version.inspect}") unless receipt_version == version
+Date.iso8601(data.fetch("date").to_s)
+
+readiness = data["release_readiness"]
+fail_check("missing release_readiness mapping") unless readiness.is_a?(Hash)
+fail_check("release_readiness version does not match #{version.inspect}") unless readiness["version"].to_s == version
+
+scope = readiness["candidate_scope"]
+fail_check("missing candidate_scope mapping") unless scope.is_a?(Hash)
+fail_check("unsupported candidate_scope algorithm") unless scope["algorithm"] == SCOPE_ALGORITHM
+paths = scope["paths"]
+fail_check("candidate_scope paths must be a non-empty array") unless paths.is_a?(Array) && !paths.empty?
+fail_check("candidate_scope paths must be unique strings") unless paths.all? { |path| path.is_a?(String) } && paths.uniq.length == paths.length
+
+receipt_path = Pathname.new(receipt).expand_path
+records = paths.sort.map do |path|
+  relative = Pathname.new(path)
+  fail_check("candidate_scope path must be normalized and relative: #{path.inspect}") if relative.absolute? || path.empty? || relative.cleanpath.to_s != path || path.start_with?("../")
+  absolute = root_path.join(relative)
+  fail_check("candidate_scope path is missing or not a regular file: #{path}") unless absolute.file? && !absolute.symlink?
+  fail_check("candidate_scope must exclude its own receipt: #{path}") if absolute.expand_path == receipt_path
+  git_mode = (absolute.stat.mode & 0o111).zero? ? "100644" : "100755"
+  "#{path}\0#{git_mode}\0#{Digest::SHA256.file(absolute).hexdigest}\n"
+end
+actual_scope_digest = "sha256:#{Digest::SHA256.hexdigest(records.join)}"
+fail_check("candidate_scope digest mismatch: expected #{scope['digest'].inspect}, got #{actual_scope_digest}") unless scope["digest"] == actual_scope_digest
+
+fail_check("receipt contains a PENDING placeholder") if source.match?(/\bPENDING(?:_[A-Z0-9]+)*\b/)
+unless readiness["terminal_status"] == "ready_for_version_bump"
+  fail_check("terminal status is not ready_for_version_bump")
+end
+
+prerequisites = readiness["prerequisites"]
+fail_check("missing release readiness prerequisites") unless prerequisites.is_a?(Hash)
+prerequisites.each do |field, value|
+  fail_check("unready prerequisite #{field}=#{value.inspect}") if value.to_s.match?(UNREADY)
+end
+
+REQUIRED_PREREQUISITES.each do |field, pattern|
+  value = prerequisites[field]
+  fail_check("missing prerequisite #{field}") unless value.is_a?(String) && !value.empty?
+  fail_check("unready prerequisite #{field}=#{value.inspect}") if value.match?(UNREADY)
+  fail_check("invalid prerequisite #{field}=#{value.inspect}") unless value.match?(pattern)
+end
+
+readiness.each do |key, value|
+  next unless value.is_a?(String)
+  fail_check("unready release_readiness value #{key}=#{value.inspect}") if value.match?(UNREADY)
+end
+
+puts "release_readiness=ready_for_version_bump"
+puts "release_version=#{version}"
+puts "release_candidate_scope_digest=#{actual_scope_digest}"

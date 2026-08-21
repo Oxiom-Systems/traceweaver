@@ -96,6 +96,9 @@ jobs:
       - name: Code trace-anchor authoring smoke
         run: scripts/traceweaver-smoke-code-trace-authoring
 
+      - name: Release readiness and exact-merge-SHA regression smoke
+        run: scripts/traceweaver-smoke-release-readiness
+
       - name: Controlled-publication smoke
         run: scripts/traceweaver-smoke-controlled-publication
 
