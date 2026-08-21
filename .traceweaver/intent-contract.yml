@@ -5,7 +5,7 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: ecf96d03903f2e20983d78f7c5c05d885bd38d9bb1725878121456ee506637fe
+baseline_hash_sha256: a7d4e6093725c0f4250f9532ecd2c8bd766542a98addb107ae93e43a94a143e1
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
@@ -50,7 +50,18 @@ review_series_convergence_candidate_amendment_status: formally_accepted_2026_08_
 formal_authority_acceptance_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-20-REQ-060-088-037-056-057-001
 formal_authority_acceptance_receipt: docs/validation/traceweaver-2026-08-20-req-060-088-review-series-formal-authority-acceptance.md
 formal_authority_accepted_at: 2026-08-20
-candidate_requirements_working_hash_sha256: ecf96d03903f2e20983d78f7c5c05d885bd38d9bb1725878121456ee506637fe
+lean_convergence_candidate_amendment_id: REQ-AMEND-CANDIDATE-2026-08-21-001
+lean_convergence_owner_direction_id: TW-OWNER-DIRECTION-2026-08-21-LEAN-CONVERGENCE-001
+lean_convergence_requirements_review_id: TW-REQ-REVIEW-2026-08-21-LEAN-CONVERGENCE-AUTHORITY-ALIGNMENT-001
+lean_convergence_formal_authority_acceptance_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-21-LEAN-CONVERGENCE-001
+lean_convergence_formal_authority_acceptance_receipt: docs/validation/traceweaver-2026-08-21-lean-convergence-formal-authority-acceptance.md
+lean_convergence_formal_authority_accepted_at: 2026-08-21
+lean_convergence_implementation_gate_id: TW-AUTH-GATE-2026-08-21-REQ-TW-037-056-057-CONVERGENCE-IMPLEMENTATION-001
+lean_convergence_implementation_status: bounded_static_controller_protocol_policy_wrapper_fixtures_and_ci_invocation_implemented_VER_TW_087_and_bounded_code_review_passed_validation_runtime_active_host_staging_and_publication_held
+lean_convergence_verification_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md
+lean_convergence_code_review_id: TW-CODE-REVIEW-2026-08-21-REVIEW-SERIES-CONVERGENCE-001
+lean_convergence_code_review_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-code-review.md
+candidate_requirements_working_hash_sha256: a7d4e6093725c0f4250f9532ecd2c8bd766542a98addb107ae93e43a94a143e1
 baseline_hash_authority_status: accepted_requirements_including_req_tw_048_static_advisory_source_evidence_with_req_tw_049_req_tw_050_req_tw_051_req_tw_052_req_tw_053_req_tw_055_req_tw_056_candidate_authority_doc_review_passed_planning_input_req_tw_054_prior_scanner_wording_authority_doc_review_passed_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_planning_input_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_req_tw_057_implementation_gate_candidate_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_and_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_passed_authority_doc_review_passed_req_tw_048_amendment_doc_review_passed_u9_unit10_auth_safe_fresh_exec_and_active_host_runtime_probes_code_review_passed_authority_doc_review_passed_reviewed_held_u9_unit11_active_host_reconciled_runtime_pass_code_review_passed_authority_doc_review_passed_constrained_runtime_accepted_dogfood_classifier_code_review_passed_authority_doc_review_passed_skill_behavior_audit_unit1_behavior_contracts_authority_doc_review_passed_runtime_held_wrapper_direct_callable_expansion_recorded_code_review_passed_authority_doc_review_passed_runtime_held_review_wrapper_skills_recorded_authority_doc_review_passed_runtime_held_ce_350_skill_surface_inventory_source_refreshed_authority_doc_review_passed_parity_held_tw_wrapper_backlog_reviewed_against_ce_350_authority_doc_review_passed_per_wrapper_proof_pending_controlled_publication_gate_recorded_authority_doc_review_passed_behavior_held_controlled_publication_route_fixture_smoke_passed_fixture_only_per_target_publication_gate_required_publication_runtime_held_code_test_trace_anchor_prior_requirement_recorded_authority_doc_review_passed_scanner_held_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_structured_traceability_findings_fixture_smoke_patched_code_review_passed_authority_doc_review_passed_runtime_held_tw_auto_closure_loop_requirement_recorded_authority_doc_review_passed_tw_auto_code_review_passed_behavior_held_tw_skill_behavior_fixture_smoke_passed_code_review_passed_authority_doc_review_passed_active_host_tw_traceability_check_structured_runtime_passed_authority_doc_review_passed_clean_ce_delegation_fixture_recorded_code_review_passed_authority_doc_review_passed_req_tw_057_code_traceability_scanner_fixture_smoke_passed_install_discovery_passed_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_tw_auto_runtime_driver_boundary_code_review_passed_status_hash_doc_review_passed_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_publication_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 active_authority_review_gate: traceweaver_core_0_2_2_release_published_post_release_evidence_doc_review_passed
@@ -1631,23 +1642,25 @@ approved_requirements:
       - A traceability check runs before implementation continues.
   - id: REQ-TW-037
     intent_ids: [INTENT-TW-003, INTENT-TW-005]
-    statement: TraceWeaver-controlled review and repair uses a persistent review series across command, run, and session re-entry; gives every explicitly authorized series an immutable generation and collision-free identity; freezes baseline, workflow profile, target, objective, concern, and canonical-protocol identity; distinguishes one-charge repair-verification cycle attempts from their child dispatches; persists blocking-finding dispositions and evidence; and permits one discovery stage followed by at most two repair-verification cycles without reset, extension, or dispatch-based overcharge on re-entry.
-    authority_status: formally_accepted_2026_08_20_planning_authority_only_review_series_ledger_controller_protocol_correction_policy_deduplication_fixtures_runtime_ci_hook_cutover_and_publication_held
-    verification_method: authority_inspection_then_future_VER-TW-087_deterministic_cross_wrapper_transition_fixtures
+    statement: TraceWeaver-controlled review and repair uses a persistent series across command, run, session, branch, wrapper, and publication-preparation re-entry; derives accepted-review identity from semantic_authority_digest, behavior_digest, verification_digest, and policy_epoch only; treats raw hashes, paths, and bookkeeping as audit metadata; permits one discovery plus one routine repair-verification cycle and a second only through an explicit retained-severe-blocker exception; and reopens only retained findings or genuine in-scope repair regressions.
+    authority_status: formally_accepted_bounded_static_controller_and_fixtures_implemented_VER_TW_087_and_bounded_code_review_passed_validation_runtime_active_host_staging_and_publication_held
+    verification_method: authority_inspection_then_VER-TW-087_deterministic_cross_wrapper_transition_fixtures
     validation_method: workflow_review
-    validation_question: Can TraceWeaver converge without repeated rediscovery, budget reset, lost findings, scope drift, or false authority acceptance?
+    validation_question: Can TraceWeaver reuse unchanged accepted meaning and close bookkeeping with zero reviewers while routing genuine changes once and terminating within its authorized repair budget?
     acceptance_criteria:
-      - One series permits exactly one discovery stage and at most two repair-verification cycles across command, run, and session re-entry.
-      - Re-entry resumes a matching series and never resets or extends its budget.
-      - Explicit new-series authority assigns a new immutable generation, predecessor identity, and authorization reason, so an otherwise identical later scope cannot collide with an earlier series.
-      - One attempt identity names one complete repair-verification cycle; all bounded repair and verification/review child calls have distinct dispatch identities mapped to that attempt, and the cycle budget decrements exactly once.
-      - Finding fingerprints bind governing rule, normalized semantic anchor, failure predicate, and claim impact; wording changes alone do not create a new finding.
-      - Blocking disposition follows REQ-TW-040, including applicable P2 findings; only non-blocking P2/P3 debt is recorded without another cycle.
-      - An accepted-review identity is reused without reviewer dispatch only when its complete frozen-scope identity, including concern or governing-rule set and canonical-protocol identity, plus its baseline, profile, target, objective, mode, changed-file, and verification identity inputs are unchanged and no new blocker exists.
-      - Repeated blockers, unchanged relevant evidence, repeated verification failure, non-monotonic blocker progress, or exhausted cycle budget terminates as held_no_progress only while unresolved blockers remain.
-      - Changes outside the frozen baseline, profile, target, objective, concern, or canonical-protocol scope terminate as held_scope_expansion and require explicit authorization for a new series generation.
-      - Terminal evaluation checks scope expansion first, then returns candidate_review_saturated for zero unresolved in-scope blocking findings, and only then applies held_no_progress while blockers remain; outstanding formal authority acceptance is separately recorded as held_authority_acceptance.
-      - Reviewer subagent dispatch queues pending reviewers under host capacity limits, treats active-agent/thread-limit errors as backpressure, closes completed reviewer agents when possible, and reports incomplete reviewer coverage instead of claiming success.
+      - One accepted-review identity is the canonical digest over exactly semantic_authority_digest, behavior_digest, verification_digest, and policy_epoch.
+      - Complete baseline and workflow-profile hashes, protocol paths and raw digests, HEAD, branch, index, session, command, wrapper, dispatch, receipt, projection, generated-view, Graphify, installation, and publication-preparation state are audit metadata only and do not launch review.
+      - Matching accepted-review identity with no new in-scope blocker returns reuse_accepted_review with zero reviewer dispatches.
+      - Only after a matching accepted review exists, identity-preserving bookkeeping returns mechanical_closure with zero reviewer dispatches and cannot invalidate the review it records; without a matching accepted review, review remains required.
+      - Applicable authority meaning changes route exactly one document review; reviewed behavior, linked-test, or meaningful verification changes route exactly one code review.
+      - One series permits exactly one discovery and one routine repair-verification cycle.
+      - A second and final cycle requires an owner- or approved change-control-authority decision receipt bound to the series, retained finding fingerprint, P0/P1/blocking-P2 severity and context, authorization reason, and final-cycle limit; agent-generated or self-authorized exceptions are invalid.
+      - One attempt identity names one repair-verification cycle; bounded repair and verification calls use distinct dispatch identities and charge the cycle once.
+      - Repair verification revisits only retained in-scope finding fingerprints and genuine in-scope repair regressions; non-blocking wording/style suggestions do not open another cycle.
+      - Repeated blockers, unchanged relevant evidence, failed progress, or exhausted authorized budget with blockers remaining returns held_no_progress.
+      - Policy-epoch change, authorized-envelope expansion, or a new out-of-scope blocker returns held_scope_expansion until explicitly authorized.
+      - Zero unresolved in-scope blockers returns candidate_review_saturated; pending formal acceptance remains separately visible as held_authority_acceptance.
+      - Reviewer dispatch queues remain bounded by host capacity and incomplete reviewer coverage cannot be reported as success.
   - id: REQ-TW-038
     intent_ids: [INTENT-TW-001, INTENT-TW-003]
     statement: Behavior-bearing code changes made by controlled automation must link test evidence to the matrix by default, unless an approved requirement or gap/exception authorizes non-test verification.
@@ -2145,8 +2158,8 @@ candidate_requirements:
       - release_readiness
   - id: REQ-TW-057
     status: active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held
-    review_series_convergence_revision_status: formally_accepted_2026_08_20_planning_authority_only_protocol_correction_policy_deduplication_fixtures_runtime_ci_hook_cutover_and_publication_held
-    review_series_convergence_review_id: TW-REQ-REVIEW-2026-08-13-REVIEW-SERIES-CONVERGENCE-001
+    review_series_convergence_revision_status: formally_accepted_canonical_protocol_policy_consolidation_wrapper_handoffs_and_fixtures_implemented_VER_TW_087_passed_locally_code_review_validation_runtime_active_host_staging_and_publication_held
+    review_series_convergence_review_id: TW-REQ-REVIEW-2026-08-21-LEAN-CONVERGENCE-AUTHORITY-ALIGNMENT-001
     authority_scope:
       - scripts/traceweaver-reconcile-codex-host-skills
       - scripts/traceweaver-smoke-codex-host-reconciliation
@@ -2321,7 +2334,7 @@ workflow_controls:
 task_capsule_minimum:
   task_id: required
   baseline_id: REQ-BASELINE-2026-04-30-001
-  baseline_hash_sha256: ecf96d03903f2e20983d78f7c5c05d885bd38d9bb1725878121456ee506637fe
+  baseline_hash_sha256: 6029a74f969c8f08efac96c6acb30cdd0078b4b798e5cebc1d7061aef6194d5a
   authorized_by: approved requirement ID or approved exception ID required for meaningful implementation
   intent_served: at least one INTENT-TW ID
   verification_required: required
@@ -2422,180 +2435,208 @@ req_tw_053_gated_publication_release_authority:
     - clean CE replacement
 
 review_series_convergence_authority_baseline:
-  decision_id: TW-OWNER-DECISION-2026-08-13-REVIEW-SERIES-CONVERGENCE-001
+  predecessor_decision_id: TW-OWNER-DECISION-2026-08-13-REVIEW-SERIES-CONVERGENCE-001
+  decision_id: TW-OWNER-DIRECTION-2026-08-21-LEAN-CONVERGENCE-001
   owner: Oxiom Systems
-  decision_source: explicit owner direction on 2026-08-13 following repeated candidate-evidence review and repair re-entry
-  candidate_amendment_id: REQ-AMEND-CANDIDATE-2026-08-13-001
-  requirements_review_id: TW-REQ-REVIEW-2026-08-13-REVIEW-SERIES-CONVERGENCE-001
-  requirements_review_path: docs/validation/traceweaver-2026-08-13-review-series-convergence-requirements-review.md
-  status: formally_accepted_2026_08_20_as_planning_authority_only_no_ledger_controller_protocol_correction_policy_deduplication_fixture_runtime_ci_hook_cutover_or_publication_authority
+  decision_source: explicit north-star goal direction on 2026-08-21
+  predecessor_requirements_review_id: TW-REQ-REVIEW-2026-08-13-REVIEW-SERIES-CONVERGENCE-001
+  candidate_amendment_id: REQ-AMEND-CANDIDATE-2026-08-21-001
+  requirements_review_id: TW-REQ-REVIEW-2026-08-21-LEAN-CONVERGENCE-AUTHORITY-ALIGNMENT-001
+  requirements_review_path: docs/validation/traceweaver-2026-08-21-lean-convergence-authority-alignment-requirements-review.md
+  status: formally_accepted_bounded_static_implementation_added_VER_TW_087_and_bounded_code_review_passed_validation_runtime_active_host_staging_and_publication_held
   requirements: [REQ-TW-037, REQ-TW-056, REQ-TW-057]
   requirement_types:
-    REQ-TW-037: system_workflow_invariant_with_persistent_cross_invocation_convergence_constraints
-    REQ-TW-056: orchestration_requirement_with_review_series_handoff_and_terminal_stop_constraints
-    REQ-TW-057: operating_mode_and_wrapper_interface_requirement_with_canonical_protocol_resolution_constraint
-  artifact_ids: [ART-TW-072]
-  trace_ids: [TRACE-TW-067]
-  acceptance_test_ids: [ATP-TW-042]
-  result_ids: [RESULT-TW-042]
-  verification_ids: [VER-TW-087]
-  validation_ids: [VAL-TW-035]
+    REQ-TW-037: system_workflow_invariant_with_persistent_semantic_review_identity_and_bounded_convergence
+    REQ-TW-056: orchestration_requirement_with_zero_review_reuse_mechanical_closure_and_bounded_repair_handoffs
+    REQ-TW-057: operating_mode_and_wrapper_interface_requirement_with_logical_canonical_protocol_resolution
+  existing_allocations:
+    artifact_ids: [ART-TW-072]
+    trace_ids: [TRACE-TW-067]
+    acceptance_test_ids: [ATP-TW-042]
+    result_ids: [RESULT-TW-042]
+    verification_ids: [VER-TW-087]
+    validation_ids: [VAL-TW-035]
   series_contract:
     stages:
       discovery: exactly_one_per_explicitly_authorized_new_series
-      repair_verification: at_most_two_cycles_per_series
-    accounting_boundary: repair_verification_cycle_at_series_level_across_command_run_and_session_reentry
-    repair_cycle_boundary: one_attempt_identity_encompasses_the_bounded_repair_and_resulting_verification_or_review_dispatches_for_one_pass
-    repair_cycle_charge_rule: decrement_remaining_cycle_budget_exactly_once_when_the_cycle_opens_never_once_per_dispatch
-    dispatch_boundary: each_wrapper_or_child_call_has_a_distinct_dispatch_identity_bound_to_its_series_stage_and_attempt
-    override_boundary: explicit_authority_may_open_a_new_series_generation_but_cannot_extend_or_reset_the_current_series
-    new_series_authorization_fields:
-      - immutable_series_generation_id
-      - predecessor_series_identity_or_none
-      - authorization_reason
-    generation_collision_rule: a_newly_authorized_series_generation_is_distinct_even_when_every_frozen_scope_field_matches_a_terminal_predecessor
-    frozen_scope_fields:
-      - originating_requirements_baseline_revision
-      - originating_workflow_profile_revision
-      - target_set
-      - review_objective
-      - concern_or_rule_set
-      - canonical_review_protocol_path
-      - canonical_review_protocol_version
-      - canonical_review_protocol_digest
-    stable_series_identity: derived_from_immutable_series_generation_id_predecessor_identity_and_frozen_scope_identity_not_from_changed_file_digest
-    attempt_identity: distinct_per_repair_verification_cycle_and_bound_to_series_generation_series_mode_and_cycle_ordinal
-    dispatch_identity: distinct_per_wrapper_or_child_dispatch_and_bound_to_series_stage_and_attempt_identity
-    ledger_fields:
-      - series_generation_id
-      - predecessor_series_identity
-      - new_series_authorization_reason
-      - series_identity
-      - attempt_identity
-      - dispatch_identity
-      - mode
-      - frozen_scope_identity
-      - canonical_review_protocol_identity
-      - finding_fingerprint
-      - finding_disposition
-      - blocking_disposition
-      - eligibility
-      - evidence_delta
-      - unresolved_blocking_finding_progress
-      - remaining_cycle_budget
-      - accepted_review_identity
-      - terminal_outcome
-      - authority_acceptance_state
-    finding_fingerprint_fields:
-      - governing_rule
-      - normalized_semantic_anchor
-      - failure_predicate
-      - claim_impact
-    fingerprint_boundary: wording_changes_alone_do_not_create_a_new_finding
-    blocking_finding_rule: unresolved_in_scope_findings_block_when_REQ_TW_040_marks_their_severity_and_impact_blocking_including_applicable_p2_findings
-    accepted_review_identity_inputs:
-      - requirements_baseline_hash
-      - workflow_profile_hash
-      - frozen_scope_identity
-      - canonical_review_protocol_path
-      - canonical_review_protocol_version
-      - canonical_review_protocol_digest
-      - target_set
-      - review_objective
-      - review_mode
-      - changed_file_digest
-      - verification_digest
-    accepted_review_identity_rule: canonical_digest_over_all_identity_inputs
-    accepted_review_scope_binding: frozen_scope_identity_canonically_covers_every_frozen_scope_field_including_concern_or_rule_set_and_canonical_review_protocol_identity_and_any_frozen_scope_change_invalidates_reuse
-    accepted_review_reuse_match: exact_identity_inputs_unchanged_no_new_unresolved_in_scope_blocker_and_matching_accepted_review_identity
-    accepted_review_reuse_effect: zero_reviewer_dispatch
-    routine_finding_rule: only_non_blocking_p2_and_p3_debt_is_recorded_without_opening_another_cycle
-    eligible_repair_rule: every_unresolved_in_scope_blocking_finding_under_REQ_TW_040_and_every_genuine_in_scope_repair_regression_is_eligible
-    regression_boundary: genuine_in_scope_repair_regression_may_become_an_eligible_blocker_but_never_resets_the_repair_cycle_cap
-    monotonic_progress_rule: each_repair_verification_cycle_must_reduce_the_unresolved_in_scope_blocking_fingerprint_set_or_supply_a_relevant_evidence_delta_that_changes_a_blocking_disposition
-    scope_expansion_rule: changed_baseline_profile_target_objective_concern_or_canonical_protocol_identity_or_a_new_out_of_scope_blocker_terminates_the_current_series_and_requires_explicit_new_series_generation_authority
-    terminal_evaluation_order:
-      - held_scope_expansion_when_any_frozen_scope_field_changed_or_a_new_blocker_is_outside_scope
-      - candidate_review_saturated_when_zero_unresolved_in_scope_blocking_findings_remain
-      - held_no_progress_when_unresolved_blockers_remain_and_progress_fails_relevant_evidence_is_unchanged_verification_repeats_failure_or_the_two_cycle_budget_is_exhausted
+      routine_repair_verification: exactly_one_available_cycle
+      severe_exception_repair_verification: one_final_cycle_only_when_owner_or_approved_change_control_authority_receipt_binds_series_retained_finding_fingerprint_p0_p1_or_blocking_p2_severity_and_context_authorization_reason_and_final_cycle_limit
+    identity:
+      accepted_review_identity_inputs:
+        - semantic_authority_digest
+        - behavior_digest
+        - verification_digest
+        - policy_epoch
+      accepted_review_identity_rule: canonical_digest_over_exactly_the_four_semantic_inputs
+      series_generation_rule: immutable_generation_predecessor_and_authorization_reason_prevent_collision_without_entering_accepted_review_identity
+      audit_metadata_only:
+        - requirements_baseline_hash
+        - workflow_profile_hash
+        - canonical_protocol_registered_path
+        - canonical_protocol_resolved_path
+        - canonical_protocol_version
+        - canonical_protocol_raw_digest
+        - head
+        - branch
+        - git_index
+        - session
+        - command
+        - wrapper
+        - dispatch_id
+        - review_id
+        - receipt_id
+        - matrix_projection
+        - generated_view
+        - graphify_state
+        - installation_hash
+        - publication_preparation
+    accounting:
+      repair_cycle_charge_rule: one_charge_when_the_logical_cycle_opens_never_once_per_dispatch
+      attempt_identity: one_per_repair_verification_cycle
+      dispatch_identity: distinct_per_wrapper_or_child_call_and_bound_to_series_stage_and_attempt
+      reentry_rule: resume_exact_generation_and_semantic_scope_without_reset_or_extension
+    finding_contract:
+      fingerprint_fields: [governing_rule, normalized_semantic_anchor, failure_predicate, claim_impact]
+      repair_eligibility: retained_in_scope_blockers_and_genuine_in_scope_repair_regressions_only
+      debt_rule: non_blocking_p2_p3_or_wording_style_debt_never_opens_another_cycle
+      progress_rule: unresolved_blocker_set_must_decrease_or_relevant_evidence_must_change_a_blocking_disposition
+    routing:
+      unchanged_accepted_review: reuse_accepted_review_zero_reviewers
+      identity_preserving_bookkeeping_after_matching_accepted_review_exists: mechanical_closure_zero_reviewers
+      identity_preserving_bookkeeping_without_matching_accepted_review: review_required
+      applicable_authority_meaning_change: document_review_one_reviewer
+      reviewed_behavior_linked_test_or_meaningful_verification_change: code_review_one_reviewer
+      policy_epoch_or_authorized_envelope_change: held_scope_expansion_zero_reviewers
+    terminal_precedence:
+      - held_scope_expansion_when_policy_epoch_or_authorized_envelope_changed_or_a_new_blocker_is_outside_scope
+      - candidate_review_saturated_when_zero_unresolved_in_scope_blockers_remain
+      - held_no_progress_when_blockers_remain_and_progress_fails_evidence_is_unchanged_verification_repeats_failure_or_authorized_budget_is_exhausted
       - otherwise_series_remains_open
-    terminal_outcomes:
-      candidate_review_saturated: zero_unresolved_in_scope_blocking_findings_after_scope_integrity_passes
-      held_no_progress: unresolved_blockers_remain_and_repeated_blocker_exhausted_cycle_budget_unchanged_relevant_evidence_repeated_verification_failure_or_non_monotonic_blocker_progress_applies
-      held_scope_expansion: frozen_scope_changed_or_new_blocker_is_outside_the_frozen_scope
-      held_authority_acceptance: formal_authority_acceptance_or_coherent_accepted_review_identity_is_still_outstanding
-    terminal_dimension_boundary: candidate_review_saturated_and_held_authority_acceptance_are_separate_receipt_dimensions_and_may_coexist
+    authority_dimension: held_authority_acceptance_is_separate_from_candidate_review_saturated_and_requires_its_own_receipt
   wrapper_allocation:
-    tw_auto: create_or_resume_series_before_review_bearing_child_dispatch_open_each_repair_cycle_once_and_pass_generation_series_attempt_dispatch_protocol_ledger_blocker_reuse_and_budget_fields
-    tw_doc_review: resolve_matching_series_use_discovery_only_for_an_explicitly_authorized_new_generation_otherwise_verify_within_the_current_repair_cycle_and_allocate_distinct_dispatch_identities
-    tw_work: resolve_matching_series_repair_only_eligible_in_scope_blockers_within_the_current_cycle_and_allocate_distinct_dispatch_identities_without_resetting_accounting_or_widening_scope
-    review_staging: preserve_series_generation_series_attempt_cycle_budget_protocol_identity_ledger_digest_and_terminal_state
-    accepted_review_reuse: return_the_exact_matching_identity_without_reviewer_dispatch_only_when_all_identity_inputs_are_unchanged_and_no_new_blocker_exists
+    tw_auto: resolve_or_create_series_once_route_zero_or_one_reviewer_and_pass_semantic_identity_accounting_and_blocker_state
+    tw_doc_review: use_discovery_only_for_an_explicit_new_generation_otherwise_verify_retained_findings_or_authority_regressions
+    tw_code_review: review_only_changed_behavior_linked_tests_meaningful_verification_or_new_in_scope_behavior_blockers
+    tw_work: repair_only_retained_in_scope_blockers_and_genuine_in_scope_regressions_inside_the_current_attempt
+    review_staging_and_publication_preparation: preserve_series_state_and_close_identity_preserving_bookkeeping_mechanically
   canonical_protocol_contract:
-    rule: each_callable_wrapper_resolves_one_registered_canonical_review_protocol
-    identity_fields: [registered_path, version, sha256_digest]
-    freeze_rule: canonical_protocol_identity_is_frozen_in_the_series_and_accepted_review_identity
-    reuse_invalidation_rule: any_protocol_path_version_or_digest_change_prevents_accepted_review_reuse_and_requires_scope_expansion_disposition
-    packaged_mirror_rule: any_required_packaged_mirror_must_pass_deterministic_parity_checking_before_use
-    current_state: authority_only_protocol_path_correction_and_duplicate_policy_source_correction_held
-  deterministic_future_fixture_scenarios:
-    - same_frozen_scope_new_generation_after_terminal_has_distinct_series_identity_and_predecessor_link
-    - one_discovery_plus_two_repair_verification_cycle_cap_across_direct_and_tw_auto_reentry
-    - one_cycle_with_tw_work_multiple_reviewers_and_tw_doc_review_verification_is_charged_once_while_every_child_has_a_distinct_dispatch_identity
-    - durable_fingerprint_deduplication_and_disposition_reuse_across_command_and_session_reentry
-    - unchanged_evidence_repeated_blocker_or_exhausted_cycle_budget_with_blockers_remaining_terminates_held_no_progress
-    - final_allowed_cycle_that_closes_all_blockers_terminates_candidate_review_saturated_not_held_no_progress
-    - baseline_profile_target_objective_concern_or_canonical_protocol_change_terminates_held_scope_expansion
-    - exact_accepted_review_identity_reuse_dispatches_zero_reviewers_and_any_identity_input_change_including_a_concern_or_rule_set_only_change_invalidates_reuse
-    - blocking_p2_is_eligible_and_prevents_saturation_while_non_blocking_p2_or_p3_only_state_records_debt_without_reopening_a_cycle
-    - zero_unresolved_in_scope_blocking_findings_terminates_candidate_review_saturated
-    - candidate_saturation_with_pending_formal_acceptance_also_records_held_authority_acceptance
-    - genuine_in_scope_repair_regression_is_eligible_without_resetting_the_cap
+    logical_identity: registered_protocol_plus_explicit_policy_epoch
+    physical_resolution: resolve_one_repository_or_installed_path_and_verify_required_packaged_mirror_parity
+    audit_boundary: physical_paths_versions_and_raw_digests_are_receipt_metadata_not_review_routing_inputs
+    policy_break_rule: only_an_explicit_policy_epoch_change_invalidates_semantic_review_compatibility
+  deterministic_fixture_scenarios:
+    - same_session_and_cross_session_exact_reuse_dispatch_zero_reviewers
+    - branch_head_index_wrapper_command_dispatch_and_publication_preparation_changes_dispatch_zero_reviewers
+    - status_receipt_projection_generated_view_graphify_installation_and_unrelated_baseline_or_profile_metadata_close_mechanically
+    - applicable_authority_semantics_change_dispatches_one_document_reviewer
+    - reviewed_behavior_or_meaningful_verification_change_dispatches_one_code_reviewer
+    - protocol_wording_or_physical_path_change_with_same_policy_epoch_dispatches_zero_reviewers
+    - one_routine_repair_cycle_closes_or_terminates_held_no_progress
+    - second_cycle_is_refused_without_owner_or_approved_change_control_authority_receipt_bound_to_series_retained_finding_fingerprint_severity_context_reason_and_final_cycle_limit
+    - retained_finding_and_genuine_repair_regression_only_verification_scope
+    - accepted_review_and_its_bookkeeping_close_atomically
     - canonical_protocol_and_required_packaged_mirror_are_deterministically_equal
   conflict_boundaries:
-    REQ-TW-086: remains_conditionally_approved_and_held_under_its_existing_activation_condition_and_does_not_supply_current_behavior_authority
-    REQ-TW-060_088: formally_accepted_2026_08_20_planning_authority_only_without_semantic_change
-    REQ-TW-089_090: optional_graphify_enrichment_is_preserved_and_is_not_a_review_series_ledger_or_gate
-    semantic_html_candidate_worktree: separate_candidate_source_evidence_only_and_untouched
-  requirements_review_child_receipts:
-    - role: convergence_requirement_quality
-      requested_model: gpt-5.6-terra
-      served_model: unattested
-      requested_reasoning_effort: high
-      fork_bound: none
-      capability_evidence: explicit_dispatch_request_only_no_independent_host_or_execution_served_model_attestation
-      outcome: advisory_input_only_held_model_unattested_not_formal_review_authority
-    - role: convergence_trace_and_authority_impact
-      requested_model: gpt-5.6-terra
-      served_model: unattested
-      requested_reasoning_effort: high
-      fork_bound: none
-      capability_evidence: explicit_dispatch_request_only_no_independent_host_or_execution_served_model_attestation
-      outcome: advisory_input_only_held_model_unattested_not_formal_review_authority
-    - role: convergence_vv_and_feasibility
-      requested_model: gpt-5.6-terra
-      served_model: unattested
-      requested_reasoning_effort: high
-      fork_bound: none
-      capability_evidence: explicit_dispatch_request_only_no_independent_host_or_execution_served_model_attestation
-      outcome: advisory_input_only_held_model_unattested_not_formal_review_authority
+    REQ-TW-060: model_routing_remains_separate_and_held
+    REQ-TW-088: mandatory_tw_graph_remains_separate_and_held
+    REQ-TW-089_090: optional_graphify_enrichment_is_preserved_and_never_authority
+    semantic_html: candidate_work_remains_separate_and_held
+    release_automation: parked_until_core_pillars_and_integrated_validation_pass
+  reviewer_receipt:
+    route: main_coordinator_formal_review_with_independent_child_advisory_only
+    requested_child_model: gpt-5.6-terra
+    requested_reasoning_effort: xhigh
+    served_child_model: unattested
+    child_formal_evidence_state: held_model_unattested
+    outcome: candidate_review_saturated_no_child_output_used_as_formal_evidence
   allowed_scope:
-    - use the formally accepted definitions as planning authority only
-    - allocate ART-TW-072, TRACE-TW-067, ATP-TW-042, RESULT-TW-042, VER-TW-087, and VAL-TW-035
-    - record formal acceptance/status/hash/derived-view/review-staging preparation only
+    - revise only REQ-TW-037, REQ-TW-056, REQ-TW-057 and their existing TRACE-TW-067 ATP-TW-042 RESULT-TW-042 VER-TW-087 VAL-TW-035 contract
+    - preserve all existing controlled identifiers without new ART_TRACE_ATP_RESULT_VER_VAL allocation
+    - bounded implementation is limited to the convergence controller protocol policy wrapper fixtures and CI slice
   held_claims:
-    - review_series_ledger_or_controller_implementation
-    - packaged_scoped_review_protocol_path_correction
-    - duplicate_autonomy_or_review_policy_source_deduplication
-    - deterministic_transition_or_protocol_parity_fixtures
-    - routing_adapter_or_model_route_implementation
+    - convergence_code_review_passed_no_additional_review_without_semantic_identity_change
+    - VAL_TW_035_owner_validation_and_active_host_runtime
+    - model_routing_implementation_or_attestation
     - tw_graph_or_graphify_behavior_change
-    - wrapper_lifecycle_hook_or_ci_enforcement
-    - runtime_or_active_host_mutation
-    - semantic_html_cutover_or_authority_migration
-    - accepted_review_identity
+    - semantic_html_implementation_or_cutover
+    - runtime_or_active_host_claim
     - stage_commit_push_pr_merge_release_deployment_or_publication
 
+lean_convergence_formal_authority_acceptance_2026_08_21:
+  acceptance_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-21-LEAN-CONVERGENCE-001
+  owner: Oxiom Systems
+  date: 2026-08-21
+  authority_source: owner_north_star_goal_to_complete_and_release_the_ordered_core_architecture
+  receipt_path: docs/validation/traceweaver-2026-08-21-lean-convergence-formal-authority-acceptance.md
+  accepted_requirements: [REQ-TW-037, REQ-TW-056, REQ-TW-057]
+  authority_effect: formally_accepted_planning_authority_only
+  accepted_review_identity_schema: traceweaver-accepted-review-identity/2
+  accepted_review_identity_inputs:
+    semantic_authority_digest: sha256:37c2af417df1822697cc13234a92e239dd8229888883324b24dfabed0578bb16
+    behavior_digest: sha256:c671ec1ed601c0cbea66e54a0b33f2eabf3de046ef723cfddea3c9efb6b71573
+    verification_digest: sha256:058ec8cc2f9e3b817f6ec203eb1eceb3f245a94c1603fcd194efe6331c5673de
+    policy_epoch: tw-review-policy/2026-08-21
+  accepted_review_identity: sha256:176c62102ae36bd73fbe408d131d5aadc4b53805e4c4e96b74c14645d331646d
+  review_series:
+    discovery: consumed_once
+    repair_verification_cycle_1: passed_retained_findings_closed
+    routine_cycles_consumed: 1
+    severe_exception_cycle_consumed: 0
+    terminal_outcome: candidate_review_saturated
+    authority_dimension: formally_accepted
+  held_effects:
+    - implementation_until_separate_authority_gate
+    - VER_TW_087_not_executed
+    - VAL_TW_035_not_satisfied
+    - runtime_active_host_CI_hook_cutover_and_publication
+    - Terra_tw_graph_Graphify_semantic_HTML_release_automation_and_release_train_later_pillars
+
+lean_convergence_implementation_2026_08_21:
+  gate_id: TW-AUTH-GATE-2026-08-21-REQ-TW-037-056-057-CONVERGENCE-IMPLEMENTATION-001
+  authority_ref: docs/plans/2026-08-21-lean-convergence-implementation-authority-gate.md
+  requirements: [REQ-TW-037, REQ-TW-056, REQ-TW-057]
+  trace_id: TRACE-TW-067
+  acceptance_test_id: ATP-TW-042
+  result_id: RESULT-TW-042
+  verification_id: VER-TW-087
+  validation_id: VAL-TW-035
+  status: bounded_static_implementation_local_deterministic_verification_and_bounded_code_review_passed
+  implementation:
+    controller: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    router: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-review
+    wrappers: [tw-auto, tw-work, tw-doc-review, tw-code-review]
+    canonical_protocol: plugins/traceweaver-core/references/scoped-review-protocol.md
+    consolidated_policy: plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md
+    terminal_receipt: plugins/traceweaver-core/references/terminal-receipt-template.yml
+    workflow_profile: plugins/traceweaver-core/references/workflow-profile-template.yml
+    automation_loop_state: plugins/traceweaver-core/references/automation-loop-state-template.yml
+    packaged_mirror_root: plugins/traceweaver-core/skills/tw-auto/references
+    fixture_smoke: scripts/traceweaver-smoke-review-series-convergence
+    ci_invocation: .github/workflows/smoke-tests.yml
+  verification:
+    red_evidence: docs/validation/evidence/review-series-convergence-red.txt
+    green_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md
+    focused_smokes:
+      - scripts/traceweaver-smoke-review-series-convergence
+      - scripts/traceweaver-smoke-scoped-review
+      - scripts/traceweaver-smoke-workflow-profile
+      - scripts/traceweaver-smoke-no-publication
+      - TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-tw-skill-behavior
+    result: passed_locally
+  code_review:
+    review_id: TW-CODE-REVIEW-2026-08-21-REVIEW-SERIES-CONVERGENCE-001
+    receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-code-review.md
+    accepted_review_identity: sha256:46e491dab0ed7d28fef0c8095fe7aec62d84cadbcdddf43aaa46b9698267b829
+    discovery_passes_consumed: 1
+    routine_repair_verification_cycles_consumed: 1
+    severe_exception_cycles_consumed: 0
+    terminal_outcome: candidate_review_saturated
+  evidence_boundary:
+    code_review: passed_no_repeat_without_semantic_identity_change
+    active_host_runtime: held
+    owner_validation: held_VAL_TW_035
+    staging_and_publication: held
+    later_pillars: held_Terra_tw_graph_semantic_HTML_integrated_validation_release_automation
 req_tw_060_088_authority_baseline:
   decision_id: TW-OWNER-DECISION-2026-08-11-REQ-TW-060-088-001
   owner: Oxiom Systems

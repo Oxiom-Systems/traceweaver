@@ -3,6 +3,7 @@ set -euo pipefail
 
 # TRACEWEAVER: file-role=traceweaver-no-publication-smoke; req=REQ-TW-043; trace=TRACE-TW-013; ver=VER-TW-022
 # TRACEWEAVER: verifies=VER-TW-022; req=REQ-TW-043; trace=TRACE-TW-013
+# TRACEWEAVER: verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_dir="$(mktemp -d)"
 trap 'rm -rf "$tmp_dir"' EXIT
@@ -150,9 +151,10 @@ require_present "$tw_grill_skill" "Do not edit project context or authority docu
 require_present "$lfg_skill" "Invoke \`tw-auto\` with the same arguments"
 require_present "$lfg_skill" "Do not run \`ce-plan\`, \`ce-work\`, \`ce-code-review\`, \`ce-commit\`"
 require_present "$lfg_skill" "Do not fall back to raw CE \`lfg\`"
-require_present "$tw_auto_skill" "at most two active"
-require_present "$tw_auto_skill" "at most three personas"
-require_present "$tw_auto_skill" "no more than two repair cycles"
+require_present "$tw_auto_skill" "exactly one review-bearing"
+require_present "$tw_auto_skill" "one reviewer persona"
+require_present "$tw_auto_skill" "one routine repair-verification cycle"
+require_present "$tw_auto_skill" "two is the absolute maximum"
 require_present "$tw_auto_skill" "held_no_progress"
 require_present "$tw_auto_skill" "tw-commit-push-pr"
 require_present "$tw_auto_skill" "never stages, commits, pushes, opens a PR"
@@ -227,10 +229,10 @@ if [ -f "$gh_marker" ]; then
 fi
 
 profile_reviewer_cap=1
-profile_active_reviewer_cap=2
-profile_persona_cap=3
-profile_repair_cycle_cap=2
-if [ "$profile_reviewer_cap" -ne 1 ] || [ "$profile_active_reviewer_cap" -ne 2 ] || [ "$profile_persona_cap" -ne 3 ] || [ "$profile_repair_cycle_cap" -ne 2 ]; then
+profile_active_reviewer_cap=1
+profile_persona_cap=1
+profile_repair_cycle_cap=1
+if [ "$profile_reviewer_cap" -ne 1 ] || [ "$profile_active_reviewer_cap" -ne 1 ] || [ "$profile_persona_cap" -ne 1 ] || [ "$profile_repair_cycle_cap" -ne 1 ]; then
   echo "profile_review_caps=failed"
   exit 1
 fi

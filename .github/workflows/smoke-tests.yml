@@ -1,4 +1,5 @@
 # TRACEWEAVER: file-role=code-traceability-ci-workflow; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
+# TRACEWEAVER: verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
 name: Smoke tests
 
 # Runs the TraceWeaver discovery/traceability smokes on pull requests and on
@@ -59,6 +60,21 @@ jobs:
 
       - name: Generated-views drift smoke
         run: scripts/traceweaver-smoke-traceability-generated-views
+
+      - name: Review-series convergence smoke
+        run: scripts/traceweaver-smoke-review-series-convergence
+
+      - name: Scoped-review regression smoke
+        run: scripts/traceweaver-smoke-scoped-review
+
+      - name: Workflow-profile regression smoke
+        run: scripts/traceweaver-smoke-workflow-profile
+
+      - name: No-publication regression smoke
+        run: scripts/traceweaver-smoke-no-publication
+
+      - name: TraceWeaver skill-behavior regression smoke
+        run: TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior
 
       - name: Code traceability smoke
         run: scripts/traceweaver-smoke-code-traceability

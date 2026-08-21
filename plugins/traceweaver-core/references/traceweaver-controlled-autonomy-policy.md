@@ -1,3 +1,5 @@
+<!-- TRACEWEAVER: file-role=controlled-autonomy-policy; req=REQ-TW-056; trace=TRACE-TW-067; ver=VER-TW-087 -->
+
 # TraceWeaver Controlled Autonomy Policy
 
 Status: alpha advisory policy
@@ -60,7 +62,7 @@ bootstrap draft authority files first:
 - create root `requirements.md` from the user's request and the packaged
   `requirements-baseline-template.md`;
 - create `.traceweaver/intent-contract.yml` from the draft baseline and the
-  packaged `intent-contract-template.yml`;
+  skill-local `intent-contract-template.yml`;
 - create root `traceability-matrix.md` from the draft baseline and Intent
   Contract;
 - stop before implementation and recommend `tw-requirements-review` plus human
@@ -91,7 +93,24 @@ from the accepted baseline and Intent Contract, then must run
 
 ## Progress And Cycle Limits
 
-Default review-fix budget: two cycles per run.
+Every review-bearing route uses the persistent controller defined by the
+canonical `scoped-review-protocol.md`. One explicitly authorized routine series
+permits one discovery stage followed by one repair-verification cycle. One
+final cycle is available only through an owner- or approved
+change-control-authority decision receipt bound to the series, retained finding
+fingerprint, P0/P1/blocking-P2 severity and context, authorization reason, and
+final-cycle limit; agent-generated or self-authorized exceptions are invalid.
+Two cycles remain the absolute cap. The budget belongs to the immutable series
+generation and follows it across command, run, session, branch, wrapper, and
+publication-preparation boundaries. It decrements once per logical
+repair-verification attempt, never once per child dispatch.
+
+Accepted-review reuse and post-acceptance bookkeeping consume no cycle when
+the semantic-authority, behavior, verification, and policy-epoch identity is
+unchanged. Bookkeeping without a matching accepted review remains
+review-required. Raw baseline, profile, protocol-file, branch, index, receipt,
+projection, Graphify, installation, and publication-preparation coordinates are
+audit metadata only.
 
 Stop before another cycle when:
 
@@ -104,8 +123,11 @@ Stop before another cycle when:
 - behavior duplicates or expands existing behavior without authority;
 - continuing requires new or changed requirements.
 
-Projects may override the cycle limit only through reviewed project-local Intent
-Contract policy.
+Projects may reduce the routine budget through reviewed project-local policy.
+They cannot increase or reset an active series. One final severe-exception
+cycle is available only through the external receipt defined above; a broader
+change requires explicit authority for a distinct successor generation after
+the current series terminates.
 
 ## Severity Policy
 
@@ -117,11 +139,16 @@ Contract policy.
 
 ## Commit, Push, And PR Boundary
 
-`tw-auto` alpha must stop before commit, push, or PR creation. It may recommend
-the next git or CE command, but it must not claim that autonomous publication is
-approved.
+`tw-auto` must stop before performing direct commit, push, or PR creation. When
+the exact work package has current approved authority, coherent traceability,
+passing verification, clean review, stable tree identity, verified target and
+credentials, and explicit human confirmation, it may route to
+`tw-commit-push-pr`. Only that wrapper may issue and consume the single-use
+publication capsule used by the packaged publication delegate. Any stale or
+changed field returns control to the appropriate gate.
 
-Commit/push/PR automation remains a later runtime/U9 claim.
+Arbitrary autonomous publication without a current exact-target capsule remains
+held.
 
 ## Compatibility Aliases
 
@@ -141,14 +168,24 @@ The following remain held:
 - dynamic no-forced discovery;
 - full Core 11 runtime suite;
 - release-ready, package-ready, or upstream-ready status;
-- autonomous commit, push, or PR publication.
+- arbitrary autonomous commit, push, PR, or merge publication without a
+  current exact-target capsule.
 
 ## Suggested Next Step Rule
 
 Every `tw-auto` outcome must end with exactly one recommended next step:
 
-- continue with another bounded cycle;
-- run a named CE/TW review gate;
+- continue internally with another bounded cycle;
+- run an embedded TraceWeaver review gate only when `tw-auto` can execute it as
+  part of the current loop;
 - create or update a gap/change/exception/clarification;
 - request a human authority decision;
-- stop before commit/push/PR with required evidence named.
+- route an exact reviewed target to `tw-commit-push-pr`, or stop before
+  commit/push/PR with the missing evidence named.
+
+Do not present `/tw-code-review`, `/tw-doc-review`, or
+`/tw-traceability-check` as the sole manual next command after successful
+`tw-work` when authority is clear and `tw-auto` can continue. Those lower
+wrappers are valid standalone next steps only for explicit diagnostics, audits,
+baseline reviews, missing-wrapper degradation, reviewer-capacity holds, or a
+human authority decision that blocks the higher-level loop.

@@ -1,3 +1,4 @@
+# TRACEWEAVER: file-role=review-series-workflow-profile-fixture; verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
 task_id: TASK-L1
 profile_revision: 1
 risk: L1
@@ -6,7 +7,8 @@ selected_controls: [compact_authority_reference, focused_verification, fresh_ver
 child_roles: { builder: terra, verifier: terra, reviewer: terra }
 model_selection: { availability: [terra], choice: terra, rationale: bounded behavior and one independent review }
 reviewer_cap: 1
-repair_cycle_cap: 2
+repair_cycle_cap: 1
+severe_blocker_exception_cycle_cap: 1
 requires_deploy: false
 requires_chrome_dogfood: false
 profile_hash: sha256:l1-frozen

@@ -1,4 +1,5 @@
-schema_version: tw-auto-loop-state/2
+# TRACEWEAVER: file-role=review-series-loop-state-template; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087
+schema_version: tw-auto-loop-state/3
 traceweaver_mode: advisory
 status: selecting_workflow_profile
 
@@ -10,6 +11,29 @@ workflow_profile:
   status: planned
   escalation_reason: null
   immutable_after_first_builder_dispatch: true
+
+review_series:
+  ledger_schema: tw-review-series-ledger/1
+  ledger_dir: .traceweaver/review-series
+  series_generation_id: "<RS-GEN-ID>"
+  predecessor_series_identity: null
+  series_identity: "sha256:<series-identity>"
+  frozen_scope_identity: "sha256:<routing-scope-identity>"
+  policy_epoch: tw-review-policy/2026-08-21
+  stage: discovery
+  attempt_identity: null
+  dispatch_identities: []
+  reviewer_dispatch_cap_per_attempt: 1
+  routine_repair_cycle_limit: 1
+  severe_blocker_exception_cycle_cap: 1
+  absolute_repair_cycle_limit: 2
+  remaining_repair_cycles: 1
+  severe_blocker_exception: null
+  unresolved_blocking_fingerprints: []
+  relevant_evidence_digest: null
+  accepted_review_identity: null
+  review_terminal_outcome: null
+  authority_acceptance_state: held_authority_acceptance
 
 accounting:
   observer: orchestration_harness
@@ -44,4 +68,4 @@ stop:
   human_decision_required: false
   terminal_result: pending
 
-next_recommended_step: "select and freeze the workflow profile before any builder dispatch"
+next_recommended_step: "create or resume the authorized review series before any review-bearing dispatch"

@@ -1,0 +1,956 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=persistent-review-series-controller; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087
+# TRACEWEAVER: entrypoint=review_series_event_controller; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087
+
+require "digest"
+require "fileutils"
+require "json"
+require "optparse"
+require "pathname"
+require "tempfile"
+require "yaml"
+
+COMMAND_SCHEMA = "tw-review-series-command/1"
+LEDGER_SCHEMA = "tw-review-series-ledger/1"
+RECEIPT_SCHEMA = "tw-review-series-receipt/1"
+PROTOCOL_VERSION_PREFIX = "Protocol version: `"
+ROUTINE_REPAIR_CYCLE_LIMIT = 1
+MAX_REPAIR_CYCLE_LIMIT = 2
+BLOCKING_P2_CONTEXTS = %w[
+  authority
+  requirements
+  tests
+  traceability
+  validation
+  release_claims
+  security
+  data_integrity
+  runtime_safety
+].freeze
+ACCEPTED_REVIEW_FIELDS = %w[
+  semantic_authority_digest
+  behavior_digest
+  verification_digest
+  policy_epoch
+].freeze
+ROUTING_SCOPE_FIELDS = %w[
+  target_paths
+  review_objective
+  concerns
+  policy_epoch
+].freeze
+MECHANICAL_CHANGE_KINDS = %w[
+  branch
+  command
+  dispatch_id
+  generated_view
+  git_index
+  graphify_state
+  head
+  installation_hash
+  matrix_projection
+  protocol_wording
+  publication_preparation
+  receipt
+  requirements_baseline_metadata
+  review_id
+  run
+  session
+  status
+  workflow_profile_metadata
+  wrapper
+].freeze
+REVIEW_WRAPPER_BY_ROUTE = {
+  "document_review" => "tw-doc-review",
+  "code_review" => "tw-code-review"
+}.freeze
+REVIEW_WRAPPERS = REVIEW_WRAPPER_BY_ROUTE.values.freeze
+
+class ControllerError < StandardError; end
+
+def require_string!(mapping, field)
+  value = mapping[field]
+  raise ControllerError, "#{field} must be a non-empty string" unless value.is_a?(String) && !value.strip.empty?
+
+  value.strip
+end
+
+def require_array!(mapping, field)
+  value = mapping[field]
+  unless value.is_a?(Array) && !value.empty? && value.all? { |item| item.is_a?(String) && !item.strip.empty? }
+    raise ControllerError, "#{field} must be a non-empty array of non-empty strings"
+  end
+
+  value.map(&:strip).uniq.sort
+end
+
+def require_mapping!(mapping, field)
+  value = mapping[field]
+  raise ControllerError, "#{field} must be a mapping" unless value.is_a?(Hash)
+
+  canonical(value)
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, result|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      result[key] = canonical(value.fetch(source_key))
+    end
+  when Array
+    value.map { |item| canonical(item) }
+  else
+    value
+  end
+end
+
+def identity(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def contained_path(root, raw_path)
+  candidate = Pathname.new(raw_path)
+  raise ControllerError, "canonical protocol path must be relative" if candidate.absolute?
+
+  resolved = root.join(candidate).cleanpath
+  root_text = root.cleanpath.to_s
+  resolved_text = resolved.to_s
+  unless resolved_text == root_text || resolved_text.start_with?("#{root_text}#{File::SEPARATOR}")
+    raise ControllerError, "canonical protocol path escapes --root"
+  end
+
+  resolved
+end
+
+def normalize_protocol!(root, protocol, verify:, canonical_protocol_file: nil)
+  raise ControllerError, "frozen_scope.canonical_protocol must be a mapping" unless protocol.is_a?(Hash)
+
+  normalized = {
+    "path" => require_string!(protocol, "path"),
+    "version" => require_string!(protocol, "version"),
+    "digest" => require_string!(protocol, "digest")
+  }
+  return normalized unless verify
+
+  path = if canonical_protocol_file
+           Pathname.new(canonical_protocol_file).expand_path
+         else
+           contained_path(root, normalized.fetch("path"))
+         end
+  raise ControllerError, "canonical protocol does not exist: #{normalized['path']}" unless path.file?
+
+  actual_digest = "sha256:#{Digest::SHA256.file(path).hexdigest}"
+  unless actual_digest == normalized.fetch("digest")
+    raise ControllerError, "canonical protocol digest mismatch: expected #{normalized['digest']} actual #{actual_digest}"
+  end
+
+  version_marker = "#{PROTOCOL_VERSION_PREFIX}#{normalized.fetch('version')}`"
+  unless path.read.include?(version_marker)
+    raise ControllerError, "canonical protocol does not declare version #{normalized['version']}"
+  end
+
+  normalized
+end
+
+def normalize_scope!(root, scope, verify_protocol:, canonical_protocol_file: nil)
+  raise ControllerError, "frozen_scope must be a mapping" unless scope.is_a?(Hash)
+
+  {
+    "semantic_authority_digest" => require_string!(scope, "semantic_authority_digest"),
+    "behavior_digest" => require_string!(scope, "behavior_digest"),
+    "verification_digest" => require_string!(scope, "verification_digest"),
+    "policy_epoch" => require_string!(scope, "policy_epoch"),
+    "requirements_baseline_hash" => require_string!(scope, "requirements_baseline_hash"),
+    "workflow_profile_hash" => require_string!(scope, "workflow_profile_hash"),
+    "target_paths" => require_array!(scope, "target_paths"),
+    "review_objective" => require_string!(scope, "review_objective"),
+    "concerns" => require_array!(scope, "concerns"),
+    "canonical_protocol" => normalize_protocol!(
+      root,
+      scope["canonical_protocol"],
+      verify: verify_protocol,
+      canonical_protocol_file: canonical_protocol_file
+    )
+  }
+end
+
+def routing_scope(scope)
+  ROUTING_SCOPE_FIELDS.each_with_object({}) do |field, result|
+    result[field] = scope.fetch(field)
+  end
+end
+
+def scope_audit_metadata(scope)
+  {
+    "requirements_baseline_hash" => scope.fetch("requirements_baseline_hash"),
+    "workflow_profile_hash" => scope.fetch("workflow_profile_hash"),
+    "canonical_protocol" => scope.fetch("canonical_protocol")
+  }
+end
+
+def mechanical_changes!(value)
+  return [] if value.nil?
+  unless value.is_a?(Array) && value.all? { |item| item.is_a?(String) && !item.strip.empty? }
+    raise ControllerError, "mechanical_changes must be an array of non-empty strings"
+  end
+
+  normalized = value.map { |item| item.strip.downcase.tr("-", "_") }.uniq.sort
+  unknown = normalized - MECHANICAL_CHANGE_KINDS
+  raise ControllerError, "unknown mechanical change kind: #{unknown.join(', ')}" unless unknown.empty?
+
+  normalized
+end
+
+def normalize_finding_text(value, field)
+  raise ControllerError, "finding #{field} must be a non-empty string" unless value.is_a?(String) && !value.strip.empty?
+
+  value.downcase.gsub(/\s+/, " ").strip
+end
+
+def process_findings!(raw_findings)
+  raise ControllerError, "findings must be an array" unless raw_findings.is_a?(Array)
+
+  raw_findings.map do |finding|
+    raise ControllerError, "each finding must be a mapping" unless finding.is_a?(Hash)
+
+    severity = require_string!(finding, "severity").upcase
+    raise ControllerError, "finding severity must be P0, P1, P2, or P3" unless %w[P0 P1 P2 P3].include?(severity)
+
+    disposition = require_string!(finding, "disposition").downcase
+    unless %w[open closed debt].include?(disposition)
+      raise ControllerError, "finding disposition must be open, closed, or debt"
+    end
+
+    context = require_string!(finding, "blocking_context").downcase.tr("-", "_")
+    fingerprint_inputs = {
+      "governing_rule" => normalize_finding_text(finding["governing_rule"], "governing_rule"),
+      "semantic_anchor" => normalize_finding_text(finding["semantic_anchor"], "semantic_anchor"),
+      "failure_predicate" => normalize_finding_text(finding["failure_predicate"], "failure_predicate"),
+      "claim_impact" => normalize_finding_text(finding["claim_impact"], "claim_impact")
+    }
+    blocking_by_severity = %w[P0 P1].include?(severity) ||
+      (severity == "P2" && BLOCKING_P2_CONTEXTS.include?(context))
+    if disposition == "debt" && blocking_by_severity
+      raise ControllerError, "blocking P0/P1 or applicable P2 finding cannot be dispositioned as debt"
+    end
+    blocking = disposition == "open" && blocking_by_severity
+    out_of_scope = finding["out_of_scope"] == true
+    regression = finding["repair_regression"] == true
+
+    canonical(finding).merge(
+      "severity" => severity,
+      "disposition" => disposition,
+      "blocking_context" => context,
+      "fingerprint_inputs" => fingerprint_inputs,
+      "fingerprint" => identity("schema" => "tw-review-finding-fingerprint/1", "inputs" => fingerprint_inputs),
+      "blocking" => blocking,
+      "repair_eligible" => blocking && !out_of_scope,
+      "repair_regression" => regression,
+      "out_of_scope" => out_of_scope
+    )
+  end
+end
+
+def accepted_review_inputs!(mapping)
+  raise ControllerError, "accepted_review_inputs must be a mapping" unless mapping.is_a?(Hash)
+
+  ACCEPTED_REVIEW_FIELDS.each_with_object({}) do |field, result|
+    result[field] = require_string!(mapping, field)
+  end
+end
+
+def audit_metadata!(mapping)
+  return {} if mapping.nil?
+  raise ControllerError, "audit_metadata must be a mapping" unless mapping.is_a?(Hash)
+
+  canonical(mapping)
+end
+
+def atomic_write(path, value)
+  FileUtils.mkdir_p(path.dirname)
+  mode = path.file? ? path.stat.mode & 0o777 : 0o600
+  tempfile = Tempfile.new([".#{path.basename}", ".tmp"], path.dirname.to_s)
+  begin
+    tempfile.binmode
+    tempfile.write("#{JSON.pretty_generate(value)}\n")
+    tempfile.flush
+    tempfile.fsync
+    File.chmod(mode, tempfile.path)
+    tempfile.close
+    File.rename(tempfile.path, path.to_s)
+  ensure
+    tempfile.close! if tempfile
+  end
+end
+
+def normalize_loaded_ledger!(ledger)
+  scope = ledger.fetch("frozen_scope")
+  ledger["routing_scope"] ||= {
+    "target_paths" => scope.fetch("target_paths"),
+    "review_objective" => scope.fetch("review_objective"),
+    "concerns" => scope.fetch("concerns"),
+    "policy_epoch" => scope["policy_epoch"] || "tw-review-routing/legacy-raw-pins/1"
+  }
+  accounting = ledger.fetch("accounting")
+  legacy_limit = accounting.fetch("repair_cycles_opened", 0) + accounting.fetch("remaining_repair_cycles", 0)
+  accounting["routine_repair_cycle_limit"] ||= legacy_limit
+  accounting["repair_cycle_limit"] ||= legacy_limit
+  accounting["severe_blocker_exception"] = nil unless accounting.key?("severe_blocker_exception")
+  ledger["mechanical_closures"] ||= []
+  ledger["audit_metadata_history"] ||= []
+  ledger
+end
+
+def load_ledger(path)
+  raise ControllerError, "review series is not authorized: #{path.basename('.json')}" unless path.file?
+
+  ledger = JSON.parse(path.read)
+  raise ControllerError, "ledger schema is not #{LEDGER_SCHEMA}" unless ledger["schema_version"] == LEDGER_SCHEMA
+
+  normalize_loaded_ledger!(ledger)
+rescue JSON::ParserError => e
+  raise ControllerError, "ledger is invalid JSON: #{e.message}"
+end
+
+def record_session!(ledger, session_id)
+  ledger["session_history"] ||= []
+  ledger["session_history"] << session_id unless ledger["session_history"].include?(session_id)
+  ledger["last_session_id"] = session_id
+end
+
+def current_blockers(ledger)
+  Array(ledger["current_findings"]).select { |finding| finding["blocking"] }.map { |finding| finding.fetch("fingerprint") }.sort
+end
+
+def nonblocking_debt_count(ledger)
+  Array(ledger["current_findings"]).count do |finding|
+    !finding["blocking"] && %w[debt open].include?(finding["disposition"])
+  end
+end
+
+def ledger_state_digest(ledger)
+  state = canonical(ledger)
+  state.delete("terminal_receipts")
+  identity("schema" => "tw-review-series-ledger-state/1", "state" => state)
+end
+
+def receipt(ledger, command, extra = {})
+  attempt = ledger["current_attempt"] || ledger.fetch("attempts").last
+  stored_scope = ledger.fetch("frozen_scope")
+  {
+    "schema_version" => RECEIPT_SCHEMA,
+    "command" => command,
+    "series_generation_id" => ledger.fetch("series_generation_id"),
+    "predecessor_series_identity" => ledger["predecessor_series_identity"],
+    "series_identity" => ledger.fetch("series_identity"),
+    "frozen_scope_identity" => ledger.fetch("frozen_scope_identity"),
+    "canonical_protocol" => stored_scope.fetch("canonical_protocol"),
+    "policy_epoch" => ledger.fetch("routing_scope").fetch("policy_epoch"),
+    "ledger_digest" => ledger_state_digest(ledger),
+    "stage" => attempt && attempt["stage"],
+    "attempt_identity" => attempt && attempt["attempt_identity"],
+    "dispatch_identities" => attempt ? Array(attempt["dispatch_identities"]) : [],
+    "remaining_repair_cycles" => ledger.fetch("accounting").fetch("remaining_repair_cycles"),
+    "unresolved_blocking_count" => current_blockers(ledger).length,
+    "nonblocking_debt_count" => nonblocking_debt_count(ledger),
+    "terminal_outcome" => ledger["terminal_outcome"],
+    "authority_acceptance_state" => ledger.fetch("authority_acceptance_state"),
+    "authority_acceptance_receipt" => ledger["authority_acceptance_receipt"],
+    "last_session_id" => ledger["last_session_id"]
+  }.merge(extra)
+end
+
+def append_mechanical_closure!(ledger, changes, audit_metadata, session_id, atomic_with_accepted_review: false)
+  return nil if changes.empty?
+
+  entry = {
+    "sequence" => ledger.fetch("mechanical_closures").length + 1,
+    "changes" => changes,
+    "audit_metadata" => audit_metadata,
+    "session_id" => session_id,
+    "atomic_with_accepted_review" => atomic_with_accepted_review,
+    "reviewer_dispatch_count" => 0
+  }
+  entry["closure_identity"] = identity("schema" => "tw-mechanical-closure/1", "entry" => entry)
+  ledger.fetch("mechanical_closures") << entry
+  entry
+end
+
+def append_terminal_receipt!(ledger, reasons, completed_attempt)
+  terminal = receipt(
+    ledger,
+    "terminal_evaluation",
+    "terminal_reasons" => reasons,
+    "stage" => completed_attempt.fetch("stage"),
+    "attempt_identity" => completed_attempt.fetch("attempt_identity"),
+    "receipt_sequence" => ledger.fetch("terminal_receipts").length + 1
+  )
+  terminal["receipt_identity"] = identity(terminal)
+  ledger.fetch("terminal_receipts") << terminal
+end
+
+options = {
+  root: nil,
+  ledger_dir: nil,
+  request: nil,
+  canonical_protocol_file: nil
+}
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: traceweaver-review-series --root PATH --ledger-dir PATH --request FILE"
+  opts.on("--root PATH") { |value| options[:root] = value }
+  opts.on("--ledger-dir PATH") { |value| options[:ledger_dir] = value }
+  opts.on("--request FILE") { |value| options[:request] = value }
+  opts.on("--canonical-protocol-file PATH") { |value| options[:canonical_protocol_file] = value }
+end
+parser.parse!
+
+begin
+  raise ControllerError, "--root is required" if options[:root].to_s.empty?
+  raise ControllerError, "--ledger-dir is required" if options[:ledger_dir].to_s.empty?
+  raise ControllerError, "--request is required" if options[:request].to_s.empty?
+
+  root = Pathname.new(options[:root]).expand_path
+  raise ControllerError, "--root must be an existing directory" unless root.directory?
+  root = root.realpath
+
+  request_path = Pathname.new(options[:request]).expand_path
+  raise ControllerError, "--request must be an existing file" unless request_path.file?
+
+  request = YAML.safe_load(request_path.read, permitted_classes: [], aliases: false)
+  raise ControllerError, "request must be a mapping" unless request.is_a?(Hash)
+  raise ControllerError, "request schema is not #{COMMAND_SCHEMA}" unless request["schema_version"] == COMMAND_SCHEMA
+
+  command = require_string!(request, "command")
+  generation = require_string!(request, "series_generation_id")
+  unless generation.match?(/\ARS-GEN-[A-Za-z0-9._-]+\z/)
+    raise ControllerError, "series_generation_id has an invalid format"
+  end
+  session_id = require_string!(request, "session_id")
+
+  ledger_dir = Pathname.new(options[:ledger_dir]).expand_path
+  FileUtils.mkdir_p(ledger_dir)
+  raise ControllerError, "--ledger-dir must resolve to a directory" unless ledger_dir.directory?
+  ledger_dir = ledger_dir.realpath
+  ledger_path = ledger_dir.join("#{generation}.json")
+  lock_path = ledger_dir.join("#{generation}.lock")
+
+  result = nil
+  File.open(lock_path, File::RDWR | File::CREAT, 0o600) do |lock|
+    lock.flock(File::LOCK_EX)
+
+    if command == "authorize_series"
+      predecessor = request["predecessor_series_identity"]
+      unless predecessor.nil? || (predecessor.is_a?(String) && !predecessor.strip.empty?)
+        raise ControllerError, "predecessor_series_identity must be null or a non-empty string"
+      end
+      authorization_reason = require_string!(request, "authorization_reason")
+      review_mode = require_string!(request, "review_mode")
+      frozen_scope = normalize_scope!(
+        root,
+        request["frozen_scope"],
+        verify_protocol: true,
+        canonical_protocol_file: options[:canonical_protocol_file]
+      )
+      normalized_routing_scope = routing_scope(frozen_scope)
+      frozen_scope_identity = identity("schema" => "tw-frozen-review-scope/2", "routing_scope" => normalized_routing_scope)
+      series_inputs = {
+        "schema" => "tw-review-series-identity/1",
+        "series_generation_id" => generation,
+        "predecessor_series_identity" => predecessor,
+        "authorization_reason" => authorization_reason,
+        "review_mode" => review_mode,
+        "frozen_scope_identity" => frozen_scope_identity
+      }
+      series_identity = identity(series_inputs)
+
+      if ledger_path.file?
+        ledger = load_ledger(ledger_path)
+        unless ledger["series_identity"] == series_identity
+          raise ControllerError, "series_generation_id already exists with different immutable identity inputs"
+        end
+        record_session!(ledger, session_id)
+        audit_entry = scope_audit_metadata(frozen_scope).merge(
+          "semantic_authority_digest" => frozen_scope.fetch("semantic_authority_digest"),
+          "behavior_digest" => frozen_scope.fetch("behavior_digest"),
+          "verification_digest" => frozen_scope.fetch("verification_digest"),
+          "session_id" => session_id
+        )
+        ledger["audit_metadata_history"] ||= []
+        ledger["audit_metadata_history"] << audit_entry unless ledger["audit_metadata_history"].last == audit_entry
+      else
+        authority_accepted = request["formal_authority_accepted"] == true
+        authority_acceptance_receipt = if authority_accepted
+                                         require_string!(request, "authority_acceptance_receipt")
+                                       end
+        ledger = {
+          "schema_version" => LEDGER_SCHEMA,
+          "series_generation_id" => generation,
+          "predecessor_series_identity" => predecessor,
+          "authorization_reason" => authorization_reason,
+          "review_mode" => review_mode,
+          "series_identity" => series_identity,
+          "frozen_scope_identity" => frozen_scope_identity,
+          "routing_scope" => normalized_routing_scope,
+          "frozen_scope" => frozen_scope,
+          "formal_authority_accepted" => authority_accepted,
+          "authority_acceptance_state" => authority_accepted ? "authority_accepted" : "held_authority_acceptance",
+          "authority_acceptance_receipt" => authority_acceptance_receipt,
+          "accounting" => {
+            "discovery_consumed" => false,
+            "repair_cycles_opened" => 0,
+            "routine_repair_cycle_limit" => ROUTINE_REPAIR_CYCLE_LIMIT,
+            "repair_cycle_limit" => ROUTINE_REPAIR_CYCLE_LIMIT,
+            "remaining_repair_cycles" => ROUTINE_REPAIR_CYCLE_LIMIT,
+            "severe_blocker_exception" => nil
+          },
+          "attempts" => [],
+          "current_attempt" => nil,
+          "dispatches" => [],
+          "finding_history" => [],
+          "current_findings" => [],
+          "evidence_history" => [],
+          "accepted_review" => nil,
+          "mechanical_closures" => [],
+          "audit_metadata_history" => [scope_audit_metadata(frozen_scope).merge(
+            "semantic_authority_digest" => frozen_scope.fetch("semantic_authority_digest"),
+            "behavior_digest" => frozen_scope.fetch("behavior_digest"),
+            "verification_digest" => frozen_scope.fetch("verification_digest"),
+            "session_id" => session_id
+          )],
+          "terminal_outcome" => nil,
+          "terminal_receipts" => [],
+          "session_history" => []
+        }
+        record_session!(ledger, session_id)
+      end
+
+      atomic_write(ledger_path, ledger)
+      result = receipt(ledger, command)
+    else
+      ledger = load_ledger(ledger_path)
+      record_session!(ledger, session_id)
+
+      case command
+      when "open_attempt"
+        stage = require_string!(request, "stage")
+        unless %w[discovery repair_verification].include?(stage)
+          raise ControllerError, "stage must be discovery or repair_verification"
+        end
+
+        if ledger["current_attempt"]
+          unless ledger.dig("current_attempt", "stage") == stage
+            raise ControllerError, "another attempt is already open"
+          end
+          atomic_write(ledger_path, ledger)
+          result = receipt(ledger, command, "idempotent_reentry" => true)
+          next
+        end
+        raise ControllerError, "terminal series cannot open another attempt" if ledger["terminal_outcome"]
+
+        accounting = ledger.fetch("accounting")
+        attempt_index = if stage == "discovery"
+                          raise ControllerError, "discovery is already consumed" if accounting["discovery_consumed"]
+                          raise ControllerError, "discovery cannot follow a repair cycle" if accounting["repair_cycles_opened"].positive?
+                          accounting["discovery_consumed"] = true
+                          0
+                        else
+                          raise ControllerError, "discovery must be consumed before repair verification" unless accounting["discovery_consumed"]
+                          if accounting["repair_cycles_opened"] >= accounting.fetch("repair_cycle_limit")
+                            raise ControllerError, "repair-verification cycle budget is exhausted"
+                          end
+                          accounting["repair_cycles_opened"] += 1
+                          accounting["remaining_repair_cycles"] = accounting.fetch("repair_cycle_limit") - accounting["repair_cycles_opened"]
+                          accounting["repair_cycles_opened"]
+                        end
+        attempt_identity = identity(
+          "schema" => "tw-review-attempt-identity/1",
+          "series_identity" => ledger.fetch("series_identity"),
+          "stage" => stage,
+          "attempt_index" => attempt_index
+        )
+        attempt = {
+          "stage" => stage,
+          "attempt_index" => attempt_index,
+          "attempt_identity" => attempt_identity,
+          "status" => "open",
+          "opened_session_id" => session_id,
+          "dispatch_identities" => []
+        }
+        ledger["current_attempt"] = attempt
+        ledger.fetch("attempts") << attempt.dup
+        atomic_write(ledger_path, ledger)
+        result = receipt(ledger, command, "idempotent_reentry" => false)
+
+      when "record_dispatch"
+        attempt = ledger["current_attempt"]
+        raise ControllerError, "record_dispatch requires an open attempt" unless attempt && attempt["status"] == "open"
+
+        wrapper = require_string!(request, "wrapper")
+        role = require_string!(request, "role")
+        if REVIEW_WRAPPERS.include?(wrapper)
+          existing_review_dispatch = ledger.fetch("dispatches").any? do |dispatch|
+            dispatch["attempt_identity"] == attempt.fetch("attempt_identity") &&
+              REVIEW_WRAPPERS.include?(dispatch["wrapper"])
+          end
+          if existing_review_dispatch
+            raise ControllerError, "one review-bearing dispatch is already recorded for this attempt"
+          end
+        end
+        sequence = ledger.fetch("dispatches").length + 1
+        dispatch_identity = identity(
+          "schema" => "tw-review-dispatch-identity/1",
+          "series_identity" => ledger.fetch("series_identity"),
+          "stage" => attempt.fetch("stage"),
+          "attempt_identity" => attempt.fetch("attempt_identity"),
+          "dispatch_sequence" => sequence,
+          "wrapper" => wrapper,
+          "role" => role
+        )
+        dispatch = {
+          "dispatch_identity" => dispatch_identity,
+          "dispatch_sequence" => sequence,
+          "series_identity" => ledger.fetch("series_identity"),
+          "stage" => attempt.fetch("stage"),
+          "attempt_identity" => attempt.fetch("attempt_identity"),
+          "wrapper" => wrapper,
+          "role" => role,
+          "session_id" => session_id
+        }
+        ledger.fetch("dispatches") << dispatch
+        attempt.fetch("dispatch_identities") << dispatch_identity
+        ledger.fetch("attempts").last["dispatch_identities"] = attempt.fetch("dispatch_identities").dup
+        atomic_write(ledger_path, ledger)
+        result = receipt(ledger, command, "dispatch_identity" => dispatch_identity)
+
+      when "complete_attempt"
+        attempt = ledger["current_attempt"]
+        raise ControllerError, "complete_attempt requires an open attempt" unless attempt && attempt["status"] == "open"
+
+        scope_expanded = false
+        if request.key?("frozen_scope")
+          supplied_scope = normalize_scope!(root, request["frozen_scope"], verify_protocol: false)
+          scope_expanded = routing_scope(supplied_scope) != ledger.fetch("routing_scope")
+        end
+        findings = process_findings!(request["findings"])
+        if attempt["stage"] == "repair_verification"
+          retained_fingerprints = Array(ledger["current_findings"]).map { |finding| finding.fetch("fingerprint") }.uniq
+          invalid_repair_findings = findings.reject do |finding|
+            retained_fingerprints.include?(finding.fetch("fingerprint")) ||
+              finding["repair_regression"] ||
+              (finding["blocking"] && finding["out_of_scope"])
+          end
+          unless invalid_repair_findings.empty?
+            invalid_fingerprints = invalid_repair_findings.map { |finding| finding.fetch("fingerprint") }.sort
+            raise ControllerError,
+                  "repair verification accepts only retained findings, genuine in-scope repair regressions, or explicit out-of-scope blockers: #{invalid_fingerprints.join(', ')}"
+          end
+        end
+        scope_expanded ||= findings.any? { |finding| finding["blocking"] && finding["out_of_scope"] }
+        evidence_digest = require_string!(request, "relevant_evidence_digest")
+        semantic_authority_digest = require_string!(request, "semantic_authority_digest")
+        behavior_digest = require_string!(request, "behavior_digest")
+        verification_digest = require_string!(request, "verification_digest")
+        verification_outcome = require_string!(request, "verification_outcome").downcase
+        unless %w[pass fail partial blocked deferred].include?(verification_outcome)
+          raise ControllerError, "verification_outcome is invalid"
+        end
+
+        previous_blockers = current_blockers(ledger)
+        previous_evidence = ledger.fetch("evidence_history").last
+        ledger["current_findings"] = findings
+        blockers = current_blockers(ledger)
+        evidence_changed = previous_evidence.nil? || previous_evidence["relevant_evidence_digest"] != evidence_digest
+        blocker_reduced = blockers.length < previous_blockers.length && (blockers - previous_blockers).empty?
+        evidence_entry = {
+          "stage" => attempt.fetch("stage"),
+          "attempt_identity" => attempt.fetch("attempt_identity"),
+          "relevant_evidence_digest" => evidence_digest,
+          "semantic_authority_digest" => semantic_authority_digest,
+          "behavior_digest" => behavior_digest,
+          "verification_digest" => verification_digest,
+          "verification_outcome" => verification_outcome,
+          "evidence_changed" => evidence_changed,
+          "unresolved_blocking_fingerprints" => blockers
+        }
+        ledger.fetch("evidence_history") << evidence_entry
+        findings.each do |finding|
+          ledger.fetch("finding_history") << finding.merge(
+            "stage" => attempt.fetch("stage"),
+            "attempt_identity" => attempt.fetch("attempt_identity")
+          )
+        end
+
+        attempt["status"] = "complete"
+        attempt["completed_session_id"] = session_id
+        attempt["unresolved_blocking_fingerprints"] = blockers
+        attempt["relevant_evidence_digest"] = evidence_digest
+        ledger.fetch("attempts")[-1] = attempt.dup
+        ledger["current_attempt"] = nil
+
+        terminal_reasons = []
+        terminal_outcome = nil
+        if scope_expanded
+          terminal_outcome = "held_scope_expansion"
+          terminal_reasons << "frozen_scope_changed_or_out_of_scope_blocker"
+        elsif blockers.empty?
+          terminal_outcome = "candidate_review_saturated"
+          terminal_reasons << "zero_unresolved_in_scope_blockers"
+        elsif attempt["stage"] == "repair_verification"
+          terminal_reasons << "blockers_and_relevant_evidence_unchanged" if blockers == previous_blockers && !evidence_changed
+          terminal_reasons << "non_monotonic_blocker_progress" if !blocker_reduced && !evidence_changed && blockers != previous_blockers
+          if ledger.dig("accounting", "remaining_repair_cycles").zero?
+            terminal_reasons << "repair_cycle_budget_exhausted"
+          end
+          repair_failures = ledger.fetch("evidence_history").count do |entry|
+            entry["stage"] == "repair_verification" && entry["verification_outcome"] == "fail"
+          end
+          terminal_reasons << "verification_repeatedly_failed" if repair_failures >= 2
+          terminal_outcome = "held_no_progress" unless terminal_reasons.empty?
+        end
+
+        ledger["terminal_outcome"] = terminal_outcome if terminal_outcome
+        append_terminal_receipt!(ledger, terminal_reasons, attempt) if terminal_outcome
+        atomic_write(ledger_path, ledger)
+        result = receipt(
+          ledger,
+          command,
+          "findings" => findings,
+          "evidence_changed" => evidence_changed,
+          "blocker_reduced" => blocker_reduced,
+          "terminal_reasons" => terminal_reasons
+        )
+
+      when "record_accepted_review"
+        unless ledger["terminal_outcome"] == "candidate_review_saturated" && current_blockers(ledger).empty?
+          raise ControllerError, "accepted review requires a saturated series with zero blockers"
+        end
+        inputs = accepted_review_inputs!(request["accepted_review_inputs"])
+        unless inputs["policy_epoch"] == ledger.dig("routing_scope", "policy_epoch")
+          raise ControllerError, "accepted review policy_epoch does not match the series"
+        end
+        latest_evidence = ledger.fetch("evidence_history").last
+        unless latest_evidence && inputs["semantic_authority_digest"] == latest_evidence["semantic_authority_digest"]
+          raise ControllerError, "accepted review semantic_authority_digest does not match the completed attempt"
+        end
+        unless inputs["behavior_digest"] == latest_evidence["behavior_digest"]
+          raise ControllerError, "accepted review behavior_digest does not match the completed attempt"
+        end
+        unless inputs["verification_digest"] == latest_evidence["verification_digest"]
+          raise ControllerError, "accepted review verification_digest does not match the completed attempt"
+        end
+        review_route = require_string!(request, "review_route")
+        expected_wrapper = REVIEW_WRAPPER_BY_ROUTE[review_route]
+        raise ControllerError, "review_route must be document_review or code_review" unless expected_wrapper
+        matched_dispatch = ledger.fetch("dispatches").any? do |dispatch|
+          dispatch["attempt_identity"] == latest_evidence["attempt_identity"] &&
+            dispatch["wrapper"] == expected_wrapper
+        end
+        unless matched_dispatch
+          raise ControllerError, "accepted review requires a #{expected_wrapper} dispatch on the completed attempt"
+        end
+        review_identity = identity("schema" => "tw-accepted-review-identity/2", "inputs" => inputs)
+        mechanical_changes = mechanical_changes!(request["mechanical_changes"])
+        audit_metadata = audit_metadata!(request["audit_metadata"])
+        ledger["accepted_review"] = {
+          "identity" => review_identity,
+          "inputs" => inputs,
+          "review_route" => review_route,
+          "recorded_session_id" => session_id
+        }
+        closure = append_mechanical_closure!(
+          ledger,
+          mechanical_changes,
+          audit_metadata,
+          session_id,
+          atomic_with_accepted_review: true
+        )
+        atomic_write(ledger_path, ledger)
+        result = receipt(
+          ledger,
+          command,
+          "accepted_review_identity" => review_identity,
+          "mechanical_closure_recorded" => !closure.nil?,
+          "mechanical_closure_identity" => closure && closure["closure_identity"]
+        )
+
+      when "record_authority_acceptance"
+        unless ledger["terminal_outcome"] == "candidate_review_saturated" && current_blockers(ledger).empty?
+          raise ControllerError, "formal authority acceptance requires a saturated series with zero blockers"
+        end
+        acceptance_receipt = require_string!(request, "authority_acceptance_receipt")
+        recorded_receipt = ledger["authority_acceptance_receipt"]
+        if ledger["formal_authority_accepted"] && recorded_receipt != acceptance_receipt
+          raise ControllerError, "formal authority acceptance is already bound to a different receipt"
+        end
+        idempotent = ledger["formal_authority_accepted"] == true
+        ledger["formal_authority_accepted"] = true
+        ledger["authority_acceptance_state"] = "authority_accepted"
+        ledger["authority_acceptance_receipt"] = acceptance_receipt
+        atomic_write(ledger_path, ledger)
+        result = receipt(ledger, command, "idempotent_reentry" => idempotent)
+
+      when "authorize_second_cycle"
+        exception = require_mapping!(request, "severe_blocker_exception")
+        authorization_kind = require_string!(exception, "authorization_kind")
+        unless %w[owner approved_change_control_authority].include?(authorization_kind)
+          raise ControllerError, "authorization_kind must be owner or approved_change_control_authority"
+        end
+        authorized_by = require_string!(exception, "authorized_by")
+        exception_series_generation_id = require_string!(exception, "series_generation_id")
+        unless exception_series_generation_id == ledger.fetch("series_generation_id")
+          raise ControllerError, "severe-blocker exception series_generation_id does not match the series"
+        end
+        fingerprint = require_string!(exception, "finding_fingerprint")
+        severity = require_string!(exception, "severity").upcase
+        blocking_context = require_string!(exception, "blocking_context")
+        authorization_receipt = require_string!(exception, "authorization_receipt")
+        authorization_reason = require_string!(exception, "authorization_reason")
+        final_cycle_limit = exception["final_cycle_limit"]
+        unless final_cycle_limit.is_a?(Integer) && final_cycle_limit == MAX_REPAIR_CYCLE_LIMIT
+          raise ControllerError, "severe-blocker exception final_cycle_limit must equal #{MAX_REPAIR_CYCLE_LIMIT}"
+        end
+        accounting = ledger.fetch("accounting")
+        unless accounting.fetch("repair_cycle_limit") == ROUTINE_REPAIR_CYCLE_LIMIT &&
+               accounting.fetch("repair_cycles_opened") == ROUTINE_REPAIR_CYCLE_LIMIT &&
+               accounting.fetch("remaining_repair_cycles").zero?
+          raise ControllerError, "second-cycle exception requires an exhausted routine cycle"
+        end
+        raise ControllerError, "second-cycle exception requires held_no_progress" unless ledger["terminal_outcome"] == "held_no_progress"
+        raise ControllerError, "second-cycle exception cannot interrupt an open attempt" if ledger["current_attempt"]
+
+        retained = Array(ledger["current_findings"]).find { |finding| finding["fingerprint"] == fingerprint }
+        raise ControllerError, "second-cycle exception finding is not a retained blocker" unless retained && retained["blocking"]
+        unless retained["severity"] == severity
+          raise ControllerError, "second-cycle exception severity does not match the retained blocker"
+        end
+        unless retained["blocking_context"] == blocking_context
+          raise ControllerError, "second-cycle exception blocking_context does not match the retained blocker"
+        end
+        severe = %w[P0 P1].include?(severity) || (severity == "P2" && retained["blocking"])
+        raise ControllerError, "second-cycle exception requires P0, P1, or blocking P2" unless severe
+
+        exception_record = {
+          "authorization_kind" => authorization_kind,
+          "authorized_by" => authorized_by,
+          "series_generation_id" => exception_series_generation_id,
+          "finding_fingerprint" => fingerprint,
+          "severity" => severity,
+          "blocking_context" => blocking_context,
+          "authorization_receipt" => authorization_receipt,
+          "authorization_reason" => authorization_reason,
+          "final_cycle_limit" => final_cycle_limit,
+          "authorized_session_id" => session_id
+        }
+        exception_record["exception_identity"] = identity(
+          "schema" => "tw-severe-blocker-cycle-exception/1",
+          "exception" => exception_record
+        )
+        accounting["repair_cycle_limit"] = MAX_REPAIR_CYCLE_LIMIT
+        accounting["remaining_repair_cycles"] = MAX_REPAIR_CYCLE_LIMIT - accounting.fetch("repair_cycles_opened")
+        accounting["severe_blocker_exception"] = exception_record
+        ledger["terminal_outcome"] = nil
+        atomic_write(ledger_path, ledger)
+        result = receipt(
+          ledger,
+          command,
+          "route" => "severe_blocker_exception_authorized",
+          "reviewer_dispatch_count" => 0,
+          "exception_identity" => exception_record["exception_identity"]
+        )
+
+      when "evaluate_reuse"
+        inputs = accepted_review_inputs!(request["accepted_review_inputs"])
+        findings = process_findings!(request.fetch("findings", []))
+        blockers = findings.select { |finding| finding["blocking"] }
+        mechanical_changes = mechanical_changes!(request["mechanical_changes"])
+        audit_metadata = audit_metadata!(request["audit_metadata"])
+        candidate_identity = identity("schema" => "tw-accepted-review-identity/2", "inputs" => inputs)
+        accepted = ledger["accepted_review"]
+        changed_fields = if accepted
+                           ACCEPTED_REVIEW_FIELDS.select { |field| accepted.fetch("inputs")[field] != inputs[field] }
+                         else
+                           ACCEPTED_REVIEW_FIELDS
+                         end
+        reusable = accepted && accepted["identity"] == candidate_identity && blockers.empty?
+        authority_blocker = blockers.any? do |finding|
+          %w[authority requirements validation release_claims].include?(finding["blocking_context"])
+        end
+        route = if accepted.nil?
+                  "review_required"
+                elsif changed_fields.include?("policy_epoch")
+                  "held_scope_expansion"
+                elsif changed_fields.include?("semantic_authority_digest") || authority_blocker
+                  "document_review"
+                elsif (changed_fields & %w[behavior_digest verification_digest]).any? || !blockers.empty?
+                  "code_review"
+                elsif reusable && !mechanical_changes.empty?
+                  "mechanical_closure"
+                elsif reusable
+                  "reuse_accepted_review"
+                else
+                  "review_required"
+                end
+        reviewer_dispatch_count = %w[document_review code_review review_required].include?(route) ? 1 : 0
+        reason = case route
+                 when "reuse_accepted_review"
+                   "semantic_behavior_verification_identity_unchanged"
+                 when "mechanical_closure"
+                   "bookkeeping_only_identity_unchanged"
+                 when "document_review"
+                   authority_blocker ? "new_authority_blocker" : "semantic_authority_changed"
+                 when "code_review"
+                   blockers.empty? ? "behavior_or_verification_changed" : "new_behavior_blocker"
+                 when "held_scope_expansion"
+                   "policy_epoch_changed"
+                 else
+                   "no_accepted_review"
+                 end
+        closure = if route == "mechanical_closure"
+                    append_mechanical_closure!(ledger, mechanical_changes, audit_metadata, session_id)
+                  end
+        atomic_write(ledger_path, ledger)
+        result = receipt(
+          ledger,
+          command,
+          "route" => route,
+          "reason" => reason,
+          "accepted_review_identity" => accepted && accepted["identity"],
+          "candidate_review_identity" => candidate_identity,
+          "changed_fields" => changed_fields,
+          "mechanical_changes" => mechanical_changes,
+          "mechanical_closure_identity" => closure && closure["closure_identity"],
+          "reviewer_dispatch_count" => reviewer_dispatch_count,
+          "new_review_required" => reviewer_dispatch_count.positive?
+        )
+
+      when "evaluate_scope"
+        supplied_scope = normalize_scope!(root, request["frozen_scope"], verify_protocol: false)
+        findings = process_findings!(request.fetch("findings", []))
+        out_of_scope_blocker = findings.any? { |finding| finding["blocking"] && finding["out_of_scope"] }
+        changed_fields = ROUTING_SCOPE_FIELDS.select do |field|
+          ledger.fetch("routing_scope")[field] != routing_scope(supplied_scope)[field]
+        end
+        expanded = !changed_fields.empty? || out_of_scope_blocker
+        result = receipt(
+          ledger,
+          command,
+          "terminal_outcome" => expanded ? "held_scope_expansion" : ledger["terminal_outcome"],
+          "scope_changed_fields" => changed_fields,
+          "out_of_scope_blocker" => out_of_scope_blocker
+        )
+
+      else
+        raise ControllerError, "unknown command: #{command}"
+      end
+    end
+  end
+
+  puts JSON.generate(result)
+rescue ControllerError, Errno::EACCES, Errno::ENOENT, Psych::SyntaxError => e
+  warn "traceweaver-review-series: #{e.message}"
+  exit 2
+end

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=review-series-controller-alias; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087
+# TRACEWEAVER: entrypoint=route_review_request; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087
+
+script_dir="$(cd "$(dirname "$0")" && pwd)"
+exec "$script_dir/traceweaver-review-series" "$@"

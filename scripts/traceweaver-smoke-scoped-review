@@ -1,13 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# TRACEWEAVER: file-role=scoped-review-routing-smoke; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087
+# TRACEWEAVER: verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
+
 root="$(cd "$(dirname "$0")/.." && pwd)"
 
 ruby - "$root" <<'RUBY'
 require "yaml"
+require "json"
+require "open3"
 
 root = ARGV.fetch(0)
 fixtures = File.join(root, "fixtures/scoped-review")
+expected_policy_epoch = "tw-review-policy/2026-08-21"
 
 def load_yaml(path)
   YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)
@@ -54,15 +60,44 @@ def validate_receipt!(receipt)
 end
 
 protocol = File.read(File.join(root, "plugins/traceweaver-core/references/scoped-review-protocol.md"))
-%w[baseline_hash profile_hash changed_file_digest verification_digest reuse_accepted_review held_no_progress ready_for_authorized_deploy held_dogfood].each do |term|
+%w[tw-scoped-review-protocol/1 series_generation_id repair_verification frozen_scope_identity semantic_authority_digest behavior_digest policy_epoch mechanical_closure held_scope_expansion candidate_review_saturated held_no_progress held_authority_acceptance].each do |term|
   fail!("protocol missing #{term}") unless protocol.include?(term)
 end
 
+controller = File.join(root, "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series")
+router_alias = File.join(root, "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-review")
+fail!("review-series controller missing") unless File.file?(controller) && File.executable?(controller)
+fail!("review router alias missing") unless File.file?(router_alias) && File.executable?(router_alias)
+
+canonical_loop_state_path = File.join(root, "plugins/traceweaver-core/references/automation-loop-state-template.yml")
+packaged_loop_state_path = File.join(root, "plugins/traceweaver-core/skills/tw-auto/references/automation-loop-state-template.yml")
+fail!("automation-loop state canonical/mirror mismatch") unless File.binread(canonical_loop_state_path) == File.binread(packaged_loop_state_path)
+loop_state = load_yaml(canonical_loop_state_path)
+fail!("wrong automation-loop state schema") unless loop_state.fetch("schema_version") == "tw-auto-loop-state/3"
+fail!("legacy review-fix counter remains") if loop_state.to_s.include?("max_review_fix_cycles")
+fail!("automation-loop reviewer cap is not one") unless loop_state.dig("review_series", "reviewer_dispatch_cap_per_attempt") == 1
+fail!("automation-loop routine repair cap is not one") unless loop_state.dig("review_series", "routine_repair_cycle_limit") == 1
+fail!("automation-loop absolute repair cap is not two") unless loop_state.dig("review_series", "absolute_repair_cycle_limit") == 2
+fail!("automation-loop policy epoch drifted") unless loop_state.dig("review_series", "policy_epoch") == expected_policy_epoch
+
+convergence_smoke = File.join(root, "scripts/traceweaver-smoke-review-series-convergence")
+output, error, status = Open3.capture3(convergence_smoke)
+fail!("review-series convergence smoke failed: #{error}\n#{output}") unless status.success?
+fail!("review-series convergence result missing") unless output.include?("review_series_convergence_status=pass")
+
 template = load_yaml(File.join(root, "plugins/traceweaver-core/references/terminal-receipt-template.yml"))
 fail!("wrong receipt schema") unless template.fetch("schema_version") == "tw-terminal-receipt/1"
-%w[baseline_hash profile_hash changed_file_digest verification_digest].each do |field|
+%w[semantic_authority_digest behavior_digest verification_digest policy_epoch].each do |field|
   fail!("template missing review identity #{field}") unless template.fetch("review_identity").key?(field)
 end
+fail!("terminal receipt policy epoch drifted") unless template.dig("review_identity", "policy_epoch") == expected_policy_epoch && template.dig("review_series", "policy_epoch") == expected_policy_epoch
+%w[requirements_baseline_hash workflow_profile_hash protocol_file_digest].each do |field|
+  fail!("template missing audit metadata #{field}") unless template.fetch("audit_metadata").key?(field)
+end
+%w[series_generation_id series_identity frozen_scope_identity policy_epoch canonical_protocol attempt_identity ledger_digest routine_repair_cycle_limit repair_cycle_limit remaining_repair_cycles severe_blocker_exception].each do |field|
+  fail!("template missing review-series field #{field}") unless template.fetch("review_series").key?(field)
+end
+fail!("template missing separate authority acceptance state") unless template.key?("authority_acceptance_state")
 %w[implemented verified reviewed deployed dogfooded].each do |fact|
   fail!("template missing #{fact}") unless template.fetch("facts").key?(fact)
 end
@@ -73,23 +108,24 @@ end
 
 items.each do |name, item|
   identity = item.fetch("review_identity")
-  %w[baseline_hash profile_hash changed_file_digest verification_digest].each do |field|
+  %w[semantic_authority_digest behavior_digest verification_digest policy_epoch].each do |field|
     fail!("#{name} missing #{field}") if identity[field].to_s.empty?
+  end
+  fail!("#{name} policy epoch drifted") unless identity.fetch("policy_epoch") == expected_policy_epoch
+  %w[requirements_baseline_hash workflow_profile_hash frozen_scope_identity].each do |field|
+    fail!("#{name} missing audit metadata #{field}") if item.dig("audit_metadata", field).to_s.empty?
   end
 
   fanout = item.fetch("fanout")
   active = fanout.fetch("active_reviewers")
   personas = fanout.fetch("personas")
   fail!("#{name} missing routine independent reviewer") unless active.include?("independent") && personas.include?("routine_independent")
-  fail!("#{name} exceeds active reviewer cap") if active.length > 2
-  fail!("#{name} exceeds persona cap") if personas.length > 3
-  if fanout.fetch("specialist_triggered")
-    fail!("#{name} specialist lacks profile trigger") if fanout["specialist_profile_control"].to_s.empty?
-  end
+  fail!("#{name} must use exactly one active reviewer") unless active.length == 1
+  fail!("#{name} must use exactly one reviewer persona") unless personas.length == 1
+  fail!("#{name} opened specialist fan-out") if fanout.fetch("specialist_triggered")
+  fail!("#{name} opened validator fan-out") if fanout.fetch("validator_triggered")
 
   finding = item.fetch("finding")
-  validator_allowed = %w[P0 P1].include?(finding.fetch("severity")) || finding["disputed"] == true
-  fail!("#{name} has disallowed validator") if fanout.fetch("validator_triggered") && !validator_allowed
   case finding.fetch("severity")
   when "P0", "P1"
     fail!("#{name} P0/P1 route") unless finding.fetch("route") == "repair_then_rerun_scoped_review"
@@ -104,16 +140,16 @@ items.each do |name, item|
   else
     fail!("#{name} unknown severity")
   end
-  fail!("#{name} exceeds repair cap") if item.fetch("repair_cycles") > 2
+  fail!("#{name} exceeds routine repair cap") if item.fetch("repair_cycles") > 1 && !item["severe_blocker_exception"]
   validate_receipt!(item.fetch("terminal_receipt"))
   accounting = item.dig("terminal_receipt", "accounting")
   fail!("#{name} missing fixed category elapsed") unless accounting.fetch("process_minutes") >= 0 && accounting.fetch("delivery_minutes") >= 0
 end
 
 l1 = items.to_h.fetch("l1.expected")
-fail!("matrix/status/projection-only identity not reused") unless l1.dig("identity_reuse", "matrix_status_projection_only_change") && l1.dig("identity_reuse", "result") == "reuse_accepted_review"
+fail!("exact semantic accepted-review identity not reused") unless l1.dig("identity_reuse", "semantic_identity_unchanged") && !l1.dig("identity_reuse", "new_unresolved_blocker") && l1.dig("identity_reuse", "result") == "reuse_accepted_review"
 l2 = items.to_h.fetch("l2.expected")
-fail!("two-cycle no-progress hold missing") unless l2.fetch("repair_cycles") == 2 && l2.fetch("repair_outcome") == "held_no_progress"
+fail!("one-cycle no-progress hold missing") unless l2.fetch("repair_cycles") == 1 && l2.fetch("repair_outcome") == "held_no_progress"
 
 premature_browser_complete = {
   "facts" => {
@@ -147,6 +183,16 @@ auto = File.read(File.join(root, "plugins/traceweaver-core/skills/tw-auto/SKILL.
 fail!("tw-auto direct implementation boundary missing") unless auto.include?("It has no direct implementation path.")
 fail!("tw-auto scoped review routing missing") unless auto.include?("Scoped Review and Terminal Routing")
 fail!("tw-auto claims direct review") if auto.include?("The master performs review")
+fail!("tw-auto persistent controller route missing") unless auto.include?("`scripts/traceweaver-review-series`") && auto.include?("`mechanical_closure`")
+fail!("tw-auto still sends metadata to doc review") if auto.include?("matrix, status, hash, validation, or review evidence changed")
+
+%w[tw-code-review tw-doc-review].each do |skill_name|
+  skill = File.read(File.join(root, "plugins/traceweaver-core/skills", skill_name, "SKILL.md"))
+  fail!("#{skill_name} canonical protocol resolution missing") unless skill.include?("<skills-root>/tw-auto/references/scoped-review-protocol.md")
+  fail!("#{skill_name} persistent controller missing") unless skill.include?("<skills-root>/tw-auto/scripts/traceweaver-review-series")
+  fail!("#{skill_name} routine one-cycle cap missing") unless skill.include?("routine repair-verification cycle")
+  fail!("#{skill_name} explicit severe-blocker exception missing") unless skill.include?("receipt-bound exception")
+end
 
 browser = File.read(File.join(root, "plugins/traceweaver-core/skills/tw-test-browser/SKILL.md"))
 %w[URL build journey console network screenshot].each do |term|

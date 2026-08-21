@@ -7,6 +7,7 @@ description: TraceWeaver-controlled code review wrapper. Use when reviewing code
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-086; req=REQ-TW-087 -->
+<!-- TRACEWEAVER: file-role=review-series-code-review-wrapper; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087 -->
 <!-- TRACEWEAVER: file-role=optional-graphify-code-review-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
 <!-- TRACEWEAVER: entrypoint=graphify_review_impact_search; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
@@ -21,19 +22,27 @@ review findings can be treated as accepted TraceWeaver input.
 
 ## Scoped Review Identity
 
-Use `references/scoped-review-protocol.md` to form the review identity from the
-baseline hash, frozen profile hash, changed-file digest, and verification
-digest. Reuse an accepted review when that identity is unchanged. A diff that
-only changes a matrix, status record, or derived projection is not a reason to
-start a generic duplicate review.
+Resolve the packaged sibling
+`<skills-root>/tw-auto/references/scoped-review-protocol.md`, verify it matches
+the registered canonical protocol version and digest, then create or resume the
+explicitly authorized generation through
+`<skills-root>/tw-auto/scripts/traceweaver-review-series`. Carry generation,
+series, frozen scope, attempt, distinct dispatch, ledger digest, eligible
+blockers, the four semantic accepted-review inputs, audit metadata, and
+remaining budget. Exact accepted-review reuse and verified post-acceptance
+mechanical closure with no new blocker dispatch zero reviewers; bookkeeping
+without a matching accepted review remains review-required.
 
-Select the profile's deduplicated reviewers: one routine independent reviewer,
-at most two active reviewers, and at most three personas in a cycle. Add a
-specialist only when its profile trigger applies. Add a validator only for P0,
-P1, or disputed P2. P0/P1 findings route to a repair and identity-scoped rerun;
-routine P2/P3 findings do not create another cycle. A disputed P2 follows the
-contested-P2 decision path. Stop at two repair cycles or unchanged blocked work
-with `held_no_progress`.
+Use exactly one review-bearing dispatch and one reviewer persona for the
+attempt. When specialist or validator concerns apply, include them in that
+reviewer's bounded concern set; do not dispatch another reviewer. P0/P1 and
+blocking P2 findings route inside the current
+repair-verification attempt; non-blocking P2/P3 findings do not create another
+cycle. A disputed P2 follows the contested-P2 decision path. Stop after one
+routine repair-verification cycle, or sooner for unchanged blocked work, with
+`held_no_progress`. One final cycle requires an explicit receipt-bound exception
+authorized by the owner or approved change-control authority; two is
+the absolute maximum.
 
 ## Required Authority Inputs
 
@@ -109,8 +118,10 @@ the user explicitly asked for a traceability diagnostic or audit.
 
 If review is blocked by missing unambiguous anchors, route the next action to
 `/tw-work ...` or `/tw-auto ...` so the work loop can author anchors and rerun
-review. If review is clean, recommend `/tw-work record ...` for the clean review
-state or scoped `/tw-doc-review ...` when authority/status/hash records changed.
+review. If review is clean, record the accepted review and its bookkeeping
+atomically. Route scoped `/tw-doc-review ...` only when normative semantic
+authority changed, never for status/hash/receipt/projection/index bookkeeping
+alone.
 If unresolved mappings or authority problems block acceptance, return the exact
 human decision or highest-level wrapper needed to repair the work.
 
