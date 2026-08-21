@@ -53,12 +53,17 @@ jobs:
           echo "version=$plugin_version" >> "$GITHUB_OUTPUT"
           echo "tag=traceweaver-core--v$plugin_version" >> "$GITHUB_OUTPUT"
           if [ "$plugin_version" = "$previous_version" ]; then
-            echo "Plugin version remains $plugin_version; this ordinary main push is not a release event."
-            echo "should_release=false" >> "$GITHUB_OUTPUT"
-            exit 0
+            tag="traceweaver-core--v$plugin_version"
+            if git ls-remote --exit-code --tags origin "refs/tags/$tag" >/dev/null 2>&1; then
+              echo "Plugin version remains $plugin_version and $tag exists; this ordinary main push is not a release event."
+              echo "should_release=false" >> "$GITHUB_OUTPUT"
+              exit 0
+            fi
+            echo "Plugin version remains $plugin_version but $tag is absent; resuming the interrupted release."
+          else
+            echo "Version changed from ${previous_version:-<none>} to $plugin_version."
           fi
 
-          echo "Version changed from ${previous_version:-<none>} to $plugin_version."
           echo "should_release=true" >> "$GITHUB_OUTPUT"
 
           # A tag may be resolved only from a receipt that proves this exact

@@ -1,10 +1,10 @@
 ---
 id: TW-RELEASE-CANDIDATE-2026-08-21-0.4.0-001
-status: ready_for_version_bump_candidate
+status: ready_for_absent_tag_release_recovery_candidate
 date: 2026-08-21
 version: 0.4.0
 tag: traceweaver-core--v0.4.0
-flat_base: 4e25807cfec3a158f58fd6d4543a1a64e2ab463c
+flat_base: ed99fd0405d62c322ab3c415db94d9aacf3ced26
 release_readiness:
   terminal_status: ready_for_version_bump
   version: 0.4.0
@@ -33,7 +33,7 @@ release_readiness:
       - scripts/traceweaver-check-release-readiness
       - scripts/traceweaver-evaluate-release-check-runs
       - scripts/traceweaver-smoke-release-readiness
-    digest: sha256:255d4dec7f476c05a6d00b67a52319943534ac1f357d6d90d59d2f2898cf1e1a
+    digest: sha256:4f8ab72a979b00102c9f82054b4f2e4f814d5138eabb379425e7b8aafa40a6d8
   runtime_identity_rule: exact_merge_sha_and_check_urls_derived_in_release_workflow
   prerequisites:
     pr1_merge_pr: "#57"
@@ -45,6 +45,7 @@ release_readiness:
     pr2_ci_run: https://github.com/Oxiom-Systems/traceweaver/actions/runs/32471460803
     pr2_scoped_review: docs/validation/traceweaver-2026-08-21-v040-pr2-graph-html-preview-verification.md
     pr3_scoped_review: CLEAN-ROOM-V040-PR3-2026-08-21
+    release_recovery_scoped_review: CLEAN-ROOM-V040-CODEQL-RECOVERY-2026-08-21
     integrated_validation: passed
     graph_freshness: passed
     consumer_validation: passed
@@ -56,10 +57,12 @@ release_readiness:
 
 ## Candidate state
 
-This record authorizes the reconciled version-bump candidate to enter the
+This record authorizes the reconciled version-bump candidate, or one bounded
+same-version absent-tag recovery after an interrupted attempt, to enter the
 main-only release workflow. It is not evidence that a tag or GitHub Release
-already exists. The only intended release producer is this version-bump PR,
-rebased on the mainline that contains merged PRs #57 and #58.
+already exists. The version-bump PR merged after PRs #57 and #58. Its first
+release attempt found a live CodeQL check-shape mismatch before tag creation;
+the recovery candidate is based on that exact merged main state.
 
 The repository-owned release-readiness checker parses this dated receipt before
 the workflow resolves a tag. It requires the exact requested version, the
@@ -92,9 +95,10 @@ The required release version is exactly `0.4.0` in all five release carriers:
 read-only local/CI preflight. The existing serialized
 `.github/workflows/release-on-version-bump.yml` remains the sole tag/release
 producer and runs only on a push to `main`. It compares the checked-out
-manifest version with the first parent and exits successfully without tag
-resolution for ordinary same-version pushes. For a real version bump it loads
-the matching dated receipt and runs
+manifest version with the first parent. It exits successfully for ordinary
+same-version pushes once that version tag exists; while the tag is absent, a
+same-version push revalidates the matching dated receipt and resumes the
+interrupted release. A version bump follows the same validated path and runs
 `ruby scripts/traceweaver-check-release-readiness`; it must never be changed
 into an every-merge release route.
 
@@ -104,11 +108,13 @@ into an every-merge release route.
 | --- | --- | --- |
 | PR1: execution contracts / Terra | merged PR number, merge SHA, exact-head CI run URL/SHA, and clean scoped review | PR #57; `f90fbd6d6560bd746aa5be3878960053052095b5`; smoke run `32463746924`; recorded verification evidence |
 | PR2: graph / semantic HTML | rebased on merged PR1, merged PR number, merge SHA, exact-head CI run URL/SHA, and clean scoped review | PR #58; `4e25807cfec3a158f58fd6d4543a1a64e2ab463c`; smoke run `32471460803`; clean-room verification evidence |
-| PR3: release candidate | deterministic fixed-scope digest and clean scoped review after reconciliation | 22-file non-self-referential scope `sha256:255d4dec7f476c05a6d00b67a52319943534ac1f357d6d90d59d2f2898cf1e1a`; `CLEAN-ROOM-V040-PR3-2026-08-21` |
+| PR3: release candidate | deterministic fixed-scope digest and clean scoped review after reconciliation | 22-file non-self-referential scope `sha256:4f8ab72a979b00102c9f82054b4f2e4f814d5138eabb379425e7b8aafa40a6d8`; `CLEAN-ROOM-V040-PR3-2026-08-21` |
+| Release recovery | exact live CodeQL check shape, absent tag, bounded repair, and clean scoped review | canceled pre-tag run `32474745598`; live `Analyze (actions)`, `Analyze (javascript-typescript)`, and `Analyze (python)` checks; `CLEAN-ROOM-V040-CODEQL-RECOVERY-2026-08-21` |
 | Post-merge runtime | checked-out merge SHA, exact-SHA smoke and CodeQL URLs, tag state, and workflow URL | `derived_by_main_only_release_workflow` |
 
 Do not substitute candidate receipts copied from the earlier mixed-tree base for
-current-base evidence. Merge order is PR1, then rebased PR2, then this PR3.
+current-base evidence. Merge order is PR1, rebased PR2, PR3, then only the
+bounded release-recovery repair if the tag is still absent.
 
 ## Documentation and release notes
 
@@ -134,7 +140,9 @@ current-base evidence. Merge order is PR1, then rebased PR2, then this PR3.
    source hash, and recorded Vestro's explicit filename-case migration caveat.
 6. The exact PR3 candidate scope digest and clean-room review are clean. The
    receipt intentionally does not predict the future merge SHA or CI URL.
-7. After merge, require the main-only workflow to match its checkout to
+7. The deterministic check-run fixtures cover the repository's live GitHub
+   Actions CodeQL matrix shape as well as the legacy CodeQL check form.
+8. After merge, require the main-only workflow to match its checkout to
    `GITHUB_SHA`, wait for both smoke and CodeQL on exactly that SHA, reject
    conflicting tags, and attach `release-runtime-receipt.json` to the GitHub
    Release.

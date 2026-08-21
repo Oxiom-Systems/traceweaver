@@ -181,14 +181,16 @@ Tagging and the GitHub Release are automated: when the single release PR's
 commit that bumps the plugin version lands on `main`, the `Release on version bump` workflow
 (`.github/workflows/release-on-version-bump.yml`) creates the
 `traceweaver-core--v<version>` tag and a matching GitHub Release using the
-`CHANGELOG.md` section for that version. The job is idempotent, so non-version
-commits do not produce a release. The workflow first checks all five release
+`CHANGELOG.md` section for that version. The job is idempotent: a same-version
+push may resume an interrupted publication only while its tag is absent, and
+becomes a successful no-op after that tag exists. The workflow first checks all five release
 manifests for exact equality and a repository-owned, fail-closed dated release
-receipt; PR1 and PR2 retain `0.3.2`, so only this 0.4.0 version-bump merge can
-mint the release. The receipt hashes a fixed candidate file set and does not
+receipt; PR1 and PR2 retain `0.3.2`, so they could not initiate the 0.4.0
+release. The receipt hashes a fixed candidate file set and does not
 predict its own commit SHA. On `main`, the serialized workflow waits for smoke
-and CodeQL on the exact merge SHA, rejects any tag-to-SHA conflict, and attaches
-its runtime evidence receipt to the GitHub Release.
+and every observed CodeQL matrix job on the exact merge SHA, rejects any
+tag-to-SHA conflict, and attaches its runtime evidence receipt to the GitHub
+Release.
 
 ## What's New in 0.4.0
 
