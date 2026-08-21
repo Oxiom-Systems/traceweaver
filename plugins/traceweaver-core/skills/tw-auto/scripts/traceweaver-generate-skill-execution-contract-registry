@@ -1,0 +1,83 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: entrypoint=generate_skill_execution_contract_registry; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090
+require "optparse"
+require "digest"
+require "pathname"
+require "yaml"
+
+options = {root: File.expand_path("../../../../..", __dir__), write: false}
+OptionParser.new do |parser|
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--registry PATH") { |value| options[:registry] = value }
+  parser.on("--write") { options[:write] = true }
+end.parse!
+
+root = Pathname.new(options.fetch(:root)).expand_path
+registry_path = Pathname.new(options[:registry] || root.join("plugins/traceweaver-core/references/skill-execution-contracts.yml")).expand_path
+abort("sec_registry_generator=missing_registry") unless registry_path.file?
+
+source = File.read(registry_path)
+registry = YAML.safe_load(source, permitted_classes: [], aliases: false)
+abort("sec_registry_generator=invalid_registry") unless registry.is_a?(Hash) && registry["contracts"].is_a?(Array)
+
+contracts = registry.fetch("contracts")
+skills = contracts.map { |entry| entry.fetch("skill") }
+abort("sec_registry_generator=contract_order_not_lexical") unless skills == skills.sort && skills.uniq == skills
+callables = Dir.children(root.join("plugins/traceweaver-core/skills")).select do |name|
+  root.join("plugins/traceweaver-core/skills", name, "SKILL.md").file? && (name.start_with?("tw-") || name == "lfg")
+end.sort
+abort("sec_registry_generator=callable_surface_mismatch") unless skills == callables
+
+def packaged_references(source, skill)
+  source.scan(%r{references/[A-Za-z0-9._/-]+}).uniq.sort.map do |reference|
+    filename = reference.delete_prefix("references/")
+    if filename == "scoped-review-protocol.md" && %w[tw-code-review tw-doc-review tw-work].include?(skill)
+      "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
+    elsif filename == "workflow-profile-template.yml" && skill == "tw-plan"
+      "plugins/traceweaver-core/references/#{filename}"
+    elsif filename == "tw-graph-lifecycle.md"
+      "plugins/traceweaver-core/references/#{filename}"
+    else
+      "plugins/traceweaver-core/skills/#{skill}/references/#{filename}"
+    end
+  end
+end
+
+def flow_array(values)
+  "[#{values.join(', ')}]"
+end
+
+metadata = skills.to_h do |skill|
+  skill_path = root.join("plugins/traceweaver-core/skills", skill, "SKILL.md")
+  body = File.read(skill_path)
+  [skill, {
+    "skill_source_hash" => "sha256:#{Digest::SHA256.file(skill_path).hexdigest}",
+    "governing_requirements" => body.scan(/REQ-TW-\d{3}/).uniq.sort,
+    "trace_records" => body.scan(/TRACE-TW-\d{3}/).uniq.sort,
+    "verification_records" => body.scan(/VER-TW-\d{3}/).uniq.sort,
+    "packaged_references" => packaged_references(body, skill)
+  }]
+end
+
+metadata_lines = ["skill_metadata:"] + metadata.map do |skill, entry|
+  fields = entry.map do |name, value|
+    "#{name}: #{value.is_a?(Array) ? flow_array(value) : value.inspect}"
+  end.join(", ")
+  "  #{skill}: { #{fields} }"
+end
+generated = source.sub(/^callable_count:\s*\d+$/, "callable_count: #{skills.length}")
+generated = generated.sub(/^skill_metadata:\n.*?(?=^contracts:)/m, "#{metadata_lines.join("\n")}\n")
+abort("sec_registry_generator=registry_sections_missing") if generated == source && registry.fetch("callable_count") != skills.length
+
+if options[:write]
+  temporary = registry_path.sub_ext("#{registry_path.extname}.tmp")
+  File.write(temporary, generated)
+  File.rename(temporary, registry_path)
+  puts "sec_registry_generator=written"
+else
+  abort("sec_registry_generator=stale") unless source == generated
+  puts "sec_registry_generator=fresh"
+end
+puts "sec_registry_callable_count=#{skills.length}"

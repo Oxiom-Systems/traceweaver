@@ -60,7 +60,7 @@ function readSkillExecutionContractSnapshot(pluginRoot: string, callableSkills: 
   if (new Set(contractSkills).size !== contractSkills.length || contractSkills.join("\n") !== [...contractSkills].sort().join("\n")) {
     throw new Error("skill execution contract registry is ambiguous or non-deterministic");
   }
-  if (contractSkills.join("\n") !== callableSkills.join("\n") || contractSkills.includes("tw-graph")) {
+  if (contractSkills.join("\n") !== callableSkills.join("\n")) {
     throw new Error("skill execution contract registry does not exactly match the callable surface");
   }
   return {
@@ -592,7 +592,12 @@ function installAntigravitySkills(options: InstallOptions): void {
 
   // Copy manifest and version
   cpSync(sourceManifestPath, targetManifestPath);
-  writeFileSync(targetVersionPath, JSON.stringify({ version: "0.2.5" }) + "\n");
+  const sourceManifest = JSON.parse(readFileSync(sourceManifestPath, "utf8")) as { version?: string };
+  if (!sourceManifest.version || !/^\d+\.\d+\.\d+$/.test(sourceManifest.version)) {
+    console.error(`TraceWeaver Antigravity manifest version is missing or invalid: ${sourceManifestPath}`);
+    process.exit(1);
+  }
+  writeFileSync(targetVersionPath, JSON.stringify({ version: sourceManifest.version }) + "\n");
 
   // Copy user-callable skills
   for (const skillName of callableSkills) {

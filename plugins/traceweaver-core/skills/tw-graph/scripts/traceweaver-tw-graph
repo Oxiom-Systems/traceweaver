@@ -1,0 +1,1128 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=tw-graph-control-surface; req=REQ-TW-088; trace=TRACE-TW-066; ver=VER-TW-086
+# TRACEWEAVER: entrypoint=tw_graph_build_check_refresh_query; req=REQ-TW-088; trace=TRACE-TW-066; ver=VER-TW-086
+
+require "digest"
+require "fileutils"
+require "find"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+require "set"
+require "tempfile"
+
+GRAPH_SCHEMA = "tw-authority-graph/1"
+MANIFEST_SCHEMA = "tw-graph-freshness-manifest/1"
+STATE_SCHEMA = "tw-graph-lifecycle-state/1"
+RECEIPT_SCHEMA = "tw-graph-freshness-receipt/1"
+CACHE_SCHEMA = "tw-graph-check-cache/1"
+PRODUCER = "traceweaver-tw-graph"
+AUTHORITY_ROOTS = [
+  "requirements.md",
+  "traceability-matrix.md",
+  ".traceweaver/intent-contract.yml"
+].freeze
+GRAPH_RELATIVE_PATH = ".traceweaver/graph/authority-graph.json"
+MANIFEST_RELATIVE_PATH = ".traceweaver/graph/freshness-manifest.json"
+STATE_RELATIVE_PATH = ".traceweaver/state/tw-graph-lifecycle.json"
+LOCK_RELATIVE_PATH = ".traceweaver/state/tw-graph-lifecycle.lock"
+RECEIPT_RELATIVE_PATH = ".traceweaver/tw-graph-freshness.json"
+CACHE_RELATIVE_PATH = ".traceweaver/state/tw-graph-check-cache.json"
+STRUCTURAL_EXCLUSIONS = [
+  ".git/",
+  ".traceweaver/graph/",
+  ".traceweaver/state/",
+  RECEIPT_RELATIVE_PATH,
+  "artifacts/semantic-html-preview/"
+].freeze
+IDENTIFIER_PATTERN = /(?<![A-Z0-9-])(?:REQ|TRACE|VER|VAL|ART|ATP|RESULT|NEED|INTENT|GAP|CHG|EXC|DEC|TASK)-[A-Z0-9]+(?:-[A-Z0-9]+)*(?![A-Z0-9-])/
+PROVENANCE_FIELDS = %w[
+  identifier source_path source_locator source_hash baseline_hash
+  schema_version producer freshness_state
+].freeze
+
+class GraphError < StandardError
+  attr_reader :code, :details
+
+  def initialize(code, message, details = {})
+    super(message)
+    @code = code
+    @details = details
+  end
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, output|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      output[key] = canonical(value.fetch(source_key))
+    end
+  when Array
+    value.map { |item| canonical(item) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_value(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def file_digest(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def output(value)
+  puts JSON.generate(canonical(value))
+end
+
+def fail!(code, message, details = {})
+  raise GraphError.new(code, message, details)
+end
+
+def atomic_write(path, content)
+  FileUtils.mkdir_p(path.dirname)
+  tempfile = Tempfile.new([".#{path.basename}", ".tmp"], path.dirname.to_s)
+  begin
+    tempfile.binmode
+    tempfile.write(content)
+    tempfile.flush
+    tempfile.fsync
+    tempfile.close
+    File.chmod(0o600, tempfile.path)
+    File.rename(tempfile.path, path.to_s)
+  ensure
+    tempfile.close! if tempfile
+  end
+end
+
+def relative_inside_root(root, path)
+  expanded = Pathname.new(path).expand_path
+  relative = expanded.relative_path_from(root).to_s
+  fail!("unsafe_path", "path escapes repository root", "path" => path.to_s) if relative == ".." || relative.start_with?("../")
+
+  relative
+rescue ArgumentError
+  fail!("unsafe_path", "path cannot be resolved under repository root", "path" => path.to_s)
+end
+
+def structurally_excluded?(relative)
+  STRUCTURAL_EXCLUSIONS.any? { |prefix| relative.start_with?(prefix) }
+end
+
+def repository_files(root)
+  output_text, _error, status = Open3.capture3(
+    "git", "-C", root.to_s, "ls-files", "--cached", "--others", "--exclude-standard", "-z"
+  )
+  relatives = if status.success?
+                output_text.split("\0")
+              else
+                found = []
+                Find.find(root.to_s) do |candidate|
+                  relative = relative_inside_root(root, candidate)
+                  if File.directory?(candidate)
+                    if relative != "." && structurally_excluded?("#{relative}/")
+                      Find.prune
+                    else
+                      next
+                    end
+                  else
+                    found << relative
+                  end
+                end
+                found
+              end
+
+  relatives.map { |relative| relative.sub(%r{\A\./}, "") }
+           .reject(&:empty?)
+           .reject { |relative| structurally_excluded?(relative) }
+           .select { |relative| root.join(relative).exist? || root.join(relative).symlink? }
+           .uniq
+           .sort
+end
+
+def safe_source_path(root, relative)
+  fail!("unsafe_path", "absolute source path is prohibited", "path" => relative) if Pathname.new(relative).absolute?
+  fail!("unsafe_path", "parent traversal is prohibited", "path" => relative) if Pathname.new(relative).each_filename.include?("..")
+  fail!("unsafe_path", "generated graph/state paths cannot become sources", "path" => relative) if structurally_excluded?(relative)
+
+  path = root.join(relative)
+  fail!("unresolvable_reference", "referenced path is missing", "path" => relative) unless path.exist? || path.symlink?
+  fail!("unsafe_path", "symlink sources are prohibited", "path" => relative) if path.symlink?
+  fail!("unresolvable_reference", "referenced path is not a regular file", "path" => relative) unless path.file?
+  fail!("unsafe_path", "source resolves outside repository root", "path" => relative) unless relative_inside_root(root, path.realpath) == relative
+
+  path
+end
+
+def canonical_source_relative(root, relative)
+  path = root.join(relative)
+  return relative unless path.symlink?
+
+  realpath = path.realpath
+  canonical_relative = relative_inside_root(root, realpath)
+  fail!("unsafe_path", "symlink source does not resolve to a regular repository file", "path" => relative) unless realpath.file?
+  fail!("unsafe_path", "symlink source resolves to generated graph/state", "path" => relative) if structurally_excluded?(canonical_relative)
+  canonical_relative
+rescue Errno::ENOENT, Errno::ELOOP => e
+  fail!("unsafe_path", "symlink source cannot be resolved safely", "path" => relative, "error" => e.class.name)
+end
+
+def read_utf8(path)
+  text = File.binread(path).force_encoding(Encoding::UTF_8)
+  return text if text.valid_encoding?
+
+  nil
+rescue SystemCallError => e
+  fail!("unreadable_source", "source cannot be read", "path" => path.to_s, "error" => e.class.name)
+end
+
+def reference_pattern(relative)
+  /(?<![A-Za-z0-9_.\/-])#{Regexp.escape(relative)}(?:#L\d+|:\d+)?(?![A-Za-z0-9_.\/-])/
+end
+
+def repository_directories(inventory)
+  inventory.flat_map do |relative|
+    parts = Pathname.new(relative).each_filename.to_a
+    (1...parts.length).map { |length| "#{parts.first(length).join('/')}\/" }
+  end.uniq.sort
+end
+
+def directory_reference_pattern(relative)
+  without_slash = relative.delete_suffix("/")
+  /(?<![A-Za-z0-9_.\/-])#{Regexp.escape(without_slash)}\/?(?![A-Za-z0-9_.\/-])/
+end
+
+def first_line_for(text, pattern)
+  index = text.lines.find_index { |line| line.match?(pattern) }
+  index ? index + 1 : 1
+end
+
+def authoritative_reference_closure(root)
+  inventory = repository_files(root)
+  directories = repository_directories(inventory)
+  AUTHORITY_ROOTS.each do |relative|
+    fail!("missing_authority_root", "required authority root is missing", "path" => relative) unless inventory.include?(relative)
+  end
+
+  queue = AUTHORITY_ROOTS.dup
+  visited = Set.new
+  references = []
+  directory_references = []
+  directory_members = Hash.new { |hash, key| hash[key] = Set.new }
+
+  until queue.empty?
+    source_relative = queue.shift
+    next if visited.include?(source_relative)
+
+    source_path = safe_source_path(root, source_relative)
+    visited << source_relative
+    text = read_utf8(source_path)
+    next unless text
+
+    inventory.each do |inventory_relative|
+      next if structurally_excluded?(inventory_relative)
+      next unless text.include?(inventory_relative)
+
+      pattern = reference_pattern(inventory_relative)
+      next unless text.match?(pattern)
+
+      line = first_line_for(text, pattern)
+      target_relative = canonical_source_relative(root, inventory_relative)
+      next if target_relative == source_relative
+      references << {
+        "source" => source_relative,
+        "target" => target_relative,
+        "line" => line
+      }
+      queue << target_relative unless visited.include?(target_relative)
+    end
+
+    directories.each do |directory_relative|
+      next unless text.include?(directory_relative.delete_suffix("/"))
+
+      pattern = directory_reference_pattern(directory_relative)
+      next unless text.match?(pattern)
+
+      line = first_line_for(text, pattern)
+      directory_references << {
+        "source" => source_relative,
+        "directory" => directory_relative,
+        "line" => line
+      }
+      inventory.each do |target_relative|
+        next unless target_relative.start_with?(directory_relative)
+        target_relative = canonical_source_relative(root, target_relative)
+        next if target_relative == source_relative
+
+        directory_members[directory_relative] << target_relative
+        queue << target_relative unless visited.include?(target_relative)
+      end
+    end
+  end
+
+  closure = visited.to_a.sort
+  references.select! { |edge| closure.include?(edge.fetch("source")) && closure.include?(edge.fetch("target")) }
+  references = references.uniq { |edge| [edge.fetch("source"), edge.fetch("target"), edge.fetch("line")] }
+                         .sort_by { |edge| [edge.fetch("source"), edge.fetch("target"), edge.fetch("line")] }
+  directory_references = directory_references
+                         .uniq { |edge| [edge.fetch("source"), edge.fetch("directory"), edge.fetch("line")] }
+                         .sort_by { |edge| [edge.fetch("source"), edge.fetch("directory"), edge.fetch("line")] }
+  normalized_directory_members = directory_members.keys.sort.to_h do |directory|
+    [directory, directory_members.fetch(directory).select { |member| closure.include?(member) }.to_a.sort]
+  end
+  [closure, references, directory_references, normalized_directory_members]
+end
+
+def baseline_hash(root)
+  roots = AUTHORITY_ROOTS.map do |relative|
+    path = safe_source_path(root, relative)
+    {"path" => relative, "source_hash" => file_digest(path)}
+  end
+  [digest_value("schema_version" => "tw-authority-baseline/1", "roots" => roots), roots]
+end
+
+def provenance(identifier:, source_path:, source_line:, source_hash:, baseline_hash:)
+  {
+    "identifier" => identifier,
+    "source_path" => source_path,
+    "source_locator" => "#{source_path}#L#{source_line}",
+    "source_hash" => source_hash,
+    "baseline_hash" => baseline_hash,
+    "schema_version" => GRAPH_SCHEMA,
+    "producer" => PRODUCER,
+    "freshness_state" => "fresh"
+  }
+end
+
+def identifier_type(identifier)
+  identifier.split("-", 2).first.downcase
+end
+
+def line_content_for_identifier(line, identifier)
+  cells = line.split("|").map(&:strip).reject(&:empty?)
+  if cells.first == identifier && cells.length > 1
+    cells[1]
+  else
+    line.strip
+  end
+end
+
+def explicit_definition_line?(identifier, line)
+  cells = line.split("|").map(&:strip).reject(&:empty?)
+  return true if cells.first == identifier
+
+  line.match?(/\A\s*(?:-\s*)?(?:id|identifier|[a-z0-9_]+_id):\s*["']?#{Regexp.escape(identifier)}(?:["']?\s*)\z/i)
+end
+
+def definition_priority(identifier, source_path, line)
+  type = identifier_type(identifier)
+  source_priority = if type == "req" && source_path == "requirements.md"
+                      0
+                    elsif %w[trace ver val art atp result].include?(type) && source_path == "traceability-matrix.md"
+                      0
+                    elsif %w[intent gap chg exc dec].include?(type) && source_path == ".traceweaver/intent-contract.yml"
+                      0
+                    elsif AUTHORITY_ROOTS.include?(source_path)
+                      1
+                    else
+                      2
+                    end
+
+  [source_priority, explicit_definition_line?(identifier, line) ? 0 : 1]
+end
+
+def relationship_for(left, right)
+  left_type = identifier_type(left)
+  right_type = identifier_type(right)
+  pair = [left_type, right_type]
+
+  case pair
+  when ["need", "req"], ["intent", "req"] then [left, right, "drives"]
+  when ["req", "need"], ["req", "intent"] then [right, left, "drives"]
+  when ["req", "trace"] then [left, right, "traced_by"]
+  when ["trace", "req"] then [right, left, "traced_by"]
+  when ["req", "ver"] then [left, right, "verified_by"]
+  when ["ver", "req"] then [right, left, "verified_by"]
+  when ["req", "val"] then [left, right, "validated_by"]
+  when ["val", "req"] then [right, left, "validated_by"]
+  when ["req", "art"] then [left, right, "evidenced_by"]
+  when ["art", "req"] then [right, left, "evidenced_by"]
+  when ["req", "atp"] then [left, right, "accepted_by"]
+  when ["atp", "req"] then [right, left, "accepted_by"]
+  when ["atp", "result"] then [left, right, "produces"]
+  when ["result", "atp"] then [right, left, "produces"]
+  when ["trace", "ver"] then [left, right, "verified_by"]
+  when ["ver", "trace"] then [right, left, "verified_by"]
+  when ["trace", "val"] then [left, right, "validated_by"]
+  when ["val", "trace"] then [right, left, "validated_by"]
+  when ["result", "ver"] then [left, right, "supports_verification"]
+  when ["ver", "result"] then [right, left, "supports_verification"]
+  else
+    if %w[gap chg exc dec].include?(left_type) && right_type == "req"
+      [left, right, "governs"]
+    elsif %w[gap chg exc dec].include?(right_type) && left_type == "req"
+      [right, left, "governs"]
+    else
+      [left, right, "related"]
+    end
+  end
+end
+
+def edge_record(source:, target:, relation:, source_path:, source_line:, source_hash:, baseline_hash:)
+  edge_identifier = digest_value(
+    "schema_version" => "tw-authority-graph-edge-identity/1",
+    "source" => source,
+    "target" => target,
+    "relation" => relation,
+    "source_path" => source_path,
+    "source_line" => source_line
+  )
+  provenance(
+    identifier: "edge:#{edge_identifier}",
+    source_path: source_path,
+    source_line: source_line,
+    source_hash: source_hash,
+    baseline_hash: baseline_hash
+  ).merge(
+    "id" => "edge:#{edge_identifier}",
+    "source" => source,
+    "target" => target,
+    "relation" => relation
+  )
+end
+
+def retain_edge!(candidates, edge, source_path, source_line)
+  key = [edge.fetch("source"), edge.fetch("target"), edge.fetch("relation")]
+  authority_rank = AUTHORITY_ROOTS.index(source_path)
+  rank = [authority_rank.nil? ? 1 : 0, authority_rank || AUTHORITY_ROOTS.length, source_path, source_line]
+  existing = candidates[key]
+  candidates[key] = [rank, edge] if existing.nil? || (rank <=> existing.first).negative?
+end
+
+def build_projection(root)
+  closure, file_references, directory_references, directory_members = authoritative_reference_closure(root)
+  baseline, authority_roots = baseline_hash(root)
+  source_hashes = closure.to_h { |relative| [relative, file_digest(safe_source_path(root, relative))] }
+  nodes = {}
+  node_priorities = {}
+  edge_candidates = {}
+  seen_mentions = Set.new
+
+  closure.each do |relative|
+    artifact_id = "artifact:#{relative}"
+    nodes[artifact_id] = provenance(
+      identifier: artifact_id,
+      source_path: relative,
+      source_line: 1,
+      source_hash: source_hashes.fetch(relative),
+      baseline_hash: baseline
+    ).merge(
+      "id" => artifact_id,
+      "type" => "artifact",
+      "label" => relative,
+      "content" => relative
+    )
+
+    text = read_utf8(safe_source_path(root, relative))
+    next unless text
+
+    text.lines.each_with_index do |line, index|
+      identifiers = line.scan(IDENTIFIER_PATTERN).uniq
+      identifiers.each do |identifier|
+        priority = definition_priority(identifier, relative, line)
+        candidate = provenance(
+          identifier: identifier,
+          source_path: relative,
+          source_line: index + 1,
+          source_hash: source_hashes.fetch(relative),
+          baseline_hash: baseline
+        ).merge(
+          "id" => identifier,
+          "type" => identifier_type(identifier),
+          "label" => identifier,
+          "content" => line_content_for_identifier(line, identifier)
+        )
+        if !nodes.key?(identifier) || (priority <=> node_priorities.fetch(identifier)).negative?
+          nodes[identifier] = candidate
+          node_priorities[identifier] = priority
+        end
+        mention_key = [artifact_id, identifier]
+        if AUTHORITY_ROOTS.include?(relative) && !seen_mentions.include?(mention_key)
+          mention_edge = edge_record(
+            source: artifact_id,
+            target: identifier,
+            relation: "mentions",
+            source_path: relative,
+            source_line: index + 1,
+            source_hash: source_hashes.fetch(relative),
+            baseline_hash: baseline
+          )
+          retain_edge!(edge_candidates, mention_edge, relative, index + 1)
+          seen_mentions << mention_key
+        end
+      end
+
+      identifiers.combination(2).each do |left, right|
+        source, target, relation = relationship_for(left, right)
+        next if relation == "related"
+
+        relationship_edge = edge_record(
+          source: source,
+          target: target,
+          relation: relation,
+          source_path: relative,
+          source_line: index + 1,
+          source_hash: source_hashes.fetch(relative),
+          baseline_hash: baseline
+        )
+        retain_edge!(edge_candidates, relationship_edge, relative, index + 1)
+      end
+    end
+  end
+
+  file_references.each do |reference|
+    source_relative = reference.fetch("source")
+    target_relative = reference.fetch("target")
+    reference_edge = edge_record(
+      source: "artifact:#{source_relative}",
+      target: "artifact:#{target_relative}",
+      relation: "references",
+      source_path: source_relative,
+      source_line: reference.fetch("line"),
+      source_hash: source_hashes.fetch(source_relative),
+      baseline_hash: baseline
+    )
+    retain_edge!(edge_candidates, reference_edge, source_relative, reference.fetch("line"))
+  end
+
+  directory_references.each do |reference|
+    source_relative = reference.fetch("source")
+    directory_relative = reference.fetch("directory")
+    directory_id = "directory:#{directory_relative}"
+    unless nodes.key?(directory_id)
+      nodes[directory_id] = provenance(
+        identifier: directory_id,
+        source_path: source_relative,
+        source_line: reference.fetch("line"),
+        source_hash: source_hashes.fetch(source_relative),
+        baseline_hash: baseline
+      ).merge(
+        "id" => directory_id,
+        "type" => "directory",
+        "label" => directory_relative,
+        "content" => directory_relative
+      )
+    end
+    directory_reference_edge = edge_record(
+      source: "artifact:#{source_relative}",
+      target: directory_id,
+      relation: "references",
+      source_path: source_relative,
+      source_line: reference.fetch("line"),
+      source_hash: source_hashes.fetch(source_relative),
+      baseline_hash: baseline
+    )
+    retain_edge!(edge_candidates, directory_reference_edge, source_relative, reference.fetch("line"))
+
+    directory_members.fetch(directory_relative, []).each do |member|
+      membership_edge = edge_record(
+        source: directory_id,
+        target: "artifact:#{member}",
+        relation: "contains",
+        source_path: source_relative,
+        source_line: reference.fetch("line"),
+        source_hash: source_hashes.fetch(source_relative),
+        baseline_hash: baseline
+      )
+      retain_edge!(edge_candidates, membership_edge, source_relative, reference.fetch("line"))
+    end
+  end
+
+  unique_edges = edge_candidates.values.map(&:last).sort_by { |edge| edge.fetch("id") }
+  graph = {
+    "schema_version" => GRAPH_SCHEMA,
+    "producer" => PRODUCER,
+    "authority" => "derived_projection_only",
+    "baseline_hash" => baseline,
+    "freshness_state" => "fresh",
+    "nodes" => nodes.values.sort_by { |node| node.fetch("id") },
+    "edges" => unique_edges
+  }
+  graph_bytes = canonical_json(graph)
+  graph_hash = "sha256:#{Digest::SHA256.hexdigest(graph_bytes)}"
+
+  entries = closure.map do |relative|
+    provenance(
+      identifier: "artifact:#{relative}",
+      source_path: relative,
+      source_line: 1,
+      source_hash: source_hashes.fetch(relative),
+      baseline_hash: baseline
+    ).merge("path" => relative)
+  end
+  manifest = {
+    "schema_version" => MANIFEST_SCHEMA,
+    "producer" => PRODUCER,
+    "authority" => "derived_hashed_inventory_only",
+    "authority_roots" => authority_roots,
+    "baseline_hash" => baseline,
+    "freshness_state" => "fresh",
+    "structural_exclusions" => [GRAPH_RELATIVE_PATH, MANIFEST_RELATIVE_PATH, STATE_RELATIVE_PATH, LOCK_RELATIVE_PATH, RECEIPT_RELATIVE_PATH, CACHE_RELATIVE_PATH],
+    "closure_count" => entries.length,
+    "closure_identity" => digest_value(
+      "schema_version" => "tw-authority-reference-closure/1",
+      "entries" => entries.map { |entry| {"path" => entry.fetch("path"), "source_hash" => entry.fetch("source_hash")} }
+    ),
+    "graph_path" => GRAPH_RELATIVE_PATH,
+    "graph_hash" => graph_hash,
+    "entries" => entries
+  }
+  manifest["manifest_hash"] = digest_value(manifest)
+  manifest_bytes = canonical_json(manifest)
+
+  {
+    "graph" => graph,
+    "manifest" => manifest,
+    "graph_bytes" => graph_bytes,
+    "manifest_bytes" => manifest_bytes
+  }
+end
+
+def write_projection(root, projection)
+  graph_path = root.join(GRAPH_RELATIVE_PATH)
+  manifest_path = root.join(MANIFEST_RELATIVE_PATH)
+  atomic_write(graph_path, projection.fetch("graph_bytes"))
+  atomic_write(manifest_path, projection.fetch("manifest_bytes"))
+end
+
+def receipt_payload(projection, cycle_id, materialization_count)
+  manifest = projection.fetch("manifest")
+  {
+    "schema_version" => RECEIPT_SCHEMA,
+    "producer" => PRODUCER,
+    "authority" => "derived_freshness_evidence_only",
+    "cycle_id" => cycle_id,
+    "materialization_count" => materialization_count,
+    "baseline_hash" => manifest.fetch("baseline_hash"),
+    "closure_identity" => manifest.fetch("closure_identity"),
+    "manifest_hash" => manifest.fetch("manifest_hash"),
+    "graph_hash" => manifest.fetch("graph_hash"),
+    "closure_count" => manifest.fetch("closure_count")
+  }
+end
+
+def write_freshness_receipt(root, projection, cycle_id, materialization_count)
+  receipt = receipt_payload(projection, cycle_id, materialization_count)
+  receipt["receipt_hash"] = digest_value(receipt)
+  atomic_write(root.join(RECEIPT_RELATIVE_PATH), canonical_json(receipt))
+  receipt
+end
+
+def verify_freshness_receipt(root, verification)
+  path = root.join(RECEIPT_RELATIVE_PATH)
+  fail!("missing_freshness_receipt", "tracked PR freshness receipt is absent", "path" => RECEIPT_RELATIVE_PATH) unless path.file? && !path.symlink?
+  receipt = parse_json_file(path, "malformed_freshness_receipt")
+  fail!("malformed_freshness_receipt", "freshness receipt schema is invalid") unless receipt["schema_version"] == RECEIPT_SCHEMA
+  recorded_hash = receipt["receipt_hash"]
+  payload = receipt.reject { |key, _value| key == "receipt_hash" }
+  fail!("freshness_receipt_hash_mismatch", "freshness receipt identity is invalid") unless recorded_hash == digest_value(payload)
+  fail!("malformed_freshness_receipt", "cycle_id is missing") unless receipt["cycle_id"].is_a?(String) && !receipt["cycle_id"].empty?
+  fail!("malformed_freshness_receipt", "materialization_count is invalid") unless receipt["materialization_count"].is_a?(Integer) && receipt["materialization_count"].positive?
+
+  expected = {
+    "baseline_hash" => verification.fetch("baseline_hash"),
+    "closure_identity" => verification.fetch("closure_identity"),
+    "manifest_hash" => verification.fetch("manifest_hash"),
+    "graph_hash" => verification.fetch("graph_hash"),
+    "closure_count" => verification.fetch("closure_count")
+  }
+  expected.each do |field, value|
+    fail!("stale_freshness_receipt", "freshness receipt differs from current deterministic projection", "field" => field) unless receipt[field] == value
+  end
+  verification.merge(
+    "receipt_hash" => recorded_hash,
+    "cycle_id" => receipt.fetch("cycle_id"),
+    "materialization_count" => receipt.fetch("materialization_count")
+  )
+end
+
+def git_workspace_fingerprint(root, receipt_hash)
+  head, _head_error, head_status = Open3.capture3("git", "-C", root.to_s, "rev-parse", "HEAD")
+  diff, _diff_error, diff_status = Open3.capture3(
+    "git", "-C", root.to_s, "diff", "--binary", "--no-ext-diff", "HEAD", "--", ".",
+    ":(exclude).traceweaver/graph/**", ":(exclude).traceweaver/state/**"
+  )
+  untracked, _untracked_error, untracked_status = Open3.capture3(
+    "git", "-C", root.to_s, "ls-files", "--others", "--exclude-standard", "-z"
+  )
+  return nil unless head_status.success? && diff_status.success? && untracked_status.success?
+
+  untracked_records = untracked.split("\0").reject(&:empty?).reject do |relative|
+    structurally_excluded?(relative)
+  end.sort.map do |relative|
+    candidate = root.join(relative)
+    if candidate.symlink?
+      [relative, "symlink", File.readlink(candidate)].join("\0")
+    elsif candidate.file?
+      mode = (candidate.stat.mode & 0o111).zero? ? "100644" : "100755"
+      [relative, mode, file_digest(candidate)].join("\0")
+    else
+      [relative, "missing_or_non_regular"].join("\0")
+    end
+  end
+
+  digest_value(
+    "schema_version" => "tw-graph-workspace-fingerprint/2",
+    "head" => head.strip,
+    "tracked_diff_hash" => "sha256:#{Digest::SHA256.hexdigest(diff.b)}",
+    "untracked_records" => untracked_records,
+    "receipt_hash" => receipt_hash
+  )
+end
+
+def cached_freshness(root)
+  return nil if ENV["TRACEWEAVER_TW_GRAPH_DISABLE_CACHE"] == "1"
+  receipt_path = root.join(RECEIPT_RELATIVE_PATH)
+  cache_path = root.join(CACHE_RELATIVE_PATH)
+  return nil unless receipt_path.file? && cache_path.file? && !receipt_path.symlink? && !cache_path.symlink?
+
+  receipt = parse_json_file(receipt_path, "malformed_freshness_receipt")
+  cache = parse_json_file(cache_path, "malformed_check_cache")
+  return nil unless cache["schema_version"] == CACHE_SCHEMA && cache["receipt_hash"] == receipt["receipt_hash"]
+  fingerprint = git_workspace_fingerprint(root, receipt.fetch("receipt_hash"))
+  return nil unless fingerprint && cache["workspace_fingerprint"] == fingerprint
+
+  cache.fetch("verification").merge("check_cache" => "reused")
+rescue KeyError
+  nil
+end
+
+def write_check_cache(root, verification)
+  fingerprint = git_workspace_fingerprint(root, verification.fetch("receipt_hash"))
+  return verification.merge("check_cache" => "unavailable_non_git_root") unless fingerprint
+
+  cache = {
+    "schema_version" => CACHE_SCHEMA,
+    "receipt_hash" => verification.fetch("receipt_hash"),
+    "workspace_fingerprint" => fingerprint,
+    "verification" => verification
+  }
+  atomic_write(root.join(CACHE_RELATIVE_PATH), canonical_json(cache))
+  verification.merge("check_cache" => "written")
+end
+
+def parse_json_file(path, code)
+  JSON.parse(File.read(path))
+rescue JSON::ParserError, SystemCallError => e
+  fail!(code, "projection JSON cannot be parsed", "path" => path.to_s, "error" => e.class.name)
+end
+
+def validate_provenance!(records, kind)
+  records.each_with_index do |record, index|
+    unless record.is_a?(Hash)
+      fail!("provenance_incomplete", "#{kind} record is not a mapping", "index" => index)
+    end
+    missing = PROVENANCE_FIELDS.reject do |field|
+      value = record[field]
+      value.is_a?(String) && !value.empty?
+    end
+    unless missing.empty?
+      fail!("provenance_incomplete", "#{kind} record lacks provenance", "index" => index, "missing" => missing)
+    end
+  end
+end
+
+def verify_projection(root)
+  graph_path = root.join(GRAPH_RELATIVE_PATH)
+  manifest_path = root.join(MANIFEST_RELATIVE_PATH)
+  unless graph_path.file? && manifest_path.file? && !graph_path.symlink? && !manifest_path.symlink?
+    fail!("missing_projection", "graph or manifest is absent")
+  end
+
+  graph = parse_json_file(graph_path, "malformed_graph")
+  manifest = parse_json_file(manifest_path, "malformed_manifest")
+  fail!("malformed_graph", "graph schema is invalid") unless graph["schema_version"] == GRAPH_SCHEMA
+  fail!("malformed_manifest", "manifest schema is invalid") unless manifest["schema_version"] == MANIFEST_SCHEMA
+
+  recorded_manifest_hash = manifest["manifest_hash"]
+  manifest_payload = manifest.reject { |key, _value| key == "manifest_hash" }
+  unless recorded_manifest_hash == digest_value(manifest_payload)
+    fail!("manifest_hash_mismatch", "manifest identity does not match its canonical content")
+  end
+
+  first = build_projection(root)
+  second = build_projection(root)
+  if ENV["TRACEWEAVER_TEST_MODE"] == "1" && ENV["TRACEWEAVER_TW_GRAPH_TEST_PERTURB_SECOND_BUILD"] == "1"
+    second = second.merge("graph_bytes" => "#{second.fetch('graph_bytes')} ")
+  end
+  unless first.fetch("graph_bytes") == second.fetch("graph_bytes") &&
+         first.fetch("manifest_bytes") == second.fetch("manifest_bytes")
+    fail!("non_reproducible_projection", "two clean in-memory builds differ")
+  end
+
+  expected_manifest = first.fetch("manifest")
+  unless manifest["baseline_hash"] == expected_manifest["baseline_hash"]
+    fail!("baseline_hash_mismatch", "manifest baseline differs from current authority")
+  end
+
+  entries = manifest["entries"]
+  fail!("provenance_incomplete", "manifest entries must be an array") unless entries.is_a?(Array)
+  expected_entries = expected_manifest.fetch("entries")
+  actual_paths = entries.map { |entry| entry.is_a?(Hash) ? entry["path"] : nil }
+  expected_paths = expected_entries.map { |entry| entry.fetch("path") }
+
+  entries.each do |entry|
+    next unless entry.is_a?(Hash) && entry["path"].is_a?(String)
+
+    candidate = root.join(entry.fetch("path"))
+    unless candidate.file? && !candidate.symlink?
+      fail!("unresolvable_manifest_entry", "manifest path cannot resolve to a regular repository file", "path" => entry.fetch("path"))
+    end
+    relative_inside_root(root, candidate.realpath)
+  end
+
+  omitted = expected_paths - actual_paths
+  fail!("omitted_reachable_artifact", "manifest omits authoritative reference closure", "paths" => omitted.sort) unless omitted.empty?
+  orphaned = actual_paths.compact - expected_paths
+  fail!("orphaned_manifest_entry", "manifest includes a path outside authoritative reference closure", "paths" => orphaned.sort) unless orphaned.empty?
+
+  validate_provenance!(entries, "manifest entry")
+  unless manifest["closure_count"] == expected_paths.length && entries.length == expected_paths.length
+    fail!("closure_count_mismatch", "manifest closure count is inconsistent")
+  end
+
+  expected_by_path = expected_entries.to_h { |entry| [entry.fetch("path"), entry] }
+  entries.each do |entry|
+    expected = expected_by_path.fetch(entry.fetch("path"))
+    unless entry["source_hash"] == file_digest(root.join(entry.fetch("path"))) && entry["source_hash"] == expected["source_hash"]
+      fail!("source_hash_mismatch", "manifest source hash is stale", "path" => entry.fetch("path"))
+    end
+    unless entry["baseline_hash"] == manifest["baseline_hash"]
+      fail!("baseline_hash_mismatch", "manifest entry baseline differs", "path" => entry.fetch("path"))
+    end
+  end
+
+  nodes = graph["nodes"]
+  edges = graph["edges"]
+  fail!("provenance_incomplete", "graph nodes or edges are missing") unless nodes.is_a?(Array) && edges.is_a?(Array)
+  validate_provenance!(nodes, "node")
+  validate_provenance!(edges, "edge")
+  unless graph["baseline_hash"] == manifest["baseline_hash"]
+    fail!("baseline_hash_mismatch", "graph and manifest baselines differ")
+  end
+
+  actual_graph_hash = file_digest(graph_path)
+  unless manifest["graph_hash"] == actual_graph_hash
+    fail!("graph_hash_mismatch", "manifest graph hash differs from stored graph")
+  end
+  unless File.binread(graph_path) == first.fetch("graph_bytes").b
+    fail!("stale_projection", "stored graph differs from deterministic current projection")
+  end
+  unless File.binread(manifest_path) == first.fetch("manifest_bytes").b
+    fail!("stale_projection", "stored manifest differs from deterministic current projection")
+  end
+
+  {
+    "freshness_state" => "fresh",
+    "baseline_hash" => manifest.fetch("baseline_hash"),
+    "manifest_hash" => manifest.fetch("manifest_hash"),
+    "graph_hash" => manifest.fetch("graph_hash"),
+    "closure_count" => manifest.fetch("closure_count"),
+    "closure_identity" => manifest.fetch("closure_identity")
+  }
+end
+
+def check_freshness(root)
+  cached = cached_freshness(root)
+  return cached if cached
+
+  graph_path = root.join(GRAPH_RELATIVE_PATH)
+  manifest_path = root.join(MANIFEST_RELATIVE_PATH)
+  partial_projection = graph_path.file? ^ manifest_path.file?
+  fail!("partial_projection", "graph and local manifest must both exist or both be absent") if partial_projection
+
+  if graph_path.file?
+    verification = verify_projection(root).merge("projection_state" => "materialized")
+  else
+    first = build_projection(root)
+    second = build_projection(root)
+    unless first.fetch("graph_bytes") == second.fetch("graph_bytes") && first.fetch("manifest_bytes") == second.fetch("manifest_bytes")
+      fail!("non_reproducible_projection", "two clean in-memory builds differ")
+    end
+    manifest = first.fetch("manifest")
+    verification = {
+      "freshness_state" => "fresh",
+      "baseline_hash" => manifest.fetch("baseline_hash"),
+      "manifest_hash" => manifest.fetch("manifest_hash"),
+      "graph_hash" => manifest.fetch("graph_hash"),
+      "closure_count" => manifest.fetch("closure_count"),
+      "closure_identity" => manifest.fetch("closure_identity"),
+      "projection_state" => "not_materialized"
+    }
+  end
+  write_check_cache(root, verify_freshness_receipt(root, verification))
+end
+
+def with_lifecycle_lock(root)
+  lock_path = root.join(LOCK_RELATIVE_PATH)
+  FileUtils.mkdir_p(lock_path.dirname)
+  fail!("unsafe_state", "lifecycle lock cannot be a symlink") if lock_path.symlink?
+  File.open(lock_path, File::RDWR | File::CREAT, 0o600) do |lock|
+    lock.flock(File::LOCK_EX)
+    yield
+  end
+end
+
+def refresh_projection(root, cycle_id)
+  fail!("missing_cycle_id", "refresh requires --cycle-id") unless cycle_id.is_a?(String) && cycle_id.match?(/\A[A-Za-z0-9][A-Za-z0-9._:-]*\z/)
+
+  with_lifecycle_lock(root) do
+    state_path = root.join(STATE_RELATIVE_PATH)
+    fail!("unsafe_state", "lifecycle state cannot be a symlink") if state_path.symlink?
+    state = if state_path.file?
+              parse_json_file(state_path, "malformed_lifecycle_state")
+            else
+              {"schema_version" => STATE_SCHEMA, "cycles" => {}}
+            end
+    fail!("malformed_lifecycle_state", "lifecycle state schema is invalid") unless state["schema_version"] == STATE_SCHEMA
+    fail!("malformed_lifecycle_state", "lifecycle cycles must be a mapping") unless state["cycles"].is_a?(Hash)
+
+    projection = build_projection(root)
+    current_identity = projection.fetch("manifest").fetch("closure_identity")
+    existing = state.fetch("cycles")[cycle_id]
+    if existing && existing["closure_identity"] == current_identity
+      write_projection(root, projection) unless root.join(GRAPH_RELATIVE_PATH).file? && root.join(MANIFEST_RELATIVE_PATH).file?
+      verification = verify_projection(root)
+      receipt = write_freshness_receipt(root, projection, cycle_id, existing.fetch("materialization_count", 1))
+      checked = write_check_cache(root, verify_freshness_receipt(root, verification))
+      return checked.merge("operation" => "refresh", "cycle_id" => cycle_id, "receipt_hash" => receipt.fetch("receipt_hash"), "refresh_state" => "already_refreshed")
+    end
+
+    write_projection(root, projection)
+    verification = verify_projection(root)
+    materialization_count = existing ? existing.fetch("materialization_count", 1) + 1 : 1
+    state.fetch("cycles")[cycle_id] = {
+      "cycle_id" => cycle_id,
+      "closure_identity" => current_identity,
+      "manifest_hash" => verification.fetch("manifest_hash"),
+      "graph_hash" => verification.fetch("graph_hash"),
+      "materialization_count" => materialization_count
+    }
+    atomic_write(state_path, canonical_json(state))
+    receipt = write_freshness_receipt(root, projection, cycle_id, materialization_count)
+    refresh_state = existing ? "same_cycle_reconciled" : "refreshed"
+    checked = write_check_cache(root, verify_freshness_receipt(root, verification))
+    checked.merge("operation" => "refresh", "cycle_id" => cycle_id, "receipt_hash" => receipt.fetch("receipt_hash"), "materialization_count" => materialization_count, "refresh_state" => refresh_state)
+  end
+end
+
+def load_fresh_graph(root)
+  verification = check_freshness(root)
+  fail!("missing_projection_for_query", "run build to materialize the fresh local graph") unless root.join(GRAPH_RELATIVE_PATH).file?
+  graph = parse_json_file(root.join(GRAPH_RELATIVE_PATH), "malformed_graph")
+  [graph, verification]
+end
+
+def node_index(graph)
+  graph.fetch("nodes").to_h { |node| [node.fetch("id"), node] }
+end
+
+def require_node!(nodes, identifier)
+  node = nodes[identifier] || nodes.values.find { |candidate| candidate["identifier"] == identifier }
+  fail!("node_not_found", "graph node was not found", "identifier" => identifier) unless node
+  node
+end
+
+def normalized_terms(value)
+  value.downcase.scan(/[a-z0-9]+/).reject { |term| term.length < 2 }.uniq
+end
+
+def search_graph(graph, query, limit)
+  terms = normalized_terms(query)
+  fail!("missing_query", "search requires --query") if terms.empty?
+  graph.fetch("nodes").map do |node|
+    haystack = [node["id"], node["label"], node["content"], node["source_path"]].compact.join(" ").downcase
+    score = terms.count { |term| haystack.include?(term) }
+    [score, node]
+  end.select { |score, _node| score.positive? }
+     .sort_by { |score, node| [-score, node.fetch("id")] }
+     .first(limit)
+     .map { |score, node| {"score" => score, "node" => node} }
+end
+
+def related_graph(graph, identifier)
+  nodes = node_index(graph)
+  node = require_node!(nodes, identifier)
+  relationships = graph.fetch("edges").select do |edge|
+    edge["source"] == node.fetch("id") || edge["target"] == node.fetch("id")
+  end
+  {
+    "node" => node,
+    "relationships" => relationships.map do |edge|
+      other_id = edge["source"] == node.fetch("id") ? edge["target"] : edge["source"]
+      {"edge" => edge, "node" => nodes[other_id]}
+    end.sort_by { |item| [item.fetch("edge").fetch("relation"), item.fetch("node").fetch("id")] }
+  }
+end
+
+def path_graph(graph, from_id, to_id)
+  nodes = node_index(graph)
+  start = require_node!(nodes, from_id).fetch("id")
+  target = require_node!(nodes, to_id).fetch("id")
+  adjacency = Hash.new { |hash, key| hash[key] = [] }
+  graph.fetch("edges").each do |edge|
+    adjacency[edge.fetch("source")] << [edge.fetch("target"), edge]
+    adjacency[edge.fetch("target")] << [edge.fetch("source"), edge]
+  end
+  adjacency.each_value { |items| items.sort_by! { |node_id, edge| [node_id, edge.fetch("id")] } }
+
+  queue = [start]
+  previous = {start => nil}
+  previous_edge = {}
+  until queue.empty?
+    current = queue.shift
+    break if current == target
+    adjacency[current].each do |next_id, edge|
+      next if previous.key?(next_id)
+      previous[next_id] = current
+      previous_edge[next_id] = edge
+      queue << next_id
+    end
+  end
+  fail!("path_not_found", "no graph path exists", "from" => from_id, "to" => to_id) unless previous.key?(target)
+
+  path_ids = []
+  edge_path = []
+  current = target
+  while current
+    path_ids << current
+    edge_path << previous_edge[current] if previous_edge[current]
+    current = previous[current]
+  end
+  {"nodes" => path_ids.reverse.map { |id| nodes.fetch(id) }, "edges" => edge_path.reverse}
+end
+
+def impact_graph(graph, identifier)
+  nodes = node_index(graph)
+  start = require_node!(nodes, identifier).fetch("id")
+  outgoing = Hash.new { |hash, key| hash[key] = [] }
+  graph.fetch("edges").each { |edge| outgoing[edge.fetch("source")] << edge }
+  queue = [[start, 0]]
+  distances = {start => 0}
+  traversed = []
+  until queue.empty?
+    current, distance = queue.shift
+    outgoing[current].sort_by { |edge| edge.fetch("id") }.each do |edge|
+      target = edge.fetch("target")
+      traversed << edge
+      next if distances.key?(target)
+      distances[target] = distance + 1
+      queue << [target, distance + 1]
+    end
+  end
+  {
+    "source" => nodes.fetch(start),
+    "impacted" => distances.reject { |id, _distance| id == start }
+                           .sort_by { |id, distance| [distance, id] }
+                           .map { |id, distance| {"distance" => distance, "node" => nodes.fetch(id)} },
+    "relationships" => traversed.uniq { |edge| edge.fetch("id") }.sort_by { |edge| edge.fetch("id") }
+  }
+end
+
+def duplicate_candidates(graph, identifier, limit)
+  nodes = node_index(graph)
+  source = require_node!(nodes, identifier)
+  fail!("wrong_node_type", "duplicate-candidate requires a requirement node") unless source["type"] == "req"
+  source_terms = normalized_terms(source.fetch("content", "")).to_set
+  candidates = graph.fetch("nodes").select { |node| node["type"] == "req" && node["id"] != source["id"] }.map do |node|
+    terms = normalized_terms(node.fetch("content", "")).to_set
+    union = source_terms | terms
+    score = union.empty? ? 0.0 : (source_terms & terms).length.to_f / union.length
+    {"score" => score.round(6), "node" => node}
+  end.select { |candidate| candidate.fetch("score") >= 0.65 }
+     .sort_by { |candidate| [-candidate.fetch("score"), candidate.fetch("node").fetch("id")] }
+     .first(limit)
+  {"source" => source, "candidates" => candidates}
+end
+
+command = ARGV.shift
+options = {root: Dir.pwd, cycle_id: nil, query: nil, id: nil, from: nil, to: nil, limit: 20}
+OptionParser.new do |parser|
+  parser.banner = "Usage: traceweaver-tw-graph <build|check|refresh|status|search|related|path|impact|duplicate-candidate> --root PATH [options]"
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--cycle-id ID") { |value| options[:cycle_id] = value }
+  parser.on("--query TEXT") { |value| options[:query] = value }
+  parser.on("--id ID") { |value| options[:id] = value }
+  parser.on("--from ID") { |value| options[:from] = value }
+  parser.on("--to ID") { |value| options[:to] = value }
+  parser.on("--limit N", Integer) { |value| options[:limit] = value }
+end.parse!
+
+begin
+  fail!("invalid_command", "operation is required") unless command
+  root = Pathname.new(options[:root]).expand_path
+  fail!("invalid_root", "repository root is not a directory") unless root.directory?
+  root = root.realpath
+  fail!("invalid_limit", "limit must be between 1 and 100") unless options[:limit].between?(1, 100)
+
+  case command
+  when "build"
+    projection = build_projection(root)
+    write_projection(root, projection)
+    verification = verify_projection(root)
+    output verification.merge("operation" => "build", "lifecycle_state" => "local_projection_only_run_refresh_to_record_freshness")
+  when "refresh"
+    output refresh_projection(root, options[:cycle_id])
+  when "check"
+    output check_freshness(root).merge("operation" => "check")
+  when "status"
+    begin
+      output check_freshness(root).merge("operation" => "status")
+    rescue GraphError => e
+      output(
+        "operation" => "status",
+        "freshness_state" => "stale_or_missing",
+        "finding" => e.code,
+        "details" => e.details
+      )
+    end
+  when "search"
+    graph, verification = load_fresh_graph(root)
+    output verification.merge("operation" => "search", "query" => options[:query], "results" => search_graph(graph, options[:query].to_s, options[:limit]))
+  when "related"
+    graph, verification = load_fresh_graph(root)
+    output verification.merge("operation" => "related", "result" => related_graph(graph, options[:id].to_s))
+  when "path"
+    graph, verification = load_fresh_graph(root)
+    output verification.merge("operation" => "path", "result" => path_graph(graph, options[:from].to_s, options[:to].to_s))
+  when "impact"
+    graph, verification = load_fresh_graph(root)
+    output verification.merge("operation" => "impact", "result" => impact_graph(graph, options[:id].to_s))
+  when "duplicate-candidate"
+    graph, verification = load_fresh_graph(root)
+    output verification.merge("operation" => "duplicate-candidate", "result" => duplicate_candidates(graph, options[:id].to_s, options[:limit]))
+  else
+    fail!("invalid_command", "unsupported operation", "operation" => command)
+  end
+rescue GraphError, KeyError, TypeError => e
+  if e.is_a?(GraphError)
+    warn "tw_graph_status=blocked"
+    warn "tw_graph_finding=#{e.code}"
+    warn "tw_graph_reason=#{e.message}"
+    warn "tw_graph_details=#{JSON.generate(canonical(e.details))}" unless e.details.empty?
+  else
+    warn "tw_graph_status=blocked"
+    warn "tw_graph_finding=malformed_projection"
+    warn "tw_graph_reason=#{e.class}: #{e.message}"
+  end
+  exit 1
+end

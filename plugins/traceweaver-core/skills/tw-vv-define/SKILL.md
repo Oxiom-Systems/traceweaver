@@ -4,6 +4,19 @@ description: Profile-aware TraceWeaver V&V definition skill. Use it for L1 compa
 argument-hint: "[accepted plan path or work-item ID]"
 ---
 
+<!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
+
+## Invocation Contract
+
+Before any other control-path action, run
+`<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
+exactly once with `--skill tw-vv-define`, the selected `--risk`, and a stable
+`--invocation-id`. Continue only when it returns `terminal_state: resolved`;
+missing, invalid, stale, or ambiguous contracts stop the invocation. This
+resolves the checklist only. It does not dispatch a child or require
+served-model attestation; use the native-child routing adapter only when an
+actual child is requested.
+
 <!-- TRACEWEAVER: file-role=vv-definition-gate-skill; req=REQ-TW-077; trace=TRACE-TW-058; ver=VER-TW-078 -->
 <!-- TRACEWEAVER: file-role=vv-definition-gate-skill; req=REQ-TW-076; trace=TRACE-TW-057; ver=VER-TW-077 -->
 

@@ -49,6 +49,14 @@ jobs:
       - name: Terra native-child routing contract
         run: scripts/traceweaver-smoke-terra-routing
 
+      - name: Mandatory authority graph contract and freshness
+        run: |
+          scripts/traceweaver-smoke-tw-graph
+          plugins/traceweaver-core/skills/tw-graph/scripts/traceweaver-tw-graph check --root .
+
+      - name: Derived semantic HTML preview
+        run: scripts/traceweaver-smoke-semantic-html-preview
+
       - name: Codex discovery smoke
         run: TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
 

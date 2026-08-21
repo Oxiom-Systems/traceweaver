@@ -4,6 +4,19 @@ description: TraceWeaver-controlled browser verification wrapper. Use when runni
 argument-hint: "[URL, route, feature, test target, or verification context]"
 ---
 
+<!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
+
+## Invocation Contract
+
+Before any other control-path action, run
+`<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
+exactly once with `--skill tw-test-browser`, the selected `--risk`, and a stable
+`--invocation-id`. Continue only when it returns `terminal_state: resolved`;
+missing, invalid, stale, or ambiguous contracts stop the invocation. This
+resolves the checklist only. It does not dispatch a child or require
+served-model attestation; use the native-child routing adapter only when an
+actual child is requested.
+
 <!-- TRACEWEAVER: file-role=verification-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-037; ver=VER-TW-047 -->
 <!-- TRACEWEAVER: file-role=verification-wrapper-skill; req=REQ-TW-087 -->
 

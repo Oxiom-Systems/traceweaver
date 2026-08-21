@@ -5,7 +5,7 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 3205a4de1092946a0ed169a20fc9d465d5f5af9fc53c98e1169e681fbc3f21dd
+baseline_hash_sha256: edce7c1a3819fc2ea3fb7e84edbbfcb462a0860fe3cf79ba198037832c86ab0e
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
@@ -17,10 +17,10 @@ u0_repair_draft:
   corrective_requirements: REQ-TW-082, REQ-TW-083, REQ-TW-084, REQ-TW-085, REQ-TW-086, REQ-TW-087
   historic_candidates_superseded_by: CHG-TW-2026-07-22-001
   historical_follow_on_status: REQ-TW-088 superseded by TW-OWNER-DECISION-2026-08-11-REQ-TW-060-088-001
-  promoted_candidate_authority: REQ-TW-088 deterministic tw-graph contract formally accepted for planning only; implementation held
+  promoted_candidate_authority: REQ-TW-088 deterministic tw-graph contract formally accepted for planning; owner-authorized 0.4.0 implementation candidate and local fixtures present
   optional_external_graphify_adapter: REQ-TW-089, REQ-TW-090
   activation_condition: active_EXC_TW_011_with_exact_Sol_ACCEPT_receipt_original_plan_amendment_baseline_branch_base_and_reviewed_semantic_diff_digest
-  held_claims: runtime, release, installation, deployment, publication, tw_graph_implementation, canonical_database_authority, product_dogfood
+  held_claims: active_host_runtime, release, deployment, publication, semantic_html_authority_cutover, canonical_database_authority, integrated_consumer_validation, product_dogfood
 u0_repair_release_ratification:
   amendment_path: docs/plans/2026-07-23-traceweaver-0.3-repair-amendment-2-release-ratification.md
   approved_whole_file_sha256: 0b67c4bfeaf23e849a261976011e0f537437170cb2ee370fff4d0d947d8dbf1f
@@ -42,7 +42,7 @@ req_tw_060_088_owner_decision_id: TW-OWNER-DECISION-2026-08-11-REQ-TW-060-088-00
 req_tw_060_088_requirements_review_id: TW-REQ-REVIEW-2026-08-11-REQ-TW-060-088-AUTHORITY-BASELINE-001
 req_tw_060_requirement_type: system_requirement_with_owner_approved_routing_and_attestation_constraints
 req_tw_088_requirement_type: system_requirement_with_owner_approved_projection_and_freshness_constraints
-req_tw_060_088_candidate_amendment_status: formally_accepted_2026_08_20_as_planning_authority_only_no_implementation_runtime_hook_ci_or_publication_authority
+req_tw_060_088_candidate_amendment_status: formally_accepted_planning_authority_with_owner_authorized_0_4_0_implementation_candidates_local_fixtures_green_runtime_host_attestation_validation_publication_and_release_held
 review_series_convergence_candidate_amendment_id: REQ-AMEND-CANDIDATE-2026-08-13-001
 review_series_convergence_owner_decision_id: TW-OWNER-DECISION-2026-08-13-REVIEW-SERIES-CONVERGENCE-001
 review_series_convergence_requirements_review_id: TW-REQ-REVIEW-2026-08-13-REVIEW-SERIES-CONVERGENCE-001
@@ -61,7 +61,7 @@ lean_convergence_implementation_status: bounded_static_controller_protocol_polic
 lean_convergence_verification_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md
 lean_convergence_code_review_id: TW-CODE-REVIEW-2026-08-21-REVIEW-SERIES-CONVERGENCE-001
 lean_convergence_code_review_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-code-review.md
-candidate_requirements_working_hash_sha256: 3205a4de1092946a0ed169a20fc9d465d5f5af9fc53c98e1169e681fbc3f21dd
+candidate_requirements_working_hash_sha256: edce7c1a3819fc2ea3fb7e84edbbfcb462a0860fe3cf79ba198037832c86ab0e
 baseline_hash_authority_status: accepted_requirements_including_req_tw_048_static_advisory_source_evidence_with_req_tw_049_req_tw_050_req_tw_051_req_tw_052_req_tw_053_req_tw_055_req_tw_056_candidate_authority_doc_review_passed_planning_input_req_tw_054_prior_scanner_wording_authority_doc_review_passed_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_planning_input_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_req_tw_057_implementation_gate_candidate_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_and_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_passed_authority_doc_review_passed_req_tw_048_amendment_doc_review_passed_u9_unit10_auth_safe_fresh_exec_and_active_host_runtime_probes_code_review_passed_authority_doc_review_passed_reviewed_held_u9_unit11_active_host_reconciled_runtime_pass_code_review_passed_authority_doc_review_passed_constrained_runtime_accepted_dogfood_classifier_code_review_passed_authority_doc_review_passed_skill_behavior_audit_unit1_behavior_contracts_authority_doc_review_passed_runtime_held_wrapper_direct_callable_expansion_recorded_code_review_passed_authority_doc_review_passed_runtime_held_review_wrapper_skills_recorded_authority_doc_review_passed_runtime_held_ce_350_skill_surface_inventory_source_refreshed_authority_doc_review_passed_parity_held_tw_wrapper_backlog_reviewed_against_ce_350_authority_doc_review_passed_per_wrapper_proof_pending_controlled_publication_gate_recorded_authority_doc_review_passed_behavior_held_controlled_publication_route_fixture_smoke_passed_fixture_only_per_target_publication_gate_required_publication_runtime_held_code_test_trace_anchor_prior_requirement_recorded_authority_doc_review_passed_scanner_held_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_structured_traceability_findings_fixture_smoke_patched_code_review_passed_authority_doc_review_passed_runtime_held_tw_auto_closure_loop_requirement_recorded_authority_doc_review_passed_tw_auto_code_review_passed_behavior_held_tw_skill_behavior_fixture_smoke_passed_code_review_passed_authority_doc_review_passed_active_host_tw_traceability_check_structured_runtime_passed_authority_doc_review_passed_clean_ce_delegation_fixture_recorded_code_review_passed_authority_doc_review_passed_req_tw_057_code_traceability_scanner_fixture_smoke_passed_install_discovery_passed_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_tw_auto_runtime_driver_boundary_code_review_passed_status_hash_doc_review_passed_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_publication_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 active_authority_review_gate: traceweaver_core_0_2_2_release_published_post_release_evidence_doc_review_passed
@@ -2017,18 +2017,18 @@ candidate_requirements:
     held_scope: semantic audit completeness, automatic removal/merge/deprecation authority, unsupported artifact classes treated as clean, runtime invocation, Vestro dogfood
   - id: REQ-TW-060
     type: system_requirement_with_owner_approved_routing_and_attestation_constraints
-    status: central_codex_routing_contract_formally_accepted_2026_08_20_planning_authority_only_implementation_runtime_ci_and_host_attestation_held
+    status: central_codex_routing_contract_formally_accepted_for_planning_owner_authorized_0_4_0_adapter_and_ci_candidate_implemented_local_fixtures_green_host_attestation_validation_publication_and_release_held
     authority_scope:
       - requirements.md
       - traceability-matrix.md
       - .traceweaver/intent-contract.yml
       - docs/validation/traceweaver-2026-08-11-req-060-088-authority-baseline-requirements-review.md
-    allowed_use: formally_accepted_planning_authority_only_no_implementation
+    allowed_use: owner_authorized_0_4_0_implementation_candidate_with_no_authority_promotion_or_runtime_claim
     proof_chain:
-      artifact: none_authority_only_amendment
+      artifact: central_contract_adapter_installer_projection_and_SEC_main_route_separation
       trace: TRACE-TW-065
-      acceptance_test: none_until_separate_vv_definition
-      result: none_until_separate_implementation_and_verification
+      acceptance_test: deterministic_L0_L3_route_attestation_and_SEC_negative_fixtures
+      result: local_candidate_fixtures_passed_independent_served_model_attestation_held
       verification: VER-TW-085
       validation: VAL-TW-033
     requirements_review:
@@ -2066,7 +2066,7 @@ candidate_requirements:
       scope_boundary: TraceWeaver-dispatched native Codex children only; unrelated host-launched agents remain host-controlled; non-native cross-model adapters require separate authority
       sol_identity_boundary: gpt-5.6-sol main-model routing is not the independent Sol reviewer or Sol ACCEPT receipt and cannot satisfy EXC-TW-011
     implementation:
-      status: not_authorized_not_started
+      status: owner_authorized_0_4_0_candidate_implemented_and_locally_verified
       current_served_model_state: unattested
       current_consequence: held_model_unattested
     historical_evidence:
@@ -2079,10 +2079,9 @@ candidate_requirements:
       observed_policy: Codex gpt-5.5 medium and Claude Sonnet
       allowed_use: historical_observation_only
     held_claims:
-      - routing_adapter
-      - central_contract_implementation
-      - ci_enforcement
       - independent_served_model_attestation
+      - active_host_runtime_and_validation
+      - publication_and_release
       - runtime_invocation_enforcement
       - host_global_model_config_mutation
       - imported_ce_component_body_edits_without_reviewed_overlay_record
@@ -2645,6 +2644,10 @@ req_tw_060_088_authority_baseline:
   requirements_review_id: TW-REQ-REVIEW-2026-08-11-REQ-TW-060-088-AUTHORITY-BASELINE-001
   requirements_review_path: docs/validation/traceweaver-2026-08-11-req-060-088-authority-baseline-requirements-review.md
   status: formally_accepted_2026_08_20_as_planning_authority_only_no_implementation_runtime_hook_ci_or_publication_authority
+  implementation_successor:
+    authority: owner-approved 0.4.0 fast-release charter and clean-room repair direction on 2026-08-21
+    status: routing_adapter_SEC_separation_tw_graph_lifecycle_setup_bootstrap_ci_freshness_and_packaged_semantic_preview_candidates_implemented_local_fixtures_green
+    held: independent_served_model_attestation, active_host_and_consumer_validation, semantic_HTML_authority_cutover, publication, release, deploy
   requirements:
     - REQ-TW-060
     - REQ-TW-088
@@ -2704,9 +2707,9 @@ req_tw_060_088_authority_baseline:
       .traceweaver/intent-contract.yml: owner decisions and allowed/held scope
     projection_boundary: graph and manifest are derived and rebuildable; cannot select, write, approve, merge, delete, supersede, or attest authority
     provenance_fields: identifier, source path or locator, source hash, baseline hash, schema version, producer, freshness state
-    lifecycle: one wrapper refresh after each completed accepted authority, trace, evidence, or verified-behavior change cycle, then tw-graph check before review completion or publication
+    lifecycle: one durable tracked receipt per completed accepted authority, trace, evidence, or verified-behavior change cycle; final refresh follows authority bookkeeping; same-cycle bookkeeping may reconcile the receipt without opening another review series; tw-graph check runs before review completion or publication
     hook_boundary: wrapper lifecycle calls only; no silently installed or mutated global, Git, or host hook
-    pr_freshness: deterministic rebuild/check fails missing, malformed, non-reproducible, provenance-incomplete, or stale projection; omitted reachable artifact; orphaned or unresolvable manifest entry; or manifest/source/baseline hash mismatch
+    pr_freshness: deterministic smoke plus read-only repository-root check with no preceding build or refresh; clean CI may verify the tracked receipt through two in-memory builds without local graph files; missing, malformed, non-reproducible, provenance-incomplete, or stale receipt/materialized projection and closure/hash mismatches fail
     graphify_boundary: REQ-TW-089/090 enrichment is optional; absence, degradation, or staleness cannot block canonical-source operation, satisfy mandatory freshness, or become authority/evidence
   requirements_review_child_receipts:
     - role: req060_requirements_quality_review
@@ -2746,16 +2749,14 @@ req_tw_060_088_authority_baseline:
     - TRACE-TW-063, VER-TW-083, and VAL-TW-031 no longer carry current REQ-TW-088
     - REQ-TW-089/090, ART-TW-071, TRACE-TW-064, ATP-TW-041, RESULT-TW-041, VER-TW-084, and VAL-TW-032 remain the separate optional Graphify chain
   allowed_scope:
-    - use the formally accepted definitions as planning authority only
+    - use the formally accepted definitions plus the owner's 0.4.0 fast-release implementation authorization for the bounded current candidates
     - allocate TRACE-TW-065, TRACE-TW-066, VER-TW-085, VER-TW-086, VAL-TW-033, and VAL-TW-034
-    - record formal acceptance/status/hash/derived-view/review-staging preparation only
+    - implement and locally verify the central routing adapter, SEC/main-route separation, mandatory tw-graph lifecycle, setup bootstrap, CI freshness, and packaged semantic preview
   held_claims:
-    - central routing contract or adapter implementation
     - child-route, host-model, or runtime mutation
     - independent served-model attestation
-    - CI enforcement
-    - tw-graph implementation, schema, manifest, or projection artifacts
-    - wrapper lifecycle integration
+    - active-host and integrated consumer validation
+    - semantic-HTML authority cutover
     - global, Git, or host hook installation or mutation
     - Graphify installation, provider-key use, semantic extraction, global graph mutation, or freshness attestation
     - stage, commit, push, PR mutation, merge, release, deployment, or publication
@@ -2902,38 +2903,20 @@ skill_execution_contract_pr1_2026_08_21:
   verification: VER-TW-090
   validation: VAL-TW-038
   owner_authority: owner-approved 0.4.0 fast-release charter/current worktree execution direction 2026-08-21
-  current_evidence: deterministic local candidate registry/resolver and recovered Terra routing fixture evidence only
+  current_evidence: deterministic 28-callable registry/resolver with packaged SKILL byte binding, separated main-route resolution, recovered Terra routing fixtures, and registered tw-graph contract
   allowed_scope:
-    - add a versioned static registry and resolver for the current 27 callable tw-* and lfg surfaces
+    - add a versioned generated registry and resolver for the current 28 callable tw-* and lfg surfaces
     - retain explicit Sol-main/Terra-child requests and independently unattested served-model holds
     - package the registry/resolver and prove deterministic local installer/discovery behavior
   held_claims:
     - authority promotion, inferred authority, or acceptance by contract resolution
     - accepted-review identity, owner validation acceptance, active-host runtime, or independently attested served-model proof
-    - tw-graph, Graphify, semantic-HTML authority migration or cutover
+    - Graphify semantic extraction and semantic-HTML authority migration or cutover
     - staging, commit, push, PR mutation, publication, release, deployment, or consumer-repository mutation
 
 next_recommended_steps:
-  - Use the formally accepted REQ-TW-060, REQ-TW-088, REQ-TW-037, REQ-TW-056, and REQ-TW-057 definitions for planning only after the excluded acceptance receipt records its clean scoped review identity; implementation remains separately gated.
-  - Keep the routing adapter, central model contract implementation, tw-graph, lifecycle integration, CI rules, host/model mutation, hook installation, and publication held until separate implementation authority and V&V exist.
-  - Close the exact-tree reviews for the selected CE 3.20.0 refresh, then publish the exact TraceWeaver Core 0.3.2 branch and PR under a single-use publication capsule.
-  - After green live PR checks, issue a separate merge-only capsule, merge the exact reviewed head, and verify the automatic traceweaver-core--v0.3.2 tag and GitHub Release against the merge commit.
-  - Keep runtime-equivalence, clean replacement, ce-sessions 3.20.0 currentness, upstream-only skill packaging, active-host currentness, deployment, dogfood, productivity, and future release claims held.
-  - Run `/tw-auto continue to the full tw-auto runtime-driver proof` while keeping full driver invocation, publication, release/package, clean replacement, Vestro/R31, unconstrained-host, and CE body-edit claims held unless separately proven.
-  - Keep REQ-TW-064 runtime invocation, publication, Vestro/R31 dogfood, release/package/upstream readiness, clean replacement, unconstrained-host support, and CE body edit claims held until their own proof gates pass; active-host filesystem/hash currentness has passed and this scoped status/hash doc review is recorded as `TW-DOC-REVIEW-2026-05-18-REQ-TW-064-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`.
-  - Treat the runtime trace-record decision-binding harness patch as reviewed after `TW-CODE-REVIEW-2026-05-18-TW-AUTO-RUNTIME-TRACE-RECORD-DECISION-BINDING-CLEAN-001`; scoped status/hash doc review passed as `TW-DOC-REVIEW-2026-05-18-TW-AUTO-RUNTIME-TRACE-RECORD-DECISION-BINDING-STATUS-HASH-CLEAN-001` and full runtime-driver behavior remains held.
-  - Treat the runtime harness validator/publication-boundary status/hash update as reviewed after `TW-DOC-REVIEW-2026-05-18-TW-AUTO-RUNTIME-HARNESS-VALIDATOR-PUBLICATION-BOUNDARY-STATUS-HASH-CLEAN-001`; full runtime-driver behavior remains held even though latest opt-in runtime artifact evidence passed, because loaded-skill autonomous driver invocation is still not proven.
-  - Treat the wrapper handoff discipline deterministic static fixture proof as reviewed input after clean scoped code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-CLEAN-001` and scoped status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-DISCIPLINE-STATUS-HASH-CLEAN-001`.
-  - Treat the wrapper handoff active-host filesystem/hash and prompt-registry currentness proof as reviewed after code review `TW-CODE-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-CLEAN-001` and status/hash doc review `TW-DOC-REVIEW-2026-05-16-WRAPPER-HANDOFF-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`.
-  - Do not rerun wrapper handoff discipline or active-host currentness reviews unless the scoped artifacts or active-host skill surface change; full runtime-driver behavior remains held until separate proof closes that gate.
-  - Treat REQ-TW-061 through REQ-TW-063 systems-engineering audit closure deterministic fixtures as reviewed static implementation input after clean scoped code review `TW-CODE-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-CLEAN-001` and scoped status/hash doc review `TW-DOC-REVIEW-2026-05-12-REQ-TW-061-063-SYSTEMS-ENGINEERING-AUDIT-CLOSURE-IMPLEMENTATION-STATUS-HASH-CLEAN-001`.
-  - Treat the 2026-05-12 active-host currentness status/hash doc review as recorded in `TW-DOC-REVIEW-2026-05-12-REQ-TW-061-063-ACTIVE-HOST-CURRENTNESS-STATUS-HASH-CLEAN-001`, then move next to fresh-session prompt-registry proof, dogfood `tw-auto`, or the next runtime-held gate.
-  - Do not rerun implementation code review unless the scoped implementation artifacts change.
-  - Do not rerun REQ-TW-061 through REQ-TW-063 implementation status/hash doc review unless its artifact identity changes.
-  - Do not rerun the 2026-05-12 active-host reconciliation/currentness proof unless the scoped source set or active-host skill surface changes.
-  - Treat the 2026-05 REQ-TW-060 status/hash review and implementation chain as historical only; the current 2026-08-20 planning authority and accepted-review identity are recorded by the formal acceptance receipt.
-  - Keep the tw-auto runtime-driver opt-in runtime branch held unless a separate proof binds autonomous driver decisions to the loaded tw-auto skill identity.
-  - Use tw-work on this TraceWeaver worktree for unambiguous coarse trace-anchor dogfood, then continue to tw-traceability-check/tw-code-review wrapper enforcement, runtime CE review delegation on clean wrapper inputs, the controlled publication route, and runtime closure-loop proof.
-  - Keep tw-grill output as source evidence only; it does not create implementation authority.
-  - Keep tw-code-review and tw-doc-review beyond the reviewed held prompt-satisfied file-access limitation observations, plus tw-auto, tw-grill, and the lfg compatibility alias, in static/advisory/source-evidence scope until their own runtime behavior evidence passes.
-  - Keep CE 3.5.0 full-surface parity, TW wrapper backlog acceptance, code/test trace-anchor enforcement, structured traceability-finding emission beyond the constrained tw-traceability-check fixture, tw-auto closure-loop automation, human-decision pause behavior, dead-TDD classification, clean CE replacement, enforcing mode, dynamic discovery, slash commands, autonomous commit/push/PR, U9 runtime claims beyond the accepted constrained host proofs, release-ready claims, and R31 held until their evidence gates pass.
+  - Finish this one clean-room integrated verification, reconcile the PR2 rebase on current main, and do not reopen review discovery for unchanged meaning.
+  - Run the bounded read-only Vestro and Air Router consumer validation, recording grep reduction, duplicate/impact navigation, bounded convergence, and false-authority-promotion results.
+  - Rebase the flat 0.4.0 release PR after PR2, recompute its fixed candidate-scope digest, replace only real prerequisite placeholders, and run the deterministic release smoke.
+  - Publish and merge PR2, then the reconciled release PR; let the main-only workflow derive exact-merge-SHA smoke, CodeQL, tag, and runtime-release receipt evidence.
+  - Keep independent served-model attestation, active-host claims, semantic-HTML authority cutover, Graphify installation, hooks, deployment, and REQ-TW-091 every-merge automation held for later evidence.

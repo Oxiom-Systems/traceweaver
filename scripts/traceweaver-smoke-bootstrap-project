@@ -31,6 +31,14 @@ expect_files "$existing" "$FIXTURES/existing-project/expected-files.txt"
 [[ "$before" == "$(shasum -a 256 "$existing/AGENTS.md" | awk '{print $1}')" ]] || { echo "bootstrap_smoke_overwrite_agents=true" >&2; exit 1; }
 echo "bootstrap_smoke_existing_project_preserved=pass"
 
+owner_root="$TMP_DIR/owner-authorized"; mkdir -p "$owner_root"
+owner_out="$("$HELPER" --root "$owner_root" --owner-authorized)"
+contains "$owner_out" "bootstrap_graph=ready" owner_graph
+[[ -f "$owner_root/.traceweaver/tw-graph-freshness.json" ]] || { echo "bootstrap_smoke_graph_receipt_missing=true" >&2; exit 1; }
+[[ -f "$owner_root/.traceweaver/graph/authority-graph.json" ]] || { echo "bootstrap_smoke_graph_projection_missing=true" >&2; exit 1; }
+"$ROOT_DIR/plugins/traceweaver-core/skills/tw-graph/scripts/traceweaver-tw-graph" check --root "$owner_root" >/dev/null
+echo "bootstrap_smoke_initial_graph_ready=pass"
+
 before="$(find "$empty/.traceweaver" -type f -exec shasum -a 256 {} \; | sort)"
 "$HELPER" --root "$empty" >/dev/null
 after="$(find "$empty/.traceweaver" -type f -exec shasum -a 256 {} \; | sort)"

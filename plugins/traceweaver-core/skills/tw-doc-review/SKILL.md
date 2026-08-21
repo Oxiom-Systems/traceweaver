@@ -3,6 +3,19 @@ name: tw-doc-review
 description: TraceWeaver-controlled document review wrapper. Use when reviewing requirements, plans, matrices, Intent Contracts, validation records, evidence records, or authority documents that may become TraceWeaver implementation authority.
 ---
 
+<!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
+
+## Invocation Contract
+
+Before any other control-path action, run
+`<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
+exactly once with `--skill tw-doc-review`, the selected `--risk`, and a stable
+`--invocation-id`. Continue only when it returns `terminal_state: resolved`;
+missing, invalid, stale, or ambiguous contracts stop the invocation. This
+resolves the checklist only. It does not dispatch a child or require
+served-model attestation; use the native-child routing adapter only when an
+actual child is requested.
+
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-050; trace=TRACE-TW-023; ver=VER-TW-032 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-086; req=REQ-TW-087 -->
@@ -135,6 +148,14 @@ Return:
 - review identity and accepted-review reuse result
 - selected reviewer personas, active-reviewer count, and repair-cycle result
 - terminal receipt reference when this review contributes to terminal state
+
+## Mandatory tw-graph Lifecycle
+
+Load `references/tw-graph-lifecycle.md` before applying this lifecycle.
+
+Require a passing `tw-graph check` before clean document-review completion.
+Read-only review never refreshes stale output; it returns the finding to the
+owning cycle. Optional Graphify cannot satisfy this mandatory check.
 
 ## Gate
 

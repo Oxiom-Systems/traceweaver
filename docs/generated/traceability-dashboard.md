@@ -9,9 +9,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `aa54d11db474b69f051b615ccb37c798e81ff393fdd2ee99fadcdcca59b84294` |
-| `requirements.md` | `1000c513acac39ebbe8001f315a32fcef37aa0ca6169ea8a4f59ab556f2fc859` |
-| `.traceweaver/intent-contract.yml` | `7014ecd3370bb473fab8a280676ef91fd3818d51443f9c6401a445967b449751` |
+| `traceability-matrix.md` | `ccf0c3cbd6598c36cbcdff766c226933241ee10a34e0523900770a86f9b616bd` |
+| `requirements.md` | `94197a77d927f1edf09f8695f614d221451e597abdb60f605d848e43a72b241c` |
+| `.traceweaver/intent-contract.yml` | `be2d3159778dc86ca401d58f340f879a3ded8c4f3e5fa7795ed8e67f311d851d` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md` | `c7406e067ddd994077a72fdfdc8dbcb2f9f2dcaec229d170935a540e74637b62` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md` | `6a83c1136739926d7c8cbcb3a45ce41c003683d11468c081c4cef802c3b128ab` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
@@ -38,7 +38,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | --- | --- | --- | --- |
 | REQ-TW-090 | Approved bounded static/advisory enrichment; Graphify neither implements nor attests REQ-TW-088 `tw-graph`; live-host invocation, semantic extraction freshness, global graph mutation, general productivity, deployment, dogfood, and future releases held | VAL-TW-032 | TRACE-TW-064 |
 | REQ-TW-089 | Approved bounded static/advisory enrichment; Graphify neither implements nor attests REQ-TW-088 `tw-graph`; live-host invocation, provider-backed semantic extraction, graph publication, deployment, dogfood, and future releases held | VAL-TW-032 | TRACE-TW-064 |
-| REQ-TW-088 | Formally accepted 2026-08-20 as planning authority only / `tw-graph`, wrapper lifecycle, CI, runtime, and host-hook implementation held | VAL-TW-034 | TRACE-TW-066 |
+| REQ-TW-088 | Formally accepted planning authority; owner-authorized 0.4.0 graph/lifecycle/CI/bootstrap candidate implemented and locally verified / active-host and integrated validation, semantic-HTML cutover, publication, release, and host hooks held | VAL-TW-034 | TRACE-TW-066 |
 | REQ-TW-087 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-030 | TRACE-TW-063 |
 | REQ-TW-086 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-029 | TRACE-TW-063 |
 | REQ-TW-085 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-028 | TRACE-TW-063 |
@@ -54,8 +54,8 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | Trace | Requirements | Artifact | Verification | Validation | Status |
 | --- | --- | --- | --- | --- | --- |
 | TRACE-TW-067 | REQ-TW-037; REQ-TW-056; REQ-TW-057 | ART-TW-072; RESULT-TW-042; controller, router, wrappers, canonical/mirror references, t... | VER-TW-087 local pass | VAL-TW-035 held | Implementation, deterministic verification, and bounded code review passed locally |
-| TRACE-TW-066 | REQ-TW-088 | Not implemented; no new ART/ATP/RESULT allocated by this authority-only patch | VER-TW-086 | VAL-TW-034 | Formally accepted planning authority only; verification not executed |
-| TRACE-TW-065 | REQ-TW-060 | Not implemented; no new ART/ATP/RESULT allocated by this authority-only patch | VER-TW-085 | VAL-TW-033 | Formally accepted planning authority only; verification not executed |
+| TRACE-TW-066 | REQ-TW-088 | Implemented candidate uses existing VER-TW-086 and deterministic smoke evidence; no new... | VER-TW-086 | VAL-TW-034 | Local VER-TW-086 projection, lifecycle, receipt-only CI, negative, and Graphify-absent fixtures pass |
+| TRACE-TW-065 | REQ-TW-060 | Implemented candidate uses existing VER-TW-085 and deterministic smoke evidence; no new... | VER-TW-085 | VAL-TW-033 | Local VER-TW-085 route and negative fixtures pass; independent served-model and active-host valid... |
 | TRACE-TW-064 | REQ-TW-089; REQ-TW-090 | ART-TW-071 | VER-TW-084 | VAL-TW-032 | Static/advisory implementation complete for optional enrichment only; historical focused/regressi... |
 | TRACE-TW-063 | REQ-TW-076; REQ-TW-077; REQ-TW-078; REQ-TW-079; REQ-TW-080; REQ-TW-081; REQ-T... | requirements.md; Intent Contract; matrix; GAP-TW-2026-07-22-008; CHG-TW-2026-07-22-001;... | VER-TW-083 | VAL-TW-025; VAL-TW-026; VAL-TW-027; VAL-TW-028; VAL-TW-02... | Conditionally approved only; no behavior authority until active EXC-TW-011 contains the exact req... |
 | TRACE-TW-062 | REQ-TW-081 | Capability matrix record; Codex discovery record; `fixtures/hooks/host-payloads/{claude... | VER-TW-082 | VAL-TW-024 | Matrix recorded: Claude Code SessionStart+PreToolUse supported; Cursor SessionStart+PreToolUse su... |
@@ -70,8 +70,8 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Trace | Requirements | Status | Next Step / Debt |
 | --- | --- | --- | --- |
-| TRACE-TW-066 | REQ-TW-088 | Formally accepted planning authority only; verification not executed | `tw-graph`, wrapper lifecycle integration, projection/schema/manifest, CI, host hooks, runtime, publication, and Graphify coupl... |
-| TRACE-TW-065 | REQ-TW-060 | Formally accepted planning authority only; verification not executed | Routing adapter, route/profile mutation, fixtures, CI, host configuration, runtime enforcement, attested service, publication, ... |
+| TRACE-TW-066 | REQ-TW-088 | Local VER-TW-086 projection, lifecycle, receipt-only CI, negative, and Graphify-absent fixtures pass | Active-host and consumer validation, semantic-HTML authority cutover, host hooks, publication, release, and Graphify coupling r... |
+| TRACE-TW-065 | REQ-TW-060 | Local VER-TW-085 route and negative fixtures pass; independent served-model and active-host validation not ... | Host configuration, active-host enforcement, independently attested service, publication, release, and unrelated host agents re... |
 | TRACE-TW-064 | REQ-TW-089; REQ-TW-090 | Static/advisory implementation complete for optional enrichment only; historical focused/regression verific... | Live-host invocation, runtime enforcement, automatic semantic extraction, provider-key use, global graph mutation, general prod... |
 | TRACE-TW-063 | REQ-TW-076; REQ-TW-077; REQ-TW-078; REQ-TW-079; REQ-TW-080; REQ-TW-081; REQ-T... | Conditionally approved only; no behavior authority until active EXC-TW-011 contains the exact required rece... | Runtime, release, installation, deployment, publication, canonical database authority, and U7 dogfood remain held; REQ-TW-088 n... |
 | TRACE-TW-062 | REQ-TW-081 | Matrix recorded: Claude Code SessionStart+PreToolUse supported; Cursor SessionStart+PreToolUse supported; C... | Runtime proof remains a separate held gate per supported cell; no manifests/fixtures for non-supported cells; requirement remai... |
@@ -121,8 +121,8 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | Validation | Source Need | Result | Evidence |
 | --- | --- | --- | --- |
 | VAL-TW-035 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Held pending installed-host dogfood and owner observation; deterministic implementation prerequis... | `docs/validation/traceweaver-2026-08-21-review-series-convergence-validation-definition.md`; future owner-o... |
-| VAL-TW-034 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Allocated / held pending implementation | Future reviewed V&V definition, deterministic projection fixtures, wrapper lifecycle receipts, and PR workf... |
-| VAL-TW-033 | NEED-TW-001; NEED-TW-002; NEED-TW-004; NEED-TW-005; NEED-TW-007; NE... | Allocated / held pending implementation and attestation | Future reviewed V&V definition, route fixtures, CI evidence, and independent host/execution receipts |
+| VAL-TW-034 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Local projection, cache invalidation, lifecycle, receipt-only CI, and Graphify-absent fixtures pa... | VER-TW-086 deterministic projection/lifecycle fixtures, wrapper lifecycle receipt, PR workflow, and future ... |
+| VAL-TW-033 | NEED-TW-001; NEED-TW-002; NEED-TW-004; NEED-TW-005; NEED-TW-007; NE... | Local route/negative fixtures passed; validation held pending independent served-model attestatio... | Local VER-TW-085 routing fixtures and future independent host/execution receipts |
 | VAL-TW-032 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Passed - owner accepted representative scenario and authorized exact 0.3.1 release 2026-07-23 | `docs/validation/traceweaver-graphify-wrapper-validation-definition.md`; `docs/validation/traceweaver-graph... |
 | VAL-TW-031 | NEED-TW-003; NEED-TW-005 | Superseded by the owner-authorized REQ-TW-088 definition and VAL-TW-034 | Historical U0 record only |
 | VAL-TW-030 | NEED-TW-001; NEED-TW-005 | Held | U3 focused fixtures |

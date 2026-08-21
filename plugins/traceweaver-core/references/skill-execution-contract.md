@@ -16,11 +16,16 @@ The resolver emits two distinct identities:
   includes the static hash, requested skill, alias target, baseline identity,
   route, and requested model.
 
-Terminal states are `missing_contract`, `invalid_contract`,
-`stale_contract`, `ambiguous_contract`, `held_model_unavailable`, and
-`held_model_unattested`. A held receipt is not evidence of a served model or
-of authority acceptance. `lfg` is an alias to `tw-auto`; it remains separately
-registered so a caller cannot bypass the contract lookup.
+Successful lookup returns `resolved`. Refusal states are `missing_contract`,
+`invalid_contract`, `stale_contract`, and `ambiguous_contract`. SEC lookup does
+not dispatch a child and therefore cannot produce `held_model_unavailable` or
+`held_model_unattested`; those states belong only to an actual native-child
+route receipt. `lfg` is an alias to `tw-auto`; it remains separately registered
+so a caller cannot bypass the contract lookup.
 
-PR1 intentionally has no `tw-graph` entry. A later PR can add one lexical
-entry and raise `callable_count` without changing the resolver schema.
+The registry generator derives anchor/reference metadata from the exact
+registered `SKILL.md` paths and binds every contract to the corresponding skill
+bytes. A source/package mismatch is `stale_contract`, including when a skill's
+behavior changes without changing its trace anchors. The generator never
+searches the repository. `tw-graph` is a normal registered callable; Graphify
+remains optional enrichment.

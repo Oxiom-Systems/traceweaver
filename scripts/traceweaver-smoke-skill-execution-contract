@@ -7,15 +7,17 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 resolver="$root/plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract"
 registry="$root/plugins/traceweaver-core/references/skill-execution-contracts.yml"
+generator="$root/plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-skill-execution-contract-registry"
 
-ruby - "$root" "$resolver" "$registry" <<'RUBY'
+ruby - "$root" "$resolver" "$registry" "$generator" <<'RUBY'
 require "json"
+require "digest"
 require "open3"
 require "tmpdir"
 require "yaml"
 require "fileutils"
 
-root, resolver, registry_path = ARGV
+root, resolver, registry_path, generator = ARGV
 
 def invoke(resolver, registry, skill, *args)
   output, error, status = Open3.capture3(resolver, "--registry", registry, "--skill", skill, *args)
@@ -33,9 +35,9 @@ end
 
 registry = YAML.safe_load(File.read(registry_path), permitted_classes: [], aliases: false)
 skills = registry.fetch("contracts").map { |entry| entry.fetch("skill") }
-expect!(skills.length == 27 && registry.fetch("callable_count") == 27, "callable count drift")
+expect!(skills.length == 28 && registry.fetch("callable_count") == 28, "callable count drift")
 expect!(skills == skills.sort && skills.uniq == skills, "registry is not deterministic")
-expect!(!skills.include?("tw-graph"), "PR1 registered tw-graph")
+expect!(skills.include?("tw-graph"), "tw-graph contract missing")
 callables = Dir.children(File.join(root, "plugins/traceweaver-core/skills")).select do |name|
   File.directory?(File.join(root, "plugins/traceweaver-core/skills", name)) && (name.start_with?("tw-") || name == "lfg")
 end.sort
@@ -44,14 +46,20 @@ metadata = registry.fetch("skill_metadata")
 expect!(metadata.keys.sort == skills, "skill metadata does not exactly cover callable surface")
 metadata.each do |skill, entry|
   source = File.read(File.join(root, "plugins/traceweaver-core/skills", skill, "SKILL.md"))
+  expect!(source.include?("traceweaver-resolve-skill-execution-contract"), "#{skill} does not resolve SEC")
+  expect!(source.include?("--skill #{skill}"), "#{skill} SEC invocation is not explicitly bound")
   expect!(entry.fetch("governing_requirements") == source.scan(/REQ-TW-\d{3}/).uniq.sort, "#{skill} governing requirements drift")
   expect!(entry.fetch("trace_records") == source.scan(/TRACE-TW-\d{3}/).uniq.sort, "#{skill} trace anchors drift")
   expect!(entry.fetch("verification_records") == source.scan(/VER-TW-\d{3}/).uniq.sort, "#{skill} verification anchors drift")
+  expected_source_hash = "sha256:#{Digest::SHA256.file(File.join(root, "plugins/traceweaver-core/skills", skill, "SKILL.md")).hexdigest}"
+  expect!(entry.fetch("skill_source_hash") == expected_source_hash, "#{skill} source hash drift")
   references = source.scan(%r{references/[A-Za-z0-9._/-]+}).uniq.sort.map do |reference|
     filename = reference.delete_prefix("references/")
     if filename == "scoped-review-protocol.md" && %w[tw-code-review tw-doc-review tw-work].include?(skill)
       "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
     elsif filename == "workflow-profile-template.yml" && skill == "tw-plan"
+      "plugins/traceweaver-core/references/#{filename}"
+    elsif filename == "tw-graph-lifecycle.md"
       "plugins/traceweaver-core/references/#{filename}"
     else
       "plugins/traceweaver-core/skills/#{skill}/references/#{filename}"
@@ -62,48 +70,50 @@ end
 
 first, _error, status = invoke(resolver, registry_path, "tw-plan", "--risk", "L2", "--invocation-id", "one")
 expect!(status.success?, "valid contract refused")
-expect!(first.fetch("terminal_state") == "held_model_unattested", "unattested resolution drift")
+expect!(first.fetch("terminal_state") == "resolved", "valid lookup did not resolve")
 expect!(first.fetch("static_definition_hash").start_with?("sha256:"), "static hash missing")
 expect!(first.fetch("invocation_receipt_id") != first.fetch("static_definition_hash"), "definition and receipt identity conflated")
 expect!(first.fetch("authority_promotion") == false, "contract promoted authority")
+expect!(first.dig("model_route", "dispatch_state") == "not_dispatched_by_contract_resolution", "SEC lookup dispatched or attested a child")
+expect!(first.dig("model_route", "served_model") == "not_applicable", "SEC lookup conflated child attestation")
 expect!(first.fetch("contract").keys.sort & %w[authority packaged_references trace_records workflow_profile graph_action verification validation holds allowed_writes next_wrapper] == %w[allowed_writes authority graph_action holds next_wrapper packaged_references trace_records validation verification workflow_profile], "contract fields incomplete")
 representative_routes = {
   "tw-audit" => {
     "profile" => "read_only",
-    "graph_action" => "optional_graphify_advisory_when_requested",
+    "graph_action" => "tw_graph_status_or_query_without_refresh_optional_graphify_enrichment",
     "allowed_writes" => ["none_during_resolution_or_route"],
     "next_wrapper" => "tw-traceability-check"
   },
   "tw-plan" => {
     "profile" => "authority_administration",
-    "graph_action" => "source_roots_only",
+    "graph_action" => "tw_graph_refresh_after_final_authority_bookkeeping_then_check",
     "allowed_writes" => ["controlled_authority_records_only_after_separate_approved_authority"],
     "next_wrapper" => "tw-vv-define",
-    "governing_requirements" => %w[REQ-TW-052 REQ-TW-089 REQ-TW-090],
+    "governing_requirements" => %w[REQ-TW-052 REQ-TW-089 REQ-TW-090 REQ-TW-092],
     "trace_records" => %w[TRACE-TW-036 TRACE-TW-046 TRACE-TW-064 TRACE-TW-070],
-    "verification_records" => %w[VER-TW-046 VER-TW-059 VER-TW-084]
+    "verification_records" => %w[VER-TW-046 VER-TW-059 VER-TW-084 VER-TW-090]
   },
   "tw-work" => {
     "profile" => "implementation",
-    "graph_action" => "optional_graphify_advisory_after_focused_verification",
+    "graph_action" => "tw_graph_impact_before_work_refresh_after_accepted_change_optional_graphify_enrichment",
     "allowed_writes" => ["approved_scoped_project_behavior_only", "no_authority_or_publication_write_by_contract"],
     "next_wrapper" => "tw-traceability-check",
-    "governing_requirements" => %w[REQ-TW-037 REQ-TW-054 REQ-TW-056 REQ-TW-057 REQ-TW-065 REQ-TW-066 REQ-TW-076 REQ-TW-078 REQ-TW-089 REQ-TW-090],
+    "governing_requirements" => %w[REQ-TW-037 REQ-TW-054 REQ-TW-056 REQ-TW-057 REQ-TW-065 REQ-TW-066 REQ-TW-076 REQ-TW-078 REQ-TW-089 REQ-TW-090 REQ-TW-092],
     "trace_records" => %w[TRACE-TW-035 TRACE-TW-042 TRACE-TW-046 TRACE-TW-048 TRACE-TW-050 TRACE-TW-059 TRACE-TW-064 TRACE-TW-067 TRACE-TW-070],
-    "verification_records" => %w[VER-TW-044 VER-TW-054 VER-TW-059 VER-TW-061 VER-TW-063 VER-TW-079 VER-TW-084 VER-TW-087]
+    "verification_records" => %w[VER-TW-044 VER-TW-054 VER-TW-059 VER-TW-061 VER-TW-063 VER-TW-079 VER-TW-084 VER-TW-087 VER-TW-090]
   },
   "tw-code-review" => {
     "profile" => "review",
-    "graph_action" => "optional_graphify_advisory_for_source_corroboration",
+    "graph_action" => "tw_graph_check_then_retained_findings_only_no_refresh",
     "allowed_writes" => ["review_receipt_only_when_separately_authorized"],
     "next_wrapper" => "tw-doc-review",
-    "governing_requirements" => %w[REQ-TW-037 REQ-TW-049 REQ-TW-052 REQ-TW-056 REQ-TW-057 REQ-TW-065 REQ-TW-086 REQ-TW-087 REQ-TW-089 REQ-TW-090],
+    "governing_requirements" => %w[REQ-TW-037 REQ-TW-049 REQ-TW-052 REQ-TW-056 REQ-TW-057 REQ-TW-065 REQ-TW-086 REQ-TW-087 REQ-TW-089 REQ-TW-090 REQ-TW-092],
     "trace_records" => %w[TRACE-TW-023 TRACE-TW-046 TRACE-TW-048 TRACE-TW-064 TRACE-TW-067 TRACE-TW-070],
-    "verification_records" => %w[VER-TW-032 VER-TW-059 VER-TW-061 VER-TW-084 VER-TW-087]
+    "verification_records" => %w[VER-TW-032 VER-TW-059 VER-TW-061 VER-TW-084 VER-TW-087 VER-TW-090]
   },
   "tw-commit-push-pr" => {
     "profile" => "publication",
-    "graph_action" => "not_applicable_publication_boundary",
+    "graph_action" => "tw_graph_check_without_refresh_before_publication",
     "allowed_writes" => ["none_until_separate_publication_capsule"],
     "next_wrapper" => "held_publication_authority_required"
   }
@@ -120,6 +130,7 @@ representative_routes.each do |skill, expected|
   expect!(contract.fetch("trace_records").include?("TRACE-TW-070"), "#{skill} SEC trace chain drift")
   expect!(contract.fetch("verification").fetch("verification") == "VER-TW-090", "#{skill} verification chain drift")
   expect!(contract.fetch("validation").fetch("validation") == "VAL-TW-038", "#{skill} validation chain drift")
+  expect!((registry.fetch("defaults").fetch("holds") - contract.fetch("holds")).empty?, "#{skill} lost default holds")
   expect!(contract.fetch("packaged_references").all? { |reference| File.file?(File.join(root, reference)) }, "#{skill} packaged reference missing")
   %w[governing_requirements trace_records verification_records].each do |field|
     next unless expected.key?(field)
@@ -142,20 +153,23 @@ end
 expect!((auto_receipt.dig("contract", "verification", "skill_verification_records") - alias_receipt.dig("contract", "verification", "skill_verification_records")).empty?, "alias omitted tw-auto verification anchors")
 expect!((auto_receipt.dig("contract", "packaged_references") - alias_receipt.dig("contract", "packaged_references")).empty?, "alias omitted tw-auto packaged references")
 default_receipt, _error, status = invoke_default(resolver, "tw-plan", "--invocation-id", "default-source")
-expect!(status.success? && default_receipt.fetch("terminal_state") == "held_model_unattested", "default source registry resolution failed")
-missing, _error, status = invoke(resolver, registry_path, "tw-graph")
+expect!(status.success? && default_receipt.fetch("terminal_state") == "resolved", "default source registry resolution failed")
+missing, _error, status = invoke(resolver, registry_path, "tw-nonexistent")
 expect!(!status.success? && missing.fetch("terminal_state") == "missing_contract", "missing contract not terminal")
 stale, _error, status = invoke(resolver, registry_path, "tw-plan", "--expected-definition-hash", "sha256:#{'0' * 64}")
 expect!(!status.success? && stale.fetch("terminal_state") == "stale_contract", "stale contract not terminal")
 unavailable, _error, status = invoke(resolver, registry_path, "tw-plan", "--available-model", "gpt-5.6-sol")
-expect!(status.success? && unavailable.fetch("terminal_state") == "held_model_unavailable" && unavailable.fetch("served_model") == "unattested", "unavailable Terra did not hold honestly")
+expect!(status.success? && unavailable.fetch("terminal_state") == "resolved" && unavailable.dig("model_route", "dispatch_state") == "not_dispatched_by_contract_resolution", "SEC lookup evaluated child availability")
 
 Dir.mktmpdir("traceweaver-sec-") do |dir|
   installed_root = File.join(dir, "traceweaver-core")
   FileUtils.cp_r(File.join(root, "plugins/traceweaver-core"), installed_root)
   installed_resolver = File.join(installed_root, "skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract")
   receipt, _error, installed_status = invoke_default(installed_resolver, "tw-plan", "--invocation-id", "default-installed")
-  expect!(installed_status.success? && receipt.fetch("terminal_state") == "held_model_unattested", "default installed registry resolution failed")
+  expect!(installed_status.success? && receipt.fetch("terminal_state") == "resolved", "default installed registry resolution failed")
+  File.open(File.join(installed_root, "skills/tw-plan/SKILL.md"), "a") { |file| file.puts("\nstale fixture mutation") }
+  stale_installed, _error, stale_installed_status = invoke_default(installed_resolver, "tw-plan", "--invocation-id", "stale-installed")
+  expect!(!stale_installed_status.success? && stale_installed.fetch("terminal_state") == "stale_contract", "installed skill source drift not terminal")
   invalid = File.join(dir, "invalid.yml")
   File.write(invalid, "schema_version: tw-skill-execution-contract-registry/1\ncontracts: []\n")
   result, _error, status = invoke(resolver, invalid, "tw-plan")
@@ -177,5 +191,7 @@ end
 
 source = File.read(resolver)
 expect!(!source.match?(/\b(?:rg|grep)\b/i), "control path contains repository-wide rediscovery")
+generator_output, generator_error, generator_status = Open3.capture3(generator, "--root", root)
+expect!(generator_status.success? && generator_output.include?("sec_registry_generator=fresh"), "deterministic SEC registry generator drift: #{generator_error}")
 puts "skill-execution-contract: PASS"
 RUBY

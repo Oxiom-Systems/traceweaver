@@ -1,0 +1,107 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=semantic-html-preview-smoke; req=REQ-TW-088; trace=TRACE-TW-066; ver=VER-TW-086
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+helper="$root/scripts/traceweaver-semantic-html-preview"
+packaged_helper="$root/plugins/traceweaver-core/skills/tw-graph/scripts/traceweaver-semantic-html-preview"
+packaged_templates="$root/plugins/traceweaver-core/skills/tw-graph/assets/semantic-html-authority-templates"
+candidate_templates="$root/docs/brainstorms/2026-08-12-semantic-html-authority-templates"
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+
+fail() { echo "semantic-html-preview: $*" >&2; exit 1; }
+expect_fail() {
+  local marker="$1"; shift
+  local output
+  if output="$("$@" 2>&1)"; then fail "expected failure: $marker"; fi
+  [[ "$output" == *"$marker"* ]] || fail "missing $marker in $output"
+}
+
+test -x "$packaged_helper" || fail "missing packaged semantic HTML helper"
+for template in index.html authority-hub.template.html decision-hold.template.html evidence-vv.template.html pr-freshness-receipt.template.html requirements.template.html traceability-matrix.template.html; do
+  test -f "$packaged_templates/$template" || fail "missing packaged template $template"
+  cmp -s "$candidate_templates/$template" "$packaged_templates/$template" || fail "packaged template drift $template"
+done
+
+"$helper" build --root "$root" >/dev/null
+output="$root/artifacts/semantic-html-preview"
+first="$(shasum -a 256 "$output"/*.html "$output/manifest.json")"
+"$helper" build --root "$root" >/dev/null
+[[ "$first" == "$(shasum -a 256 "$output"/*.html "$output/manifest.json")" ]] || fail "double build bytes differ"
+"$helper" check --root "$root" >/dev/null
+
+ruby - "$output" <<'RUBY'
+require "pathname"
+
+output = Pathname.new(ARGV.fetch(0))
+Dir.children(output).grep(/\.html\z/).each do |name|
+  page = output.join(name)
+  text = File.read(page)
+  text.scan(/href="([^"]+)"/).flatten.each do |href|
+    abort("unexpected external href #{href}") if href.match?(%r{\A(?:[a-z]+:|//)}i)
+    target, fragment = href.split("#", 2)
+    destination = target.nil? || target.empty? ? page : output.join(target)
+    abort("generated href target missing #{name}:#{href}") unless destination.file?
+    next unless fragment
+    abort("generated href fragment missing #{name}:#{href}") unless File.read(destination).include?(%Q(id="#{fragment}"))
+  end
+end
+RUBY
+
+for file in requirements.html traceability-matrix.html intent-contract.html index.html; do
+  test -f "$output/$file" || fail "missing $file"
+  if grep -Eiq '<(script|iframe|object|embed|form)([[:space:]>])' "$output/$file" ||
+     grep -Eiq '[[:space:]]on[a-z]+[[:space:]]*=' "$output/$file" ||
+     grep -Eiq '[[:space:]](src|href)[[:space:]]*=[^>]*(https?:|javascript:|data:)' "$output/$file"; then
+    fail "active content in $file"
+  fi
+done
+grep -q 'DERIVED, STATIC, NON-AUTHORITATIVE PREVIEW' "$output/requirements.html" || fail "missing derived label"
+grep -q 'REQ-TW-088' "$output/requirements.html" || fail "missing visible stable ID"
+grep -q 'href="traceability-matrix.html#id-TRACE-TW-066"' "$output/requirements.html" || fail "missing stable link"
+for source in requirements.md traceability-matrix.md .traceweaver/intent-contract.yml; do
+  grep -Fq -- "$(sed -n '1p' "$root/$source")" "$output"/*.html || fail "text parity missing for $source"
+done
+
+cp -R "$root" "$tmp/repo"
+fixture="$tmp/repo"
+"$fixture/scripts/traceweaver-semantic-html-preview" build --root "$fixture" >/dev/null
+printf '\nsource drift\n' >>"$fixture/requirements.md"
+expect_fail stale_or_hand_edited_preview "$fixture/scripts/traceweaver-semantic-html-preview" check --root "$fixture"
+"$fixture/scripts/traceweaver-semantic-html-preview" build --root "$fixture" >/dev/null
+printf '\nhand edit\n' >>"$fixture/artifacts/semantic-html-preview/requirements.html"
+expect_fail stale_or_hand_edited_preview "$fixture/scripts/traceweaver-semantic-html-preview" check --root "$fixture"
+printf '<script>bad</script>\n' >"$fixture/plugins/traceweaver-core/skills/tw-graph/assets/semantic-html-authority-templates/index.html"
+expect_fail malformed_template "$fixture/scripts/traceweaver-semantic-html-preview" build --root "$fixture"
+
+for snippet in \
+  '<base href="https://example.invalid/">' \
+  '<meta http-equiv="refresh" content="0;url=https://example.invalid/">' \
+  '<img src="image.png">' \
+  '<a onclick="alert(1)">bad</a>' \
+  '<style>@import url("https://example.invalid/style.css");</style>' \
+  '<pre><script>bad</script></pre>' \
+  '<svg><use href="https://example.invalid/icon.svg#x"></use></svg>' \
+  '<math><mi>x</mi></math>' \
+  '<form action="https://example.invalid/"></form>'
+do
+  negative="$tmp/negative-$RANDOM"
+  cp -R "$root" "$negative"
+  printf '\n%s\n' "$snippet" >>"$negative/plugins/traceweaver-core/skills/tw-graph/assets/semantic-html-authority-templates/index.html"
+  expect_fail active_template_content "$negative/scripts/traceweaver-semantic-html-preview" build --root "$negative"
+done
+
+range_fixture="$tmp/range-fixture"
+cp -R "$root" "$range_fixture"
+printf '\nRange REQ-TW-049-058 and unresolved REQ-TW-999 remain literal text.\n' >>"$range_fixture/requirements.md"
+"$range_fixture/scripts/traceweaver-semantic-html-preview" build --root "$range_fixture" >/dev/null
+range_output="$range_fixture/artifacts/semantic-html-preview/requirements.html"
+! grep -Eq 'href="[^"]*id-REQ-TW-049-058"' "$range_output" || fail "requirement range was linked as an ID"
+! grep -Eq 'href="[^"]*id-REQ-TW-999"' "$range_output" || fail "unresolved identifier was linked"
+grep -q 'REQ-TW-049-058 and unresolved REQ-TW-999 remain literal text' "$range_output" || fail "range or unresolved text changed"
+
+"$root/plugins/traceweaver-core/skills/tw-graph/scripts/traceweaver-tw-graph" build --root "$root" >/dev/null
+! grep -q 'artifacts/semantic-html-preview/' "$root/.traceweaver/graph/freshness-manifest.json" || fail "preview recursed into graph"
+echo "semantic_html_preview_smoke=pass"

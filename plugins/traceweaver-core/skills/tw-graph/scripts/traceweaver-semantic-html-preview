@@ -1,0 +1,178 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=derived-semantic-html-preview; req=REQ-TW-088; trace=TRACE-TW-066; ver=VER-TW-086
+# TRACEWEAVER: entrypoint=semantic_html_preview_build_check; req=REQ-TW-088; trace=TRACE-TW-066; ver=VER-TW-086
+
+require "digest"
+require "fileutils"
+require "json"
+require "optparse"
+require "pathname"
+
+SCHEMA = "traceweaver-semantic-html-preview/1"
+PRODUCER = "traceweaver-semantic-html-preview"
+SOURCES = {
+  "requirements.html" => "requirements.md",
+  "traceability-matrix.html" => "traceability-matrix.md",
+  "intent-contract.html" => ".traceweaver/intent-contract.yml"
+}.freeze
+TEMPLATES = %w[
+  index.html authority-hub.template.html decision-hold.template.html evidence-vv.template.html
+  pr-freshness-receipt.template.html requirements.template.html traceability-matrix.template.html
+].freeze
+PACKAGED_TEMPLATES = Pathname.new(__dir__).join("../assets/semantic-html-authority-templates").expand_path.freeze
+OUTPUT = "artifacts/semantic-html-preview"
+ID = /(?<![A-Z0-9-])(?:REQ|TRACE|VER|VAL|ART|ATP|RESULT|NEED|INTENT|GAP|CHG|EXC|DEC|TASK)-TW-\d{3}(?![A-Z0-9-])/
+ACTIVE = /<(?:base|script|iframe|object|embed|form|link|img|audio|video|source|track|frame|frameset|svg|math)\b|<meta\b[^>]*\bhttp-equiv\s*=\s*["']?\s*refresh\b|\bon\w+\s*=|\b(?:src|srcset|action|formaction|poster|data|background|xlink:href)\s*=|\b(?:href)\s*=\s*["'](?:https?:|javascript:|data:|\/\/)/im
+CSS_FETCH = /@import|\burl\s*\(|\bimage-set\s*\(/i
+
+class PreviewError < StandardError; end
+def die(message)
+  raise PreviewError, message
+end
+def digest(text)
+  "sha256:#{Digest::SHA256.hexdigest(text)}"
+end
+def esc(text)
+  text.gsub("&", "&amp;").gsub("<", "&lt;").gsub(">", "&gt;").gsub('"', "&quot;")
+end
+def out(value)
+  puts(JSON.generate(value.sort.to_h))
+end
+def read(path)
+  die("missing_or_nonregular=#{path}") unless path.file? && !path.symlink?
+  value = File.binread(path).force_encoding(Encoding::UTF_8)
+  die("non_utf8=#{path}") unless value.valid_encoding?
+  value
+end
+
+def template_check(root)
+  dir = PACKAGED_TEMPLATES
+  hashes = {}
+  TEMPLATES.each do |name|
+    value = read(dir.join(name))
+    die("malformed_template=#{name}") unless value.match?(/<!doctype html>/i) && value.match?(/<main\b/i)
+    inline_css = value.scan(/\bstyle\s*=\s*["']([^"']*)["']/im).flatten
+    style_blocks = value.scan(/<style\b[^>]*>(.*?)<\/style>/im).flatten
+    die("active_template_content=#{name}") if value.match?(ACTIVE) || (inline_css + style_blocks).any? { |css| css.match?(CSS_FETCH) }
+    hashes[name] = digest(value)
+  end
+  {"source" => "tw-graph/assets/semantic-html-authority-templates", "files" => hashes, "bundle_hash" => digest(JSON.generate(hashes.sort.to_h))}
+end
+
+def destination_for(identifier)
+  case identifier.split("-", 2).first
+  when "REQ" then "requirements.html"
+  when "TRACE", "VER", "VAL", "ART", "ATP", "RESULT" then "traceability-matrix.html"
+  else "intent-contract.html"
+  end
+end
+
+def record_destinations(source_text)
+  destinations = Hash.new { |hash, key| hash[key] = [] }
+  %w[requirements.html traceability-matrix.html].each do |name|
+    source_text.fetch(name).each_line do |line|
+      identifier = line[/^\|\s*(#{ID.source})\s*\|/, 1]
+      destinations[identifier] << name if identifier
+    end
+  end
+  destinations
+end
+
+def linked_source(text, current, destinations)
+  first = {}
+  text.gsub(ID) do |identifier|
+    target = destinations.fetch(identifier, []).include?(destination_for(identifier)) ? destination_for(identifier) : destinations.fetch(identifier, []).first
+    next identifier unless target
+    id = "id-#{identifier}"
+    anchor = first[identifier] ? "" : %(<a id="#{id}" aria-label="#{identifier}"></a>)
+    first[identifier] = true
+    link = target == current ? "##{id}" : "#{target}##{id}"
+    %(#{anchor}<a href="#{link}">#{identifier}</a>)
+  end
+end
+
+def page(name, source_path, source, source_hash, destinations)
+  content = linked_source(esc(source), name, destinations)
+  <<~HTML
+    <!doctype html>
+    <html lang="en">
+    <head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>TraceWeaver derived preview — #{esc(source_path)}</title></head>
+    <body>
+    <header><p><strong>DERIVED, STATIC, NON-AUTHORITATIVE PREVIEW</strong></p><p>Canonical source: <code>#{esc(source_path)}</code> · source hash: <code>#{source_hash}</code> · schema: <code>#{SCHEMA}</code></p></header>
+    <nav aria-label="Preview pages"><a href="index.html">Authority preview index</a> <a href="requirements.html">Requirements</a> <a href="traceability-matrix.html">Traceability matrix</a> <a href="intent-contract.html">Intent contract</a></nav>
+    <main><h1>#{esc(source_path)}</h1><pre>#{content}</pre></main>
+    <footer><p>This read-only HTML is derived from Markdown/YAML. It neither approves nor replaces canonical authority.</p></footer>
+    </body></html>
+  HTML
+end
+
+def index_page(manifest_hash, records)
+  items = records.map { |name, record| %(<li><a href="#{name}">#{name}</a> — <code>#{record["source"]}</code> — <code>#{record["source_hash"]}</code></li>) }.join
+  <<~HTML
+    <!doctype html>
+    <html lang="en"><head><meta charset="utf-8"><title>TraceWeaver derived authority preview</title></head><body>
+    <header><p><strong>DERIVED, STATIC, NON-AUTHORITATIVE PREVIEW</strong></p><p>Manifest hash: <code>#{manifest_hash}</code></p></header>
+    <main><h1>TraceWeaver authority preview</h1><p>Markdown and YAML remain canonical. No consumer cutover is implied.</p><ul>#{items}</ul></main>
+    <footer><p>Producer: <code>#{PRODUCER}</code> · schema: <code>#{SCHEMA}</code></p></footer></body></html>
+  HTML
+end
+
+def artifacts(root)
+  template_bundle = template_check(root)
+  source_text = SOURCES.to_h { |name, relative| [name, read(root.join(relative))] }
+  destinations = record_destinations(source_text)
+  records = SOURCES.to_h do |name, relative|
+    source = source_text.fetch(name)
+    [name, {"source" => relative, "source_hash" => digest(source), "bytes" => source.bytesize}]
+  end
+  manifest = {"schema_version" => SCHEMA, "producer" => PRODUCER, "authority" => "derived_non_authoritative", "template_bundle" => template_bundle, "records" => records}
+  manifest["manifest_hash"] = digest(JSON.generate(manifest.sort.to_h))
+  files = {"manifest.json" => JSON.generate(manifest.sort.to_h) + "\n", "index.html" => index_page(manifest["manifest_hash"], records)}
+  SOURCES.each { |name, relative| source = source_text.fetch(name); files[name] = page(name, relative, source, digest(source), destinations) }
+  files
+end
+
+def write(root, files)
+  dir = root.join(OUTPUT)
+  FileUtils.mkdir_p(dir)
+  files.each { |name, value| File.binwrite(dir.join(name), value) }
+end
+
+def check(root)
+  dir = root.join(OUTPUT)
+  die("missing_preview_output") unless dir.directory?
+  expected = artifacts(root)
+  actual = Dir.children(dir).sort
+  die("unexpected_preview_output=#{(actual - expected.keys).join(',')}") unless (actual - expected.keys).empty?
+  expected.each do |name, value|
+    path = dir.join(name)
+    die("missing_preview_output=#{name}") unless path.file? && !path.symlink?
+    stored = read(path)
+    die("active_preview_content=#{name}") if stored.match?(ACTIVE)
+    die("stale_or_hand_edited_preview=#{name}") unless stored == value
+  end
+  {"operation" => "check", "freshness_state" => "fresh", "output" => OUTPUT, "files" => expected.keys.sort}
+end
+
+command = ARGV.shift
+options = {root: Dir.pwd}
+OptionParser.new { |p| p.on("--root PATH") { |value| options[:root] = value } }.parse!
+begin
+  die("invalid_operation") unless %w[build check].include?(command)
+  root = Pathname.new(options[:root]).expand_path
+  die("invalid_root") unless root.directory?
+  if command == "build"
+    first, second = artifacts(root), artifacts(root)
+    die("non_deterministic_preview") unless first == second
+    write(root, first)
+    out(check(root).merge("operation" => "build"))
+  else
+    out(check(root))
+  end
+rescue PreviewError => error
+  warn "semantic_html_preview_status=blocked"
+  warn "semantic_html_preview_finding=#{error.message}"
+  exit 1
+end

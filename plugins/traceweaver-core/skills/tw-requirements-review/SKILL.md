@@ -3,11 +3,30 @@ name: tw-requirements-review
 description: TraceWeaver adapter for reviewing whether requirements, needs, acceptance criteria, or planning statements are good enough to become implementation authority. Use before planning treats requirements as approved authority.
 ---
 
+<!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
+
+## Invocation Contract
+
+Before any other control-path action, run
+`<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
+exactly once with `--skill tw-requirements-review`, the selected `--risk`, and a stable
+`--invocation-id`. Continue only when it returns `terminal_state: resolved`;
+missing, invalid, stale, or ambiguous contracts stop the invocation. This
+resolves the checklist only. It does not dispatch a child or require
+served-model attestation; use the native-child routing adapter only when an
+actual child is requested.
+
 <!-- TRACEWEAVER: file-role=requirements-review-wrapper-skill; req=REQ-TW-050; trace=TRACE-TW-021; ver=VER-TW-030 -->
 <!-- TRACEWEAVER: file-role=systems-engineering-prompt-contract-skill; req=REQ-TW-061; trace=TRACE-TW-044; ver=VER-TW-056 -->
 <!-- TRACEWEAVER: file-role=requirements-review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 
 # TraceWeaver Requirements Review
+
+<!-- TRACEWEAVER: file-role=tw-graph-requirements-review-gate; req=REQ-TW-088; trace=TRACE-TW-066; ver=VER-TW-086 -->
+
+This review loads `references/tw-graph-lifecycle.md` and requires a passing
+`tw-graph check` before it represents clean authority-review input; it never
+refreshes stale derived output during review.
 
 ## Purpose
 

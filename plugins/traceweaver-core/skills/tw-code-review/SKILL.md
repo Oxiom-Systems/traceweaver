@@ -3,6 +3,19 @@ name: tw-code-review
 description: TraceWeaver-controlled code review wrapper. Use when reviewing code, scripts, skill behavior, manifests, runtime harnesses, or behavior-bearing changes that must first pass traceability checks before CE code review.
 ---
 
+<!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
+
+## Invocation Contract
+
+Before any other control-path action, run
+`<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
+exactly once with `--skill tw-code-review`, the selected `--risk`, and a stable
+`--invocation-id`. Continue only when it returns `terminal_state: resolved`;
+missing, invalid, stale, or ambiguous contracts stop the invocation. This
+resolves the checklist only. It does not dispatch a child or require
+served-model attestation; use the native-child routing adapter only when an
+actual child is requested.
+
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-049; trace=TRACE-TW-023; ver=VER-TW-032 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
@@ -153,6 +166,14 @@ Return:
 - review identity and whether accepted review was reused
 - selected reviewer personas, active-reviewer count, and repair-cycle result
 - terminal receipt reference when this review contributes to terminal state
+
+## Mandatory tw-graph Lifecycle
+
+Load `references/tw-graph-lifecycle.md` before applying this lifecycle.
+
+Require a passing `tw-graph check` before clean review completion. Read-only
+review never refreshes stale output; it returns the finding to the owning cycle.
+Optional Graphify cannot satisfy this mandatory check.
 
 ## Gate
 

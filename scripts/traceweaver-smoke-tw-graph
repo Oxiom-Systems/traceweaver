@@ -1,0 +1,358 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=tw-graph-projection-smoke; req=REQ-TW-088; trace=TRACE-TW-066; ver=VER-TW-086
+# TRACEWEAVER: verifies=VER-TW-086; req=REQ-TW-088; trace=TRACE-TW-066
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+helper="$root/plugins/traceweaver-core/skills/tw-graph/scripts/traceweaver-tw-graph"
+lifecycle="$root/plugins/traceweaver-core/references/tw-graph-lifecycle.md"
+workflow="$root/.github/workflows/smoke-tests.yml"
+
+fail() {
+  echo "tw-graph: $1" >&2
+  exit 1
+}
+
+expect_contains() {
+  local value="$1"
+  local expected="$2"
+  local label="$3"
+  [[ "$value" == *"$expected"* ]] || fail "$label missing=$expected actual=$value"
+}
+
+expect_failure() {
+  local expected="$1"
+  shift
+  local output
+  local status
+  set +e
+  output="$("$@" 2>&1)"
+  status=$?
+  set -e
+  [[ "$status" -ne 0 ]] || fail "negative fixture unexpectedly passed expected=$expected"
+  expect_contains "$output" "$expected" "negative fixture"
+}
+
+[[ -x "$helper" ]] || fail "missing executable control surface: $helper"
+
+tmp="$(mktemp -d)"
+trap 'rm -rf "$tmp"' EXIT
+fixture="$tmp/repository with spaces"
+mkdir -p "$fixture/.traceweaver" "$fixture/docs/evidence/bundle" "$fixture/docs/validation" "$fixture/scripts" "$fixture/notes"
+
+cat >"$fixture/requirements.md" <<'EOF'
+# Requirements
+
+Evidence: `docs/evidence/direct.md`
+
+The governed set mentions REQ-TW-088 and REQ-TW-089 before their formal
+definitions; prose references must not replace the definition node content.
+
+| ID | Requirement | Intent | Verification | Validation | Status |
+| --- | --- | --- | --- | --- | --- |
+| REQ-TW-088 | The system shall encrypt customer records—at rest. | NEED-TW-001 | VER-TW-086 | VAL-TW-034 | approved |
+| REQ-TW-089 | The system shall encrypt customer records at rest. | NEED-TW-001 | VER-TW-084 | VAL-TW-034 | candidate |
+EOF
+
+gate_token='TW-AUTH-GATE-'REQ-TW-088'-GRAPH'
+printf '\nThe implementation gate %s is not a requirement identifier.\n' "$gate_token" >>"$fixture/requirements.md"
+
+cat >"$fixture/traceability-matrix.md" <<'EOF'
+# Traceability Matrix
+
+| Trace | Need | Requirement | Artifact | Verification | Validation |
+| --- | --- | --- | --- | --- | --- |
+| TRACE-TW-066 | NEED-TW-001 | REQ-TW-088 | `scripts/feature.sh`; `docs/evidence/direct.md` | VER-TW-086 | VAL-TW-034 |
+| TRACE-TW-064 | NEED-TW-001 | REQ-TW-089 | `docs/validation/decision.yml`; `docs/evidence/bundle/` | VER-TW-084 | VAL-TW-034 |
+EOF
+
+cat >"$fixture/.traceweaver/intent-contract.yml" <<'EOF'
+schema_version: traceweaver-intent/1
+owner: Fixture Owner
+intent:
+  - INTENT-TW-001
+allowed_scope:
+  - REQ-TW-088
+held_scope:
+  - publication
+matrix_alias: .traceweaver/traceability-matrix.md
+decision_record: docs/validation/decision.yml
+EOF
+
+ln -s ../traceability-matrix.md "$fixture/.traceweaver/traceability-matrix.md"
+
+cat >"$fixture/docs/evidence/direct.md" <<'EOF'
+# Direct Evidence
+
+TRACE-TW-066 is verified by VER-TW-086. Supporting evidence lives at
+`docs/evidence/transitive.md`.
+EOF
+
+cat >"$fixture/docs/evidence/transitive.md" <<'EOF'
+# Transitive Evidence
+
+RESULT-TW-045 satisfies VER-TW-086 for REQ-TW-088.
+EOF
+
+cat >"$fixture/docs/evidence/bundle/member.md" <<'EOF'
+# Directory-referenced Evidence
+
+RESULT-TW-041 supports VER-TW-084.
+EOF
+
+cat >"$fixture/docs/validation/decision.yml" <<'EOF'
+decision_id: DEC-TW-001
+requirement: REQ-TW-089
+outcome: held_pending_validation
+EOF
+
+cat >"$fixture/scripts/feature.sh" <<'EOF'
+#!/usr/bin/env bash
+# TRACEWEAVER: file-role=fixture-feature; req=REQ-TW-088; trace=TRACE-TW-066; ver=VER-TW-086
+echo fixture
+EOF
+
+echo "unreferenced input" >"$fixture/notes/unreferenced.txt"
+echo "orphan input" >"$fixture/docs/orphan.md"
+
+"$helper" build --root "$fixture" >/dev/null
+graph="$fixture/.traceweaver/graph/authority-graph.json"
+manifest="$fixture/.traceweaver/graph/freshness-manifest.json"
+[[ -f "$graph" && -f "$manifest" ]] || fail "build omitted graph or manifest"
+grep -Fq '"path":"docs/evidence/bundle/member.md"' "$manifest" || fail "directory reference omitted a reachable artifact"
+false_embedded_requirement='REQ-TW-088''-GRAPH'
+if grep -Fq "\"id\":\"$false_embedded_requirement\"" "$graph"; then
+  fail "embedded gate token created a false requirement node"
+fi
+
+first_graph_hash="$(shasum -a 256 "$graph" | awk '{print $1}')"
+first_manifest_hash="$(shasum -a 256 "$manifest" | awk '{print $1}')"
+"$helper" build --root "$fixture" >/dev/null
+[[ "$first_graph_hash" == "$(shasum -a 256 "$graph" | awk '{print $1}')" ]] || fail "double build graph bytes differ"
+[[ "$first_manifest_hash" == "$(shasum -a 256 "$manifest" | awk '{print $1}')" ]] || fail "double build manifest bytes differ"
+
+graphify_absent_graph="$first_graph_hash"
+graphify_absent_manifest="$first_manifest_hash"
+TRACEWEAVER_GRAPHIFY_BIN="$tmp/not-installed" "$helper" build --root "$fixture" >/dev/null
+[[ "$graphify_absent_graph" == "$(shasum -a 256 "$graph" | awk '{print $1}')" ]] || fail "Graphify absence changed mandatory graph"
+[[ "$graphify_absent_manifest" == "$(shasum -a 256 "$manifest" | awk '{print $1}')" ]] || fail "Graphify absence changed mandatory manifest"
+
+status_output="$("$helper" status --root "$fixture")"
+expect_contains "$status_output" '"freshness_state":"stale_or_missing"' "build without lifecycle receipt"
+expect_contains "$status_output" 'missing_freshness_receipt' "build without lifecycle receipt finding"
+initial_refresh="$("$helper" refresh --root "$fixture" --cycle-id CYCLE-TEST-001)"
+expect_contains "$initial_refresh" '"refresh_state":"refreshed"' "initial refresh"
+receipt="$fixture/.traceweaver/tw-graph-freshness.json"
+[[ -f "$receipt" ]] || fail "refresh omitted tracked freshness receipt"
+status_output="$("$helper" status --root "$fixture")"
+expect_contains "$status_output" '"freshness_state":"fresh"' "status"
+"$helper" check --root "$fixture" >/dev/null
+
+search_output="$("$helper" search --root "$fixture" --query "encrypt customer records")"
+expect_contains "$search_output" 'REQ-TW-088' "search"
+related_output="$("$helper" related --root "$fixture" --id REQ-TW-088)"
+expect_contains "$related_output" 'TRACE-TW-066' "related"
+path_output="$("$helper" path --root "$fixture" --from NEED-TW-001 --to VER-TW-086)"
+expect_contains "$path_output" 'REQ-TW-088' "path"
+impact_output="$("$helper" impact --root "$fixture" --id REQ-TW-088)"
+expect_contains "$impact_output" 'VER-TW-086' "impact"
+duplicate_output="$("$helper" duplicate-candidate --root "$fixture" --id REQ-TW-088)"
+expect_contains "$duplicate_output" 'REQ-TW-089' "duplicate candidate"
+
+echo "excluded mutation" >>"$fixture/notes/unreferenced.txt"
+"$helper" check --root "$fixture" >/dev/null || fail "excluded input made projection stale"
+
+echo "controlled mutation" >>"$fixture/docs/evidence/transitive.md"
+expect_failure "source_hash_mismatch" "$helper" check --root "$fixture"
+refresh_output="$("$helper" refresh --root "$fixture" --cycle-id CYCLE-TEST-001)"
+expect_contains "$refresh_output" '"refresh_state":"same_cycle_reconciled"' "same-cycle bookkeeping reconciliation"
+expect_contains "$refresh_output" '"materialization_count":2' "same-cycle materialization accounting"
+"$helper" check --root "$fixture" >/dev/null
+refreshed_graph_hash="$(shasum -a 256 "$graph" | awk '{print $1}')"
+repeat_output="$("$helper" refresh --root "$fixture" --cycle-id CYCLE-TEST-001)"
+expect_contains "$repeat_output" '"refresh_state":"already_refreshed"' "idempotent refresh"
+[[ "$refreshed_graph_hash" == "$(shasum -a 256 "$graph" | awk '{print $1}')" ]] || fail "duplicate cycle refresh rewrote projection"
+
+copy_fixture() {
+  local name="$1"
+  local target="$tmp/$name"
+  cp -R "$fixture" "$target"
+  printf '%s\n' "$target"
+}
+
+cache_fixture="$(copy_fixture cache-dirty-worktree)"
+rm -rf "$cache_fixture/.git" "$cache_fixture/.traceweaver/state"
+git -C "$cache_fixture" init -q
+git -C "$cache_fixture" config user.name "TraceWeaver Fixture"
+git -C "$cache_fixture" config user.email "traceweaver-fixture@example.invalid"
+git -C "$cache_fixture" add -A
+git -C "$cache_fixture" -c commit.gpgSign=false commit -qm "fixture baseline"
+printf '\nfirst dirty edit\n' >>"$cache_fixture/docs/evidence/transitive.md"
+"$helper" refresh --root "$cache_fixture" --cycle-id CYCLE-CACHE-001 >/dev/null
+cache_output="$("$helper" check --root "$cache_fixture")"
+expect_contains "$cache_output" '"check_cache":"reused"' "cache reuse before dirty-byte regression"
+status_before="$(git -C "$cache_fixture" status --porcelain=v1 --untracked-files=all)"
+printf '\nsecond dirty edit with unchanged status shape\n' >>"$cache_fixture/docs/evidence/transitive.md"
+status_after="$(git -C "$cache_fixture" status --porcelain=v1 --untracked-files=all)"
+[[ "$status_before" == "$status_after" ]] || fail "dirty-byte cache fixture changed git status shape"
+expect_failure "source_hash_mismatch" "$helper" check --root "$cache_fixture"
+
+echo "outside repository" >"$tmp/outside-source.md"
+unsafe_symlink="$(copy_fixture unsafe-symlink)"
+ln -s "$tmp/outside-source.md" "$unsafe_symlink/docs/evidence/escape.md"
+printf '\nEscaping evidence: `docs/evidence/escape.md`\n' >>"$unsafe_symlink/requirements.md"
+expect_failure "unsafe_path" "$helper" build --root "$unsafe_symlink"
+
+rewrite_manifest() {
+  local repo="$1"
+  local mode="$2"
+  ruby -rjson -rdigest - "$repo" "$mode" <<'RUBY'
+root, mode = ARGV
+path = File.join(root, ".traceweaver/graph/freshness-manifest.json")
+manifest = JSON.parse(File.read(path))
+
+canonical = lambda do |value|
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.to_h { |key| [key, canonical.call(value.fetch(key))] }
+  when Array
+    value.map { |item| canonical.call(item) }
+  else
+    value
+  end
+end
+
+case mode
+when "omitted"
+  manifest.fetch("entries").reject! { |entry| entry.fetch("path") == "docs/evidence/transitive.md" }
+when "orphaned"
+  source = File.join(root, "docs/orphan.md")
+  manifest.fetch("entries") << {
+    "path" => "docs/orphan.md",
+    "source_hash" => "sha256:#{Digest::SHA256.file(source).hexdigest}",
+    "source_locator" => "docs/orphan.md#L1",
+    "freshness_state" => "fresh"
+  }
+  manifest["entries"].sort_by! { |entry| entry.fetch("path") }
+when "unresolvable"
+  manifest.fetch("entries") << {
+    "path" => "docs/missing.md",
+    "source_hash" => "sha256:#{"0" * 64}",
+    "source_locator" => "docs/missing.md#L1",
+    "freshness_state" => "fresh"
+  }
+  manifest["entries"].sort_by! { |entry| entry.fetch("path") }
+when "source_hash"
+  manifest.fetch("entries").first["source_hash"] = "sha256:#{"1" * 64}"
+when "baseline"
+  manifest["baseline_hash"] = "sha256:#{"2" * 64}"
+when "manifest_hash"
+  manifest["producer"] = "tampered"
+  File.write(path, "#{JSON.pretty_generate(manifest)}\n")
+  exit
+else
+  abort("unknown manifest rewrite mode")
+end
+
+payload = manifest.reject { |key, _value| key == "manifest_hash" }
+manifest["manifest_hash"] = "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical.call(payload)))}"
+File.write(path, "#{JSON.pretty_generate(canonical.call(manifest))}\n")
+RUBY
+}
+
+omitted="$(copy_fixture omitted)"
+rewrite_manifest "$omitted" omitted
+expect_failure "omitted_reachable_artifact" "$helper" check --root "$omitted"
+
+orphaned="$(copy_fixture orphaned)"
+rewrite_manifest "$orphaned" orphaned
+expect_failure "orphaned_manifest_entry" "$helper" check --root "$orphaned"
+
+unresolvable="$(copy_fixture unresolvable)"
+rewrite_manifest "$unresolvable" unresolvable
+expect_failure "unresolvable_manifest_entry" "$helper" check --root "$unresolvable"
+
+source_hash="$(copy_fixture source-hash)"
+rewrite_manifest "$source_hash" source_hash
+expect_failure "source_hash_mismatch" "$helper" check --root "$source_hash"
+
+baseline="$(copy_fixture baseline)"
+rewrite_manifest "$baseline" baseline
+expect_failure "baseline_hash_mismatch" "$helper" check --root "$baseline"
+
+manifest_hash="$(copy_fixture manifest-hash)"
+rewrite_manifest "$manifest_hash" manifest_hash
+expect_failure "manifest_hash_mismatch" "$helper" check --root "$manifest_hash"
+
+malformed="$(copy_fixture malformed)"
+echo '{not-json' >"$malformed/.traceweaver/graph/freshness-manifest.json"
+expect_failure "malformed_manifest" "$helper" check --root "$malformed"
+
+receipt_only="$(copy_fixture receipt-only)"
+rm "$receipt_only/.traceweaver/graph/authority-graph.json" "$receipt_only/.traceweaver/graph/freshness-manifest.json"
+receipt_only_output="$(TRACEWEAVER_TW_GRAPH_DISABLE_CACHE=1 "$helper" check --root "$receipt_only")"
+expect_contains "$receipt_only_output" '"projection_state":"not_materialized"' "receipt-only PR freshness"
+
+partial="$(copy_fixture partial)"
+rm "$partial/.traceweaver/graph/authority-graph.json"
+expect_failure "partial_projection" env TRACEWEAVER_TW_GRAPH_DISABLE_CACHE=1 "$helper" check --root "$partial"
+
+missing_receipt="$(copy_fixture missing-receipt)"
+rm "$missing_receipt/.traceweaver/tw-graph-freshness.json"
+expect_failure "missing_freshness_receipt" env TRACEWEAVER_TW_GRAPH_DISABLE_CACHE=1 "$helper" check --root "$missing_receipt"
+
+tampered_receipt="$(copy_fixture tampered-receipt)"
+printf '\n' >>"$tampered_receipt/.traceweaver/tw-graph-freshness.json"
+ruby -rjson - "$tampered_receipt/.traceweaver/tw-graph-freshness.json" <<'RUBY'
+path = ARGV.fetch(0)
+receipt = JSON.parse(File.read(path))
+receipt["cycle_id"] = "tampered"
+File.write(path, JSON.generate(receipt))
+RUBY
+expect_failure "freshness_receipt_hash_mismatch" env TRACEWEAVER_TW_GRAPH_DISABLE_CACHE=1 "$helper" check --root "$tampered_receipt"
+
+provenance="$(copy_fixture provenance)"
+ruby -rjson -rdigest - "$provenance" <<'RUBY'
+root = ARGV.fetch(0)
+graph_path = File.join(root, ".traceweaver/graph/authority-graph.json")
+manifest_path = File.join(root, ".traceweaver/graph/freshness-manifest.json")
+graph = JSON.parse(File.read(graph_path))
+graph.fetch("nodes").first.delete("source_locator")
+
+canonical = lambda do |value|
+  case value
+  when Hash then value.keys.map(&:to_s).sort.to_h { |key| [key, canonical.call(value.fetch(key))] }
+  when Array then value.map { |item| canonical.call(item) }
+  else value
+  end
+end
+
+File.write(graph_path, "#{JSON.pretty_generate(canonical.call(graph))}\n")
+manifest = JSON.parse(File.read(manifest_path))
+manifest["graph_hash"] = "sha256:#{Digest::SHA256.file(graph_path).hexdigest}"
+payload = manifest.reject { |key, _value| key == "manifest_hash" }
+manifest["manifest_hash"] = "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical.call(payload)))}"
+File.write(manifest_path, "#{JSON.pretty_generate(canonical.call(manifest))}\n")
+RUBY
+expect_failure "provenance_incomplete" "$helper" check --root "$provenance"
+
+expect_failure "non_reproducible_projection" env TRACEWEAVER_TW_GRAPH_DISABLE_CACHE=1 TRACEWEAVER_TEST_MODE=1 TRACEWEAVER_TW_GRAPH_TEST_PERTURB_SECOND_BUILD=1 "$helper" check --root "$fixture"
+
+[[ -f "$lifecycle" ]] || fail "missing lifecycle contract"
+for wrapper in tw-work tw-code-review tw-doc-review tw-requirements-review tw-commit tw-commit-push-pr tw-auto; do
+  skill="$root/plugins/traceweaver-core/skills/$wrapper/SKILL.md"
+  grep -Fq "tw-graph-lifecycle.md" "$skill" || fail "wrapper lacks lifecycle contract: $wrapper"
+done
+grep -Fq "scripts/traceweaver-smoke-tw-graph" "$workflow" || fail "CI omits tw-graph smoke"
+grep -Fq "tw-graph/scripts/traceweaver-tw-graph check --root ." "$workflow" || fail "CI omits required tw-graph freshness check"
+if grep -Fq "tw-graph/scripts/traceweaver-tw-graph build --root ." "$workflow"; then fail "CI self-heals graph freshness before checking"; fi
+
+echo "tw_graph_projection=pass"
+echo "tw_graph_reference_closure=pass"
+echo "tw_graph_queries=pass"
+echo "tw_graph_duplicate_candidates=pass"
+echo "tw_graph_lifecycle=pass"
+echo "tw_graph_pr_freshness=pass"
+echo "tw_graph_dirty_byte_cache_invalidation=pass"
+echo "tw_graph_graphify_absent=pass"
