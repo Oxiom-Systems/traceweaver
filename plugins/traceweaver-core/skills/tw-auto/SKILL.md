@@ -34,13 +34,15 @@ the overlay.
 
 ## Skill Execution Contract
 
-Before control-path routing, resolve this callable's one static execution
-contract through `tw-auto/scripts/traceweaver-resolve-skill-execution-contract`.
-Use its bounded receipt rather than rediscovering authority, references,
-trace records, model route, graph action, V&V, holds, writes, or next wrapper
-across the repository. A missing, invalid, stale, or ambiguous contract is a
-terminal hold. The contract is advisory metadata only: it never promotes
-authority and PR1 has no `tw-graph` route.
+<!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
+
+Run `<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
+exactly once with `--skill tw-auto`, the selected `--risk`, and a stable
+`--invocation-id` before any other control-path action. Continue only when it
+returns `terminal_state: resolved`; missing, invalid, stale, or ambiguous
+contracts stop the invocation. This resolves the checklist only. It does not
+dispatch a child or require served-model attestation. Use the native-child
+routing adapter only when an actual child is requested.
 
 ## Required Inputs
 
@@ -324,6 +326,12 @@ Route terminal reporting to `references/terminal-receipt-template.yml`. Report
 `held_dogfood` when required browser dogfood evidence remains, and `complete`
 only when every required fact has passed. Never infer deployment or dogfood from
 implementation, verification, or review.
+
+## Mandatory tw-graph Lifecycle
+
+Load `references/tw-graph-lifecycle.md`. `tw-auto` is read-only: it carries
+the owning child's one accepted-cycle refresh receipt and its subsequent
+`tw-graph check`; it never refreshes the graph itself.
 
 ## Output
 

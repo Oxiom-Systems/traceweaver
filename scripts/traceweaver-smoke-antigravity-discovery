@@ -51,6 +51,9 @@ assert_equal() {
 assert_file "$manifest"
 assert_file "$version_file"
 assert_dir "$skills_root"
+assert_dir "$skills_root/tw-graph"
+assert_file "$skills_root/tw-graph/scripts/traceweaver-semantic-html-preview"
+assert_file "$skills_root/tw-graph/assets/semantic-html-authority-templates/index.html"
 
 # Check manifest content
 name="$(python3 -c "import json; print(json.load(open('$manifest'))['name'])")"
@@ -58,7 +61,8 @@ assert_equal "manifest_name" "traceweaver-core" "$name"
 
 # Check version file content
 version="$(python3 -c "import json; print(json.load(open('$version_file'))['version'])")"
-assert_equal "version_value" "0.2.5" "$version"
+source_version="$(python3 -c "import json; print(json.load(open('$repo_root/plugins/traceweaver-core/.antigravity-plugin/plugin.json'))['version'])")"
+assert_equal "version_value" "$source_version" "$version"
 
 expected_skills=(
   tw-auto

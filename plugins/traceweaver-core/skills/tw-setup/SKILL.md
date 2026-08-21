@@ -4,6 +4,19 @@ description: Advisory local setup and project-bootstrap wrapper. It preserves pr
 argument-hint: "[setup check, environment issue, or tool diagnostic]"
 ---
 
+<!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
+
+## Invocation Contract
+
+Before any other control-path action, run
+`<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
+exactly once with `--skill tw-setup`, the selected `--risk`, and a stable
+`--invocation-id`. Continue only when it returns `terminal_state: resolved`;
+missing, invalid, stale, or ambiguous contracts stop the invocation. This
+resolves the checklist only. It does not dispatch a child or require
+served-model attestation; use the native-child routing adapter only when an
+actual child is requested.
+
 <!-- TRACEWEAVER: file-role=setup-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-037; ver=VER-TW-047 -->
 <!-- TRACEWEAVER: file-role=optional-graphify-setup-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
 <!-- TRACEWEAVER: entrypoint=graphify_setup_detection; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
@@ -76,3 +89,8 @@ and continue from repository sources. Graphify output is derived and is not auth
 Return the project-local files created or conflict-held, authority-draft state,
 role state, model-routing receipt, separate deployment/dogfood state, and host
 claim boundary.
+When all three authority roots exist—or are created with explicit owner
+authorization—bootstrap must invoke the packaged `tw-graph` refresh once and
+leave both a queryable local projection and a tracked freshness receipt. It
+must not install a Git or host hook. If authority roots are absent, report the
+graph bootstrap hold without blocking the rest of the advisory setup output.

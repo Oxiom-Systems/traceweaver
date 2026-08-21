@@ -12,6 +12,7 @@ PROFILE_TEMPLATE="$PLUGIN_ROOT/references/workflow-profile-template.yml"
 REQ_TEMPLATE="$PLUGIN_ROOT/references/requirements-baseline-template.md"
 MATRIX_TEMPLATE="$PLUGIN_ROOT/references/traceability-matrix-bootstrap-template.md"
 INTENT_TEMPLATE="$PLUGIN_ROOT/references/intent-contract-template.yml"
+GRAPH_HELPER="$PLUGIN_ROOT/skills/tw-graph/scripts/traceweaver-tw-graph"
 root=""; owner=0; role=""; capsule=""; native=0; master_mutation=0; managed=0; deploy=0; dogfood=0
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -147,6 +148,15 @@ if [[ "$owner" -eq 1 ]]; then
   for spec in "$REQ_TEMPLATE:requirements.md" "$MATRIX_TEMPLATE:traceability-matrix.md" "$INTENT_TEMPLATE:.traceweaver/intent-contract.yml"; do template="${spec%%:*}"; destination="$root/${spec#*:}"; if [[ ! -e "$destination" ]]; then temp="$(mktemp "$tw/.bootstrap.XXXXXX")"; cp "$template" "$temp"; mv "$temp" "$destination"; fi; done
 else echo "bootstrap_authority=held_owner_authorization_required"; fi
 if [[ "$managed" -eq 1 ]]; then pointer='<!-- TRACEWEAVER: project-local-contract=.traceweaver/master-orchestrator.md; activation=manual-until-fresh-runtime-proof -->'; [[ -e "$root/AGENTS.md" ]] || : >"$root/AGENTS.md"; grep -Fqx "$pointer" "$root/AGENTS.md" || printf '\n%s\n' "$pointer" >>"$root/AGENTS.md"; echo "bootstrap_host_activation=managed_pointer_added"; else echo "bootstrap_host_activation=manual_launch_only"; fi
+if [[ -f "$root/requirements.md" && -f "$root/traceability-matrix.md" && -f "$tw/intent-contract.yml" && -x "$GRAPH_HELPER" ]]; then
+  graph_identity="$(shasum -a 256 "$root/requirements.md" "$root/traceability-matrix.md" "$tw/intent-contract.yml" | shasum -a 256 | awk '{print $1}')"
+  graph_output="$("$GRAPH_HELPER" refresh --root "$root" --cycle-id "bootstrap:${graph_identity}")"
+  echo "bootstrap_graph=ready"
+  echo "bootstrap_graph_receipt=$tw/tw-graph-freshness.json"
+  echo "bootstrap_graph_result=$graph_output"
+else
+  echo "bootstrap_graph=held_missing_authority_roots_or_helper"
+fi
 echo "bootstrap_model_receipt=$receipt"
 if [[ "$master_mutation" -eq 1 && -z "$role" ]]; then echo "bootstrap_role=top_level_master_read_only"; echo "bootstrap_result=refused_master_mutation"; echo "project_ready=false"; exit 1; fi
 if [[ -n "$role" ]]; then echo "bootstrap_role=bounded_child:$role"; echo "bootstrap_result=bounded_child_activated"; else echo "bootstrap_role=top_level_master_read_only"; echo "bootstrap_result=bootstrapped_template_manual_launch_only"; fi

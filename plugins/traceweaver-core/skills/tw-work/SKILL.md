@@ -4,6 +4,19 @@ description: TraceWeaver-controlled implementation worker. Use when applying app
 argument-hint: "[approved task or plan path]"
 ---
 
+<!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
+
+## Invocation Contract
+
+Before any other control-path action, run
+`<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
+exactly once with `--skill tw-work`, the selected `--risk`, and a stable
+`--invocation-id`. Continue only when it returns `terminal_state: resolved`;
+missing, invalid, stale, or ambiguous contracts stop the invocation. This
+resolves the checklist only. It does not dispatch a child or require
+served-model attestation; use the native-child routing adapter only when an
+actual child is requested.
+
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-057; trace=TRACE-TW-042; ver=VER-TW-054 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-056; trace=TRACE-TW-046; ver=VER-TW-059 -->
@@ -415,6 +428,15 @@ bookkeeping uses the deterministic `mechanical_closure` route and dispatches no
 reviewer after exact accepted-review reuse. Recommend standalone lower gates only for an
 explicit diagnostic, audit, baseline-authority review, or a human-decision pause
 where no higher wrapper can proceed.
+
+## Mandatory tw-graph Lifecycle
+
+Load `references/tw-graph-lifecycle.md` before applying this lifecycle.
+
+After one accepted change cycle changes authority, trace, evidence, or verified
+behavior, `tw-work` owns exactly one `tw-graph refresh` and immediately
+runs `tw-graph check`. Same-cycle re-entry is idempotent; later source change
+requires a new authorized cycle. Graphify is separate optional enrichment.
 
 ## Output
 

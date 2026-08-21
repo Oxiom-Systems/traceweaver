@@ -6,15 +6,15 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "aa54d11db474b69f051b615ccb37c798e81ff393fdd2ee99fadcdcca59b84294"
+      "sha256": "ccf0c3cbd6598c36cbcdff766c226933241ee10a34e0523900770a86f9b616bd"
     },
     {
       "path": "requirements.md",
-      "sha256": "1000c513acac39ebbe8001f315a32fcef37aa0ca6169ea8a4f59ab556f2fc859"
+      "sha256": "94197a77d927f1edf09f8695f614d221451e597abdb60f605d848e43a72b241c"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "7014ecd3370bb473fab8a280676ef91fd3818d51443f9c6401a445967b449751"
+      "sha256": "be2d3159778dc86ca401d58f340f879a3ded8c4f3e5fa7795ed8e67f311d851d"
     },
     {
       "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md",
@@ -1008,7 +1008,7 @@
       "verification_method": "Central-contract inspection; L0-L3 positive routes; Terra unavailable, unattested, mismatch, Sol/Luna, inheritance, and full-history negative fixtures; CI route scan; independent host/execution attestation",
       "validation_path": "VAL-TW-033",
       "owner": "Oxiom Systems",
-      "status": "Formally accepted 2026-08-20 as planning authority only / implementation, runtime, CI enforcement, and host attestation held",
+      "status": "Formally accepted planning authority; owner-authorized 0.4.0 adapter/CI candidate and fixtures implemented locally / independent served-model attestation, active-host validation, publication, and release held",
       "trace_ids": [
         "TRACE-TW-043",
         "TRACE-TW-065"
@@ -1388,12 +1388,12 @@
     {
       "id": "REQ-TW-088",
       "type": "Derived Trace Graph",
-      "summary": "One TraceWeaver-owned `tw-graph` surface deterministically builds, checks, refreshes, and queries a repository-local rebuildable authority projection with a versioned freshness manifest, canonical source locators and provenance, one wrapper refresh per accepted change cycle, and a required PR freshness check. Requirements Markdown, the matrix, and the Intent Contract retain their separate authority roles; no global, Git, or host hook is silently installed or mutated.",
+      "summary": "One TraceWeaver-owned `tw-graph` surface deterministically builds, checks, refreshes, and queries a repository-local rebuildable authority projection with a versioned freshness manifest, canonical source locators and provenance, one durable receipt per accepted change cycle with same-cycle final-bookkeeping reconciliation, and a required PR freshness check. Requirements Markdown, the matrix, and the Intent Contract retain their separate authority roles; no global, Git, or host hook is silently installed or mutated.",
       "source_need": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
       "verification_method": "Deterministic double-build; stale-input fail/refresh/pass; excluded-input stability; wrapper refresh-count; PR freshness fail/pass; provenance/schema; Graphify-absent equivalence",
       "validation_path": "VAL-TW-034",
       "owner": "Oxiom Systems",
-      "status": "Formally accepted 2026-08-20 as planning authority only / `tw-graph`, wrapper lifecycle, CI, runtime, and host-hook implementation held",
+      "status": "Formally accepted planning authority; owner-authorized 0.4.0 graph/lifecycle/CI/bootstrap candidate implemented and locally verified / active-host and integrated validation, semantic-HTML cutover, publication, release, and host hooks held",
       "trace_ids": [
         "TRACE-TW-066"
       ]
@@ -2113,22 +2113,22 @@
       "owner": "Oxiom Systems",
       "needs": "NEED-TW-001; NEED-TW-002; NEED-TW-004; NEED-TW-005; NEED-TW-007; NEED-TW-008",
       "requirements": "REQ-TW-060",
-      "artifact": "Not implemented; no new ART/ATP/RESULT allocated by this authority-only patch",
+      "artifact": "Implemented candidate uses existing VER-TW-085 and deterministic smoke evidence; no new controlled IDs allocated",
       "verification": "VER-TW-085",
       "validation": "VAL-TW-033",
-      "status": "Formally accepted planning authority only; verification not executed",
-      "next_step": "Routing adapter, route/profile mutation, fixtures, CI, host configuration, runtime enforcement, attested service, publication, and unrelated host agents remain held/out of scope"
+      "status": "Local VER-TW-085 route and negative fixtures pass; independent served-model and active-host validation not executed",
+      "next_step": "Host configuration, active-host enforcement, independently attested service, publication, release, and unrelated host agents remain held/out of scope"
     },
     {
       "id": "TRACE-TW-066",
       "owner": "Oxiom Systems",
       "needs": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
       "requirements": "REQ-TW-088",
-      "artifact": "Not implemented; no new ART/ATP/RESULT allocated by this authority-only patch",
+      "artifact": "Implemented candidate uses existing VER-TW-086 and deterministic smoke evidence; no new controlled IDs allocated",
       "verification": "VER-TW-086",
       "validation": "VAL-TW-034",
-      "status": "Formally accepted planning authority only; verification not executed",
-      "next_step": "`tw-graph`, wrapper lifecycle integration, projection/schema/manifest, CI, host hooks, runtime, publication, and Graphify coupling remain held"
+      "status": "Local VER-TW-086 projection, lifecycle, receipt-only CI, negative, and Graphify-absent fixtures pass",
+      "next_step": "Active-host and consumer validation, semantic-HTML authority cutover, host hooks, publication, release, and Graphify coupling remain held"
     },
     {
       "id": "TRACE-TW-067",
@@ -3776,22 +3776,22 @@
       "Requirement": "REQ-TW-060",
       "Method": "Allocated Sol-main/Terra-child routing contract verification",
       "Procedure / Command": "Inspect the one central route/profile contract and all TraceWeaver-owned native-child dispatch call sites; exercise L0=`low`, L1=`medium`, L2=`high`, and L3=`xhigh`; require immutable attester identity plus execution/request identity to bind exactly one receipt to its task/dispatch, workflow-profile hash, requested/served models, effort, and fork; reject omitted `model: gpt-5.6-terra`, Sol/Luna child routes, model inheritance, full-history inheritance, unbounded fork, effort drift, silent fallback, replayed/cross-receipt/incompletely bound attestation, and acceptance/self-report as served-model proof; simulate Terra unavailable, unattested service, and model mismatch; scan the proposed CI rule.",
-      "Tested Ref": "Future reviewed routing contract, dispatch adapter, route/profile fixtures, CI rule, and independent host/execution attestation receipts",
-      "Result": "Allocated only, not executed. Required outcomes are `held_model_unavailable`, `served_model: unattested` plus `held_model_unattested`, or `held_model_mismatch` as applicable; no held child output may support verification, review, completion, or publication.",
-      "Evidence Path": "`requirements.md`; `.traceweaver/intent-contract.yml`; `traceability-matrix.md`; `docs/validation/traceweaver-2026-08-11-req-060-088-authority-baseline-requirements-review.md`; future V&V definition and evidence",
+      "Tested Ref": "Central routing contract, dispatch adapter, SEC/main-route separation, L0-L3 route/profile fixtures, CI route scan, and independent host/execution attestation receipt contract",
+      "Result": "Executed locally for deterministic routes and negative fixtures. Required outcomes are `held_model_unavailable`, `served_model: unattested` plus `held_model_unattested`, or `held_model_mismatch` as applicable; no held child output may support verification, review, completion, or publication.",
+      "Evidence Path": "`requirements.md`; `.traceweaver/intent-contract.yml`; `traceability-matrix.md`; `docs/validation/traceweaver-2026-08-11-req-060-088-authority-baseline-requirements-review.md`; `plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child`; `scripts/traceweaver-smoke-terra-routing`; `scripts/traceweaver-smoke-skill-execution-contract`",
       "Date / Session": "2026-08-11",
-      "Notes": "Requirements-definition verification allocated. Implementation, fixtures, CI enforcement, runtime proof, and independent served-model attestation remain held."
+      "Notes": "Local deterministic implementation and CI fixtures pass. Independent served-model attestation, active-host validation, publication, and release remain held."
     },
     {
       "ID": "VER-TW-086",
       "Requirement": "REQ-TW-088",
       "Method": "Allocated deterministic `tw-graph` projection and PR-freshness verification",
-      "Procedure / Command": "Build the same authoritative reference closure twice and compare output; mutate a controlled input and require `tw-graph check` to fail until one refresh; mutate an excluded input and require no stale failure; assert one refresh per accepted wrapper change cycle; require the derived hashed manifest to cover every repository-local trace, evidence, validation, and code-anchor artifact referenced directly or transitively from the authoritative inputs; exercise omitted-reachable-artifact, orphaned/unresolvable-entry, manifest/source/baseline-mismatch, missing, malformed, non-reproducible, provenance-incomplete, and stale PR failures plus a fresh pass; repeat with Graphify absent and confirm identical mandatory freshness behavior.",
-      "Tested Ref": "Future reviewed `tw-graph` schema/manifest, builder/checker/query surface, wrapper lifecycle fixtures, and PR workflow",
-      "Result": "Allocated only, not executed. The mandatory projection and manifest must remain source-derived, complete for the authoritative reference closure, and independently fresh whether Graphify is ready, absent, degraded, or stale.",
-      "Evidence Path": "`requirements.md`; `.traceweaver/intent-contract.yml`; `traceability-matrix.md`; `docs/validation/traceweaver-2026-08-11-req-060-088-authority-baseline-requirements-review.md`; future V&V definition and evidence",
+      "Procedure / Command": "Build the same authoritative reference closure twice and compare output; mutate a controlled input and require `tw-graph check` to fail until one refresh; mutate an excluded input and require no stale failure; assert one durable receipt per accepted wrapper change cycle and same-cycle final-bookkeeping reconciliation; require the derived hashed manifest to cover every repository-local trace, evidence, validation, and code-anchor artifact referenced directly or transitively from the authoritative inputs; exercise omitted-reachable-artifact, orphaned/unresolvable-entry, manifest/source/baseline-mismatch, missing, malformed, non-reproducible, provenance-incomplete, and stale PR failures plus a fresh pass; repeat with Graphify absent and confirm identical mandatory freshness behavior.",
+      "Tested Ref": "`tw-graph` schema/manifest/receipt, builder/checker/query surface, bootstrap and wrapper lifecycle fixtures, packaged semantic preview, and PR workflow",
+      "Result": "Executed locally. The mandatory projection and manifest must remain source-derived, complete for the authoritative reference closure, and independently fresh whether Graphify is ready, absent, degraded, or stale.",
+      "Evidence Path": "`requirements.md`; `.traceweaver/intent-contract.yml`; `traceability-matrix.md`; `docs/validation/traceweaver-2026-08-11-req-060-088-authority-baseline-requirements-review.md`; `plugins/traceweaver-core/skills/tw-graph/scripts/traceweaver-tw-graph`; `scripts/traceweaver-smoke-tw-graph`; `scripts/traceweaver-smoke-bootstrap-project`; `scripts/traceweaver-smoke-semantic-html-preview`",
       "Date / Session": "2026-08-11",
-      "Notes": "Requirements-definition verification allocated. `tw-graph`, wrapper lifecycle, projection artifacts, PR CI, runtime, and host hooks remain held."
+      "Notes": "Local deterministic graph, lifecycle, receipt-only CI, packaged-preview, and Graphify-absent fixtures pass. Active-host/integrated validation, semantic-HTML cutover, publication, release, and host hooks remain held."
     },
     {
       "ID": "VER-TW-087",
@@ -4164,8 +4164,8 @@
       "Scenario / Intended Use": "An owner runs representative L0 and L3 TraceWeaver flows and can see Sol coordinating while every TraceWeaver-native child is explicitly requested as Terra with `low` or `xhigh` reasoning, bounded context, and independently attested requested/served model fields bound to that child's receipt, task/dispatch, profile, effort, and fork.",
       "Stakeholder / Representative": "Oxiom Systems, with host/execution attestation independent of the dispatched child",
       "Acceptance Signal": "Receipts make the cost/quality split visible; Terra unavailable stops as `held_model_unavailable`; missing, invalid, replayed, cross-receipt, or incompletely bound attestation records `served_model: unattested` and `held_model_unattested`; mismatch records `held_model_mismatch`; no Sol/Luna/inherited child or held output reaches review, completion, or publication.",
-      "Evidence Path": "Future reviewed V&V definition, route fixtures, CI evidence, and independent host/execution receipts",
-      "Result": "Allocated / held pending implementation and attestation",
+      "Evidence Path": "Local VER-TW-085 routing fixtures and future independent host/execution receipts",
+      "Result": "Local route/negative fixtures passed; validation held pending independent served-model attestation and owner observation",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "Configuration, dispatch acceptance, or child self-report is not service proof. Sol-main model identity cannot satisfy the independent historical `Sol ACCEPT` reviewer requirement."
     },
@@ -4175,10 +4175,10 @@
       "Scenario / Intended Use": "An owner follows one representative PR change from authoritative Markdown through reference-closure inventory, stale or incomplete manifest detection, one lifecycle refresh, a fresh `tw-graph check`, and source-located relationship navigation without repository-wide grep.",
       "Stakeholder / Representative": "Oxiom Systems, independent of the implementation agent",
       "Acceptance Signal": "A controlled source change or omitted reachable artifact causes the PR freshness check to fail, one refresh makes the complete derived manifest pass, canonical locators resolve to the unchanged authority sources, and the same workflow succeeds with Graphify absent; no graph or manifest output selects, writes, or attests authority.",
-      "Evidence Path": "Future reviewed V&V definition, deterministic projection fixtures, wrapper lifecycle receipts, and PR workflow evidence",
-      "Result": "Allocated / held pending implementation",
+      "Evidence Path": "VER-TW-086 deterministic projection/lifecycle fixtures, wrapper lifecycle receipt, PR workflow, and future owner-observed consumer evidence",
+      "Result": "Local projection, cache invalidation, lifecycle, receipt-only CI, and Graphify-absent fixtures passed; owner/integrated validation remains held",
       "Owner": "Oxiom Systems",
-      "Deferred Trigger / Notes": "`tw-graph`, manifest/schema, wrapper lifecycle, PR CI, runtime, and host hooks remain held. Optional Graphify enrichment cannot satisfy this validation."
+      "Deferred Trigger / Notes": "Active-host and consumer validation, semantic-HTML authority cutover, host hooks, publication, and release remain held. Optional Graphify enrichment cannot satisfy this validation."
     },
     {
       "ID": "VAL-TW-035",

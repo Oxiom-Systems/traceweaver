@@ -31,3 +31,8 @@
 # Graphify produces a derived local relationship graph. Source requirements,
 # code, and TraceWeaver evidence remain authoritative.
 graphify-out/
+
+# Deterministic derived projections. Markdown/YAML remain canonical.
+.traceweaver/graph/
+.traceweaver/state/
+artifacts/semantic-html-preview/

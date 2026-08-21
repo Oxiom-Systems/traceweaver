@@ -450,12 +450,12 @@ for ce_skill in "$ROOT_DIR"/plugins/traceweaver-core/skills/ce-*/SKILL.md; do
     imported_ce_unanchored_total=$((imported_ce_unanchored_total + 1))
   fi
 done
-if [[ "$skill_file_total" != "53" ]]; then
-  echo "traceweaver_skill_file_total=failed expected=53 actual=$skill_file_total" >&2
+if [[ "$skill_file_total" != "54" ]]; then
+  echo "traceweaver_skill_file_total=failed expected=54 actual=$skill_file_total" >&2
   exit 1
 fi
-if [[ "$anchored_skill_total" != "48" ]]; then
-  echo "traceweaver_skill_file_anchored=failed expected=48 actual=$anchored_skill_total" >&2
+if [[ "$anchored_skill_total" != "49" ]]; then
+  echo "traceweaver_skill_file_anchored=failed expected=49 actual=$anchored_skill_total" >&2
   exit 1
 fi
 assert_contains "$tw_authority_gate" "file-role=authority-gate-wrapper-skill" "tw_authority_gate_file_role_anchor"

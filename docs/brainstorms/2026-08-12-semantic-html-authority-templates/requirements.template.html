@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Candidate template — requirements baseline</title>
+  <style>
+    :root { color-scheme: light; --ink:#17252d; --muted:#5f7079; --line:#d8dfde; --paper:#f7f6f0; --surface:#fff; --navy:#173f4e; --cyan:#0d7480; --cyan-soft:#e0f1f1; --orange:#d96138; --orange-soft:#fbe8df; --amber:#926116; --amber-soft:#faefd8; --green:#287354; --green-soft:#e1f1e8; --red:#9b3c36; --red-soft:#f7e4e1; }
+    * { box-sizing:border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); font:15px/1.55 Inter,ui-sans-serif,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }
+    a { color:var(--cyan); text-underline-offset:3px; }
+    code,.mono { font-family:"SFMono-Regular",Consolas,monospace; }
+    header { color:#fff; background:var(--navy); }
+    .wrap { width:min(1060px,calc(100% - 32px)); margin-inline:auto; }
+    header .wrap { padding:28px 0; }
+    h1,h2,h3 { line-height:1.15; }
+    h1 { margin:0 0 10px; font:700 clamp(34px,5vw,58px)/1 Georgia,serif; letter-spacing:-.03em; }
+    h2 { margin:0 0 12px; color:var(--navy); font:700 30px/1.1 Georgia,serif; }
+    h3 { margin:0 0 8px; color:var(--navy); font-size:18px; }
+    .kicker { margin:0 0 7px; color:#f4bd91; font-size:11px; font-weight:900; letter-spacing:.12em; text-transform:uppercase; }
+    .lede { max-width:780px; margin:0; color:#cee0e3; }
+    nav { border-bottom:1px solid var(--line); background:#fff; }
+    nav .wrap { display:flex; gap:16px; overflow:auto; padding:10px 0; }
+    nav a { flex:0 0 auto; font-size:12px; font-weight:750; text-decoration:none; }
+    main { padding:30px 0 64px; }
+    section { padding:25px 0; border-bottom:1px solid var(--line); }
+    .notice { padding:15px 17px; border:1px solid #efcdbd; border-radius:12px; color:#704327; background:var(--orange-soft); }
+    .metadata,.fields,.relationships { display:grid; grid-template-columns:170px minmax(0,1fr); margin:0; }
+    .metadata dt,.metadata dd,.fields dt,.fields dd,.relationships dt,.relationships dd { padding:8px 0; border-top:1px solid var(--line); }
+    .metadata dt,.fields dt,.relationships dt { padding-right:12px; overflow-wrap:anywhere; color:var(--muted); font-size:10px; font-weight:900; letter-spacing:.08em; text-transform:uppercase; }
+    .metadata dd,.fields dd,.relationships dd { margin:0; }
+    .card,.record { padding:19px; border:1px solid var(--line); border-radius:15px; background:var(--surface); box-shadow:0 10px 28px rgba(23,63,78,.06); }
+    .record { margin-top:14px; border-left:5px solid var(--cyan); }
+    .id { display:block; margin-bottom:7px; color:var(--orange); font-size:11px; font-weight:900; letter-spacing:.08em; }
+    .statement { padding:13px 14px; border-radius:10px; color:#284f57; background:var(--cyan-soft); }
+    .statement strong { display:block; color:#174d55; font-size:10px; letter-spacing:.08em; text-transform:uppercase; }
+    .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:12px; }
+    .chip { padding:4px 7px; border-radius:999px; font-size:10px; font-weight:850; }
+    .candidate { color:var(--amber); background:var(--amber-soft); }
+    .held { color:var(--red); background:var(--red-soft); }
+    .allowed { color:var(--green); background:var(--green-soft); }
+    table { width:100%; border-collapse:collapse; border:1px solid var(--line); background:#fff; }
+    th,td { padding:10px; border-bottom:1px solid var(--line); text-align:left; vertical-align:top; font-size:12px; }
+    th { color:var(--muted); background:#f0f1ed; font-size:10px; letter-spacing:.07em; text-transform:uppercase; }
+    tr:last-child td { border-bottom:0; }
+    footer { padding:24px 0 40px; color:var(--muted); font-size:11px; }
+    @media (max-width:680px) { .metadata,.fields,.relationships { grid-template-columns:1fr; } .metadata dd,.fields dd,.relationships dd { padding-top:0; border-top:0; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <p class="kicker">Candidate template · not current authority</p>
+      <h1>Requirements baseline</h1>
+      <p class="lede">A record-first shape for future controlled requirements: one stable semantic article owns each normative statement, its source, its allowed and held scope, and its V&amp;V definition.</p>
+    </div>
+  </header>
+  <nav aria-label="Template navigation">
+    <div class="wrap"><a href="index.html">Contract index</a><a href="#file-contract">File contract</a><a href="#baseline-closure">Baseline closure</a><a href="#field-contract">Field contract</a><a href="#needs">Need sample</a><a href="#requirements">Requirement sample</a><a href="#authoring-rules">Authoring rules</a></div>
+  </nav>
+  <main class="wrap">
+    <section>
+      <div class="notice"><strong>Boundary:</strong> this is source evidence for a possible future <code>requirements.html</code>. The controlling baseline remains <a href="../../../requirements.md">requirements.md</a>; copying this sample does not allocate authority IDs or authorize implementation.</div>
+    </section>
+    <section id="file-contract" aria-labelledby="file-contract-title">
+      <h2 id="file-contract-title">Visible file contract</h2>
+      <dl class="metadata">
+        <dt>File role</dt><dd>controlled-requirements-baseline</dd>
+        <dt>Authority class</dt><dd>candidate-template</dd>
+        <dt>Schema version</dt><dd><code>tw-semantic-html/1-candidate</code></dd>
+        <dt>Source identity</dt><dd><a href="index.html#CAND-TW-HTML-001">Candidate contract set</a></dd>
+        <dt>Owner</dt><dd>Named human authority owner</dd>
+        <dt>Composition identity</dt><dd><code>manual-candidate-template/2026-08-12</code> from the linked candidate contract set</dd>
+        <dt>Authority baseline ID</dt><dd><a href="#SAMPLE-BASELINE-001">SAMPLE-BASELINE-001</a></dd>
+        <dt>authority_baseline_hash_sha256</dt><dd><code>SAMPLE_BASELINE_SET_HASH</code></dd>
+        <dt>file_self_hash_sha256</dt><dd><code>CANONICAL_FILE_HASH_PLACEHOLDER</code></dd>
+        <dt>Freshness state</dt><dd><code>not_evaluated</code></dd>
+        <dt>Template lifecycle state</dt><dd><code>candidate</code></dd>
+      </dl>
+    </section>
+    <section id="baseline-closure" aria-labelledby="baseline-closure-title">
+      <h2 id="baseline-closure-title">Atomic baseline-set closure sample</h2>
+      <article class="record" id="SAMPLE-BASELINE-001">
+        <span class="id mono"><span class="stable-id">SAMPLE-BASELINE-001</span> · <span class="record-type">authority-baseline manifest sample</span></span>
+        <h3>One ordered canonical authority set</h3>
+        <dl class="fields">
+          <dt>Generation ID</dt><dd><code>SAMPLE-GENERATION-001</code></dd>
+          <dt>Manifest schema version</dt><dd><code>authority-baseline-manifest/v2</code></dd>
+          <dt>Semantic schema version</dt><dd><code>tw-semantic-html/1-candidate</code></dd>
+          <dt>Manifest and control-plane owner</dt><dd>The authoritative <a href="../../../.traceweaver/intent-contract.yml">.traceweaver/intent-contract.yml</a>; this HTML sample is illustrative, uncomputed, and outside current authority.</dd>
+          <dt>Control-plane role</dt><dd><code>project-authority-control-plane</code></dd>
+          <dt>Control-plane schema version</dt><dd><code>intent-control-plane/v1-candidate</code></dd>
+          <dt>Selected operating mode</dt><dd><code>advisory</code> as an illustrative extracted value, not an accepted candidate change</dd>
+          <dt>Active gate locator</dt><dd><a href="decision-hold.template.html#SAMPLE-HOLD-001">SAMPLE-HOLD-001</a> as an illustrative stable locator</dd>
+          <dt>Held-claim projection</dt><dd>Illustrative ordered locators for routing, hooks, CI, runtime, cutover, and publication; the owning Intent Contract remains unchanged and no candidate value is accepted.</dd>
+          <dt>Workflow-policy projection</dt><dd>Illustrative ordered policy ID, ASCII root-relative POSIX Git-tree blob path, <code>tw-policy-block-v1:&lt;policy-id&gt;</code> locator, and lowercase SHA-256 of the exact non-empty policy-block payload bytes; no workflow policy is created or computed by this template.</dd>
+          <dt>Control-plane digest</dt><dd><code>3333333333333333333333333333333333333333333333333333333333333333</code>; sample-not-computed</dd>
+          <dt>Ordered member 1</dt><dd><code>requirements.html | controlled-requirements-baseline | 1111111111111111111111111111111111111111111111111111111111111111</code></dd>
+          <dt>Ordered member 2</dt><dd><code>traceability-matrix.html | controlled-traceability-baseline | 2222222222222222222222222222222222222222222222222222222222222222</code></dd>
+          <dt>Canonical member transform</dt><dd>For each member, first select its exact path in <a href="index.html#metadata-label-registry-v1"><code>metadata_label_registry_v1</code></a> and validate the declared role/schema and complete metadata-label set, then apply <a href="index.html#CAND-TW-HTML-016"><code>metadata_label_v1</code></a> and its exact direct-value-container rule to select <code>file_self_hash_sha256</code> and <code>authority_baseline_hash_sha256</code>. Map each selected parser text node to exactly one literal ASCII, contiguous, non-overlapping original-source byte span; replace only those spans with <code>CANONICAL_FILE_HASH_PLACEHOLDER</code> and <code>CANONICAL_BASELINE_HASH_PLACEHOLDER</code>, preserve every other original byte, and do not serialize the DOM. Reject every path/registry, encoding, label, descendant, value-container, character-reference-derived or ambiguous source span, selector, repeated-set-hash, reserialization, or byte-shape violation named by CAND-TW-HTML-016. Neither displayed digest is an input to itself.</dd>
+          <dt>Canonical control-plane serialization</dt><dd><code>intent_control_plane_v1</code> serializes, in order, <code>control_plane_schema_version</code>, <code>operating_mode</code>, <code>active_gate</code>, <code>held_claim_count</code> plus each unique <code>held_claim</code> in declaration order, and <code>workflow_policy_count</code> plus each unique policy's <code>workflow_policy_id</code>, <code>workflow_policy_path</code>, <code>workflow_policy_locator</code>, and <code>workflow_policy_digest</code>. Every field uses <code>name=&lt;minimal-decimal-UTF-8-byte-count&gt;:&lt;value&gt;\n</code>. Each policy path is an ASCII root-relative POSIX path resolving in the accepted reviewed Git tree to exactly one regular blob; no working-tree fallback, symlink, submodule, tree, absolute/backslash/scheme/percent/control form, empty/dot segment, or root escape is permitted. The locator is exactly <code>tw-policy-block-v1:&lt;policy-id&gt;</code>, its ID matches <code>[A-Za-z0-9][A-Za-z0-9._-]{0,127}</code> and the tuple ID, and it resolves once to the non-nested UTF-8/LF/no-BOM marker block defined by CAND-TW-HTML-026. <code>workflow_policy_digest</code> is the lowercase 64-hex SHA-256 of the exact non-empty payload bytes between marker lines, excluding markers and all outside bytes, without decoding, normalization, line-ending conversion, parser serialization, whole-file hashing, or other substitute. Duplicate IDs or path/locator pairs, cross-policy resolution, or missing, ambiguous, nested, malformed, empty, wrongly encoded, non-blob, or digest-mismatched content makes extraction <code>incomplete</code> and emits no substitute digest. The extraction excludes the manifest, baseline ID/hash, member digests, stored control-plane digest, receipt identities, generated views, and file/self hashes; its SHA-256 is the control-plane digest shown above.</dd>
+          <dt>Canonical manifest serialization</dt><dd>The controlled Intent Contract serializes <code>manifest_schema_version=30:authority-baseline-manifest/v2\n</code>, <code>baseline_id=19:SAMPLE-BASELINE-001\n</code>, <code>generation_id=21:SAMPLE-GENERATION-001\n</code>, <code>semantic_schema_version=28:tw-semantic-html/1-candidate\n</code>, <code>control_plane_source_path=32:.traceweaver/intent-contract.yml\n</code>, <code>control_plane_role=31:project-authority-control-plane\n</code>, <code>control_plane_schema_version=33:intent-control-plane/v1-candidate\n</code>, <code>control_plane_digest=64:3333333333333333333333333333333333333333333333333333333333333333\n</code>, <code>member_count=1:2\n</code>, then <code>member_path=17:requirements.html\n</code>, <code>member_role=32:controlled-requirements-baseline\n</code>, <code>member_digest=64:1111111111111111111111111111111111111111111111111111111111111111\n</code>, <code>member_path=24:traceability-matrix.html\n</code>, <code>member_role=32:controlled-traceability-baseline\n</code>, and <code>member_digest=64:2222222222222222222222222222222222222222222222222222222222222222\n</code>. A decoder consumes exactly the declared value bytes before each required LF and rejects non-minimal or incorrect counts, wrong order, and trailing bytes. The serialization contains no baseline-set-hash field; its SHA-256 is the baseline-set hash and binds this member closure to the extracted control plane.</dd>
+          <dt>Pair-consistency rule</dt><dd>A receipt, cutover, or rollback shall independently resolve every policy blob and unique marker block from the accepted reviewed Git tree, recompute each exact payload digest and both outer digests, and reject a manifest paired with a different control-plane digest, a different active gate, or changed mode, held claims, policy ID/path/locator/payload digest, or workflow-policy tuple order without a separately accepted successor.</dd>
+          <dt>Baseline-set hash locator</dt><dd>The controlled Intent Contract owns the computed set hash. This canonical member cites it once, only in the file-level <code>authority_baseline_hash_sha256</code> metadata field above; it shall not repeat that current value in this manifest reference.</dd>
+          <dt>Membership boundary</dt><dd>Evidence, receipts, review records, and derived views are excluded from canonical set membership; each carries its own one-placeholder self-hash and cites the already-fixed set. A current gate may rely only on evidence for this set or on historical evidence with a linked applicability review or re-verification.</dd>
+          <dt>Disposition</dt><dd>Sample only; no controlled baseline ID or manifest has been allocated.</dd>
+        </dl>
+      </article>
+    </section>
+    <section id="field-contract" aria-labelledby="field-contract-title">
+      <h2 id="field-contract-title">Record and field contract</h2>
+      <table>
+        <thead><tr><th>Semantic location</th><th>Cardinality</th><th>Controlled meaning</th></tr></thead>
+        <tbody>
+          <tr><td><code>main &gt; section#needs &gt; article[id]</code></td><td>Zero or more</td><td>One visible stakeholder need per stable ID.</td></tr>
+          <tr><td><code>main &gt; section#requirements &gt; article[id]</code></td><td>One or more</td><td>One normative requirement per stable ID; no second writable copy.</td></tr>
+          <tr><td><code>p.statement</code></td><td>Exactly one per requirement</td><td>The sole normative obligation, using shall, should, or may deliberately.</td></tr>
+          <tr><td><code>dl.fields</code></td><td>Exactly one per record</td><td>Visible labeled fields; authority must not exist only in attributes, comments, JSON, or CSS.</td></tr>
+          <tr><td><code>dl.relationships &gt; dt.relation + dd &gt; a.record-ref</code></td><td>As required by type and lifecycle</td><td>The sole trace-closing grammar applies only after the static-document precondition in <a href="index.html#CAND-TW-HTML-006">CAND-TW-HTML-006</a> rejects <code>base</code>, URL rewriting, active/resource/form/embed constructs, event handlers, and CSS fetch primitives. Normalized relation text comes from the closed vocabulary; the raw source target is ASCII same-file <code>#fragment</code> or source-file-relative POSIX <code>relative-path#fragment</code>, with exactly one literal <code>#</code> and no percent sign, query, whitespace/control, backslash, scheme, authority, or absolute path. Evaluate it under this physical document's own repository URL, never a browser-effective or rewritten base URL; normalize literal dot segments from the source file's physical directory and require both lexical and existing-target realpaths to remain inside the physical Git root. Link text exactly equals the target stable ID. Other links are navigation, citation, or metadata only.</td></tr>
+          <tr><td>Role/state orphan predicate</td><td>Exactly one declared rule per controlled record family</td><td>A candidate baseline manifest or need may be a root; an approved need requires inbound <code>satisfies</code> or an accepted gap; an approved requirement requires outgoing <code>satisfies</code>; trace/work requires <code>authorized by</code>; V&amp;V evidence requires <code>verifies</code> or <code>validates</code>; retired items require retirement control. Non-authority support records are excluded unless their role schema declares otherwise.</td></tr>
+          <tr><td>Lifecycle status</td><td>Exactly one current status</td><td>Candidate, approved, held, superseded, or retired; transitions require a linked decision, relation legality is checked against both endpoints, and historical evidence retains its original baseline while newer-baseline applicability remains separately reviewed.</td></tr>
+        </tbody>
+      </table>
+    </section>
+    <section id="needs" aria-labelledby="needs-title">
+      <h2 id="needs-title">Need record sample</h2>
+      <article class="record" id="SAMPLE-NEED-001">
+        <span class="id mono"><span class="stable-id">SAMPLE-NEED-001</span> · <span class="record-type">stakeholder need</span></span>
+        <h3>Understand the current authority chain without repository search</h3>
+        <p>A maintainer needs to move from intended outcome to controlling requirement and proof through visible links, while knowing which stages remain held.</p>
+        <dl class="fields">
+          <dt>Stakeholder</dt><dd>TraceWeaver maintainer</dd>
+          <dt>Source</dt><dd>Named owner statement and dated review record</dd>
+          <dt>Success signal</dt><dd>Representative navigation task is completed with no grep-only lookup and no authority-stage mistake.</dd>
+          <dt>Validation owner</dt><dd>Named product owner</dd>
+          <dt>Lineage</dt><dd>Initial candidate; no predecessor</dd>
+        </dl>
+        <div class="chips"><span class="chip candidate">Candidate</span></div>
+      </article>
+    </section>
+    <section id="requirements" aria-labelledby="requirements-title">
+      <h2 id="requirements-title">Requirement record sample</h2>
+      <article class="record" id="SAMPLE-REQ-001">
+        <span class="id mono"><span class="stable-id">SAMPLE-REQ-001</span> · <span class="record-type">interface requirement</span></span>
+        <h3>Stable visible authority links</h3>
+        <p class="statement"><strong>Normative statement</strong>The controlled requirements baseline shall represent every ID-bearing requirement as exactly one semantic article whose visible ID equals its unique fragment identifier.</p>
+        <dl class="fields">
+          <dt>Summary</dt><dd>Give every requirement one durable human-and-agent address.</dd>
+          <dt>Source / intent</dt><dd>Owner-approved candidate direction recorded in a dated authority review.</dd>
+          <dt>Rationale</dt><dd>Stable links reduce duplicated summaries and whole-repository scanning.</dd>
+          <dt>Owner</dt><dd>TraceWeaver authority owner</dd>
+          <dt>Approval state</dt><dd>candidate</dd>
+          <dt>Allowed scope</dt><dd>Template review and deterministic fixtures after separate authorization.</dd>
+          <dt>Held scope</dt><dd>Parser changes, baseline cutover, hooks, CI, runtime, and publication.</dd>
+          <dt>Verification method</dt><dd>DOM/schema inspection with duplicate-ID and anchor/text-mismatch negative fixtures.</dd>
+          <dt>Verification criteria</dt><dd>Exactly one article; non-empty visible ID; one matching fragment; every local relationship resolves.</dd>
+          <dt>Validation question</dt><dd>Can a maintainer share and resolve the record without repository search or ambiguity?</dd>
+          <dt>Lineage</dt><dd>Initial candidate; no predecessor or successor</dd>
+        </dl>
+        <dl class="relationships" aria-label="Requirement relationships">
+          <dt class="relation">Satisfies</dt><dd><a class="record-ref" href="#SAMPLE-NEED-001">SAMPLE-NEED-001</a></dd>
+          <dt class="relation">Verified by</dt><dd><a class="record-ref" href="evidence-vv.template.html#SAMPLE-VER-001">SAMPLE-VER-001</a></dd>
+          <dt class="relation">Validated by</dt><dd><a class="record-ref" href="evidence-vv.template.html#SAMPLE-VAL-001">SAMPLE-VAL-001</a></dd>
+          <dt class="relation">Controlled by</dt><dd><a class="record-ref" href="decision-hold.template.html#SAMPLE-HOLD-001">SAMPLE-HOLD-001</a></dd>
+        </dl>
+        <div class="chips"><span class="chip candidate">Candidate</span><span class="chip allowed">Template review allowed</span><span class="chip held">Implementation held</span></div>
+      </article>
+    </section>
+    <section id="authoring-rules" aria-labelledby="authoring-rules-title">
+      <h2 id="authoring-rules-title">Authoring rules</h2>
+      <div class="card">
+        <ol>
+          <li>Keep the summary explanatory and the statement normative; do not duplicate the obligation elsewhere.</li>
+          <li>Use one requirement type and one primary obligation per record. Split compound behavior that has independent acceptance paths.</li>
+          <li>Link source, decisions, trace, verification, validation, and lifecycle state. Never infer authority from proximity.</li>
+          <li>Keep implementation and publication holds explicit until separately proven and accepted.</li>
+          <li>Retain superseded IDs as linked tombstones; never reuse an allocated ID.</li>
+        </ol>
+      </div>
+    </section>
+  </main>
+  <footer class="wrap">Candidate template composed 2026-08-12. Suggested paired view: <a href="traceability-matrix.template.html">traceability matrix template</a>.</footer>
+</body>
+</html>

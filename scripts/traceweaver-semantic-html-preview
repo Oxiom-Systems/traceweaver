@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=derived-semantic-html-preview-entrypoint; req=REQ-TW-088; trace=TRACE-TW-066; ver=VER-TW-086
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+helper="$root/plugins/traceweaver-core/skills/tw-graph/scripts/traceweaver-semantic-html-preview"
+[[ -x "$helper" ]] || { echo "semantic_html_preview_status=blocked" >&2; echo "semantic_html_preview_finding=missing_packaged_helper" >&2; exit 1; }
+exec "$helper" "$@"

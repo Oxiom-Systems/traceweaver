@@ -4,6 +4,19 @@ description: TraceWeaver-controlled commit, push, and PR wrapper. Use when the u
 argument-hint: "[publication request or PR scope]"
 ---
 
+<!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
+
+## Invocation Contract
+
+Before any other control-path action, run
+`<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
+exactly once with `--skill tw-commit-push-pr`, the selected `--risk`, and a stable
+`--invocation-id`. Continue only when it returns `terminal_state: resolved`;
+missing, invalid, stale, or ambiguous contracts stop the invocation. This
+resolves the checklist only. It does not dispatch a child or require
+served-model attestation; use the native-child routing adapter only when an
+actual child is requested.
+
 <!-- TRACEWEAVER: file-role=publication-wrapper-skill; req=REQ-TW-053; trace=TRACE-TW-033; ver=VER-TW-042 -->
 
 # TraceWeaver Commit, Push, and PR
@@ -117,6 +130,13 @@ unreviewed, or contradictory, stop and report the coherence blocker.
   authority to bypass gates.
 - Do not claim release-ready, package-ready, upstream-ready, clean replacement,
   or real-publication behavior from static wrapper presence.
+
+## Mandatory tw-graph Lifecycle
+
+Load `references/tw-graph-lifecycle.md` before applying this lifecycle.
+
+Require a passing `tw-graph check` before this publication wrapper may proceed.
+Never refresh from publication merely to make a stale gate pass.
 
 ## Output
 
