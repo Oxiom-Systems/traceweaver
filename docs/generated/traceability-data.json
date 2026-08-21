@@ -503,9 +503,7 @@
       "validation_path": "VAL-TW-011",
       "owner": "Oxiom Systems",
       "status": "Approved",
-      "trace_ids": [
-
-      ]
+      "trace_ids": []
     },
     {
       "id": "REQ-TW-033",
@@ -6557,15 +6555,9 @@
     {
       "requirement_id": "REQ-TW-001",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6573,15 +6565,9 @@
     {
       "requirement_id": "REQ-TW-002",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6589,15 +6575,9 @@
     {
       "requirement_id": "REQ-TW-003",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6605,15 +6585,9 @@
     {
       "requirement_id": "REQ-TW-004",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6621,15 +6595,9 @@
     {
       "requirement_id": "REQ-TW-005",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6637,15 +6605,9 @@
     {
       "requirement_id": "REQ-TW-006",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6653,15 +6615,9 @@
     {
       "requirement_id": "REQ-TW-007",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6669,15 +6625,9 @@
     {
       "requirement_id": "REQ-TW-008",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6685,15 +6635,9 @@
     {
       "requirement_id": "REQ-TW-009",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6701,15 +6645,9 @@
     {
       "requirement_id": "REQ-TW-010",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6717,15 +6655,9 @@
     {
       "requirement_id": "REQ-TW-011",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6733,15 +6665,9 @@
     {
       "requirement_id": "REQ-TW-012",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6749,15 +6675,9 @@
     {
       "requirement_id": "REQ-TW-013",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6765,15 +6685,9 @@
     {
       "requirement_id": "REQ-TW-014",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6781,15 +6695,9 @@
     {
       "requirement_id": "REQ-TW-015",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6797,15 +6705,9 @@
     {
       "requirement_id": "REQ-TW-016",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6813,15 +6715,9 @@
     {
       "requirement_id": "REQ-TW-017",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6829,15 +6725,9 @@
     {
       "requirement_id": "REQ-TW-018",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6845,15 +6735,9 @@
     {
       "requirement_id": "REQ-TW-019",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6861,15 +6745,9 @@
     {
       "requirement_id": "REQ-TW-020",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6877,15 +6755,9 @@
     {
       "requirement_id": "REQ-TW-021",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6893,15 +6765,9 @@
     {
       "requirement_id": "REQ-TW-022",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6909,15 +6775,9 @@
     {
       "requirement_id": "REQ-TW-023",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6925,15 +6785,9 @@
     {
       "requirement_id": "REQ-TW-024",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6941,15 +6795,9 @@
     {
       "requirement_id": "REQ-TW-025",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6957,15 +6805,9 @@
     {
       "requirement_id": "REQ-TW-026",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6973,15 +6815,9 @@
     {
       "requirement_id": "REQ-TW-027",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -6989,15 +6825,9 @@
     {
       "requirement_id": "REQ-TW-028",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7005,15 +6835,9 @@
     {
       "requirement_id": "REQ-TW-029",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7021,15 +6845,9 @@
     {
       "requirement_id": "REQ-TW-030",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7037,15 +6855,9 @@
     {
       "requirement_id": "REQ-TW-031",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7053,15 +6865,9 @@
     {
       "requirement_id": "REQ-TW-032",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7069,15 +6875,9 @@
     {
       "requirement_id": "REQ-TW-033",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7085,15 +6885,9 @@
     {
       "requirement_id": "REQ-TW-034",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7101,15 +6895,9 @@
     {
       "requirement_id": "REQ-TW-035",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7117,15 +6905,9 @@
     {
       "requirement_id": "REQ-TW-036",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7133,15 +6915,9 @@
     {
       "requirement_id": "REQ-TW-037",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7149,15 +6925,9 @@
     {
       "requirement_id": "REQ-TW-038",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7165,15 +6935,9 @@
     {
       "requirement_id": "REQ-TW-039",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7181,15 +6945,9 @@
     {
       "requirement_id": "REQ-TW-040",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7197,15 +6955,9 @@
     {
       "requirement_id": "REQ-TW-041",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7213,15 +6965,9 @@
     {
       "requirement_id": "REQ-TW-042",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7229,15 +6975,9 @@
     {
       "requirement_id": "REQ-TW-043",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7245,15 +6985,9 @@
     {
       "requirement_id": "REQ-TW-044",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7261,15 +6995,9 @@
     {
       "requirement_id": "REQ-TW-045",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7277,15 +7005,9 @@
     {
       "requirement_id": "REQ-TW-046",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7293,15 +7015,9 @@
     {
       "requirement_id": "REQ-TW-047",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7309,15 +7025,9 @@
     {
       "requirement_id": "REQ-TW-048",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7325,15 +7035,9 @@
     {
       "requirement_id": "REQ-TW-049",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7341,15 +7045,9 @@
     {
       "requirement_id": "REQ-TW-050",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7357,15 +7055,9 @@
     {
       "requirement_id": "REQ-TW-051",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7373,15 +7065,9 @@
     {
       "requirement_id": "REQ-TW-052",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7389,15 +7075,9 @@
     {
       "requirement_id": "REQ-TW-053",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7405,15 +7085,9 @@
     {
       "requirement_id": "REQ-TW-054",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7421,15 +7095,9 @@
     {
       "requirement_id": "REQ-TW-055",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7437,15 +7105,9 @@
     {
       "requirement_id": "REQ-TW-056",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7453,15 +7115,9 @@
     {
       "requirement_id": "REQ-TW-057",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7469,15 +7125,9 @@
     {
       "requirement_id": "REQ-TW-058",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7485,15 +7135,9 @@
     {
       "requirement_id": "REQ-TW-059",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7501,15 +7145,9 @@
     {
       "requirement_id": "REQ-TW-060",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7517,15 +7155,9 @@
     {
       "requirement_id": "REQ-TW-061",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7533,15 +7165,9 @@
     {
       "requirement_id": "REQ-TW-062",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7549,15 +7175,9 @@
     {
       "requirement_id": "REQ-TW-063",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7565,15 +7185,9 @@
     {
       "requirement_id": "REQ-TW-064",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7581,15 +7195,9 @@
     {
       "requirement_id": "REQ-TW-065",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7613,15 +7221,9 @@
     {
       "requirement_id": "REQ-TW-067",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7629,15 +7231,9 @@
     {
       "requirement_id": "REQ-TW-068",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7645,15 +7241,9 @@
     {
       "requirement_id": "REQ-TW-069",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7661,15 +7251,9 @@
     {
       "requirement_id": "REQ-TW-070",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7677,15 +7261,9 @@
     {
       "requirement_id": "REQ-TW-071",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7693,15 +7271,9 @@
     {
       "requirement_id": "REQ-TW-072",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7709,15 +7281,9 @@
     {
       "requirement_id": "REQ-TW-073",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7725,15 +7291,9 @@
     {
       "requirement_id": "REQ-TW-074",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7741,15 +7301,9 @@
     {
       "requirement_id": "REQ-TW-075",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7757,15 +7311,9 @@
     {
       "requirement_id": "REQ-TW-076",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7773,15 +7321,9 @@
     {
       "requirement_id": "REQ-TW-077",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7789,15 +7331,9 @@
     {
       "requirement_id": "REQ-TW-078",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7805,15 +7341,9 @@
     {
       "requirement_id": "REQ-TW-079",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7821,15 +7351,9 @@
     {
       "requirement_id": "REQ-TW-080",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7837,15 +7361,9 @@
     {
       "requirement_id": "REQ-TW-081",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7853,15 +7371,9 @@
     {
       "requirement_id": "REQ-TW-082",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7869,15 +7381,9 @@
     {
       "requirement_id": "REQ-TW-083",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7885,15 +7391,9 @@
     {
       "requirement_id": "REQ-TW-084",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7901,15 +7401,9 @@
     {
       "requirement_id": "REQ-TW-085",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7917,15 +7411,9 @@
     {
       "requirement_id": "REQ-TW-086",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7933,15 +7421,9 @@
     {
       "requirement_id": "REQ-TW-087",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
@@ -7949,15 +7431,9 @@
     {
       "requirement_id": "REQ-TW-088",
       "coverage_status": "missing_structured_acceptance_result",
-      "structured_acceptance_result_ids": [
-
-      ],
-      "final_dispositions": [
-
-      ],
-      "owners": [
-
-      ],
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
       "next_triggers": [
         "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]

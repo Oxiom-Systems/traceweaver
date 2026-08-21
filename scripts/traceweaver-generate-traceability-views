@@ -12,7 +12,8 @@ require "yaml"
 
 options = {
   root: Dir.pwd,
-  out: nil
+  out: nil,
+  json_fixture: nil
 }
 
 OptionParser.new do |opts|
@@ -20,7 +21,12 @@ OptionParser.new do |opts|
 
   opts.on("--root PATH", "Repository root") { |value| options[:root] = value }
   opts.on("--out PATH", "Output directory") { |value| options[:out] = value }
+  opts.on("--json-fixture PATH", "Test-only JSON fixture to canonicalize") { |value| options[:json_fixture] = value }
 end.parse!
+
+if options[:json_fixture] && options[:out].nil?
+  abort "--json-fixture requires --out PATH"
+end
 
 root = File.expand_path(options[:root])
 out_dir = File.expand_path(options[:out] || File.join(root, "docs", "generated"))
@@ -113,6 +119,34 @@ end
 def truncate(value, length = 150)
   text = compact(value, "")
   text.length > length ? "#{text[0, length - 3]}..." : text
+end
+
+JSON_FORMAT = JSON::State.new(
+  indent: "  ",
+  space: " ",
+  object_nl: "\n",
+  array_nl: "\n",
+  ascii_only: false,
+  allow_nan: false,
+  max_nesting: false
+)
+
+def canonical_json(value)
+  formatted = JSON.generate(value, JSON_FORMAT)
+
+  # JSON strings cannot contain literal newlines after JSON.generate, so these
+  # structural patterns cannot rewrite bracket- or brace-like string content.
+  formatted
+    .gsub(/(?<=\[)\n[ \t]*\n[ \t]*(?=\])/, "")
+    .gsub(/(?<=\{)\n[ \t]*(?=\})/, "") + "\n"
+end
+
+if options[:json_fixture]
+  FileUtils.mkdir_p(out_dir)
+  fixture = JSON.parse(File.read(options[:json_fixture], encoding: "UTF-8"))
+  File.write(File.join(out_dir, "traceability-data.json"), canonical_json(fixture))
+  puts "traceability_generated_views_fixture=pass"
+  exit
 end
 
 # TRACEWEAVER: entrypoint=traceability_view_generate_orchestrator; req=REQ-TW-067; trace=TRACE-TW-051; ver=VER-TW-064
@@ -354,7 +388,7 @@ end
 mermaid << "  end\n"
 
 FileUtils.mkdir_p(out_dir)
-File.write(File.join(out_dir, "traceability-data.json"), "#{JSON.pretty_generate(data)}\n")
+File.write(File.join(out_dir, "traceability-data.json"), canonical_json(data))
 File.write(File.join(out_dir, "traceability-dashboard.md"), dashboard)
 File.write(File.join(out_dir, "traceability-graph.mmd"), mermaid)
 
