@@ -23,9 +23,13 @@ Deployment and Chrome dogfood have separate permissions and receipts.
 
 ## Model routing
 
-Record availability, selected model, rationale, and unavailable consequence.
-Attempt Luna only if native child dispatch exists. Otherwise record one
-`luna_dispatch_unavailable` receipt and use Terra without investigation.
+Resolve the central `workflow-profile-template.yml` model-routing contract and
+run `tw-auto/scripts/traceweaver-route-native-child` before every
+TraceWeaver-owned native child call. Use the adapter's explicit dispatch
+parameters without inheritance. If the adapter holds the route, do not dispatch
+another model. Finalize the same receipt only from independent host/execution
+attestation; held child output cannot become verification, review, completion,
+or publication evidence.
 
 ## Authority and host boundary
 

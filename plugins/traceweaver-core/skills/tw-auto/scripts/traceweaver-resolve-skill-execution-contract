@@ -1,0 +1,126 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: entrypoint=resolve_skill_execution_contract; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090
+require "digest"
+require "json"
+require "optparse"
+require "yaml"
+
+REQUIRED_DEFAULTS = %w[authority packaged_references trace_records workflow_profile graph_action verification validation holds allowed_writes next_wrapper].freeze
+REQUIRED_WORKFLOW = %w[coordinator_model native_child_model risk_reasoning_effort unavailable_model_outcome unattested_model_outcome served_model_rule].freeze
+REQUIRED_SKILL_METADATA = %w[governing_requirements trace_records verification_records packaged_references].freeze
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.to_h do |key|
+      source_key = value.key?(key) ? key : key.to_sym
+      [key, canonical(value.fetch(source_key))]
+    end
+  when Array then value.map { |item| canonical(item) }
+  else value
+  end
+end
+
+def sha(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def terminal(state, detail, status: 2)
+  puts JSON.generate({ schema_version: "tw-skill-execution-contract-receipt/1", terminal_state: state, detail: detail })
+  exit status
+end
+
+options = { risk: "L1", available_models: ["gpt-5.6-terra"], invocation_id: "unspecified" }
+OptionParser.new do |parser|
+  parser.on("--skill SKILL") { |v| options[:skill] = v }
+  parser.on("--registry PATH") { |v| options[:registry] = v }
+  parser.on("--baseline ID") { |v| options[:baseline] = v }
+  parser.on("--risk LEVEL") { |v| options[:risk] = v }
+  parser.on("--available-model MODELS", "Comma-separated") { |v| options[:available_models] = v.split(",").reject(&:empty?) }
+  parser.on("--expected-definition-hash HASH") { |v| options[:expected_hash] = v }
+  parser.on("--invocation-id ID") { |v| options[:invocation_id] = v }
+end.parse!
+
+terminal("invalid_contract", "skill_required") unless options[:skill]
+root = File.expand_path("../../..", __dir__)
+registry_path = options[:registry] || File.join(root, "references", "skill-execution-contracts.yml")
+terminal("missing_contract", "registry_missing:#{registry_path}") unless File.file?(registry_path)
+begin
+  registry = YAML.safe_load(File.read(registry_path), permitted_classes: [], aliases: false)
+rescue Psych::Exception => error
+  terminal("invalid_contract", "registry_yaml:#{error.class}")
+end
+terminal("invalid_contract", "registry_not_mapping") unless registry.is_a?(Hash)
+defaults = registry["defaults"]
+contracts = registry["contracts"]
+profiles = registry["route_profiles"]
+metadata = registry["skill_metadata"]
+terminal("invalid_contract", "defaults_missing") unless defaults.is_a?(Hash) && REQUIRED_DEFAULTS.all? { |field| defaults.key?(field) }
+terminal("invalid_contract", "workflow_profile_invalid") unless defaults["workflow_profile"].is_a?(Hash) && REQUIRED_WORKFLOW.all? { |field| defaults["workflow_profile"].key?(field) }
+terminal("invalid_contract", "contract_list_invalid") unless contracts.is_a?(Array) && registry["callable_count"] == contracts.length
+terminal("invalid_contract", "route_profiles_invalid") unless profiles.is_a?(Hash)
+names = contracts.map { |entry| entry.is_a?(Hash) ? entry["skill"] : nil }
+terminal("invalid_contract", "contract_name_invalid") unless names.all? { |name| name.is_a?(String) && (name.start_with?("tw-") || name == "lfg") }
+terminal("ambiguous_contract", "duplicate_skill") unless names.uniq.length == names.length
+terminal("invalid_contract", "contract_order_not_lexical") unless names == names.sort
+terminal("invalid_contract", "skill_metadata_invalid") unless metadata.is_a?(Hash) && metadata.keys.sort == names
+metadata.each_value do |skill_metadata|
+  terminal("invalid_contract", "skill_metadata_fields_missing") unless skill_metadata.is_a?(Hash) && REQUIRED_SKILL_METADATA.all? { |field| skill_metadata[field].is_a?(Array) }
+  terminal("invalid_contract", "skill_metadata_anchors_missing") if %w[governing_requirements trace_records verification_records].any? { |field| skill_metadata[field].empty? }
+end
+entry = contracts.find { |contract| contract["skill"] == options[:skill] }
+terminal("missing_contract", "skill:#{options[:skill]}") unless entry
+alias_target = entry["alias_of"]
+target_entry = nil
+if alias_target
+  target_entry = contracts.find { |contract| contract["skill"] == alias_target }
+  terminal("ambiguous_contract", "alias_target_missing:#{alias_target}") unless target_entry
+  terminal("ambiguous_contract", "alias_chain_not_supported") if target_entry["alias_of"]
+end
+terminal("invalid_contract", "risk:#{options[:risk]}") unless defaults["workflow_profile"]["risk_reasoning_effort"].key?(options[:risk])
+profile_name = entry["route_profile"]
+profile = profiles[profile_name]
+terminal("invalid_contract", "route_profile_missing:#{profile_name}") unless profile_name.is_a?(String) && profile.is_a?(Hash)
+terminal("invalid_contract", "skill_reference_missing") unless entry["skill_reference"].is_a?(String)
+skill_metadata = metadata.fetch(options[:skill])
+target_metadata = alias_target ? metadata.fetch(alias_target) : nil
+resolved_metadata = if target_metadata
+  REQUIRED_SKILL_METADATA.to_h { |field| [field, (target_metadata.fetch(field) + skill_metadata.fetch(field)).uniq] }
+else
+  skill_metadata
+end
+definition = { "schema_version" => registry["schema_version"], "registry_id" => registry["registry_id"], "defaults" => defaults, "route_profile" => profile, "skill_metadata" => resolved_metadata, "contract" => entry }
+definition_hash = sha(definition)
+terminal("stale_contract", "expected=#{options[:expected_hash]} actual=#{definition_hash}") if options[:expected_hash] && options[:expected_hash] != definition_hash
+resolved = Marshal.load(Marshal.dump(defaults)).merge(profile).merge(entry.reject { |key, _| %w[skill alias_of route_profile skill_reference].include?(key) })
+resolved["authority"] = resolved.fetch("authority").merge("contract_requirement" => resolved.fetch("authority").fetch("requirement"), "governing_requirements" => resolved_metadata.fetch("governing_requirements"))
+resolved["trace_records"] = (resolved_metadata.fetch("trace_records") + resolved.fetch("trace_records")).uniq
+resolved["verification"] = resolved.fetch("verification").merge("skill_verification_records" => resolved_metadata.fetch("verification_records"))
+resolved["packaged_references"] = (resolved.fetch("packaged_references") + resolved_metadata.fetch("packaged_references")).uniq
+resolved["skill"] = options[:skill]
+resolved["resolved_skill"] = alias_target || options[:skill]
+resolved["alias_of"] = alias_target if alias_target
+resolved["route_profile"] = profile_name
+resolved["packaged_references"] = (resolved.fetch("packaged_references") + [entry.fetch("skill_reference")]).uniq
+resolved["packaged_references"] = (resolved.fetch("packaged_references") + [target_entry.fetch("skill_reference")]).uniq if target_entry
+terminal("invalid_contract", "resolved_fields_missing") unless REQUIRED_DEFAULTS.all? { |field| resolved.key?(field) && resolved[field] != nil && resolved[field] != [] }
+repository_root = File.expand_path("../../../../..", __dir__)
+package_root = File.expand_path("../../..", __dir__)
+resolved.fetch("packaged_references").each do |reference|
+  terminal("invalid_contract", "reference_invalid") unless reference.is_a?(String) && !reference.start_with?("/") && !reference.include?("..")
+  source_path = File.join(repository_root, reference)
+  installed_path = reference.start_with?("plugins/traceweaver-core/") ? File.join(package_root, reference.delete_prefix("plugins/traceweaver-core/")) : source_path
+  terminal("invalid_contract", "reference_missing:#{reference}") unless File.file?(source_path) || File.file?(installed_path)
+end
+route = resolved.fetch("workflow_profile")
+receipt = { "schema_version" => "tw-skill-execution-contract-receipt/1", "terminal_state" => nil, "static_definition_hash" => definition_hash, "invocation_id" => options[:invocation_id], "baseline_identity" => options[:baseline] || "unprovided_baseline_identity", "contract" => resolved, "requested_model" => route.fetch("native_child_model"), "served_model" => "unattested", "requested_reasoning_effort" => route.fetch("risk_reasoning_effort").fetch(options[:risk]), "child_output_eligible_as_formal_evidence" => false, "authority_promotion" => false }
+unless options[:available_models].include?(route.fetch("native_child_model"))
+  receipt["terminal_state"] = route.fetch("unavailable_model_outcome")
+  receipt["invocation_receipt_id"] = sha(receipt)
+  puts JSON.generate(canonical(receipt)); exit 0
+end
+receipt["terminal_state"] = route.fetch("unattested_model_outcome")
+receipt["invocation_receipt_id"] = sha(receipt)
+puts JSON.generate(canonical(receipt))

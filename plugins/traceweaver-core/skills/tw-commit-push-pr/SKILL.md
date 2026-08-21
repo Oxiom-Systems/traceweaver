@@ -22,6 +22,15 @@ publication authorization capsule after every gate below passes. The capsule is
 an execution boundary, not a waiver: any later tree, target, credential, review,
 or check-state change invalidates it.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex delegate call, run the packaged
+sibling `tw-auto/scripts/traceweaver-route-native-child` against the canonical
+workflow-profile contract. Use only its explicit dispatch parameters and
+finalize its receipt with independent host/execution attestation. A held route
+makes delegate output ineligible; never inherit a model, fall back, or edit an
+imported CE-derived body to bypass the overlay.
+
 ## Required Inputs
 
 Before preparing publication, load and cite:
@@ -75,14 +84,14 @@ unreviewed, or contradictory, stop and report the coherence blocker.
      `<git-common-dir>/traceweaver/publication-consumed-run-ids`, plus the
      exact local repository path from which that Git common directory must be
      derived.
-8. Validate and consume the capsule exactly once immediately before the first
+9. Validate and consume the capsule exactly once immediately before the first
    mutation with the skill-local
    `scripts/traceweaver-validate-publication-capsule --mode consume --repo <exact-repo-path> --ledger <canonical-ledger>`,
    then delegate to the TraceWeaver-packaged `ce-commit-push-pr`. The delegate
    must use `--mode revalidate` against the same canonical ledger before each
    later mutation and stop if the run ID plus exact consumed-capsule digest is
    absent or any capsule field is stale.
-9. Merge requires a new post-PR merge capsule; the publication capsule can
+10. Merge requires a new post-PR merge capsule; the publication capsule can
    never authorize it. After the exact PR exists and checks settle, rerun the
    live gates and issue a separate capsule containing only `merge` plus the
    repository-qualified PR number/URL, expected base/head, exact head SHA, and
@@ -90,7 +99,7 @@ unreviewed, or contradictory, stop and report the coherence blocker.
    of requested changes, and passing every required check. After merge, verify
    the merge commit and any downstream workflow or deployment outcome; never
    equate merge with deployment.
-10. If any gate is not clean, stop before branch mutation, staging, commit, push,
+11. If any gate is not clean, stop before branch mutation, staging, commit, push,
    PR creation, or PR update and return the exact next TraceWeaver step.
 
 ## Boundaries

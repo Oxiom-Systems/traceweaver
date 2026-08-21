@@ -1,8 +1,9 @@
 #!/usr/bin/env bun
 
 // TRACEWEAVER: file-role=codex-installer; req=REQ-TW-016; trace=TRACE-TW-010; ver=VER-TW-019
-// TRACEWEAVER: file-role=model-default-installer-policy; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055
+// TRACEWEAVER: file-role=model-routing-installer-projection; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
 // TRACEWEAVER: file-role=antigravity-installer; req=REQ-TW-068; trace=TRACE-TW-054; ver=VER-TW-069
+import { createHash } from "node:crypto";
 import {
   cpSync,
   existsSync,
@@ -17,22 +18,101 @@ import { homedir } from "node:os";
 import { basename, isAbsolute, join, resolve } from "node:path";
 
 const callableMarkerFile = ".traceweaver-core-install.json";
-const modelDefaults = {
-  codex: {
-    model: "gpt-5.5",
-    reasoningEffort: "medium",
-    enforcement: "traceweaver_policy_and_smoke_default",
-    overrideEnvironment: {
-      model: "TRACEWEAVER_CODEX_MODEL",
-      reasoningEffort: "TRACEWEAVER_CODEX_REASONING_EFFORT",
+const modelRoutingContractRelativePath = "references/workflow-profile-template.yml";
+const skillExecutionContractRegistryRelativePath = "references/skill-execution-contracts.yml";
+
+type ModelRoutingSnapshot = {
+  contractReference: string;
+  contractSha256: string;
+  schemaVersion: string;
+  codexMainModel: string;
+  codexSubagentModel: string;
+  codexSubagentReasoningEffort: string;
+  solAllowedForSubagents: boolean;
+  terraUnavailableConsequence: string;
+  riskReasoningEffort: Record<"L0" | "L1" | "L2" | "L3", string>;
+  adapter: string;
+  enforcement: string;
+};
+
+type SkillExecutionContractSnapshot = {
+  registryReference: string;
+  registrySha256: string;
+  schemaVersion: string;
+  callableCount: number;
+  controlRoute: string;
+  contractSkills: string[];
+};
+
+function readSkillExecutionContractSnapshot(pluginRoot: string, callableSkills: string[]): SkillExecutionContractSnapshot {
+  const registryPath = join(pluginRoot, skillExecutionContractRegistryRelativePath);
+  const registry = readFileSync(registryPath, "utf8");
+  const schemaVersion = registry.match(/^schema_version:\s*(\S+)\s*$/m)?.[1];
+  const count = registry.match(/^callable_count:\s*(\d+)\s*$/m)?.[1];
+  const controlRoute = registry.match(/^control_route:\s*(\S+)\s*$/m)?.[1];
+  const contractSkills = [...registry.matchAll(/^\s+- \{ skill: ([a-z0-9-]+)/gm)].map((match) => match[1]);
+  if (schemaVersion !== "tw-skill-execution-contract-registry/1" || !count || !controlRoute) {
+    throw new Error("skill execution contract registry is incomplete");
+  }
+  if (Number(count) !== contractSkills.length || contractSkills.length !== callableSkills.length) {
+    throw new Error("skill execution contract registry callable count is invalid");
+  }
+  if (new Set(contractSkills).size !== contractSkills.length || contractSkills.join("\n") !== [...contractSkills].sort().join("\n")) {
+    throw new Error("skill execution contract registry is ambiguous or non-deterministic");
+  }
+  if (contractSkills.join("\n") !== callableSkills.join("\n") || contractSkills.includes("tw-graph")) {
+    throw new Error("skill execution contract registry does not exactly match the callable surface");
+  }
+  return {
+    registryReference: skillExecutionContractRegistryRelativePath,
+    registrySha256: `sha256:${createHash("sha256").update(registry).digest("hex")}`,
+    schemaVersion,
+    callableCount: contractSkills.length,
+    controlRoute,
+    contractSkills,
+  };
+}
+
+function routingScalar(block: string, indentation: number, field: string): string {
+  const expression = new RegExp(`^${" ".repeat(indentation)}${field}:\\s*([^#\\n]+?)\\s*$`, "m");
+  const match = block.match(expression);
+  if (!match) {
+    throw new Error(`central model-routing contract is missing ${field}`);
+  }
+  return match[1].trim();
+}
+
+function readModelRoutingSnapshot(pluginRoot: string): ModelRoutingSnapshot {
+  const contractPath = join(pluginRoot, modelRoutingContractRelativePath);
+  const contract = readFileSync(contractPath, "utf8");
+  const section = contract.match(/^model_routing:\s*\n([\s\S]*?)(?=^selected_controls:)/m);
+  if (!section) {
+    throw new Error("central model-routing contract block is missing");
+  }
+  const block = section[1];
+  const solAllowed = routingScalar(block, 2, "sol_allowed_for_subagents");
+  if (solAllowed !== "false") {
+    throw new Error("central model-routing contract permits Sol subagents");
+  }
+  return {
+    contractReference: modelRoutingContractRelativePath,
+    contractSha256: `sha256:${createHash("sha256").update(contract).digest("hex")}`,
+    schemaVersion: routingScalar(block, 2, "schema_version"),
+    codexMainModel: routingScalar(block, 2, "codex_main_model"),
+    codexSubagentModel: routingScalar(block, 2, "codex_subagent_model"),
+    codexSubagentReasoningEffort: routingScalar(block, 2, "codex_subagent_reasoning_effort"),
+    solAllowedForSubagents: false,
+    terraUnavailableConsequence: routingScalar(block, 2, "terra_unavailable_consequence"),
+    riskReasoningEffort: {
+      L0: routingScalar(block, 4, "L0"),
+      L1: routingScalar(block, 4, "L1"),
+      L2: routingScalar(block, 4, "L2"),
+      L3: routingScalar(block, 4, "L3"),
     },
-  },
-  claude: {
-    model: "sonnet",
-    enforcement: "policy_recorded_runtime_enforcement_held",
-  },
-  importedCeComponentBodyPolicy: "no_model_default_edits_without_reviewed_overlay_fork_record",
-} as const;
+    adapter: routingScalar(block, 4, "adapter"),
+    enforcement: "adapter_and_ci_static_contract_runtime_attestation_held",
+  };
+}
 
 type InstallOptions = {
   pluginRoot: string;
@@ -208,7 +288,8 @@ function renderCodexAgentToml(agent: ParsedAgent): string {
 }
 
 // TRACEWEAVER: entrypoint=installCodexSkills; req=REQ-TW-016; trace=TRACE-TW-010; ver=VER-TW-019
-// TRACEWEAVER: entrypoint=installCodexSkills; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055
+// TRACEWEAVER: entrypoint=installCodexSkills; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
+// TRACEWEAVER: entrypoint=installCodexSkills; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090
 function installCodexSkills(options: InstallOptions): void {
   assertTraceWeaverPlugin(options.pluginRoot, options.target);
 
@@ -235,6 +316,8 @@ function installCodexSkills(options: InstallOptions): void {
   const installedReferences = existsSync(sourceReferencesRoot)
     ? listFiles(sourceReferencesRoot).map((entry) => entry.replace(`${sourceReferencesRoot}/`, "")).sort()
     : [];
+  const modelRouting = readModelRoutingSnapshot(options.pluginRoot);
+  const skillExecutionContracts = readSkillExecutionContractSnapshot(options.pluginRoot, callableSkills);
 
   const legacyActiveSurfaceStatus = removeLegacyActiveSkillSurface(legacyActiveSkillsRoot, manifestPath);
   assertCallableTargetsAvailable(targetCallableSkillsRoot, callableSkills);
@@ -298,7 +381,8 @@ function installCodexSkills(options: InstallOptions): void {
         callableSkillsRoot: targetCallableSkillsRoot,
         agents: installedAgents,
         references: installedReferences,
-        modelDefaults,
+        modelRouting,
+        skillExecutionContracts,
         prompts: [],
         promptFiles: [],
         installer: basename(import.meta.path),
@@ -314,10 +398,14 @@ function installCodexSkills(options: InstallOptions): void {
   console.log(`installed_agent_toml_count=${installedAgents.length}`);
   console.log(`installed_reference_file_count=${installedReferences.length}`);
   console.log(`installed_manifest=${manifestPath}`);
-  console.log(`installed_model_default_codex_model=${modelDefaults.codex.model}`);
-  console.log(`installed_model_default_codex_reasoning_effort=${modelDefaults.codex.reasoningEffort}`);
-  console.log(`installed_model_default_claude_model=${modelDefaults.claude.model}`);
-  console.log(`installed_model_default_claude_enforcement=${modelDefaults.claude.enforcement}`);
+  console.log(`installed_model_routing_contract=${modelRouting.contractReference}`);
+  console.log(`installed_model_routing_contract_sha256=${modelRouting.contractSha256}`);
+  console.log(`installed_model_routing_main=${modelRouting.codexMainModel}`);
+  console.log(`installed_model_routing_subagent=${modelRouting.codexSubagentModel}`);
+  console.log(`installed_model_routing_effort=${modelRouting.codexSubagentReasoningEffort}`);
+  console.log(`installed_sec_registry=${skillExecutionContracts.registryReference}`);
+  console.log(`installed_sec_registry_sha256=${skillExecutionContracts.registrySha256}`);
+  console.log(`installed_sec_callable_count=${skillExecutionContracts.callableCount}`);
   console.log("installed_manifest_prompts=0");
   console.log(`installed_packaged_skills_root=${targetPackagedSkillsRoot}`);
   console.log(`installed_callable_skills_root=${targetCallableSkillsRoot}`);
@@ -476,14 +564,17 @@ function listFiles(root: string): string[] {
 }
 
 // TRACEWEAVER: entrypoint=installAntigravitySkills; req=REQ-TW-068; trace=TRACE-TW-054; ver=VER-TW-069
+// TRACEWEAVER: entrypoint=installAntigravitySkills; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090
 function installAntigravitySkills(options: InstallOptions): void {
   assertTraceWeaverPlugin(options.pluginRoot, options.target);
 
   const geminiRoot = options.geminiHome;
   const targetPluginRoot = join(geminiRoot, "config", "plugins", "traceweaver-core");
   const targetSkillsRoot = join(targetPluginRoot, "skills");
+  const targetReferencesRoot = join(targetPluginRoot, "references");
 
   const sourceSkillsRoot = join(options.pluginRoot, "skills");
+  const sourceReferencesRoot = join(options.pluginRoot, "references");
   const sourceManifestPath = join(options.pluginRoot, ".antigravity-plugin", "plugin.json");
   const targetManifestPath = join(targetPluginRoot, "plugin.json");
   const targetVersionPath = join(targetPluginRoot, "installed_version.json");
@@ -510,8 +601,14 @@ function installAntigravitySkills(options: InstallOptions): void {
     cpSync(sourceSkillDir, targetSkillDir, { recursive: true });
   }
 
+  if (existsSync(sourceReferencesRoot)) {
+    rmSync(targetReferencesRoot, { force: true, recursive: true });
+    cpSync(sourceReferencesRoot, targetReferencesRoot, { recursive: true });
+  }
+
   console.log(`installed_skill_directory_count=${callableSkills.length}`);
   console.log(`installed_callable_skill_directory_count=${callableSkills.length}`);
+  console.log(`installed_reference_root=${targetReferencesRoot}`);
   console.log(`installed_manifest=${targetManifestPath}`);
   console.log(`installed_packaged_skills_root=${targetSkillsRoot}`);
 }

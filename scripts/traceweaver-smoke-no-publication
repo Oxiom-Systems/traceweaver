@@ -151,6 +151,7 @@ require_present "$tw_grill_skill" "Do not edit project context or authority docu
 require_present "$lfg_skill" "Invoke \`tw-auto\` with the same arguments"
 require_present "$lfg_skill" "Do not run \`ce-plan\`, \`ce-work\`, \`ce-code-review\`, \`ce-commit\`"
 require_present "$lfg_skill" "Do not fall back to raw CE \`lfg\`"
+require_present "$tw_auto_skill" "Skill Execution Contract"
 require_present "$tw_auto_skill" "exactly one review-bearing"
 require_present "$tw_auto_skill" "one reviewer persona"
 require_present "$tw_auto_skill" "one routine repair-verification cycle"

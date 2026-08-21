@@ -1,4 +1,5 @@
-# TRACEWEAVER: file-role=workflow-profile-convergence-budget; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087
+# TRACEWEAVER: file-role=review-series-workflow-profile; verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
+# TRACEWEAVER: terra-routing=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
 schema_version: tw-workflow-profile/1
 task_id: TASK-YYYY-MM-DD-NNN
 profile_revision: 1
@@ -15,28 +16,102 @@ process_budget:
   estimated_process_target_minutes: 0 # target ratio * estimated_delivery_minutes
   estimated_process_ceiling_minutes: 0 # ceiling ratio * estimated_delivery_minutes
 
+# REQ-TW-060 central model-routing contract. This is the single normative
+# TraceWeaver-owned source; installed copies must remain byte-identical.
+model_routing:
+  schema_version: tw-codex-model-routing/1
+  codex_main_model: gpt-5.6-sol
+  codex_subagent_model: gpt-5.6-terra
+  codex_subagent_reasoning_effort: risk_selected
+  sol_allowed_for_subagents: false
+  terra_unavailable_consequence: held_model_unavailable
+  risk_reasoning_effort:
+    L0: low
+    L1: medium
+    L2: high
+    L3: xhigh
+  native_child_dispatch:
+    adapter: tw-auto/scripts/traceweaver-route-native-child
+    model_argument: explicit_required
+    reasoning_effort_argument: explicit_frozen_profile_value_required
+    fork_turns: none_or_bounded_positive
+    prohibited: [model_inheritance, full_history_inheritance, gpt-5.6-sol, luna, silent_fallback]
+  receipt_fields:
+    - receipt_identity
+    - task_or_dispatch_identity
+    - role
+    - workflow_profile_hash
+    - workflow_profile_file_digest
+    - trusted_attester_registry_sha256
+    - requested_model
+    - served_model
+    - requested_reasoning_effort
+    - fork_turns
+    - capability_evidence
+    - outcome
+  attestation:
+    accepted_attester_kinds: [host_runtime, execution_service]
+    signature_algorithm: rsa-sha256
+    signature_required: true
+    trusted_attester_registry_sha256: unconfigured # freeze an external host-managed registry digest in the selected profile before dispatch
+    immutable_attester_identity_required: true
+    execution_or_request_identity_required: true
+    exact_receipt_binding_required: true
+    external_trust_store_required: true
+    child_self_report_is_proof: false
+    dispatch_acceptance_is_proof: false
+    missing_or_invalid_outcome: held_model_unattested
+    mismatch_outcome: held_model_mismatch
+    served_model_when_unattested: unattested
+    replay_and_cross_receipt_rejected: true
+  evidence_eligibility:
+    attested_model_match: eligible_for_profiled_child_use
+    held_model_unavailable: ineligible
+    held_model_unattested: ineligible
+    held_model_mismatch: ineligible
+  traceweaver_owned_native_child_surfaces:
+    - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+    - plugins/traceweaver-core/skills/tw-brainstorm/SKILL.md
+    - plugins/traceweaver-core/skills/tw-code-review/SKILL.md
+    - plugins/traceweaver-core/skills/tw-commit/SKILL.md
+    - plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md
+    - plugins/traceweaver-core/skills/tw-compound/SKILL.md
+    - plugins/traceweaver-core/skills/tw-compound-refresh/SKILL.md
+    - plugins/traceweaver-core/skills/tw-debug/SKILL.md
+    - plugins/traceweaver-core/skills/tw-doc-review/SKILL.md
+    - plugins/traceweaver-core/skills/tw-ideate/SKILL.md
+    - plugins/traceweaver-core/skills/tw-plan/SKILL.md
+    - plugins/traceweaver-core/skills/tw-resolve-pr-feedback/SKILL.md
+    - plugins/traceweaver-core/skills/tw-sessions/SKILL.md
+    - plugins/traceweaver-core/skills/tw-setup/SKILL.md
+    - plugins/traceweaver-core/skills/tw-strategy/SKILL.md
+    - plugins/traceweaver-core/skills/tw-test-browser/SKILL.md
+    - plugins/traceweaver-core/skills/tw-test-xcode/SKILL.md
+    - plugins/traceweaver-core/skills/tw-work/SKILL.md
+    - plugins/traceweaver-core/skills/tw-worktree/SKILL.md
+
 selected_controls: []
 child_roles:
-  builder: { model: "<available model>", maximum_timebox_minutes: 0 }
-  verifier: { model: "<available model>", maximum_timebox_minutes: 0 }
-  reviewer: { model: "<available model>", maximum_timebox_minutes: 0 }
-  deployer: { model: "<available model or not_applicable>", maximum_timebox_minutes: 0 }
-  dogfooder: { model: "<available model or not_applicable>", maximum_timebox_minutes: 0 }
+  builder: { model: gpt-5.6-terra, reasoning_effort: "<risk-selected value>", maximum_timebox_minutes: 0 }
+  verifier: { model: gpt-5.6-terra, reasoning_effort: "<risk-selected value>", maximum_timebox_minutes: 0 }
+  reviewer: { model: gpt-5.6-terra, reasoning_effort: "<risk-selected value>", maximum_timebox_minutes: 0 }
+  deployer: { model: "gpt-5.6-terra or not_applicable", reasoning_effort: "<risk-selected value or not_applicable>", maximum_timebox_minutes: 0 }
+  dogfooder: { model: "gpt-5.6-terra or not_applicable", reasoning_effort: "<risk-selected value or not_applicable>", maximum_timebox_minutes: 0 }
 model_selection:
-  availability: []
-  choice: "<chosen available model for each child role>"
-  rationale: "<why this available model is proportionate>"
-  unavailable_consequence: "hold or delegate; never implement as fallback"
+  availability: [] # host capability evidence; never implies served-model proof
+  choice: gpt-5.6-terra
+  rationale: "REQ-TW-060 fixes every TraceWeaver-owned native child to Terra; risk selects effort, not model."
+  unavailable_consequence: held_model_unavailable
 reviewer_cap: 1
-repair_cycle_cap: 1 # routine repair-verification cycle
-severe_blocker_exception_cycle_cap: 1 # owner/change-control receipt only; absolute total remains two
+repair_cycle_cap: 1
+severe_blocker_exception_cycle_cap: 1
 requires_deploy: false
 requires_chrome_dogfood: false
 
 # The canonical serialized planned fields above are hashed before building.
 profile_hash: "sha256:<canonical-profile-hash>"
 immutable_after_building:
-  fields: [risk, process_budget, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, severe_blocker_exception_cycle_cap, requires_deploy, requires_chrome_dogfood, profile_hash]
+  fields: [risk, process_budget, model_routing, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, severe_blocker_exception_cycle_cap, requires_deploy, requires_chrome_dogfood, profile_hash]
   expansion_rule: "After the first builder dispatch, create a new profile_revision with escalation_reason; never silently add a control or reviewer."
 
 accounting:

@@ -1,0 +1,554 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=native-child-model-routing-adapter; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
+# TRACEWEAVER: entrypoint=native_child_route_plan_and_finalize; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
+
+require "base64"
+require "digest"
+require "fileutils"
+require "json"
+require "optparse"
+require "openssl"
+require "pathname"
+require "tempfile"
+require "yaml"
+
+COMMAND_SCHEMA = "tw-native-child-route-command/1"
+RECEIPT_SCHEMA = "tw-native-child-route-receipt/1"
+ATTESTATION_SCHEMA = "tw-native-child-attestation/1"
+TRUST_SCHEMA = "tw-native-child-attester-trust/1"
+LEDGER_SCHEMA = "tw-native-child-attestation-ledger/1"
+DEFAULT_CONTRACT = "plugins/traceweaver-core/references/workflow-profile-template.yml"
+PACKAGED_CONTRACT = File.expand_path("../references/workflow-profile-template.yml", __dir__)
+INDEPENDENT_ATTESTER_KINDS = %w[host_runtime execution_service].freeze
+SIGNATURE_ALGORITHM = "rsa-sha256"
+
+class RouteError < StandardError; end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, output|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      output[key] = canonical(value.fetch(source_key))
+    end
+  when Array
+    value.map { |item| canonical(item) }
+  else
+    value
+  end
+end
+
+def identity(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def require_string!(mapping, field)
+  value = mapping[field]
+  raise RouteError, "#{field} must be a non-empty string" unless value.is_a?(String) && !value.strip.empty?
+
+  value.strip
+end
+
+def require_mapping!(mapping, field)
+  value = mapping[field]
+  raise RouteError, "#{field} must be a mapping" unless value.is_a?(Hash)
+
+  value
+end
+
+def safe_yaml(path, label)
+  value = YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)
+  raise RouteError, "#{label} must be a mapping" unless value.is_a?(Hash)
+
+  value
+rescue Errno::ENOENT
+  raise RouteError, "#{label} does not exist: #{path}"
+rescue Psych::Exception => e
+  raise RouteError, "#{label} is invalid YAML: #{e.message}"
+end
+
+def resolve_contract(root, explicit)
+  return Pathname.new(explicit).expand_path if explicit
+
+  repository_contract = root.join(DEFAULT_CONTRACT)
+  return repository_contract if repository_contract.file?
+
+  Pathname.new(PACKAGED_CONTRACT)
+end
+
+def load_routing_contract(path)
+  profile = safe_yaml(path, "workflow-profile contract")
+  routing = require_mapping!(profile, "model_routing")
+  expected = {
+    "codex_main_model" => "gpt-5.6-sol",
+    "codex_subagent_model" => "gpt-5.6-terra",
+    "codex_subagent_reasoning_effort" => "risk_selected",
+    "sol_allowed_for_subagents" => false,
+    "terra_unavailable_consequence" => "held_model_unavailable"
+  }
+  expected.each do |field, value|
+    raise RouteError, "central routing invariant #{field} is invalid" unless routing[field] == value
+  end
+  effort = routing["risk_reasoning_effort"]
+  unless effort == {"L0" => "low", "L1" => "medium", "L2" => "high", "L3" => "xhigh"}
+    raise RouteError, "central routing risk_reasoning_effort mapping is invalid"
+  end
+  dispatch = require_mapping!(routing, "native_child_dispatch")
+  unless dispatch["adapter"] == "tw-auto/scripts/traceweaver-route-native-child" &&
+         dispatch["model_argument"] == "explicit_required" &&
+         dispatch["reasoning_effort_argument"] == "explicit_frozen_profile_value_required" &&
+         dispatch["fork_turns"] == "none_or_bounded_positive"
+    raise RouteError, "central native-child dispatch contract is invalid"
+  end
+  attestation = require_mapping!(routing, "attestation")
+  unless attestation["accepted_attester_kinds"] == INDEPENDENT_ATTESTER_KINDS &&
+         attestation["signature_algorithm"] == SIGNATURE_ALGORITHM &&
+         attestation["signature_required"] == true &&
+         attestation["external_trust_store_required"] == true &&
+         attestation["missing_or_invalid_outcome"] == "held_model_unattested" &&
+         attestation["mismatch_outcome"] == "held_model_mismatch"
+    raise RouteError, "central attestation contract is invalid"
+  end
+  receipt_fields = routing["receipt_fields"]
+  required_receipt_fields = %w[
+    receipt_identity task_or_dispatch_identity role workflow_profile_hash
+    workflow_profile_file_digest trusted_attester_registry_sha256
+    requested_model served_model requested_reasoning_effort fork_turns
+    capability_evidence outcome
+  ]
+  unless receipt_fields.is_a?(Array) && (required_receipt_fields - receipt_fields).empty?
+    raise RouteError, "central receipt field contract is incomplete"
+  end
+
+  [routing, "sha256:#{Digest::SHA256.file(path).hexdigest}"]
+end
+
+def normalized_fork!(value)
+  return "none" if value == "none"
+  return value if value.is_a?(Integer) && value.positive?
+
+  raise RouteError, "fork_turns must be the literal none or a bounded positive integer"
+end
+
+def planned_identity_inputs(receipt)
+  {
+    "schema" => "tw-native-child-route-plan-identity/1",
+    "contract_identity" => receipt.fetch("contract_identity"),
+    "task_or_dispatch_identity" => receipt.fetch("task_or_dispatch_identity"),
+    "role" => receipt.fetch("role"),
+    "workflow_profile_hash" => receipt.fetch("workflow_profile_hash"),
+    "workflow_profile_file_digest" => receipt.fetch("workflow_profile_file_digest"),
+    "trusted_attester_registry_sha256" => receipt.fetch("trusted_attester_registry_sha256"),
+    "risk_level" => receipt.fetch("risk_level"),
+    "requested_model" => receipt.fetch("requested_model"),
+    "requested_reasoning_effort" => receipt.fetch("requested_reasoning_effort"),
+    "fork_turns" => receipt.fetch("fork_turns"),
+    "capability_evidence" => receipt.fetch("capability_evidence")
+  }
+end
+
+def load_selected_profile(path, risk:, profile_hash:)
+  raise RouteError, "--workflow-profile is required" unless path
+
+  profile_path = Pathname.new(path).expand_path
+  raise RouteError, "workflow profile must be a regular file" unless profile_path.file? && !profile_path.symlink?
+  profile = safe_yaml(profile_path, "workflow profile")
+  raise RouteError, "workflow profile schema is invalid" unless profile["schema_version"] == "tw-workflow-profile/1"
+  raise RouteError, "workflow profile risk does not match request" unless profile["risk"] == risk
+  raise RouteError, "workflow profile hash does not match request" unless profile["profile_hash"] == profile_hash
+  registry_digest = profile.dig("model_routing", "attestation", "trusted_attester_registry_sha256")
+  unless registry_digest == "unconfigured" || registry_digest.to_s.match?(/\Asha256:[0-9a-f]{64}\z/)
+    raise RouteError, "workflow profile trusted-attester registry digest is missing or invalid"
+  end
+
+  {
+    "workflow_profile_file_digest" => "sha256:#{Digest::SHA256.file(profile_path).hexdigest}",
+    "trusted_attester_registry_sha256" => registry_digest
+  }
+end
+
+def plan(request, routing, contract_identity, selected_profile)
+  task = require_string!(request, "task_or_dispatch_identity")
+  role = require_string!(request, "role")
+  profile_hash = require_string!(request, "workflow_profile_hash")
+  risk = require_string!(request, "risk_level")
+  model = require_string!(request, "requested_model")
+  effort = require_string!(request, "requested_reasoning_effort")
+  capability = require_string!(request, "capability_evidence")
+  fork_turns = normalized_fork!(request["fork_turns"])
+  available = request["available_models"]
+  unless available.is_a?(Array) && available.all? { |item| item.is_a?(String) && !item.strip.empty? }
+    raise RouteError, "available_models must be an array of non-empty strings"
+  end
+
+  expected_model = routing.fetch("codex_subagent_model")
+  raise RouteError, "requested_model must explicitly equal #{expected_model}" unless model == expected_model
+
+  expected_effort = routing.fetch("risk_reasoning_effort")[risk]
+  raise RouteError, "risk_level must be L0, L1, L2, or L3" unless expected_effort
+  unless effort == expected_effort
+    raise RouteError, "requested_reasoning_effort #{effort} does not match frozen #{risk}=#{expected_effort}"
+  end
+
+  receipt = {
+    "schema_version" => RECEIPT_SCHEMA,
+    "receipt_phase" => "planned",
+    "contract_identity" => contract_identity,
+    "task_or_dispatch_identity" => task,
+    "role" => role,
+    "workflow_profile_hash" => profile_hash,
+    "workflow_profile_file_digest" => selected_profile.fetch("workflow_profile_file_digest"),
+    "trusted_attester_registry_sha256" => selected_profile.fetch("trusted_attester_registry_sha256"),
+    "risk_level" => risk,
+    "requested_model" => model,
+    "served_model" => "unattested",
+    "requested_reasoning_effort" => effort,
+    "fork_turns" => fork_turns,
+    "capability_evidence" => capability,
+    "child_output_eligible" => false
+  }
+  receipt["receipt_identity"] = identity(planned_identity_inputs(receipt))
+
+  if available.include?(expected_model)
+    receipt.merge(
+      "outcome" => "dispatch_ready_pending_attestation",
+      "dispatch_parameters" => {
+        "model" => expected_model,
+        "reasoning_effort" => expected_effort,
+        "fork_turns" => fork_turns
+      }
+    )
+  else
+    receipt.merge(
+      "outcome" => routing.fetch("terra_unavailable_consequence"),
+      "dispatch_parameters" => nil,
+      "held_reason" => "requested Terra capability is absent; dispatch and fallback are prohibited"
+    )
+  end
+end
+
+def validate_planned_receipt!(receipt, routing, contract_identity)
+  raise RouteError, "planned_receipt must be a mapping" unless receipt.is_a?(Hash)
+  raise RouteError, "planned_receipt schema is invalid" unless receipt["schema_version"] == RECEIPT_SCHEMA
+  raise RouteError, "planned_receipt is not in planned phase" unless receipt["receipt_phase"] == "planned"
+  raise RouteError, "planned_receipt contract changed" unless receipt["contract_identity"] == contract_identity
+  %w[task_or_dispatch_identity role workflow_profile_hash capability_evidence].each do |field|
+    require_string!(receipt, field)
+  end
+  profile_digest = require_string!(receipt, "workflow_profile_file_digest")
+  trust_digest = require_string!(receipt, "trusted_attester_registry_sha256")
+  unless profile_digest.match?(/\Asha256:[0-9a-f]{64}\z/)
+    raise RouteError, "planned_receipt workflow profile digest is invalid"
+  end
+  unless trust_digest == "unconfigured" || trust_digest.match?(/\Asha256:[0-9a-f]{64}\z/)
+    raise RouteError, "planned_receipt trusted-attester registry digest is invalid"
+  end
+  risk = require_string!(receipt, "risk_level")
+  expected_effort = routing.fetch("risk_reasoning_effort")[risk]
+  raise RouteError, "planned_receipt risk level is invalid" unless expected_effort
+  raise RouteError, "planned_receipt requested model changed" unless receipt["requested_model"] == routing["codex_subagent_model"]
+  unless receipt["requested_reasoning_effort"] == expected_effort
+    raise RouteError, "planned_receipt reasoning effort differs from the frozen risk mapping"
+  end
+  fork_turns = normalized_fork!(receipt["fork_turns"])
+  expected_dispatch = {
+    "model" => routing.fetch("codex_subagent_model"),
+    "reasoning_effort" => expected_effort,
+    "fork_turns" => fork_turns
+  }
+  unless receipt["dispatch_parameters"] == expected_dispatch
+    raise RouteError, "planned_receipt dispatch parameters are invalid"
+  end
+  unless receipt["served_model"] == "unattested" && receipt["child_output_eligible"] == false
+    raise RouteError, "planned_receipt claims unearned model evidence"
+  end
+  expected = identity(planned_identity_inputs(receipt))
+  raise RouteError, "planned_receipt identity is invalid" unless receipt["receipt_identity"] == expected
+  raise RouteError, "held/unavailable plan cannot be finalized" unless receipt["outcome"] == "dispatch_ready_pending_attestation"
+
+  receipt
+rescue KeyError => e
+  raise RouteError, "planned_receipt is incomplete: #{e.message}"
+end
+
+def held_final(receipt, outcome:, reason:, served_model: "unattested", attestation: nil, trust_digest: nil)
+  final = receipt.merge(
+    "receipt_phase" => "finalized",
+    "served_model" => served_model,
+    "outcome" => outcome,
+    "child_output_eligible" => false,
+    "held_reason" => reason,
+    "dispatch_parameters" => receipt["dispatch_parameters"],
+    "attestation_trust_store_digest" => trust_digest
+  )
+  if attestation.is_a?(Hash)
+    final["attester_identity"] = attestation["immutable_attester_identity"]
+    final["execution_or_request_identity"] = attestation["execution_or_request_identity"]
+    final["attestation_digest"] = identity("schema" => "tw-native-child-attestation-digest/1", "attestation" => attestation)
+  end
+  final["finalization_identity"] = identity("schema" => "tw-native-child-route-finalization/1", "receipt" => final)
+  final
+end
+
+def load_trust_store(path)
+  return [nil, nil] unless path
+
+  trust_path = Pathname.new(path).expand_path
+  raise RouteError, "attester trust store must be a regular non-symlink file" unless trust_path.file? && !trust_path.symlink?
+  trust = safe_yaml(trust_path, "attester trust store")
+  raise RouteError, "attester trust store schema is invalid" unless trust["schema_version"] == TRUST_SCHEMA
+  raise RouteError, "attester trust store attesters must be an array" unless trust["attesters"].is_a?(Array)
+  identities = trust.fetch("attesters").map do |attester|
+    raise RouteError, "attester trust store entry must be a mapping" unless attester.is_a?(Hash)
+
+    [require_string!(attester, "immutable_attester_identity"), require_string!(attester, "attester_kind")]
+  end
+  raise RouteError, "attester trust store contains duplicate identities" unless identities.uniq.length == identities.length
+
+  [trust, "sha256:#{Digest::SHA256.file(trust_path).hexdigest}"]
+end
+
+def attestation_binding_error(attestation, receipt)
+  return "attestation must be a mapping" unless attestation.is_a?(Hash)
+  return "attestation schema is invalid" unless attestation["schema_version"] == ATTESTATION_SCHEMA
+
+  fields = %w[
+    immutable_attester_identity
+    attester_kind
+    execution_or_request_identity
+    child_receipt_identity
+    task_or_dispatch_identity
+    workflow_profile_hash
+    requested_model
+    served_model
+    requested_reasoning_effort
+    capability_evidence
+    signature_algorithm
+    signature
+  ]
+  missing = fields.reject { |field| attestation[field].is_a?(String) && !attestation[field].strip.empty? }
+  missing << "fork_turns" unless attestation.key?("fork_turns")
+  return "attestation is incomplete: #{missing.join(',')}" unless missing.empty?
+  return "attestation is not independently produced" unless INDEPENDENT_ATTESTER_KINDS.include?(attestation["attester_kind"])
+
+  binding = {
+    "child_receipt_identity" => "receipt_identity",
+    "task_or_dispatch_identity" => "task_or_dispatch_identity",
+    "workflow_profile_hash" => "workflow_profile_hash",
+    "requested_model" => "requested_model",
+    "requested_reasoning_effort" => "requested_reasoning_effort",
+    "fork_turns" => "fork_turns"
+  }
+  changed = binding.select { |attestation_field, receipt_field| attestation[attestation_field] != receipt[receipt_field] }
+  return "attestation binding mismatch: #{changed.keys.sort.join(',')}" unless changed.empty?
+
+  nil
+end
+
+def trusted_attester(trust, attestation)
+  return nil unless trust
+
+  trust.fetch("attesters").find do |candidate|
+    candidate.is_a?(Hash) &&
+      candidate["immutable_attester_identity"] == attestation["immutable_attester_identity"] &&
+      candidate["attester_kind"] == attestation["attester_kind"] &&
+      candidate["signature_algorithm"] == SIGNATURE_ALGORITHM &&
+      candidate["public_key_pem"].is_a?(String) && !candidate["public_key_pem"].strip.empty? &&
+      INDEPENDENT_ATTESTER_KINDS.include?(candidate["attester_kind"])
+  end
+end
+
+def signed_attestation_payload(attestation)
+  canonical(attestation.reject { |key, _value| key.to_s == "signature" })
+end
+
+def valid_attestation_signature?(attestation, trusted)
+  return false unless attestation["signature_algorithm"] == SIGNATURE_ALGORITHM
+
+  signature = Base64.strict_decode64(attestation.fetch("signature"))
+  public_key = OpenSSL::PKey.read(trusted.fetch("public_key_pem"))
+  return false unless public_key.is_a?(OpenSSL::PKey::RSA)
+  return false if public_key.n.num_bits < 2048
+
+  public_key.verify(
+    OpenSSL::Digest::SHA256.new,
+    signature,
+    JSON.generate(signed_attestation_payload(attestation))
+  )
+rescue ArgumentError, OpenSSL::PKey::PKeyError, KeyError
+  false
+end
+
+def atomic_json(path, value)
+  FileUtils.mkdir_p(path.dirname)
+  tempfile = Tempfile.new([".#{path.basename}", ".tmp"], path.dirname.to_s)
+  begin
+    tempfile.binmode
+    tempfile.write("#{JSON.pretty_generate(value)}\n")
+    tempfile.flush
+    tempfile.fsync
+    tempfile.close
+    File.chmod(0o600, tempfile.path)
+    File.rename(tempfile.path, path.to_s)
+  ensure
+    tempfile.close! if tempfile
+  end
+end
+
+def consume_attestation(state_dir, attestation, receipt_identity)
+  FileUtils.mkdir_p(state_dir)
+  lock_path = state_dir.join("attestation-ledger.lock")
+  ledger_path = state_dir.join("attestation-ledger.json")
+  File.open(lock_path, File::RDWR | File::CREAT, 0o600) do |lock|
+    lock.flock(File::LOCK_EX)
+    ledger = if ledger_path.file?
+               JSON.parse(ledger_path.read)
+             else
+               {"schema_version" => LEDGER_SCHEMA, "uses" => {}}
+             end
+    raise RouteError, "attestation ledger schema is invalid" unless ledger["schema_version"] == LEDGER_SCHEMA
+    raise RouteError, "attestation ledger uses must be a mapping" unless ledger["uses"].is_a?(Hash)
+
+    key = identity(
+      "attester_identity" => attestation.fetch("immutable_attester_identity"),
+      "execution_or_request_identity" => attestation.fetch("execution_or_request_identity")
+    )
+    digest = identity("schema" => "tw-native-child-attestation-digest/1", "attestation" => attestation)
+    existing = ledger.fetch("uses")[key]
+    if existing
+      return :idempotent if existing["receipt_identity"] == receipt_identity && existing["attestation_digest"] == digest
+
+      return :replayed
+    end
+
+    ledger.fetch("uses")[key] = {
+      "receipt_identity" => receipt_identity,
+      "attestation_digest" => digest,
+      "immutable_attester_identity" => attestation.fetch("immutable_attester_identity"),
+      "execution_or_request_identity" => attestation.fetch("execution_or_request_identity")
+    }
+    atomic_json(ledger_path, ledger)
+    :consumed
+  end
+rescue JSON::ParserError => e
+  raise RouteError, "attestation ledger is invalid JSON: #{e.message}"
+end
+
+def finalize(request, routing, contract_identity, state_dir, trust_store_path)
+  receipt = validate_planned_receipt!(request["planned_receipt"], routing, contract_identity)
+  attestation = request["attestation"]
+  return held_final(receipt, outcome: "held_model_unattested", reason: "independent host or execution attestation is missing") unless attestation
+
+  trust, trust_digest = load_trust_store(trust_store_path)
+  unless trust
+    return held_final(receipt, outcome: "held_model_unattested", reason: "external trusted-attester registry is missing", attestation: attestation)
+  end
+
+  if (reason = attestation_binding_error(attestation, receipt))
+    return held_final(receipt, outcome: "held_model_unattested", reason: reason, attestation: attestation, trust_digest: trust_digest)
+  end
+  expected_trust_digest = receipt.fetch("trusted_attester_registry_sha256")
+  if expected_trust_digest == "unconfigured"
+    return held_final(receipt, outcome: "held_model_unattested", reason: "frozen workflow profile has no trusted-attester registry", attestation: attestation, trust_digest: trust_digest)
+  end
+  unless trust_digest == expected_trust_digest
+    return held_final(receipt, outcome: "held_model_unattested", reason: "attester trust store digest does not match the frozen workflow profile", attestation: attestation, trust_digest: trust_digest)
+  end
+  trusted = trusted_attester(trust, attestation)
+  unless trusted
+    return held_final(receipt, outcome: "held_model_unattested", reason: "attester identity and kind are not trusted independently of the child", attestation: attestation, trust_digest: trust_digest)
+  end
+  unless valid_attestation_signature?(attestation, trusted)
+    return held_final(receipt, outcome: "held_model_unattested", reason: "attestation signature is invalid for the frozen trusted-attester registry", attestation: attestation, trust_digest: trust_digest)
+  end
+
+  consumption = consume_attestation(state_dir, attestation, receipt.fetch("receipt_identity"))
+  if consumption == :replayed
+    return held_final(receipt, outcome: "held_model_unattested", reason: "execution/request attestation identity was replayed across receipts", attestation: attestation, trust_digest: trust_digest)
+  end
+
+  served = attestation.fetch("served_model")
+  if served != routing.fetch("codex_subagent_model")
+    return held_final(receipt, outcome: "held_model_mismatch", reason: "independently attested served model differs from requested Terra", served_model: served, attestation: attestation, trust_digest: trust_digest)
+  end
+
+  final = receipt.merge(
+    "receipt_phase" => "finalized",
+    "served_model" => served,
+    "outcome" => "attested_model_match",
+    "child_output_eligible" => true,
+    "attester_identity" => attestation.fetch("immutable_attester_identity"),
+    "execution_or_request_identity" => attestation.fetch("execution_or_request_identity"),
+    "attestation_digest" => identity("schema" => "tw-native-child-attestation-digest/1", "attestation" => attestation),
+    "attestation_trust_store_digest" => trust_digest,
+    "attestation_consumption" => consumption.to_s
+  )
+  final["finalization_identity"] = identity("schema" => "tw-native-child-route-finalization/1", "receipt" => final)
+  final
+end
+
+options = {
+  root: Dir.pwd,
+  state_dir: nil,
+  request: nil,
+  contract: nil,
+  trust_store: nil,
+  workflow_profile: nil
+}
+
+OptionParser.new do |parser|
+  parser.banner = "Usage: traceweaver-route-native-child --root ROOT --state-dir DIR --request FILE --workflow-profile FILE [--contract FILE] [--trust-store FILE]"
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--state-dir PATH") { |value| options[:state_dir] = value }
+  parser.on("--request PATH") { |value| options[:request] = value }
+  parser.on("--contract PATH") { |value| options[:contract] = value }
+  parser.on("--trust-store PATH") { |value| options[:trust_store] = value }
+  parser.on("--workflow-profile PATH") { |value| options[:workflow_profile] = value }
+end.parse!
+
+begin
+  raise RouteError, "--request is required" unless options[:request]
+  raise RouteError, "--state-dir is required" unless options[:state_dir]
+
+  root = Pathname.new(options[:root]).expand_path
+  raise RouteError, "--root is not a directory: #{root}" unless root.directory?
+  root = root.realpath
+  state_dir = Pathname.new(options[:state_dir]).expand_path
+  raise RouteError, "--state-dir must not be the filesystem root" if state_dir.cleanpath.to_s == File::SEPARATOR
+
+  request = safe_yaml(Pathname.new(options[:request]).expand_path, "route request")
+  raise RouteError, "route request schema is invalid" unless request["schema_version"] == COMMAND_SCHEMA
+  contract_path = resolve_contract(root, options[:contract])
+  routing, contract_identity = load_routing_contract(contract_path)
+
+  result = case request["command"]
+           when "plan"
+             selected_profile = load_selected_profile(
+               options[:workflow_profile],
+               risk: require_string!(request, "risk_level"),
+               profile_hash: require_string!(request, "workflow_profile_hash")
+             )
+             plan(request, routing, contract_identity, selected_profile)
+           when "finalize"
+             planned_receipt = require_mapping!(request, "planned_receipt")
+             selected_profile = load_selected_profile(
+               options[:workflow_profile],
+               risk: require_string!(planned_receipt, "risk_level"),
+               profile_hash: require_string!(planned_receipt, "workflow_profile_hash")
+             )
+             unless planned_receipt["workflow_profile_file_digest"] == selected_profile["workflow_profile_file_digest"] &&
+                    planned_receipt["trusted_attester_registry_sha256"] == selected_profile["trusted_attester_registry_sha256"]
+               raise RouteError, "workflow profile changed after route planning"
+             end
+             finalize(request, routing, contract_identity, state_dir, options[:trust_store])
+           else
+             raise RouteError, "command must be plan or finalize"
+           end
+  puts JSON.pretty_generate(result)
+rescue RouteError, KeyError => e
+  warn "native_child_route_status=refused"
+  warn "native_child_route_reason=#{e.message}"
+  exit 1
+end

@@ -46,6 +46,15 @@ available. One final cycle requires the controller's owner- or approved
 change-control-authority receipt bound to the series, retained fingerprint,
 severity/context, authorization reason, and final-cycle limit.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex builder, verifier, or repair call,
+run the packaged sibling `tw-auto/scripts/traceweaver-route-native-child`
+against the canonical workflow-profile contract. Use only its explicit
+dispatch parameters and finalize its receipt with independent host/execution
+attestation. A held route makes child output ineligible; never inherit a model,
+fall back, or edit an imported CE-derived body to bypass the overlay.
+
 ## Required Inputs
 
 Before changing meaningful behavior, load and cite:
@@ -400,10 +409,10 @@ user command after work.
 
 When work is ready for review, return the highest-level next wrapper:
 `/tw-code-review ...` for changed code-like files, scoped `/tw-doc-review ...`
-only for normative semantic-authority changes, or return control to `/tw-auto ...`
-when the automation loop should continue. Status/hash/receipt/projection
-bookkeeping uses the deterministic post-acceptance `mechanical_closure` route
-and dispatches no reviewer. Recommend standalone lower gates only for an
+only for normative semantic-authority changes, or return control to
+`/tw-auto ...` when the automation loop should continue. Status/hash/receipt/projection
+bookkeeping uses the deterministic `mechanical_closure` route and dispatches no
+reviewer after exact accepted-review reuse. Recommend standalone lower gates only for an
 explicit diagnostic, audit, baseline-authority review, or a human-decision pause
 where no higher wrapper can proceed.
 

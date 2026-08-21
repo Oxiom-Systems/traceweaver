@@ -1,16 +1,16 @@
 #!/usr/bin/env bash
 # TRACEWEAVER: file-role=separate-home-runtime-smoke; verifies=VER-TW-025; req=REQ-TW-016; trace=TRACE-TW-016; ver=VER-TW-025
-# TRACEWEAVER: file-role=model-default-separate-home-runtime-smoke; req=REQ-TW-060; trace=TRACE-TW-043; ver=VER-TW-055
-# TRACEWEAVER: verifies=VER-TW-055; req=REQ-TW-060; trace=TRACE-TW-043
+# TRACEWEAVER: file-role=model-routing-separate-home-runtime-smoke; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
+# TRACEWEAVER: verifies=VER-TW-085; req=REQ-TW-060; trace=TRACE-TW-065
 set -euo pipefail
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_home="$(mktemp -d)"
 codex_home="$tmp_home/.codex"
-expected_codex_model="gpt-5.5"
+expected_codex_model="gpt-5.6-sol"
+expected_codex_subagent_model="gpt-5.6-terra"
 expected_codex_reasoning_effort="medium"
-expected_claude_model="sonnet"
-model="${TRACEWEAVER_CODEX_MODEL:-gpt-5.5}"
+model="${TRACEWEAVER_CODEX_MODEL:-gpt-5.6-sol}"
 reasoning_effort="${TRACEWEAVER_CODEX_REASONING_EFFORT:-medium}"
 exec_timeout_seconds="${TRACEWEAVER_CODEX_EXEC_TIMEOUT_SECONDS:-120}"
 auth_mode="${TRACEWEAVER_CODEX_AUTH_MODE:-none}"
@@ -143,20 +143,20 @@ echo "separate_home_runtime_home_isolated=true"
 echo "fresh_codex_auth_mode=$auth_mode"
 echo "fresh_codex_runtime_model=$model"
 echo "fresh_codex_runtime_reasoning_effort=$reasoning_effort"
-echo "fresh_codex_model_default_policy_codex_model=$(json_query "$manifest" modelDefaults.codex.model)"
-echo "fresh_codex_model_default_policy_codex_reasoning_effort=$(json_query "$manifest" modelDefaults.codex.reasoningEffort)"
-echo "fresh_codex_model_default_policy_claude_model=$(json_query "$manifest" modelDefaults.claude.model)"
-if [ "$(json_query "$manifest" modelDefaults.codex.model)" = "$expected_codex_model" ] \
-  && [ "$(json_query "$manifest" modelDefaults.codex.reasoningEffort)" = "$expected_codex_reasoning_effort" ] \
-  && [ "$(json_query "$manifest" modelDefaults.claude.model)" = "$expected_claude_model" ]; then
-  echo "fresh_codex_model_default_manifest=pass"
+echo "fresh_codex_model_routing_main=$(json_query "$manifest" modelRouting.codexMainModel)"
+echo "fresh_codex_model_routing_subagent=$(json_query "$manifest" modelRouting.codexSubagentModel)"
+echo "fresh_codex_model_routing_effort=$(json_query "$manifest" modelRouting.codexSubagentReasoningEffort)"
+if [ "$(json_query "$manifest" modelRouting.codexMainModel)" = "$expected_codex_model" ] \
+  && [ "$(json_query "$manifest" modelRouting.codexSubagentModel)" = "$expected_codex_subagent_model" ] \
+  && [ "$(json_query "$manifest" modelRouting.codexSubagentReasoningEffort)" = "risk_selected" ]; then
+  echo "fresh_codex_model_routing_manifest=pass"
 else
-  echo "fresh_codex_model_default_manifest=held_mismatch"
+  echo "fresh_codex_model_routing_manifest=held_mismatch"
 fi
 if [ "$model" = "$expected_codex_model" ] && [ "$reasoning_effort" = "$expected_codex_reasoning_effort" ]; then
-  echo "fresh_codex_runtime_model_default_match=pass_default_runtime_args"
+  echo "fresh_codex_runtime_main_model_match=pass_default_runtime_args"
 else
-  echo "fresh_codex_runtime_model_default_match=pass_explicit_override_runtime_args"
+  echo "fresh_codex_runtime_main_model_match=pass_explicit_override_runtime_args"
 fi
 if [ "$auth_copy_used" = true ]; then
   echo "fresh_codex_auth_boundary=held_live_auth_copy_available_to_read_only_exec_until_tokenless_probe_exists"

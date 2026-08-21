@@ -18,6 +18,15 @@ authority.
 `tw-strategy` delegates to the TraceWeaver-packaged `ce-strategy` engine. It
 does not approve, rewrite, or silently broaden requirements.
 
+## Native Child Routing
+
+Before any TraceWeaver-owned native Codex child call, run the packaged sibling
+`tw-auto/scripts/traceweaver-route-native-child` against the canonical workflow-
+profile contract. Use only its explicit dispatch parameters and finalize its
+receipt with independent host/execution attestation. A held route makes child
+output ineligible; never inherit a model, fall back, or edit an imported
+CE-derived body to bypass the overlay.
+
 ## Required Inputs
 
 Before delegating, load and cite the available authority context:

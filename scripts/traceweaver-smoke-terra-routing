@@ -1,0 +1,326 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=terra-native-child-routing-smoke; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
+# TRACEWEAVER: verifies=VER-TW-085; req=REQ-TW-060; trace=TRACE-TW-065
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+adapter="$root/plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child"
+contract="$root/plugins/traceweaver-core/references/workflow-profile-template.yml"
+contract_mirror="$root/plugins/traceweaver-core/skills/tw-auto/references/workflow-profile-template.yml"
+
+if [ ! -x "$adapter" ]; then
+  echo "terra-routing: missing executable native-child routing adapter: $adapter" >&2
+  exit 1
+fi
+
+ruby - "$root" "$adapter" "$contract" "$contract_mirror" <<'RUBY'
+require "base64"
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "openssl"
+require "tmpdir"
+require "yaml"
+
+root, adapter, contract_path, mirror_path = ARGV
+
+def fail!(message)
+  warn("terra-routing: #{message}")
+  exit 1
+end
+
+def expect!(condition, message)
+  fail!(message) unless condition
+end
+
+def write_yaml(path, value)
+  File.write(path, YAML.dump(value))
+end
+
+def invoke(adapter, root, state_dir, request, profile:, trust_store: nil)
+  request_path = File.join(state_dir, "request-#{Dir.children(state_dir).length}.yml")
+  write_yaml(request_path, request)
+  command = [adapter, "--root", root, "--state-dir", state_dir, "--request", request_path, "--workflow-profile", profile]
+  command.concat(["--trust-store", trust_store]) if trust_store
+  output, error, status = Open3.capture3(*command)
+  [status.success? ? JSON.parse(output) : nil, output, error, status]
+rescue JSON::ParserError => e
+  fail!("adapter returned invalid JSON: #{e.message}")
+end
+
+def invoke!(adapter, root, state_dir, request, profile:, trust_store: nil)
+  receipt, output, error, status = invoke(adapter, root, state_dir, request, profile: profile, trust_store: trust_store)
+  fail!("adapter rejected #{request.fetch('command')}: #{error.strip} #{output.strip}") unless status.success?
+  receipt
+end
+
+def plan_request(risk:, identity:, available: ["gpt-5.6-terra"], model: "gpt-5.6-terra", effort: nil, fork_turns: "none")
+  effort ||= {"L0" => "low", "L1" => "medium", "L2" => "high", "L3" => "xhigh"}.fetch(risk)
+  {
+    "schema_version" => "tw-native-child-route-command/1",
+    "command" => "plan",
+    "task_or_dispatch_identity" => identity,
+    "role" => "reviewer",
+    "workflow_profile_hash" => "sha256:profile-#{risk.downcase}",
+    "risk_level" => risk,
+    "requested_model" => model,
+    "requested_reasoning_effort" => effort,
+    "fork_turns" => fork_turns,
+    "available_models" => available,
+    "capability_evidence" => "fixture-model-catalog:#{available.join(',')}"
+  }
+end
+
+def finalize_request(plan, attestation = nil)
+  request = {
+    "schema_version" => "tw-native-child-route-command/1",
+    "command" => "finalize",
+    "planned_receipt" => plan
+  }
+  request["attestation"] = attestation if attestation
+  request
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.to_h { |key| [key, canonical(value.fetch(key))] }
+  when Array
+    value.map { |item| canonical(item) }
+  else
+    value
+  end
+end
+
+def identity(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def planned_identity_inputs(receipt)
+  {
+    "schema" => "tw-native-child-route-plan-identity/1",
+    "contract_identity" => receipt.fetch("contract_identity"),
+    "task_or_dispatch_identity" => receipt.fetch("task_or_dispatch_identity"),
+    "role" => receipt.fetch("role"),
+    "workflow_profile_hash" => receipt.fetch("workflow_profile_hash"),
+    "workflow_profile_file_digest" => receipt.fetch("workflow_profile_file_digest"),
+    "trusted_attester_registry_sha256" => receipt.fetch("trusted_attester_registry_sha256"),
+    "risk_level" => receipt.fetch("risk_level"),
+    "requested_model" => receipt.fetch("requested_model"),
+    "requested_reasoning_effort" => receipt.fetch("requested_reasoning_effort"),
+    "fork_turns" => receipt.fetch("fork_turns"),
+    "capability_evidence" => receipt.fetch("capability_evidence")
+  }
+end
+
+def attestation_for(plan, execution:, signing_key:, served: "gpt-5.6-terra", attester: "fixture-host-attester", kind: "host_runtime")
+  attestation = {
+    "schema_version" => "tw-native-child-attestation/1",
+    "immutable_attester_identity" => attester,
+    "attester_kind" => kind,
+    "execution_or_request_identity" => execution,
+    "child_receipt_identity" => plan.fetch("receipt_identity"),
+    "task_or_dispatch_identity" => plan.fetch("task_or_dispatch_identity"),
+    "workflow_profile_hash" => plan.fetch("workflow_profile_hash"),
+    "requested_model" => plan.fetch("requested_model"),
+    "served_model" => served,
+    "requested_reasoning_effort" => plan.fetch("requested_reasoning_effort"),
+    "fork_turns" => plan.fetch("fork_turns"),
+    "capability_evidence" => "fixture-independent-host-execution-record",
+    "signature_algorithm" => "rsa-sha256"
+  }
+  payload = JSON.generate(canonical(attestation))
+  attestation["signature"] = Base64.strict_encode64(signing_key.sign(OpenSSL::Digest::SHA256.new, payload))
+  attestation
+end
+
+contract = YAML.safe_load(File.read(contract_path), permitted_classes: [], aliases: false)
+routing = contract.fetch("model_routing")
+expected_invariants = {
+  "codex_main_model" => "gpt-5.6-sol",
+  "codex_subagent_model" => "gpt-5.6-terra",
+  "codex_subagent_reasoning_effort" => "risk_selected",
+  "sol_allowed_for_subagents" => false,
+  "terra_unavailable_consequence" => "held_model_unavailable"
+}
+expected_invariants.each do |field, expected|
+  expect!(routing[field] == expected, "central contract #{field} differs from #{expected.inspect}")
+end
+expect!(routing.fetch("risk_reasoning_effort") == {"L0" => "low", "L1" => "medium", "L2" => "high", "L3" => "xhigh"}, "risk-to-effort mapping drifted")
+expect!(routing.dig("native_child_dispatch", "adapter") == "tw-auto/scripts/traceweaver-route-native-child", "central contract does not name the adapter")
+expect!(routing.dig("native_child_dispatch", "fork_turns") == "none_or_bounded_positive", "fork bound is not explicit")
+expect!(routing.dig("attestation", "missing_or_invalid_outcome") == "held_model_unattested", "unattested outcome drifted")
+expect!(routing.dig("attestation", "mismatch_outcome") == "held_model_mismatch", "mismatch outcome drifted")
+expect!(routing.dig("attestation", "signature_algorithm") == "rsa-sha256", "attestation signature algorithm drifted")
+expect!(routing.dig("attestation", "signature_required") == true, "attestation signatures are not mandatory")
+expect!(routing.dig("attestation", "trusted_attester_registry_sha256") == "unconfigured", "template must not ship a fixture or implicit production trust registry")
+expect!((%w[workflow_profile_file_digest trusted_attester_registry_sha256] - routing.fetch("receipt_fields")).empty?, "receipt contract omits frozen profile or trust-registry identity")
+expect!(File.binread(contract_path) == File.binread(mirror_path), "canonical workflow profile and packaged mirror differ")
+
+surfaces = routing.fetch("traceweaver_owned_native_child_surfaces")
+expect!(!surfaces.empty?, "central contract has no TraceWeaver-owned route-surface inventory")
+surfaces.each do |relative|
+  expect!(!relative.include?("/ce-"), "imported CE body entered the TraceWeaver-owned route inventory: #{relative}")
+  path = File.join(root, relative)
+  expect!(File.file?(path), "registered route surface is missing: #{relative}")
+  expect!(File.read(path).include?("traceweaver-route-native-child"), "registered route surface bypasses the central adapter: #{relative}")
+end
+
+model_pointer = File.read(File.join(root, "plugins/traceweaver-core/references/traceweaver-model-defaults.md"))
+expect!(model_pointer.include?("Compatibility pointer"), "historical model-default reference is still normative")
+expect!(model_pointer.include?("workflow-profile-template.yml"), "model-default pointer does not resolve the central contract")
+expect!(!model_pointer.include?("codex_model: gpt-5.5"), "historical gpt-5.5 default is still active")
+
+master = File.read(File.join(root, "plugins/traceweaver-core/references/master-orchestrator-prompt-template.md"))
+expect!(master.include?("traceweaver-route-native-child"), "master orchestrator bypasses the routing adapter")
+expect!(!master.include?("Attempt Luna"), "master orchestrator still permits Luna")
+expect!(!master.include?("use Terra without investigation"), "master orchestrator still permits silent fallback")
+
+Dir.mktmpdir("traceweaver-terra-routing-") do |state_dir|
+  signing_key = OpenSSL::PKey::RSA.generate(2048)
+  trust_store = File.join(state_dir, "trusted-attesters.yml")
+  write_yaml(trust_store, {
+    "schema_version" => "tw-native-child-attester-trust/1",
+    "attesters" => [
+      {
+        "immutable_attester_identity" => "fixture-host-attester",
+        "attester_kind" => "host_runtime",
+        "signature_algorithm" => "rsa-sha256",
+        "public_key_pem" => signing_key.public_key.to_pem
+      }
+    ]
+  })
+  trust_digest = "sha256:#{Digest::SHA256.file(trust_store).hexdigest}"
+  profiles = %w[L0 L1 L2 L3].to_h do |risk|
+    path = File.join(state_dir, "profile-#{risk.downcase}.yml")
+    write_yaml(path, {
+      "schema_version" => "tw-workflow-profile/1",
+      "risk" => risk,
+      "profile_hash" => "sha256:profile-#{risk.downcase}",
+      "model_routing" => {
+        "attestation" => {
+          "trusted_attester_registry_sha256" => trust_digest
+        }
+      }
+    })
+    [risk, path]
+  end
+
+  %w[L0 L1 L2 L3].zip(%w[low medium high xhigh]).each do |risk, effort|
+    receipt = invoke!(adapter, root, state_dir, plan_request(risk: risk, identity: "dispatch-#{risk.downcase}"), profile: profiles.fetch(risk))
+    expect!(receipt.fetch("outcome") == "dispatch_ready_pending_attestation", "#{risk} did not route to pending attestation")
+    expect!(receipt.fetch("requested_model") == "gpt-5.6-terra", "#{risk} did not request Terra")
+    expect!(receipt.fetch("requested_reasoning_effort") == effort, "#{risk} effort mapping drifted")
+    expect!(receipt.fetch("served_model") == "unattested", "plan receipt falsely attested the served model")
+    expect!(receipt.fetch("child_output_eligible") == false, "unattested child output became evidence eligible")
+    dispatch = receipt.fetch("dispatch_parameters")
+    expect!(dispatch == {"model" => "gpt-5.6-terra", "reasoning_effort" => effort, "fork_turns" => "none"}, "#{risk} dispatch parameters are not fully explicit")
+    %w[receipt_identity task_or_dispatch_identity role workflow_profile_hash workflow_profile_file_digest trusted_attester_registry_sha256 requested_model served_model requested_reasoning_effort fork_turns capability_evidence outcome].each do |field|
+      expect!(receipt.key?(field) && !receipt[field].nil?, "receipt omitted #{field}")
+    end
+  end
+
+  bounded = invoke!(adapter, root, state_dir, plan_request(risk: "L2", identity: "dispatch-bounded", fork_turns: 3), profile: profiles.fetch("L2"))
+  expect!(bounded.dig("dispatch_parameters", "fork_turns") == 3, "bounded positive fork was not retained")
+
+  unavailable = invoke!(adapter, root, state_dir, plan_request(risk: "L1", identity: "dispatch-unavailable", available: ["gpt-5.6-sol"]), profile: profiles.fetch("L1"))
+  expect!(unavailable.fetch("outcome") == "held_model_unavailable", "Terra absence did not hold")
+  expect!(unavailable["dispatch_parameters"].nil?, "Terra absence still emitted dispatch parameters")
+  expect!(unavailable.fetch("child_output_eligible") == false, "unavailable child output became evidence eligible")
+
+  [
+    plan_request(risk: "L1", identity: "dispatch-sol", model: "gpt-5.6-sol"),
+    plan_request(risk: "L1", identity: "dispatch-effort-drift", effort: "xhigh"),
+    plan_request(risk: "L1", identity: "dispatch-inheritance", fork_turns: "inherit"),
+    plan_request(risk: "L1", identity: "dispatch-full-history", fork_turns: "all")
+  ].each do |bad_request|
+    _receipt, _output, _error, status = invoke(adapter, root, state_dir, bad_request, profile: profiles.fetch("L1"))
+    expect!(!status.success?, "adapter accepted forbidden route #{bad_request.fetch('task_or_dispatch_identity')}")
+  end
+
+  plan = invoke!(adapter, root, state_dir, plan_request(risk: "L3", identity: "dispatch-attestation"), profile: profiles.fetch("L3"))
+  unattested = invoke!(adapter, root, state_dir, finalize_request(plan), profile: profiles.fetch("L3"))
+  expect!(unattested.fetch("outcome") == "held_model_unattested", "missing attestation did not hold")
+  expect!(unattested.fetch("served_model") == "unattested", "missing attestation invented a served model")
+
+  forged_plan = Marshal.load(Marshal.dump(plan))
+  forged_plan["requested_reasoning_effort"] = "low"
+  forged_plan.fetch("dispatch_parameters")["reasoning_effort"] = "low"
+  forged_plan["receipt_identity"] = identity(planned_identity_inputs(forged_plan))
+  forged_attestation = attestation_for(forged_plan, execution: "execution-forged-plan", signing_key: signing_key)
+  _forged_receipt, _forged_output, _forged_error, forged_status = invoke(adapter, root, state_dir, finalize_request(forged_plan, forged_attestation), profile: profiles.fetch("L3"), trust_store: trust_store)
+  expect!(!forged_status.success?, "a forged deterministic planned receipt bypassed route-invariant validation")
+
+  self_report = attestation_for(plan, execution: "execution-self-report", signing_key: signing_key, kind: "child_self_report")
+  self_reported = invoke!(adapter, root, state_dir, finalize_request(plan, self_report), profile: profiles.fetch("L3"), trust_store: trust_store)
+  expect!(self_reported.fetch("outcome") == "held_model_unattested", "child self-report was accepted as independent attestation")
+
+  incomplete = attestation_for(plan, execution: "execution-incomplete", signing_key: signing_key)
+  incomplete.delete("workflow_profile_hash")
+  incomplete_receipt = invoke!(adapter, root, state_dir, finalize_request(plan, incomplete), profile: profiles.fetch("L3"), trust_store: trust_store)
+  expect!(incomplete_receipt.fetch("outcome") == "held_model_unattested", "incomplete attestation did not hold")
+
+  cross_plan = invoke!(adapter, root, state_dir, plan_request(risk: "L3", identity: "dispatch-cross"), profile: profiles.fetch("L3"))
+  cross = invoke!(adapter, root, state_dir, finalize_request(cross_plan, attestation_for(plan, execution: "execution-cross", signing_key: signing_key)), profile: profiles.fetch("L3"), trust_store: trust_store)
+  expect!(cross.fetch("outcome") == "held_model_unattested", "cross-receipt attestation was accepted")
+
+  mismatch = invoke!(adapter, root, state_dir, finalize_request(plan, attestation_for(plan, execution: "execution-mismatch", signing_key: signing_key, served: "gpt-5.6-sol")), profile: profiles.fetch("L3"), trust_store: trust_store)
+  expect!(mismatch.fetch("outcome") == "held_model_mismatch", "served-model mismatch did not hold")
+  expect!(mismatch.fetch("served_model") == "gpt-5.6-sol", "mismatch receipt did not retain the served model")
+  expect!(mismatch.fetch("child_output_eligible") == false, "mismatched child output became evidence eligible")
+
+  invalid_signature = attestation_for(plan, execution: "execution-invalid-signature", signing_key: signing_key)
+  invalid_signature["signature"] = Base64.strict_encode64("not-a-valid-signature")
+  invalid_signature_receipt = invoke!(adapter, root, state_dir, finalize_request(plan, invalid_signature), profile: profiles.fetch("L3"), trust_store: trust_store)
+  expect!(invalid_signature_receipt.fetch("outcome") == "held_model_unattested", "invalid signature was accepted")
+
+  unconfigured_profile = File.join(state_dir, "profile-l3-unconfigured.yml")
+  write_yaml(unconfigured_profile, {
+    "schema_version" => "tw-workflow-profile/1",
+    "risk" => "L3",
+    "profile_hash" => "sha256:profile-l3-unconfigured",
+    "model_routing" => {"attestation" => {"trusted_attester_registry_sha256" => "unconfigured"}}
+  })
+  unconfigured_request = plan_request(risk: "L3", identity: "dispatch-unconfigured")
+  unconfigured_request["workflow_profile_hash"] = "sha256:profile-l3-unconfigured"
+  unconfigured_plan = invoke!(adapter, root, state_dir, unconfigured_request, profile: unconfigured_profile)
+  unconfigured_attestation = attestation_for(unconfigured_plan, execution: "execution-unconfigured", signing_key: signing_key)
+  unconfigured = invoke!(adapter, root, state_dir, finalize_request(unconfigured_plan, unconfigured_attestation), profile: unconfigured_profile, trust_store: trust_store)
+  expect!(unconfigured.fetch("outcome") == "held_model_unattested", "an unconfigured frozen trust registry accepted attestation")
+
+  alternate_key = OpenSSL::PKey::RSA.generate(2048)
+  alternate_trust_store = File.join(state_dir, "alternate-trusted-attesters.yml")
+  write_yaml(alternate_trust_store, {
+    "schema_version" => "tw-native-child-attester-trust/1",
+    "attesters" => [{
+      "immutable_attester_identity" => "fixture-host-attester",
+      "attester_kind" => "host_runtime",
+      "signature_algorithm" => "rsa-sha256",
+      "public_key_pem" => alternate_key.public_key.to_pem
+    }]
+  })
+  wrong_trust_attestation = attestation_for(plan, execution: "execution-wrong-trust", signing_key: alternate_key)
+  wrong_trust = invoke!(adapter, root, state_dir, finalize_request(plan, wrong_trust_attestation), profile: profiles.fetch("L3"), trust_store: alternate_trust_store)
+  expect!(wrong_trust.fetch("outcome") == "held_model_unattested", "trust store outside the frozen profile was accepted")
+
+  valid_attestation = attestation_for(plan, execution: "execution-valid", signing_key: signing_key)
+  valid = invoke!(adapter, root, state_dir, finalize_request(plan, valid_attestation), profile: profiles.fetch("L3"), trust_store: trust_store)
+  expect!(valid.fetch("outcome") == "attested_model_match", "valid independent Terra attestation did not pass")
+  expect!(valid.fetch("served_model") == "gpt-5.6-terra", "valid receipt did not attest Terra")
+  expect!(valid.fetch("child_output_eligible") == true, "attested matching child output remained ineligible")
+  expect!(valid.fetch("attester_identity") == "fixture-host-attester", "valid receipt omitted attester identity")
+  expect!(valid.fetch("execution_or_request_identity") == "execution-valid", "valid receipt omitted execution identity")
+
+  replay_plan = invoke!(adapter, root, state_dir, plan_request(risk: "L3", identity: "dispatch-replay"), profile: profiles.fetch("L3"))
+  replay_attestation = attestation_for(replay_plan, execution: "execution-valid", signing_key: signing_key)
+  replay = invoke!(adapter, root, state_dir, finalize_request(replay_plan, replay_attestation), profile: profiles.fetch("L3"), trust_store: trust_store)
+  expect!(replay.fetch("outcome") == "held_model_unattested", "execution-attestation replay was accepted")
+end
+
+workflow = File.read(File.join(root, ".github/workflows/smoke-tests.yml"))
+expect!(workflow.include?("scripts/traceweaver-smoke-terra-routing"), "CI does not reject forbidden TraceWeaver child routes")
+
+puts "terra-routing: PASS"
+RUBY
