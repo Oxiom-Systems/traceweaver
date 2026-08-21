@@ -9,9 +9,9 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `d638426e40f688891559b50c1107f1e80ba9731e07b6e591aa9d94244300f78b` |
-| `requirements.md` | `9424d947d672a1cc41729e7ed68e0b497b708aa46cd8b439c38500db2ed2e4df` |
-| `.traceweaver/intent-contract.yml` | `4b128c2e72321eeecbff167bb43e60231125ab2e3253ec8b55d28aa01bcf619b` |
+| `traceability-matrix.md` | `0b779b09b6c6c85425db7f06cabb23ef44406c2b1004c53fe0a6412c68ca2cee` |
+| `requirements.md` | `d29db66e16767121ccb262a5e0c7f46feccd04a2d41bbbda6109b6d0bd7abf82` |
+| `.traceweaver/intent-contract.yml` | `c24580bd3752019fe270e988ab4dcb3c5a9740f8023fc577e60e4c4cba9d6476` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md` | `c7406e067ddd994077a72fdfdc8dbcb2f9f2dcaec229d170935a540e74637b62` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md` | `6a83c1136739926d7c8cbcb3a45ce41c003683d11468c081c4cef802c3b128ab` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
@@ -26,7 +26,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | result records | 40 |
 | verification records | 86 |
 | validation records | 35 |
-| code anchor records | 291 |
+| code anchor records | 321 |
 | structured acceptance results | 3 |
 | structured acceptance coverage | 90 |
 | structured acceptance missing requirements | 87 |
@@ -53,7 +53,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Trace | Requirements | Artifact | Verification | Validation | Status |
 | --- | --- | --- | --- | --- | --- |
-| TRACE-TW-067 | REQ-TW-037; REQ-TW-056; REQ-TW-057 | ART-TW-072 planning-authority record only; RESULT-TW-042 remains not executed; series l... | VER-TW-087 | VAL-TW-035 | Formally accepted planning authority only; zero retained blockers; verification not executed |
+| TRACE-TW-067 | REQ-TW-037; REQ-TW-056; REQ-TW-057 | ART-TW-072; RESULT-TW-042; controller, router, wrappers, canonical/mirror references, t... | VER-TW-087 local pass | VAL-TW-035 held | Implementation, deterministic verification, and bounded code review passed locally |
 | TRACE-TW-066 | REQ-TW-088 | Not implemented; no new ART/ATP/RESULT allocated by this authority-only patch | VER-TW-086 | VAL-TW-034 | Formally accepted planning authority only; verification not executed |
 | TRACE-TW-065 | REQ-TW-060 | Not implemented; no new ART/ATP/RESULT allocated by this authority-only patch | VER-TW-085 | VAL-TW-033 | Formally accepted planning authority only; verification not executed |
 | TRACE-TW-064 | REQ-TW-089; REQ-TW-090 | ART-TW-071 | VER-TW-084 | VAL-TW-032 | Static/advisory implementation complete for optional enrichment only; historical focused/regressi... |
@@ -70,7 +70,6 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Trace | Requirements | Status | Next Step / Debt |
 | --- | --- | --- | --- |
-| TRACE-TW-067 | REQ-TW-037; REQ-TW-056; REQ-TW-057 | Formally accepted planning authority only; zero retained blockers; verification not executed | Implement the ledger/controller, canonical protocol-path correction, duplicate policy-source correction, and deterministic tran... |
 | TRACE-TW-066 | REQ-TW-088 | Formally accepted planning authority only; verification not executed | `tw-graph`, wrapper lifecycle integration, projection/schema/manifest, CI, host hooks, runtime, publication, and Graphify coupl... |
 | TRACE-TW-065 | REQ-TW-060 | Formally accepted planning authority only; verification not executed | Routing adapter, route/profile mutation, fixtures, CI, host configuration, runtime enforcement, attested service, publication, ... |
 | TRACE-TW-064 | REQ-TW-089; REQ-TW-090 | Static/advisory implementation complete for optional enrichment only; historical focused/regression verific... | Live-host invocation, runtime enforcement, automatic semantic extraction, provider-key use, global graph mutation, general prod... |
@@ -82,6 +81,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | TRACE-TW-058 | REQ-TW-077 | Requirements-quality review and scoped doc review passed 2026-07-22; skill, validator, fixtures, example ca... | Install/discovery-smoke enumeration updated in Unit 4; packaged-skill install claim and capsule-handoff runtime behavior held |
 | TRACE-TW-057 | REQ-TW-076 | Requirements-quality review and scoped doc review passed 2026-07-22; static/advisory implementation added; ... | Requirement remains candidate_for_review pending baseline amendment; phase-gating claim on `tw-work` is REQ-TW-078 scope; runti... |
 | TRACE-TW-056 | REQ-TW-070; REQ-TW-071; REQ-TW-072; REQ-TW-073; REQ-TW-074; REQ-TW-075 | Owner approved promotion 2026-06-12; verify, distilled-coverage, and full local smoke suite pass; scoped do... | Lifecycle-orchestrator domain remains private-only by owner decision 2026-06-12; validation-closure backlog on the pre-existing... |
+| TRACE-TW-055 | REQ-TW-069; REQ-TW-010; REQ-TW-050; REQ-TW-061 | Requirements review passed; scoped doc review passed; static wrapper update added; deterministic smoke pass... | Keep broad real-document runtime behavior, publication, release/package/upstream readiness, clean replacement, and autonomous p... |
 
 ## Structured Acceptance Results
 
@@ -120,7 +120,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Validation | Source Need | Result | Evidence |
 | --- | --- | --- | --- |
-| VAL-TW-035 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Allocated / held pending implementation and owner validation | Future reviewed V&V definition, deterministic cross-wrapper transcripts, immutable series receipts, canonic... |
+| VAL-TW-035 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Held pending installed-host dogfood and owner observation; deterministic implementation prerequis... | `docs/validation/traceweaver-2026-08-21-review-series-convergence-validation-definition.md`; future owner-o... |
 | VAL-TW-034 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Allocated / held pending implementation | Future reviewed V&V definition, deterministic projection fixtures, wrapper lifecycle receipts, and PR workf... |
 | VAL-TW-033 | NEED-TW-001; NEED-TW-002; NEED-TW-004; NEED-TW-005; NEED-TW-007; NE... | Allocated / held pending implementation and attestation | Future reviewed V&V definition, route fixtures, CI evidence, and independent host/execution receipts |
 | VAL-TW-032 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Passed - owner accepted representative scenario and authorized exact 0.3.1 release 2026-07-23 | `docs/validation/traceweaver-graphify-wrapper-validation-definition.md`; `docs/validation/traceweaver-graph... |

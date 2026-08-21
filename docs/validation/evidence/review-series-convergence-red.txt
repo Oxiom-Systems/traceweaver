@@ -1,0 +1,17 @@
+record_type=traceweaver_expected_failing_verification_evidence
+date=2026-08-21
+requirements=REQ-TW-037,REQ-TW-056,REQ-TW-057
+trace_id=TRACE-TW-067
+verification_id=VER-TW-087
+acceptance_test_id=ATP-TW-042
+result_id=RESULT-TW-042
+authority_gate=TW-AUTH-GATE-2026-08-21-REQ-TW-037-056-057-CONVERGENCE-IMPLEMENTATION-001
+tested_ref=codex/convergence-controller-v040 based on origin/main 22e0a21e20a67dd37448aee4381df5e6882868bd before controller implementation
+environment=macOS local repository shell; deterministic Ruby/Bash harness
+procedure=scripts/traceweaver-smoke-review-series-convergence
+expected_result=fail before implementation because the repository-owned persistent review-series controller does not exist
+actual_result=review-series-convergence: missing executable controller at the worktree-local tw-auto scripts path
+exit_status=1
+outcome=fail_expected_red
+handoff=tw-work may implement only the authorized convergence controller, protocol resolution, policy consolidation, wrapper integration, and deterministic fixtures after the V&V capsule review passes
+holds=Terra-routing,tw-graph,Graphify,semantic-HTML,integrated-validation,release-automation,staging,publication,release

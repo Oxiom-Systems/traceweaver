@@ -3,6 +3,7 @@ set -euo pipefail
 
 # TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-052; trace=TRACE-TW-037; ver=VER-TW-047
 # TRACEWEAVER: verifies=VER-TW-047; req=REQ-TW-052; trace=TRACE-TW-037
+# TRACEWEAVER: verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
 # TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-049; trace=TRACE-TW-031; ver=VER-TW-040
 # TRACEWEAVER: verifies=VER-TW-040; req=REQ-TW-049; trace=TRACE-TW-031
 # TRACEWEAVER: file-role=skill-behavior-smoke; req=REQ-TW-056; trace=TRACE-TW-042; ver=VER-TW-054
@@ -321,8 +322,8 @@ assert_contains "$tw_auto" "CTA-UNRESOLVED-ANCHOR-MAPPING" "tw_auto_unresolved_m
 assert_contains "$tw_auto" "Review-Staging Closure Loop" "tw_auto_review_staging_closure_loop_section"
 assert_contains "$tw_auto" "Artifact-identity blockers" "tw_auto_detects_split_review_identity"
 assert_contains "$tw_auto" "exact scoped file list" "tw_auto_exact_review_stage_scope"
-assert_contains "$tw_auto" "records the clean review once" "tw_auto_records_clean_review_once"
-assert_contains "$tw_auto" "housekeeping-only" "tw_auto_housekeeping_repair_once"
+assert_contains "$tw_auto" "records an accepted review once" "tw_auto_records_accepted_review_once"
+assert_contains "$tw_auto" "Post-acceptance bookkeeping" "tw_auto_bookkeeping_closes_without_repair"
 assert_contains "$tw_auto" "must not review-stage around real blockers" "tw_auto_real_blockers_not_staged_around"
 assert_contains "$tw_auto" "Post-Work Review Closure" "tw_auto_post_work_review_closure_section"
 assert_contains "$tw_auto" "successful \`tw-work\` return as a transition" "tw_auto_treats_tw_work_as_transition"

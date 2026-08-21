@@ -1,19 +1,24 @@
 profile: L2
 review_identity:
-  baseline_hash: sha256:baseline-l2
-  profile_hash: sha256:profile-l2
-  changed_file_digest: sha256:changed-l2
+  semantic_authority_digest: sha256:semantic-authority-l2
+  behavior_digest: sha256:behavior-l2
   verification_digest: sha256:verification-l2
+  policy_epoch: tw-review-policy/2026-08-21
+audit_metadata:
+  requirements_baseline_hash: sha256:requirements-l2
+  workflow_profile_hash: sha256:profile-l2
+  frozen_scope_identity: sha256:scope-l2
+bookkeeping:
+  bookkeeping_digest: sha256:bookkeeping-l2
 fanout:
-  active_reviewers: [independent, interface_specialist]
-  personas: [routine_independent, interface_specialist]
-  specialist_triggered: true
-  specialist_profile_control: cross_module_interface
+  active_reviewers: [independent]
+  personas: [routine_independent]
+  specialist_triggered: false
   validator_triggered: false
 finding:
   severity: P1
   route: repair_then_rerun_scoped_review
-repair_cycles: 2
+repair_cycles: 1
 repair_outcome: held_no_progress
 terminal_receipt:
   facts:

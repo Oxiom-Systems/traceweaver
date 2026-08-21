@@ -10,6 +10,7 @@ argument-hint: "[approved task or plan path]"
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-065; trace=TRACE-TW-048; ver=VER-TW-061 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-078; trace=TRACE-TW-059; ver=VER-TW-079 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-066; trace=TRACE-TW-050; ver=VER-TW-063 -->
+<!-- TRACEWEAVER: file-role=review-series-repair-wrapper; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087 -->
 <!-- TRACEWEAVER: file-role=optional-graphify-work-refresh-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
 <!-- TRACEWEAVER: entrypoint=graphify_post_verification_refresh; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
@@ -27,6 +28,23 @@ V&V-definition/preflight/no-publication handoff back to `tw-auto`.
 Use `tw-work` for behavior-bearing code, scripts, skill instructions, fixtures,
 smokes, manifests, runtime harnesses, and validation artifacts. Do not use it to
 approve or rewrite requirements.
+
+## Review-Series Repair Contract
+
+When work belongs to a review series, resolve the packaged sibling
+`tw-auto/references/scoped-review-protocol.md` and resume the supplied
+generation through `tw-auto/scripts/traceweaver-review-series`. Preserve the
+frozen scope, series, current repair-verification attempt, ledger digest,
+eligible blocker set, evidence history, four semantic identity inputs, audit
+metadata, and remaining budget. Record this `tw-work` call as a distinct
+dispatch under the current attempt.
+
+Repair only retained in-scope blockers and genuine in-scope repair regressions.
+Never open discovery, reset the budget, widen scope, or turn non-blocking
+wording/style debt into another cycle. One routine repair-and-rerun is
+available. One final cycle requires the controller's owner- or approved
+change-control-authority receipt bound to the series, retained fingerprint,
+severity/context, authorization reason, and final-cycle limit.
 
 ## Required Inputs
 
@@ -382,8 +400,10 @@ user command after work.
 
 When work is ready for review, return the highest-level next wrapper:
 `/tw-code-review ...` for changed code-like files, scoped `/tw-doc-review ...`
-for authority/status/hash changes, or return control to `/tw-auto ...` when the
-automation loop should continue. Recommend standalone lower gates only for an
+only for normative semantic-authority changes, or return control to `/tw-auto ...`
+when the automation loop should continue. Status/hash/receipt/projection
+bookkeeping uses the deterministic post-acceptance `mechanical_closure` route
+and dispatches no reviewer. Recommend standalone lower gates only for an
 explicit diagnostic, audit, baseline-authority review, or a human-decision pause
 where no higher wrapper can proceed.
 

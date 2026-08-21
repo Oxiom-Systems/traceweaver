@@ -1,9 +1,45 @@
+# TRACEWEAVER: file-role=review-series-terminal-receipt-template; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087
 schema_version: tw-terminal-receipt/1
+review_series:
+  series_generation_id: "<RS-GEN-ID>"
+  predecessor_series_identity: null
+  series_identity: "sha256:<series-identity>"
+  frozen_scope_identity: "sha256:<frozen-scope-identity>"
+  policy_epoch: tw-review-policy/2026-08-21
+  canonical_protocol:
+    path: plugins/traceweaver-core/references/scoped-review-protocol.md
+    version: tw-scoped-review-protocol/1
+    digest: "sha256:<canonical-protocol>"
+  stage: discovery
+  attempt_identity: "sha256:<attempt-identity>"
+  dispatch_identities: []
+  ledger_digest: "sha256:<durable-ledger>"
+  routine_repair_cycle_limit: 1
+  repair_cycle_limit: 1
+  remaining_repair_cycles: 1
+  severe_blocker_exception: null
 review_identity:
-  baseline_hash: "sha256:<approved-baseline>"
-  profile_hash: "sha256:<frozen-profile>"
-  changed_file_digest: "sha256:<reviewed-behavior-and-authority-files>"
-  verification_digest: "sha256:<verification-evidence>"
+  semantic_authority_digest: "sha256:<applicable-authority-semantics>"
+  behavior_digest: "sha256:<reviewed-behavior-and-linked-tests>"
+  verification_digest: "sha256:<verification-method-target-outcome>"
+  policy_epoch: tw-review-policy/2026-08-21
+audit_metadata:
+  requirements_baseline_hash: "sha256:<requirements-baseline>"
+  workflow_profile_hash: "sha256:<workflow-profile>"
+  protocol_file_digest: "sha256:<raw-protocol-file>"
+  head: "<git-head>"
+  branch: "<git-branch>"
+  git_index_digest: "sha256:<git-index>"
+mechanical_closure:
+  changes: []
+  reviewer_dispatch_count: 0
+findings:
+  unresolved_blocking_fingerprints: []
+  nonblocking_debt_fingerprints: []
+  relevant_evidence_digest: "sha256:<relevant-evidence>"
+review_terminal_outcome: held
+authority_acceptance_state: held_authority_acceptance
+authority_acceptance_receipt: null
 facts:
   implemented: { state: held, evidence_refs: [] }
   verified: { state: held, evidence_refs: [] }

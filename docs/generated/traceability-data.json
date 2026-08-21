@@ -6,15 +6,15 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "d638426e40f688891559b50c1107f1e80ba9731e07b6e591aa9d94244300f78b"
+      "sha256": "0b779b09b6c6c85425db7f06cabb23ef44406c2b1004c53fe0a6412c68ca2cee"
     },
     {
       "path": "requirements.md",
-      "sha256": "9424d947d672a1cc41729e7ed68e0b497b708aa46cd8b439c38500db2ed2e4df"
+      "sha256": "d29db66e16767121ccb262a5e0c7f46feccd04a2d41bbbda6109b6d0bd7abf82"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "4b128c2e72321eeecbff167bb43e60231125ab2e3253ec8b55d28aa01bcf619b"
+      "sha256": "c24580bd3752019fe270e988ab4dcb3c5a9740f8023fc577e60e4c4cba9d6476"
     },
     {
       "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md",
@@ -36,7 +36,7 @@
     "result_records": 40,
     "verification_records": 86,
     "validation_records": 35,
-    "code_anchor_records": 291,
+    "code_anchor_records": 321,
     "structured_acceptance_results": 3,
     "structured_acceptance_coverage": 90,
     "structured_acceptance_missing_requirements": 87,
@@ -569,12 +569,12 @@
     {
       "id": "REQ-TW-037",
       "type": "Automation",
-      "summary": "TraceWeaver-controlled review and repair must persist one collision-free authorized series generation across command, run, and session re-entry; allow one discovery stage plus at most two one-charge repair-verification cycles; give every child call a distinct dispatch identity mapped to its cycle attempt; preserve blocking-finding fingerprints/dispositions, evidence, budget, protocol identity, and terminal receipts; reuse only an exact complete-frozen-scope/protocol/evidence-bound accepted review; and apply scope-expansion, saturation, no-progress, and separate authority-acceptance outcomes in deterministic order.",
+      "summary": "TraceWeaver-controlled review and repair persists one collision-free authorized series generation across command, run, session, branch, wrapper, and publication-preparation re-entry. Accepted-review identity uses exactly semantic-authority, behavior, verification, and policy-epoch digests; raw hashes and process coordinates are audit metadata. A routine series permits one discovery plus one repair-verification cycle; one final severe-blocker cycle requires an externally authorized, fully bound exception receipt. Unchanged accepted meaning and post-acceptance bookkeeping use zero reviewers, while retained findings and genuine repair regressions are the only repair-verification scope.",
       "source_need": "NEED-TW-003; NEED-TW-005",
-      "verification_method": "Authority inspection; VER-TW-087 future deterministic transition fixtures",
+      "verification_method": "Authority inspection; VER-TW-087 deterministic transition fixtures",
       "validation_path": "VAL-TW-035",
       "owner": "Oxiom Systems",
-      "status": "Formally accepted 2026-08-20 as planning authority only / implementation and runtime held",
+      "status": "Formally accepted 2026-08-21 / bounded static controller and fixtures implemented / VER-TW-087 local execution passed / active-host runtime and VAL-TW-035 held",
       "trace_ids": [
         "TRACE-TW-009",
         "TRACE-TW-030",
@@ -921,12 +921,12 @@
     {
       "id": "REQ-TW-056",
       "type": "Auto Closure Loop",
-      "summary": "`tw-auto` must create or resume the applicable REQ-TW-037 series generation before review-bearing child dispatch; open and charge each logical repair-verification cycle once; pass generation, series, cycle-attempt, child-dispatch, protocol, ledger, blocker, reuse, and budget fields through `tw-doc-review` and `tw-work`; repair every eligible in-scope blocking finding under REQ-TW-040; and stop under deterministic terminal precedence without reset, overcharge, stale reuse, scope widening, or authority acceptance by implication.",
+      "summary": "`tw-auto` creates or resumes the applicable REQ-TW-037 series before review routing, carries generation/series/attempt/dispatch/ledger/blocker/budget and semantic identity state through `tw-doc-review`, `tw-code-review`, and `tw-work`, routes zero or one reviewer by meaning, charges the routine repair cycle once, and stops under deterministic terminal precedence without reset, rediscovery, stale reuse, widening, publication, or implied authority acceptance.",
       "source_need": "NEED-TW-001; NEED-TW-003; NEED-TW-004; NEED-TW-005; NEED-TW-008",
-      "verification_method": "Existing closure-loop proof plus VER-TW-087 future deterministic cross-wrapper fixtures",
+      "verification_method": "Existing closure-loop proof plus VER-TW-087 deterministic cross-wrapper fixtures",
       "validation_path": "VAL-TW-035",
       "owner": "Oxiom Systems",
-      "status": "Formally accepted 2026-08-20 as planning authority only / ledger, controller, fixtures, runtime, and publication held",
+      "status": "Formally accepted 2026-08-21 / bounded static wrapper handoff and controller implemented / VER-TW-087 local execution passed / active-host runtime, VAL-TW-035, and publication held",
       "trace_ids": [
         "TRACE-TW-030",
         "TRACE-TW-031",
@@ -947,12 +947,12 @@
     {
       "id": "REQ-TW-057",
       "type": "Operating Modes",
-      "summary": "Existing authority-baseline, implementation-gate, review-staging, and publication modes remain; review routing additionally distinguishes one authorized `discovery` stage from at most two `repair_verification` cycles, assigns one attempt identity per cycle and distinct dispatch identities per call, requires direct `tw-doc-review` and `tw-work` re-entry to resume the exact series generation, preserves generation/series/attempt/protocol/budget state in review staging, and resolves one registered canonical review protocol by path/version/digest with deterministic packaged-mirror parity.",
+      "summary": "Existing authority-baseline, implementation-gate, review-staging, and publication modes remain. Review-bearing wrappers resolve one logical registered protocol and explicit policy epoch, verify canonical/packaged mirror parity, persist one discovery plus one routine repair cycle and any externally authorized final severe exception, and keep physical paths/digests as audit metadata rather than review identity.",
       "source_need": "NEED-TW-001; NEED-TW-003; NEED-TW-004; NEED-TW-005; NEED-TW-008",
-      "verification_method": "Existing operating-mode proof plus VER-TW-087 future cross-wrapper and protocol-parity fixtures",
+      "verification_method": "Existing operating-mode proof plus VER-TW-087 cross-wrapper and protocol-parity fixtures",
       "validation_path": "VAL-TW-035",
       "owner": "Oxiom Systems",
-      "status": "Formally accepted 2026-08-20 as planning authority only / protocol correction, policy deduplication, fixtures, runtime, and publication held",
+      "status": "Formally accepted 2026-08-21 / protocol resolution, policy consolidation, wrapper contracts, and fixtures implemented / VER-TW-087 local execution passed / active-host runtime, VAL-TW-035, and publication held",
       "trace_ids": [
         "TRACE-TW-032",
         "TRACE-TW-034",
@@ -2135,11 +2135,11 @@
       "owner": "Oxiom Systems",
       "needs": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
       "requirements": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
-      "artifact": "ART-TW-072 planning-authority record only; RESULT-TW-042 remains not executed; series ledger/controller, protocol-path correction, policy deduplication, fixtures, derived views, and snapshot implementation remain held",
-      "verification": "VER-TW-087",
-      "validation": "VAL-TW-035",
-      "status": "Formally accepted planning authority only; zero retained blockers; verification not executed",
-      "next_step": "Implement the ledger/controller, canonical protocol-path correction, duplicate policy-source correction, and deterministic transition/parity fixtures only under separate authority; all runtime and publication claims remain held"
+      "artifact": "ART-TW-072; RESULT-TW-042; controller, router, wrappers, canonical/mirror references, transition fixtures, CI step",
+      "verification": "VER-TW-087 local pass",
+      "validation": "VAL-TW-035 held",
+      "status": "Implementation, deterministic verification, and bounded code review passed locally",
+      "next_step": "Prepare an exact convergence-only review-staging/publication capsule without starting later pillars"
     }
   ],
   "atp_entries": [
@@ -2488,11 +2488,11 @@
     {
       "ID": "ATP-TW-042",
       "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
-      "Procedure / Scenario": "Run a deterministic cross-wrapper transition suite over direct and `tw-auto`-mediated `tw-doc-review`/`tw-work` invocations: create and terminate one series, then authorize another with identical frozen scope; execute one discovery plus at most two repair-verification cycles; place `tw-work`, multiple child reviewers, and `tw-doc-review` verification inside one cycle; exit and re-enter by command, run, and session; repeat a fingerprint with wording-only changes; exercise blocking P2 and non-blocking P2/P3 states; provide unchanged evidence and a repeated blocker; close all blockers on the final allowed cycle; change each frozen scope field including a concern or governing-rule-set-only change and protocol path/version/digest; reuse an exact accepted review and vary each identity input; retain pending formal authority acceptance; introduce a genuine in-scope repair regression; and resolve a canonical protocol plus required packaged mirror.",
-      "Setup / Context": "Future reviewed series schema/ledger/controller, wrapper integration, canonical protocol registry/path correction, duplicate policy-source correction, deterministic transcript fixtures, and immutable receipts; none exists under this authority-only patch",
-      "Expected Result": "Same-scope generations receive distinct series identities with predecessor links; exactly one discovery and at most two repair-verification cycles occur across re-entry; a multi-dispatch cycle consumes one budget unit while dispatch identities remain distinct; identities, fingerprints, dispositions, and budget persist; blocking P2 is eligible and prevents saturation while only non-blocking P2/P3 debt avoids a cycle; unchanged evidence/repeated blockers/non-monotonic progress or exhausted budget with blockers remaining terminate `held_no_progress`; final-cycle blocker closure terminates `candidate_review_saturated`; every frozen-scope change, including a concern-only or protocol-identity change, terminates `held_scope_expansion`; exact accepted-review reuse dispatches zero reviewers and any identity-input change, including a concern-only change through `frozen_scope_identity`, invalidates reuse; pending formal acceptance separately records `held_authority_acceptance`; a genuine in-scope regression may be eligible but never resets the cap; canonical and packaged protocol content pass parity.",
+      "Procedure / Scenario": "Run deterministic cross-wrapper transitions that create and resume a persistent series; prove same-session and cross-session accepted-review reuse; attempt bookkeeping both before and after a matching accepted review exists; vary branch, HEAD, index, command, wrapper, dispatch, status, receipt, projection, generated-view, Graphify, installation, unrelated baseline/profile metadata, protocol wording/path, and publication preparation without semantic changes; vary each of semantic_authority_digest, behavior_digest, verification_digest, and policy_epoch; execute discovery plus one routine repair-verification cycle; request a second cycle with no authority, self-authority, and an owner- or approved change-control-authority decision receipt bound to the series, retained finding fingerprint, P0/P1/blocking-P2 severity and context, authorization reason, and final-cycle limit; repeat finding wording; add a genuine in-scope repair regression; and resolve the canonical protocol plus required packaged mirror.",
+      "Setup / Context": "Future reviewed ledger/controller, wrapper integration, canonical protocol resolver, consolidated policy source, deterministic transcript fixtures, and immutable receipts",
+      "Expected Result": "Exact four-field semantic identity reuse and post-acceptance bookkeeping closure dispatch zero reviewers; bookkeeping before a matching accepted review requires review; authority change dispatches one document reviewer; behavior or meaningful verification change dispatches one code reviewer; raw/audit-only changes dispatch zero reviewers; one routine repair cycle is charged once; a second cycle is refused without the authorized complete severe-exception receipt and allowed once with it; only retained findings and genuine regressions re-enter; blockers terminate held_no_progress when progress or budget fails; policy/envelope expansion terminates held_scope_expansion; zero blockers terminate candidate_review_saturated while authority acceptance remains separate; protocol mirror parity passes.",
       "Owner": "Oxiom Systems",
-      "Status": "Allocated only, not executed; implementation, fixtures, routing, hooks, CI, runtime, cutover, publication, and accepted review identity held"
+      "Status": "Accepted procedure definition; not executed. Implementation, CI, active-host runtime, publication, and release remain held."
     }
   ],
   "result_records": [
@@ -2851,10 +2851,10 @@
       "ID": "RESULT-TW-042",
       "Requirement / Need": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
       "ATP / Method": "ATP-TW-042",
-      "Tested Ref / Context": "Review-series convergence authority-baseline definition and future deterministic transition suite",
-      "Evidence Artifact": "`requirements.md`; `.traceweaver/intent-contract.yml`; `traceability-matrix.md`; `docs/validation/traceweaver-2026-08-13-review-series-convergence-requirements-review.md`",
-      "Result": "Allocated, not executed. The candidate wording now repairs generation collision, cycle/dispatch accounting and terminal precedence, blocking-P2 routing, and complete-frozen-scope/protocol/evidence-bound reuse, but no ledger/controller, wrapper transition, canonical protocol-path correction, duplicate policy-source correction, fixture result, runtime behavior, or accepted review identity exists.",
-      "Date / Session": "2026-08-13"
+      "Tested Ref / Context": "2026-08-21 RED-before-implementation plus deterministic GREEN transition suite",
+      "Evidence Artifact": "`docs/validation/evidence/review-series-convergence-red.txt`; `scripts/traceweaver-smoke-review-series-convergence`; `docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md`; `docs/validation/traceweaver-2026-08-21-review-series-convergence-code-review.md`; controller/router/wrapper/protocol/policy/profile/receipt paths and CI step",
+      "Result": "Passed locally. Exact semantic identity, audit-only raw pins, zero-review reuse/mechanical closure, correct authority/behavior routing, one routine cycle, complete externally authorized severe exception, self/mismatched authorization rejection, retained-finding/regression-only scope, durable locked state, terminal precedence, protocol parity, regression smokes, and bounded code review passed. VAL-TW-035 remains open.",
+      "Date / Session": "2026-08-21"
     }
   ],
   "verification_evidence": [
@@ -3796,13 +3796,13 @@
     {
       "ID": "VER-TW-087",
       "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
-      "Method": "Allocated deterministic persistent review-series transition and protocol-parity verification",
-      "Procedure / Command": "Execute ATP-TW-042 across direct and `tw-auto`-mediated `tw-doc-review`/`tw-work` calls; assert collision-free authorized generation and predecessor linkage, one discovery plus no more than two one-charge repair-verification cycles, and distinct child dispatch identities mapped to each cycle attempt; persist and compare frozen scope and protocol identity, generation/series/attempt/dispatch identities, ledger digests, fingerprints, blocking dispositions, evidence deltas, unresolved-blocker counts, budget, accepted-review identity inputs, terminal outcome, and authority-acceptance state; exercise blocking P2 versus non-blocking P2/P3, exact complete-frozen-scope-bound accepted-review zero-dispatch reuse and concern-only/per-field invalidation, final-cycle blocker closure precedence, genuine in-scope repair regression, `held_no_progress`, `held_scope_expansion`, `candidate_review_saturated`, and concurrent `held_authority_acceptance`; compare the registered canonical protocol with every required packaged mirror.",
-      "Tested Ref": "Future reviewed ledger/controller, wrapper resolver/handoffs, protocol registry and path correction, duplicate policy-source correction, deterministic transcript fixtures, and immutable receipts",
-      "Result": "Allocated only, not executed. The formal authority acceptance does not verify runtime convergence, wrapper persistence, or protocol parity.",
-      "Evidence Path": "`requirements.md`; `.traceweaver/intent-contract.yml`; `traceability-matrix.md`; historical 2026-08-13 review; 2026-08-20 formal-acceptance receipt; future V&V definition and evidence",
-      "Date / Session": "2026-08-20",
-      "Notes": "Requirements-definition verification allocated; not executed. Ledger/controller, protocol correction, policy deduplication, fixtures, routing, hooks, CI, runtime, cutover, publication, and runtime accepted-review reuse remain held. The documentary review identity in the formal acceptance receipt is not VER-TW-087 execution evidence."
+      "Method": "Deterministic persistent review-series semantic-routing and convergence verification",
+      "Procedure / Command": "Execute revised ATP-TW-042 across direct and `tw-auto`-mediated wrappers; assert exact four-field accepted-review identity, audit-only raw pins, zero-review accepted reuse, bookkeeping review-required before acceptance and mechanical closure after acceptance, one document or code reviewer for genuine changes, one routine repair-verification cycle, complete externally authorized severe exception for a second final cycle, rejection of incomplete/self/mismatched authorization, retained-finding/regression-only verification, durable locked generation/attempt/dispatch/fingerprint/evidence/budget state, terminal precedence, atomic accepted-review bookkeeping, canonical protocol resolution, and packaged-mirror parity.",
+      "Tested Ref": "Bounded convergence controller, wrapper handoffs, protocol resolver, consolidated policy, fixtures, CI invocation, and immutable receipts",
+      "Result": "Passed locally: convergence, scoped-review, workflow-profile, no-publication, and runtime-disabled wrapper smokes all green; canonical/mirror parity, syntax, code anchors, generated-view drift, and traceability checks are recorded in the dated receipt. This is static/local implementation proof, not active-host or owner validation.",
+      "Evidence Path": "`docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md`; `scripts/traceweaver-smoke-review-series-convergence`; `docs/validation/evidence/review-series-convergence-red.txt`",
+      "Date / Session": "2026-08-21",
+      "Notes": "Active-host runtime, VAL-TW-035, staging, publication, Terra, graph, HTML, release, and deploy remain held."
     }
   ],
   "validation_evidence": [
@@ -4183,16 +4183,256 @@
     {
       "ID": "VAL-TW-035",
       "Source Need": "NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008",
-      "Scenario / Intended Use": "An owner starts with one scoped document review, applies no more than two eligible blocker-repair cycles through direct or `tw-auto`-mediated wrappers, leaves and resumes the workflow, and reaches a truthful terminal state without identity collision, rediscovery, budget reset, dispatch overcharge, or stale review reuse.",
+      "Scenario / Intended Use": "An owner starts one scoped review, leaves and resumes across commands, sessions, branches, wrappers, and publication preparation, records accepted review, applies bookkeeping, and—only if a blocker exists—uses one routine repair-verification cycle or one explicitly authorized severe exception.",
       "Stakeholder / Representative": "Oxiom Systems, independent of the implementation agent",
-      "Acceptance Signal": "The owner sees immutable generation/predecessor linkage, the same frozen scope and protocol identity, one attempt per logical cycle, separate child dispatch identities, finding fingerprints/blocking dispositions, remaining cycle budget, and complete frozen-scope-bound accepted-review identity inputs across re-entry; blockers decrease monotonically or the series stops `held_no_progress`; changed scope stops `held_scope_expansion`; exact accepted review dispatches no reviewer; blocking P2 prevents saturation while only non-blocking P2/P3 debt avoids reopening a cycle; final-cycle blocker closure and zero unresolved blockers yield `candidate_review_saturated`; and pending formal acceptance remains visible as `held_authority_acceptance` rather than being misreported as accepted or publishable.",
-      "Evidence Path": "Future reviewed V&V definition, deterministic cross-wrapper transcripts, immutable series receipts, canonical protocol parity evidence, and an owner-observed representative review series",
-      "Result": "Allocated / held pending implementation and owner validation",
+      "Acceptance Signal": "Unchanged accepted meaning and post-acceptance bookkeeping use zero reviewers while bookkeeping without a matching accepted review still requires review; applicable authority or behavior changes route once; repair verification revisits only retained findings and genuine regressions; non-blocking wording/style debt does not start a cycle; the routine series closes after one repair or stops held_no_progress; any second cycle visibly cites a complete external authority receipt; no series exceeds the absolute two-cycle cap; pending formal acceptance is never presented as publication authority.",
+      "Evidence Path": "`docs/validation/traceweaver-2026-08-21-review-series-convergence-validation-definition.md`; future owner-observed installed-host transcript",
+      "Result": "Held pending installed-host dogfood and owner observation; deterministic implementation prerequisite VER-TW-087 passed locally",
       "Owner": "Oxiom Systems",
-      "Deferred Trigger / Notes": "This authority-only allocation does not validate convergence. The candidate review saturated and formal planning-authority acceptance is recorded, but ledger/controller, protocol correction, policy deduplication, fixtures, runtime reuse, hooks, CI, cutover, publication, and owner validation remain held; optional Graphify is neither ledger nor gate."
+      "Deferred Trigger / Notes": "Static/local implementation proof is current, but VAL-TW-035 is not satisfied. Graphify is optional navigation only. Terra, tw-graph, semantic HTML, staging, publication, release, and deploy remain separately held."
     }
   ],
   "code_anchor_evidence": [
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "persistent-locked-review-series-controller"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-review",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "compatibility-route-review-entrypoint"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "review-series-orchestrator-handoff"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-work/SKILL.md",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "retained-finding-repair-handoff"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-doc-review/SKILL.md",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "document-review-series-handoff"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-code-review/SKILL.md",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "code-review-series-handoff"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/scoped-review-protocol.md",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "canonical-scoped-review-protocol"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; mirror",
+      "Role": "packaged-scoped-review-protocol"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
+      "Requirement": "REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "canonical-autonomy-policy"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/traceweaver-controlled-autonomy-policy.md",
+      "Requirement": "REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; mirror",
+      "Role": "packaged-autonomy-policy"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/terminal-receipt-template.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "canonical-terminal-receipt-template"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/terminal-receipt-template.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; mirror",
+      "Role": "packaged-terminal-receipt-template"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "canonical-convergence-budget-profile"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/workflow-profile-template.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; mirror",
+      "Role": "packaged-convergence-budget-profile"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/automation-loop-state-template.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "canonical-persistent-review-loop-state"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/automation-loop-state-template.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; mirror",
+      "Role": "packaged-persistent-review-loop-state"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-review-series-convergence",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; verifies",
+      "Role": "convergence-transition-fixture-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-scoped-review",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; verifies",
+      "Role": "scoped-review-protocol-regression-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-workflow-profile",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; verifies",
+      "Role": "one-reviewer-one-cycle-profile-regression-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-no-publication",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "verifies",
+      "Role": "convergence-publication-hold-regression-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-tw-skill-behavior",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "verifies",
+      "Role": "runtime-disabled-wrapper-contract-regression-smoke"
+    },
+    {
+      "Artifact Path": ".github/workflows/smoke-tests.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "verifies",
+      "Role": "convergence-ci-invocation"
+    },
+    {
+      "Artifact Path": "fixtures/scoped-review/contested-p2.expected",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "fixture",
+      "Role": "contested-blocking-p2-expectation"
+    },
+    {
+      "Artifact Path": "fixtures/scoped-review/l1.expected",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "fixture",
+      "Role": "l1-convergence-budget-expectation"
+    },
+    {
+      "Artifact Path": "fixtures/scoped-review/l2.expected",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "fixture",
+      "Role": "l2-convergence-budget-expectation"
+    },
+    {
+      "Artifact Path": "fixtures/scoped-review/l3.expected",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "fixture",
+      "Role": "l3-convergence-budget-expectation"
+    },
+    {
+      "Artifact Path": "fixtures/workflow-profile/l0-profile.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "fixture",
+      "Role": "l0-no-review-profile-expectation"
+    },
+    {
+      "Artifact Path": "fixtures/workflow-profile/l1-profile.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "fixture",
+      "Role": "l1-one-review-one-cycle-profile-expectation"
+    },
+    {
+      "Artifact Path": "fixtures/workflow-profile/l2-profile.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "fixture",
+      "Role": "l2-one-review-one-cycle-profile-expectation"
+    },
+    {
+      "Artifact Path": "fixtures/workflow-profile/l3-profile.yml",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "fixture",
+      "Role": "l3-one-review-one-cycle-profile-expectation"
+    },
     {
       "Artifact Path": "scripts/traceweaver-smoke-verify",
       "Requirement": "REQ-TW-001",

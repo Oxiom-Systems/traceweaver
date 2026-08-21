@@ -8,6 +8,7 @@ disable-model-invocation: false
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-082; req=REQ-TW-083; req=REQ-TW-084 -->
 <!-- TRACEWEAVER: file-role=advisory-profile-router; req=REQ-TW-086; req=REQ-TW-087 -->
 <!-- TRACEWEAVER: file-role=workflow-skill; req=REQ-TW-056; trace=TRACE-TW-031; ver=VER-TW-040 -->
+<!-- TRACEWEAVER: file-role=review-series-orchestrator; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087 -->
 <!-- TRACEWEAVER: file-role=optional-graphify-receipt-router; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
 <!-- TRACEWEAVER: entrypoint=graphify_child_receipt_carry; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
 
@@ -77,8 +78,8 @@ the first applicable profile deterministically:
 | --- | --- | --- |
 | L0 | Documentation, generated, or mechanical no-behavior change | Deterministic check when applicable; no V&V and no multi-agent review. |
 | L1 | Narrow low-consequence behavior | Compact authority reference, focused verification, fresh verifier, one independent reviewer. |
-| L2 | Cross-module, API, data-flow, or deployment-facing behavior | Full work-item capsule, fresh verifier, one reviewer and at most one justified specialist. |
-| L3 | Money, security, destructive action, release, external side effect, or unclear authority | Full V&V, strongest independent reviewer, explicit rollback, owner-held decisions; no more than three reviewer personas. |
+| L2 | Cross-module, API, data-flow, or deployment-facing behavior | Full work-item capsule, fresh verifier, one reviewer carrying any justified specialist concern. |
+| L3 | Money, security, destructive action, release, external side effect, or unclear authority | Full V&V, strongest independent reviewer carrying all triggered concerns, explicit rollback, and owner-held decisions; no reviewer fan-out. |
 
 The profile records risk, selected controls, child roles, model availability,
 choice and rationale, reviewer cap, repair-cycle cap, deploy requirement,
@@ -211,11 +212,12 @@ master does not review; it carries only the frozen identity and receipts.
 ### Artifact-identity blockers
 
 Review staging is allowed only after the relevant evidence is present in the
-exact scoped file list and the review identity is coherent. Untracked authority
-or plan files, split authority/evidence identities, or blocking findings return
-held. The master records the clean review once when that identical review passes;
-it does not repeat a clean review without a changed identity. A
-housekeeping-only repair may run once within the frozen repair cap, but the
+exact scoped file list and the semantic review identity is coherent. Untracked
+authority or plan files, split authority/evidence identities, or blocking
+findings return held. The master records an accepted review once and reuses it
+while the four semantic inputs remain unchanged. Post-acceptance bookkeeping
+uses `mechanical_closure` with zero reviewers and consumes no repair cycle;
+bookkeeping before a matching accepted review remains review-required. The
 master must not review-stage around real blockers.
 
 ## Post-Work Review Closure
@@ -224,9 +226,14 @@ The master treats a successful `tw-work` return as a transition, not a terminal
 state. Unless an authority or verification blocker is returned, continue after
 the implementation child. Run or require `tw-traceability-check` through its
 named child, then Run `tw-code-review` through its review child for
-behavior-bearing changes. Run scoped `tw-doc-review` only when authority, plan,
-matrix, status, hash, validation, or review evidence changed. These are child
-routes, not user handoffs; returning only a manual review command is a post-work closure regression.
+behavior-bearing changes. Before review routing, create or resume the explicitly
+authorized generation through `scripts/traceweaver-review-series`, open one
+logical repair-verification attempt, and record every repair/review call as a
+distinct dispatch under that attempt. Run scoped `tw-doc-review` only when
+normative semantic authority changed. Status, hash, review-ID, receipt, matrix
+projection, generated-view, index, and equivalent audit-only changes close
+mechanically after a matching accepted review exists. These are child routes,
+not user handoffs. Returning only a manual review command is a post-work closure regression.
 
 An explicit stop override such as "stop after implementation" stops those child
 routes, reports review as held, and forbids a done or release-ready claim.
@@ -268,18 +275,29 @@ names the next permitted wrapper or the held condition.
 
 ## Scoped Review and Terminal Routing
 
-For a profiled review child, route only the review identity and fan-out defined
-by `references/scoped-review-protocol.md`. The identity is baseline hash,
-profile hash, changed-file digest, and verification digest. If it matches an
-accepted review, route receipt reuse rather than another generic review;
-matrix/status/projection-only changes do not create a new changed-file digest.
+For a profiled review child, resolve the canonical path, declared version, and
+digest in `references/scoped-review-protocol.md`, verify the packaged mirror,
+then use `scripts/traceweaver-review-series` with a
+`tw-review-series-command/1` request. In an installed host, pass the resolved
+package-owned protocol through `--canonical-protocol-file`; never reinterpret
+the registered source-relative path as a consuming-project file. Carry the
+immutable generation, predecessor, series, scope, stage, attempt, dispatch,
+finding, evidence, remaining-budget, and four semantic accepted-review inputs
+through every child capsule. Session, branch, wrapper, and publication-
+preparation re-entry resume the ledger; they never reset it.
 
 The master routes, but never performs, review, repair, deployment, browser
-dogfood, or terminal acceptance. It enforces the profiled reviewer and repair
-caps in the child capsule: one routine independent reviewer, at most two active
-reviewers, at most three personas, validators only for P0/P1 or disputed P2,
-and no more than two repair cycles. It routes P0/P1 repair, the contested-P2
-path, and `held_no_progress`; routine P2/P3 do not gain an extra cycle.
+dogfood, or terminal acceptance. It enforces exactly one review-bearing
+dispatch and one reviewer persona per attempt; specialist or validator concerns
+must be carried by that reviewer rather than opening fan-out. It also enforces
+one discovery stage and one routine repair-verification cycle. One final cycle
+requires an owner- or approved change-control-authority decision receipt bound
+to the series, retained P0/P1/blocking-P2 fingerprint and context,
+authorization reason, and final-cycle limit; two is the absolute maximum. It
+routes blocking repair, the contested-P2 path, `held_scope_expansion`, and
+`held_no_progress`; non-blocking P2/P3 debt does not gain another cycle. Zero
+blockers yields `candidate_review_saturated`, while authority acceptance remains
+a separate receipt dimension.
 
 Route terminal reporting to `references/terminal-receipt-template.yml`. Report
 `ready_for_authorized_deploy` when only authorized deployment evidence remains,
@@ -292,7 +310,8 @@ implementation, verification, or review.
 Return the profile revision/hash and selected fields, child capsule routing,
 monotonic receipts, estimate guards, actual accounting, and one truthful state:
 `routed`, `refused_profile_immutable`, `refused_estimated_process_ceiling`,
-`held_process_budget`, `held_no_progress`, `ready_for_authorized_deploy`, or
-`held_dogfood`. `complete` is a child-receipt result only, never a master
+`held_process_budget`, `candidate_review_saturated`, `held_no_progress`,
+`held_scope_expansion`, `held_authority_acceptance`,
+`ready_for_authorized_deploy`, or `held_dogfood`. `complete` is a child-receipt result only, never a master
 inference. Deployment and dogfood remain separate child receipts; neither is
 implied by implementation or verification.

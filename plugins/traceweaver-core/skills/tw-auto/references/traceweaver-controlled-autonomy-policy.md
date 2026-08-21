@@ -1,4 +1,4 @@
-<!-- TRACEWEAVER: file-role=controlled-autonomy-policy; req=REQ-TW-056; trace=TRACE-TW-045; ver=VER-TW-057 -->
+<!-- TRACEWEAVER: file-role=controlled-autonomy-policy; req=REQ-TW-056; trace=TRACE-TW-067; ver=VER-TW-087 -->
 
 # TraceWeaver Controlled Autonomy Policy
 
@@ -93,7 +93,24 @@ from the accepted baseline and Intent Contract, then must run
 
 ## Progress And Cycle Limits
 
-Default review-fix budget: two cycles per run.
+Every review-bearing route uses the persistent controller defined by the
+canonical `scoped-review-protocol.md`. One explicitly authorized routine series
+permits one discovery stage followed by one repair-verification cycle. One
+final cycle is available only through an owner- or approved
+change-control-authority decision receipt bound to the series, retained finding
+fingerprint, P0/P1/blocking-P2 severity and context, authorization reason, and
+final-cycle limit; agent-generated or self-authorized exceptions are invalid.
+Two cycles remain the absolute cap. The budget belongs to the immutable series
+generation and follows it across command, run, session, branch, wrapper, and
+publication-preparation boundaries. It decrements once per logical
+repair-verification attempt, never once per child dispatch.
+
+Accepted-review reuse and post-acceptance bookkeeping consume no cycle when
+the semantic-authority, behavior, verification, and policy-epoch identity is
+unchanged. Bookkeeping without a matching accepted review remains
+review-required. Raw baseline, profile, protocol-file, branch, index, receipt,
+projection, Graphify, installation, and publication-preparation coordinates are
+audit metadata only.
 
 Stop before another cycle when:
 
@@ -106,8 +123,11 @@ Stop before another cycle when:
 - behavior duplicates or expands existing behavior without authority;
 - continuing requires new or changed requirements.
 
-Projects may override the cycle limit only through reviewed project-local Intent
-Contract policy.
+Projects may reduce the routine budget through reviewed project-local policy.
+They cannot increase or reset an active series. One final severe-exception
+cycle is available only through the external receipt defined above; a broader
+change requires explicit authority for a distinct successor generation after
+the current series terminates.
 
 ## Severity Policy
 

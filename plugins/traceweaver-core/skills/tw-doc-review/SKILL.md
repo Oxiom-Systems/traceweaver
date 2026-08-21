@@ -6,6 +6,7 @@ description: TraceWeaver-controlled document review wrapper. Use when reviewing 
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-050; trace=TRACE-TW-023; ver=VER-TW-032 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-086; req=REQ-TW-087 -->
+<!-- TRACEWEAVER: file-role=review-series-document-review-wrapper; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087 -->
 
 # TraceWeaver Document Review
 
@@ -18,18 +19,26 @@ can affect implementation authority or accepted evidence.
 
 ## Scoped Review Identity
 
-Use `references/scoped-review-protocol.md` to identify a review by baseline
-hash, frozen profile hash, changed-file digest, and verification digest. Reuse
-an accepted review when all four values match. Matrix-only, status-only, and
-derived-projection-only changes do not alter the reviewed changed-file digest
-and must not trigger a generic duplicate document review.
+Resolve the packaged sibling
+`<skills-root>/tw-auto/references/scoped-review-protocol.md`, verify it matches
+the registered canonical protocol version and digest, then create or resume the
+explicitly authorized generation through
+`<skills-root>/tw-auto/scripts/traceweaver-review-series`. Carry generation,
+series, frozen scope, attempt, distinct dispatch, ledger digest, eligible
+blockers, the four semantic accepted-review inputs, audit metadata, and
+remaining budget. Exact accepted-review reuse and verified post-acceptance
+mechanical closure dispatch no reviewer; bookkeeping without a matching
+accepted review remains review-required.
 
-Use the frozen profile's deduplicated fan-out: one routine independent reviewer,
-at most two active reviewers, and no more than three personas. A specialist is
-profile-triggered only; a validator is limited to P0, P1, or disputed P2. Route
-P0/P1 through repair and a scoped rerun, route disputed P2 through its decision
-path, and record routine P2/P3 without an extra review cycle. Stop after two
-repair cycles or unchanged blocked work as `held_no_progress`.
+Use exactly one review-bearing dispatch and one reviewer persona for the
+attempt. When specialist or validator concerns apply, include them in that
+reviewer's bounded concern set; do not dispatch another reviewer. Route P0/P1
+and blocking P2 through the current repair-verification attempt, route
+disputed P2 through its decision path, and record non-blocking P2/P3 without an
+extra review cycle. Stop after one routine repair-verification cycle, or sooner
+for unchanged blocked work, as `held_no_progress`. One final cycle requires an
+explicit receipt-bound exception authorized by the owner or approved
+change-control authority; two is the absolute maximum.
 
 ## Required Authority Inputs
 
@@ -61,13 +70,16 @@ authority until the authority files exist and review passes.
    historical wording drift as non-blocking debt unless it changes accepted
    scope, pending gate, held claims, runtime/publication claims, artifact
    identity, or material authority.
-3. If the document contains requirements, acceptance criteria, planning
-   statements, authority claims, held-claim changes, or validation questions,
-   run `tw-requirements-review` before CE document review.
-4. If the document changes a matrix, Intent Contract, validation/evidence record,
-   status field, hash, review scope, accepted scope, or held claim, run
-   `tw-traceability-check` or require an explicit trace/matrix consistency check
-   before accepting the document as TraceWeaver input.
+3. Run `tw-requirements-review` before CE document review only when normative
+   requirement meaning, accepted scope, validation intent, allowed/held
+   behavior, must-not-change constraints, or publication policy changed.
+4. Use the persistent review-series controller for the supplied generation.
+   Discovery is valid only for an explicitly authorized new generation;
+   otherwise resume the current repair-verification attempt. Bookkeeping-only
+   changes use `evaluate_reuse` and stop without a reviewer only after the four
+   semantic inputs match an existing accepted review and no new blocker exists.
+   A matrix or Intent Contract change that alters normative authority still
+   routes through `tw-traceability-check` before one document review.
 5. Run `ce-doc-review` only after the requirement-quality and authority/trace
    preflight is passable, or after remaining limits are explicitly recorded as
    held conditions.
@@ -88,8 +100,9 @@ checks for document authority review. Do not return standalone
 `tw-requirements-review` or `tw-traceability-check` as the normal next user
 command when those checks are embedded in the document review path.
 
-If the document review is clean, recommend `/tw-work record ...` for the clean
-review state and scoped status/hash refresh. If the document is blocked by
+If the document review is clean, record the accepted review and scoped
+bookkeeping atomically, run the mechanical consistency check, and stop without
+another review dispatch. If the document is blocked by
 requirements quality or authority identity, recommend the highest-level wrapper
 that can repair it, normally `/tw-work ...` for an accepted authority patch or
 `/tw-auto ...` for a multi-step loop. Recommend standalone lower gates only for

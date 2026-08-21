@@ -1,0 +1,591 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=review-series-convergence-smoke; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087
+# TRACEWEAVER: verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+controller="$root/plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series"
+canonical_protocol="$root/plugins/traceweaver-core/references/scoped-review-protocol.md"
+packaged_protocol="$root/plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md"
+
+if [ ! -x "$controller" ]; then
+  echo "review-series-convergence: missing executable controller: $controller" >&2
+  exit 1
+fi
+
+ruby - "$root" "$controller" "$canonical_protocol" "$packaged_protocol" <<'RUBY'
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "tmpdir"
+require "yaml"
+
+root, controller, canonical_protocol, packaged_protocol = ARGV
+REPOSITORY_ROOT = root
+CANONICAL_PROTOCOL_PATH = "plugins/traceweaver-core/references/scoped-review-protocol.md"
+CANONICAL_PROTOCOL_VERSION = "tw-scoped-review-protocol/1"
+
+def fail!(message)
+  warn("review-series-convergence: #{message}")
+  exit 1
+end
+
+def deep_copy(value)
+  Marshal.load(Marshal.dump(value))
+end
+
+def invoke!(controller, ledger_dir, request, root: REPOSITORY_ROOT, canonical_protocol_file: nil)
+  request_path = File.join(ledger_dir, "request-#{Dir.children(ledger_dir).length}.yml")
+  File.write(request_path, YAML.dump(request))
+  arguments = [
+    controller,
+    "--root", root,
+    "--ledger-dir", ledger_dir,
+    "--request", request_path
+  ]
+  arguments.concat(["--canonical-protocol-file", canonical_protocol_file]) if canonical_protocol_file
+  output, error, status = Open3.capture3(*arguments)
+  fail!("controller failed for #{request.fetch('command')}: #{error.strip}") unless status.success?
+  JSON.parse(output)
+rescue JSON::ParserError => e
+  fail!("controller returned invalid JSON for #{request.fetch('command')}: #{e.message}")
+end
+
+def invoke_failure!(controller, ledger_dir, request)
+  request_path = File.join(ledger_dir, "request-#{Dir.children(ledger_dir).length}.yml")
+  File.write(request_path, YAML.dump(request))
+  output, error, status = Open3.capture3(
+    controller,
+    "--root", REPOSITORY_ROOT,
+    "--ledger-dir", ledger_dir,
+    "--request", request_path
+  )
+  fail!("controller unexpectedly accepted #{request.fetch('command')}: #{output.strip}") if status.success?
+  error
+end
+
+def expect!(condition, message)
+  fail!(message) unless condition
+end
+
+def authorize_request(generation:, predecessor: nil, reason: "owner authorized bounded series", session: "session-a")
+  {
+    "schema_version" => "tw-review-series-command/1",
+    "command" => "authorize_series",
+    "series_generation_id" => generation,
+    "predecessor_series_identity" => predecessor,
+    "authorization_reason" => reason,
+    "session_id" => session,
+    "review_mode" => "repair_verification",
+    "formal_authority_accepted" => false,
+    "frozen_scope" => {
+      "semantic_authority_digest" => "sha256:semantic-authority-a",
+      "behavior_digest" => "sha256:behavior-a",
+      "verification_digest" => "sha256:verification-a",
+      "policy_epoch" => "tw-review-policy/2026-08-21",
+      "requirements_baseline_hash" => "sha256:baseline-a",
+      "workflow_profile_hash" => "sha256:profile-a",
+      "target_paths" => ["a.md", "b.yml"],
+      "review_objective" => "verify the bounded convergence repair",
+      "concerns" => ["cycle accounting", "finding identity"],
+      "canonical_protocol" => {
+        "path" => CANONICAL_PROTOCOL_PATH,
+        "version" => CANONICAL_PROTOCOL_VERSION,
+        "digest" => "sha256:#{Digest::SHA256.file(File.join(REPOSITORY_ROOT, CANONICAL_PROTOCOL_PATH)).hexdigest}"
+      }
+    }
+  }
+end
+
+def stage_request(generation, command, stage: nil, session: "session-a")
+  request = {
+    "schema_version" => "tw-review-series-command/1",
+    "command" => command,
+    "series_generation_id" => generation,
+    "session_id" => session
+  }
+  request["stage"] = stage if stage
+  request
+end
+
+def dispatch_request(generation, wrapper:, role:, session: "session-a")
+  stage_request(generation, "record_dispatch", session: session).merge(
+    "wrapper" => wrapper,
+    "role" => role
+  )
+end
+
+def finding(rule:, anchor:, predicate:, impact:, severity: "P1", context: "authority", disposition: "open", regression: false, out_of_scope: false)
+  {
+    "governing_rule" => rule,
+    "semantic_anchor" => anchor,
+    "failure_predicate" => predicate,
+    "claim_impact" => impact,
+    "severity" => severity,
+    "blocking_context" => context,
+    "disposition" => disposition,
+    "repair_regression" => regression,
+    "out_of_scope" => out_of_scope
+  }
+end
+
+def complete_request(generation, findings:, evidence_digest:, scope: nil, semantic: "sha256:semantic-authority-a", behavior: "sha256:behavior-a", verification: "sha256:verification-a", verification_outcome: "pass", session: "session-a")
+  request = stage_request(generation, "complete_attempt", session: session).merge(
+    "findings" => findings,
+    "relevant_evidence_digest" => evidence_digest,
+    "semantic_authority_digest" => semantic,
+    "behavior_digest" => behavior,
+    "verification_digest" => verification,
+    "verification_outcome" => verification_outcome
+  )
+  request["frozen_scope"] = scope if scope
+  request
+end
+
+unless File.binread(canonical_protocol) == File.binread(packaged_protocol)
+  fail!("canonical protocol and packaged mirror differ")
+end
+unless File.read(canonical_protocol).include?("Protocol version: `#{CANONICAL_PROTOCOL_VERSION}`")
+  fail!("canonical protocol does not declare #{CANONICAL_PROTOCOL_VERSION}")
+end
+
+Dir.mktmpdir("traceweaver-review-series-") do |ledger_dir|
+  consumer_root = File.join(ledger_dir, "consumer-project")
+  installed_ledger = File.join(ledger_dir, "installed-ledger")
+  installed_protocol = File.join(ledger_dir, "installed-scoped-review-protocol.md")
+  FileUtils.mkdir_p([consumer_root, installed_ledger])
+  FileUtils.cp(canonical_protocol, installed_protocol)
+  installed_authorization = invoke!(
+    controller,
+    installed_ledger,
+    authorize_request(generation: "RS-GEN-FIXTURE-INSTALLED"),
+    root: consumer_root,
+    canonical_protocol_file: installed_protocol
+  )
+  expect!(installed_authorization.dig("canonical_protocol", "path") == CANONICAL_PROTOCOL_PATH, "installed protocol mapping changed the registered path identity")
+
+  first = invoke!(controller, ledger_dir, authorize_request(generation: "RS-GEN-FIXTURE-001"))
+  expect!(first["series_generation_id"] == "RS-GEN-FIXTURE-001", "generation was not retained")
+  expect!(first.fetch("ledger_digest").start_with?("sha256:"), "authorization receipt omitted ledger digest")
+  expect!(first["remaining_repair_cycles"] == 1, "new series must start with one routine repair-verification cycle")
+  first_identity = first.fetch("series_identity")
+  expect!(first.dig("canonical_protocol", "path") == CANONICAL_PROTOCOL_PATH, "controller did not resolve the registered protocol path")
+  expect!(first.dig("canonical_protocol", "version") == CANONICAL_PROTOCOL_VERSION, "controller did not retain the registered protocol version")
+  expect!(first.dig("canonical_protocol", "digest") == authorize_request(generation: "unused").dig("frozen_scope", "canonical_protocol", "digest"), "controller did not retain the actual protocol digest")
+
+  discovery = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-001", "open_attempt", stage: "discovery"))
+  expect!(discovery["stage"] == "discovery", "discovery stage did not open")
+  discovery_attempt = discovery.fetch("attempt_identity")
+  discovery_reentry = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-001", "open_attempt", stage: "discovery", session: "session-b"))
+  expect!(discovery_reentry["attempt_identity"] == discovery_attempt, "discovery re-entry changed attempt identity")
+  expect!(discovery_reentry["remaining_repair_cycles"] == 1, "discovery re-entry charged repair budget")
+
+  initial_blocker = finding(
+    rule: "REQ-TW-037",
+    anchor: " Stable   finding anchor ",
+    predicate: "BLOCKER remains",
+    impact: "Authority acceptance"
+  )
+  invalid_debt = deep_copy(initial_blocker)
+  invalid_debt["disposition"] = "debt"
+  debt_error = invoke_failure!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-001",
+    findings: [invalid_debt],
+    evidence_digest: "sha256:invalid-debt"
+  ))
+  expect!(debt_error.include?("cannot be dispositioned as debt"), "blocking finding was downgraded to debt")
+  initial = invoke!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-001",
+    findings: [initial_blocker],
+    evidence_digest: "sha256:evidence-a"
+  ))
+  first_fingerprint = initial.fetch("findings").first.fetch("fingerprint")
+  expect!(initial["unresolved_blocking_count"] == 1, "discovery blocker was not retained")
+
+  cycle_one = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-001", "open_attempt", stage: "repair_verification"))
+  cycle_one_attempt = cycle_one.fetch("attempt_identity")
+  expect!(cycle_one["remaining_repair_cycles"] == 0, "routine repair cycle did not charge exactly once")
+  cycle_one_reentry = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-001", "open_attempt", stage: "repair_verification", session: "session-b"))
+  expect!(cycle_one_reentry["attempt_identity"] == cycle_one_attempt, "cycle re-entry changed attempt identity")
+  expect!(cycle_one_reentry["remaining_repair_cycles"] == 0, "cycle re-entry charged the budget twice")
+
+  unretained_finding = finding(
+    rule: "REQ-TW-056",
+    anchor: "new repair-review topic",
+    predicate: "unrelated issue appeared during bounded repair verification",
+    impact: "would reopen discovery without authority"
+  )
+  unretained_error = invoke_failure!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-001",
+    findings: [unretained_finding],
+    evidence_digest: "sha256:unretained-finding"
+  ))
+  expect!(unretained_error.include?("repair verification accepts only retained findings"), "repair verification accepted a new unretained non-regression finding")
+
+  dispatches = [
+    invoke!(controller, ledger_dir, dispatch_request("RS-GEN-FIXTURE-001", wrapper: "tw-auto", role: "orchestrator")),
+    invoke!(controller, ledger_dir, dispatch_request("RS-GEN-FIXTURE-001", wrapper: "tw-work", role: "repair")),
+    invoke!(controller, ledger_dir, dispatch_request("RS-GEN-FIXTURE-001", wrapper: "tw-doc-review", role: "repair_verifier"))
+  ]
+  duplicate_review_error = invoke_failure!(
+    controller,
+    ledger_dir,
+    dispatch_request("RS-GEN-FIXTURE-001", wrapper: "tw-code-review", role: "second_reviewer")
+  )
+  expect!(duplicate_review_error.include?("one review-bearing dispatch is already recorded"), "one attempt accepted multiple review-bearing dispatches")
+  dispatch_ids = dispatches.map { |receipt| receipt.fetch("dispatch_identity") }
+  expect!(dispatch_ids.uniq.length == 3, "child dispatch identities are not distinct")
+  expect!(dispatches.all? { |receipt| receipt["attempt_identity"] == cycle_one_attempt }, "multi-dispatch cycle was not bound to one attempt")
+  expect!(dispatches.all? { |receipt| receipt["remaining_repair_cycles"] == 0 }, "dispatch count changed cycle budget")
+
+  reworded_blocker = finding(
+    rule: " req-tw-037 ",
+    anchor: "stable finding anchor",
+    predicate: " blocker   remains ",
+    impact: "authority acceptance"
+  )
+  no_progress = invoke!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-001",
+    findings: [reworded_blocker],
+    evidence_digest: "sha256:evidence-a"
+  ))
+  expect!(no_progress.fetch("findings").first.fetch("fingerprint") == first_fingerprint, "wording-only change created a new fingerprint")
+  expect!(no_progress["terminal_outcome"] == "held_no_progress", "unchanged evidence and blockers did not hold no-progress")
+  expect!(no_progress.fetch("ledger_digest").start_with?("sha256:"), "terminal receipt omitted ledger digest")
+  expect!(no_progress["attempt_identity"] == cycle_one_attempt, "terminal receipt lost the completed attempt identity")
+  expect!(no_progress.fetch("dispatch_identities") == dispatch_ids, "terminal receipt lost its cycle dispatch identities")
+
+  second_authorization = authorize_request(
+    generation: "RS-GEN-FIXTURE-002",
+    predecessor: first_identity,
+    reason: "owner authorized a distinct successor generation"
+  )
+  second_authorization.fetch("frozen_scope").fetch("target_paths").reverse!
+  second_authorization.fetch("frozen_scope").fetch("concerns").reverse!
+  second = invoke!(controller, ledger_dir, second_authorization)
+  expect!(second.fetch("series_identity") != first_identity, "same-scope successor generation collided with predecessor")
+  expect!(second.fetch("frozen_scope_identity") == first.fetch("frozen_scope_identity"), "set ordering changed frozen-scope identity")
+  expect!(second["predecessor_series_identity"] == first_identity, "successor lost predecessor linkage")
+
+  invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "open_attempt", stage: "discovery"))
+  blocking_p2 = finding(
+    rule: "REQ-TW-040",
+    anchor: "blocking p2",
+    predicate: "traceability is wrong",
+    impact: "traceability claim",
+    severity: "P2",
+    context: "traceability"
+  )
+  nonblocking_p2 = finding(
+    rule: "REQ-TW-040",
+    anchor: "wording debt",
+    predicate: "copy can improve",
+    impact: "style only",
+    severity: "P2",
+    context: "style",
+    disposition: "debt"
+  )
+  p3 = finding(
+    rule: "REQ-TW-040",
+    anchor: "label debt",
+    predicate: "label can improve",
+    impact: "style only",
+    severity: "P3",
+    context: "style",
+    disposition: "debt"
+  )
+  p2_receipt = invoke!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-002",
+    findings: [blocking_p2, nonblocking_p2, p3],
+    evidence_digest: "sha256:evidence-p2"
+  ))
+  expect!(p2_receipt["unresolved_blocking_count"] == 1, "blocking P2 did not prevent saturation")
+  expect!(p2_receipt["nonblocking_debt_count"] == 2, "non-blocking P2/P3 debt was not separated")
+  expect!(p2_receipt["remaining_repair_cycles"] == 1, "recording discovery findings consumed the routine repair cycle")
+
+  invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "open_attempt", stage: "repair_verification"))
+  regression = finding(
+    rule: "REQ-TW-037",
+    anchor: "repair regression",
+    predicate: "repair reset budget",
+    impact: "cycle accounting",
+    regression: true
+  )
+  regression_receipt = invoke!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-002",
+    findings: [regression],
+    evidence_digest: "sha256:evidence-regression"
+  ))
+  expect!(regression_receipt.fetch("findings").first["repair_eligible"] == true, "in-scope repair regression was not eligible")
+  expect!(regression_receipt["remaining_repair_cycles"] == 0, "repair regression reset or extended the routine cap")
+  expect!(regression_receipt["terminal_outcome"] == "held_no_progress", "remaining blocker did not stop after the routine cycle")
+
+  unavailable_second_cycle = invoke_failure!(
+    controller,
+    ledger_dir,
+    stage_request("RS-GEN-FIXTURE-002", "open_attempt", stage: "repair_verification")
+  )
+  expect!(unavailable_second_cycle.include?("terminal series cannot open another attempt"), "second cycle was available without an explicit severe-blocker exception")
+
+  severe_exception_request = stage_request("RS-GEN-FIXTURE-002", "authorize_second_cycle").merge(
+    "severe_blocker_exception" => {
+      "authorization_kind" => "owner",
+      "authorized_by" => "Oxiom Systems",
+      "series_generation_id" => "RS-GEN-FIXTURE-002",
+      "finding_fingerprint" => regression_receipt.fetch("findings").first.fetch("fingerprint"),
+      "severity" => "P1",
+      "blocking_context" => "authority",
+      "authorization_receipt" => "TW-SEVERE-BLOCKER-EXCEPTION-FIXTURE-001",
+      "authorization_reason" => "owner explicitly authorizes one final repair for the retained P1",
+      "final_cycle_limit" => 2
+    }
+  )
+  self_authorized = deep_copy(severe_exception_request)
+  self_authorized.fetch("severe_blocker_exception")["authorization_kind"] = "agent"
+  self_authorized_error = invoke_failure!(controller, ledger_dir, self_authorized)
+  expect!(self_authorized_error.include?("authorization_kind must be owner or approved_change_control_authority"), "agent self-authorization was accepted for the second cycle")
+  mismatched_series_exception = deep_copy(severe_exception_request)
+  mismatched_series_exception.fetch("severe_blocker_exception")["series_generation_id"] = "RS-GEN-FIXTURE-OTHER"
+  mismatched_series_error = invoke_failure!(controller, ledger_dir, mismatched_series_exception)
+  expect!(mismatched_series_error.include?("series_generation_id does not match"), "severe-blocker exception was not bound to its series")
+  severe_exception = invoke!(controller, ledger_dir, severe_exception_request)
+  expect!(severe_exception["remaining_repair_cycles"] == 1, "severe-blocker exception did not expose exactly one final cycle")
+  expect!(severe_exception["reviewer_dispatch_count"] == 0, "authorizing the final cycle dispatched a reviewer")
+
+  final_cycle = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "open_attempt", stage: "repair_verification"))
+  expect!(final_cycle["remaining_repair_cycles"] == 0, "final cycle accounting is incorrect")
+  final_review_dispatch = invoke!(controller, ledger_dir, dispatch_request("RS-GEN-FIXTURE-002", wrapper: "tw-code-review", role: "routine_independent"))
+  expect!(final_review_dispatch["reviewer_dispatch_count"].nil?, "recording a review dispatch reported another reviewer")
+  rediscovered_debt_error = invoke_failure!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-002",
+    findings: [nonblocking_p2, p3],
+    evidence_digest: "sha256:rediscovered-closed-debt"
+  ))
+  expect!(rediscovered_debt_error.include?("repair verification accepts only retained findings"), "final cycle rediscovered findings closed by the prior repair cycle")
+  saturated = invoke!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-002",
+    findings: [],
+    evidence_digest: "sha256:evidence-closed"
+  ))
+  expect!(saturated["terminal_outcome"] == "candidate_review_saturated", "final-cycle blocker closure did not saturate")
+  expect!(saturated["authority_acceptance_state"] == "held_authority_acceptance", "pending authority acceptance was hidden")
+
+  authority_acceptance = stage_request("RS-GEN-FIXTURE-002", "record_authority_acceptance").merge(
+    "authority_acceptance_receipt" => "TW-FORMAL-AUTHORITY-FIXTURE-001"
+  )
+  authority_accepted = invoke!(controller, ledger_dir, authority_acceptance)
+  expect!(authority_accepted["terminal_outcome"] == "candidate_review_saturated", "authority acceptance changed the review terminal")
+  expect!(authority_accepted["authority_acceptance_state"] == "authority_accepted", "formal authority acceptance was not recorded")
+  expect!(authority_accepted["authority_acceptance_receipt"] == "TW-FORMAL-AUTHORITY-FIXTURE-001", "formal authority acceptance receipt was not retained")
+  authority_reentry = invoke!(controller, ledger_dir, authority_acceptance)
+  expect!(authority_reentry["idempotent_reentry"] == true, "same formal authority receipt was not idempotent")
+  mismatched_authority = deep_copy(authority_acceptance)
+  mismatched_authority["authority_acceptance_receipt"] = "TW-FORMAL-AUTHORITY-FIXTURE-002"
+  authority_error = invoke_failure!(controller, ledger_dir, mismatched_authority)
+  expect!(authority_error.include?("already bound to a different receipt"), "formal authority receipt was silently overwritten")
+
+  accepted_review_inputs = {
+    "semantic_authority_digest" => "sha256:semantic-authority-a",
+    "behavior_digest" => "sha256:behavior-a",
+    "verification_digest" => "sha256:verification-a",
+    "policy_epoch" => "tw-review-policy/2026-08-21"
+  }
+  preacceptance_bookkeeping = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_reuse").merge(
+    "accepted_review_inputs" => accepted_review_inputs,
+    "mechanical_changes" => ["receipt"]
+  ))
+  expect!(preacceptance_bookkeeping["route"] == "review_required" && preacceptance_bookkeeping["reviewer_dispatch_count"] == 1, "bookkeeping closed mechanically before a matching accepted review existed")
+
+  accept = stage_request("RS-GEN-FIXTURE-002", "record_accepted_review").merge(
+    "accepted_review_inputs" => accepted_review_inputs,
+    "review_route" => "code_review",
+    "mechanical_changes" => ["receipt", "status"]
+  )
+  mismatched_accept = deep_copy(accept)
+  mismatched_accept.fetch("accepted_review_inputs")["behavior_digest"] = "sha256:not-the-completed-attempt"
+  mismatch_error = invoke_failure!(controller, ledger_dir, mismatched_accept)
+  expect!(mismatch_error.include?("behavior_digest does not match"), "accepted review was not bound to completed-attempt behavior")
+  wrong_review_route = deep_copy(accept)
+  wrong_review_route["review_route"] = "document_review"
+  review_route_error = invoke_failure!(controller, ledger_dir, wrong_review_route)
+  expect!(review_route_error.include?("requires a tw-doc-review dispatch"), "accepted review ignored the matching reviewer-dispatch requirement")
+  accepted = invoke!(controller, ledger_dir, accept)
+  accepted_identity = accepted.fetch("accepted_review_identity")
+  expect!(accepted["mechanical_closure_recorded"] == true, "accepted review and its bookkeeping were not recorded atomically")
+  exact_reuse = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_reuse").merge(
+    "accepted_review_inputs" => accept.fetch("accepted_review_inputs")
+  ))
+  expect!(exact_reuse["accepted_review_identity"] == accepted_identity, "exact accepted-review identity changed")
+  expect!(exact_reuse["candidate_review_identity"] == accepted_identity, "exact candidate identity changed")
+  expect!(exact_reuse["route"] == "reuse_accepted_review" && exact_reuse["reviewer_dispatch_count"] == 0, "exact reuse dispatched a reviewer")
+
+  cross_session_reuse = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_reuse", session: "session-cross-reentry").merge(
+    "accepted_review_inputs" => accept.fetch("accepted_review_inputs")
+  ))
+  expect!(cross_session_reuse["series_identity"] == second["series_identity"], "cross-session reuse changed the series")
+  expect!(cross_session_reuse["route"] == "reuse_accepted_review" && cross_session_reuse["reviewer_dispatch_count"] == 0, "cross-session exact reuse dispatched a reviewer")
+
+  mechanical = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_reuse", session: "session-mechanical").merge(
+    "accepted_review_inputs" => accept.fetch("accepted_review_inputs"),
+    "mechanical_changes" => %w[branch head git_index wrapper command dispatch_id run session status review_id receipt matrix_projection generated_view graphify_state installation_hash requirements_baseline_metadata workflow_profile_metadata protocol_wording publication_preparation],
+    "audit_metadata" => {
+      "requirements_baseline_hash" => "sha256:unrelated-baseline-b",
+      "workflow_profile_hash" => "sha256:profile-bookkeeping-b",
+      "protocol_file_digest" => "sha256:formatting-only-protocol-b"
+    }
+  ))
+  expect!(mechanical["route"] == "mechanical_closure" && mechanical["reviewer_dispatch_count"] == 0, "bookkeeping-only changes did not close mechanically")
+
+  %w[absent stale refreshed].each do |graphify_state|
+    graphify = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_reuse", session: "session-graphify-#{graphify_state}").merge(
+      "accepted_review_inputs" => accept.fetch("accepted_review_inputs"),
+      "mechanical_changes" => ["graphify_state"],
+      "audit_metadata" => { "graphify_state" => graphify_state }
+    ))
+    expect!(graphify["route"] == "mechanical_closure" && graphify["reviewer_dispatch_count"] == 0, "Graphify #{graphify_state} affected authority or completion")
+  end
+
+  new_blocker_reuse = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_reuse").merge(
+    "accepted_review_inputs" => accept.fetch("accepted_review_inputs"),
+    "findings" => [initial_blocker]
+  ))
+  expect!(new_blocker_reuse["route"] != "reuse_accepted_review", "new unresolved blocker reused an accepted review")
+
+  semantic_change = deep_copy(accept.fetch("accepted_review_inputs"))
+  semantic_change["semantic_authority_digest"] = "sha256:semantic-authority-b"
+  document_route = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_reuse").merge(
+    "accepted_review_inputs" => semantic_change
+  ))
+  expect!(document_route["route"] == "document_review" && document_route["reviewer_dispatch_count"] == 1, "applicable authority meaning change did not route one document reviewer")
+
+  %w[behavior_digest verification_digest].each do |field|
+    varied_inputs = deep_copy(accept.fetch("accepted_review_inputs"))
+    varied_inputs[field] = "sha256:varied-#{field}"
+    code_route = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_reuse").merge(
+      "accepted_review_inputs" => varied_inputs
+    ))
+    expect!(code_route["route"] == "code_review" && code_route["reviewer_dispatch_count"] == 1, "#{field} change did not route one code reviewer")
+    expect!(code_route["accepted_review_identity"] == accepted_identity, "stored accepted-review identity was overwritten by #{field} candidate")
+  end
+
+  policy_change = deep_copy(accept.fetch("accepted_review_inputs"))
+  policy_change["policy_epoch"] = "tw-review-policy/next"
+  policy_route = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_reuse").merge(
+    "accepted_review_inputs" => policy_change
+  ))
+  expect!(policy_route["route"] == "held_scope_expansion" && policy_route["reviewer_dispatch_count"] == 0, "policy-epoch change did not fail closed")
+
+  original_scope = second_authorization.fetch("frozen_scope")
+  scope_mutations = {
+    "target_paths" => ->(scope) { scope["target_paths"] = ["different.md"] },
+    "review_objective" => ->(scope) { scope["review_objective"] = "different objective" },
+    "concerns" => ->(scope) { scope["concerns"] = ["different concern"] },
+    "policy_epoch" => ->(scope) { scope["policy_epoch"] = "tw-review-policy/next" }
+  }
+  scope_mutations.each do |field, mutate|
+    expanded_scope = deep_copy(original_scope)
+    mutate.call(expanded_scope)
+    expanded = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_scope").merge(
+      "frozen_scope" => expanded_scope,
+      "findings" => []
+    ))
+    expect!(expanded["terminal_outcome"] == "held_scope_expansion", "#{field} change did not take terminal precedence")
+  end
+
+  raw_pin_changes = deep_copy(original_scope)
+  raw_pin_changes["requirements_baseline_hash"] = "sha256:baseline-b"
+  raw_pin_changes["workflow_profile_hash"] = "sha256:profile-b"
+  raw_pin_changes.fetch("canonical_protocol")["digest"] = "sha256:protocol-formatting-b"
+  raw_pin_result = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_scope").merge(
+    "frozen_scope" => raw_pin_changes,
+    "findings" => []
+  ))
+  expect!(raw_pin_result["terminal_outcome"] != "held_scope_expansion", "raw baseline, profile, or protocol-file pin reopened scope")
+
+  out_of_scope = finding(
+    rule: "external-scope-rule",
+    anchor: "outside frozen target",
+    predicate: "new external blocker",
+    impact: "outside scope",
+    out_of_scope: true
+  )
+  expanded = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-002", "evaluate_scope").merge(
+    "frozen_scope" => original_scope,
+    "findings" => [out_of_scope]
+  ))
+  expect!(expanded["terminal_outcome"] == "held_scope_expansion", "out-of-scope blocker did not take terminal precedence")
+
+  third = invoke!(controller, ledger_dir, authorize_request(
+    generation: "RS-GEN-FIXTURE-003",
+    predecessor: second.fetch("series_identity"),
+    reason: "exercise exhausted-budget and repeated-verification-failure terminal"
+  ))
+  invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-003", "open_attempt", stage: "discovery"))
+  invoke!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-003",
+    findings: [initial_blocker],
+    evidence_digest: "sha256:exhausted-discovery",
+    verification_outcome: "fail"
+  ))
+  invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-003", "open_attempt", stage: "repair_verification", session: "session-2"))
+  exhausted = invoke!(controller, ledger_dir, complete_request(
+    "RS-GEN-FIXTURE-003",
+    findings: [initial_blocker],
+    evidence_digest: "sha256:exhausted-evidence-1",
+    verification: "sha256:failed-verification-1",
+    verification_outcome: "fail",
+    session: "session-2"
+  ))
+  expect!(!exhausted.nil?, "exhausted-budget fixture did not execute")
+  expect!(third["remaining_repair_cycles"] == 1, "third series did not receive the routine one-cycle budget")
+  expect!(exhausted["remaining_repair_cycles"] == 0, "exhausted series retained repair budget")
+  expect!(exhausted["terminal_outcome"] == "held_no_progress", "exhausted budget with blocker did not hold no-progress")
+  expect!(Array(exhausted["terminal_reasons"]).include?("repair_cycle_budget_exhausted"), "exhausted-budget reason was not recorded")
+  second_attempt_error = invoke_failure!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-003", "open_attempt", stage: "repair_verification", session: "session-3"))
+  expect!(second_attempt_error.include?("terminal series cannot open another attempt"), "no-progress automatically started another repair cycle")
+
+  legacy_ledger_path = File.join(ledger_dir, "RS-GEN-FIXTURE-003.json")
+  legacy_ledger = JSON.parse(File.read(legacy_ledger_path))
+  legacy_ledger.delete("routing_scope")
+  legacy_ledger.delete("mechanical_closures")
+  legacy_ledger.delete("audit_metadata_history")
+  legacy_ledger.fetch("accounting").delete("routine_repair_cycle_limit")
+  legacy_ledger.fetch("accounting").delete("repair_cycle_limit")
+  legacy_ledger.fetch("accounting").delete("severe_blocker_exception")
+  %w[semantic_authority_digest behavior_digest verification_digest policy_epoch].each do |field|
+    legacy_ledger.fetch("frozen_scope").delete(field)
+  end
+  File.write(legacy_ledger_path, "#{JSON.pretty_generate(legacy_ledger)}\n")
+  legacy_status = invoke!(controller, ledger_dir, stage_request("RS-GEN-FIXTURE-003", "evaluate_scope", session: "session-legacy").merge(
+    "frozen_scope" => authorize_request(generation: "unused").fetch("frozen_scope"),
+    "findings" => []
+  ))
+  expect!(legacy_status["policy_epoch"] == "tw-review-routing/legacy-raw-pins/1", "legacy persisted ledger did not migrate to a fail-closed policy epoch")
+
+  ledger_path = File.join(ledger_dir, "RS-GEN-FIXTURE-002.json")
+  ledger = JSON.parse(File.read(ledger_path))
+  expect!(ledger.dig("accounting", "discovery_consumed") == true, "discovery state was not durable")
+  expect!(ledger.dig("accounting", "repair_cycles_opened") == 2, "explicit-exception cycle accounting was not durable")
+  expect!(ledger.dig("accounting", "routine_repair_cycle_limit") == 1, "routine one-cycle cap was not durable")
+  expect!(ledger.dig("accounting", "repair_cycle_limit") == 2, "severe-blocker exception did not remain bounded at two total cycles")
+  expect!(ledger.dig("accounting", "severe_blocker_exception", "authorization_kind") == "owner", "severe-blocker exception authority was not durable")
+  expect!(ledger.dig("accounting", "severe_blocker_exception", "authorized_by") == "Oxiom Systems", "severe-blocker exception authorizer was not durable")
+  expect!(ledger.dig("accounting", "severe_blocker_exception", "series_generation_id") == "RS-GEN-FIXTURE-002", "severe-blocker exception series binding was not durable")
+  expect!(ledger.dig("accounting", "severe_blocker_exception", "authorization_receipt") == "TW-SEVERE-BLOCKER-EXCEPTION-FIXTURE-001", "severe-blocker exception receipt was not durable")
+  expect!(ledger.dig("accounting", "severe_blocker_exception", "blocking_context") == "authority", "severe-blocker exception context was not durable")
+  expect!(ledger.dig("accounting", "severe_blocker_exception", "authorization_reason").include?("owner explicitly authorizes"), "severe-blocker exception reason was not durable")
+  expect!(ledger.dig("accounting", "severe_blocker_exception", "final_cycle_limit") == 2, "severe-blocker exception final limit was not durable")
+  expect!(ledger.fetch("dispatches").all? { |entry| !entry["dispatch_identity"].to_s.empty? }, "durable dispatch receipt is incomplete")
+  expect!(!ledger.fetch("finding_history").empty?, "finding fingerprints and dispositions were not durable")
+  expect!(!ledger.fetch("evidence_history").empty?, "evidence deltas were not durable")
+  expect!(ledger.dig("accepted_review", "identity") == accepted_identity, "accepted-review identity inputs were not durable")
+  expect!(!ledger.fetch("mechanical_closures").empty?, "mechanical closure was not durably recorded")
+  expect!(!ledger.fetch("terminal_receipts").empty?, "terminal receipts were not durable")
+end
+
+puts "review_series_convergence_status=pass"
+puts "review_series_convergence_verification=VER-TW-087"
+puts "review_series_convergence_result=RESULT-TW-042"
+RUBY

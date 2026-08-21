@@ -1,14 +1,20 @@
 profile: L2
 review_identity:
-  baseline_hash: sha256:baseline-contested-p2
-  profile_hash: sha256:profile-l2
-  changed_file_digest: sha256:changed-contested-p2
+  semantic_authority_digest: sha256:semantic-authority-contested-p2
+  behavior_digest: sha256:behavior-contested-p2
   verification_digest: sha256:verification-contested-p2
+  policy_epoch: tw-review-policy/2026-08-21
+audit_metadata:
+  requirements_baseline_hash: sha256:requirements-contested-p2
+  workflow_profile_hash: sha256:profile-contested-p2
+  frozen_scope_identity: sha256:scope-contested-p2
+bookkeeping:
+  bookkeeping_digest: sha256:bookkeeping-contested-p2
 fanout:
-  active_reviewers: [independent, validator]
-  personas: [routine_independent, validator]
+  active_reviewers: [independent]
+  personas: [routine_independent]
   specialist_triggered: false
-  validator_triggered: true
+  validator_triggered: false
 finding:
   severity: P2
   disputed: true

@@ -1,11 +1,18 @@
 profile: L1
 review_identity:
-  baseline_hash: sha256:baseline-l1
-  profile_hash: sha256:profile-l1
-  changed_file_digest: sha256:changed-l1
+  semantic_authority_digest: sha256:semantic-authority-l1
+  behavior_digest: sha256:behavior-l1
   verification_digest: sha256:verification-l1
+  policy_epoch: tw-review-policy/2026-08-21
+audit_metadata:
+  requirements_baseline_hash: sha256:requirements-l1
+  workflow_profile_hash: sha256:profile-l1
+  frozen_scope_identity: sha256:scope-l1
+bookkeeping:
+  bookkeeping_digest: sha256:bookkeeping-l1
 identity_reuse:
-  matrix_status_projection_only_change: true
+  semantic_identity_unchanged: true
+  new_unresolved_blocker: false
   result: reuse_accepted_review
 fanout:
   active_reviewers: [independent]
