@@ -28,15 +28,17 @@ increment.
 - The release workflow now rejects any disagreement among the marketplace,
   Claude, Codex, Cursor, and Antigravity plugin manifest versions before it
   resolves a tag.
-- Only the reconciled 0.4.0 version-bump merge can mint
-  `traceweaver-core--v0.4.0`; ordinary merges, including PR1 and PR2, do not
-  create a release.
+- The reconciled 0.4.0 version-bump merge initiates
+  `traceweaver-core--v0.4.0`; an absent-tag recovery may resume an interrupted
+  publication, while ordinary same-version merges after the tag exists remain
+  successful no-ops.
 - Release readiness now hashes a fixed candidate file set instead of requiring
   a self-referential future commit identity. The main-only workflow waits for
   smoke and CodeQL on the exact merge SHA, fails closed on tag conflicts, and
   publishes a runtime evidence receipt with the GitHub Release.
-- Same-version main pushes exit as successful no-ops before tag resolution;
-  only a real manifest version change loads the matching dated release receipt.
+- Same-version main pushes exit as successful no-ops once their version tag
+  exists. If the tag is absent after an interrupted release, the matching dated
+  receipt is revalidated and publication resumes.
 - Canonical authority filenames are enforced with portable Git casing.
   Uppercase `REQUIREMENTS.md` consumers require an explicit, reviewed case-only
   migration rather than silent source reinterpretation.
@@ -52,6 +54,9 @@ increment.
   not changed and the migration caveat is documented above.
 - Deterministic Terra-routing and bounded review-convergence suites passed;
   served-model attestation remains honestly unavailable without host evidence.
+- Exact-main release evaluation covers both legacy CodeQL checks and GitHub
+  Actions CodeQL matrix jobs named `Analyze (…)`, matching the observed live
+  repository payload.
 
 ### Held
 

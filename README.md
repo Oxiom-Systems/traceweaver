@@ -205,9 +205,10 @@ flat release branch.
 - Existing 0.3.x workflows remain advisory. 0.4.0 does not add enforcement,
   live consumer-runtime validation, independent served-model attestation, or
   autonomous publication by documentation alone.
-- A release is minted only when this one version-bump PR reaches `main`; PR1
-  and PR2 deliberately retain their pre-release version and cannot mint their
-  own release.
+- This one version-bump PR initiated the release; PR1 and PR2 deliberately
+  retained their pre-release version. A bounded same-version recovery can
+  resume publication only while the `0.4.0` tag is absent. After the tag exists,
+  ordinary same-version pushes are successful no-ops.
 - The committed release receipt covers a deterministic fixed file set rather
   than predicting its own future commit. After merge, the serialized workflow
   waits for smoke and CodeQL to pass on the exact checked-out `main` SHA,

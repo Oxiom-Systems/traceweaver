@@ -48,7 +48,9 @@ end)
 
 codeql_candidates = exact.select do |run|
   name = run["name"].to_s
-  app_slug(run) == "github-code-scanning" || name.match?(/\Acodeql(?:\b|\s|\/|:)/i)
+  legacy_code_scanning = app_slug(run) == "github-code-scanning" || name.match?(/\Acodeql(?:\b|\s|\/|:)/i)
+  actions_matrix_job = app_slug(run) == "github-actions" && name.match?(/\AAnalyze \([^)]+\)\z/)
+  legacy_code_scanning || actions_matrix_job
 end
 codeql = codeql_candidates
   .group_by { |run| [app_slug(run), run["name"].to_s] }

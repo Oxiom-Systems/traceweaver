@@ -56,6 +56,10 @@ ruby "$evaluator" --sha bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb --input fixture
 [ "$(jq -r .state "$temp_dir/pending.json")" = pending ]
 [ "$(jq -r .state "$temp_dir/failed.json")" = failed ]
 [ "$(jq -r .terminal_state "$temp_dir/failed.json")" = held_ci_failed ]
+[ "$(jq -r '.codeql | length' "$temp_dir/ready.json")" = 3 ]
+[ "$(jq -r '[.codeql[].app_slug] | unique | join(",")' "$temp_dir/ready.json")" = github-actions ]
+[ "$(jq -r '.missing | length' "$temp_dir/pending.json")" = 0 ]
+[ "$(jq -r '.missing | length' "$temp_dir/failed.json")" = 0 ]
 [ "$(jq -r .state "$temp_dir/wrong-sha.json")" = pending ]
 [ "$(jq -r '.missing | sort | join(",")' "$temp_dir/wrong-sha.json")" = codeql,smoke ]
 
@@ -66,6 +70,7 @@ grep -q 'release-runtime-receipt.json' "$workflow"
 grep -q -- '--merge-sha "\$GITHUB_SHA"' "$workflow"
 grep -q 'previous_version=' "$workflow"
 grep -q 'should_release=false' "$workflow"
+grep -q 'resuming the interrupted release' "$workflow"
 grep -q "traceweaver-plugin-\$plugin_version-release-candidate.md" "$workflow"
 grep -q "steps.version.outputs.should_release == 'true'" "$workflow"
 grep -q 'held_ci_failed' "$workflow"
@@ -92,6 +97,8 @@ echo "release_readiness_negative_version_fixture=pass"
 echo "release_readiness_negative_scope_fixture=pass"
 echo "release_readiness_negative_merge_sha_fixture=pass"
 echo "release_exact_sha_check_run_fixtures=pass"
+echo "release_live_codeql_actions_matrix_fixture=pass"
 echo "release_workflow_exact_sha_gate=pass"
 echo "release_workflow_version_bump_only_gate=pass"
+echo "release_workflow_absent_tag_recovery_gate=pass"
 echo "release_readiness_non_self_referential_scope=pass"
