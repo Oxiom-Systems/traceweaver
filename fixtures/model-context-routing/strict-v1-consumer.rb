@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 # TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-110; trace=TRACE-TW-072; ver=VER-TW-092
 
-# Checked-in e1b2886 producer bytes make this consumer independent of git
+# Checked-in 1b1cafa producer bytes make this consumer independent of git
 # history: CI compares current ordinary v1 SEC output itself, not a synthetic
 # stand-in or a model-context artifact.
 
@@ -15,7 +15,7 @@ require "yaml"
 fixture_path = ARGV.fetch(0)
 root = File.expand_path(ARGV.fetch(1, File.expand_path("../..", __dir__)))
 fixture = JSON.parse(File.read(fixture_path))
-abort "v1 fixture schema" unless fixture["schema_version"] == "tw-v1-producer-invariance/1" && fixture["base_commit"] == "e1b2886ea51ceae03249c4ae09ff75308678970a"
+abort "v1 fixture schema" unless fixture["schema_version"] == "tw-v1-producer-invariance/1" && fixture["base_commit"] == "1b1cafa2dc06f5309e527a6b8328fa0acf6f0250"
 records = fixture.fetch("records")
 abort "v1 SEC cardinality" unless fixture["ordinary_sec_receipt_count"] == 112 && records.length == 112
 

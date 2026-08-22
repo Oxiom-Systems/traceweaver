@@ -9,10 +9,10 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `0b2b143984d25d9d582987a421099df9968bd16de2e24f827405da36f63790fe` |
+| `traceability-matrix.md` | `489aecaf35ca4de99eb5e1c4b403e47f6ee2dd590d01ddf9bf250a7c69c88c02` |
 | `requirements.md` | `2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91` |
 | `.traceweaver/intent-contract.yml` | `11971ccf62b1e9a9e1fcfc22f2e1717c2f04a8eff014717c57d6b4606652c3ad` |
-| `docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md` | `edd9833333feeed526e33184cc346cd28565ec17b885ab7b030eae6e634dbf52` |
+| `docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md` | `2a4e9dc6a11e6c7f924c033df18bb79f5a56f5e0c92a070cfefa4adb5948909c` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md` | `c7406e067ddd994077a72fdfdc8dbcb2f9f2dcaec229d170935a540e74637b62` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md` | `6a83c1136739926d7c8cbcb3a45ce41c003683d11468c081c4cef802c3b128ab` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
@@ -27,7 +27,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | result records | 40 |
 | verification records | 86 |
 | validation records | 36 |
-| code anchor records | 429 |
+| code anchor records | 434 |
 | structured acceptance results | 4 |
 | structured acceptance coverage | 105 |
 | structured acceptance missing requirements | 101 |

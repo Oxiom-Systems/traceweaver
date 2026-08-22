@@ -1,10 +1,10 @@
 ---
 id: TW-CODE-REVIEW-2026-08-22-V050-CONSOLIDATED-001
 status: closed_clean
-reviewer: /root/v050_consolidated_code_review
+reviewer: terra-integrated-reviewer:/root/v050_convergence_integrated_review
 reviewer_relationship: did_not_author_or_edit_reviewed_package
-reviewed_behavior_digest: sha256:fc78c3bf929a822f5c998584ce1dcf2912567a9aade3d3864e0bd68d81eabb0d
-reviewed_behavior_path_count: 136
+reviewed_behavior_digest: sha256:d7d066d95cb5438558ea31f51004ff6a290b984eab71e5e7eca12ccb2275ae99
+reviewed_behavior_path_count: 155
 reviewed_findings:
   open_p0: 0
   open_p1: 0
@@ -12,12 +12,12 @@ reviewed_findings:
 artifact_bindings:
   map:
     path: plugins/traceweaver-core/references/model-context-map.yml
-    file_sha256: sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52
-    semantic_digest: sha256:153ce25228e915ec0949fe1dab1b2296ce3f9934948987c8b191be15eb47665d
+    file_sha256: sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb
+    semantic_digest: sha256:2eab40f5e2e459dfb1ff1f655b0fb0cdacfe8c40478f04368d7185b219c988f2
   oracle:
     path: plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
-    file_sha256: sha256:6505622611558c592c04c2e9b27582b2bb6529736ee9d6b23bbefb9f3000ed21
-    semantic_digest: sha256:57e6759a481157ec339bf5b66322cf25b5b86d14c6bd9d0fceaf566a8b53ff2d
+    file_sha256: sha256:8639cf36bc675cfd17d06d4e59ec1bb81d732617d5950c185dd128d54730c7e3
+    semantic_digest: sha256:e20e838ad7ed01f850466ed16b30914a2883c2f3d40a0f9f0827aa972e65c9fa
   inventory:
     generator: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map
     semantic_digest: sha256:fd0eb117987ece30d1f2d3c576d051e8f5f14a3c97e7d55581c22e5a43afdf01
@@ -29,10 +29,12 @@ artifact_bindings:
 
 # TraceWeaver Core 0.5.0 Consolidated Code-Review Series
 
-The independent reviewer examined the integrated model-governance candidate as
-one review series. The implementation author repaired all blocking findings in
-one consolidated repair cycle; the reviewer did not author or edit the
-reviewed package.
+The previously accepted model-governance package and its repaired findings were
+retained as the predecessor. A single Terra reviewer then examined the 0.5.0
+convergence amendment as one integrated mixed code-and-document review. The
+same Sol implementation session repaired all three blocking convergence
+findings in one batch, and the same Terra reviewer closed them in one targeted
+continuation. The reviewer did not author or edit the reviewed package.
 
 ## Repaired Findings
 
@@ -63,24 +65,34 @@ checked but are excluded from the reviewed behavior digest they derive from.
 The expanded release smoke proves the digest remains unchanged before and
 after carrier generation and rejects an omitted changed derived carrier.
 
-## Final Independent Confirmation
+## 0.5.0 Convergence Amendment
 
-The same reviewer independently recomputed the 136-path behavior digest,
-confirmed it matches the value above, reran the retained installer, package,
-replay, receipt, code-anchor, acceptance, oracle, and carrier-cycle checks, and
-closed the series with zero open P0 and zero open P1 findings. No new review
-cycle was created and the reviewer made no repository edits.
+The Terra reviewer found and closed three P1 issues in the same review series:
+publication wrappers could have reopened a separate document review, source
+oracles omitted direct convergence dependencies, and the synthetic release
+copy used a hard-coded subset. The one Sol repair batch added exact integrated
+review reuse, complete direct-source closure, and generic changed/untracked
+release-copy verification. The targeted continuation confirmed all three
+closures and reported zero open P0 and zero open P1 findings.
 
-One P2 mechanical observation remains intentionally outside the behavior
-review: the pending release-candidate carrier changed after the preceding graph
-refresh. This does not reopen the consolidated repair series. It requires the
-final carrier update and same-cycle graph regeneration before readiness can
-pass; those derived-carrier checks remain mandatory.
+The full CI matrix then exposed one predecessor-compatibility omission: adding
+the review-reuse section had displaced the inherited REQ-TW-060 native-child
+routing paragraph in both publication wrappers. The final candidate composes
+the already reviewed review-reuse rule with that exact mandatory central-
+adapter invariant. Terra-routing, SEC generation, oracle completeness, strict
+v1 receipts, and controlled-publication checks all pass on the composition;
+this restoration did not add a reviewer or reopen the repair series.
 
-The staged hygiene check subsequently removed three trailing spaces from the
-inventory generator. The behavior digest above therefore supersedes the prior
-byte identity while preserving identical Ruby semantics and output. The same
-reviewer recomputed the new digest, confirmed Ruby syntax, 28 top-level
-callables, 87 declared routes, the unchanged inventory digest, and clean
-staged/unstaged hygiene, then retained `closed_clean` without opening a new
-review cycle.
+The reviewer independently accepted the canonical oracle binding, confirmed
+the canonical/mirror equality and focused regression suite, and authorized the
+post-review deterministic closure: bind reviewer identity, commit the reviewed
+behavior, rebase the strict v1 byte fixture to that real commit, update derived
+carriers, refresh the authoritative graph once, and run full CI. The final
+155-path digest above was mechanically recomputed after the v1 rebase. Those
+mechanical identity updates do not reopen the review series; any semantic
+behavior change would.
+
+The resulting policy retains one Sol delivery session and one Terra reviewer.
+Clean work is bounded to two model turns; blocking work is bounded to the same
+reviewer plus one Sol repair batch and one targeted reviewer continuation.
+Actual elapsed-time or token savings remain held until measured in use.

@@ -44,6 +44,7 @@ release_readiness:
       - docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md
       - fixtures/bootstrap-project/empty-project/expected-files.txt
       - fixtures/bootstrap-project/existing-project/expected-files.txt
+      - fixtures/controlled-publication-route/reviews/mixed-integrated-clean.json
       - fixtures/model-context-routing/acceptance-cases.yml
       - fixtures/model-context-routing/accounting-assembled.json
       - fixtures/model-context-routing/accounting-packet.json
@@ -136,33 +137,51 @@ release_readiness:
       - plugins/traceweaver-core/references/model-context-map.yml
       - plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
       - plugins/traceweaver-core/references/skill-execution-contracts.yml
+      - plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md
+      - plugins/traceweaver-core/references/tw-graph-lifecycle.md
       - plugins/traceweaver-core/references/workflow-profile-template.yml
+      - plugins/traceweaver-core/skills/tw-auto/SKILL.md
       - plugins/traceweaver-core/skills/tw-auto/references/model-context-map.yml
       - plugins/traceweaver-core/skills/tw-auto/references/model-context-oracle-adequacy-review.json
+      - plugins/traceweaver-core/skills/tw-auto/references/traceweaver-controlled-autonomy-policy.md
       - plugins/traceweaver-core/skills/tw-auto/references/workflow-profile-template.yml
       - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-compile-model-context-route
       - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map
       - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-skill-execution-contract-registry
       - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+      - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence
       - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
       - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-validate-model-context-receipt
+      - plugins/traceweaver-core/skills/tw-code-review/SKILL.md
+      - plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md
+      - plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review
+      - plugins/traceweaver-core/skills/tw-commit/SKILL.md
+      - plugins/traceweaver-core/skills/tw-doc-review/SKILL.md
+      - plugins/traceweaver-core/skills/tw-plan/SKILL.md
       - plugins/traceweaver-core/skills/tw-setup/scripts/traceweaver-bootstrap-project
+      - plugins/traceweaver-core/skills/tw-work/SKILL.md
       - requirements.md
       - scripts/traceweaver-check-release-readiness
       - scripts/traceweaver-smoke-bootstrap-project
       - scripts/traceweaver-smoke-codex-discovery
       - scripts/traceweaver-smoke-codex-host-registry
+      - scripts/traceweaver-smoke-consolidated-convergence
+      - scripts/traceweaver-smoke-controlled-publication
+      - scripts/traceweaver-smoke-graphify-wrapper-routing
       - scripts/traceweaver-smoke-installer-transaction
       - scripts/traceweaver-smoke-model-context-routing
+      - scripts/traceweaver-smoke-no-publication
       - scripts/traceweaver-smoke-release-readiness
+      - scripts/traceweaver-smoke-scoped-review
       - scripts/traceweaver-smoke-skill-execution-contract
+      - scripts/traceweaver-smoke-tw-skill-behavior
       - scripts/traceweaver-smoke-workflow-profile
       - src/index.ts
       - traceability-matrix.md
     excluded_paths:
       - .traceweaver/tw-graph-freshness.json
       - docs/validation/traceweaver-plugin-0.5.0-release-candidate.md
-    digest: sha256:73c8b675528a0ebe2307c076bf361f310f635394b11f901dc35bcb169e75c401
+    digest: sha256:61b50906edd33f93e6d4a4fca86a8fbc6d555276e2e8c250e71d64361f6e79de
   candidate_identity:
     plan_id: TW-PLAN-2026-08-22-V050-MODEL-GOVERNANCE-001
     plan_review_id: TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001
@@ -175,15 +194,15 @@ release_readiness:
     authoritative_runtime: v1
     model_context_mode: advisory_shadow_compile
     active_cutover: disabled
-    map_digest: sha256:153ce25228e915ec0949fe1dab1b2296ce3f9934948987c8b191be15eb47665d
-    oracle_digest: sha256:57e6759a481157ec339bf5b66322cf25b5b86d14c6bd9d0fceaf566a8b53ff2d
+    map_digest: sha256:2eab40f5e2e459dfb1ff1f655b0fb0cdacfe8c40478f04368d7185b219c988f2
+    oracle_digest: sha256:e20e838ad7ed01f850466ed16b30914a2883c2f3d40a0f9f0827aa972e65c9fa
     inventory_digest: sha256:fd0eb117987ece30d1f2d3c576d051e8f5f14a3c97e7d55581c22e5a43afdf01
     oracle_review_id: ORACLE-ADEQUACY-TW-049-RELEASE-001
-    oracle_reviewer_identity: /root/v050_independent_validation
+    oracle_reviewer_identity: terra-integrated-reviewer:/root/v050_convergence_integrated_review
     oracle_reviewer_relationship: did_not_implement_compiler_or_author_source_oracle
-    reviewed_behavior_digest: sha256:fc78c3bf929a822f5c998584ce1dcf2912567a9aade3d3864e0bd68d81eabb0d
-    reviewed_behavior_path_count: 136
-    reviewed_scope_digest: sha256:73c8b675528a0ebe2307c076bf361f310f635394b11f901dc35bcb169e75c401
+    reviewed_behavior_digest: sha256:d7d066d95cb5438558ea31f51004ff6a290b984eab71e5e7eca12ccb2275ae99
+    reviewed_behavior_path_count: 155
+    reviewed_scope_digest: sha256:61b50906edd33f93e6d4a4fca86a8fbc6d555276e2e8c250e71d64361f6e79de
   prerequisites:
     accepted_plan: accepted
     plan_document_review: passed
@@ -238,6 +257,14 @@ ATP-TW-049 result, VER-TW-092 result, independent VAL-TW-040 result, bounded
 traceability, package projection and rollback evidence, and candidate scope
 identity are closed on the same reviewed behavior digest.
 
+The convergence amendment keeps normal approved mixed work in one retained Sol
+delivery session for authority lock, compact planning, implementation,
+verification, and one batched repair at most. One Terra reviewer applies all CE
+review lenses in one integrated pass and, only when blocking findings exist,
+one targeted continuation under the same identity. `tw-plan` and `tw-work` are
+embedded phases, publication reuses the exact integrated review, and the
+authoritative graph refresh occurs once after terminal closure.
+
 The readiness checker verifies every identity and passed/accepted disposition
 mechanically. Historical 0.4.0 PR1/PR2 records remain readable through the
 legacy readiness schema, but they are not prerequisites or substitutes for
@@ -278,8 +305,9 @@ record claims bounded TRACE-TW-072 readiness only.
 ## Pre-Merge Boundary
 
 The integrated implementation and single consolidated repair/review series are
-frozen. The final scope digest and evidence identities above must continue to
-pass:
+frozen. The encoded turn bounds are verified structurally; actual elapsed-time
+or token savings remain held until measured. The final scope digest and
+evidence identities above must continue to pass:
 
 ```sh
 ruby scripts/traceweaver-check-release-readiness \

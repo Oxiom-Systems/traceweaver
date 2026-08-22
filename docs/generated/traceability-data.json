@@ -6,7 +6,7 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "0b2b143984d25d9d582987a421099df9968bd16de2e24f827405da36f63790fe"
+      "sha256": "489aecaf35ca4de99eb5e1c4b403e47f6ee2dd590d01ddf9bf250a7c69c88c02"
     },
     {
       "path": "requirements.md",
@@ -18,7 +18,7 @@
     },
     {
       "path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md",
-      "sha256": "edd9833333feeed526e33184cc346cd28565ec17b885ab7b030eae6e634dbf52"
+      "sha256": "2a4e9dc6a11e6c7f924c033df18bb79f5a56f5e0c92a070cfefa4adb5948909c"
     },
     {
       "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md",
@@ -40,7 +40,7 @@
     "result_records": 40,
     "verification_records": 86,
     "validation_records": 36,
-    "code_anchor_records": 429,
+    "code_anchor_records": 434,
     "structured_acceptance_results": 4,
     "structured_acceptance_coverage": 105,
     "structured_acceptance_missing_requirements": 101,
@@ -5254,6 +5254,38 @@
       "Role": "compatibility-route-review-entrypoint"
     },
     {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence",
+      "Requirement": "REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087",
+      "Trace": "TRACE-TW-031; TRACE-TW-067",
+      "Verification": "VER-TW-040; VER-TW-087",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "retained-Sol-integrated-Terra-delivery-router"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review",
+      "Requirement": "REQ-TW-053; REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087",
+      "Trace": "TRACE-TW-033; TRACE-TW-067",
+      "Verification": "VER-TW-040; VER-TW-042; VER-TW-087",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "exact-integrated-review-publication-prerequisite-validator"
+    },
+    {
+      "Artifact Path": "fixtures/controlled-publication-route/reviews/mixed-integrated-clean.json",
+      "Requirement": "REQ-TW-053; REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087",
+      "Trace": "TRACE-TW-033; TRACE-TW-067",
+      "Verification": "VER-TW-042; VER-TW-087",
+      "Anchor Type": "fixture; verifies",
+      "Role": "mixed-candidate-integrated-review-publication-positive"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/tw-graph-lifecycle.md",
+      "Requirement": "REQ-TW-088",
+      "Trace": "TRACE-TW-066",
+      "Verification": "VER-TW-086",
+      "Anchor Type": "file-role",
+      "Role": "post-terminal-zero-model-tw-graph-projection-lifecycle"
+    },
+    {
       "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
       "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
       "Trace": "TRACE-TW-067",
@@ -5372,6 +5404,14 @@
       "Verification": "VER-TW-087",
       "Anchor Type": "file-role; verifies",
       "Role": "convergence-transition-fixture-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-consolidated-convergence",
+      "Requirement": "REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087",
+      "Trace": "TRACE-TW-031; TRACE-TW-067",
+      "Verification": "VER-TW-040; VER-TW-087",
+      "Anchor Type": "file-role; verifies",
+      "Role": "two-turn-clean-and-four-turn-batched-repair-convergence-smoke"
     },
     {
       "Artifact Path": "scripts/traceweaver-smoke-scoped-review",
