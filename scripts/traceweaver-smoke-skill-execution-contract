@@ -63,14 +63,17 @@ metadata.each do |skill, entry|
   expect!(entry.fetch("governing_requirements") == source.scan(/REQ-TW-\d{3}/).uniq.sort, "#{skill} governing requirements drift")
   expect!(entry.fetch("trace_records") == source.scan(/TRACE-TW-\d{3}/).uniq.sort, "#{skill} trace anchors drift")
   expect!(entry.fetch("verification_records") == source.scan(/VER-TW-\d{3}/).uniq.sort, "#{skill} verification anchors drift")
+  expect!(entry.fetch("governing_requirements").include?("REQ-TW-092"), "#{skill} lost SEC requirement anchor")
+  expect!(entry.fetch("trace_records").include?("TRACE-TW-070"), "#{skill} lost SEC trace anchor")
+  expect!(entry.fetch("verification_records").include?("VER-TW-090"), "#{skill} lost SEC verification anchor")
   expected_source_hash = "sha256:#{Digest::SHA256.file(File.join(root, "plugins/traceweaver-core/skills", skill, "SKILL.md")).hexdigest}"
   expect!(entry.fetch("skill_source_hash") == expected_source_hash, "#{skill} source hash drift")
   references = source.scan(%r{references/[A-Za-z0-9._/-]+}).uniq.sort.map do |reference|
     filename = reference.delete_prefix("references/")
     if filename == "scoped-review-protocol.md" && %w[tw-code-review tw-doc-review tw-work].include?(skill)
       "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
-    elsif filename == "workflow-profile-template.yml" && skill == "tw-plan"
-      "plugins/traceweaver-core/references/#{filename}"
+    elsif filename == "workflow-profile-template.yml" && %w[tw-auto tw-plan tw-work tw-code-review tw-doc-review].include?(skill)
+      "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
     elsif filename == "tw-graph-lifecycle.md"
       "plugins/traceweaver-core/references/#{filename}"
     else
@@ -91,6 +94,12 @@ expect!(first.dig("model_route", "served_model") == "not_applicable", "SEC looku
 expect!(!JSON.generate(first).include?("model_context"), "ordinary v1 SEC receipt contains shadow fields")
 expect!(first.fetch("contract").keys.sort & %w[authority packaged_references trace_records workflow_profile graph_action verification validation holds allowed_writes next_wrapper] == %w[allowed_writes authority graph_action holds next_wrapper packaged_references trace_records validation verification workflow_profile], "contract fields incomplete")
 representative_routes = {
+  "tw-auto" => {
+    "profile" => "consolidated_delivery",
+    "graph_action" => "retained_main_tw_graph_refresh_and_check_after_terminal_review_as_zero_model_mechanical_closure",
+    "allowed_writes" => ["approved_scoped_behavior_verification_and_trace_evidence_in_retained_main_session", "terminal_bookkeeping_only_after_integrated_review"],
+    "next_wrapper" => "integrated_tw-code-review_or_terminal_hold"
+  },
   "tw-audit" => {
     "profile" => "read_only",
     "graph_action" => "tw_graph_status_or_query_without_refresh_optional_graphify_enrichment",
@@ -101,28 +110,19 @@ representative_routes = {
     "profile" => "authority_administration",
     "graph_action" => "tw_graph_refresh_after_final_authority_bookkeeping_then_check",
     "allowed_writes" => ["controlled_authority_records_only_after_separate_approved_authority"],
-    "next_wrapper" => "tw-vv-define",
-    "governing_requirements" => %w[REQ-TW-052 REQ-TW-089 REQ-TW-090 REQ-TW-092],
-    "trace_records" => %w[TRACE-TW-036 TRACE-TW-046 TRACE-TW-064 TRACE-TW-070],
-    "verification_records" => %w[VER-TW-046 VER-TW-059 VER-TW-084 VER-TW-090]
+    "next_wrapper" => "tw-auto_or_user_requested_plan_handoff"
   },
   "tw-work" => {
     "profile" => "implementation",
-    "graph_action" => "tw_graph_impact_before_work_refresh_after_accepted_change_optional_graphify_enrichment",
+    "graph_action" => "tw_graph_impact_before_work_defer_refresh_until_terminal_review_optional_graphify_pre_review",
     "allowed_writes" => ["approved_scoped_project_behavior_only", "no_authority_or_publication_write_by_contract"],
-    "next_wrapper" => "tw-traceability-check",
-    "governing_requirements" => %w[REQ-TW-037 REQ-TW-054 REQ-TW-056 REQ-TW-057 REQ-TW-065 REQ-TW-066 REQ-TW-076 REQ-TW-078 REQ-TW-089 REQ-TW-090 REQ-TW-092],
-    "trace_records" => %w[TRACE-TW-035 TRACE-TW-042 TRACE-TW-046 TRACE-TW-048 TRACE-TW-050 TRACE-TW-059 TRACE-TW-064 TRACE-TW-067 TRACE-TW-070],
-    "verification_records" => %w[VER-TW-044 VER-TW-054 VER-TW-059 VER-TW-061 VER-TW-063 VER-TW-079 VER-TW-084 VER-TW-087 VER-TW-090]
+    "next_wrapper" => "tw-auto_integrated_review"
   },
   "tw-code-review" => {
     "profile" => "review",
-    "graph_action" => "tw_graph_check_then_retained_findings_only_no_refresh",
+    "graph_action" => "defer_tw_graph_refresh_and_check_to_retained_main_after_terminal_review_no_reentry",
     "allowed_writes" => ["review_receipt_only_when_separately_authorized"],
-    "next_wrapper" => "tw-doc-review",
-    "governing_requirements" => %w[REQ-TW-037 REQ-TW-049 REQ-TW-052 REQ-TW-056 REQ-TW-057 REQ-TW-065 REQ-TW-086 REQ-TW-087 REQ-TW-089 REQ-TW-090 REQ-TW-092],
-    "trace_records" => %w[TRACE-TW-023 TRACE-TW-046 TRACE-TW-048 TRACE-TW-064 TRACE-TW-067 TRACE-TW-070],
-    "verification_records" => %w[VER-TW-032 VER-TW-059 VER-TW-061 VER-TW-084 VER-TW-087 VER-TW-090]
+    "next_wrapper" => "mechanical_closure_or_same_reviewer_targeted_closure"
   },
   "tw-commit-push-pr" => {
     "profile" => "publication",
@@ -156,6 +156,8 @@ expect!(status.success? && first.fetch("static_definition_hash") == second.fetch
 expect!(first.fetch("invocation_receipt_id") != second.fetch("invocation_receipt_id"), "invocation receipt was not distinct")
 alias_receipt, _error, status = invoke(resolver, registry_path, "lfg", "--invocation-id", "alias")
 expect!(status.success? && alias_receipt.dig("contract", "resolved_skill") == "tw-auto" && alias_receipt.dig("contract", "alias_of") == "tw-auto", "alias resolution failed")
+expect!(alias_receipt.dig("contract", "route_profile") == "consolidated_delivery", "lfg did not select consolidated delivery")
+expect!(alias_receipt.dig("contract", "next_wrapper") == "integrated_tw-code-review_or_terminal_hold", "lfg retained legacy planning handoff")
 auto_receipt, _error, status = invoke(resolver, registry_path, "tw-auto", "--invocation-id", "auto")
 expect!(status.success?, "tw-auto contract refused")
 %w[governing_requirements trace_records].each do |field|
@@ -165,6 +167,9 @@ expect!(status.success?, "tw-auto contract refused")
 end
 expect!((auto_receipt.dig("contract", "verification", "skill_verification_records") - alias_receipt.dig("contract", "verification", "skill_verification_records")).empty?, "alias omitted tw-auto verification anchors")
 expect!((auto_receipt.dig("contract", "packaged_references") - alias_receipt.dig("contract", "packaged_references")).empty?, "alias omitted tw-auto packaged references")
+contract_routes = registry.fetch("contracts").to_h { |contract| [contract.fetch("skill"), contract] }
+expect!(contract_routes.fetch("tw-doc-review").fetch("next_wrapper") == "mechanical_closure_or_same_reviewer_targeted_closure", "tw-doc-review retained legacy traceability handoff")
+expect!(contract_routes.fetch("tw-code-review").fetch("next_wrapper") != "tw-doc-review", "mixed review still fans out to standalone document review")
 default_receipt, _error, status = invoke_default(resolver, "tw-plan", "--invocation-id", "default-source")
 expect!(status.success? && default_receipt.fetch("terminal_state") == "resolved", "default source registry resolution failed")
 missing, _error, status = invoke(resolver, registry_path, "tw-nonexistent")

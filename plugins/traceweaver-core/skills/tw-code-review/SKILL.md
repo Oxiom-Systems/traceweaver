@@ -1,6 +1,6 @@
 ---
 name: tw-code-review
-description: TraceWeaver-controlled code review wrapper. Use when reviewing code, scripts, skill behavior, manifests, runtime harnesses, or behavior-bearing changes that must first pass traceability checks before CE code review.
+description: TraceWeaver integrated candidate review. Use for one independent review of a frozen behavior or mixed candidate, covering code, tests, relevant normative docs, traceability, correctness, and triggered risk lenses in one reviewer context.
 ---
 
 <!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
@@ -23,15 +23,23 @@ actual child is requested.
 <!-- TRACEWEAVER: file-role=review-series-code-review-wrapper; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087 -->
 <!-- TRACEWEAVER: file-role=optional-graphify-code-review-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
 <!-- TRACEWEAVER: entrypoint=graphify_review_impact_search; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: file-role=integrated-candidate-review; req=REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-031,TRACE-TW-067; ver=VER-TW-040,VER-TW-087 -->
 
 # TraceWeaver Code Review
 
 ## Purpose
 
-Run code review as a TraceWeaver-controlled review step instead of a raw CE
-review. This wrapper preserves the CE reviewer behavior while requiring
-authority, traceability, verification, validation, and held-claim checks before
-review findings can be treated as accepted TraceWeaver input.
+Review the entire frozen implementation candidate in one independent context.
+This wrapper preserves useful CE review behavior while combining code, linked
+tests, relevant normative documents, traceability, correctness, and triggered
+risk concerns. It is the sole review route for a mixed candidate.
+
+Load the `consolidated_delivery` block from the packaged sibling
+`<skills-root>/tw-auto/references/workflow-profile-template.yml`. Normal review
+uses one `gpt-5.6-terra` reviewer identity; the retained Sol primary must not
+also dispatch specialist, validator, traceability, or document reviewers.
+Apply imported CE checklists and personas only as lenses inside this reviewer;
+`ce-code-review` and `ce-doc-review` must not spawn nested reviewer subagents.
 
 ## Native Child Routing
 
@@ -55,16 +63,15 @@ remaining budget. Exact accepted-review reuse and verified post-acceptance
 mechanical closure with no new blocker dispatch zero reviewers; bookkeeping
 without a matching accepted review remains review-required.
 
-Use exactly one review-bearing dispatch and one reviewer persona for the
-attempt. When specialist or validator concerns apply, include them in that
-reviewer's bounded concern set; do not dispatch another reviewer. P0/P1 and
-blocking P2 findings route inside the current
-repair-verification attempt; non-blocking P2/P3 findings do not create another
-cycle. A disputed P2 follows the contested-P2 decision path. Stop after one
-routine repair-verification cycle, or sooner for unchanged blocked work, with
-`held_no_progress`. One final cycle requires an explicit receipt-bound exception
-authorized by the owner or approved change-control authority; two is
-the absolute maximum.
+Use exactly one review-bearing dispatch and one reviewer identity for the
+initial attempt. Treat personas as lenses in that context. Return all eligible
+P0/P1 and blocking P2 findings together for one batched Sol repair;
+non-blocking P2/P3 findings do not create another cycle. After evidence
+progress, resume the same reviewer identity once for targeted closure. The
+normal automatic budget is two reviewer turns and one repair batch. An unchanged blocker
+without evidence progress returns `held_no_progress` without redispatch.
+Only a fresh explicit owner or approved change-control decision may invoke the
+REQ-TW-037/056/057 severe-blocker exception outside that automatic budget.
 
 ## Required Authority Inputs
 
@@ -96,7 +103,9 @@ reviewed change, stop and report the missing authority. Do not run raw
    linked tests, fixtures, and smokes to `tw-traceability-check` for code-anchor
    scanning. Use whole-repo scanner output only for audit/baseline debt unless
    publication or release claims depend on it.
-4. Run `tw-traceability-check` on the review target before CE review.
+4. Apply the `tw-traceability-check` rules to the review target inside this
+   reviewer context before CE-derived review; do not dispatch a traceability
+   child.
 5. If `tw-traceability-check` returns blocked, needs revision, missing
    test-first evidence, missing verification, missing validation, dark behavior,
    stale evidence, or an unsupported done/release claim, stop before accepted
@@ -110,14 +119,15 @@ reviewed change, stop and report the missing authority. Do not run raw
    review unless the finding changes task authority, requirement meaning,
    verification authority, or accepted scope. Do not rewrite source or matrix
    files from `tw-code-review`.
-7. Run `ce-code-review` only after the traceability check is passable or the
+7. Apply the packaged `ce-code-review` method only after the traceability check is passable or the
    remaining limitation is explicitly recorded as an approved held condition.
 8. Keep `ce-code-review` in TraceWeaver no-publication mode. It may report
    findings and policy-allowed local fixes, but it must not stage, commit, push,
    open PRs, update PRs, or claim release/clean-replacement readiness.
-9. Report code-review findings together with the traceability result, test-first
-   evidence, verification evidence, validation path, held claims, and next
-   required review or human decision.
+9. Review relevant normative documents in the same frozen scope and report all
+   findings together with traceability, test-first evidence, verification,
+   validation, held claims, and the next decision. Do not open `tw-doc-review`
+   for this mixed candidate.
 
 ## Optional Graphify Review Context
 
@@ -138,12 +148,12 @@ It is not a review finding or review-pass evidence.
 return standalone `tw-traceability-check` as the normal next user command unless
 the user explicitly asked for a traceability diagnostic or audit.
 
-If review is blocked by missing unambiguous anchors, route the next action to
-`/tw-work ...` or `/tw-auto ...` so the work loop can author anchors and rerun
-review. If review is clean, record the accepted review and its bookkeeping
-atomically. Route scoped
-`/tw-doc-review ...` only when normative semantic authority changed, never for
-status/hash/receipt/projection/index bookkeeping alone.
+If review is blocked by missing unambiguous anchors or eligible findings,
+return the complete batch to the retained `/tw-auto` Sol context. If review is
+clean, return terminal semantic acceptance; the primary then records
+bookkeeping atomically with zero model dispatches. Route `/tw-doc-review ...`
+only for a separate authority-only or document-only semantic change, never for
+a mixed candidate or status/hash/receipt/projection/index bookkeeping.
 If unresolved mappings or authority problems block acceptance, return the exact
 human decision or highest-level wrapper needed to repair the work.
 
@@ -167,13 +177,14 @@ Return:
 - selected reviewer personas, active-reviewer count, and repair-cycle result
 - terminal receipt reference when this review contributes to terminal state
 
-## Mandatory tw-graph Lifecycle
+## Post-Terminal tw-graph Lifecycle
 
 Load `references/tw-graph-lifecycle.md` before applying this lifecycle.
 
-Require a passing `tw-graph check` before clean review completion. Read-only
-review never refreshes stale output; it returns the finding to the owning cycle.
-Optional Graphify cannot satisfy this mandatory check.
+Do not refresh generated graph state during semantic review. After terminal
+acceptance, the retained primary performs the required `tw-graph` refresh/check
+mechanically and atomically with other bookkeeping. That output cannot reopen
+review. Optional Graphify cannot satisfy the mandatory authority-graph check.
 
 ## Gate
 

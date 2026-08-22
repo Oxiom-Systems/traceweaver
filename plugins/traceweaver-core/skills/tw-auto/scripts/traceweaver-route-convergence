@@ -1,0 +1,241 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=consolidated-delivery-router; req=REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-031,TRACE-TW-067; ver=VER-TW-040,VER-TW-087
+# TRACEWEAVER: entrypoint=consolidated_delivery_route; req=REQ-TW-056,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-067; ver=VER-TW-087
+
+require "json"
+require "optparse"
+require "pathname"
+require "yaml"
+
+class ConvergenceRouteError < StandardError; end
+
+DEFAULT_PROFILE = "plugins/traceweaver-core/references/workflow-profile-template.yml"
+PACKAGED_PROFILE = File.expand_path("../references/workflow-profile-template.yml", __dir__)
+CHANGE_CLASSES = %w[normal_mixed authority_only document_only mechanical_closure].freeze
+FINDINGS = %w[none nonblocking blocking].freeze
+
+begin
+options = {
+  profile: nil,
+  findings: "none",
+  repair_batches: 0,
+  evidence_progress: true
+}
+
+OptionParser.new do |parser|
+  parser.on("--profile PATH") { |value| options[:profile] = value }
+  parser.on("--change-class CLASS") { |value| options[:change_class] = value }
+  parser.on("--findings CLASS") { |value| options[:findings] = value }
+  parser.on("--repair-batches COUNT", Integer) { |value| options[:repair_batches] = value }
+  parser.on("--evidence-progress VALUE") do |value|
+    raise ConvergenceRouteError, "--evidence-progress must be true or false" unless %w[true false].include?(value)
+
+    options[:evidence_progress] = value == "true"
+  end
+end.parse!
+
+raise ConvergenceRouteError, "--change-class is required" unless options[:change_class]
+unless CHANGE_CLASSES.include?(options[:change_class])
+  raise ConvergenceRouteError, "--change-class must be one of #{CHANGE_CLASSES.join(', ')}"
+end
+unless FINDINGS.include?(options[:findings])
+  raise ConvergenceRouteError, "--findings must be one of #{FINDINGS.join(', ')}"
+end
+unless (0..1).cover?(options[:repair_batches])
+  raise ConvergenceRouteError, "repair batch cap is one"
+end
+
+profile_path = if options[:profile]
+                 Pathname.new(options[:profile]).expand_path
+               elsif Pathname.new(DEFAULT_PROFILE).file?
+                 Pathname.new(DEFAULT_PROFILE).expand_path
+               else
+                 Pathname.new(PACKAGED_PROFILE)
+               end
+profile = YAML.safe_load(File.read(profile_path), permitted_classes: [], aliases: false)
+routing = profile.fetch("model_routing")
+contract = profile.fetch("consolidated_delivery")
+
+unless routing.fetch("codex_main_model") == "gpt-5.6-sol" &&
+       routing.fetch("codex_subagent_model") == "gpt-5.6-terra" &&
+       routing.fetch("sol_allowed_for_subagents") == false
+  raise ConvergenceRouteError, "v1 Sol-main/Terra-child routing invariant changed"
+end
+unless contract.fetch("schema_version") == "tw-consolidated-delivery/1" &&
+       contract.dig("primary", "model") == routing.fetch("codex_main_model") &&
+       contract.dig("primary", "separate_child_dispatches") == 0 &&
+       contract.dig("integrated_review", "model") == routing.fetch("codex_subagent_model") &&
+       contract.dig("integrated_review", "nested_reviewer_dispatches") == 0
+  raise ConvergenceRouteError, "consolidated delivery contract is invalid"
+end
+
+base = {
+  "schema_version" => "tw-consolidated-delivery-route/1",
+  "change_class" => options[:change_class],
+  "primary_model" => routing.fetch("codex_main_model"),
+  "reviewer_model" => routing.fetch("codex_subagent_model"),
+  "sol_allowed_for_subagents" => routing.fetch("sol_allowed_for_subagents"),
+  "nested_reviewer_dispatches" => contract.dig("integrated_review", "nested_reviewer_dispatches"),
+  "publication" => contract.fetch("publication"),
+  "post_terminal_bookkeeping_model_dispatches" => contract.dig("mechanical_closure", "model_dispatches")
+}
+
+result = case options[:change_class]
+         when "mechanical_closure"
+           if options[:findings] != "none" || options[:repair_batches] != 0
+             raise ConvergenceRouteError, "mechanical closure cannot carry findings or repair work"
+           end
+           {
+             "outcome" => "mechanical_closure",
+             "primary_phases" => [],
+             "candidate_freeze_count" => 0,
+             "standalone_tw_plan" => false,
+             "standalone_tw_doc_review" => false,
+             "planning_work_native_child_dispatches" => 0,
+             "review_native_child_dispatches" => 0,
+             "native_child_dispatches" => 0,
+             "reviewer_turns" => 0,
+             "reviewer_identity_count" => 0,
+             "repair_batches" => 0,
+             "total_model_turns" => 0
+           }
+         when "authority_only", "document_only"
+           common = {
+             "primary_phases" => ["authority_lock"],
+             "candidate_freeze_count" => 1,
+             "standalone_tw_plan" => false,
+             "standalone_tw_doc_review" => true,
+             "planning_work_native_child_dispatches" => 0,
+             "reviewer_identity_count" => contract.dig("integrated_review", "reviewer_identity_count")
+           }
+           case options[:findings]
+           when "none"
+             raise ConvergenceRouteError, "repair work requires blocking findings" unless options[:repair_batches].zero?
+             common.merge(
+               "outcome" => "standalone_document_review_clean",
+               "review_native_child_dispatches" => 1,
+               "native_child_dispatches" => 1,
+               "reviewer_turns" => 1,
+               "repair_batches" => 0,
+               "total_model_turns" => 2
+             )
+           when "nonblocking"
+             raise ConvergenceRouteError, "nonblocking findings cannot consume a repair batch" unless options[:repair_batches].zero?
+             common.merge(
+               "outcome" => "standalone_document_review_accepted_with_nonblocking_findings",
+               "review_native_child_dispatches" => 1,
+               "native_child_dispatches" => 1,
+               "reviewer_turns" => 1,
+               "repair_batches" => 0,
+               "total_model_turns" => 2
+             )
+           when "blocking"
+             if options[:repair_batches].zero?
+               common.merge(
+                 "outcome" => "standalone_document_batch_repair_then_targeted_closure",
+                 "candidate_freeze_count" => contract.dig("candidate", "repair_path_freeze_count_max"),
+                 "review_native_child_dispatches" => 2,
+                 "native_child_dispatches" => 2,
+                 "reviewer_turns" => 2,
+                 "reviewer_resumption" => "same_identity",
+                 "repair_batches" => 1,
+                 "total_model_turns" => contract.dig("model_turn_budget", "blocking_path_max")
+               )
+             elsif !options[:evidence_progress]
+               common.merge(
+                 "outcome" => "held_no_progress",
+                 "review_native_child_dispatches" => 1,
+                 "native_child_dispatches" => 1,
+                 "reviewer_turns" => 1,
+                 "reviewer_resumption" => "prohibited",
+                 "repair_batches" => 1,
+                 "total_model_turns" => 3
+               )
+             else
+               common.merge(
+                 "outcome" => "standalone_document_targeted_reviewer_closure",
+                 "candidate_freeze_count" => contract.dig("candidate", "repair_path_freeze_count_max"),
+                 "review_native_child_dispatches" => 2,
+                 "native_child_dispatches" => 2,
+                 "reviewer_turns" => 2,
+                 "reviewer_resumption" => "same_identity",
+                 "repair_batches" => 1,
+                 "total_model_turns" => contract.dig("model_turn_budget", "blocking_path_max")
+               )
+             end
+           end
+         when "normal_mixed"
+           phases = contract.dig("primary", "phases") - ["batch_repair"]
+           common = {
+             "primary_phases" => phases,
+             "candidate_freeze_count" => contract.dig("candidate", "clean_path_freeze_count"),
+             "standalone_tw_plan" => false,
+             "standalone_tw_doc_review" => false,
+             "planning_work_native_child_dispatches" => contract.dig("primary", "separate_child_dispatches"),
+             "reviewer_identity_count" => contract.dig("integrated_review", "reviewer_identity_count")
+           }
+           case options[:findings]
+           when "none"
+             raise ConvergenceRouteError, "repair work requires blocking findings" unless options[:repair_batches].zero?
+             common.merge(
+               "outcome" => "integrated_candidate_review_clean",
+               "review_native_child_dispatches" => 1,
+               "native_child_dispatches" => contract.dig("integrated_review", "clean_path_native_child_dispatches"),
+               "reviewer_turns" => 1,
+               "repair_batches" => 0,
+               "total_model_turns" => contract.dig("model_turn_budget", "clean_path")
+             )
+           when "nonblocking"
+             raise ConvergenceRouteError, "nonblocking findings cannot consume a repair batch" unless options[:repair_batches].zero?
+             common.merge(
+               "outcome" => "accepted_with_nonblocking_findings",
+               "review_native_child_dispatches" => 1,
+               "native_child_dispatches" => 1,
+               "reviewer_turns" => 1,
+               "repair_batches" => 0,
+               "total_model_turns" => 2
+             )
+           when "blocking"
+             if options[:repair_batches].zero?
+             common.merge(
+               "outcome" => "batch_repair_then_targeted_closure",
+               "candidate_freeze_count" => contract.dig("candidate", "repair_path_freeze_count_max"),
+               "review_native_child_dispatches" => 2,
+                 "native_child_dispatches" => 2,
+                 "reviewer_turns" => 2,
+                 "reviewer_resumption" => "same_identity",
+                 "repair_batches" => 1,
+                 "total_model_turns" => contract.dig("model_turn_budget", "blocking_path_max")
+               )
+             elsif !options[:evidence_progress]
+               common.merge(
+                 "outcome" => "held_no_progress",
+                 "review_native_child_dispatches" => 1,
+                 "native_child_dispatches" => 1,
+                 "reviewer_turns" => 1,
+                 "reviewer_resumption" => "prohibited",
+                 "repair_batches" => 1,
+                 "total_model_turns" => 3
+               )
+             else
+               common.merge(
+                 "outcome" => "targeted_reviewer_closure",
+                 "candidate_freeze_count" => contract.dig("candidate", "repair_path_freeze_count_max"),
+                 "review_native_child_dispatches" => 2,
+                 "native_child_dispatches" => 2,
+                 "reviewer_turns" => 2,
+                 "reviewer_resumption" => "same_identity",
+                 "repair_batches" => 1,
+                 "total_model_turns" => contract.dig("model_turn_budget", "blocking_path_max")
+               )
+             end
+           end
+         end
+
+puts JSON.pretty_generate(base.merge(result))
+rescue ConvergenceRouteError, KeyError, Errno::ENOENT, Psych::Exception => e
+  warn "traceweaver_convergence_route=held_invalid_input reason=#{e.message}"
+  exit 2
+end

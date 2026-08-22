@@ -24,7 +24,7 @@ canonical_template_path = File.join(root, "plugins/traceweaver-core/references/w
 packaged_template_path = File.join(root, "plugins/traceweaver-core/skills/tw-auto/references/workflow-profile-template.yml")
 raise "workflow-profile-template: packaged mirror drift" unless File.binread(canonical_template_path) == File.binread(packaged_template_path)
 template = load_yaml(canonical_template_path)
-%w[schema_version task_id profile_revision profile_status risk selection_rationale model_routing model_context selected_controls child_roles model_selection reviewer_cap repair_cycle_cap severe_blocker_exception_cycle_cap requires_deploy requires_chrome_dogfood profile_hash immutable_after_building accounting].each do |field|
+%w[schema_version task_id profile_revision profile_status risk selection_rationale model_routing consolidated_delivery model_context selected_controls child_roles model_selection reviewer_cap repair_cycle_cap severe_blocker_exception_cycle_cap requires_deploy requires_chrome_dogfood profile_hash immutable_after_building accounting].each do |field|
   raise "workflow-profile-template: missing #{field}" unless template.key?(field)
 end
 raise "workflow-profile-template: wrong schema" unless template.fetch("schema_version") == "tw-workflow-profile/1"
@@ -55,6 +55,7 @@ raise "workflow-profile-template: mandatory source-category drift" unless source
 raise "workflow-profile-template: model-context efficiency overclaim" unless model_context.fetch("efficiency_eligibility") == false
 raise "workflow-profile-template: missing immutable building boundary" unless template.dig("immutable_after_building", "fields").include?("profile_hash")
 raise "workflow-profile-template: model-context profile not immutable after building" unless template.dig("immutable_after_building", "fields").include?("model_context")
+raise "workflow-profile-template: consolidated delivery not immutable after building" unless template.dig("immutable_after_building", "fields").include?("consolidated_delivery")
 raise "workflow-profile-template: missing fixed accounting categories" unless template.dig("accounting", "fixed_categories") == %w[process delivery unclassified]
 profile_budget = template.fetch("process_budget")
 %w[target_total_effort_percent hard_ceiling_total_effort_percent target_process_to_delivery_ratio_percent hard_ceiling_process_to_delivery_ratio_percent estimated_delivery_minutes estimated_process_target_minutes estimated_process_ceiling_minutes].each do |field|
@@ -111,8 +112,7 @@ raise "budget: delivery-underrun hold missing" unless budget.dig("delivery_under
 raise "budget: terminal hard hold wrong" unless budget.dig("delivery_underrun_terminal", "actual_process_minutes") > budget.dig("delivery_underrun_terminal", "actual_delivery_minutes")
 
 auto = File.read(File.join(root, "plugins/traceweaver-core/skills/tw-auto/SKILL.md"))
-raise "tw-auto: direct implementation route present" unless auto.include?("It has no direct implementation path.")
-raise "tw-auto: profile router missing" unless auto.include?("advisory profile and capsule router")
-raise "tw-auto: direct coding engine present" if auto.include?("ce-work")
+raise "tw-auto: consolidated profile wiring missing" unless auto.include?("<skills-root>/tw-auto/references/workflow-profile-template.yml")
+raise "tw-auto: deterministic convergence router missing" unless auto.include?("<skills-root>/tw-auto/scripts/traceweaver-route-convergence")
 puts "workflow-profile smoke: PASS"
 RUBY

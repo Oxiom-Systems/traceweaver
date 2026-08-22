@@ -42,7 +42,7 @@ GENERIC_FAMILIES = [
   ["tw-worktree", "worktree_operator"]
 ].freeze
 ROUTE_KINDS = {
-  "implementation" => %w[tw-work tw-worktree],
+  "implementation" => %w[tw-auto tw-work tw-worktree],
   "review" => %w[tw-audit tw-code-review tw-doc-review tw-resolve-pr-feedback tw-test-browser tw-test-xcode tw-traceability-check],
   "publication" => %w[tw-commit tw-commit-push-pr]
 }.freeze

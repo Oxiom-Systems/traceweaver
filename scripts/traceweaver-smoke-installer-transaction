@@ -89,12 +89,16 @@ assert_success_projection() {
     install_manifest="$target_root/install-manifest.json"
     [[ -f "$target_root/skills/tw-auto/references/model-context-map.yml" ]]
     [[ -f "$target_root/skills/tw-auto/references/workflow-profile-template.yml" ]]
+    [[ -x "$target_root/skills/tw-auto/scripts/traceweaver-route-convergence" ]]
+    [[ -x "$target_root/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review" ]]
   else
     source_manifest="$repo_root/plugins/traceweaver-core/.antigravity-plugin/plugin.json"
     target_root="$home/config/plugins/traceweaver-core"
     install_manifest="$target_root/install-manifest.json"
     [[ -f "$target_root/skills/tw-auto/references/model-context-map.yml" ]]
     [[ -f "$target_root/skills/tw-auto/references/workflow-profile-template.yml" ]]
+    [[ -x "$target_root/skills/tw-auto/scripts/traceweaver-route-convergence" ]]
+    [[ -x "$target_root/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review" ]]
     [[ -d "$target_root/agents" ]]
   fi
   [[ -f "$install_manifest" ]]

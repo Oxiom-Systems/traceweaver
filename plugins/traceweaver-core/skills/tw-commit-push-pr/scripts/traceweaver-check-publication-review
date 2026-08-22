@@ -1,0 +1,77 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=publication-review-route-validator; req=REQ-TW-053,REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-033,TRACE-TW-067; ver=VER-TW-040,VER-TW-042,VER-TW-087
+
+require "json"
+require "optparse"
+
+SCHEMA = "tw-publication-review/1"
+INTEGRATED_COVERAGE = %w[
+  behavior
+  correctness
+  held_claims
+  linked_tests
+  relevant_normative_docs
+  traceability_vv
+  triggered_risk_lenses
+].freeze
+
+options = {}
+# TRACEWEAVER: entrypoint=validate_publication_review_route; req=REQ-TW-053,REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-033,TRACE-TW-067; ver=VER-TW-040,VER-TW-042,VER-TW-087
+OptionParser.new do |parser|
+  parser.on("--record PATH") { |value| options[:record] = value }
+  parser.on("--candidate-kind KIND") { |value| options[:candidate_kind] = value }
+  parser.on("--candidate-digest DIGEST") { |value| options[:candidate_digest] = value }
+end.parse!
+
+def hold!(reason)
+  puts JSON.generate({
+    "schema_version" => SCHEMA,
+    "outcome" => "held_publication_review_invalid",
+    "reason" => reason
+  })
+  exit 2
+end
+
+record_path = options[:record]
+candidate_kind = options[:candidate_kind]
+candidate_digest = options[:candidate_digest]
+hold!("missing_argument") unless [record_path, candidate_kind, candidate_digest].all? { |value| value.is_a?(String) && !value.empty? }
+hold!("candidate_kind") unless %w[behavior mixed authority_only document_only].include?(candidate_kind)
+hold!("candidate_digest") unless candidate_digest.match?(/\Asha256:[0-9a-f]{64}\z/)
+
+begin
+  record = JSON.parse(File.binread(record_path))
+rescue Errno::ENOENT, JSON::ParserError
+  hold!("record_unreadable")
+end
+
+hold!("record_schema") unless record.is_a?(Hash) && record["schema_version"] == SCHEMA
+hold!("candidate_binding") unless record["candidate_kind"] == candidate_kind && record["candidate_digest"] == candidate_digest
+hold!("review_status") unless record["status"] == "clean"
+hold!("reviewer_identity") unless record["reviewer_identity"].is_a?(String) && !record["reviewer_identity"].empty?
+hold!("reviewer_identity_count") unless record["reviewer_identity_count"] == 1
+hold!("review_turn_count") unless record["review_turn_count"].is_a?(Integer) && record["review_turn_count"].between?(1, 2)
+hold!("nested_reviewer_dispatches") unless record["nested_reviewer_dispatches"] == 0
+
+if %w[behavior mixed].include?(candidate_kind)
+  hold!("mixed_candidate_review_route") unless record["review_route"] == "tw-code-review"
+  coverage = record["coverage"]
+  hold!("mixed_candidate_review_scope") unless coverage.is_a?(Array) && (INTEGRATED_COVERAGE - coverage).empty?
+else
+  hold!("standalone_document_review_route") unless record["review_route"] == "tw-doc-review"
+  coverage = record["coverage"]
+  hold!("standalone_document_review_scope") unless coverage.is_a?(Array) && coverage.include?("authority_and_document_semantics")
+end
+
+puts JSON.generate({
+  "schema_version" => SCHEMA,
+  "outcome" => "publication_review_eligible",
+  "candidate_kind" => candidate_kind,
+  "candidate_digest" => candidate_digest,
+  "review_route" => record.fetch("review_route"),
+  "reviewer_identity" => record.fetch("reviewer_identity"),
+  "review_turn_count" => record.fetch("review_turn_count"),
+  "new_model_dispatches" => 0
+})

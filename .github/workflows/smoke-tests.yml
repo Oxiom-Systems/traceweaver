@@ -90,6 +90,9 @@ jobs:
       - name: Workflow-profile regression smoke
         run: scripts/traceweaver-smoke-workflow-profile
 
+      - name: Consolidated Sol delivery convergence smoke
+        run: scripts/traceweaver-smoke-consolidated-convergence
+
       - name: No-publication regression smoke
         run: scripts/traceweaver-smoke-no-publication
 

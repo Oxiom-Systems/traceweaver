@@ -7,7 +7,7 @@
     "relationship": "did_not_implement_compiler_or_author_source_oracle",
     "independent": true
   },
-  "map_digest": "sha256:153ce25228e915ec0949fe1dab1b2296ce3f9934948987c8b191be15eb47665d",
+  "map_digest": "sha256:2eab40f5e2e459dfb1ff1f655b0fb0cdacfe8c40478f04368d7185b219c988f2",
   "inventory_digest": "sha256:fd0eb117987ece30d1f2d3c576d051e8f5f14a3c97e7d55581c22e5a43afdf01",
   "route_count": 87,
   "category_count": 6,
@@ -21,6 +21,11 @@
           "source_manifest_category": "controlling_authority",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md",
           "digest": "sha256:83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": "requirements.md",
+          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
         }
       ]
     },
@@ -33,6 +38,11 @@
           "source_manifest_category": "task_scope",
           "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
           "digest": "sha256:4b99eb5fa71506fbb8710ea479513407e51a03555d0aa43a47089f7bdf2ae56b"
+        },
+        {
+          "source_manifest_category": "task_scope",
+          "locator": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
+          "digest": "sha256:0bf1e297f78cc20e6d846812a9fc992996f5aa12a43da97d6b2aa7fcc28e927f"
         }
       ]
     },
@@ -44,7 +54,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
-          "digest": "sha256:673f8b727436bf2715bdd2d610725a2c8a07775e159534f4853dc3cefd43bb6d"
+          "digest": "sha256:5a4f1183aa36f92d43b4571f59a15116eaf97a2d0d02f5ae0d43a03e0d2ff141"
         }
       ]
     },
@@ -56,7 +66,52 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/tw-graph-lifecycle.md",
+          "digest": "sha256:dd42e6ff01ccb572e10421f1dc80ce55928596ec0024a20af350bf242f5a59b6"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+          "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md",
+          "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+          "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series",
+          "digest": "sha256:c9bc35ebc170c76c817fd129c72a6d1e3bfe4002237e4332006b7f69d20ba003"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence",
+          "digest": "sha256:1f1205c208cb7cc5e08b71669d03cad0d8144c408e850cf77c34cdbaf635cc5f"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child",
+          "digest": "sha256:1bb98139c91fece82c483e0b8fc3ab9cde6685bf4fd7437ed42c8f1f17054e5b"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
+          "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-work/SKILL.md",
+          "digest": "sha256:837202d39be53af82f38783a90fa1fb6b132a9cd5868942367ffba37b80e62dd"
         }
       ]
     },
@@ -76,6 +131,11 @@
           "source_manifest_category": "accepted_evidence",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md",
           "digest": "sha256:60d9bf513683e61651f7d65cff5be2939bfdd0ee3a4817b85f4dadb88eb92a3c"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "scripts/traceweaver-smoke-consolidated-convergence",
+          "digest": "sha256:6f3d22daf0130e037fb0f52b82b7a2d8508a65be8f5c1850776272d5cff8d56f"
         }
       ]
     },
@@ -123,7 +183,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -190,7 +250,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -222,6 +282,11 @@
           "source_manifest_category": "controlling_authority",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md",
           "digest": "sha256:83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": "requirements.md",
+          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
         }
       ]
     },
@@ -234,6 +299,11 @@
           "source_manifest_category": "task_scope",
           "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
           "digest": "sha256:4b99eb5fa71506fbb8710ea479513407e51a03555d0aa43a47089f7bdf2ae56b"
+        },
+        {
+          "source_manifest_category": "task_scope",
+          "locator": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
+          "digest": "sha256:0bf1e297f78cc20e6d846812a9fc992996f5aa12a43da97d6b2aa7fcc28e927f"
         }
       ]
     },
@@ -245,7 +315,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
-          "digest": "sha256:673f8b727436bf2715bdd2d610725a2c8a07775e159534f4853dc3cefd43bb6d"
+          "digest": "sha256:5a4f1183aa36f92d43b4571f59a15116eaf97a2d0d02f5ae0d43a03e0d2ff141"
         }
       ]
     },
@@ -257,7 +327,52 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/tw-graph-lifecycle.md",
+          "digest": "sha256:dd42e6ff01ccb572e10421f1dc80ce55928596ec0024a20af350bf242f5a59b6"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+          "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md",
+          "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+          "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series",
+          "digest": "sha256:c9bc35ebc170c76c817fd129c72a6d1e3bfe4002237e4332006b7f69d20ba003"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence",
+          "digest": "sha256:1f1205c208cb7cc5e08b71669d03cad0d8144c408e850cf77c34cdbaf635cc5f"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child",
+          "digest": "sha256:1bb98139c91fece82c483e0b8fc3ab9cde6685bf4fd7437ed42c8f1f17054e5b"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
+          "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-work/SKILL.md",
+          "digest": "sha256:837202d39be53af82f38783a90fa1fb6b132a9cd5868942367ffba37b80e62dd"
         }
       ]
     },
@@ -277,6 +392,11 @@
           "source_manifest_category": "accepted_evidence",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md",
           "digest": "sha256:60d9bf513683e61651f7d65cff5be2939bfdd0ee3a4817b85f4dadb88eb92a3c"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "scripts/traceweaver-smoke-consolidated-convergence",
+          "digest": "sha256:6f3d22daf0130e037fb0f52b82b7a2d8508a65be8f5c1850776272d5cff8d56f"
         }
       ]
     },
@@ -324,7 +444,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -391,7 +511,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -423,6 +543,11 @@
           "source_manifest_category": "controlling_authority",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md",
           "digest": "sha256:83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": "requirements.md",
+          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
         }
       ]
     },
@@ -435,6 +560,11 @@
           "source_manifest_category": "task_scope",
           "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
           "digest": "sha256:4b99eb5fa71506fbb8710ea479513407e51a03555d0aa43a47089f7bdf2ae56b"
+        },
+        {
+          "source_manifest_category": "task_scope",
+          "locator": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
+          "digest": "sha256:0bf1e297f78cc20e6d846812a9fc992996f5aa12a43da97d6b2aa7fcc28e927f"
         }
       ]
     },
@@ -446,7 +576,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-code-review/SKILL.md",
-          "digest": "sha256:b6197cd7418d312077f459fb272c5f84576913fb9b29985f1109c14c27823e69"
+          "digest": "sha256:20b19c2f0de7f166d6bed8967c63fa585e7cbb5c3f6542b415f2114255d3c01d"
         }
       ]
     },
@@ -458,7 +588,52 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/tw-graph-lifecycle.md",
+          "digest": "sha256:dd42e6ff01ccb572e10421f1dc80ce55928596ec0024a20af350bf242f5a59b6"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+          "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/ce-code-review/SKILL.md",
+          "digest": "sha256:c7e39b83cdec9f14591022e435c3440205b55c67c7225dc13d39059186468a48"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/ce-doc-review/SKILL.md",
+          "digest": "sha256:3c84b988ac0953bd6b4389b2a45536b661d7153cfbf877cf6f32d162c96a311d"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md",
+          "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory",
+          "digest": "sha256:2c419279f88f88350dd6c8dbdbbfcf19596cf1b093b6b0caa9b78e9339651847"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+          "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series",
+          "digest": "sha256:c9bc35ebc170c76c817fd129c72a6d1e3bfe4002237e4332006b7f69d20ba003"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child",
+          "digest": "sha256:1bb98139c91fece82c483e0b8fc3ab9cde6685bf4fd7437ed42c8f1f17054e5b"
         }
       ]
     },
@@ -478,6 +653,11 @@
           "source_manifest_category": "accepted_evidence",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md",
           "digest": "sha256:60d9bf513683e61651f7d65cff5be2939bfdd0ee3a4817b85f4dadb88eb92a3c"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "scripts/traceweaver-smoke-consolidated-convergence",
+          "digest": "sha256:6f3d22daf0130e037fb0f52b82b7a2d8508a65be8f5c1850776272d5cff8d56f"
         }
       ]
     },
@@ -525,7 +705,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -592,7 +772,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -659,7 +839,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -726,7 +906,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -793,7 +973,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -860,7 +1040,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -927,7 +1107,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -994,7 +1174,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1061,7 +1241,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1128,7 +1308,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1195,7 +1375,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1262,7 +1442,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1329,7 +1509,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1396,7 +1576,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1463,7 +1643,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1530,7 +1710,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1585,7 +1765,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-commit/SKILL.md",
-          "digest": "sha256:b0836c2545fa436c748fcedc725214349040f26a02ae0ff625fb1555da6e4e64"
+          "digest": "sha256:74d91bdbf31640122614405f8b9dfbdaac1fbaef5f1de1cb23a9f699aeefe7ad"
         }
       ]
     },
@@ -1597,7 +1777,27 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/tw-graph-lifecycle.md",
+          "digest": "sha256:dd42e6ff01ccb572e10421f1dc80ce55928596ec0024a20af350bf242f5a59b6"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/ce-commit/SKILL.md",
+          "digest": "sha256:bc1b4cd03c8a911dec2923e643d1e790e9361acb26cdc7fdf56bf004bd3fa09a"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+          "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review",
+          "digest": "sha256:2062190190a1ef9dbc66198a5e0be167d31c0934b3efaab918045958cee19624"
         }
       ]
     },
@@ -1652,7 +1852,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md",
-          "digest": "sha256:95faa931e33e611b2ec8bb4a6a6517d222687803b1352cc76cc24d0b3c7efe56"
+          "digest": "sha256:dbd6f435d0e2683fd214a10e67dcbdcaae1b9f0b4c30f8ff2035303d28cd3003"
         }
       ]
     },
@@ -1664,7 +1864,32 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/tw-graph-lifecycle.md",
+          "digest": "sha256:dd42e6ff01ccb572e10421f1dc80ce55928596ec0024a20af350bf242f5a59b6"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md",
+          "digest": "sha256:264667767cc5c29c62b4e71eb8d0e08434a35b07c7159ef2b5854587da4e02a6"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+          "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review",
+          "digest": "sha256:2062190190a1ef9dbc66198a5e0be167d31c0934b3efaab918045958cee19624"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule",
+          "digest": "sha256:b50b3603aa7a73cd956f735870069ee62a23af725f6f340d590794fe44eac41b"
         }
       ]
     },
@@ -1719,7 +1944,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1731,7 +1956,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1786,7 +2011,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1798,7 +2023,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1865,7 +2090,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1932,7 +2157,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -1999,7 +2224,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2066,7 +2291,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2133,7 +2358,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2200,7 +2425,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2267,7 +2492,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2334,7 +2559,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2401,7 +2626,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2468,7 +2693,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2523,7 +2748,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2535,7 +2760,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2567,6 +2792,11 @@
           "source_manifest_category": "controlling_authority",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md",
           "digest": "sha256:83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": "requirements.md",
+          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
         }
       ]
     },
@@ -2579,6 +2809,11 @@
           "source_manifest_category": "task_scope",
           "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
           "digest": "sha256:4b99eb5fa71506fbb8710ea479513407e51a03555d0aa43a47089f7bdf2ae56b"
+        },
+        {
+          "source_manifest_category": "task_scope",
+          "locator": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
+          "digest": "sha256:0bf1e297f78cc20e6d846812a9fc992996f5aa12a43da97d6b2aa7fcc28e927f"
         }
       ]
     },
@@ -2590,7 +2825,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-doc-review/SKILL.md",
-          "digest": "sha256:b06908d80fb9eb4428cd93e324dd3200b5486e0717cb1370b1c88605fb9b552e"
+          "digest": "sha256:2e71de1829156e0e064595233d5ef5f23a822942d1449bc00556012e3c56c550"
         }
       ]
     },
@@ -2602,7 +2837,42 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/tw-graph-lifecycle.md",
+          "digest": "sha256:dd42e6ff01ccb572e10421f1dc80ce55928596ec0024a20af350bf242f5a59b6"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+          "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/ce-doc-review/SKILL.md",
+          "digest": "sha256:3c84b988ac0953bd6b4389b2a45536b661d7153cfbf877cf6f32d162c96a311d"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md",
+          "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+          "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series",
+          "digest": "sha256:c9bc35ebc170c76c817fd129c72a6d1e3bfe4002237e4332006b7f69d20ba003"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child",
+          "digest": "sha256:1bb98139c91fece82c483e0b8fc3ab9cde6685bf4fd7437ed42c8f1f17054e5b"
         }
       ]
     },
@@ -2622,6 +2892,11 @@
           "source_manifest_category": "accepted_evidence",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md",
           "digest": "sha256:60d9bf513683e61651f7d65cff5be2939bfdd0ee3a4817b85f4dadb88eb92a3c"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "scripts/traceweaver-smoke-consolidated-convergence",
+          "digest": "sha256:6f3d22daf0130e037fb0f52b82b7a2d8508a65be8f5c1850776272d5cff8d56f"
         }
       ]
     },
@@ -2669,7 +2944,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2736,7 +3011,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2803,7 +3078,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2870,7 +3145,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -2937,7 +3212,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3004,7 +3279,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3071,7 +3346,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3138,7 +3413,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3205,7 +3480,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3272,7 +3547,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3339,7 +3614,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3406,7 +3681,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3473,7 +3748,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3540,7 +3815,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3607,7 +3882,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3639,6 +3914,11 @@
           "source_manifest_category": "controlling_authority",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md",
           "digest": "sha256:83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": "requirements.md",
+          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
         }
       ]
     },
@@ -3651,6 +3931,11 @@
           "source_manifest_category": "task_scope",
           "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
           "digest": "sha256:4b99eb5fa71506fbb8710ea479513407e51a03555d0aa43a47089f7bdf2ae56b"
+        },
+        {
+          "source_manifest_category": "task_scope",
+          "locator": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
+          "digest": "sha256:0bf1e297f78cc20e6d846812a9fc992996f5aa12a43da97d6b2aa7fcc28e927f"
         }
       ]
     },
@@ -3662,7 +3947,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
-          "digest": "sha256:530444afde69486e3986c5495166f1e48a983d40184214b4479cbf19f0f47dd4"
+          "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447"
         }
       ]
     },
@@ -3674,7 +3959,32 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+          "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/ce-plan/SKILL.md",
+          "digest": "sha256:b4f8768827552f2fdf55ad29e5f1144156ad983f683e8e751cb08900d3f391e5"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory",
+          "digest": "sha256:2c419279f88f88350dd6c8dbdbbfcf19596cf1b093b6b0caa9b78e9339651847"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+          "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child",
+          "digest": "sha256:1bb98139c91fece82c483e0b8fc3ab9cde6685bf4fd7437ed42c8f1f17054e5b"
         }
       ]
     },
@@ -3694,6 +4004,11 @@
           "source_manifest_category": "accepted_evidence",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md",
           "digest": "sha256:60d9bf513683e61651f7d65cff5be2939bfdd0ee3a4817b85f4dadb88eb92a3c"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "scripts/traceweaver-smoke-consolidated-convergence",
+          "digest": "sha256:6f3d22daf0130e037fb0f52b82b7a2d8508a65be8f5c1850776272d5cff8d56f"
         }
       ]
     },
@@ -3741,7 +4056,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3808,7 +4123,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3875,7 +4190,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -3942,7 +4257,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4009,7 +4324,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4076,7 +4391,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4143,7 +4458,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4210,7 +4525,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4277,7 +4592,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4344,7 +4659,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4411,7 +4726,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4478,7 +4793,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4545,7 +4860,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4612,7 +4927,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4679,7 +4994,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4746,7 +5061,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4813,7 +5128,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4880,7 +5195,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -4947,7 +5262,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5014,7 +5329,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5081,7 +5396,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5148,7 +5463,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5215,7 +5530,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5282,7 +5597,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5349,7 +5664,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5416,7 +5731,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5483,7 +5798,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5515,6 +5830,11 @@
           "source_manifest_category": "controlling_authority",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md",
           "digest": "sha256:83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": "requirements.md",
+          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
         }
       ]
     },
@@ -5527,6 +5847,11 @@
           "source_manifest_category": "task_scope",
           "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
           "digest": "sha256:4b99eb5fa71506fbb8710ea479513407e51a03555d0aa43a47089f7bdf2ae56b"
+        },
+        {
+          "source_manifest_category": "task_scope",
+          "locator": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
+          "digest": "sha256:0bf1e297f78cc20e6d846812a9fc992996f5aa12a43da97d6b2aa7fcc28e927f"
         }
       ]
     },
@@ -5538,7 +5863,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-work/SKILL.md",
-          "digest": "sha256:a2cf9fbbe3e1b49f9ce182f12aec2237c351049815d0a243e1750eb04f568a1f"
+          "digest": "sha256:837202d39be53af82f38783a90fa1fb6b132a9cd5868942367ffba37b80e62dd"
         }
       ]
     },
@@ -5550,7 +5875,62 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/tw-graph-lifecycle.md",
+          "digest": "sha256:dd42e6ff01ccb572e10421f1dc80ce55928596ec0024a20af350bf242f5a59b6"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+          "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/ce-work/SKILL.md",
+          "digest": "sha256:765d165999f2df5f6647a7d11c5a7d4ce7fc1a85e4e2b1cf4a62b9dc2d383c01"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md",
+          "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory",
+          "digest": "sha256:2c419279f88f88350dd6c8dbdbbfcf19596cf1b093b6b0caa9b78e9339651847"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+          "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series",
+          "digest": "sha256:c9bc35ebc170c76c817fd129c72a6d1e3bfe4002237e4332006b7f69d20ba003"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child",
+          "digest": "sha256:1bb98139c91fece82c483e0b8fc3ab9cde6685bf4fd7437ed42c8f1f17054e5b"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors",
+          "digest": "sha256:732ad2ac7edd2e5155cac21f86b6477ce283b166fba436d11786c0c0ca5c2cd7"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors",
+          "digest": "sha256:d5ffa7408469cdf6d05d702a4773f13c917e59627b0f6778170b69a8b5b9de70"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-vv-define/scripts/traceweaver-check-vv-capsule",
+          "digest": "sha256:7bc4a14e9b7a40c36dfcc694cde43a07147a982bc2512a2c8500eee16169b043"
         }
       ]
     },
@@ -5570,6 +5950,11 @@
           "source_manifest_category": "accepted_evidence",
           "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md",
           "digest": "sha256:60d9bf513683e61651f7d65cff5be2939bfdd0ee3a4817b85f4dadb88eb92a3c"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "scripts/traceweaver-smoke-consolidated-convergence",
+          "digest": "sha256:6f3d22daf0130e037fb0f52b82b7a2d8508a65be8f5c1850776272d5cff8d56f"
         }
       ]
     },
@@ -5617,7 +6002,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5684,7 +6069,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5751,7 +6136,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5806,7 +6191,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5818,7 +6203,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52"
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
         }
       ]
     },
@@ -5846,5 +6231,5 @@
 
   ],
   "expected": "pass_every_release_route_category_dispositioned",
-  "oracle_digest": "sha256:99263b3865648f7b842014cf2762c39c78573ee719b91618431a8d24b4ebc2b6"
+  "oracle_digest": "sha256:31f9378b16b8a0920221149d755a682887e9f533718eaa78444e70163a09ec06"
 }

@@ -1,0 +1,21 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=publication-integrated-review-fixture; verifies=VER-TW-042,VER-TW-087; req=REQ-TW-053,REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-033,TRACE-TW-067",
+  "schema_version": "tw-publication-review/1",
+  "candidate_kind": "mixed",
+  "candidate_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "status": "clean",
+  "review_route": "tw-code-review",
+  "reviewer_identity": "terra-integrated-reviewer:fixture",
+  "reviewer_identity_count": 1,
+  "review_turn_count": 2,
+  "nested_reviewer_dispatches": 0,
+  "coverage": [
+    "behavior",
+    "linked_tests",
+    "relevant_normative_docs",
+    "traceability_vv",
+    "correctness",
+    "triggered_risk_lenses",
+    "held_claims"
+  ]
+}

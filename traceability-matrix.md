@@ -660,6 +660,10 @@ anchor is allocated for the authority-only REQ-TW-060/088 amendment.
 | docs/validation/traceweaver-plugin-0.5.0-release-candidate.md | REQ-TW-122; REQ-TW-123 | TRACE-TW-072 | VER-TW-092 | release-candidate; evidence-envelope | exact-reviewed-scope-and-held-claim-release-gate |
 | plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role; entrypoint | persistent-locked-review-series-controller |
 | plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-review | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role; entrypoint | compatibility-route-review-entrypoint |
+| plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence | REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087 | TRACE-TW-031; TRACE-TW-067 | VER-TW-040; VER-TW-087 | file-role; entrypoint | retained-Sol-integrated-Terra-delivery-router |
+| plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review | REQ-TW-053; REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087 | TRACE-TW-033; TRACE-TW-067 | VER-TW-040; VER-TW-042; VER-TW-087 | file-role; entrypoint | exact-integrated-review-publication-prerequisite-validator |
+| fixtures/controlled-publication-route/reviews/mixed-integrated-clean.json | REQ-TW-053; REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087 | TRACE-TW-033; TRACE-TW-067 | VER-TW-042; VER-TW-087 | fixture; verifies | mixed-candidate-integrated-review-publication-positive |
+| plugins/traceweaver-core/references/tw-graph-lifecycle.md | REQ-TW-088 | TRACE-TW-066 | VER-TW-086 | file-role | post-terminal-zero-model-tw-graph-projection-lifecycle |
 | plugins/traceweaver-core/skills/tw-auto/SKILL.md | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role | review-series-orchestrator-handoff |
 | plugins/traceweaver-core/skills/tw-work/SKILL.md | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role | retained-finding-repair-handoff |
 | plugins/traceweaver-core/skills/tw-doc-review/SKILL.md | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role | document-review-series-handoff |
@@ -675,6 +679,7 @@ anchor is allocated for the authority-only REQ-TW-060/088 amendment.
 | plugins/traceweaver-core/references/automation-loop-state-template.yml | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role | canonical-persistent-review-loop-state |
 | plugins/traceweaver-core/skills/tw-auto/references/automation-loop-state-template.yml | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role; mirror | packaged-persistent-review-loop-state |
 | scripts/traceweaver-smoke-review-series-convergence | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role; verifies | convergence-transition-fixture-smoke |
+| scripts/traceweaver-smoke-consolidated-convergence | REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087 | TRACE-TW-031; TRACE-TW-067 | VER-TW-040; VER-TW-087 | file-role; verifies | two-turn-clean-and-four-turn-batched-repair-convergence-smoke |
 | scripts/traceweaver-smoke-scoped-review | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role; verifies | scoped-review-protocol-regression-smoke |
 | scripts/traceweaver-smoke-workflow-profile | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | file-role; verifies | one-reviewer-one-cycle-profile-regression-smoke |
 | scripts/traceweaver-smoke-no-publication | REQ-TW-037; REQ-TW-056; REQ-TW-057 | TRACE-TW-067 | VER-TW-087 | verifies | convergence-publication-hold-regression-smoke |

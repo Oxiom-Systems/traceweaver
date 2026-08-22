@@ -203,7 +203,14 @@ Release.
 TraceWeaver Core 0.5.0 adds a deterministic, inspectable, shadow-only
 model-context map and compiler adjacent to the existing workflow profile and
 Skill Execution Contract. Model role, risk effort, packet budget, and context
-completeness remain independent fields.
+completeness remain independent fields. Normal approved mixed delivery now
+keeps authority lock, compact planning, V&V setup, implementation, focused
+verification, trace updates, and one possible repair batch in the retained Sol
+main context. It dispatches one Terra integrated reviewer, with at most one
+targeted continuation of that same reviewer after repair on the normal
+automatic path. The existing severe-blocker exception still requires a fresh
+explicit owner or approved change-control decision; it is not an automatic
+loop continuation.
 
 The B0--B3 values are experimental hypotheses and may be only unqualified or
 structurally eligible in this release. They do not prove savings, sufficiency,
@@ -271,11 +278,13 @@ or autonomously publish. Those claims remain separately gated.
 - `tw-traceability-check` checks whether behavior traces to
   approved authority, implementation, test-first verification, and validation
   evidence.
-- `tw-auto` runs the advisory controlled-autonomy loop: CE-compatible
-  plan/work/review sequencing plus TraceWeaver authority, traceability,
-  test-first verification, matrix-update, and next-step controls.
-- `tw-plan` wraps the packaged `ce-plan` planning engine with TraceWeaver
-  authority, requirements-quality, traceability, and no-publication controls.
+- `tw-auto` runs consolidated advisory delivery: the retained Sol main context
+  performs authority lock, compact plan, work, verification, trace updates, and
+  one possible repair batch, then uses one Terra integrated-review identity.
+- `tw-plan` is an embedded `tw-auto` phase for normal approved work. Call it
+  standalone only when the user requests a plan artifact or the work is
+  planning-only; review that artifact separately only when normative authority
+  changes.
 - `tw-brainstorm` wraps packaged `ce-brainstorm` so vague ideas and requirement
   source material enter TraceWeaver as source evidence before
   `tw-requirements-review`.
@@ -349,16 +358,20 @@ tw-strategy when product direction needs grounding
 -> tw-brainstorm
 -> tw-requirements-review
 -> authority-baseline record
--> tw-plan
--> tw-authority-gate
--> test-first verification evidence
--> tw-work
--> tw-traceability-check
--> tw-code-review / tw-doc-review
--> verification evidence record
--> validation evidence record
+-> tw-auto retained Sol primary
+   (authority lock -> compact plan -> proportional V&V setup -> work
+    -> focused verification -> trace/matrix update -> candidate freeze)
+-> one Terra tw-code-review integrated review
+   (code + tests + relevant normative docs + traceability + risk lenses)
+-> optional one-batch Sol repair -> same Terra reviewer targeted closure
+-> zero-model mechanical receipts/status/generated views
 -> tw-compound
 ```
+
+`tw-doc-review` remains a standalone route for authority-only or document-only
+semantic changes. It is not a second review for a mixed implementation
+candidate. Publication, deployment, and release remain held until separately
+authorized.
 
 `authority-baseline`, `verification`, and `validation` are record outputs in
 this alpha, not installed `tw-*` skills or slash commands. A later unit may add
@@ -384,9 +397,10 @@ enforcing mode remain held until U9 or a later accepted runtime proof.
 
 `tw-auto` is the first packaged TraceWeaver-controlled automation surface. It
 provides advisory automation with the Intent Contract, traceability matrix,
-bounded review-fix cycle, severity policy, and stop-before commit/push/PR
-boundary. The packaged `lfg` name delegates to `tw-auto` so users who expect the
-CE autonomous entrypoint do not bypass TraceWeaver authority controls.
+one integrated review identity, at most one batched repair, severity policy,
+and stop-before commit/push/PR boundary. The packaged `lfg` name delegates to
+`tw-auto` so users who expect the CE autonomous entrypoint do not bypass
+TraceWeaver authority controls.
 
 There are two valid blank-project starts:
 

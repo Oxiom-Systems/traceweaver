@@ -66,8 +66,8 @@ def packaged_references(source, skill)
     filename = reference.delete_prefix("references/")
     if filename == "scoped-review-protocol.md" && %w[tw-code-review tw-doc-review tw-work].include?(skill)
       "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
-    elsif filename == "workflow-profile-template.yml" && skill == "tw-plan"
-      "plugins/traceweaver-core/references/#{filename}"
+    elsif filename == "workflow-profile-template.yml" && %w[tw-auto tw-plan tw-work tw-code-review tw-doc-review].include?(skill)
+      "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
     elsif filename == "tw-graph-lifecycle.md"
       "plugins/traceweaver-core/references/#{filename}"
     else

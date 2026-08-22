@@ -2,7 +2,7 @@
   "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-116; trace=TRACE-TW-072; ver=VER-TW-092",
   "schema_version": "tw-model-context-source-manifest/1",
   "scenario": "seeded_omission",
-  "required_source": "requirements.md",
+  "required_source": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-result.md",
   "manifest_contains_required_source": false,
   "expected": "held_source_manifest_incomplete"
 }

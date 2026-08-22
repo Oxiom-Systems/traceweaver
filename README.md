@@ -273,12 +273,13 @@ Reference material:
 | --- | --- |
 | Unsure where to start | `tw-auto "describe the goal"` |
 | Candidate requirements or acceptance criteria exist | `tw-requirements-review` |
-| Approved work needs a plan | `tw-plan` |
-| Approved plan needs code or docs changed | `tw-work` |
+| Approved mixed behavior work needs delivery | `tw-auto` (retained Sol plan/work/verify/trace, then one Terra integrated review) |
+| User explicitly requests a standalone plan artifact | `tw-plan` |
+| User explicitly requests standalone implementation | `tw-work`, returning to `tw-auto` integrated review |
 | Existing repo needs dark-code or lost-intent audit | `tw-audit` |
 | Bug, regression, failing test, or incident | `tw-debug` |
-| Behavior-bearing files changed | `tw-code-review` |
-| Requirements, plans, matrix, Intent Contract, or evidence changed | `tw-doc-review` |
+| Mixed behavior-bearing candidate changed | `tw-code-review` once, including relevant normative docs |
+| Authority-only or document-only semantic change | `tw-doc-review` standalone |
 | Commit, push, or PR is requested | `tw-commit-push-pr` |
 | Learning should be captured | `tw-compound` |
 

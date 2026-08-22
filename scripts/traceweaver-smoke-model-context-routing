@@ -54,10 +54,83 @@ IMPORTED_ENGINES = {
 }.freeze
 GENERIC_FAMILIES = [["tw-commit", "publication_preparer"], ["tw-commit-push-pr", "publication_delegate"], ["tw-debug", "diagnosis_worker"], ["tw-worktree", "worktree_operator"]].freeze
 ROUTE_KINDS = {
-  "implementation" => %w[tw-work tw-worktree],
+  "implementation" => %w[tw-auto tw-work tw-worktree],
   "review" => %w[tw-audit tw-code-review tw-doc-review tw-resolve-pr-feedback tw-test-browser tw-test-xcode tw-traceability-check],
   "publication" => %w[tw-commit tw-commit-push-pr]
 }.freeze
+DIRECT_CONTROL_DEPENDENCIES = {
+  "tw-auto" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+    plugins/traceweaver-core/skills/tw-plan/SKILL.md
+    plugins/traceweaver-core/skills/tw-work/SKILL.md
+  ],
+  "tw-plan" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/ce-plan/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+  ],
+  "tw-work" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/ce-work/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+    plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors
+    plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors
+    plugins/traceweaver-core/skills/tw-vv-define/scripts/traceweaver-check-vv-capsule
+  ],
+  "tw-code-review" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/ce-code-review/SKILL.md
+    plugins/traceweaver-core/skills/ce-doc-review/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+  ],
+  "tw-doc-review" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/ce-doc-review/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+  ],
+  "tw-commit" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/skills/ce-commit/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review
+  ],
+  "tw-commit-push-pr" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review
+    plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule
+  ]
+}.transform_values { |paths| paths.sort.freeze }.freeze
 
 def shell(*command)
   Open3.capture3(*command)
@@ -136,6 +209,15 @@ def manifest_for_delivery(root, template, fixture)
   manifest
 end
 
+def manifest_source!(manifest, locator)
+  source = manifest.fetch("categories")
+    .flat_map { |category| category.fetch("sources", []) }
+    .find { |candidate| candidate["locator"] == locator }
+  raise "delivery_source_missing=#{locator}" unless source
+
+  source
+end
+
 def source_manifest_for_route(route_id)
   # The owner-controlled adequacy review supplies the route's obligations;
   # this system-temporary file is only a delivery candidate.  It cannot become
@@ -173,6 +255,28 @@ def path_within?(base, candidate)
   candidate_path == base_path || candidate_path.to_s.start_with?("#{base_path}/")
 end
 
+def copy_oracle_sources!(source_root, destination_root, oracle, skip_prefixes: [], label: "oracle")
+  oracle.fetch("route_category_cells").flat_map { |cell| cell.fetch("source_refs", []) }
+    .map { |reference| reference.fetch("locator") }
+    .reject { |locator| skip_prefixes.any? { |prefix| locator.start_with?(prefix) } }
+    .uniq
+    .sort
+    .each do |locator|
+      locator_path = Pathname.new(locator)
+      raise "unsafe_#{label}_source_locator=#{locator}" if locator_path.absolute? || locator_path.each_filename.include?("..")
+
+      source = File.join(source_root, locator)
+      destination = File.join(destination_root, locator)
+      raise "#{label}_source_outside_root=#{locator}" unless path_within?(source_root, source)
+      raise "#{label}_source_missing=#{locator}" unless File.file?(source)
+      raise "#{label}_source_symlink=#{locator}" if File.symlink?(source)
+      raise "#{label}_destination_outside_root=#{locator}" unless path_within?(destination_root, destination)
+
+      FileUtils.mkdir_p(File.dirname(destination))
+      FileUtils.cp(source, destination)
+    end
+end
+
 def bound_project_for(root)
   @bound_projects ||= {}
   return @bound_projects[root] if @bound_projects[root]
@@ -188,6 +292,15 @@ def bound_project_for(root)
     FileUtils.cp_r(File.join(root, "fixtures/model-context-routing"), File.join(project, "fixtures"))
   end
   FileUtils.cp(File.join(root, "README.md"), File.join(project, "README.md")) if File.file?(File.join(root, "README.md"))
+
+  # The isolated delivery project must contain every digest-bound source that
+  # the canonical oracle can select.  Derive that inventory from the oracle so
+  # a newly approved requirement or evidence artifact cannot silently leave
+  # alias/source-delivery tests exercising an incomplete synthetic project.
+  oracle_path = File.join(root, "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json")
+  oracle = JSON.parse(File.read(oracle_path))
+  copy_oracle_sources!(root, project, oracle, label: "oracle")
+
   @bound_projects[root] = project
 end
 
@@ -241,6 +354,8 @@ def assert_canonical_oracle_mandatory_rejection!(root)
     FileUtils.cp_r(File.join(root, "plugins/traceweaver-core"), File.join(project, "plugins"))
     FileUtils.mkdir_p(File.join(project, ".traceweaver"))
     FileUtils.cp(PROFILE, File.join(project, ".traceweaver/v050-model-governance-workflow-profile.yml"))
+    source_oracle = JSON.parse(File.read(File.join(root, "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json")))
+    copy_oracle_sources!(root, project, source_oracle, label: "canonical_oracle_test")
     oracle_path = File.join(project, "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json")
     oracle = JSON.parse(File.read(oracle_path))
     mandatory = oracle.fetch("route_category_cells").find { |cell| cell.fetch("route_id") == "tw-plan" && cell.fetch("category") == "controlling_authority" }
@@ -317,6 +432,7 @@ def assert_installed_direct_callable!(root, tmp)
   FileUtils.cp_r(File.join(root, "docs"), consumer)
   FileUtils.cp(File.join(root, "README.md"), File.join(consumer, "README.md"))
   installed_oracle = JSON.parse(File.read(File.join(home, ".codex/traceweaver-core/references/model-context-oracle-adequacy-review.json")))
+  copy_oracle_sources!(root, consumer, installed_oracle, skip_prefixes: ["plugins/traceweaver-core/"], label: "installed")
   installed_scenarios = [
     ["tw-setup", compiler, validator],
     ["tw-authority-gate", compiler, validator],
@@ -403,6 +519,15 @@ def validate_oracle_review!(root, review, inventory, map_digest)
       end
     end
   end
+  DIRECT_CONTROL_DEPENDENCIES.each do |route_id, expected|
+    route_cells = actual.fetch(route_id)
+    implementation = route_cells.find { |cell| cell.fetch("category") == "implementation_dependencies" }
+    locators = implementation.fetch("source_refs").map { |reference| reference.fetch("locator") }.sort
+    raise "oracle_review_direct_dependency_closure=#{route_id}" unless locators == expected
+  end
+  lfg_dependencies = actual.fetch("lfg").find { |cell| cell.fetch("category") == "implementation_dependencies" }
+    .fetch("source_refs").map { |reference| reference.fetch("locator") }.sort
+  raise "oracle_review_alias_dependency_parity" unless lfg_dependencies == DIRECT_CONTROL_DEPENDENCIES.fetch("tw-auto")
   raise "oracle_review_open_cells" unless review.fetch("open_or_uncertain_cells") == []
 end
 
@@ -611,7 +736,7 @@ Dir.mktmpdir("traceweaver-model-context-smoke-") do |tmp|
       }
       manifest_path = if (named_manifest = positive_manifests[id])
         candidate = File.join(fixture_root, named_manifest)
-        source = JSON.parse(File.read(candidate)).fetch("categories").first.fetch("sources").first
+        source = manifest_source!(JSON.parse(File.read(candidate)), fixture.fetch("locator"))
         fixture.each { |field, value| next if %w[expected _traceweaver].include?(field); raise "delivery_fixture_not_exercised=#{id}:#{field}" unless source[field] == value }
         candidate
       else
@@ -623,15 +748,15 @@ Dir.mktmpdir("traceweaver-model-context-smoke-") do |tmp|
       entry.fetch("expected").start_with?("pass_") ? (raise "delivery_positive=#{id}" unless receipt["outcome"] == "structurally_eligible_shadow_recommendation") : assert_held(receipt, entry.fetch("expected"))
       if id == "MC117_DIRECT_BYTES"
         direct = JSON.parse(File.read(manifest_path))
-        direct_source = direct.fetch("categories").first.fetch("sources").first
+        direct_source = manifest_source!(direct, fixture.fetch("locator"))
         raise "direct_payload_fixture" unless direct_source.fetch("bytes_base64") == fixture.fetch("bytes_base64")
         missing_payload = deep_copy(direct)
-        missing_payload.fetch("categories").first.fetch("sources").first.delete("bytes_base64")
+        manifest_source!(missing_payload, fixture.fetch("locator")).delete("bytes_base64")
         missing_path = File.join(tmp, "#{id}-missing-bytes.json")
         File.write(missing_path, JSON.generate(missing_payload))
         assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-missing-bytes", source_manifest: missing_path), "held_source_delivery_invalid")
         tampered_payload = deep_copy(direct)
-        tampered_payload.fetch("categories").first.fetch("sources").first["bytes_base64"] = "VGFtcGVyZWQgZGlyZWN0IGJ5dGVzLgo="
+        manifest_source!(tampered_payload, fixture.fetch("locator"))["bytes_base64"] = "VGFtcGVyZWQgZGlyZWN0IGJ5dGVzLgo="
         tampered_path = File.join(tmp, "#{id}-tampered-bytes.json")
         File.write(tampered_path, JSON.generate(tampered_payload))
         assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-tampered-bytes", source_manifest: tampered_path), "held_source_delivery_invalid")

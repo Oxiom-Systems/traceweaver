@@ -127,6 +127,7 @@ expect_rejected release_readiness_merge_sha_fixture \
   ruby "$checker" --receipt "$v2_ready" --version 0.5.0 --root . --merge-sha 0000000000000000000000000000000000000000
 
 candidate_record=docs/validation/traceweaver-plugin-0.5.0-release-candidate.md
+candidate_state_pending=0
 if [ -f "$candidate_record" ]; then
   ruby -rdate -ryaml -e '
     source = File.read(ARGV.fetch(0))
@@ -146,12 +147,16 @@ if [ -f "$candidate_record" ]; then
     grep -Fq 'receipt contains a PENDING placeholder' "$temp_dir/release_readiness_pending_integrated_candidate.err"
     candidate_state_gate=pass_pending_rejected
   else
-    ruby "$checker" \
-      --receipt "$candidate_record" \
-      --version 0.5.0 \
-      --root . \
-      --merge-sha "$worktree_head" >/dev/null
-    candidate_state_gate=pass_final_ready
+    if ruby "$checker" \
+        --receipt "$candidate_record" \
+        --version 0.5.0 \
+        --root . \
+        --merge-sha "$worktree_head" >"$temp_dir/current-candidate.out" 2>"$temp_dir/current-candidate.err"; then
+      candidate_state_gate=pass_final_ready
+    else
+      candidate_state_gate=held_terminal_carrier_rebind_required
+      candidate_state_pending=1
+    fi
   fi
 fi
 
@@ -192,70 +197,6 @@ git clone --quiet --no-hardlinks . "$production_repo"
 git -C "$production_repo" checkout --quiet --detach "$released_base"
 [ "$(git -C "$production_repo" rev-parse HEAD)" = "$released_base" ]
 
-manifest_paths=(
-  .claude-plugin/marketplace.json
-  plugins/traceweaver-core/.claude-plugin/plugin.json
-  plugins/traceweaver-core/.codex-plugin/plugin.json
-  plugins/traceweaver-core/.cursor-plugin/plugin.json
-  plugins/traceweaver-core/.antigravity-plugin/plugin.json
-)
-for path in "${manifest_paths[@]}"; do
-  cp -p "$source_root/$path" "$production_repo/$path"
-done
-
-copy_current_path() {
-  local path="$1"
-  mkdir -p "$production_repo/$(dirname "$path")"
-  cp -p "$source_root/$path" "$production_repo/$path"
-}
-
-real_bounded_paths=(
-  requirements.md
-  .traceweaver/intent-contract.yml
-  plugins/traceweaver-core/references/model-context-map.yml
-  plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
-  plugins/traceweaver-core/references/skill-execution-contracts.yml
-  plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map
-  plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-acceptance-results
-  plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors
-  docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md
-  docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md
-  traceability-matrix.md
-  .traceweaver/tw-graph-freshness.json
-  scripts/traceweaver-check-release-readiness
-  scripts/traceweaver-generate-traceability-views
-  scripts/traceweaver-smoke-traceability-generated-views
-  scripts/traceweaver-smoke-verify
-  scripts/traceweaver-smoke-model-context-routing
-  scripts/traceweaver-smoke-installer-transaction
-  scripts/traceweaver-smoke-release-readiness
-)
-for path in "${real_bounded_paths[@]}"; do
-  copy_current_path "$path"
-done
-
-while IFS= read -r path; do
-  [ -n "$path" ] || continue
-  copy_current_path "$path"
-done < <(jq -r '.route_category_cells[].source_refs[]?.locator' "$source_root/plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json" | sort -u)
-
-production_map="$production_repo/plugins/traceweaver-core/references/model-context-map.yml"
-production_oracle="$production_repo/plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json"
-production_inventory="$temp_dir/production-inventory.json"
-"$production_repo/plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map" \
-  --root "$production_repo" \
-  --map "$production_map" \
-  --format json >"$production_inventory"
-
-map_digest="$(ruby -ryaml -e 'print YAML.safe_load(File.read(ARGV.fetch(0)), permitted_classes: [], aliases: false).fetch("map_digest")' "$production_map")"
-oracle_digest="$(jq -r .oracle_digest "$production_oracle")"
-inventory_digest="$(jq -r .inventory_digest "$production_inventory")"
-oracle_review_id="$(jq -r .review_id "$production_oracle")"
-oracle_reviewer_identity="$(jq -r .reviewer.identity "$production_oracle")"
-oracle_reviewer_relationship="$(jq -r .reviewer.relationship "$production_oracle")"
-map_file_sha256="sha256:$(shasum -a 256 "$production_map" | awk '{print $1}')"
-oracle_file_sha256="sha256:$(shasum -a 256 "$production_oracle" | awk '{print $1}')"
-
 carrier_paths=(
   docs/validation/traceweaver-plugin-0.5.0-release-candidate.md
   .traceweaver/tw-graph-freshness.json
@@ -277,6 +218,62 @@ is_carrier_path() {
   done
   return 1
 }
+
+list_source_provisional_delta() {
+  {
+    git -C "$source_root" diff --name-only --no-renames "$released_base" --
+    git -C "$source_root" ls-files --others --exclude-standard
+  } | sort -u
+}
+
+if git -C "$source_root" diff --name-only --diff-filter=D "$released_base" -- | grep -q .; then
+  echo "production_provisional_deleted_path=unsupported" >&2
+  exit 1
+fi
+
+copy_current_path() {
+  local path="$1"
+  if [ ! -f "$source_root/$path" ] || [ -L "$source_root/$path" ]; then
+    echo "production_provisional_path_invalid=$path" >&2
+    exit 1
+  fi
+  mkdir -p "$production_repo/$(dirname "$path")"
+  cp -p "$source_root/$path" "$production_repo/$path"
+}
+
+provisional_behavior_paths=()
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  is_carrier_path "$path" && continue
+  provisional_behavior_paths+=("$path")
+  copy_current_path "$path"
+done < <(list_source_provisional_delta)
+
+for required_delta in \
+  plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence \
+  plugins/traceweaver-core/references/tw-graph-lifecycle.md; do
+  if ! printf '%s\n' "${provisional_behavior_paths[@]}" | grep -Fxq "$required_delta"; then
+    echo "production_provisional_behavior_delta=missing path=$required_delta" >&2
+    exit 1
+  fi
+done
+
+production_map="$production_repo/plugins/traceweaver-core/references/model-context-map.yml"
+production_oracle="$production_repo/plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json"
+production_inventory="$temp_dir/production-inventory.json"
+"$production_repo/plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map" \
+  --root "$production_repo" \
+  --map "$production_map" \
+  --format json >"$production_inventory"
+
+map_digest="$(ruby -ryaml -e 'print YAML.safe_load(File.read(ARGV.fetch(0)), permitted_classes: [], aliases: false).fetch("map_digest")' "$production_map")"
+oracle_digest="$(jq -r .oracle_digest "$production_oracle")"
+inventory_digest="$(jq -r .inventory_digest "$production_inventory")"
+oracle_review_id="$(jq -r .review_id "$production_oracle")"
+oracle_reviewer_identity="$(jq -r .reviewer.identity "$production_oracle")"
+oracle_reviewer_relationship="$(jq -r .reviewer.relationship "$production_oracle")"
+map_file_sha256="sha256:$(shasum -a 256 "$production_map" | awk '{print $1}')"
+oracle_file_sha256="sha256:$(shasum -a 256 "$production_oracle" | awk '{print $1}')"
 
 list_production_delta() {
   {
@@ -303,8 +300,28 @@ while IFS= read -r path; do
   is_carrier_path "$path" && continue
   production_behavior_paths+=("$path")
 done < <(list_production_delta)
+if [ "${#production_behavior_paths[@]}" -ne "${#provisional_behavior_paths[@]}" ] ||
+   [ "$(printf '%s\n' "${production_behavior_paths[@]}")" != "$(printf '%s\n' "${provisional_behavior_paths[@]}")" ]; then
+  echo "production_provisional_behavior_delta=copy_mismatch" >&2
+  exit 1
+fi
+for required_delta in \
+  plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence \
+  plugins/traceweaver-core/references/tw-graph-lifecycle.md; do
+  if ! printf '%s\n' "${production_behavior_paths[@]}" | grep -Fxq "$required_delta"; then
+    echo "production_synthetic_behavior_delta=missing path=$required_delta" >&2
+    exit 1
+  fi
+done
+echo "production_provisional_behavior_delta=pass paths=${#production_behavior_paths[@]}"
 reviewed_behavior_digest="$(calculate_paths_digest "${production_behavior_paths[@]}")"
 reviewed_behavior_path_count="${#production_behavior_paths[@]}"
+
+# Populate the excluded graph-freshness carrier only after the provisional
+# behavior identity is fixed. The smoke does not refresh the real repository
+# graph and this carrier never enters semantic review identity or candidate
+# scope.
+copy_current_path .traceweaver/tw-graph-freshness.json
 
 mkdir -p "$production_repo/docs/validation"
 cat >"$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-code-review.md" <<EOF
@@ -1032,3 +1049,8 @@ echo "release_readiness_non_self_referential_scope=pass"
 echo "release_public_shadow_claim_boundary=pass"
 echo "release_workflow_push_main_only=pass"
 echo "release_candidate_state_gate=${candidate_state_gate:-not_present}"
+if [ "$candidate_state_pending" -ne 0 ]; then
+  echo "release_candidate_terminal_carrier_rebind=held" >&2
+  cat "$temp_dir/current-candidate.err" >&2
+  exit 1
+fi

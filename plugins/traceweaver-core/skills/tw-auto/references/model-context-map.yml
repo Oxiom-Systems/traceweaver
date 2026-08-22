@@ -67,7 +67,7 @@ source_oracle:
   adequacy_review_schema: tw-model-context-oracle-adequacy-review/1
 
 route_kinds:
-  implementation: [tw-work, tw-worktree]
+  implementation: [tw-auto, tw-work, tw-worktree]
   review: [tw-audit, tw-code-review, tw-doc-review, tw-resolve-pr-feedback, tw-test-browser, tw-test-xcode, tw-traceability-check]
   publication: [tw-commit, tw-commit-push-pr]
 
@@ -86,4 +86,4 @@ receipt:
   v1_embedding: prohibited
   isolated_replay: separately_authorized_only
 held_claims: [active_descendant_enforcement, active_routing, provider_replay_qualification, served_model_attestation, token_sufficiency, material_token_savings, quality_equivalence, active_cutover]
-map_digest: sha256:153ce25228e915ec0949fe1dab1b2296ce3f9934948987c8b191be15eb47665d
+map_digest: sha256:2eab40f5e2e459dfb1ff1f655b0fb0cdacfe8c40478f04368d7185b219c988f2
