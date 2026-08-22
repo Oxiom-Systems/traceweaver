@@ -1,4 +1,5 @@
 # TRACEWEAVER: file-role=skill-execution-contract-registry; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090
+# TRACEWEAVER: file-role=shadow-model-context-sec-binding; req=REQ-TW-109,REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072; ver=VER-TW-092
 # This registry is a static advisory control-plane input. It cannot approve or
 # promote authority, mutate a project, or turn a child receipt into evidence.
 schema_version: tw-skill-execution-contract-registry/1
@@ -8,6 +9,17 @@ callable_count: 28
 canonical_order: lexical_skill_name
 definition_hash_algorithm: sha256-canonical-json-v1
 control_route: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+model_context_map:
+  schema_version: tw-model-context-map/1
+  map_path: plugins/traceweaver-core/references/model-context-map.yml
+  mirror_path: plugins/traceweaver-core/skills/tw-auto/references/model-context-map.yml
+  map_digest: sha256:153ce25228e915ec0949fe1dab1b2296ce3f9934948987c8b191be15eb47665d
+  profile_path: plugins/traceweaver-core/references/workflow-profile-template.yml
+  compiler_path: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-compile-model-context-route
+  receipt_validator_path: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-validate-model-context-receipt
+  mode: advisory_shadow_compile
+  authoritative_runtime: v1
+  v1_receipt_projection: separate_shadow_artifact_only_v1_unchanged
 defaults:
   authority:
     controlled_sources: [requirements.md, traceability-matrix.md, .traceweaver/intent-contract.yml]

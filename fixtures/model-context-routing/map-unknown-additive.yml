@@ -1,0 +1,4 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-109; trace=TRACE-TW-072; ver=VER-TW-092
+schema_version: tw-model-context-map/1
+unauthorized_field: unapproved_additive_contract_field
+expected: held_model_context_route_invalid

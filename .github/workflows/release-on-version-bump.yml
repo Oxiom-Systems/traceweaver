@@ -1,3 +1,4 @@
+# TRACEWEAVER: file-role=v050-main-only-release-and-runtime-receipt; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092
 name: Release on version bump
 
 # Creates the `traceweaver-core--v<version>` git tag and a matching GitHub
@@ -104,9 +105,25 @@ jobs:
             fi
             echo "tag_exists=true" >> "$GITHUB_OUTPUT"
             if gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
-              if ! gh release view "$tag" --repo "$GITHUB_REPOSITORY" --json assets --jq '.assets[].name' \
-                | grep -Fxq release-runtime-receipt.json; then
+              receipt_dir="$RUNNER_TEMP/traceweaver-existing-release-receipt"
+              mkdir -p "$receipt_dir"
+              if ! gh release download "$tag" \
+                --repo "$GITHUB_REPOSITORY" \
+                --pattern release-runtime-receipt.json \
+                --dir "$receipt_dir" \
+                --clobber; then
                 echo "::error title=held_release_metadata_write_unavailable::Existing release lacks its runtime evidence receipt"
+                exit 1
+              fi
+              runtime_receipt="$receipt_dir/release-runtime-receipt.json"
+              if ! ruby scripts/traceweaver-check-release-readiness \
+                --runtime-receipt "$runtime_receipt" \
+                --version "${{ steps.version.outputs.version }}" \
+                --tag "$tag" \
+                --merge-sha "$GITHUB_SHA" \
+                --scope-digest "${{ steps.version.outputs.candidate_scope_digest }}" \
+                --workflow-prefix "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/"; then
+                echo "::error title=held_release_metadata_write_unavailable::Existing release runtime evidence receipt is invalid"
                 exit 1
               fi
               echo "Exact tag and GitHub Release already exist; idempotent no-op."

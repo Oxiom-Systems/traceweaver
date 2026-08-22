@@ -1,0 +1,3 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-114; trace=TRACE-TW-072; ver=VER-TW-092
+B3: [tw-graph, tw-setup, tw-update, tw-authority-gate, tw-commit, tw-commit-push-pr, tw-requirements-review, tw-sessions, tw-strategy, tw-test-browser, tw-test-xcode, tw-worktree, tw-brainstorm, tw-code-review, tw-compound, tw-compound-refresh, tw-debug, tw-doc-review, tw-grill, tw-ideate, tw-resolve-pr-feedback, tw-traceability-check, tw-audit, tw-auto, tw-plan, tw-vv-define, tw-work]
+expected: held_model_context_map_invalid

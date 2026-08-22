@@ -1,0 +1,62 @@
+schema_version: tw-task-capsule/1
+task_id: TASK-TW-2026-08-22-V050-MODEL-GOVERNANCE-001
+status: implementation_complete_validation_accepted_same_candidate_finalization
+workflow_profile: .traceweaver/v050-model-governance-workflow-profile.yml
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+authorized_by:
+  decision: TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001
+  change: CHG-TW-2026-08-22-002
+  requirements: REQ-TW-109..123
+intent_served: INTENT-TW-011
+need_served: NEED-TW-013
+plan: docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md
+artifact: ART-TW-079
+trace: TRACE-TW-072
+acceptance_test: ATP-TW-049
+verification_required:
+  definition: docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md
+  id: VER-TW-092
+  red_evidence: docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md
+  frozen_acceptance_cases: fixtures/model-context-routing/acceptance-cases.yml
+  frozen_case_count: 72
+validation_question: Can an independent maintainer install and understand deterministic shadow route recommendations and honest holds while v1 remains authoritative and no active, served-model, savings, sufficiency, or quality claim is implied?
+validation_required:
+  definition: docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md
+  id: VAL-TW-040
+allowed_scope:
+  - model-context map, profile, frozen source oracle taxonomy, generator, lowest-eligible compiler, and protected separate shadow receipt validator
+  - SEC/bootstrap shadow projection with byte-identical native-child/terminal/review-series v1 receipts
+  - transactional installed package projection and failure-injection rollback
+  - model-context and regression fixtures, smoke, and CI
+  - integrated release-readiness v2, exact 0.5.0 manifests, docs, changelog, and release record
+  - one consolidated review/repair series and controlled exact 0.5.0 commit, push, PR, and pre-merge checks
+must_not_change:
+  - v1 routing, receipt schema/identity/bytes, authority, evidence, terminal, or publication behavior
+  - gpt-5.6-sol main, explicit gpt-5.6-terra child, or L0 through L3 effort policy
+  - imported CE component bodies
+  - active-cutover disabled state
+  - Markdown and YAML authority roles
+  - deferred lifecycle and semantic-HTML program
+held_claims:
+  - active routing or descendant enforcement
+  - independently attested served-model identity
+  - actual or material token savings
+  - token sufficiency or quality equivalence
+  - production or provider replay qualification
+open_assumptions: []
+review_policy:
+  document_review_series: one
+  code_review_series: one
+  routine_repair_cycle_cap: 1
+  new_requirement_or_scope_change_returns_to_owner: true
+current_execution_boundary:
+  terminal: ready_to_merge
+  authorized: [implementation, consolidated_review_and_repair, verification, validation, trace_and_graph_reconciliation, commit, push, pull_request, pull_request_checks]
+  prohibited_without_new_owner_direction: [merge, tag, github_release, post_merge_release_receipt]
+  source: explicit Oxiom Systems direction on 2026-08-22 to continue until ready to merge and not merge
+rollback:
+  repository: abandon or revert the exact integrated branch/PR
+  installed_package: restore complete prior touched projection bytes and POSIX modes on any injected or real install failure
+  runtime: not_applicable_active_cutover_disabled
+next_step: finalize exact-candidate evidence, trace/graph reconciliation, and the consolidated reviewer confirmation; then commit, push, open the PR, close required checks, and stop ready to merge

@@ -1,0 +1,391 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=model-context-shadow-receipt-validator; req=REQ-TW-110,REQ-TW-113,REQ-TW-118,REQ-TW-119; trace=TRACE-TW-072; ver=VER-TW-092
+# TRACEWEAVER: entrypoint=validate_model_context_receipt; req=REQ-TW-113,REQ-TW-118; trace=TRACE-TW-072; ver=VER-TW-092
+
+require "digest"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+require "yaml"
+
+RECEIPT_SCHEMA = "tw-model-context-receipt/1"
+WORKFLOW_LEDGER_SCHEMA = "tw-model-context-workflow-accounting/1"
+
+def secure_package_root?(candidate)
+  return false unless candidate.directory? && !candidate.symlink?
+
+  real_root = candidate.realpath
+  %w[
+    references/model-context-map.yml
+    references/skill-execution-contracts.yml
+    skills/tw-auto/scripts/traceweaver-generate-model-context-map
+  ].all? do |relative|
+    cursor = candidate
+    relative.split("/").each do |part|
+      cursor = cursor.join(part)
+      return false if cursor.symlink?
+    end
+    cursor.file? && cursor.realpath.to_s.start_with?("#{real_root}/")
+  end
+rescue Errno::ENOENT
+  false
+end
+
+def discover_package_root!
+  candidates = [
+    Pathname.new(File.expand_path("../../..", __dir__)),
+    Pathname.new(File.expand_path("../../../traceweaver-core", __dir__))
+  ]
+  root = candidates.find { |candidate| secure_package_root?(candidate) }
+  raise "missing_or_unsafe_traceweaver_package_root" unless root
+
+  root.realpath
+end
+
+PACKAGE_ROOT = discover_package_root!
+SOURCE_CHECKOUT_RUNTIME = PACKAGE_ROOT.parent.basename.to_s == "plugins" && PACKAGE_ROOT.parent.parent.join(".git").exist?
+INSTALLED_RUNTIME = !SOURCE_CHECKOUT_RUNTIME
+
+class ReceiptError < StandardError
+  attr_reader :outcome
+  def initialize(outcome, reason)
+    @outcome = outcome
+    super(reason)
+  end
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, out|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      out[key] = canonical(value.fetch(source_key))
+    end
+  when Array then value.map { |entry| canonical(entry) }
+  else value
+  end
+end
+
+def identity(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def read_json(path)
+  value = JSON.parse(File.read(path))
+  raise ReceiptError.new("held_receipt_invalid", "receipt_not_mapping") unless value.is_a?(Hash)
+  value
+rescue Errno::ENOENT
+  raise ReceiptError.new("held_receipt_invalid", "receipt_missing")
+rescue JSON::ParserError => error
+  raise ReceiptError.new("held_receipt_invalid", "receipt_json:#{error.message}")
+end
+
+def available?(value)
+  value.is_a?(String) && !value.empty? && value != "unavailable"
+end
+
+def resolve_artifact(root, locator, field)
+  raise ReceiptError.new("held_receipt_invalid", "locator:#{field}") unless available?(locator) && locator.split("/").none? { |part| part == ".." } && !Pathname.new(locator).absolute?
+  controlled = locator.start_with?("plugins/traceweaver-core/")
+  packaged_relative = locator.delete_prefix("plugins/traceweaver-core/")
+  packaged_relatives = [packaged_relative]
+  if packaged_relative.start_with?("skills/ce-")
+    packaged_relatives << packaged_relative.sub(/\Askills\/ce-/, "internal-skills/ce-")
+  end
+  candidates = if controlled && INSTALLED_RUNTIME
+                 packaged_relatives.map { |relative| [PACKAGE_ROOT, relative] }
+               elsif controlled
+                 [[root, locator], *packaged_relatives.map { |relative| [PACKAGE_ROOT, relative] }]
+               else
+                 [[root, locator]]
+               end
+  path = candidates.map do |base, relative|
+    candidate = base.join(relative).cleanpath
+    next unless candidate.file?
+    cursor = base
+    unsafe = false
+    candidate.relative_path_from(base).each_filename do |part|
+      cursor = cursor.join(part)
+      unsafe ||= cursor.symlink?
+    end
+    next if unsafe
+    resolved = candidate.realpath
+    real_base = base.realpath
+    next unless resolved.to_s.start_with?("#{real_base}/")
+
+    resolved
+  rescue Errno::ENOENT, ArgumentError
+    nil
+  end.compact.first
+  raise ReceiptError.new("held_receipt_invalid", "artifact:#{field}") unless path
+
+  path
+end
+
+def artifact(root, locator, expected_digest, field)
+  path = resolve_artifact(root, locator, field)
+  actual = "sha256:#{Digest::SHA256.file(path).hexdigest}"
+  raise ReceiptError.new("held_receipt_invalid", "digest:#{field}") unless expected_digest == actual
+  path
+end
+
+# Structural eligibility is a derived advisory conclusion, never a caller
+# assertion.  Re-run the same closed compiler calculation from the bound
+# physical artifacts and compare the complete semantic envelope.  This also
+# defeats a tamperer who recomputes `receipt_id` after changing a protected
+# accounting, routing, source-coverage, or isolation field.
+def recompute_structural_receipt!(root, receipt, manifest_path, inventory, map_path, profile_path)
+  raise ReceiptError.new("held_receipt_invalid", "structural_manifest_unavailable") unless manifest_path
+  routing = receipt["routing"]
+  accounting = receipt["accounting"]
+  raise ReceiptError.new("held_receipt_invalid", "routing_shape") unless routing.is_a?(Hash) && %w[model_role risk reasoning_effort floor selected_budget].all? { |field| routing.key?(field) }
+  raise ReceiptError.new("held_receipt_invalid", "accounting_shape") unless accounting.is_a?(Hash)
+  packet = accounting["packet_components"]
+  assembled = accounting["assembled_components"]
+  packet_flags = {
+    "direct_input" => "--direct-input", "injected_locator" => "--injected-locator",
+    "required_conversation" => "--required-conversation", "injected_tool_results" => "--injected-tool-results",
+    "injected_shard_summaries" => "--injected-shard-summaries"
+  }
+  assembled_flags = {
+    "system" => "--system", "developer" => "--developer", "tool_schemas" => "--tool-schemas", "host_metadata" => "--host-metadata"
+  }
+  unless packet.is_a?(Hash) && packet.keys.sort == packet_flags.keys.sort && assembled.is_a?(Hash) && assembled.keys.sort == assembled_flags.keys.sort &&
+         (packet.values + assembled.values + [accounting["reserved_output"], receipt["depth"]]).all? { |value| value.is_a?(Integer) && value >= 0 }
+    raise ReceiptError.new("held_receipt_invalid", "accounting_components")
+  end
+  raise ReceiptError.new("held_receipt_invalid", "accounting_packet") unless accounting["packet_input"] == packet.values.sum
+  raise ReceiptError.new("held_receipt_invalid", "accounting_assembled") unless accounting["assembled_input"] == packet.values.sum + assembled.values.sum
+  raise ReceiptError.new("held_receipt_invalid", "accounting_planned") unless accounting["planned_context"] == accounting["assembled_input"] + accounting["reserved_output"]
+
+  compiler = PACKAGE_ROOT.join("skills/tw-auto/scripts/traceweaver-compile-model-context-route")
+  command = [compiler.to_s, "--root", root.to_s, "--route-id", receipt.fetch("route_id"), "--risk", routing.fetch("risk"),
+             "--reserved-output", accounting.fetch("reserved_output").to_s, "--source-manifest", manifest_path.to_s,
+             "--baseline", receipt.fetch("baseline_identity"), "--invocation-id", receipt.fetch("invocation_id"),
+             "--depth", receipt.fetch("depth").to_s, "--receipt-kind", receipt.fetch("receipt_kind"),
+             "--observation", receipt.dig("observation", "state")]
+  command.concat(["--map", map_path.to_s]) if map_path
+  command.concat(["--profile", profile_path.to_s]) if profile_path
+  packet_flags.each { |field, flag| command.concat([flag, packet.fetch(field).to_s]) }
+  assembled_flags.each { |field, flag| command.concat([flag, assembled.fetch(field).to_s]) }
+  inventory_route = inventory.fetch("routes").find { |route| route["route_id"] == receipt["route_id"] }
+  raise ReceiptError.new("held_receipt_invalid", "semantic_unknown_route") unless inventory_route
+  if !%w[top_level alias].include?(inventory_route["kind"])
+    command.concat(["--parent-route", receipt["parent_route"]])
+  end
+  command.concat(["--plan-receipt-id", receipt["plan_receipt_id"]]) if receipt["receipt_kind"] == "final" && receipt["plan_receipt_id"].is_a?(String)
+  stdout, stderr, status = Open3.capture3(*command)
+  raise ReceiptError.new("held_receipt_invalid", "semantic_recompute:#{stderr.strip}") unless status.success?
+  expected = JSON.parse(stdout)
+  raise ReceiptError.new("held_receipt_invalid", "semantic_outcome") unless expected["outcome"] == "structurally_eligible_shadow_recommendation"
+  if receipt["mode"] == "isolated_shadow_replay"
+    expected["mode"] = "isolated_shadow_replay"
+    expected["state_mutation_performed"] = true
+    expected["isolation"] = "fixture_isolated_mock_provider_and_temp_writes"
+    expected["isolated_effects"] = %w[declared_mock_provider_request isolated_receipt_write isolated_workspace_write]
+    expected["receipt_id"] = identity(expected.reject { |key, _| key == "receipt_id" })
+  end
+  raise ReceiptError.new("held_receipt_invalid", "semantic_receipt_mismatch") unless canonical(expected) == canonical(receipt)
+end
+
+def validate!(receipt, options, root)
+  raise ReceiptError.new("held_receipt_invalid", "schema") unless receipt["schema_version"] == RECEIPT_SCHEMA
+  raise ReceiptError.new("held_receipt_invalid", "receipt_kind") unless %w[plan final].include?(receipt["receipt_kind"])
+  isolated_replay = receipt["mode"] == "isolated_shadow_replay"
+  raise ReceiptError.new("held_receipt_invalid", "not_advisory") unless %w[advisory_shadow_compile isolated_shadow_replay].include?(receipt["mode"]) && receipt["authoritative_runtime"] == "v1"
+  %w[v1_behavior_changed model_call_performed child_dispatch_performed active_enforcement].each do |field|
+    raise ReceiptError.new("held_receipt_invalid", "effect:#{field}") unless receipt[field] == false
+  end
+  if isolated_replay
+    raise ReceiptError.new("held_receipt_invalid", "isolated_write_not_declared") unless receipt["state_mutation_performed"] == true && receipt["isolation"] == "fixture_isolated_mock_provider_and_temp_writes" && receipt["isolated_effects"] == %w[declared_mock_provider_request isolated_receipt_write isolated_workspace_write]
+  else
+    raise ReceiptError.new("held_receipt_invalid", "effect:state_mutation_performed") unless receipt["state_mutation_performed"] == false
+  end
+  %w[baseline_identity invocation_id route_id canonical_route_id map_locator map_file_digest map_digest sec_locator sec_digest profile_locator profile_digest inventory_digest oracle_locator oracle_file_digest oracle_digest source_manifest_locator source_manifest_digest receipt_id].each do |field|
+    raise ReceiptError.new("held_receipt_invalid", "missing:#{field}") unless receipt[field].is_a?(String) && !receipt[field].empty?
+  end
+  actual = identity(receipt.reject { |key, _| key == "receipt_id" })
+  raise ReceiptError.new("held_receipt_invalid", "receipt_identity") unless receipt["receipt_id"] == actual
+  held = receipt.fetch("outcome").start_with?("held_")
+  %w[map_file_digest map_digest sec_digest profile_digest inventory_digest oracle_file_digest oracle_digest source_manifest_digest].each do |field|
+    next if held && receipt[field] == "unavailable"
+    raise ReceiptError.new("held_receipt_invalid", "digest_format:#{field}") unless receipt[field].match?(/\Asha256:[0-9a-f]{64}\z/)
+  end
+  raise ReceiptError.new("held_receipt_invalid", "efficiency_claim") unless receipt.dig("eligibility", "efficiency") == false
+  raise ReceiptError.new("held_receipt_invalid", "observation") unless %w[host_measured estimated unavailable].include?(receipt.dig("observation", "state"))
+  raise ReceiptError.new("held_receipt_invalid", "expected_route") if options[:expected_route_id] && receipt["route_id"] != options[:expected_route_id]
+  raise ReceiptError.new("held_receipt_invalid", "expected_baseline") if options[:expected_baseline] && receipt["baseline_identity"] != options[:expected_baseline]
+  raise ReceiptError.new("held_receipt_invalid", "expected_invocation") if options[:expected_invocation_id] && receipt["invocation_id"] != options[:expected_invocation_id]
+  raise ReceiptError.new("held_receipt_invalid", "expected_parent") if options[:expected_parent_route] && receipt["parent_route"] != options[:expected_parent_route]
+  raise ReceiptError.new("held_receipt_invalid", "expected_depth") if options.key?(:expected_depth) && receipt["depth"] != options[:expected_depth]
+  if receipt["receipt_kind"] == "final" && options[:plan_receipt]
+    plan = read_json(options[:plan_receipt])
+    raise ReceiptError.new("held_receipt_invalid", "plan_receipt_kind") unless plan["receipt_kind"] == "plan"
+    raise ReceiptError.new("held_receipt_invalid", "plan_receipt_identity") unless plan["receipt_id"] == identity(plan.reject { |key, _| key == "receipt_id" })
+    # Plan and final are independent canonical shadow receipts.  A valid
+    # final must not be allowed to inherit routing/accounting/source fields
+    # from a merely well-hashed but semantically forged plan.
+    validate!(plan, {}, root)
+    raise ReceiptError.new("held_receipt_invalid", "plan_binding") unless receipt["plan_receipt_id"] == plan["receipt_id"]
+    %w[baseline_identity invocation_id route_id canonical_route_id parent_route depth map_digest sec_digest profile_digest inventory_digest oracle_locator oracle_file_digest oracle_digest source_manifest_digest].each do |field|
+      raise ReceiptError.new("held_receipt_invalid", "plan_final_identity:#{field}") unless receipt[field] == plan[field]
+    end
+  end
+  generator = PACKAGE_ROOT.join("skills/tw-auto/scripts/traceweaver-generate-model-context-map")
+  stdout, stderr, status = Open3.capture3(generator.to_s, "--root", root.to_s, "--format", "json")
+  raise ReceiptError.new("held_receipt_invalid", "inventory:#{stderr.strip}") unless status.success?
+  inventory = JSON.parse(stdout)
+  map_path = nil
+  if available?(receipt["map_locator"])
+    map_path = artifact(root, receipt["map_locator"], receipt["map_file_digest"], "map")
+    map = YAML.safe_load(File.read(map_path), permitted_classes: [], aliases: false)
+    raise ReceiptError.new("held_receipt_invalid", "map_digest") unless map.fetch("map_digest") == receipt["map_digest"]
+    raise ReceiptError.new("held_receipt_invalid", "current_map_digest") unless receipt["map_digest"] == inventory.fetch("map_digest")
+  end
+  if available?(receipt["sec_locator"])
+    sec_path = artifact(root, receipt["sec_locator"], receipt["sec_digest"], "sec")
+    canonical_sec = resolve_artifact(root, "plugins/traceweaver-core/references/skill-execution-contracts.yml", "canonical_sec")
+    raise ReceiptError.new("held_receipt_invalid", "sec_locator") unless sec_path == canonical_sec
+  end
+  if available?(receipt["profile_locator"])
+    profile_path = artifact(root, receipt["profile_locator"], receipt["profile_digest"], "profile")
+    raise ReceiptError.new("held_receipt_invalid", "profile_locator") unless profile_path == root.join(".traceweaver/v050-model-governance-workflow-profile.yml")
+  end
+  if available?(receipt["oracle_locator"])
+    oracle_path = artifact(root, receipt["oracle_locator"], receipt["oracle_file_digest"], "oracle")
+    map_path ||= resolve_artifact(root, "plugins/traceweaver-core/references/model-context-map.yml", "canonical_map")
+    map = YAML.safe_load(File.read(map_path), permitted_classes: [], aliases: false)
+    canonical_oracle = resolve_artifact(root, map.dig("source_oracle", "adequacy_review_locator"), "canonical_oracle")
+    raise ReceiptError.new("held_receipt_invalid", "oracle_locator") unless oracle_path == canonical_oracle
+    oracle = read_json(oracle_path)
+    raise ReceiptError.new("held_receipt_invalid", "oracle_identity") unless receipt["oracle_digest"] == identity(oracle.reject { |key, _| key == "oracle_digest" }) && oracle["oracle_digest"] == receipt["oracle_digest"]
+    raise ReceiptError.new("held_receipt_invalid", "oracle_map_binding") unless oracle["map_digest"] == receipt["map_digest"] && oracle["inventory_digest"] == receipt["inventory_digest"]
+    reviewer = oracle["reviewer"]
+    unless reviewer.is_a?(Hash) && reviewer["identity"].is_a?(String) && !reviewer["identity"].empty? && reviewer["independent"] == true && reviewer["relationship"] == "did_not_implement_compiler_or_author_source_oracle" && reviewer["identity"] != "compiler"
+      raise ReceiptError.new("held_receipt_invalid", "oracle_reviewer_relationship")
+    end
+  end
+  if available?(receipt["source_manifest_locator"])
+    manifest_path = artifact(root, receipt["source_manifest_locator"], receipt["source_manifest_digest"], "source_manifest")
+    read_json(manifest_path)
+    Array(receipt.dig("source_coverage", "delivered_sources")).each do |source|
+      artifact(root, source["locator"], source["digest"], "delivered_source")
+      if source["delivery_mode"] == "shard"
+        artifact(root, source["parent_locator"], source["parent_source_digest"], "shard_parent")
+      end
+    end
+  end
+  unless held
+    raise ReceiptError.new("held_receipt_invalid", "structural_manifest_unavailable") unless available?(receipt["source_manifest_locator"]) && available?(receipt["source_manifest_digest"])
+    raise ReceiptError.new("held_receipt_invalid", "structural_outcome") unless receipt["outcome"] == "structurally_eligible_shadow_recommendation" && receipt.dig("eligibility", "content") == true && receipt.dig("eligibility", "qualification") == "structurally_eligible"
+    recompute_structural_receipt!(root, receipt, manifest_path, inventory, map_path, profile_path)
+  end
+  route = inventory.fetch("routes").find { |candidate| candidate["route_id"] == receipt["route_id"] }
+  if !held || available?(receipt["inventory_digest"])
+    raise ReceiptError.new("held_receipt_invalid", "unknown_route") unless route
+    raise ReceiptError.new("held_receipt_invalid", "canonical_route") unless route["canonical_route_id"] == receipt["canonical_route_id"]
+    raise ReceiptError.new("held_receipt_invalid", "parent_route") unless route["parent_route"] == receipt["parent_route"]
+    raise ReceiptError.new("held_receipt_invalid", "inventory_digest") unless receipt["inventory_digest"] == inventory["inventory_digest"]
+  end
+end
+
+def replay!(receipt, ledger)
+  return unless ledger
+  return unless File.file?(ledger)
+  File.foreach(ledger).with_index(1) do |line, index|
+    next if line.strip.empty?
+    prior = JSON.parse(line)
+    next unless prior.is_a?(Hash)
+    if prior["receipt_id"] == receipt["receipt_id"]
+      raise ReceiptError.new("held_receipt_duplicate", "nonidentical_duplicate_line:#{index}") unless canonical(prior) == canonical(receipt)
+      raise ReceiptError.new("held_receipt_replay", "identical_replay_line:#{index}")
+    end
+    key = %w[baseline_identity invocation_id route_id parent_route depth].map { |field| prior[field] }
+    current = %w[baseline_identity invocation_id route_id parent_route depth].map { |field| receipt[field] }
+    raise ReceiptError.new("held_receipt_replay", "lineage_replay_line:#{index}") if key == current
+  rescue JSON::ParserError
+    raise ReceiptError.new("held_receipt_invalid", "ledger_json_line:#{index}")
+  end
+end
+
+# This is intentionally a real aggregation validator rather than fixture-side
+# arithmetic.  A cached input is provenance for an already charged phase; it
+# can never become a sixth usage bucket.  Session qualification is a pure
+# function of the two frozen snapshots, so a reset is reproducible.
+def validate_workflow_ledger!(path)
+  ledger = if File.extname(path) == ".yml" || File.extname(path) == ".yaml"
+             YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)
+           else
+             read_json(path)
+           end
+  raise ReceiptError.new("held_receipt_invalid", "workflow_ledger_not_mapping") unless ledger.is_a?(Hash)
+  raise ReceiptError.new("held_receipt_invalid", "workflow_ledger_schema") unless ledger["schema_version"] == WORKFLOW_LEDGER_SCHEMA
+  usage = ledger["usage"]
+  expected_buckets = %w[coordinator child retry continuation shard]
+  unless usage.is_a?(Hash) && usage.keys.sort == expected_buckets.sort && usage.values.all? { |value| value.is_a?(Integer) && value >= 0 }
+    raise ReceiptError.new("held_receipt_invalid", "workflow_usage_buckets")
+  end
+  total = usage.values.sum
+  raise ReceiptError.new("held_receipt_invalid", "workflow_usage_total") unless ledger["whole_workflow_usage"] == total
+  cached = ledger["cached_inputs"]
+  unless cached.is_a?(Array) && cached.all? { |entry| entry.is_a?(Hash) }
+    raise ReceiptError.new("held_receipt_invalid", "workflow_cached_inputs")
+  end
+  cached.each do |entry|
+    phase = entry["charged_phase"]
+    tokens = entry["tokens"]
+    unless expected_buckets.include?(phase) && tokens.is_a?(Integer) && tokens >= 0 && entry["counted_once_in_phase"] == true && entry["separately_charged"] == false && tokens <= usage.fetch(phase)
+      raise ReceiptError.new("held_receipt_invalid", "workflow_cached_input_binding")
+    end
+  end
+  snapshots = ledger["snapshots"]
+  expected_snapshot_keys = %w[current_capability current_tokenizer previous_capability previous_tokenizer]
+  unless snapshots.is_a?(Hash) && snapshots.keys.sort == expected_snapshot_keys && snapshots.values.all? { |value| value.is_a?(String) && !value.empty? }
+    raise ReceiptError.new("held_receipt_invalid", "workflow_snapshots")
+  end
+  changed = snapshots["previous_capability"] != snapshots["current_capability"] || snapshots["previous_tokenizer"] != snapshots["current_tokenizer"]
+  expected_qualification = changed ? "unqualified" : "structurally_eligible"
+  unless ledger["qualification_state"] == expected_qualification && ledger["qualification_reason"] == (changed ? "capability_or_tokenizer_snapshot_changed" : "snapshots_unchanged")
+    raise ReceiptError.new("held_receipt_invalid", "workflow_snapshot_reset")
+  end
+  {
+    "schema_version" => "tw-model-context-workflow-accounting-validation/1",
+    "outcome" => "pass",
+    "whole_workflow_usage" => total,
+    "qualification_state" => expected_qualification
+  }
+end
+
+options = { root: File.expand_path("../../../../..", __dir__) }
+OptionParser.new do |parser|
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--receipt PATH") { |value| options[:receipt] = value }
+  parser.on("--plan-receipt PATH") { |value| options[:plan_receipt] = value }
+  parser.on("--ledger PATH") { |value| options[:ledger] = value }
+  parser.on("--workflow-ledger PATH") { |value| options[:workflow_ledger] = value }
+  parser.on("--expected-route-id ID") { |value| options[:expected_route_id] = value }
+  parser.on("--expected-baseline ID") { |value| options[:expected_baseline] = value }
+  parser.on("--expected-invocation-id ID") { |value| options[:expected_invocation_id] = value }
+  parser.on("--expected-parent-route ID") { |value| options[:expected_parent_route] = value }
+  parser.on("--expected-depth N", Integer) { |value| options[:expected_depth] = value }
+end.parse!
+
+begin
+  if options[:workflow_ledger]
+    raise ReceiptError.new("held_receipt_invalid", "workflow_ledger_with_receipt") if options[:receipt] || options[:plan_receipt] || options[:ledger]
+    puts JSON.generate(canonical(validate_workflow_ledger!(options[:workflow_ledger])))
+    exit 0
+  end
+  raise ReceiptError.new("held_receipt_invalid", "receipt_required") unless options[:receipt]
+  root = Pathname.new(options.fetch(:root)).expand_path.realpath
+  receipt = read_json(options.fetch(:receipt))
+  validate!(receipt, options, root)
+  replay!(receipt, options[:ledger])
+  puts JSON.generate(canonical({ "schema_version" => "tw-model-context-receipt-validation/1", "outcome" => "pass", "receipt_id" => receipt.fetch("receipt_id") }))
+rescue ReceiptError => error
+  warn JSON.generate(canonical({ "schema_version" => "tw-model-context-receipt-validation/1", "outcome" => error.outcome, "reason" => error.message }))
+  exit 2
+end

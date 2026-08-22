@@ -1,0 +1,5 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-112; trace=TRACE-TW-072; ver=VER-TW-092",
+  "inventory_observation": "partly_observed",
+  "active_enforcement": false
+}

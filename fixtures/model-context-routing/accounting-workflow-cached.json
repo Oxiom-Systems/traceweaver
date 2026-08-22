@@ -1,0 +1,28 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-113; trace=TRACE-TW-072; ver=VER-TW-092",
+  "schema_version": "tw-model-context-workflow-accounting/1",
+  "usage": {
+    "coordinator": 100,
+    "child": 200,
+    "retry": 10,
+    "continuation": 20,
+    "shard": 30
+  },
+  "cached_inputs": [
+    {
+      "charged_phase": "child",
+      "tokens": 200,
+      "counted_once_in_phase": true,
+      "separately_charged": false
+    }
+  ],
+  "whole_workflow_usage": 360,
+  "snapshots": {
+    "previous_capability": "codex-gpt-5.6-context-hypothesis-2026-08-22",
+    "current_capability": "codex-gpt-5.6-context-hypothesis-2026-08-22",
+    "previous_tokenizer": "tokenizer-2026-08-22",
+    "current_tokenizer": "tokenizer-2026-08-22"
+  },
+  "qualification_state": "structurally_eligible",
+  "qualification_reason": "snapshots_unchanged"
+}

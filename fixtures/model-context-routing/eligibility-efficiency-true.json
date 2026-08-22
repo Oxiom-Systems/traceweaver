@@ -1,0 +1,6 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-119; trace=TRACE-TW-072; ver=VER-TW-092",
+  "content_eligibility": true,
+  "efficiency_eligibility": true,
+  "expected": "held_efficiency_claim_ineligible"
+}

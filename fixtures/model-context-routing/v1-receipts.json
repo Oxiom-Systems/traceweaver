@@ -1,0 +1,930 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-110,REQ-TW-118; trace=TRACE-TW-072; ver=VER-TW-092",
+  "records": [
+    {
+      "producer": "sec",
+      "skill": "lfg",
+      "risk": "L0",
+      "invocation_id": "v1-base-lfg-l0",
+      "bytes_sha256": "sha256:59f47efbbae165472f8645b43d70174895a249c67098fb75fd7eb46cd1fe3481"
+    },
+    {
+      "producer": "sec",
+      "skill": "lfg",
+      "risk": "L1",
+      "invocation_id": "v1-base-lfg-l1",
+      "bytes_sha256": "sha256:b0c674a2eaf4e89f971e50c4215c985b25af365ab50043659776715423c53a78"
+    },
+    {
+      "producer": "sec",
+      "skill": "lfg",
+      "risk": "L2",
+      "invocation_id": "v1-base-lfg-l2",
+      "bytes_sha256": "sha256:52e00eb5e4402e6f7ef70fa2fdc27ad875b2522de4a32255e12cc9616352c0b6"
+    },
+    {
+      "producer": "sec",
+      "skill": "lfg",
+      "risk": "L3",
+      "invocation_id": "v1-base-lfg-l3",
+      "bytes_sha256": "sha256:a71afe3b29946bd4b27600434d8a1a625fdb6dc6d4c0f61f4ad98404a56946fa"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-audit",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-audit-l0",
+      "bytes_sha256": "sha256:4714ed52804d6a0b5e5d0c67c83c7441f46c73426a1ff529a446bd7492cec31d"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-audit",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-audit-l1",
+      "bytes_sha256": "sha256:34efeb0e8165c5325c7053395f7ccc71cd26c672c224e5300fb265254c587518"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-audit",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-audit-l2",
+      "bytes_sha256": "sha256:a4c9fe1a1b351927a6288b2a71139c4a8f8dabfae443549d7dedd9b1924e7ddd"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-audit",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-audit-l3",
+      "bytes_sha256": "sha256:f26a33c8dfab96a43c20732e62e927630a820179e1e91fc8098e084ec64ac783"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-authority-gate",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-authority-gate-l0",
+      "bytes_sha256": "sha256:3631ddbf085949ea8c66edeaf7f5bb1901c3e381f15e9a08a6d78771885135af"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-authority-gate",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-authority-gate-l1",
+      "bytes_sha256": "sha256:480ad7a5fa191b018be6d48ba6fed0ba1cfb4dde380e9a15f1e83b929316e574"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-authority-gate",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-authority-gate-l2",
+      "bytes_sha256": "sha256:499f33e6e873c17691c4e9d4831961f9bd7cd3e40b79c39b928eb98a397fd65b"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-authority-gate",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-authority-gate-l3",
+      "bytes_sha256": "sha256:00cdf6a490f70920477445806adcf0b14e739416b066587c528ba2ef135729f7"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-auto",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-auto-l0",
+      "bytes_sha256": "sha256:cccd4b3c37fc52a2c548ea5b65a23395236aa8eaa18882d47ea91763e4fefcce"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-auto",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-auto-l1",
+      "bytes_sha256": "sha256:37206e637a1956adb0c2524914bd634f359860e2ebe65d65afc2f4380fbd00cf"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-auto",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-auto-l2",
+      "bytes_sha256": "sha256:5d6168a185e6412ec1bf63294017cd669bdc9d0131edf474220e05723c462005"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-auto",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-auto-l3",
+      "bytes_sha256": "sha256:85c4367be99837a1afd39991f6cf307dd18328a1b6f3d5908be9d26f68bd3511"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-brainstorm",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-brainstorm-l0",
+      "bytes_sha256": "sha256:7578e55fbdfe4e674f48ab05175b6f8a892c28f12bdaddf3cb7dca41b5c88ae3"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-brainstorm",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-brainstorm-l1",
+      "bytes_sha256": "sha256:59bf90739801ac50c8d0ec98ce0c87cc3031b7536234befa0776382d5a3304f1"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-brainstorm",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-brainstorm-l2",
+      "bytes_sha256": "sha256:66067c75e802c133c9a4512bf6a4493b0084b9496a5c15047807ba40e6e53293"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-brainstorm",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-brainstorm-l3",
+      "bytes_sha256": "sha256:889d53ef3ade39c18e33bc0a44ae413f861914ef52661f58cc832c52a94bac70"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-code-review",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-code-review-l0",
+      "bytes_sha256": "sha256:b9cf119a7931c16fb451c3253a43b5db9d721646fddfc456815548665431e3d1"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-code-review",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-code-review-l1",
+      "bytes_sha256": "sha256:64b7e81d7d5784db5fe65c19a2632583e993d0cc3f8c76a36799625acffc31ca"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-code-review",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-code-review-l2",
+      "bytes_sha256": "sha256:4ae9202bfaa16fd30c4cda66670cbd1e2bf8607c99051506d22afdc8a1f8f928"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-code-review",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-code-review-l3",
+      "bytes_sha256": "sha256:d1d61e450d04ed1e568707962dff000ed2dd3d3779e758f1de2516094358e576"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-commit",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-commit-l0",
+      "bytes_sha256": "sha256:ee7cc67d9ae214bcdcfd1964af838e32e4770f87a2384f1568fb112617dbcffb"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-commit",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-commit-l1",
+      "bytes_sha256": "sha256:9ee77b2c12d0bf2d6d642cc6dc25c976fdbba5ec90d6b1c4e163e207e82489dd"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-commit",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-commit-l2",
+      "bytes_sha256": "sha256:8398e53e7c4c8a9e64d3dacfb9080ada984aa0cc634601e84d79df1a9b5eb9a3"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-commit",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-commit-l3",
+      "bytes_sha256": "sha256:4e810c89685e320bd014ab6dd19e37579d894aa2293224281a9c75780de3bb9c"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-commit-push-pr",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-commit-push-pr-l0",
+      "bytes_sha256": "sha256:a5ce0f6960b5bf310be9cee6f2daf6e37b9f8c46f92d2b1efa7dbd70ceb4576a"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-commit-push-pr",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-commit-push-pr-l1",
+      "bytes_sha256": "sha256:aac0b263e994ff70fb40684759e433e1bb690c2a9351daa29e66ba6acc0aa1e7"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-commit-push-pr",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-commit-push-pr-l2",
+      "bytes_sha256": "sha256:c28884008d319cd71011a605f746735f6cee00e91260b04917986e4a756c95f5"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-commit-push-pr",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-commit-push-pr-l3",
+      "bytes_sha256": "sha256:283c616dfdfb24eedeacf7191d632e1b35989ab16e6822e8bc15f4d4634f1e2f"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-compound",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-compound-l0",
+      "bytes_sha256": "sha256:da2b47e9dc6fe2fe677be3037109ac18cbc4fedec577773d4dd005e4dfc498a2"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-compound",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-compound-l1",
+      "bytes_sha256": "sha256:074b3d6c7d8c9bbd393abcd81adb49f9e76c18325a660420d7a3215c171000b0"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-compound",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-compound-l2",
+      "bytes_sha256": "sha256:1091746e6c5102483686ae4aa7e8fc0a4ef656be1b0f3336c36be85fe28d6880"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-compound",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-compound-l3",
+      "bytes_sha256": "sha256:28762845b5249fe6d2753d307cc90519f0b6ef0df52ee320e52f8140459d1d39"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-compound-refresh",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-compound-refresh-l0",
+      "bytes_sha256": "sha256:5abdecaaee463292a0d6fa3bed9e72c2965599666df158768ff4cca9dc7ce115"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-compound-refresh",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-compound-refresh-l1",
+      "bytes_sha256": "sha256:0125524314ea805046425daf79dbda48ba47ff268b837e07a029cd3a8a838f54"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-compound-refresh",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-compound-refresh-l2",
+      "bytes_sha256": "sha256:cb2f742e5030f8df5ecd8d0b11e48bceeb6c0203c607a7a3d7ba607560003df8"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-compound-refresh",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-compound-refresh-l3",
+      "bytes_sha256": "sha256:e011dd499cd07c75f9a10c85bc0189e2ed08f419c92b9327739d01f8e3154750"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-debug",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-debug-l0",
+      "bytes_sha256": "sha256:b31f93ee52cf90491c02e9ac62161915fc7f6cb79ca6c652230ec87620507571"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-debug",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-debug-l1",
+      "bytes_sha256": "sha256:f219e2a8b05d3126490d081c34407a20a98382df7ca3aeb8d96d16949e35d949"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-debug",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-debug-l2",
+      "bytes_sha256": "sha256:5736ae4af86e8b05f2ee30f9a138345f5172e6628777d62830f14b1460bd2209"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-debug",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-debug-l3",
+      "bytes_sha256": "sha256:27ddc977d18be5ff8b6d22da496bbdd20d28a801886c970ec95a64707edf573e"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-doc-review",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-doc-review-l0",
+      "bytes_sha256": "sha256:c5365cdb299d93f6a390055918cfb9642041c454837ca30685752df68ad0ccf3"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-doc-review",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-doc-review-l1",
+      "bytes_sha256": "sha256:1aa2f1e17063217c61d4f1172e4ba3b1ba2cfb90861838e526c35a6a2c952c1b"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-doc-review",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-doc-review-l2",
+      "bytes_sha256": "sha256:395b1826925d266577fdfc0778d2183e54fa0179cf9c4716bbfd6a17eb801ffd"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-doc-review",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-doc-review-l3",
+      "bytes_sha256": "sha256:2ca75d4256f71c6b183f4403191c8f5d5d8a5a2443e5fbd9ee304a24d5e29003"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-graph",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-graph-l0",
+      "bytes_sha256": "sha256:8a302344e6874b00dccb4ba8f78c794bcff0aabc723512e6d789335967ce1c94"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-graph",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-graph-l1",
+      "bytes_sha256": "sha256:d46228450c82fdf13c7bfbe68d8e5cf83459b5cbba46ca6793c489b7318b537a"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-graph",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-graph-l2",
+      "bytes_sha256": "sha256:61792be0dc3682579f5f53e4f15f25f4275e7922a7f27c29e402fea95369d514"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-graph",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-graph-l3",
+      "bytes_sha256": "sha256:966ad8cc9f6674278eb871eb353e8cdd39b90d89bc89f18dd0cad0b029e9b3da"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-grill",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-grill-l0",
+      "bytes_sha256": "sha256:338c8fd54be68059a252cbc03341c7e3ab506bbd7330e8bfe0248e96a8795438"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-grill",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-grill-l1",
+      "bytes_sha256": "sha256:6597fcb17ead69d5fe25d044af9f2e5acef58834cd7f502b67267f6314eaf068"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-grill",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-grill-l2",
+      "bytes_sha256": "sha256:ca0dfc28d1c65faf82cd44af48107a8fe9127ffd0e1d8bfbdb713a1fa7c118e6"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-grill",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-grill-l3",
+      "bytes_sha256": "sha256:be8ea66710c4643039475c36f9523d8ae3c3cb4c760d8dcf0b81d79f9e7cfd6b"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-ideate",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-ideate-l0",
+      "bytes_sha256": "sha256:49862b0aab9af507e73dd0aebe602dc90db80d1b828d6f4cd4dd6990779a4815"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-ideate",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-ideate-l1",
+      "bytes_sha256": "sha256:5457017228f421f9e34b990afe821fb3f0d89ffa7aa8c2b0ce2157d50496cb16"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-ideate",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-ideate-l2",
+      "bytes_sha256": "sha256:282b7b561ed770a0337f1c661432e7517ae5e87c866f6c7716c768ec5a4d6aa0"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-ideate",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-ideate-l3",
+      "bytes_sha256": "sha256:aa42d8609cbb497620d759e30bf93cd0c4dc8aa989bdf31e26cb20286b7c5694"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-plan",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-plan-l0",
+      "bytes_sha256": "sha256:83bba55b5caa4059bf12d5a68d2e5877718dc2ea1da2ba06300888406ed38dfe"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-plan",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-plan-l1",
+      "bytes_sha256": "sha256:e18c01ed90b0cbf85a8a6217e5781bd9c08ab9e8952f4d6a01431f740a5c85e3"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-plan",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-plan-l2",
+      "bytes_sha256": "sha256:cc1eac2520c9b441d20094a9d3c248e8a761b449ec62f124b78e27b0005cffae"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-plan",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-plan-l3",
+      "bytes_sha256": "sha256:de63496854854741c4b8fe33843ae461369ea714c9a3f266e1b5e57180daccd4"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-requirements-review",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-requirements-review-l0",
+      "bytes_sha256": "sha256:bde4b477ec0aaa2270d80b9e9303039de93f37313feebd87a64c3a8b6b38704f"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-requirements-review",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-requirements-review-l1",
+      "bytes_sha256": "sha256:106135541c5051d511a302684f60ef7d58ba9e7e20fd0b0ed49e302afe6531ce"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-requirements-review",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-requirements-review-l2",
+      "bytes_sha256": "sha256:ab7c8f68978cf0d86fadb00e9d118e3293afdc96f33f6c0f5bac164d82621259"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-requirements-review",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-requirements-review-l3",
+      "bytes_sha256": "sha256:1a4db177505efe85ce16f17fbf296c533f680d5b17e2845be03f90191dd01fe8"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-resolve-pr-feedback",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-resolve-pr-feedback-l0",
+      "bytes_sha256": "sha256:1b679c668dce30c8855f37742d83d0d6a0de2f4abe3b2416d3e0c8498edad8bf"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-resolve-pr-feedback",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-resolve-pr-feedback-l1",
+      "bytes_sha256": "sha256:3e46eb3b37bb21a692e17de42cdb70e24c9d84fa00559b625e904465caa87d4d"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-resolve-pr-feedback",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-resolve-pr-feedback-l2",
+      "bytes_sha256": "sha256:412af35f762b9a396843e71d593f68332fb41a6a8bd4e52449177f28ab0c9d5a"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-resolve-pr-feedback",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-resolve-pr-feedback-l3",
+      "bytes_sha256": "sha256:3f6a9ce3d3698a64a91cded378ce448460c69388fb252616795588fe867e8fc1"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-sessions",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-sessions-l0",
+      "bytes_sha256": "sha256:7b8b085788c444baad26a2c97ba1e73d3dce21fcf8da80f27945f3da112674ca"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-sessions",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-sessions-l1",
+      "bytes_sha256": "sha256:118acf9e716c1fa0f946a8ec63df87af176188111eada6b84025da19933ef8b6"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-sessions",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-sessions-l2",
+      "bytes_sha256": "sha256:c4f524a8c23ad8d0a2bad3d44be981b524e05fbd21f8f0fb638c120650bfe43d"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-sessions",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-sessions-l3",
+      "bytes_sha256": "sha256:130db4465f355d3b393a997322a6bec2f631c4ca97adfa347fedce9a6237ec6f"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-setup",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-setup-l0",
+      "bytes_sha256": "sha256:595f9ac45d4bd1be4d22078eaef61c15060121628eccdf368be87787590f3a34"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-setup",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-setup-l1",
+      "bytes_sha256": "sha256:8ae3fc07e2037eb51361faf3335ad38f900ffa619bcba59f1da88e93ec4dca48"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-setup",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-setup-l2",
+      "bytes_sha256": "sha256:3977a183fdab870d2387feffa4ba8513249b2d0f4ee56a93c88b9fa03fa52443"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-setup",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-setup-l3",
+      "bytes_sha256": "sha256:3a664af62fa138308a610c6f51e1b6b855b465372a84f82d6f140f78f1156840"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-strategy",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-strategy-l0",
+      "bytes_sha256": "sha256:f7b23a962d1739c27fe5a06e5d0823c90d65a64cd53318ad9855130c2129c23a"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-strategy",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-strategy-l1",
+      "bytes_sha256": "sha256:f4006ce2d8513fc89d9fcc8e85ff4dcd97f691431785246a0296665b35038687"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-strategy",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-strategy-l2",
+      "bytes_sha256": "sha256:c034b7baedf4d1bbd57743cfe76bf872035611dba423ae5aeb9a048b94712696"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-strategy",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-strategy-l3",
+      "bytes_sha256": "sha256:634320ad963ff9b3192f8fe66f9bf8fa63a2704fccbecabb559367f37c8c3fc7"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-test-browser",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-test-browser-l0",
+      "bytes_sha256": "sha256:27b3d6bd48e16adccd25d032b317213f3e1ab8ae3549acacdb030b828ab549b3"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-test-browser",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-test-browser-l1",
+      "bytes_sha256": "sha256:c8539915316d97c7764fec05c97c474ebbc318dc112a5bdcb88fa838e8c3eed3"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-test-browser",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-test-browser-l2",
+      "bytes_sha256": "sha256:865837301b2b35c2881ae41565d468af78842fe5301330f322090d1b1dc2711e"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-test-browser",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-test-browser-l3",
+      "bytes_sha256": "sha256:8e35f1f87348d493734bb0175937f00cc29ce2a400dce61b0debbc12630a37bd"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-test-xcode",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-test-xcode-l0",
+      "bytes_sha256": "sha256:c80d0c7f9cd45fff10ca2e3b32c81f85692074b4c43a74d5f993a39607800d66"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-test-xcode",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-test-xcode-l1",
+      "bytes_sha256": "sha256:2209f62adffc7a6620375d3f3eef6149cffe614878b626e77117894c23165318"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-test-xcode",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-test-xcode-l2",
+      "bytes_sha256": "sha256:1a09e424d24b70a83292dae173983d07bd7e23cc9b0eb2c13daca10a88297e01"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-test-xcode",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-test-xcode-l3",
+      "bytes_sha256": "sha256:4c4dbc25f4a8fc540505249ca08b3e8ab09b03f49a391c0fa765df4b7d28d542"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-traceability-check",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-traceability-check-l0",
+      "bytes_sha256": "sha256:6503572b212b151b147f887e6d774a7ea8860681ef5d9d53d36cad9a9d4b7e69"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-traceability-check",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-traceability-check-l1",
+      "bytes_sha256": "sha256:348e39ba626fb65dbfa670332cc58ef553b0ac7d70dc64f52cad2cb390864864"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-traceability-check",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-traceability-check-l2",
+      "bytes_sha256": "sha256:802fb594ec342c223aea6b7de7e887875aec67a5e4e2acae7929a65db922cb9d"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-traceability-check",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-traceability-check-l3",
+      "bytes_sha256": "sha256:fab5ec31428836295e7b28e26e91edaf4cdee6776bb5148beeb8ad8e27a4e846"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-update",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-update-l0",
+      "bytes_sha256": "sha256:9eaaf2003f8a8dccf5a65c66a479fe8ff5544cb78d5f4d6f2d20a291f2de370a"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-update",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-update-l1",
+      "bytes_sha256": "sha256:23d2a002bb9f549deda8bfcaa4d9fe128d2241178e858ebc7d1af7740dc38280"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-update",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-update-l2",
+      "bytes_sha256": "sha256:c5e1369457aa2ae8da28053f02a4984a32c27a4cd8afe3f2f37c502a948f9c76"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-update",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-update-l3",
+      "bytes_sha256": "sha256:fb8c7566c69278fce0b8bbb1fa2aaedbe56e78c738fa6e1aafc54d453b6f0583"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-vv-define",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-vv-define-l0",
+      "bytes_sha256": "sha256:77c32839ab5fbbae1b370fb54beafceb426afe4f7e4e5f4a79517f3c4818717e"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-vv-define",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-vv-define-l1",
+      "bytes_sha256": "sha256:af9f70ed249a2397bde4fd84887bcaaa8d37c29fcb91a4b736b2626187905337"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-vv-define",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-vv-define-l2",
+      "bytes_sha256": "sha256:978220d6c5218dffe65f15f2b8904fc1d30518dbea7506778c7a604d36e0a040"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-vv-define",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-vv-define-l3",
+      "bytes_sha256": "sha256:b7c076e1bf56cd3357580b9919bd5bb4251259b6bd5ca9af5dab0a55d786b75e"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-work",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-work-l0",
+      "bytes_sha256": "sha256:168df6e3d1d67b6b8f7f1c4cbd820856424e6f1fa06615042629fde91378db30"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-work",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-work-l1",
+      "bytes_sha256": "sha256:3caf737823c44ac14e62e5f0fd5ae451c51588c79aa308a7657ec20ec5fce3c8"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-work",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-work-l2",
+      "bytes_sha256": "sha256:1ac3d564d64d2a355f0310f72f280e0a54d34c8cb92da590ba979220b53fae5f"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-work",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-work-l3",
+      "bytes_sha256": "sha256:94c52b8090107997d3bc8bef6a0cac853efbf86e8ab56061e6470d1b2b00a415"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-worktree",
+      "risk": "L0",
+      "invocation_id": "v1-base-tw-worktree-l0",
+      "bytes_sha256": "sha256:6ae5a2688dcb01b96c8d14d7e1add38e07936e076eeaa5833477fefdb412f628"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-worktree",
+      "risk": "L1",
+      "invocation_id": "v1-base-tw-worktree-l1",
+      "bytes_sha256": "sha256:e46e1819d4c7bd0b9c5b8353a5a08f23f403361147d73adbffaad751bdefa803"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-worktree",
+      "risk": "L2",
+      "invocation_id": "v1-base-tw-worktree-l2",
+      "bytes_sha256": "sha256:25e525cf0e942dd257e182a94f9f3a020cc5a6eb4d8217690e4ce112c476047d"
+    },
+    {
+      "producer": "sec",
+      "skill": "tw-worktree",
+      "risk": "L3",
+      "invocation_id": "v1-base-tw-worktree-l3",
+      "bytes_sha256": "sha256:a4dd34fb6cef877bdba28a572c45e90a2bc610747df9c9c96ee6b1e7a04caae8"
+    }
+  ],
+  "schema_version": "tw-v1-producer-invariance/1",
+  "base_commit": "e1b2886ea51ceae03249c4ae09ff75308678970a",
+  "baseline_identity": "REQ-BASELINE-2026-04-30-001@dae781e0cc1793798378f5af81a99503581e83dfbc9ce38876c465f4521f6300",
+  "ordinary_sec_receipt_count": 112,
+  "native_child": {
+    "request": {
+      "schema_version": "tw-native-child-route-command/1",
+      "command": "plan",
+      "task_or_dispatch_identity": "v1-base-native-child",
+      "role": "builder",
+      "workflow_profile_hash": "sha256:c3c12581d6f3700f56a66061037e9820f2502042dc469d76ae39743e5b6b9814",
+      "risk_level": "L3",
+      "requested_model": "gpt-5.6-terra",
+      "requested_reasoning_effort": "xhigh",
+      "fork_turns": "none",
+      "capability_evidence": "v1-base-capability",
+      "available_models": [
+        "gpt-5.6-terra"
+      ]
+    },
+    "planned_sha256": "sha256:16a6ab11a2484b60e63a7f5fbed5b04f1c79c0681fd98edf4cf61027ab6b9403",
+    "terminal_sha256": "sha256:316db2e0cdc7dcd4d83cea2a488c5d09e8e8e77df0f7015767c413e9249d0477",
+    "planned_keys": [
+      "capability_evidence",
+      "child_output_eligible",
+      "contract_identity",
+      "dispatch_parameters",
+      "fork_turns",
+      "outcome",
+      "receipt_identity",
+      "receipt_phase",
+      "requested_model",
+      "requested_reasoning_effort",
+      "risk_level",
+      "role",
+      "schema_version",
+      "served_model",
+      "task_or_dispatch_identity",
+      "trusted_attester_registry_sha256",
+      "workflow_profile_file_digest",
+      "workflow_profile_hash"
+    ],
+    "terminal_keys": [
+      "attestation_trust_store_digest",
+      "capability_evidence",
+      "child_output_eligible",
+      "contract_identity",
+      "dispatch_parameters",
+      "finalization_identity",
+      "fork_turns",
+      "held_reason",
+      "outcome",
+      "receipt_identity",
+      "receipt_phase",
+      "requested_model",
+      "requested_reasoning_effort",
+      "risk_level",
+      "role",
+      "schema_version",
+      "served_model",
+      "task_or_dispatch_identity",
+      "trusted_attester_registry_sha256",
+      "workflow_profile_file_digest",
+      "workflow_profile_hash"
+    ]
+  },
+  "terminal_receipt_template": {
+    "path": "plugins/traceweaver-core/references/terminal-receipt-template.yml",
+    "bytes_sha256": "sha256:d76246a8efc79c53cc6571841db809c3d6d4fea72f02108c01191d312db834d0",
+    "keys": [
+      "accounting",
+      "audit_metadata",
+      "authority_acceptance_receipt",
+      "authority_acceptance_state",
+      "facts",
+      "findings",
+      "mechanical_closure",
+      "requirements",
+      "review_identity",
+      "review_series",
+      "review_terminal_outcome",
+      "schema_version",
+      "terminal_state"
+    ]
+  },
+  "review_series": {
+    "request": {
+      "schema_version": "tw-review-series-command/1",
+      "command": "authorize_series",
+      "series_generation_id": "RS-GEN-v1-base",
+      "predecessor_series_identity": null,
+      "authorization_reason": "owner authorized bounded series",
+      "session_id": "v1-session",
+      "review_mode": "repair_verification",
+      "formal_authority_accepted": false,
+      "frozen_scope": {
+        "semantic_authority_digest": "sha256:semantic-authority-a",
+        "behavior_digest": "sha256:behavior-a",
+        "verification_digest": "sha256:verification-a",
+        "policy_epoch": "tw-review-policy/2026-08-21",
+        "requirements_baseline_hash": "sha256:baseline-a",
+        "workflow_profile_hash": "sha256:profile-a",
+        "target_paths": [
+          "a.md",
+          "b.yml"
+        ],
+        "review_objective": "verify the bounded convergence repair",
+        "concerns": [
+          "cycle accounting",
+          "finding identity"
+        ],
+        "canonical_protocol": {
+          "path": "plugins/traceweaver-core/references/scoped-review-protocol.md",
+          "version": "tw-scoped-review-protocol/1",
+          "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+        }
+      }
+    },
+    "sha256": "sha256:889cb60470f3477b17bf2906eebf2cd52ea97dd7f091de57bd4bbd46da0ba130",
+    "keys": [
+      "attempt_identity",
+      "authority_acceptance_receipt",
+      "authority_acceptance_state",
+      "canonical_protocol",
+      "command",
+      "dispatch_identities",
+      "frozen_scope_identity",
+      "last_session_id",
+      "ledger_digest",
+      "nonblocking_debt_count",
+      "policy_epoch",
+      "predecessor_series_identity",
+      "remaining_repair_cycles",
+      "schema_version",
+      "series_generation_id",
+      "series_identity",
+      "stage",
+      "terminal_outcome",
+      "unresolved_blocking_count"
+    ]
+  }
+}

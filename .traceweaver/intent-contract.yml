@@ -5,10 +5,16 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: edce7c1a3819fc2ea3fb7e84edbbfcb462a0860fe3cf79ba198037832c86ab0e
+baseline_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
-baseline_review_scope: original accepted baseline plus approved amendments through REQ-AMEND-2026-05-03-001
+baseline_review_scope: original accepted baseline plus approved amendments and the owner-approved 0.5.0 shadow model-governance delivery authority
+v050_model_governance_decision_id: TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001
+v050_model_governance_decision_source: docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md
+v050_model_governance_decision_sha256: 83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5
+v050_model_governance_requirements_review_id: TW-REQ-AUTH-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-001
+v050_model_governance_scope: REQ-TW-109_through_REQ-TW-123_shadow_only_v1_authoritative
+v050_model_governance_release_authority: conditional_same_candidate_verification_review_rollback_validation_PR_checks_and_release_receipt
 u0_repair_draft:
   amendment_id: REQ-AMEND-2026-07-22-001
   status: conditionally_approved_no_behavior_authority_until_active_EXC_TW_011
@@ -61,7 +67,7 @@ lean_convergence_implementation_status: bounded_static_controller_protocol_polic
 lean_convergence_verification_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md
 lean_convergence_code_review_id: TW-CODE-REVIEW-2026-08-21-REVIEW-SERIES-CONVERGENCE-001
 lean_convergence_code_review_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-code-review.md
-candidate_requirements_working_hash_sha256: edce7c1a3819fc2ea3fb7e84edbbfcb462a0860fe3cf79ba198037832c86ab0e
+candidate_requirements_working_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
 baseline_hash_authority_status: accepted_requirements_including_req_tw_048_static_advisory_source_evidence_with_req_tw_049_req_tw_050_req_tw_051_req_tw_052_req_tw_053_req_tw_055_req_tw_056_candidate_authority_doc_review_passed_planning_input_req_tw_054_prior_scanner_wording_authority_doc_review_passed_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_planning_input_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_req_tw_057_implementation_gate_candidate_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_and_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_passed_authority_doc_review_passed_req_tw_048_amendment_doc_review_passed_u9_unit10_auth_safe_fresh_exec_and_active_host_runtime_probes_code_review_passed_authority_doc_review_passed_reviewed_held_u9_unit11_active_host_reconciled_runtime_pass_code_review_passed_authority_doc_review_passed_constrained_runtime_accepted_dogfood_classifier_code_review_passed_authority_doc_review_passed_skill_behavior_audit_unit1_behavior_contracts_authority_doc_review_passed_runtime_held_wrapper_direct_callable_expansion_recorded_code_review_passed_authority_doc_review_passed_runtime_held_review_wrapper_skills_recorded_authority_doc_review_passed_runtime_held_ce_350_skill_surface_inventory_source_refreshed_authority_doc_review_passed_parity_held_tw_wrapper_backlog_reviewed_against_ce_350_authority_doc_review_passed_per_wrapper_proof_pending_controlled_publication_gate_recorded_authority_doc_review_passed_behavior_held_controlled_publication_route_fixture_smoke_passed_fixture_only_per_target_publication_gate_required_publication_runtime_held_code_test_trace_anchor_prior_requirement_recorded_authority_doc_review_passed_scanner_held_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_structured_traceability_findings_fixture_smoke_patched_code_review_passed_authority_doc_review_passed_runtime_held_tw_auto_closure_loop_requirement_recorded_authority_doc_review_passed_tw_auto_code_review_passed_behavior_held_tw_skill_behavior_fixture_smoke_passed_code_review_passed_authority_doc_review_passed_active_host_tw_traceability_check_structured_runtime_passed_authority_doc_review_passed_clean_ce_delegation_fixture_recorded_code_review_passed_authority_doc_review_passed_req_tw_057_code_traceability_scanner_fixture_smoke_passed_install_discovery_passed_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_tw_auto_runtime_driver_boundary_code_review_passed_status_hash_doc_review_passed_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_publication_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 active_authority_review_gate: traceweaver_core_0_2_2_release_published_post_release_evidence_doc_review_passed
@@ -2333,7 +2339,7 @@ workflow_controls:
 task_capsule_minimum:
   task_id: required
   baseline_id: REQ-BASELINE-2026-04-30-001
-  baseline_hash_sha256: 6029a74f969c8f08efac96c6acb30cdd0078b4b798e5cebc1d7061aef6194d5a
+  baseline_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
   authorized_by: approved requirement ID or approved exception ID required for meaningful implementation
   intent_served: at least one INTENT-TW ID
   verification_required: required
@@ -2914,9 +2920,95 @@ skill_execution_contract_pr1_2026_08_21:
     - Graphify semantic extraction and semantic-HTML authority migration or cutover
     - staging, commit, push, PR mutation, publication, release, deployment, or consumer-repository mutation
 
+v050_shadow_model_governance_2026_08_22:
+  decision_id: TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001
+  decision_source: docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md
+  decision_sha256: 83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5
+  owner: Oxiom Systems
+  release_target: 0.5.0
+  branch: codex/v050-model-context-routing
+  intent: INTENT-TW-011
+  need: NEED-TW-013
+  requirements:
+    - REQ-TW-109
+    - REQ-TW-110
+    - REQ-TW-111
+    - REQ-TW-112
+    - REQ-TW-113
+    - REQ-TW-114
+    - REQ-TW-115
+    - REQ-TW-116
+    - REQ-TW-117
+    - REQ-TW-118
+    - REQ-TW-119
+    - REQ-TW-120
+    - REQ-TW-121
+    - REQ-TW-122
+    - REQ-TW-123
+  design_decision: DEC-TW-009
+  risk: RISK-TW-011
+  evidence_chain:
+    artifact: ART-TW-079
+    trace: TRACE-TW-072
+    acceptance_test: ATP-TW-049
+    result: RESULT-TW-049
+    verification: VER-TW-092
+    validation: VAL-TW-040
+  status: owner_approved_integrated_delivery_validation_accepted_merge_ready_preparation_in_progress
+  implementation_mode: advisory_shadow_compile
+  authoritative_runtime: v1
+  workflow:
+    - one controlled requirements and authority delta
+    - one implementation plan and scoped document review
+    - one L3 V&V package and preimplementation review
+    - implementation
+    - one consolidated code review and blocking-finding repair pass
+    - same-candidate verification, traceability, rollback, and proxy validation
+    - controlled commit, push, PR, and pre-merge checks, then stop ready to merge
+  allowed_scope:
+    - deterministic model-context map and closed route inventory
+    - experimental B0 through B3 profile and accounting snapshot
+    - frozen six-category source oracle and exact manifest coverage checks
+    - lowest-eligible advisory compiler, separate protected shadow receipts, and invalid-route holds
+    - v1-invariance and isolated-replay guard fixtures
+    - SEC and bootstrap shadow projections with byte-identical native-child, terminal, and review-series v1 receipts
+    - package-wide transactional install rollback
+    - integrated release-readiness schema and exact 0.5.0 metadata
+    - controlled PR and pre-merge checks after all same-candidate gates pass
+  current_execution_boundary:
+    terminal: ready_to_merge
+    authorized:
+      - implementation and the single consolidated repair series
+      - same-candidate verification, validation, trace, graph, and evidence reconciliation
+      - commit, push, pull-request creation, review-thread closure, and required PR checks
+    prohibited_without_new_owner_direction:
+      - merge
+      - tag
+      - GitHub Release
+      - post-merge release receipt
+    source: explicit Oxiom Systems direction on 2026-08-22 to continue until ready to merge and not merge
+  must_not_change:
+    - gpt-5.6-sol coordinator and explicit gpt-5.6-terra controlled-child policy
+    - L0 through L3 risk-selected effort mapping
+    - v1 dispatch, receipt schema, identity, bytes, authority, evidence eligibility, terminal, and publication behavior
+    - imported CE component bodies
+    - Markdown and YAML authority roots
+    - active-cutover state
+  held_claims:
+    - active routing or descendant enforcement
+    - independently attested served-model identity
+    - actual or material token savings
+    - token sufficiency or quality equivalence
+    - production or provider replay qualification
+    - automatic model calls or publication from the shadow compiler
+    - deferred product-lifecycle and semantic-HTML program
+  deferred_prior_program:
+    decision: TW-DECISION-2026-08-22-V050-DIRECT-AUTHORITY-TRANSITION-001
+    reserved_ids: INTENT-TW-009..010, NEED-TW-009..012, REQ-TW-093..108, DEC-TW-004..008, IF-TW-001..005, RISK-TW-001..010, ART-TW-078, TRACE-TW-071, ATP-TW-048, RESULT-TW-048, VER-TW-091, VAL-TW-039
+    disposition: preserved_on_historical_worktree_deferred_outside_0_5_0_not_a_release_gate_or_release_content
+
 next_recommended_steps:
-  - Finish this one clean-room integrated verification, reconcile the PR2 rebase on current main, and do not reopen review discovery for unchanged meaning.
-  - Run the bounded read-only Vestro and Air Router consumer validation, recording grep reduction, duplicate/impact navigation, bounded convergence, and false-authority-promotion results.
-  - Rebase the flat 0.4.0 release PR after PR2, recompute its fixed candidate-scope digest, replace only real prerequisite placeholders, and run the deterministic release smoke.
-  - Publish and merge PR2, then the reconciled release PR; let the main-only workflow derive exact-merge-SHA smoke, CodeQL, tag, and runtime-release receipt evidence.
-  - Keep independent served-model attestation, active-host claims, semantic-HTML authority cutover, Graphify installation, hooks, deployment, and REQ-TW-091 every-merge automation held for later evidence.
+  - Finish the exact 0.5.0 model-governance evidence carriers, consolidated review confirmation, trace and graph reconciliation, commit, push, PR, and required checks; stop when the PR is demonstrably ready to merge.
+  - Do not merge, tag, create a GitHub Release, or create a post-merge release receipt without a new explicit Oxiom Systems direction.
+  - Keep the older 0.4.0 PR sequencing and deferred product-lifecycle Slices 1--8 as historical/deferred context, not active 0.5.0 agent goals.
+  - Keep active routing, descendant enforcement, independent served-model attestation, quantitative savings or sufficiency, quality equivalence, provider replay, semantic-HTML cutover, deployment, and autonomous publication held for later evidence.

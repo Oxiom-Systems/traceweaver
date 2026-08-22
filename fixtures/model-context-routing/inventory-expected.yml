@@ -1,0 +1,6 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-111; trace=TRACE-TW-072; ver=VER-TW-092
+schema_version: tw-model-context-routing-fixture/1
+top_level_callable_count: 28
+canonical_order: lexical_route_id
+expected_kinds: { top_level: 27, alias: 1, imported_prompt: 55, generic_family: 4 }
+expected: pass_each_declared_route_once_in_lexical_order

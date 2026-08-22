@@ -1,0 +1,50 @@
+{
+  "schema": "traceweaver-release-runtime-receipt/1",
+  "version": "0.5.0",
+  "tag": "traceweaver-core--v0.5.0",
+  "merge_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "candidate_scope_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
+  "workflow_url": "https://github.com/Oxiom-Systems/traceweaver/actions/runs/123456789",
+  "required_ci": {
+    "traceweaver_anchor": "TRACEWEAVER: file-role=release-runtime-receipt-positive-fixture; verifies=VER-TW-092; req=REQ-TW-122,REQ-TW-123; trace=TRACE-TW-072",
+    "schema": "traceweaver-release-check-runs/1",
+    "sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "state": "ready",
+    "terminal_state": null,
+    "missing": [],
+    "smoke": {
+      "name": "smoke",
+      "app_slug": "github-actions",
+      "status": "completed",
+      "conclusion": "success",
+      "details_url": "https://github.com/Oxiom-Systems/traceweaver/actions/runs/123456789/job/1",
+      "id": 1001
+    },
+    "codeql": [
+      {
+        "name": "Analyze (actions)",
+        "app_slug": "github-actions",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/Oxiom-Systems/traceweaver/actions/runs/123456789/job/2",
+        "id": 1002
+      },
+      {
+        "name": "Analyze (javascript-typescript)",
+        "app_slug": "github-actions",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/Oxiom-Systems/traceweaver/actions/runs/123456789/job/3",
+        "id": 1003
+      },
+      {
+        "name": "Analyze (python)",
+        "app_slug": "github-actions",
+        "status": "completed",
+        "conclusion": "success",
+        "details_url": "https://github.com/Oxiom-Systems/traceweaver/actions/runs/123456789/job/4",
+        "id": 1004
+      }
+    ]
+  }
+}

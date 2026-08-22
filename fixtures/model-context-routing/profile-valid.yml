@@ -1,0 +1,5 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-114; trace=TRACE-TW-072; ver=VER-TW-092
+schema_version: tw-model-context-routing-fixture/1
+profile: .traceweaver/v050-model-governance-workflow-profile.yml
+hash_excluded_top_level_fields: [profile_hash, profile_status, accounting]
+expected: pass_hash_excludes_only_profile_status_accounting_and_profile_hash

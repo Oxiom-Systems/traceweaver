@@ -1,0 +1,4 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-120; trace=TRACE-TW-072; ver=VER-TW-092
+mode: isolated_shadow_replay
+authorization: absent
+expected: held_replay_not_authorized

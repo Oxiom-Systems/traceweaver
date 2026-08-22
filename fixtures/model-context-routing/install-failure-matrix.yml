@@ -1,0 +1,6 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-121; trace=TRACE-TW-072; ver=VER-TW-092
+schema_version: tw-model-context-routing-fixture/1
+delegate_command: scripts/traceweaver-smoke-installer-transaction --case MC121_ROLLBACK_MATRIX
+phases: [after_preflight_snapshot, after_skills_projection, after_references_projection, after_agents_projection, after_direct_callables_projection, after_generated_routing_projection, after_plugin_manifest_projection, after_install_manifest_write, after_reconciliation_cleanup]
+target_states: [pre_existing, absent]
+expected: pass_each_phase_and_target_state_byte_mode_exact

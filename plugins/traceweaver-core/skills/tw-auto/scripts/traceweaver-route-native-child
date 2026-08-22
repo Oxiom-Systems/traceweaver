@@ -1,8 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-# TRACEWEAVER: file-role=native-child-model-routing-adapter; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
-# TRACEWEAVER: entrypoint=native_child_route_plan_and_finalize; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
+# TRACEWEAVER: file-role=native-child-model-routing-adapter; req=REQ-TW-060,REQ-TW-110; trace=TRACE-TW-065,TRACE-TW-072; ver=VER-TW-085,VER-TW-092
+# TRACEWEAVER: entrypoint=native_child_route_plan_and_finalize; req=REQ-TW-060,REQ-TW-110; trace=TRACE-TW-065,TRACE-TW-072; ver=VER-TW-085,VER-TW-092
 
 require "base64"
 require "digest"
@@ -122,7 +122,20 @@ def load_routing_contract(path)
     raise RouteError, "central receipt field contract is incomplete"
   end
 
-  [routing, "sha256:#{Digest::SHA256.file(path).hexdigest}"]
+  # A workflow profile that adds only the explicitly separate shadow
+  # model-context projection must not perturb the authoritative v1 receipt.
+  # Older/custom contracts without this field retain the historical full-file
+  # digest behavior.
+  compatibility_identity = profile.dig("model_context", "v1_native_child_contract_identity")
+  if compatibility_identity
+    unless compatibility_identity.match?(/\Asha256:[0-9a-f]{64}\z/)
+      raise RouteError, "model-context v1 native-child contract identity is invalid"
+    end
+  else
+    compatibility_identity = "sha256:#{Digest::SHA256.file(path).hexdigest}"
+  end
+
+  [routing, compatibility_identity]
 end
 
 def normalized_fork!(value)

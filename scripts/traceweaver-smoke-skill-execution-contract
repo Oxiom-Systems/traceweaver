@@ -3,6 +3,7 @@ set -euo pipefail
 
 # TRACEWEAVER: file-role=skill-execution-contract-smoke; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090
 # TRACEWEAVER: verifies=VER-TW-090; req=REQ-TW-092; trace=TRACE-TW-070
+# TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-109,REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072
 
 root="$(cd "$(dirname "$0")/.." && pwd)"
 resolver="$root/plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract"
@@ -44,6 +45,17 @@ end.sort
 expect!(skills == callables, "registry does not exactly cover callable surface")
 metadata = registry.fetch("skill_metadata")
 expect!(metadata.keys.sort == skills, "skill metadata does not exactly cover callable surface")
+model_context_binding = registry.fetch("model_context_map")
+expect!(model_context_binding.fetch("schema_version") == "tw-model-context-map/1", "model-context schema binding drift")
+expect!(model_context_binding.fetch("mode") == "advisory_shadow_compile", "model-context mode drift")
+expect!(model_context_binding.fetch("authoritative_runtime") == "v1", "model-context changed authoritative runtime")
+expect!(model_context_binding.fetch("v1_receipt_projection") == "separate_shadow_artifact_only_v1_unchanged", "model-context v1 receipt boundary drift")
+metadata_output, metadata_error, metadata_status = Open3.capture3(resolver, "--registry", registry_path, "--model-context-metadata")
+expect!(metadata_status.success?, "separate model-context metadata resolution failed: #{metadata_error}")
+model_context_metadata = JSON.parse(metadata_output)
+expect!(model_context_metadata.fetch("schema_version") == "tw-model-context-sec-binding/1", "separate model-context metadata schema drift")
+expect!(model_context_metadata.fetch("model_call_performed") == false, "SEC model-context inspection performed a call")
+expect!(model_context_metadata.fetch("v1_receipt_changed") == false, "SEC model-context inspection changed v1")
 metadata.each do |skill, entry|
   source = File.read(File.join(root, "plugins/traceweaver-core/skills", skill, "SKILL.md"))
   expect!(source.include?("traceweaver-resolve-skill-execution-contract"), "#{skill} does not resolve SEC")
@@ -76,6 +88,7 @@ expect!(first.fetch("invocation_receipt_id") != first.fetch("static_definition_h
 expect!(first.fetch("authority_promotion") == false, "contract promoted authority")
 expect!(first.dig("model_route", "dispatch_state") == "not_dispatched_by_contract_resolution", "SEC lookup dispatched or attested a child")
 expect!(first.dig("model_route", "served_model") == "not_applicable", "SEC lookup conflated child attestation")
+expect!(!JSON.generate(first).include?("model_context"), "ordinary v1 SEC receipt contains shadow fields")
 expect!(first.fetch("contract").keys.sort & %w[authority packaged_references trace_records workflow_profile graph_action verification validation holds allowed_writes next_wrapper] == %w[allowed_writes authority graph_action holds next_wrapper packaged_references trace_records validation verification workflow_profile], "contract fields incomplete")
 representative_routes = {
   "tw-audit" => {

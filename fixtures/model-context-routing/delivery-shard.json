@@ -1,0 +1,10 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-117; trace=TRACE-TW-072; ver=VER-TW-092",
+  "delivery_mode": "shard",
+  "locator": "fixtures/model-context-routing/delivery-shard-source.txt",
+  "digest": "sha256:e99b012fc9893a6f036307c9dfdc0341b793ac6dc7d20f6c221f675139ab96bd",
+  "parent_locator": "fixtures/model-context-routing/delivery-parent-source.txt",
+  "fresh": true,
+  "parent_source_digest": "sha256:458d42f3a44b3ee15eba0551d369cba70d12169d8136ef3e4584c231cf51b2de",
+  "expected": "pass_parent_source_bound"
+}

@@ -1,0 +1,172 @@
+# TRACEWEAVER: file-role=v050-model-governance-workflow-profile; req=REQ-TW-109,REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092
+schema_version: tw-workflow-profile/1
+task_id: TW-PLAN-2026-08-22-V050-MODEL-GOVERNANCE-001
+profile_revision: 1
+profile_status: building
+risk: L3
+selection_rationale: Release, installer transaction/rollback, receipt integrity, untrusted path handling, CI, and public claim boundaries make this high-consequence work even though active routing remains disabled.
+
+process_budget:
+  target_total_effort_percent: 20
+  hard_ceiling_total_effort_percent: 50
+  target_process_to_delivery_ratio_percent: 25
+  hard_ceiling_process_to_delivery_ratio_percent: 100
+  estimated_delivery_minutes: 240
+  estimated_process_target_minutes: 60
+  estimated_process_ceiling_minutes: 240
+
+model_routing:
+  schema_version: tw-codex-model-routing/1
+  codex_main_model: gpt-5.6-sol
+  codex_subagent_model: gpt-5.6-terra
+  codex_subagent_reasoning_effort: risk_selected
+  sol_allowed_for_subagents: false
+  terra_unavailable_consequence: held_model_unavailable
+  risk_reasoning_effort: { L0: low, L1: medium, L2: high, L3: xhigh }
+  native_child_dispatch:
+    adapter: tw-auto/scripts/traceweaver-route-native-child
+    model_argument: explicit_required
+    reasoning_effort_argument: explicit_frozen_profile_value_required
+    fork_turns: none_or_bounded_positive
+    prohibited: [model_inheritance, full_history_inheritance, gpt-5.6-sol, luna, silent_fallback]
+  receipt_fields:
+    - receipt_identity
+    - task_or_dispatch_identity
+    - role
+    - workflow_profile_hash
+    - workflow_profile_file_digest
+    - trusted_attester_registry_sha256
+    - requested_model
+    - served_model
+    - requested_reasoning_effort
+    - fork_turns
+    - capability_evidence
+    - outcome
+  attestation:
+    accepted_attester_kinds: [host_runtime, execution_service]
+    signature_algorithm: rsa-sha256
+    signature_required: true
+    trusted_attester_registry_sha256: unconfigured
+    immutable_attester_identity_required: true
+    execution_or_request_identity_required: true
+    exact_receipt_binding_required: true
+    external_trust_store_required: true
+    child_self_report_is_proof: false
+    dispatch_acceptance_is_proof: false
+    missing_or_invalid_outcome: held_model_unattested
+    mismatch_outcome: held_model_mismatch
+    served_model_when_unattested: unattested
+    replay_and_cross_receipt_rejected: true
+  evidence_eligibility:
+    attested_model_match: eligible_for_profiled_child_use
+    held_model_unavailable: ineligible
+    held_model_unattested: ineligible
+    held_model_mismatch: ineligible
+  traceweaver_owned_native_child_surfaces:
+    - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+    - plugins/traceweaver-core/skills/tw-brainstorm/SKILL.md
+    - plugins/traceweaver-core/skills/tw-code-review/SKILL.md
+    - plugins/traceweaver-core/skills/tw-commit/SKILL.md
+    - plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md
+    - plugins/traceweaver-core/skills/tw-compound/SKILL.md
+    - plugins/traceweaver-core/skills/tw-compound-refresh/SKILL.md
+    - plugins/traceweaver-core/skills/tw-debug/SKILL.md
+    - plugins/traceweaver-core/skills/tw-doc-review/SKILL.md
+    - plugins/traceweaver-core/skills/tw-ideate/SKILL.md
+    - plugins/traceweaver-core/skills/tw-plan/SKILL.md
+    - plugins/traceweaver-core/skills/tw-resolve-pr-feedback/SKILL.md
+    - plugins/traceweaver-core/skills/tw-sessions/SKILL.md
+    - plugins/traceweaver-core/skills/tw-setup/SKILL.md
+    - plugins/traceweaver-core/skills/tw-strategy/SKILL.md
+    - plugins/traceweaver-core/skills/tw-test-browser/SKILL.md
+    - plugins/traceweaver-core/skills/tw-test-xcode/SKILL.md
+    - plugins/traceweaver-core/skills/tw-work/SKILL.md
+    - plugins/traceweaver-core/skills/tw-worktree/SKILL.md
+
+model_context:
+  schema_version: tw-model-context-profile/1
+  mode: advisory_shadow_compile
+  authoritative_runtime: v1
+  active_cutover: disabled
+  v1_native_child_contract_identity: sha256:578af74a58db59922a133b1af35e4b21ed1a74344c6c3adf66fc8bb665d091b2
+  capability_snapshot: codex-gpt-5.6-context-hypothesis-2026-08-22
+  capability_context_window: 272000
+  tokenizer_snapshot: host_normalized_tokens_unattested_2026-08-22
+  pricing_snapshot: optional_unconfigured
+  qualification_state: unqualified
+  budgets:
+    B0: { packet_input_cap: 32000, reserved_output_cap: 4000 }
+    B1: { packet_input_cap: 64000, reserved_output_cap: 8000 }
+    B2: { packet_input_cap: 128000, reserved_output_cap: 16000 }
+    B3: { packet_input_cap: 192000, reserved_output_cap: 24000 }
+  host_system_tool_reserve: 32000
+  assembled_input_target: 224000
+  assembled_input_proposal_ceiling: 240000
+  pricing_refresh_sentinel: 272000
+  maximum_shard_fanout: 8
+  maximum_route_depth: 4
+  efficiency_eligibility: false
+  ascending_selection: [B0, B1, B2, B3]
+  route_floor_source: REQ-TW-114
+  descendant_floor_rule: inherit_canonical_parent_unless_authority_approved_override_is_enumerated
+  source_oracle:
+    categories: [controlling_authority, task_scope, skill_contract, implementation_dependencies, current_external_sources, accepted_evidence]
+    mandatory_all_routes: [controlling_authority, task_scope, skill_contract]
+    mandatory_implementation_review_publication: [implementation_dependencies, accepted_evidence]
+    conditional_temporal_external: current_external_sources
+    dispositions: [satisfied, excluded_by_authority, held]
+    mandatory_category_exclusion_allowed: false
+    empty_or_all_excluded_allowed: false
+    compiler_may_author_oracle: false
+
+selected_controls:
+  - approved requirements and exact authority roots
+  - test-first RED evidence and L3 V&V capsule
+  - one consolidated independent code review and one routine repair cycle
+  - untrusted path/digest/receipt validation
+  - v1 behavior invariance
+  - package-wide byte/mode-exact rollback
+  - exact release candidate, PR checks, and automatic release receipt
+  - held-claim and imported-CE byte-stability scans
+
+child_roles:
+  builder: { model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 180 }
+  verifier: { model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 60 }
+  reviewer: { model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 60 }
+  deployer: { model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 30 }
+  dogfooder: { model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 30 }
+
+model_selection:
+  availability: [current_host_exposes_gpt-5.6-terra_request_surface]
+  choice: gpt-5.6-terra
+  rationale: REQ-TW-060 fixes native children to Terra and L3 selects xhigh; requested model remains unattested without external service evidence.
+  unavailable_consequence: held_model_unavailable
+
+reviewer_cap: 1
+repair_cycle_cap: 1
+severe_blocker_exception_cycle_cap: 0
+requires_deploy: false # no runtime/product deployment; GitHub publication uses the separately gated deployer role
+requires_chrome_dogfood: false
+
+high_risk_controls:
+  rollback: Abandon or revert the exact integrated branch/PR; installer transaction restores prior installed bytes and modes at every injected failure; no active routing state exists.
+  owner_decision: TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001
+
+profile_hash_algorithm: sha256-canonical-json-v1
+profile_hash_excluded_top_level_fields: [profile_hash, profile_status, accounting]
+profile_hash: sha256:c3c12581d6f3700f56a66061037e9820f2502042dc469d76ae39743e5b6b9814
+immutable_after_building:
+  fields: [schema_version, task_id, profile_revision, risk, process_budget, model_routing, model_context, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, severe_blocker_exception_cycle_cap, requires_deploy, requires_chrome_dogfood, high_risk_controls, profile_hash_algorithm, profile_hash_excluded_top_level_fields, immutable_after_building, profile_hash]
+  expansion_rule: After the first builder dispatch, create a new revision with an owner-approved escalation reason; never silently add scope, control, reviewer, model, or active-cutover behavior.
+
+accounting:
+  observer: orchestration_harness
+  clock: monotonic
+  child_self_report: advisory_only
+  fixed_categories: [process, delivery, unclassified]
+  unclassified_rule: counts_as_process_until_reviewer_resolves
+  receipts: []
+  terminal_rules:
+    target: actual_process_minutes <= 0.25 * actual_delivery_minutes
+    hard_hold: actual_process_minutes > actual_delivery_minutes => held_process_budget
+    no_in_task_exception: true

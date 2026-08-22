@@ -1,0 +1,7 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-120; trace=TRACE-TW-072; ver=VER-TW-092
+mode: advisory_shadow_compile
+model_call_performed: false
+child_dispatch_performed: false
+state_mutation_performed: false
+tracked_repository_write: false
+expected: pass_no_call_dispatch_or_write

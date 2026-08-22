@@ -1,0 +1,4 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-111; trace=TRACE-TW-072; ver=VER-TW-092
+schema_version: tw-model-context-routing-fixture/1
+omitted_route: tw-plan
+expected: held_model_context_inventory_invalid

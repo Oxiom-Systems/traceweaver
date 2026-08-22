@@ -1,0 +1,7 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-114; trace=TRACE-TW-072; ver=VER-TW-092",
+  "route_id": "tw-graph",
+  "packet_input": 32000,
+  "reserved_output": 4000,
+  "expected": "B0"
+}

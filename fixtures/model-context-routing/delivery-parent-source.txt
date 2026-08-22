@@ -1,0 +1,1 @@
+The complete parent source for the model-context delivery binding fixture.

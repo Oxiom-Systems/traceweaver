@@ -9,9 +9,10 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Source | SHA-256 |
 | --- | --- |
-| `traceability-matrix.md` | `ccf0c3cbd6598c36cbcdff766c226933241ee10a34e0523900770a86f9b616bd` |
-| `requirements.md` | `94197a77d927f1edf09f8695f614d221451e597abdb60f605d848e43a72b241c` |
-| `.traceweaver/intent-contract.yml` | `be2d3159778dc86ca401d58f340f879a3ded8c4f3e5fa7795ed8e67f311d851d` |
+| `traceability-matrix.md` | `0b2b143984d25d9d582987a421099df9968bd16de2e24f827405da36f63790fe` |
+| `requirements.md` | `2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91` |
+| `.traceweaver/intent-contract.yml` | `11971ccf62b1e9a9e1fcfc22f2e1717c2f04a8eff014717c57d6b4606652c3ad` |
+| `docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md` | `edd9833333feeed526e33184cc346cd28565ec17b885ab7b030eae6e634dbf52` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md` | `c7406e067ddd994077a72fdfdc8dbcb2f9f2dcaec229d170935a540e74637b62` |
 | `docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-090.md` | `6a83c1136739926d7c8cbcb3a45ce41c003683d11468c081c4cef802c3b128ab` |
 | `docs/validation/traceweaver-system-acceptance-results.md` | `082bbd5f1ff364b80a62c441d2c505c65ce75283b087adf9994633681bea6168` |
@@ -20,34 +21,34 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | View | Count |
 | --- | ---: |
-| requirements | 90 |
+| requirements | 105 |
 | trace rows | 65 |
 | atp entries | 39 |
 | result records | 40 |
 | verification records | 86 |
-| validation records | 35 |
-| code anchor records | 321 |
-| structured acceptance results | 3 |
-| structured acceptance coverage | 90 |
-| structured acceptance missing requirements | 87 |
-| structured acceptance non closed requirements | 88 |
+| validation records | 36 |
+| code anchor records | 429 |
+| structured acceptance results | 4 |
+| structured acceptance coverage | 105 |
+| structured acceptance missing requirements | 101 |
+| structured acceptance non closed requirements | 102 |
 
 ## Latest Requirements
 
 | Requirement | Status | Validation | Trace Rows |
 | --- | --- | --- | --- |
-| REQ-TW-090 | Approved bounded static/advisory enrichment; Graphify neither implements nor attests REQ-TW-088 `tw-graph`; live-host invocation, semantic extraction freshness, global graph mutation, general productivity, deployment, dogfood, and future releases held | VAL-TW-032 | TRACE-TW-064 |
-| REQ-TW-089 | Approved bounded static/advisory enrichment; Graphify neither implements nor attests REQ-TW-088 `tw-graph`; live-host invocation, provider-backed semantic extraction, graph publication, deployment, dogfood, and future releases held | VAL-TW-032 | TRACE-TW-064 |
-| REQ-TW-088 | Formally accepted planning authority; owner-authorized 0.4.0 graph/lifecycle/CI/bootstrap candidate implemented and locally verified / active-host and integrated validation, semantic-HTML cutover, publication, release, and host hooks held | VAL-TW-034 | TRACE-TW-066 |
-| REQ-TW-087 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-030 | TRACE-TW-063 |
-| REQ-TW-086 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-029 | TRACE-TW-063 |
-| REQ-TW-085 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-028 | TRACE-TW-063 |
-| REQ-TW-084 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-027 | TRACE-TW-063 |
-| REQ-TW-083 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-026 | TRACE-TW-063 |
-| REQ-TW-082 | Conditionally approved; no behavior authority until active EXC-TW-011 contains the exact Sol ACCEPT receipt, original-plan/amendment hashes, baseline hash, branch/base, and reviewed semantic diff digest | VAL-TW-025 | TRACE-TW-063 |
-| REQ-TW-081 | Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority | VAL-TW-024 | TRACE-TW-063; TRACE-TW-062 |
-| REQ-TW-080 | Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority | VAL-TW-023 | TRACE-TW-063; TRACE-TW-061 |
-| REQ-TW-079 | Candidate history; superseded_by CHG-TW-2026-07-22-001; no behavior authority | VAL-TW-022 | TRACE-TW-063; TRACE-TW-060 |
+| REQ-TW-123 | Approved for shadow implementation | VAL-TW-040 |  |
+| REQ-TW-122 | Approved release/change-control constraint; conditional exact 0.5.0 authority | VAL-TW-040 |  |
+| REQ-TW-121 | Approved for 0.5.0 package implementation | VAL-TW-040 |  |
+| REQ-TW-120 | Advisory behavior approved; live/provider replay held | VAL-TW-040 |  |
+| REQ-TW-119 | Approved; savings and served-model claims held | VAL-TW-040 |  |
+| REQ-TW-118 | Approved for repository/package integrity; external authenticity held | VAL-TW-040 |  |
+| REQ-TW-117 | Approved for shadow implementation | VAL-TW-040 |  |
+| REQ-TW-116 | Approved for shadow implementation | VAL-TW-040 |  |
+| REQ-TW-115 | Approved for shadow implementation | VAL-TW-040 |  |
+| REQ-TW-114 | Approved; B0--B3 sufficiency remains unqualified | VAL-TW-040 |  |
+| REQ-TW-113 | Approved for shadow implementation | VAL-TW-040 |  |
+| REQ-TW-112 | Approved negative claim boundary; active enforcement held | VAL-TW-040 |  |
 
 ## Latest Trace Rows
 
@@ -87,6 +88,7 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Result | Requirement | Disposition | Owner | Next Trigger |
 | --- | --- | --- | --- | --- |
+| RESULT-TW-049 | REQ-TW-122 | pass | Oxiom Systems | Explicit merge authorization or any change to the reviewed behavior digest. |
 | SAR-TW-2026-07-23-GRAPHIFY-WRAPPER-REQ-TW-089 | REQ-TW-089 | pass | Oxiom Systems | Wrapper fallback contract change, Graphify installation behavior change, or representative scenario regression. |
 | SAR-TW-2026-07-23-GRAPHIFY-WRAPPER-REQ-TW-090 | REQ-TW-090 | pass | Oxiom Systems | Wrapper lifecycle placement change, Graphify receipt contract change, semantic-refresh claim, or representative scena... |
 | SAR-TW-001 | REQ-TW-066 | partial | Oxiom Systems | Use the pack on the next real closure claim before marking it complete. |
@@ -95,31 +97,32 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 
 | Requirement | Coverage Status | Next Trigger |
 | --- | --- | --- |
+| REQ-TW-123 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-121 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-120 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-119 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-118 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-117 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-116 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-115 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-114 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-113 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-112 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-111 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-110 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
+| REQ-TW-109 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
 | REQ-TW-088 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
 | REQ-TW-087 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
 | REQ-TW-086 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
 | REQ-TW-085 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
 | REQ-TW-084 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
 | REQ-TW-083 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-082 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-081 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-080 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-079 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-078 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-077 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-076 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-075 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-074 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-073 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-072 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-071 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-070 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
-| REQ-TW-069 | missing_structured_acceptance_result | Create a structured acceptance result or reviewed held-validation record before claiming requirement closure. |
 
 ## Latest Validation Records
 
 | Validation | Source Need | Result | Evidence |
 | --- | --- | --- | --- |
+| VAL-TW-040 | NEED-TW-013 | Accepted: all 522 cells dispositioned with matching source digests; Codex B0/B1 and Antigravity B... | `docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md`; canonical 522-cell... |
 | VAL-TW-035 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Held pending installed-host dogfood and owner observation; deterministic implementation prerequis... | `docs/validation/traceweaver-2026-08-21-review-series-convergence-validation-definition.md`; future owner-o... |
 | VAL-TW-034 | NEED-TW-001; NEED-TW-003; NEED-TW-005; NEED-TW-008 | Local projection, cache invalidation, lifecycle, receipt-only CI, and Graphify-absent fixtures pa... | VER-TW-086 deterministic projection/lifecycle fixtures, wrapper lifecycle receipt, PR workflow, and future ... |
 | VAL-TW-033 | NEED-TW-001; NEED-TW-002; NEED-TW-004; NEED-TW-005; NEED-TW-007; NE... | Local route/negative fixtures passed; validation held pending independent served-model attestatio... | Local VER-TW-085 routing fixtures and future independent host/execution receipts |
@@ -127,4 +130,3 @@ Source of truth: `traceability-matrix.md`. This file is a read-only derived view
 | VAL-TW-031 | NEED-TW-003; NEED-TW-005 | Superseded by the owner-authorized REQ-TW-088 definition and VAL-TW-034 | Historical U0 record only |
 | VAL-TW-030 | NEED-TW-001; NEED-TW-005 | Held | U3 focused fixtures |
 | VAL-TW-029 | NEED-TW-001; NEED-TW-003; NEED-TW-005 | Held | U3 focused fixtures |
-| VAL-TW-028 | NEED-TW-001; NEED-TW-002; NEED-TW-003 | Held | U2 focused fixtures |

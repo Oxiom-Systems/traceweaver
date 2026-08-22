@@ -11,6 +11,7 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-056; req=REQ-TW-061; trace=TRACE-TW-044
 # TRACEWEAVER: file-role=optional-graphify-install-discovery-smoke; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084
 # TRACEWEAVER: verifies=VER-TW-084; req=REQ-TW-090; trace=TRACE-TW-064
+# TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_root="$(mktemp -d)"
@@ -460,6 +461,28 @@ callable_graphify_status="$(TRACEWEAVER_GRAPHIFY_BIN="$tmp_root/not-installed" "
 grep -Fq "graphify_status=not_installed" <<<"$packaged_graphify_status"
 grep -Fq "graphify_status=not_installed" <<<"$callable_graphify_status"
 echo "installed_graphify_advisory_helper=pass"
+
+direct_sec_receipt="$tmp_root/direct-sec-receipt.json"
+"$callable_skills_root/tw-auto/scripts/traceweaver-resolve-skill-execution-contract" \
+  --skill tw-plan \
+  --risk L2 \
+  --invocation-id installed-direct-callable >"$direct_sec_receipt"
+assert_equal "installed_direct_sec_terminal" "resolved" "$(json_query "$direct_sec_receipt" terminal_state)"
+assert_equal "installed_direct_sec_skill" "tw-plan" "$(json_query "$direct_sec_receipt" contract.skill)"
+echo "installed_direct_sec_resolution=pass"
+
+direct_bootstrap_root="$tmp_root/direct-bootstrap-root"
+mkdir -p "$direct_bootstrap_root"
+direct_bootstrap_output="$tmp_root/direct-bootstrap.out"
+"$callable_skills_root/tw-setup/scripts/traceweaver-bootstrap-project" \
+  --root "$direct_bootstrap_root" >"$direct_bootstrap_output"
+grep -Fq "bootstrap_result=bootstrapped_template_manual_launch_only" "$direct_bootstrap_output"
+assert_file "$direct_bootstrap_root/.traceweaver/model-context-map.yml"
+assert_equal \
+  "installed_direct_bootstrap_model_context_map" \
+  "$(hash_file "$references_root/model-context-map.yml")" \
+  "$(hash_file "$direct_bootstrap_root/.traceweaver/model-context-map.yml")"
+echo "installed_direct_bootstrap=pass"
 
 assert_file "$references_root/traceweaver-model-defaults.md"
 grep -Fq "Compatibility pointer" "$references_root/traceweaver-model-defaults.md"

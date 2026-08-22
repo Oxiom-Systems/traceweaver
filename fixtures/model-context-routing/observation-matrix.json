@@ -1,0 +1,9 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-119; trace=TRACE-TW-072; ver=VER-TW-092",
+  "allowed": [
+    "host_measured",
+    "estimated",
+    "unavailable"
+  ],
+  "expected": "pass_closed_enum"
+}

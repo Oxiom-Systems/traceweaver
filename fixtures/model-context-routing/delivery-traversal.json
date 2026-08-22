@@ -1,0 +1,6 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-117; trace=TRACE-TW-072; ver=VER-TW-092",
+  "delivery_mode": "locator",
+  "locator": "../outside",
+  "expected": "held_source_delivery_invalid"
+}

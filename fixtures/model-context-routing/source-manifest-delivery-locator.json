@@ -1,0 +1,89 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-117; trace=TRACE-TW-072; ver=VER-TW-092",
+  "schema_version": "tw-model-context-source-manifest/1",
+  "oracle_id": "ORACLE-TW-049-DELIVERY-LOCATOR-001",
+  "oracle_reviewer": {
+    "identity": "fixture-independent-reviewer",
+    "relationship": "did_not_implement_compiler_or_author_source_oracle",
+    "independent": true
+  },
+  "temporal_or_external_facts": {
+    "sec": false,
+    "route": false,
+    "task": false
+  },
+  "categories": [
+    {
+      "category": "controlling_authority",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "README.md",
+          "digest": "sha256:0c38fe62847308d5d2b96889c37aa44ade1399c07e2fd9621c8d46b4d84b6735",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md",
+          "digest": "sha256:83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    },
+    {
+      "category": "task_scope",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
+          "digest": "sha256:4b99eb5fa71506fbb8710ea479513407e51a03555d0aa43a47089f7bdf2ae56b",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    },
+    {
+      "category": "skill_contract",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
+          "digest": "sha256:530444afde69486e3986c5495166f1e48a983d40184214b4479cbf19f0f47dd4",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    },
+    {
+      "category": "implementation_dependencies",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "plugins/traceweaver-core/references/model-context-map.yml",
+          "digest": "sha256:68e716c3e56492a2aff6ca83de7eeb76981c4b7e5ba6e17a7effc17d3e42da52",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    },
+    {
+      "category": "current_external_sources",
+      "disposition": "excluded_by_authority",
+      "exclusion_authority": "TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001",
+      "exclusion_rationale": "The released static route declaration carries no temporally unstable or external fact."
+    },
+    {
+      "category": "accepted_evidence",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md",
+          "digest": "sha256:60d9bf513683e61651f7d65cff5be2939bfdd0ee3a4817b85f4dadb88eb92a3c",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    }
+  ]
+}

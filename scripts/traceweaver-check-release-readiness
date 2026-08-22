@@ -1,14 +1,20 @@
 #!/usr/bin/env ruby
 # Fail closed unless the dated release receipt proves this exact version is ready
 # to enter the existing main-only, version-bump release workflow.
+# TRACEWEAVER: file-role=release-readiness-checker; verifies=VER-TW-092; req=REQ-TW-122,REQ-TW-123; trace=TRACE-TW-072
+# TRACEWEAVER: entrypoint=release_readiness_v2; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092
 require "date"
 require "digest"
+require "json"
 require "open3"
 require "pathname"
 require "yaml"
 
-USAGE = "usage: traceweaver-check-release-readiness --receipt PATH --version VERSION [--root PATH] [--merge-sha SHA]".freeze
-REQUIRED_PREREQUISITES = {
+USAGE = <<~TEXT.freeze
+  usage: traceweaver-check-release-readiness --receipt PATH --version VERSION [--root PATH] [--merge-sha SHA]
+         traceweaver-check-release-readiness --runtime-receipt PATH --version VERSION --tag TAG --merge-sha SHA --scope-digest DIGEST --workflow-prefix URL
+TEXT
+LEGACY_REQUIRED_PREREQUISITES = {
   "pr1_merge_pr" => /\A(?:#\d+|https:\/\/github\.com\/[^\/]+\/[^\/]+\/pull\/\d+)\z/,
   "pr1_merge_sha" => /\A[0-9a-f]{40}\z/,
   "pr1_ci_run" => /\Ahttps:\/\//,
@@ -24,18 +30,760 @@ REQUIRED_PREREQUISITES = {
   "manifest_equality" => /\A(?:passed|verified)\z/,
   "changelog_release_notes" => /\A(?:passed|verified)\z/
 }.freeze
+READINESS_V2_SCHEMA = "tw-release-readiness/2".freeze
+READINESS_V2_VERSION = "0.5.0".freeze
+READINESS_V2_PRODUCTION_RECEIPT = "docs/validation/traceweaver-plugin-0.5.0-release-candidate.md".freeze
+READINESS_V2_PRODUCTION_ID = "TW-RELEASE-CANDIDATE-2026-08-22-0.5.0-001".freeze
+READINESS_V2_PRODUCTION_TAG = "traceweaver-core--v0.5.0".freeze
+READINESS_V2_RELEASED_BASE = "e1b2886ea51ceae03249c4ae09ff75308678970a".freeze
+READINESS_V2_REQUIREMENT = "REQ-TW-122".freeze
+READINESS_V2_TRACE = "TRACE-TW-072".freeze
+READINESS_V2_VERIFICATION = "VER-TW-092".freeze
+READINESS_V2_VALIDATION = "VAL-TW-040".freeze
+READINESS_V2_GRAPH_CYCLE = "TW-AUTHORITY-GATE-2026-08-22-V050-MODEL-GOVERNANCE-001".freeze
+READINESS_V2_MAP_PATH = "plugins/traceweaver-core/references/model-context-map.yml".freeze
+READINESS_V2_ORACLE_PATH = "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json".freeze
+READINESS_V2_INVENTORY_GENERATOR = "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map".freeze
+READINESS_V2_ACCEPTANCE_CHECKER = "plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-acceptance-results".freeze
+READINESS_V2_ORACLE_REVIEWER_RELATIONSHIP = "did_not_implement_compiler_or_author_source_oracle".freeze
+READINESS_V2_GENERATED_VIEW_CHECK = "scripts/traceweaver-smoke-traceability-generated-views".freeze
+READINESS_V2_CURRENT_SNAPSHOT_CHECK = "scripts/traceweaver-smoke-verify".freeze
+GRAPH_FRESHNESS_PATH = ".traceweaver/tw-graph-freshness.json".freeze
+READINESS_V2_SOURCE_CATEGORIES = %w[
+  controlling_authority
+  task_scope
+  skill_contract
+  implementation_dependencies
+  current_external_sources
+  accepted_evidence
+].freeze
+READINESS_V2_BEHAVIOR_DIGEST_EXCLUSIONS = [
+  READINESS_V2_PRODUCTION_RECEIPT,
+  GRAPH_FRESHNESS_PATH,
+  "docs/validation/traceweaver-2026-08-22-v050-model-governance-code-review.md",
+  "docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md",
+  "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md",
+  "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-result.md",
+  "docs/generated/traceability-dashboard.md",
+  "docs/generated/traceability-data.json",
+  "docs/generated/traceability-graph.mmd",
+  ".traceweaver/intent-contract.current.yml"
+].freeze
+READINESS_V2_IDENTITIES = {
+  "plan_id" => "TW-PLAN-2026-08-22-V050-MODEL-GOVERNANCE-001",
+  "plan_review_id" => "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001",
+  "acceptance_test_id" => "ATP-TW-049",
+  "acceptance_result_id" => "RESULT-TW-049",
+  "verification_id" => "VER-TW-092",
+  "validation_id" => "VAL-TW-040",
+  "trace_id" => "TRACE-TW-072",
+  "authoritative_runtime" => "v1",
+  "model_context_mode" => "advisory_shadow_compile",
+  "active_cutover" => "disabled"
+}.freeze
+READINESS_V2_PREREQUISITES = {
+  "accepted_plan" => "accepted",
+  "plan_document_review" => "passed",
+  "code_review_series" => "closed",
+  "acceptance_result" => "passed",
+  "verification_result" => "passed",
+  "validation_result" => "accepted",
+  "bounded_traceability" => "passed",
+  "graph_freshness" => "passed",
+  "package_projection" => "passed",
+  "installer_rollback" => "passed",
+  "manifest_equality" => "passed",
+  "public_claim_scan" => "passed",
+  "v1_invariance" => "passed",
+  "global_backlog" => "visible_non_gating",
+  "runtime_exact_sha_checks" => "required_by_release_workflow",
+  "automatic_release_receipt" => "required_by_release_workflow"
+}.freeze
+READINESS_V2_EVIDENCE = %w[
+  plan
+  plan_document_review
+  code_review_series
+  acceptance_result
+  verification_result
+  validation_result
+  traceability
+  graph_freshness
+].freeze
+READINESS_V2_PRODUCTION_EVIDENCE = {
+  "plan" => "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
+  "plan_document_review" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md",
+  "code_review_series" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-code-review.md",
+  "acceptance_result" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md",
+  "verification_result" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md",
+  "validation_result" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-result.md",
+  "traceability" => "traceability-matrix.md",
+  "graph_freshness" => ".traceweaver/tw-graph-freshness.json",
+  "package_projection" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md",
+  "installer_rollback" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md",
+  "manifest_equality" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md",
+  "public_claim_scan" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md",
+  "v1_invariance" => "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md"
+}.freeze
+READINESS_V2_VERIFICATION_CLAIMS = %w[
+  package_projection
+  installer_rollback
+  manifest_equality
+  public_claim_scan
+  v1_invariance
+].freeze
+READINESS_V2_HELD_CLAIMS = %w[
+  active_routing
+  descendant_enforcement
+  independently_attested_served_model
+  actual_or_material_token_savings
+  token_sufficiency
+  quality_equivalence
+  provider_replay_qualification
+  active_cutover
+].freeze
+MANIFEST_VERSION_PATHS = {
+  ".claude-plugin/marketplace.json" => %w[metadata version],
+  "plugins/traceweaver-core/.claude-plugin/plugin.json" => %w[version],
+  "plugins/traceweaver-core/.codex-plugin/plugin.json" => %w[version],
+  "plugins/traceweaver-core/.cursor-plugin/plugin.json" => %w[version],
+  "plugins/traceweaver-core/.antigravity-plugin/plugin.json" => %w[version]
+}.freeze
 SCOPE_ALGORITHM = "sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))".freeze
 UNREADY = /(?:pending|held|unreconciled|blocked)/i.freeze
+SHA256_IDENTITY = /\Asha256:[0-9a-f]{64}\z/.freeze
+GIT_SHA = /\A[0-9a-f]{40}\z/.freeze
+RUNTIME_RECEIPT_SCHEMA = "traceweaver-release-runtime-receipt/1".freeze
+REQUIRED_CI_SCHEMA = "traceweaver-release-check-runs/1".freeze
+REQUIRED_CODEQL_NAMES = [
+  "Analyze (actions)",
+  "Analyze (javascript-typescript)",
+  "Analyze (python)"
+].freeze
 
 def fail_check(message)
   warn "release-readiness-check: #{message}"
   exit 1
 end
 
+def normalized_relative_path(value, label)
+  fail_check("#{label} must be a non-empty string") unless value.is_a?(String) && !value.empty?
+  relative = Pathname.new(value)
+  if relative.absolute? || relative.cleanpath.to_s != value || value.start_with?("../")
+    fail_check("#{label} must be normalized and relative: #{value.inspect}")
+  end
+  value
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, output|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      output[key] = canonical(value.fetch(source_key))
+    end
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def semantic_digest(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def file_sha256(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def file_scope_digest(root_path, paths)
+  records = paths.sort.map do |path|
+    absolute = root_regular_file(root_path, path, "reviewed behavior path")
+    git_mode = (absolute.stat.mode & 0o111).zero? ? "100644" : "100755"
+    "#{path}\0#{git_mode}\0#{Digest::SHA256.file(absolute).hexdigest}\n"
+  end
+  "sha256:#{Digest::SHA256.hexdigest(records.join)}"
+end
+
+def root_regular_file(root_path, relative, label)
+  absolute = root_path.join(relative)
+  fail_check("#{label} is missing or not a regular file: #{relative}") unless absolute.file? && !absolute.symlink?
+  resolved = absolute.realpath
+  root_prefix = "#{root_path}#{File::SEPARATOR}"
+  fail_check("#{label} escapes repository root: #{relative}") unless resolved.to_s.start_with?(root_prefix)
+  absolute
+rescue Errno::ENOENT, Errno::EACCES => e
+  fail_check("#{label} cannot be resolved: #{relative}: #{e.message}")
+end
+
+def parse_front_matter(path, label)
+  source = File.read(path)
+  front_matter = source.match(/\A---[ \t]*\n(.*?)\n---[ \t]*(?:\n|\z)/m)
+  fail_check("missing YAML front matter in #{label}") unless front_matter
+  data = YAML.safe_load(front_matter[1], permitted_classes: [Date], aliases: false)
+  fail_check("front matter is not a mapping in #{label}") unless data.is_a?(Hash)
+  [data, source]
+rescue Psych::Exception => e
+  fail_check("invalid YAML front matter in #{label}: #{e.message}")
+end
+
+def git_capture(root_path, *arguments)
+  output, error, status = Open3.capture3("git", "-C", root_path.to_s, *arguments)
+  fail_check("git #{arguments.join(' ')} failed: #{error.strip}") unless status.success?
+  output
+end
+
+def assert_resolved_release_base(root_path, released_base)
+  _output, _error, status = Open3.capture3(
+    "git", "-C", root_path.to_s, "cat-file", "-e", "#{released_base}^{commit}"
+  )
+  fail_check("released_base does not resolve to a commit: #{released_base}") unless status.success?
+  _output, _error, status = Open3.capture3(
+    "git", "-C", root_path.to_s, "merge-base", "--is-ancestor", released_base, "HEAD"
+  )
+  fail_check("released_base is not an ancestor of repository HEAD: #{released_base}") unless status.success?
+end
+
+def production_delta(root_path, released_base)
+  fields = git_capture(root_path, "diff", "--name-status", "--no-renames", "-z", released_base, "--").split("\0")
+  fail_check("could not parse production delta") unless fields.length.even?
+  tracked = {}
+  fields.each_slice(2) do |status, path|
+    next if status.nil? || status.empty?
+    normalized_relative_path(path, "changed path")
+    fail_check("production candidate contains deleted path #{path}; deletions are not authorized") if status.start_with?("D")
+    fail_check("unsupported git delta status #{status.inspect} for #{path}") unless status.match?(/\A[AMT]\z/)
+    tracked[path] = status
+  end
+  untracked = git_capture(root_path, "ls-files", "--others", "--exclude-standard", "-z").split("\0").reject(&:empty?)
+  untracked.each do |path|
+    normalized_relative_path(path, "untracked path")
+    tracked[path] ||= "?"
+  end
+  tracked
+end
+
+def load_canonical_map(root_path, candidate_paths)
+  fail_check("canonical model-context map must be bound by candidate_scope") unless candidate_paths.include?(READINESS_V2_MAP_PATH)
+  map_path = root_regular_file(root_path, READINESS_V2_MAP_PATH, "canonical model-context map")
+  map = YAML.safe_load(File.read(map_path), permitted_classes: [], aliases: false)
+  fail_check("canonical model-context map is not a mapping") unless map.is_a?(Hash)
+  fail_check("canonical model-context map schema is invalid") unless map["schema_version"] == "tw-model-context-map/1"
+  map_digest = map["map_digest"]
+  fail_check("canonical model-context map digest is invalid") unless map_digest.is_a?(String) && map_digest.match?(SHA256_IDENTITY)
+  actual_digest = semantic_digest(map.reject { |key, _value| key == "map_digest" })
+  fail_check("canonical model-context map digest mismatch") unless map_digest == actual_digest
+  fail_check("canonical model-context source categories are invalid") unless map.dig("source_oracle", "categories") == READINESS_V2_SOURCE_CATEGORIES
+  [map, map_path, map_digest]
+rescue Psych::Exception => e
+  fail_check("canonical model-context map is invalid YAML: #{e.message}")
+end
+
+def load_inventory(root_path, candidate_paths, map_path, map_digest)
+  fail_check("model-context inventory generator must be bound by candidate_scope") unless candidate_paths.include?(READINESS_V2_INVENTORY_GENERATOR)
+  generator = root_regular_file(root_path, READINESS_V2_INVENTORY_GENERATOR, "model-context inventory generator")
+  fail_check("model-context inventory generator is not executable") unless generator.executable?
+  output, error, status = Open3.capture3(
+    generator.to_s, "--root", root_path.to_s, "--map", map_path.to_s, "--format", "json"
+  )
+  fail_check("model-context inventory generation failed: #{error.strip}") unless status.success?
+  inventory = JSON.parse(output)
+  fail_check("model-context inventory is not a mapping") unless inventory.is_a?(Hash)
+  fail_check("model-context inventory schema is invalid") unless inventory["schema_version"] == "tw-model-context-inventory/1"
+  fail_check("model-context inventory map digest mismatch") unless inventory["map_digest"] == map_digest
+  routes = inventory["routes"]
+  fail_check("model-context inventory routes are invalid") unless routes.is_a?(Array) && routes.length == 87
+  route_ids = routes.map { |route| route.is_a?(Hash) && route["route_id"] }
+  fail_check("model-context inventory route identities are invalid") unless route_ids.all? { |route_id| route_id.is_a?(String) && !route_id.empty? } && route_ids.uniq.length == 87
+  fail_check("model-context inventory route count is invalid") unless inventory["declared_route_count"] == 87 && inventory["top_level_callable_count"] == 28
+  actual_inventory_digest = semantic_digest(routes)
+  fail_check("model-context inventory digest mismatch") unless inventory["inventory_digest"] == actual_inventory_digest
+  [inventory, actual_inventory_digest]
+rescue JSON::ParserError => e
+  fail_check("model-context inventory generator returned invalid JSON: #{e.message}")
+end
+
+def validate_oracle_cell!(root_path, map, inventory_by_route, cell)
+  fail_check("oracle route/category cell is not a mapping") unless cell.is_a?(Hash)
+  route_id = cell["route_id"]
+  category = cell["category"]
+  fail_check("oracle route/category cell has an unknown route") unless inventory_by_route.key?(route_id)
+  fail_check("oracle route/category cell has an unknown category") unless READINESS_V2_SOURCE_CATEGORIES.include?(category)
+  disposition = cell["disposition"]
+  fail_check("oracle route/category cell is held or invalid: #{route_id}/#{category}") unless %w[satisfied excluded_by_authority].include?(disposition)
+
+  mandatory_all = map.dig("source_oracle", "mandatory_all_routes")
+  if disposition == "excluded_by_authority"
+    fail_check("oracle mandatory category is excluded: #{route_id}/#{category}") if mandatory_all.include?(category)
+    unless cell["exclusion_authority"].is_a?(String) && !cell["exclusion_authority"].empty? &&
+           cell["exclusion_rationale"].is_a?(String) && !cell["exclusion_rationale"].empty?
+      fail_check("oracle exclusion is unexplained: #{route_id}/#{category}")
+    end
+    return
+  end
+
+  references = cell["source_refs"]
+  fail_check("oracle satisfied cell lacks source references: #{route_id}/#{category}") unless references.is_a?(Array) && !references.empty?
+  references.each do |reference|
+    unless reference.is_a?(Hash) && reference["source_manifest_category"] == category &&
+           reference["digest"].is_a?(String) && reference["digest"].match?(SHA256_IDENTITY)
+      fail_check("oracle source reference is invalid: #{route_id}/#{category}")
+    end
+    locator = normalized_relative_path(reference["locator"], "oracle source locator")
+    source_path = root_regular_file(root_path, locator, "oracle source")
+    fail_check("oracle source digest mismatch: #{route_id}/#{category}:#{locator}") unless reference["digest"] == file_sha256(source_path)
+  end
+end
+
+def load_canonical_oracle(root_path, candidate_paths, map, map_digest, inventory, inventory_digest)
+  fail_check("canonical model-context oracle must be bound by candidate_scope") unless candidate_paths.include?(READINESS_V2_ORACLE_PATH)
+  oracle_path = root_regular_file(root_path, READINESS_V2_ORACLE_PATH, "canonical model-context oracle")
+  oracle = JSON.parse(File.read(oracle_path))
+  fail_check("canonical model-context oracle is not a mapping") unless oracle.is_a?(Hash)
+  fail_check("canonical model-context oracle schema is invalid") unless oracle["schema_version"] == "tw-model-context-oracle-adequacy-review/1"
+  fail_check("canonical model-context oracle map digest mismatch") unless oracle["map_digest"] == map_digest
+  fail_check("canonical model-context oracle inventory digest mismatch") unless oracle["inventory_digest"] == inventory_digest
+  oracle_digest = oracle["oracle_digest"]
+  fail_check("canonical model-context oracle digest is invalid") unless oracle_digest.is_a?(String) && oracle_digest.match?(SHA256_IDENTITY)
+  actual_oracle_digest = semantic_digest(oracle.reject { |key, _value| key == "oracle_digest" })
+  fail_check("canonical model-context oracle digest mismatch") unless oracle_digest == actual_oracle_digest
+
+  reviewer = oracle["reviewer"]
+  unless reviewer.is_a?(Hash) && reviewer["identity"].is_a?(String) && !reviewer["identity"].empty? &&
+         reviewer["relationship"].is_a?(String) && !reviewer["relationship"].empty? && reviewer["independent"] == true
+    fail_check("canonical model-context oracle reviewer is invalid")
+  end
+  fail_check("canonical model-context oracle uses a generic pre-validation reviewer") if reviewer["identity"] == "independent-validation-reviewer"
+  unless reviewer["relationship"] == READINESS_V2_ORACLE_REVIEWER_RELATIONSHIP
+    fail_check("canonical model-context oracle reviewer relationship is invalid")
+  end
+
+  routes = inventory.fetch("routes")
+  inventory_by_route = routes.to_h { |route| [route.fetch("route_id"), route] }
+  cells = oracle["route_category_cells"]
+  expected_pairs = inventory_by_route.keys.product(READINESS_V2_SOURCE_CATEGORIES).sort
+  actual_pairs = cells.is_a?(Array) ? cells.map { |cell| [cell["route_id"], cell["category"]] } : []
+  fail_check("canonical model-context oracle route count is invalid") unless oracle["route_count"] == 87
+  fail_check("canonical model-context oracle category count is invalid") unless oracle["category_count"] == 6
+  fail_check("canonical model-context oracle must contain 522 cells") unless cells.is_a?(Array) && cells.length == 522
+  fail_check("canonical model-context oracle cells are not unique") unless actual_pairs.uniq.length == 522
+  fail_check("canonical model-context oracle route/category coverage is invalid") unless actual_pairs.sort == expected_pairs
+  cells.each { |cell| validate_oracle_cell!(root_path, map, inventory_by_route, cell) }
+
+  route_kind_routes = map.fetch("route_kinds").values.flatten
+  cells.group_by { |cell| cell.fetch("route_id") }.each do |route_id, route_cells|
+    canonical_route = inventory_by_route.fetch(route_id).fetch("canonical_route_id")
+    next unless route_kind_routes.include?(canonical_route)
+    %w[implementation_dependencies accepted_evidence].each do |category|
+      cell = route_cells.find { |candidate| candidate.fetch("category") == category }
+      fail_check("oracle route-kind obligation is not satisfied: #{route_id}/#{category}") unless cell && cell["disposition"] == "satisfied"
+    end
+  end
+  fail_check("canonical model-context oracle contains open or uncertain cells") unless oracle["open_or_uncertain_cells"] == []
+  [oracle, oracle_path, oracle_digest, reviewer]
+rescue JSON::ParserError => e
+  fail_check("canonical model-context oracle is invalid JSON: #{e.message}")
+end
+
+def validate_model_context_artifacts(root_path, candidate_paths)
+  map, map_path, map_digest = load_canonical_map(root_path, candidate_paths)
+  inventory, inventory_digest = load_inventory(root_path, candidate_paths, map_path, map_digest)
+  oracle, oracle_path, oracle_digest, reviewer = load_canonical_oracle(
+    root_path, candidate_paths, map, map_digest, inventory, inventory_digest
+  )
+  {
+    map_digest: map_digest,
+    map_file_sha256: file_sha256(map_path),
+    oracle_digest: oracle_digest,
+    oracle_file_sha256: file_sha256(oracle_path),
+    inventory_digest: inventory_digest,
+    oracle_review_id: oracle.fetch("review_id"),
+    oracle_reviewer: reviewer,
+    route_count: 87,
+    cell_count: 522
+  }
+end
+
+def assert_graph_receipt(path)
+  data = JSON.parse(File.read(path))
+  fail_check("graph freshness receipt is not a mapping") unless data.is_a?(Hash)
+  fail_check("graph freshness schema_version is invalid") unless data["schema_version"] == "tw-graph-freshness-receipt/1"
+  fail_check("graph freshness cycle_id is invalid") unless data["cycle_id"] == READINESS_V2_GRAPH_CYCLE
+  fail_check("graph freshness producer is invalid") unless data["producer"] == "traceweaver-tw-graph"
+  fail_check("graph freshness authority is invalid") unless data["authority"] == "derived_freshness_evidence_only"
+  %w[baseline_hash closure_identity graph_hash manifest_hash receipt_hash].each do |field|
+    fail_check("graph freshness #{field} is invalid") unless data[field].is_a?(String) && data[field].match?(SHA256_IDENTITY)
+  end
+  fail_check("graph freshness closure_count is invalid") unless data["closure_count"].is_a?(Integer) && data["closure_count"].positive?
+  fail_check("graph freshness materialization_count is invalid") unless data["materialization_count"].is_a?(Integer) && data["materialization_count"].positive?
+rescue JSON::ParserError => e
+  fail_check("graph freshness receipt is invalid JSON: #{e.message}")
+end
+
+def assert_derived_carrier_freshness(root_path)
+  [
+    [READINESS_V2_GENERATED_VIEW_CHECK, "generated traceability-view drift check", "traceability_generated_views_smoke=pass"],
+    [READINESS_V2_CURRENT_SNAPSHOT_CHECK, "current Intent Contract snapshot drift check", "traceweaver_verify=pass"]
+  ].each do |relative, label, pass_marker|
+    script = root_regular_file(root_path, relative, label)
+    fail_check("#{label} is not executable") unless script.executable?
+    output, error, status = Open3.capture3(script.to_s, chdir: root_path.to_s)
+    next if status.success? && output.include?(pass_marker)
+
+    detail = [error.strip, output.strip].reject(&:empty?).join(" | ")
+    fail_check("#{label} rejected production derived carriers: #{detail}")
+  end
+end
+
+def assert_evidence_front_matter(path, label, expected_id, expected_status)
+  data, = parse_front_matter(path, label)
+  fail_check("#{label} id must be #{expected_id.inspect}") unless data["id"] == expected_id
+  fail_check("#{label} status must be #{expected_status.inspect}") unless data["status"] == expected_status
+  data
+end
+
+def expected_artifact_bindings(context)
+  {
+    "map" => {
+      "path" => READINESS_V2_MAP_PATH,
+      "file_sha256" => context.fetch(:map_file_sha256),
+      "semantic_digest" => context.fetch(:map_digest)
+    },
+    "oracle" => {
+      "path" => READINESS_V2_ORACLE_PATH,
+      "file_sha256" => context.fetch(:oracle_file_sha256),
+      "semantic_digest" => context.fetch(:oracle_digest)
+    },
+    "inventory" => {
+      "generator" => READINESS_V2_INVENTORY_GENERATOR,
+      "semantic_digest" => context.fetch(:inventory_digest),
+      "route_count" => context.fetch(:route_count),
+      "route_category_cell_count" => context.fetch(:cell_count)
+    }
+  }
+end
+
+def assert_shared_evidence_bindings(data, label, context, behavior_digest, behavior_path_count)
+  fail_check("#{label} reviewed_behavior_digest mismatch") unless data["reviewed_behavior_digest"] == behavior_digest
+  fail_check("#{label} reviewed_behavior_path_count mismatch") unless data["reviewed_behavior_path_count"] == behavior_path_count
+  fail_check("#{label} artifact_bindings mismatch") unless data["artifact_bindings"] == expected_artifact_bindings(context)
+end
+
+def assert_structured_acceptance(root_path, path, identity, context, behavior_digest, behavior_path_count)
+  acceptance, = parse_front_matter(path, "acceptance result evidence")
+  fail_check("acceptance result evidence record_type is invalid") unless acceptance["record_type"] == "traceweaver_acceptance_result"
+  fail_check("acceptance result evidence schema_version is invalid") unless acceptance["schema_version"] == 1
+  fail_check("acceptance result evidence result_id is invalid") unless acceptance["result_id"] == identity.fetch("acceptance_result_id")
+  fail_check("acceptance result evidence status must be \"pass\"") unless acceptance["status"] == "pass"
+  fail_check("acceptance result evidence need_ids are invalid") unless acceptance["need_ids"] == ["NEED-TW-013"]
+  fail_check("acceptance result evidence owner is invalid") unless acceptance["owner"] == "Oxiom Systems"
+  fail_check("acceptance result evidence date is invalid") unless acceptance["date"].to_s == "2026-08-22"
+  {
+    "requirement_id" => READINESS_V2_REQUIREMENT,
+    "linked_trace_id" => identity.fetch("trace_id"),
+    "linked_atp_id" => identity.fetch("acceptance_test_id"),
+    "linked_result_id" => identity.fetch("acceptance_result_id"),
+    "linked_verification_id" => identity.fetch("verification_id"),
+    "linked_validation_id" => identity.fetch("validation_id")
+  }.each do |field, expected|
+    fail_check("acceptance result evidence #{field} must be #{expected.inspect}") unless acceptance[field] == expected
+  end
+  assert_shared_evidence_bindings(acceptance, "acceptance result evidence", context, behavior_digest, behavior_path_count)
+  structured = acceptance["structured_acceptance"]
+  fail_check("acceptance result evidence structured_acceptance is invalid") unless structured.is_a?(Hash)
+  fail_check("acceptance result evidence final disposition must be \"pass\"") unless structured["final_disposition"] == "pass"
+  fail_check("acceptance result evidence tested artifact is not the reviewed behavior") unless structured["tested_baseline_or_artifact_version"] == behavior_digest
+  functional = structured["functional_acceptance_evidence"]
+  expected_functional = %w[
+    scripts/traceweaver-smoke-model-context-routing
+    scripts/traceweaver-smoke-installer-transaction
+    scripts/traceweaver-smoke-release-readiness
+  ]
+  functional_evidence = functional.is_a?(Hash) ? functional["evidence"] : nil
+  unless functional.is_a?(Hash) && functional["status"] == "present" && functional_evidence.is_a?(Array) &&
+         (expected_functional - functional_evidence).empty?
+    fail_check("acceptance result evidence lacks the bounded functional smoke set")
+  end
+
+  checker = root_regular_file(root_path, READINESS_V2_ACCEPTANCE_CHECKER, "structured acceptance-result checker")
+  relative = path.relative_path_from(root_path).to_s
+  output, error, status = Open3.capture3(checker.to_s, "--root", root_path.to_s, "--file", relative)
+  unless status.success? && output.include?("acceptance_result_status=pass") && output.include?("acceptance_result_findings=0")
+    fail_check("structured acceptance-result checker rejected production evidence: #{[error.strip, output.strip].reject(&:empty?).join(' | ')}")
+  end
+  acceptance
+end
+
+def assert_production_evidence(root_path, evidence, identity, context, behavior_digest, behavior_path_count)
+  unless evidence.keys.sort == READINESS_V2_PRODUCTION_EVIDENCE.keys.sort
+    fail_check("production evidence keys must exactly match the release contract")
+  end
+  READINESS_V2_PRODUCTION_EVIDENCE.each do |field, expected|
+    fail_check("production evidence #{field} must be #{expected.inspect}") unless evidence[field] == expected
+  end
+
+  plan = assert_evidence_front_matter(
+    root_path.join(evidence.fetch("plan")), "plan evidence",
+    identity.fetch("plan_id"), "accepted_doc_review_passed"
+  )
+  fail_check("plan evidence trace is invalid") unless plan["trace"] == READINESS_V2_TRACE
+
+  plan_review = assert_evidence_front_matter(
+    root_path.join(evidence.fetch("plan_document_review")), "plan document review evidence",
+    identity.fetch("plan_review_id"), "pass_after_one_consolidated_repair"
+  )
+  unless plan_review["reviewer"].is_a?(String) && !plan_review["reviewer"].empty? &&
+         plan_review["reviewer_relationship"] == "did_not_author_or_edit_reviewed_package"
+    fail_check("plan document review evidence lacks its independent reviewer binding")
+  end
+
+  code_review = assert_evidence_front_matter(
+    root_path.join(evidence.fetch("code_review_series")), "code review evidence",
+    identity.fetch("code_review_series_id"), "closed_clean"
+  )
+  unless code_review["reviewer"].is_a?(String) && !code_review["reviewer"].empty? &&
+         code_review["reviewer_relationship"] == "did_not_author_or_edit_reviewed_package"
+    fail_check("code review evidence lacks its independent reviewer binding")
+  end
+  assert_shared_evidence_bindings(code_review, "code review evidence", context, behavior_digest, behavior_path_count)
+  expected_findings = { "open_p0" => 0, "open_p1" => 0, "repair_cycle_count" => 1 }
+  fail_check("code review evidence lacks the closed consolidated review result") unless code_review["reviewed_findings"] == expected_findings
+
+  assert_structured_acceptance(
+    root_path,
+    root_path.join(evidence.fetch("acceptance_result")),
+    identity,
+    context,
+    behavior_digest,
+    behavior_path_count
+  )
+  verification = assert_evidence_front_matter(
+    root_path.join(evidence.fetch("verification_result")), "verification result evidence",
+    identity.fetch("verification_id"), "passed"
+  )
+  claims = verification["evidence_claims"]
+  fail_check("verification result evidence lacks evidence_claims") unless claims.is_a?(Hash)
+  READINESS_V2_VERIFICATION_CLAIMS.each do |claim|
+    fail_check("verification result evidence claim #{claim} must be \"passed\"") unless claims[claim] == "passed"
+  end
+  assert_shared_evidence_bindings(verification, "verification result evidence", context, behavior_digest, behavior_path_count)
+  expected_checks = %w[
+    model_context_routing
+    installer_transaction
+    release_readiness
+    structured_acceptance
+    generated_view_drift
+    current_snapshot_drift
+    manifest_equality
+    public_claim_scan
+    v1_invariance
+  ]
+  checks = verification["executed_checks"]
+  fail_check("verification result evidence lacks executed_checks") unless checks.is_a?(Hash)
+  expected_checks.each do |check|
+    fail_check("verification result executed check #{check} must be \"passed\"") unless checks[check] == "passed"
+  end
+
+  validation = assert_evidence_front_matter(
+    root_path.join(evidence.fetch("validation_result")), "validation result evidence",
+    identity.fetch("validation_id"), "accepted"
+  )
+  oracle_reviewer = context.fetch(:oracle_reviewer)
+  fail_check("validation result rater must equal the canonical oracle reviewer identity") unless validation["rater"] == oracle_reviewer.fetch("identity")
+  fail_check("validation result rater relationship must equal the canonical oracle reviewer relationship") unless validation["rater_relationship"] == oracle_reviewer.fetch("relationship")
+  fail_check("validation result oracle review id mismatch") unless validation["oracle_review_id"] == context.fetch(:oracle_review_id)
+  fail_check("validation result evidence must record all 522 oracle cells") unless validation["reviewed_oracle_cells"] == context.fetch(:cell_count)
+  assert_shared_evidence_bindings(validation, "validation result evidence", context, behavior_digest, behavior_path_count)
+  scenario_results = validation["scenario_results"]
+  expected_scenarios = %w[b0 b1 b2 b3 negative_holds v1_invariance claim_boundary complete_oracle_review]
+  fail_check("validation result evidence lacks scenario_results") unless scenario_results.is_a?(Hash)
+  expected_scenarios.each do |scenario|
+    fail_check("validation result scenario #{scenario} must be \"passed\"") unless scenario_results[scenario] == "passed"
+  end
+
+  trace_source = File.read(root_path.join(evidence.fetch("traceability")))
+  [READINESS_V2_REQUIREMENT, READINESS_V2_TRACE, READINESS_V2_VERIFICATION, READINESS_V2_VALIDATION].each do |anchor|
+    fail_check("traceability evidence is missing #{anchor}") unless trace_source.include?(anchor)
+  end
+  assert_graph_receipt(root_path.join(evidence.fetch("graph_freshness")))
+end
+
+def assert_runtime_receipt(path, version, tag, merge_sha, scope_digest, workflow_prefix)
+  fail_check("runtime receipt is missing or not a regular file: #{path}") unless path.file? && !path.symlink?
+  fail_check("invalid runtime merge SHA #{merge_sha.inspect}") unless merge_sha.match?(GIT_SHA)
+  fail_check("invalid runtime candidate scope digest #{scope_digest.inspect}") unless scope_digest.match?(SHA256_IDENTITY)
+  fail_check("runtime tag must be traceweaver-core--v#{version}") unless tag == "traceweaver-core--v#{version}"
+  unless workflow_prefix.match?(%r{\Ahttps://[^/]+/[^/]+/[^/]+/actions/runs/\z})
+    fail_check("invalid runtime workflow URL prefix #{workflow_prefix.inspect}")
+  end
+
+  data = JSON.parse(File.read(path))
+  fail_check("runtime receipt is not a mapping") unless data.is_a?(Hash)
+  required_keys = %w[schema version tag merge_sha candidate_scope_digest workflow_url required_ci]
+  fail_check("runtime receipt keys are invalid") unless data.keys.sort == required_keys.sort
+  {
+    "schema" => RUNTIME_RECEIPT_SCHEMA,
+    "version" => version,
+    "tag" => tag,
+    "merge_sha" => merge_sha,
+    "candidate_scope_digest" => scope_digest
+  }.each do |field, expected|
+    fail_check("runtime receipt #{field} must be #{expected.inspect}") unless data[field] == expected
+  end
+  workflow_url = data["workflow_url"]
+  run_id = workflow_url.is_a?(String) && workflow_url.delete_prefix(workflow_prefix)
+  fail_check("runtime receipt workflow_url is invalid") unless workflow_url.is_a?(String) && workflow_url.start_with?(workflow_prefix) && run_id.match?(/\A[1-9][0-9]*\z/)
+
+  required_ci = data["required_ci"]
+  fail_check("runtime receipt required_ci is not a mapping") unless required_ci.is_a?(Hash)
+  fail_check("runtime receipt required_ci schema is invalid") unless required_ci["schema"] == REQUIRED_CI_SCHEMA
+  fail_check("runtime receipt required_ci SHA is invalid") unless required_ci["sha"] == merge_sha
+  fail_check("runtime receipt required_ci state is not ready") unless required_ci["state"] == "ready"
+  fail_check("runtime receipt required_ci terminal_state must be null") unless required_ci["terminal_state"].nil?
+  fail_check("runtime receipt required_ci missing checks must be empty") unless required_ci["missing"] == []
+  smoke = required_ci["smoke"]
+  unless smoke.is_a?(Hash) && smoke["name"] == "smoke" && smoke["app_slug"] == "github-actions" &&
+         smoke["status"] == "completed" && smoke["conclusion"] == "success" &&
+         smoke["details_url"].is_a?(String) && smoke["details_url"].start_with?(workflow_prefix) &&
+         smoke["id"].is_a?(Integer) && smoke["id"].positive?
+    fail_check("runtime receipt required_ci smoke proof is invalid")
+  end
+  codeql = required_ci["codeql"]
+  fail_check("runtime receipt required_ci CodeQL proof is invalid") unless codeql.is_a?(Array) && codeql.length == REQUIRED_CODEQL_NAMES.length
+  fail_check("runtime receipt required_ci CodeQL entry is invalid") unless codeql.all? { |entry| entry.is_a?(Hash) }
+  fail_check("runtime receipt required_ci CodeQL names are invalid") unless codeql.map { |entry| entry["name"] }.sort == REQUIRED_CODEQL_NAMES.sort
+  codeql.each do |entry|
+    unless entry["app_slug"] == "github-actions" && entry["status"] == "completed" &&
+           entry["conclusion"] == "success" && entry["details_url"].is_a?(String) &&
+           entry["details_url"].start_with?(workflow_prefix) && entry["id"].is_a?(Integer) && entry["id"].positive?
+      fail_check("runtime receipt required_ci CodeQL entry is invalid")
+    end
+  end
+rescue JSON::ParserError => e
+  fail_check("runtime receipt is invalid JSON: #{e.message}")
+end
+
+def nested_value(mapping, path)
+  path.reduce(mapping) { |value, key| value.is_a?(Hash) ? value[key] : nil }
+end
+
+def assert_v2_manifest_versions(root_path, version)
+  MANIFEST_VERSION_PATHS.each do |relative, json_path|
+    absolute = root_path.join(relative)
+    fail_check("release manifest is missing: #{relative}") unless absolute.file?
+    begin
+      data = JSON.parse(File.read(absolute))
+    rescue JSON::ParserError => e
+      fail_check("release manifest is invalid JSON: #{relative}: #{e.message}")
+    end
+    actual = nested_value(data, json_path).to_s
+    fail_check("release manifest #{relative} version #{actual.inspect} does not match #{version.inspect}") unless actual == version
+  end
+end
+
+def assert_v2(data, readiness, version, root_path, receipt_relative, paths, scope_digest)
+  fail_check("#{READINESS_V2_SCHEMA} is reserved for #{READINESS_V2_VERSION}") unless version == READINESS_V2_VERSION
+
+  scope = readiness.fetch("candidate_scope")
+  exclusions = scope["excluded_paths"]
+  fail_check("candidate_scope excluded_paths must be a unique string array") unless exclusions.is_a?(Array) && exclusions.all? { |path| path.is_a?(String) } && exclusions.uniq.length == exclusions.length
+  exclusions.each { |path| normalized_relative_path(path, "candidate_scope excluded path") }
+  fail_check("candidate_scope must explicitly exclude #{GRAPH_FRESHNESS_PATH}") unless exclusions.include?(GRAPH_FRESHNESS_PATH)
+  fail_check("candidate_scope includes an excluded path") unless (paths & exclusions).empty?
+
+  fail_check("#{READINESS_V2_SCHEMA} receipt must be inside repository root") if receipt_relative.start_with?("../")
+  expected_exclusions = [GRAPH_FRESHNESS_PATH, receipt_relative].sort
+  fail_check("candidate_scope excluded_paths must contain only graph freshness and its own receipt") unless exclusions.sort == expected_exclusions
+
+  identity = readiness["candidate_identity"]
+  fail_check("missing candidate_identity mapping") unless identity.is_a?(Hash)
+  READINESS_V2_IDENTITIES.each do |field, expected|
+    fail_check("candidate_identity #{field} must be #{expected.inspect}") unless identity[field] == expected
+  end
+  code_review_id = identity["code_review_series_id"]
+  fail_check("candidate_identity code_review_series_id is invalid") unless code_review_id.is_a?(String) && code_review_id.match?(/\ATW-CODE-REVIEW-[A-Z0-9._-]+\z/)
+  fail_check("candidate_identity reviewed_scope_digest does not bind candidate_scope") unless identity["reviewed_scope_digest"] == scope_digest
+
+  prerequisites = readiness["prerequisites"]
+  fail_check("missing release readiness prerequisites") unless prerequisites.is_a?(Hash)
+  READINESS_V2_PREREQUISITES.each do |field, expected|
+    fail_check("prerequisite #{field} must be #{expected.inspect}") unless prerequisites[field] == expected
+  end
+  legacy_fields = prerequisites.keys.grep(/\Apr[12]_/)
+  fail_check("#{READINESS_V2_SCHEMA} must not use historical PR1/PR2 prerequisites: #{legacy_fields.join(',')}") unless legacy_fields.empty?
+
+  held_claims = readiness["held_claims"]
+  fail_check("held_claims must be a unique string array") unless held_claims.is_a?(Array) && held_claims.all? { |claim| claim.is_a?(String) } && held_claims.uniq.length == held_claims.length
+  missing_claims = READINESS_V2_HELD_CLAIMS - held_claims
+  fail_check("missing required held claims: #{missing_claims.join(',')}") unless missing_claims.empty?
+
+  evidence = readiness["evidence"]
+  fail_check("missing evidence mapping") unless evidence.is_a?(Hash)
+  production_receipt = receipt_relative == READINESS_V2_PRODUCTION_RECEIPT
+  required_evidence = READINESS_V2_EVIDENCE + (production_receipt ? READINESS_V2_VERIFICATION_CLAIMS : [])
+  required_evidence.each do |field|
+    relative = normalized_relative_path(evidence[field], "evidence #{field}")
+    root_regular_file(root_path, relative, "evidence #{field}")
+    next if field == "graph_freshness" && relative == GRAPH_FRESHNESS_PATH
+    fail_check("evidence #{field} is not bound by candidate_scope: #{relative}") unless paths.include?(relative)
+  end
+  fail_check("graph_freshness evidence path must be #{GRAPH_FRESHNESS_PATH}") unless evidence["graph_freshness"] == GRAPH_FRESHNESS_PATH
+
+  if production_receipt
+    {
+      "id" => READINESS_V2_PRODUCTION_ID,
+      "status" => "ready_for_version_bump",
+      "version" => READINESS_V2_VERSION,
+      "tag" => READINESS_V2_PRODUCTION_TAG,
+      "released_base" => READINESS_V2_RELEASED_BASE,
+      "requirement" => READINESS_V2_REQUIREMENT,
+      "trace" => READINESS_V2_TRACE,
+      "verification" => READINESS_V2_VERIFICATION,
+      "validation" => READINESS_V2_VALIDATION
+    }.each do |field, expected|
+      fail_check("production receipt #{field} must be #{expected.inspect}") unless data[field].to_s == expected
+    end
+    fail_check("production candidate deleted_paths must be empty") unless !scope.key?("deleted_paths") || scope["deleted_paths"] == []
+    assert_resolved_release_base(root_path, data.fetch("released_base"))
+    context = validate_model_context_artifacts(root_path, paths)
+    delta = production_delta(root_path, data.fetch("released_base"))
+    permitted_non_scope = [receipt_relative, GRAPH_FRESHNESS_PATH]
+    omitted = delta.keys - paths - permitted_non_scope
+    fail_check("production candidate scope omits changed paths: #{omitted.sort.join(',')}") unless omitted.empty?
+    behavior_paths = (delta.keys - READINESS_V2_BEHAVIOR_DIGEST_EXCLUSIONS).sort
+    fail_check("production reviewed behavior set is empty") if behavior_paths.empty?
+    behavior_digest = file_scope_digest(root_path, behavior_paths)
+    {
+      "map_digest" => context.fetch(:map_digest),
+      "oracle_digest" => context.fetch(:oracle_digest),
+      "inventory_digest" => context.fetch(:inventory_digest),
+      "oracle_review_id" => context.fetch(:oracle_review_id),
+      "oracle_reviewer_identity" => context.dig(:oracle_reviewer, "identity"),
+      "oracle_reviewer_relationship" => context.dig(:oracle_reviewer, "relationship"),
+      "reviewed_behavior_digest" => behavior_digest,
+      "reviewed_behavior_path_count" => behavior_paths.length
+    }.each do |field, expected|
+      fail_check("candidate_identity #{field} must be #{expected.inspect}") unless identity[field] == expected
+    end
+    assert_production_evidence(
+      root_path, evidence, identity, context, behavior_digest, behavior_paths.length
+    )
+    assert_derived_carrier_freshness(root_path)
+  elsif !receipt_relative.start_with?("fixtures/release-readiness/")
+    fail_check("#{READINESS_V2_SCHEMA} production receipt path must be #{READINESS_V2_PRODUCTION_RECEIPT}")
+  end
+
+  assert_v2_manifest_versions(root_path, version)
+end
+
 receipt = nil
+runtime_receipt = nil
 version = nil
 root = "."
 merge_sha = nil
+tag = nil
+scope_digest = nil
+workflow_prefix = nil
 until ARGV.empty?
   flag = ARGV.shift
   value = ARGV.shift
@@ -43,39 +791,59 @@ until ARGV.empty?
 
   case flag
   when "--receipt" then receipt = value
+  when "--runtime-receipt" then runtime_receipt = value
   when "--version" then version = value
   when "--root" then root = value
   when "--merge-sha" then merge_sha = value
+  when "--tag" then tag = value
+  when "--scope-digest" then scope_digest = value
+  when "--workflow-prefix" then workflow_prefix = value
   else fail_check(USAGE)
   end
 end
+fail_check(USAGE) if receipt && runtime_receipt
+
+if runtime_receipt
+  fail_check(USAGE) unless version && tag && merge_sha && scope_digest && workflow_prefix
+  assert_runtime_receipt(Pathname.new(runtime_receipt).expand_path, version, tag, merge_sha, scope_digest, workflow_prefix)
+  puts "release_runtime_receipt=valid"
+  exit 0
+end
+
 fail_check(USAGE) unless receipt && version
 
 root_path = Pathname.new(root).expand_path
 fail_check("root is not a directory: #{root}") unless root_path.directory?
+root_path = root_path.realpath
 
 if merge_sha
-  fail_check("invalid merge SHA #{merge_sha.inspect}") unless merge_sha.match?(/\A[0-9a-f]{40}\z/)
+  fail_check("invalid merge SHA #{merge_sha.inspect}") unless merge_sha.match?(GIT_SHA)
   repository_head, git_error, git_status = Open3.capture3("git", "-C", root_path.to_s, "rev-parse", "HEAD")
   fail_check("could not resolve repository HEAD: #{git_error.strip}") unless git_status.success?
   repository_head = repository_head.strip
   fail_check("merge SHA #{merge_sha} does not match checked-out HEAD #{repository_head}") unless repository_head == merge_sha
 end
 
-source = File.read(receipt)
-front_matter = source.match(/\A---[ \t]*\n(.*?)\n---[ \t]*(?:\n|\z)/m)
-fail_check("missing YAML front matter in #{receipt}") unless front_matter
-
-data = YAML.safe_load(front_matter[1], permitted_classes: [Date], aliases: false)
-fail_check("front matter is not a mapping in #{receipt}") unless data.is_a?(Hash)
+receipt_path = Pathname.new(receipt).expand_path
+fail_check("receipt is missing or not a regular file: #{receipt}") unless receipt_path.file? && !receipt_path.symlink?
+receipt_path = receipt_path.realpath
+data, source = parse_front_matter(receipt_path, receipt)
 
 receipt_version = data["version"].to_s
 fail_check("receipt version #{receipt_version.inspect} does not match #{version.inspect}") unless receipt_version == version
-Date.iso8601(data.fetch("date").to_s)
+begin
+  Date.iso8601(data.fetch("date").to_s)
+rescue ArgumentError, KeyError
+  fail_check("receipt date must be ISO-8601")
+end
 
 readiness = data["release_readiness"]
 fail_check("missing release_readiness mapping") unless readiness.is_a?(Hash)
 fail_check("release_readiness version does not match #{version.inspect}") unless readiness["version"].to_s == version
+fail_check("receipt contains a PENDING placeholder") if source.match?(/\bPENDING(?:_[A-Z0-9]+)*\b/)
+unless readiness["terminal_status"] == "ready_for_version_bump"
+  fail_check("terminal status is not ready_for_version_bump")
+end
 
 scope = readiness["candidate_scope"]
 fail_check("missing candidate_scope mapping") unless scope.is_a?(Hash)
@@ -84,35 +852,36 @@ paths = scope["paths"]
 fail_check("candidate_scope paths must be a non-empty array") unless paths.is_a?(Array) && !paths.empty?
 fail_check("candidate_scope paths must be unique strings") unless paths.all? { |path| path.is_a?(String) } && paths.uniq.length == paths.length
 
-receipt_path = Pathname.new(receipt).expand_path
 records = paths.sort.map do |path|
-  relative = Pathname.new(path)
-  fail_check("candidate_scope path must be normalized and relative: #{path.inspect}") if relative.absolute? || path.empty? || relative.cleanpath.to_s != path || path.start_with?("../")
-  absolute = root_path.join(relative)
-  fail_check("candidate_scope path is missing or not a regular file: #{path}") unless absolute.file? && !absolute.symlink?
+  normalized_relative_path(path, "candidate_scope path")
+  absolute = root_regular_file(root_path, path, "candidate_scope path")
   fail_check("candidate_scope must exclude its own receipt: #{path}") if absolute.expand_path == receipt_path
+  fail_check("candidate_scope must exclude #{GRAPH_FRESHNESS_PATH}") if path == GRAPH_FRESHNESS_PATH
   git_mode = (absolute.stat.mode & 0o111).zero? ? "100644" : "100755"
   "#{path}\0#{git_mode}\0#{Digest::SHA256.file(absolute).hexdigest}\n"
 end
 actual_scope_digest = "sha256:#{Digest::SHA256.hexdigest(records.join)}"
 fail_check("candidate_scope digest mismatch: expected #{scope['digest'].inspect}, got #{actual_scope_digest}") unless scope["digest"] == actual_scope_digest
 
-fail_check("receipt contains a PENDING placeholder") if source.match?(/\bPENDING(?:_[A-Z0-9]+)*\b/)
-unless readiness["terminal_status"] == "ready_for_version_bump"
-  fail_check("terminal status is not ready_for_version_bump")
-end
-
-prerequisites = readiness["prerequisites"]
-fail_check("missing release readiness prerequisites") unless prerequisites.is_a?(Hash)
-prerequisites.each do |field, value|
-  fail_check("unready prerequisite #{field}=#{value.inspect}") if value.to_s.match?(UNREADY)
-end
-
-REQUIRED_PREREQUISITES.each do |field, pattern|
-  value = prerequisites[field]
-  fail_check("missing prerequisite #{field}") unless value.is_a?(String) && !value.empty?
-  fail_check("unready prerequisite #{field}=#{value.inspect}") if value.match?(UNREADY)
-  fail_check("invalid prerequisite #{field}=#{value.inspect}") unless value.match?(pattern)
+schema = readiness["schema_version"]
+if schema.nil? || schema == "tw-release-readiness/1"
+  fail_check("release #{version} requires #{READINESS_V2_SCHEMA}") unless version == "0.4.0"
+  prerequisites = readiness["prerequisites"]
+  fail_check("missing release readiness prerequisites") unless prerequisites.is_a?(Hash)
+  prerequisites.each do |field, value|
+    fail_check("unready prerequisite #{field}=#{value.inspect}") if value.to_s.match?(UNREADY)
+  end
+  LEGACY_REQUIRED_PREREQUISITES.each do |field, pattern|
+    value = prerequisites[field]
+    fail_check("missing prerequisite #{field}") unless value.is_a?(String) && !value.empty?
+    fail_check("unready prerequisite #{field}=#{value.inspect}") if value.match?(UNREADY)
+    fail_check("invalid prerequisite #{field}=#{value.inspect}") unless value.match?(pattern)
+  end
+elsif schema == READINESS_V2_SCHEMA
+  receipt_relative = receipt_path.relative_path_from(root_path).to_s
+  assert_v2(data, readiness, version, root_path, receipt_relative, paths, actual_scope_digest)
+else
+  fail_check("unsupported release_readiness schema #{schema.inspect}")
 end
 
 readiness.each do |key, value|
@@ -121,5 +890,6 @@ readiness.each do |key, value|
 end
 
 puts "release_readiness=ready_for_version_bump"
+puts "release_readiness_schema=#{schema || 'tw-release-readiness/1'}"
 puts "release_version=#{version}"
 puts "release_candidate_scope_digest=#{actual_scope_digest}"

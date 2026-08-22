@@ -9,6 +9,7 @@
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-043; trace=TRACE-TW-010; ver=VAL-TW-011 -->
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-065; trace=TRACE-TW-048; ver=VAL-TW-011 -->
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-068; trace=TRACE-TW-054; ver=VAL-TW-016 -->
+<!-- TRACEWEAVER: file-role=v050-shadow-governance-public-guide; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092; val=VAL-TW-040 -->
 
 TraceWeaver keeps coding-agent work tied to intent, approved authority,
 verification evidence, validation questions, and explicit held claims.
@@ -17,13 +18,10 @@ Use it when you want Codex, Claude Code, or other agent tools to move quickly
 without losing the proof behind what changed, why it changed, and whether it is
 ready to publish.
 
-TraceWeaver Core `0.4.0` is an alpha advisory plugin for Codex and Claude Code.
-Its release candidate is reconciled on the merged convergence, Skill Execution
-Contract/Terra, and graph/HTML-preview slices. Antigravity support remains
-limited to static local install/discovery metadata. Runtime-driver binding,
-enforcing mode, clean CE replacement, slash-command support,
-unconstrained-host support, and autonomous publication remain held until
-separate evidence gates pass.
+TraceWeaver Core `0.5.0` is an alpha advisory release candidate for Codex and
+Claude Code. It adds inspectable shadow model/context governance while the
+existing v1 dispatch remains authoritative. Antigravity support remains
+limited to static local install/discovery metadata.
 
 ## Intro Video
 
@@ -68,10 +66,10 @@ codex plugin marketplace add Oxiom-Systems/traceweaver
 codex plugin marketplace upgrade traceweaver
 ```
 
-After the 0.4.0 GitHub Release is published, for a pinned local alpha install:
+After the 0.5.0 GitHub Release is published, for a pinned local alpha install:
 
 ```sh
-git clone --branch traceweaver-core--v0.4.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.5.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
@@ -148,10 +146,32 @@ Use the [worked bootstrap example](docs/guides/worked-authority-bootstrap-exampl
 when you want to see what belongs in the first three files before reading the
 full reference templates.
 
-## What's New in 0.4.0
+## What's New in 0.5.0
 
-Compared with 0.3.x, the reconciled 0.4.0 release adds deterministic
-control-plane artifacts and navigation:
+TraceWeaver Core 0.5.0 adds a deterministic, inspectable, shadow-only
+model-context map and compiler. The map keeps model role, risk effort, packet
+budget, and context completeness independent and gives every declared
+TraceWeaver route a stable record beside the existing Skill Execution
+Contract.
+
+The B0--B3 packet budgets are experimental, revision-controlled hypotheses;
+they are not proof that a packet is sufficient, cheaper, or quality-equivalent.
+The compiler selects the lowest structurally eligible hypothesis at or above
+the authorized route floor, or returns an exact hold without truncating or
+dropping required sources. V1 remains authoritative and the shadow compiler
+cannot dispatch a model, change a v1 receipt, or publish work.
+
+Shadow plan and final decisions use separate canonical receipts, leaving v1
+resolver, native-child, terminal, and review-series receipt schemas and bytes
+unchanged. Installation is one recoverable package transaction whose rollback
+restores the prior touched projection's bytes and executable modes after a
+failure.
+
+Active routing, descendant enforcement, served-model attestation, token savings, token sufficiency, quality equivalence, and provider replay qualification remain held.
+Active cutover is disabled and requires a future owner decision; it is not a
+0.5.0 release prerequisite.
+
+The 0.5.0 package retains the deterministic 0.4.0 control-plane foundations:
 
 - generated JSON is deterministic across supported runtimes, and review series
   persist within their bounded convergence budget, reusing an accepted review
@@ -171,10 +191,24 @@ control-plane artifacts and navigation:
 - a bounded, read-only Vestro and Air Router validation route records consumer
   evidence without changing consumer repositories or invoking live services.
 
-### 0.4.0 Quick Start
+### 0.5.0 Quick Start
 
-After installing the reconciled 0.4.0 release, use the graph before falling
-back to repository-wide search:
+After installing 0.5.0, inspect the packaged
+`references/model-context-map.yml` and `references/workflow-profile-template.yml`
+before treating a budget recommendation as meaningful. In a source checkout,
+run the complete deterministic acceptance smoke:
+
+```sh
+plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map --root .
+scripts/traceweaver-smoke-model-context-routing
+```
+
+See [How To Use TraceWeaver](docs/guides/using-traceweaver.md#inspect-050-shadow-modelcontext-governance)
+for an explicit advisory-compile example. Its fixture manifest is illustrative,
+and its output is a separate shadow receipt rather than a v1 dispatch.
+
+The existing graph remains useful before falling back to repository-wide
+search:
 
 ```text
 tw-graph status
@@ -188,8 +222,7 @@ tw-graph check
 Use callable skills normally; their deterministic Skill Execution Contracts
 make the required inputs, requested/served-model receipt fields, evidence, and
 held boundaries inspectable rather than inferred. The contract index and exact
-artifact locations are supplied by the integrated 0.4.0 package, not by this
-flat release branch.
+artifact locations are supplied by the integrated 0.5.0 package.
 
 ### Compatibility and Migration
 
@@ -198,16 +231,16 @@ flat release branch.
   generated HTML preview into an authority file.
 - Canonical filenames are case-sensitive across Git hosts. Existing projects
   that track `REQUIREMENTS.md` must perform an explicit, reviewed case-only
-  rename to `requirements.md`; 0.4.0 will not silently reinterpret or rename
+  rename to `requirements.md`; 0.5.0 will not silently reinterpret or rename
   an authority source.
-- Existing Graphify users can retain it as optional context; 0.4.0 neither
+- Existing Graphify users can retain it as optional context; 0.5.0 neither
   installs Graphify nor uses it to satisfy `tw-graph` freshness.
-- Existing 0.3.x workflows remain advisory. 0.4.0 does not add enforcement,
+- Existing workflows remain advisory. 0.5.0 does not add active enforcement,
   live consumer-runtime validation, independent served-model attestation, or
   autonomous publication by documentation alone.
-- This one version-bump PR initiated the release; PR1 and PR2 deliberately
-  retained their pre-release version. A bounded same-version recovery can
-  resume publication only while the `0.4.0` tag is absent. After the tag exists,
+- One integrated 0.5.0 candidate replaces the historical 0.4.0 PR1/PR2
+  prerequisite shape. A bounded same-version recovery can resume publication
+  only while the `0.5.0` tag is absent. After the tag exists,
   ordinary same-version pushes are successful no-ops.
 - The committed release receipt covers a deterministic fixed file set rather
   than predicting its own future commit. After merge, the serialized workflow

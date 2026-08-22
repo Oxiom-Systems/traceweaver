@@ -1,0 +1,9 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-113; trace=TRACE-TW-072; ver=VER-TW-092",
+  "direct": 100,
+  "injected_locator": 20,
+  "required_conversation": 30,
+  "injected_tool_results": 40,
+  "injected_shard_summaries": 50,
+  "packet_input": 240
+}
