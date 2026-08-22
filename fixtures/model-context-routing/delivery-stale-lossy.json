@@ -1,0 +1,10 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-117; trace=TRACE-TW-072; ver=VER-TW-092",
+  "delivery_mode": "shard",
+  "locator": "README.md",
+  "parent_locator": "README.md",
+  "fresh": false,
+  "lossy": true,
+  "mismatched_parent_source_digest": "sha256:ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff",
+  "expected": "held_source_delivery_invalid"
+}

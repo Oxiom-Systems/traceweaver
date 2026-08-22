@@ -1,0 +1,661 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=model-context-shadow-compiler; req=REQ-TW-110,REQ-TW-113,REQ-TW-120; trace=TRACE-TW-072; ver=VER-TW-092
+# TRACEWEAVER: entrypoint=compile_model_context_route; req=REQ-TW-114,REQ-TW-115,REQ-TW-116,REQ-TW-117,REQ-TW-119; trace=TRACE-TW-072; ver=VER-TW-092
+
+require "base64"
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+require "tmpdir"
+require "yaml"
+
+MAP_SCHEMA = "tw-model-context-map/1"
+PROFILE_SCHEMA = "tw-model-context-profile/1"
+RECEIPT_SCHEMA = "tw-model-context-receipt/1"
+ORACLE_SCHEMA = "tw-model-context-oracle-adequacy-review/1"
+SOURCE_CATEGORIES = %w[controlling_authority task_scope skill_contract implementation_dependencies current_external_sources accepted_evidence].freeze
+BUDGETS = %w[B0 B1 B2 B3].freeze
+EFFORT = { "L0" => "low", "L1" => "medium", "L2" => "high", "L3" => "xhigh" }.freeze
+
+def secure_package_root?(candidate)
+  return false unless candidate.directory? && !candidate.symlink?
+
+  real_root = candidate.realpath
+  %w[
+    references/model-context-map.yml
+    references/skill-execution-contracts.yml
+    skills/tw-auto/scripts/traceweaver-generate-model-context-map
+  ].all? do |relative|
+    cursor = candidate
+    relative.split("/").each do |part|
+      cursor = cursor.join(part)
+      return false if cursor.symlink?
+    end
+    cursor.file? && cursor.realpath.to_s.start_with?("#{real_root}/")
+  end
+rescue Errno::ENOENT
+  false
+end
+
+def discover_package_root!
+  candidates = [
+    Pathname.new(File.expand_path("../../..", __dir__)),
+    Pathname.new(File.expand_path("../../../traceweaver-core", __dir__))
+  ]
+  root = candidates.find { |candidate| secure_package_root?(candidate) }
+  raise "missing_or_unsafe_traceweaver_package_root" unless root
+
+  root.realpath
+end
+
+PACKAGE_ROOT = discover_package_root!
+SOURCE_CHECKOUT_RUNTIME = PACKAGE_ROOT.parent.basename.to_s == "plugins" && PACKAGE_ROOT.parent.parent.join(".git").exist?
+INSTALLED_RUNTIME = !SOURCE_CHECKOUT_RUNTIME
+
+class CompileError < StandardError
+  attr_reader :outcome
+  def initialize(outcome, reason)
+    @outcome = outcome
+    super(reason)
+  end
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, out|
+      actual_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      out[key] = canonical(value.fetch(actual_key))
+    end
+  when Array then value.map { |entry| canonical(entry) }
+  else value
+  end
+end
+
+def identity(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def yaml(path, outcome)
+  value = YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)
+  raise CompileError.new(outcome, "not_mapping") unless value.is_a?(Hash)
+  value
+rescue Errno::ENOENT
+  raise CompileError.new(outcome, "missing:#{path}")
+rescue Psych::Exception => error
+  raise CompileError.new(outcome, "invalid_yaml:#{error.message}")
+end
+
+def json(path, outcome)
+  value = JSON.parse(File.read(path))
+  raise CompileError.new(outcome, "not_mapping") unless value.is_a?(Hash)
+  value
+rescue Errno::ENOENT
+  raise CompileError.new(outcome, "missing:#{path}")
+rescue JSON::ParserError => error
+  raise CompileError.new(outcome, "invalid_json:#{error.message}")
+end
+
+def relative_locator(root, path, outcome)
+  resolved = Pathname.new(path).expand_path.realpath
+  root_path = root.realpath
+  package_path = PACKAGE_ROOT.realpath
+  if resolved == root_path || resolved.to_s.start_with?("#{root_path}/")
+    resolved.relative_path_from(root_path).to_s
+  elsif resolved.to_s.start_with?("#{package_path}/")
+    # Installed compiler recomputation may pass a physical package artifact
+    # back through --map.  Preserve the only safe logical spelling rather
+    # than treating this controlled PACKAGE_ROOT path as a consumer escape.
+    "plugins/traceweaver-core/#{resolved.relative_path_from(package_path)}"
+  else
+    raise CompileError.new(outcome, "escaping_artifact_locator")
+  end
+rescue ArgumentError
+  raise CompileError.new(outcome, "invalid_artifact_locator")
+rescue Errno::ENOENT
+  raise CompileError.new(outcome, "invalid_artifact_locator")
+end
+
+def resolve_locator(root, locator, outcome)
+  path = Pathname.new(locator.to_s)
+  raise CompileError.new(outcome, "unsafe_locator") if locator.to_s.empty? || path.absolute? || locator.split("/").include?("..")
+  controlled = locator.start_with?("plugins/traceweaver-core/")
+  source = root.join(locator).cleanpath
+  packaged_relative = locator.delete_prefix("plugins/traceweaver-core/")
+  packaged = controlled ? PACKAGE_ROOT.join(packaged_relative).cleanpath : nil
+  internal = controlled && packaged_relative.start_with?("skills/ce-") ? PACKAGE_ROOT.join(packaged_relative.sub(/\Askills\/ce-/, "internal-skills/ce-")).cleanpath : nil
+  candidates = if controlled && INSTALLED_RUNTIME
+                 [packaged, internal]
+               elsif controlled
+                 [source, packaged, internal]
+               else
+                 [source]
+               end
+  resolved = candidates.compact.map do |candidate|
+    next unless candidate.file?
+    base = candidate.to_s.start_with?("#{PACKAGE_ROOT}/") ? PACKAGE_ROOT : root
+    cursor = base
+    unsafe_component = false
+    candidate.relative_path_from(base).each_filename do |part|
+      cursor = cursor.join(part)
+      unsafe_component ||= cursor.symlink?
+    end
+    next if unsafe_component
+    actual = candidate.realpath
+    boundary = base.realpath
+    next unless actual.to_s.start_with?("#{boundary}/")
+
+    actual
+  rescue Errno::ENOENT, ArgumentError
+    nil
+  end.compact.first
+  raise CompileError.new(outcome, "unreadable_or_symlinked_locator") unless resolved
+
+  resolved
+end
+
+def explicit_regular_file(path, outcome, root)
+  candidate = Pathname.new(path).expand_path
+  raise CompileError.new(outcome, "unreadable_explicit_path") unless candidate.file?
+  lexical_tmp = Pathname.new(Dir.tmpdir).expand_path
+  trusted_base = [root, lexical_tmp].find do |base|
+    candidate.to_s.start_with?("#{base}/")
+  end
+  if trusted_base
+    cursor = trusted_base.realpath
+    candidate.relative_path_from(trusted_base).each_filename do |component|
+      cursor = cursor.join(component)
+      raise CompileError.new(outcome, "symlinked_explicit_path") if cursor.symlink?
+    end
+  elsif candidate.symlink?
+    raise CompileError.new(outcome, "symlinked_explicit_path")
+  end
+  candidate.realpath
+rescue Errno::ENOENT
+  raise CompileError.new(outcome, "unreadable_explicit_path")
+end
+
+def isolated_workspace!(value, requested_root)
+  raise CompileError.new("held_replay_not_authorized", "isolated_workspace_missing") unless value.is_a?(String) && !value.empty?
+  workspace = Pathname.new(value).expand_path
+  # The authorized fixture workspace is pre-created by the caller.  Never
+  # create it while validating an isolated replay request: a held compile has
+  # no permission to leave filesystem effects behind.
+  raise CompileError.new("held_replay_not_authorized", "isolated_workspace_nonexistent") unless workspace.directory?
+  lexical_tmp = Pathname.new(Dir.tmpdir).expand_path
+  real_tmp = lexical_tmp.realpath
+  trusted_base = [lexical_tmp, real_tmp].find { |base| workspace.to_s.start_with?("#{base}/") }
+  raise CompileError.new("held_replay_not_authorized", "isolated_workspace_not_temp") unless trusted_base
+  cursor = trusted_base
+  workspace.relative_path_from(trusted_base).each_filename do |part|
+    cursor = cursor.join(part)
+    raise CompileError.new("held_replay_not_authorized", "isolated_workspace_symlink") if cursor.symlink?
+  end
+  resolved = workspace.realpath
+  real_requested_root = requested_root.realpath
+  # A symlink spelling of the project root (or a child within it) must not
+  # turn a repository write into a permitted isolated-workspace write.
+  inside_requested_root = resolved == real_requested_root || resolved.to_s.start_with?("#{real_requested_root}/")
+  raise CompileError.new("held_replay_not_authorized", "isolated_workspace_not_temp") unless resolved.to_s.start_with?("#{real_tmp}/") && !inside_requested_root
+
+  resolved
+rescue Errno::ENOENT, ArgumentError
+  raise CompileError.new("held_replay_not_authorized", "isolated_workspace_nonexistent")
+end
+
+def safe_source(root, source)
+  raise CompileError.new("held_source_delivery_invalid", "invalid_source_shape") unless source.is_a?(Hash)
+  locator = source["locator"]
+  raise CompileError.new("held_source_delivery_invalid", "missing_locator") unless locator.is_a?(String) && !locator.empty?
+  path = Pathname.new(locator)
+  raise CompileError.new("held_source_delivery_invalid", "escaping_locator") if path.absolute? || locator.split("/").include?("..")
+  resolved = resolve_locator(root, locator, "held_source_delivery_invalid")
+  digest = source["digest"]
+  actual = "sha256:#{Digest::SHA256.file(resolved).hexdigest}"
+  raise CompileError.new("held_source_delivery_invalid", "digest_mismatch:#{locator}") unless digest == actual
+  raise CompileError.new("held_source_delivery_invalid", "lossy_delivery") if source["truncated"] == true || source["lossy"] == true || source["inherited"] == true
+  mode = source["delivery_mode"]
+  raise CompileError.new("held_source_delivery_invalid", "unsupported_delivery_mode") unless %w[direct locator shard].include?(mode)
+  if mode == "direct"
+    encoded = source["bytes_base64"]
+    raise CompileError.new("held_source_delivery_invalid", "missing_direct_bytes") unless encoded.is_a?(String) && !encoded.empty?
+    begin
+      delivered_bytes = Base64.strict_decode64(encoded)
+    rescue ArgumentError
+      raise CompileError.new("held_source_delivery_invalid", "invalid_direct_bytes")
+    end
+    raise CompileError.new("held_source_delivery_invalid", "noncanonical_direct_bytes") unless Base64.strict_encode64(delivered_bytes) == encoded
+    raise CompileError.new("held_source_delivery_invalid", "direct_bytes_mismatch") unless delivered_bytes == File.binread(resolved)
+  elsif source.key?("bytes_base64")
+    raise CompileError.new("held_source_delivery_invalid", "bytes_payload_not_allowed_for_#{mode}")
+  elsif mode == "locator"
+    raise CompileError.new("held_source_delivery_invalid", "locator_not_contained") unless source["contained"] == true
+  elsif mode == "shard"
+    parent_locator = source["parent_locator"]
+    parent = Pathname.new(parent_locator.to_s)
+    raise CompileError.new("held_source_delivery_invalid", "missing_shard_parent") if parent_locator.to_s.empty? || parent.absolute? || parent_locator.split("/").include?("..")
+    parent_path = resolve_locator(root, parent_locator, "held_source_delivery_invalid")
+    parent_digest = source["parent_source_digest"]
+    actual_parent_digest = "sha256:#{Digest::SHA256.file(parent_path).hexdigest}"
+    raise CompileError.new("held_source_delivery_invalid", "stale_shard") unless source["fresh"] == true && parent_digest == actual_parent_digest
+  end
+  delivered = { "locator" => locator, "digest" => digest, "delivery_mode" => mode }
+  if mode == "shard"
+    delivered["parent_locator"] = parent_locator
+    delivered["parent_source_digest"] = parent_digest
+  end
+  delivered
+end
+
+def route_kind(map, route_id)
+  map.fetch("route_kinds").each do |kind, routes|
+    return kind if routes.include?(route_id)
+  end
+  "general"
+end
+
+def temporal_or_external_required?(root, map, manifest, route_id)
+  task = manifest["temporal_or_external_facts"]
+  unless task.is_a?(Hash) && task.keys.sort == %w[route sec task] && task.values.all? { |value| value == true || value == false }
+    raise CompileError.new("held_source_oracle_invalid", "temporal_external_derivation_missing")
+  end
+  registry = yaml(resolve_locator(root, map.fetch("discovery").fetch("sec_registry"), "held_source_oracle_invalid"), "held_source_oracle_invalid")
+  contract = registry.fetch("contracts").find { |entry| entry["skill"] == route_id }
+  raise CompileError.new("held_source_oracle_invalid", "route_not_in_sec") unless contract
+  sec_marked = contract["temporal_or_external_facts"] == true || contract["current_external_sources_required"] == true
+  route_marked = Array(map.dig("source_oracle", "temporal_external_routes")).include?(route_id)
+  task.values.any? || sec_marked || route_marked
+end
+
+def oracle_ref!(root, reference, category)
+  raise CompileError.new("held_source_oracle_invalid", "oracle_source_reference") unless reference.is_a?(Hash) && reference["source_manifest_category"] == category
+  locator, digest = reference["locator"], reference["digest"]
+  path = Pathname.new(locator.to_s)
+  raise CompileError.new("held_source_oracle_invalid", "oracle_source_locator") if locator.to_s.empty? || path.absolute? || locator.split("/").include?("..")
+  resolved = resolve_locator(root, locator, "held_source_oracle_invalid")
+  actual = "sha256:#{Digest::SHA256.file(resolved).hexdigest}"
+  raise CompileError.new("held_source_oracle_invalid", "oracle_source_digest") unless digest == actual
+  { "locator" => locator, "digest" => digest }
+end
+
+def validate_oracle!(root, map, oracle, inventory, route_id)
+  raise CompileError.new("held_source_oracle_invalid", "oracle_not_mapping") unless oracle.is_a?(Hash)
+  raise CompileError.new("held_source_oracle_invalid", "oracle_schema") unless oracle["schema_version"] == map.dig("source_oracle", "adequacy_review_schema") && oracle["schema_version"] == ORACLE_SCHEMA
+  reviewer = oracle["reviewer"]
+  unless reviewer.is_a?(Hash) && reviewer["identity"].is_a?(String) && !reviewer["identity"].empty? && reviewer["relationship"] == "did_not_implement_compiler_or_author_source_oracle" && reviewer["independent"] == true && reviewer["identity"] != "compiler"
+    raise CompileError.new("held_source_oracle_invalid", "oracle_independent_reviewer_required")
+  end
+  raise CompileError.new("held_source_oracle_invalid", "oracle_map_binding") unless oracle["map_digest"] == map["map_digest"]
+  raise CompileError.new("held_source_oracle_invalid", "oracle_inventory_binding") unless oracle["inventory_digest"] == inventory["inventory_digest"]
+  raise CompileError.new("held_source_oracle_invalid", "oracle_identity") unless oracle["oracle_digest"] == identity(oracle.reject { |key, _| key == "oracle_digest" })
+  routes = inventory.fetch("routes").map { |route| route.fetch("route_id") }.sort
+  cells = oracle["route_category_cells"]
+  raise CompileError.new("held_source_oracle_invalid", "oracle_cells_shape") unless cells.is_a?(Array) && cells.all? { |cell| cell.is_a?(Hash) }
+  raise CompileError.new("held_source_oracle_invalid", "oracle_matrix_cardinality") unless oracle["route_count"] == routes.length && oracle["category_count"] == SOURCE_CATEGORIES.length && cells.is_a?(Array) && cells.length == routes.length * SOURCE_CATEGORIES.length
+  grouped = cells.group_by { |cell| cell.is_a?(Hash) ? cell["route_id"] : nil }
+  raise CompileError.new("held_source_oracle_invalid", "oracle_route_coverage") unless grouped.keys.sort == routes && oracle["open_or_uncertain_cells"] == []
+  # This is a property of the canonical oracle, not merely of the one route
+  # being compiled.  A recomputed digest must not make an exclusion of a
+  # globally mandatory category acceptable on an unrelated route.
+  mandatory = Array(map.dig("source_oracle", "mandatory_all_routes"))
+  cells.each do |cell|
+    category = cell["category"]
+    disposition = cell["disposition"]
+    raise CompileError.new("held_source_oracle_invalid", "oracle_global_category") unless SOURCE_CATEGORIES.include?(category)
+    raise CompileError.new("held_source_oracle_invalid", "oracle_global_disposition") unless %w[satisfied excluded_by_authority].include?(disposition)
+    if mandatory.include?(category) && disposition == "excluded_by_authority"
+      raise CompileError.new("held_source_oracle_invalid", "oracle_mandatory_category_excluded:#{category}")
+    end
+  end
+  route_cells = grouped.fetch(route_id)
+  raise CompileError.new("held_source_oracle_invalid", "oracle_category_coverage") unless route_cells.map { |cell| cell["category"] }.sort == SOURCE_CATEGORIES.sort
+  obligations = {}
+  route_cells.each do |cell|
+    category = cell.fetch("category")
+    disposition = cell["disposition"]
+    raise CompileError.new("held_source_oracle_invalid", "oracle_disposition:#{category}") unless %w[satisfied excluded_by_authority].include?(disposition)
+    if disposition == "satisfied"
+      references = cell["source_refs"]
+      raise CompileError.new("held_source_oracle_invalid", "oracle_source_refs:#{category}") unless references.is_a?(Array) && !references.empty?
+      obligations[category] = { "disposition" => disposition, "sources" => references.map { |reference| oracle_ref!(root, reference, category) }.sort_by { |reference| reference.fetch("locator") } }
+    else
+      if Array(map.dig("source_oracle", "mandatory_all_routes")).include?(category)
+        raise CompileError.new("held_source_oracle_invalid", "oracle_mandatory_category_excluded:#{category}")
+      end
+      unless cell["exclusion_authority"].is_a?(String) && !cell["exclusion_authority"].empty? && cell["exclusion_rationale"].is_a?(String) && !cell["exclusion_rationale"].empty?
+        raise CompileError.new("held_source_oracle_invalid", "oracle_exclusion:#{category}")
+      end
+      obligations[category] = { "disposition" => disposition, "exclusion_authority" => cell["exclusion_authority"], "exclusion_rationale" => cell["exclusion_rationale"] }
+    end
+  end
+  [obligations, reviewer]
+end
+
+def validate_manifest(root, map, manifest, route_id, obligations, oracle_reviewer)
+  raise CompileError.new("held_source_oracle_invalid", "manifest_not_mapping") unless manifest.is_a?(Hash)
+  raise CompileError.new("held_source_oracle_invalid", "unsupported_schema") unless manifest["schema_version"] == "tw-model-context-source-manifest/1"
+  raise CompileError.new("held_source_oracle_invalid", "compiler_authored") if manifest["compiler_authored"] == true
+  categories = manifest["categories"]
+  raise CompileError.new("held_source_oracle_invalid", "empty_categories") unless categories.is_a?(Array) && !categories.empty? && categories.all? { |entry| entry.is_a?(Hash) }
+  names = categories.map { |entry| entry.is_a?(Hash) ? entry["category"] : nil }
+  raise CompileError.new("held_source_oracle_invalid", "taxonomy_invalid") unless names.sort == SOURCE_CATEGORIES.sort && names.uniq == names
+  categories.each do |category|
+    disposition = category["disposition"]
+    raise CompileError.new("held_source_oracle_invalid", "category_disposition_shape") unless %w[satisfied excluded_by_authority].include?(disposition)
+    if disposition == "satisfied"
+      sources = category["sources"]
+      raise CompileError.new("held_source_oracle_invalid", "category_sources_shape") unless sources.is_a?(Array) && sources.all? { |source| source.is_a?(Hash) }
+    end
+  end
+  required_sources = manifest["required_sources"]
+  unless required_sources.nil? || (required_sources.is_a?(Array) && required_sources.all? { |source| source.is_a?(Hash) && source["locator"].is_a?(String) && source["digest"].is_a?(String) })
+    raise CompileError.new("held_source_oracle_invalid", "required_sources_shape")
+  end
+  discovered = manifest["discovered_dependencies"]
+  unless discovered.nil? || (discovered.is_a?(Array) && discovered.all? { |entry| entry.is_a?(String) && !entry.empty? })
+    raise CompileError.new("held_source_oracle_invalid", "discovered_dependencies_shape")
+  end
+  external_required = temporal_or_external_required?(root, map, manifest, route_id)
+  delivered = []
+  categories.each do |category|
+    name = category.fetch("category")
+    disposition = category["disposition"]
+    obligation = obligations.fetch(name)
+    temporal_override = name == "current_external_sources" && external_required && obligation["disposition"] == "excluded_by_authority"
+    required_disposition = temporal_override ? "satisfied" : obligation.fetch("disposition")
+    raise CompileError.new("held_source_oracle_invalid", "oracle_disposition_recall:#{name}") unless disposition == required_disposition
+    if disposition == "satisfied"
+      sources = category["sources"]
+      raise CompileError.new("held_source_oracle_invalid", "satisfied_without_source:#{name}") unless sources.is_a?(Array) && !sources.empty?
+      normalized = sources.map { |source| safe_source(root, source) }.sort_by { |source| source.fetch("locator") }
+      unless temporal_override
+        expected = obligation.fetch("sources")
+        actual = normalized.map { |source| source.slice("locator", "digest") }
+        raise CompileError.new("held_source_manifest_incomplete", "oracle_recall:#{name}") unless (expected - actual).empty?
+      end
+      delivered.concat(normalized)
+    elsif disposition == "excluded_by_authority"
+      unless category["exclusion_authority"] == obligation["exclusion_authority"] && category["exclusion_rationale"] == obligation["exclusion_rationale"]
+        raise CompileError.new("held_source_oracle_invalid", "oracle_exclusion_recall:#{name}")
+      end
+    end
+  end
+  raise CompileError.new("held_source_manifest_stale", "discovered_dependency") if discovered.is_a?(Array) && !discovered.empty?
+  required = required_sources || delivered
+  expected = required.map { |source| [source["locator"], source["digest"]] }.sort
+  actual = delivered.map { |source| [source["locator"], source["digest"]] }.sort
+  raise CompileError.new("held_source_manifest_incomplete", "manifest_recall_incomplete") unless (expected - actual).empty?
+  { "oracle_id" => manifest["oracle_id"], "delivered_sources" => delivered.sort_by { |source| source.fetch("locator") }, "oracle_reviewer" => oracle_reviewer }
+end
+
+def profile!(profile)
+  raise CompileError.new("held_model_context_route_invalid", "profile_schema") unless profile["schema_version"] == "tw-workflow-profile/1"
+  raise CompileError.new("held_model_context_route_invalid", "profile_hash_contract") unless profile["profile_hash_algorithm"] == "sha256-canonical-json-v1" && profile["profile_hash_excluded_top_level_fields"] == %w[profile_hash profile_status accounting]
+  profile_payload = profile.dup
+  profile.fetch("profile_hash_excluded_top_level_fields").each { |field| profile_payload.delete(field) }
+  raise CompileError.new("held_model_context_route_invalid", "profile_hash") unless profile["profile_hash"] == identity(profile_payload)
+  model_context = profile["model_context"]
+  raise CompileError.new("held_model_context_route_invalid", "profile_model_context_missing") unless model_context.is_a?(Hash)
+  expected = {
+    "schema_version" => PROFILE_SCHEMA,
+    "mode" => "advisory_shadow_compile",
+    "authoritative_runtime" => "v1",
+    "active_cutover" => "disabled",
+    "capability_context_window" => 272_000,
+    "host_system_tool_reserve" => 32_000,
+    "assembled_input_target" => 224_000,
+    "assembled_input_proposal_ceiling" => 240_000,
+    "pricing_refresh_sentinel" => 272_000,
+    "maximum_shard_fanout" => 8,
+    "maximum_route_depth" => 4,
+    "efficiency_eligibility" => false,
+    "ascending_selection" => BUDGETS
+  }
+  expected.each { |field, value| raise CompileError.new("held_model_context_route_invalid", "profile_#{field}") unless model_context[field] == value }
+  budgets = model_context["budgets"]
+  exact_budgets = {
+    "B0" => { "packet_input_cap" => 32_000, "reserved_output_cap" => 4_000 },
+    "B1" => { "packet_input_cap" => 64_000, "reserved_output_cap" => 8_000 },
+    "B2" => { "packet_input_cap" => 128_000, "reserved_output_cap" => 16_000 },
+    "B3" => { "packet_input_cap" => 192_000, "reserved_output_cap" => 24_000 }
+  }
+  raise CompileError.new("held_model_context_route_invalid", "profile_budgets") unless budgets == exact_budgets
+  raise CompileError.new("held_model_context_route_invalid", "profile_qualification_state") unless model_context["qualification_state"] == "unqualified"
+  model_context
+end
+
+def held_receipt(options, outcome, reason, bindings = {})
+  receipt = {
+    "schema_version" => RECEIPT_SCHEMA,
+    "receipt_kind" => options[:receipt_kind],
+    "mode" => "advisory_shadow_compile",
+    "authoritative_runtime" => "v1",
+    "v1_behavior_changed" => false,
+    "model_call_performed" => false,
+    "child_dispatch_performed" => false,
+    "state_mutation_performed" => false,
+    "active_enforcement" => false,
+    "invocation_id" => options[:invocation_id] || "unavailable",
+    "route_id" => options[:route_id] || "unavailable",
+    "canonical_route_id" => "unavailable",
+    "parent_route" => options[:parent_route] || "unavailable",
+    "depth" => options[:depth],
+    "baseline_identity" => options[:baseline] || "unavailable",
+    "map_locator" => "unavailable",
+    "map_file_digest" => "unavailable",
+    "map_digest" => "unavailable",
+    "sec_locator" => "unavailable",
+    "sec_digest" => "unavailable",
+    "profile_locator" => "unavailable",
+    "profile_digest" => "unavailable",
+    "inventory_digest" => "unavailable",
+    "oracle_locator" => "unavailable",
+    "oracle_file_digest" => "unavailable",
+    "oracle_digest" => "unavailable",
+    "source_manifest_locator" => "unavailable",
+    "source_manifest_digest" => "unavailable",
+    "routing" => { "model_role" => "unavailable", "risk" => options[:risk] || "unavailable", "reasoning_effort" => "unavailable", "floor" => "unavailable", "selected_budget" => "unavailable" },
+    "accounting" => { "packet_input" => "unavailable", "assembled_input" => "unavailable", "reserved_output" => "unavailable", "planned_context" => "unavailable" },
+    "source_coverage" => { "oracle_id" => "unavailable", "delivered_sources" => [], "oracle_reviewer" => "unavailable" },
+    "observation" => { "state" => options[:observation], "capability_snapshot" => "unavailable", "tokenizer_snapshot" => "unavailable", "pricing_snapshot" => "unavailable" },
+    "outcome" => outcome,
+    "held_reason" => reason,
+    "eligibility" => { "content" => false, "efficiency" => false, "qualification" => "unqualified" }
+  }
+  receipt.merge!(bindings)
+  receipt["receipt_id"] = identity(receipt)
+  receipt
+end
+
+options = {
+  root: File.expand_path("../../../../..", __dir__), mode: "advisory_shadow_compile", receipt_kind: "final", depth: 0,
+  direct_input: 0, injected_locator: 0, required_conversation: 0, injected_tool_results: 0,
+  injected_shard_summaries: 0, system: 0, developer: 0, tool_schemas: 0, host_metadata: 0,
+  shard_fanout: 0, overflow: "hold", observation: "estimated"
+}
+OptionParser.new do |parser|
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--mode MODE", %w[advisory_shadow_compile isolated_shadow_replay]) { |value| options[:mode] = value }
+  parser.on("--isolated-authorization TOKEN") { |value| options[:isolated_authorization] = value }
+  parser.on("--isolated-workspace PATH") { |value| options[:isolated_workspace] = value }
+  parser.on("--map PATH") { |value| options[:map] = value }
+  parser.on("--profile PATH") { |value| options[:profile] = value }
+  parser.on("--route-id ID") { |value| options[:route_id] = value }
+  parser.on("--risk LEVEL") { |value| options[:risk] = value }
+  parser.on("--packet-input N", Integer) { |value| options[:packet_input] = value }
+  parser.on("--reserved-output N", Integer) { |value| options[:reserved_output] = value }
+  parser.on("--direct-input N", Integer) { |value| options[:direct_input] = value }
+  parser.on("--injected-locator N", Integer) { |value| options[:injected_locator] = value }
+  parser.on("--required-conversation N", Integer) { |value| options[:required_conversation] = value }
+  parser.on("--injected-tool-results N", Integer) { |value| options[:injected_tool_results] = value }
+  parser.on("--injected-shard-summaries N", Integer) { |value| options[:injected_shard_summaries] = value }
+  parser.on("--system N", Integer) { |value| options[:system] = value }
+  parser.on("--developer N", Integer) { |value| options[:developer] = value }
+  parser.on("--tool-schemas N", Integer) { |value| options[:tool_schemas] = value }
+  parser.on("--host-metadata N", Integer) { |value| options[:host_metadata] = value }
+  parser.on("--source-manifest PATH") { |value| options[:source_manifest] = value }
+  parser.on("--source-oracle PATH") { |value| options[:source_oracle] = value }
+  parser.on("--baseline ID") { |value| options[:baseline] = value }
+  parser.on("--invocation-id ID") { |value| options[:invocation_id] = value }
+  parser.on("--parent-route ID") { |value| options[:parent_route] = value }
+  parser.on("--depth N", Integer) { |value| options[:depth] = value }
+  parser.on("--shard-fanout N", Integer) { |value| options[:shard_fanout] = value }
+  parser.on("--overflow MODE", %w[hold locator shard downgrade truncate lossy retry]) { |value| options[:overflow] = value }
+  parser.on("--receipt-kind KIND", %w[plan final]) { |value| options[:receipt_kind] = value }
+  parser.on("--plan-receipt-id ID") { |value| options[:plan_receipt_id] = value }
+  parser.on("--observation STATE", %w[host_measured estimated unavailable]) { |value| options[:observation] = value }
+end.parse!
+
+bindings = {}
+begin
+  isolated_replay = options[:mode] == "isolated_shadow_replay"
+  workspace = nil
+  if isolated_replay
+    raise CompileError.new("held_replay_not_authorized", "isolated_shadow_replay_not_separately_authorized") unless options[:isolated_authorization] == "fixture_isolated_mock_only" && options[:isolated_workspace].is_a?(String)
+    workspace = isolated_workspace!(options[:isolated_workspace], Pathname.new(options.fetch(:root)).expand_path)
+  elsif options[:mode] != "advisory_shadow_compile"
+    raise CompileError.new("held_replay_not_authorized", "unsupported_mode")
+  end
+  %i[route_id risk source_manifest baseline invocation_id].each do |field|
+    raise CompileError.new("held_model_context_route_invalid", "missing_#{field}") unless options[field].is_a?(String) && !options[field].empty?
+  end
+  raise CompileError.new("held_model_context_route_invalid", "invalid_risk") unless EFFORT.key?(options[:risk])
+  raise CompileError.new("held_model_context_route_invalid", "invalid_depth") unless options[:depth].is_a?(Integer) && options[:depth] >= 0
+  root = Pathname.new(options.fetch(:root)).expand_path.realpath
+  map_reference = "plugins/traceweaver-core/references/model-context-map.yml"
+  map_path = options[:map] ? explicit_regular_file(options[:map], "held_model_context_route_invalid", root) : resolve_locator(root, map_reference, "held_model_context_route_invalid")
+  profile_path = options[:profile] ? explicit_regular_file(options[:profile], "held_model_context_route_invalid", root) : resolve_locator(root, ".traceweaver/v050-model-governance-workflow-profile.yml", "held_model_context_route_invalid")
+  bindings["map_locator"] = options[:map] ? relative_locator(root, map_path, "held_model_context_route_invalid") : map_reference
+  bindings["map_file_digest"] = "sha256:#{Digest::SHA256.file(map_path).hexdigest}" if map_path.file? && !map_path.symlink?
+  map = yaml(map_path, "held_model_context_route_invalid")
+  raise CompileError.new("held_model_context_route_invalid", "map_schema") unless map["schema_version"] == MAP_SCHEMA
+  raise CompileError.new("held_model_context_route_invalid", "map_digest") unless map["map_digest"] == identity(map.reject { |key, _| key == "map_digest" })
+  bindings["map_digest"] = map.fetch("map_digest")
+  sec_reference = map.fetch("discovery").fetch("sec_registry")
+  sec_path = resolve_locator(root, sec_reference, "held_model_context_route_invalid")
+  bindings["sec_locator"] = sec_reference
+  bindings["sec_digest"] = "sha256:#{Digest::SHA256.file(sec_path).hexdigest}" if sec_path.file? && !sec_path.symlink?
+  generator = PACKAGE_ROOT.join("skills/tw-auto/scripts/traceweaver-generate-model-context-map")
+  stdout, stderr, status = Open3.capture3(generator.to_s, "--root", root.to_s, "--map", map_path.to_s, "--format", "json")
+  raise CompileError.new("held_model_context_route_invalid", stderr.strip.empty? ? "inventory_generation" : stderr.strip) unless status.success?
+  inventory = JSON.parse(stdout)
+  matches = inventory.fetch("routes").select { |route| route["route_id"] == options[:route_id] }
+  raise CompileError.new("held_model_context_route_invalid", "route_cardinality") unless matches.length == 1
+  route = matches.fetch(0)
+  bindings["canonical_route_id"] = route.fetch("canonical_route_id")
+  bindings["parent_route"] = route.fetch("parent_route")
+  bindings["inventory_digest"] = inventory.fetch("inventory_digest")
+  oracle_reference = map.fetch("source_oracle").fetch("adequacy_review_locator")
+  oracle_path = options[:source_oracle] ? explicit_regular_file(options[:source_oracle], "held_source_oracle_invalid", root) : resolve_locator(root, oracle_reference, "held_source_oracle_invalid")
+  canonical_oracle_path = resolve_locator(root, oracle_reference, "held_source_oracle_invalid")
+  raise CompileError.new("held_source_oracle_invalid", "oracle_locator_not_canonical") unless oracle_path == canonical_oracle_path
+  bindings["oracle_locator"] = oracle_reference
+  bindings["oracle_file_digest"] = "sha256:#{Digest::SHA256.file(oracle_path).hexdigest}" if oracle_path.file? && !oracle_path.symlink?
+  oracle = json(oracle_path, "held_source_oracle_invalid")
+  bindings["oracle_digest"] = oracle["oracle_digest"] if oracle["oracle_digest"].is_a?(String)
+  obligations, oracle_reviewer = validate_oracle!(root, map, oracle, inventory, route.fetch("route_id"))
+  if route["kind"] != "top_level" && route["kind"] != "alias"
+    raise CompileError.new("held_model_context_route_invalid", "parent_mismatch") unless options[:parent_route] == route["parent_route"]
+  elsif options[:parent_route]
+    raise CompileError.new("held_model_context_route_invalid", "unexpected_parent")
+  end
+  profile = profile!(yaml(profile_path, "held_model_context_route_invalid"))
+  bindings["profile_locator"] = relative_locator(root, profile_path, "held_model_context_route_invalid")
+  bindings["profile_digest"] = "sha256:#{Digest::SHA256.file(profile_path).hexdigest}" if profile_path.file? && !profile_path.symlink?
+  raise CompileError.new("held_context_insufficient", "depth_limit") if options[:depth] > profile.fetch("maximum_route_depth")
+  raise CompileError.new("held_context_insufficient", "fanout_limit") if options[:shard_fanout] > profile.fetch("maximum_shard_fanout")
+  manifest_path = explicit_regular_file(options[:source_manifest], "held_source_oracle_invalid", root)
+  # Eligible receipts must bind a physical project-controlled manifest.  An
+  # external temporary manifest can still drive a canonical held result, but
+  # can never produce a replayable structural recommendation.
+  bindings["source_manifest_locator"] = relative_locator(root, manifest_path, "held_source_manifest_unbound")
+  bindings["source_manifest_digest"] = "sha256:#{Digest::SHA256.file(manifest_path).hexdigest}"
+  manifest = json(manifest_path, "held_source_oracle_invalid")
+  source = validate_manifest(root, map, manifest, route.fetch("canonical_route_id"), obligations, oracle_reviewer)
+
+  options[:direct_input] = options[:packet_input] if options.key?(:packet_input)
+  input_fields = %i[direct_input injected_locator required_conversation injected_tool_results injected_shard_summaries]
+  overhead_fields = %i[system developer tool_schemas host_metadata]
+  (input_fields + overhead_fields + [:shard_fanout, :reserved_output]).each { |field| raise CompileError.new("held_model_context_route_invalid", "negative_#{field}") if options[field] && options[field] < 0 }
+  packet = input_fields.sum { |field| options[field] }
+  overhead = overhead_fields.sum { |field| options[field] }
+  reserved = options[:reserved_output] || 4_000
+  assembled = overhead + packet
+  planned = assembled + reserved
+  start = BUDGETS.index(route.fetch("floor"))
+  raise CompileError.new("held_model_context_route_invalid", "floor_invalid") unless start
+  selected = BUDGETS[start..].find do |budget|
+    cap = profile.fetch("budgets").fetch(budget)
+    packet <= cap.fetch("packet_input_cap") && reserved <= cap.fetch("reserved_output_cap") && assembled <= profile.fetch("assembled_input_proposal_ceiling") && planned <= profile.fetch("capability_context_window")
+  end
+  unless selected
+    if %w[downgrade truncate lossy retry].include?(options[:overflow])
+      raise CompileError.new("held_judgment_insufficient", "prohibited_overflow:#{options[:overflow]}")
+    end
+    if options[:overflow] == "locator"
+      bindings["overflow_recommendation"] = { "next_action" => "digest_checked_locator", "effect_performed" => false, "reason" => "all_eligible_budget_classes_exhausted" }
+    elsif options[:overflow] == "shard"
+      bindings["overflow_recommendation"] = { "next_action" => "fresh_bounded_shard_or_reisolation", "effect_performed" => false, "maximum_fanout" => profile.fetch("maximum_shard_fanout"), "maximum_depth" => profile.fetch("maximum_route_depth"), "reason" => "all_eligible_budget_classes_exhausted" }
+    end
+    raise CompileError.new("held_context_insufficient", "overflow_exhausted_after_promotion_locator_shard")
+  end
+  receipt = bindings.merge({
+    "schema_version" => RECEIPT_SCHEMA,
+    "receipt_kind" => options[:receipt_kind],
+    "mode" => options[:mode],
+    "authoritative_runtime" => "v1",
+    "v1_behavior_changed" => false,
+    "model_call_performed" => false,
+    "child_dispatch_performed" => false,
+    "state_mutation_performed" => isolated_replay,
+    "active_enforcement" => false,
+    "baseline_identity" => options[:baseline],
+    "invocation_id" => options[:invocation_id],
+    "route_id" => route.fetch("route_id"),
+    "canonical_route_id" => route.fetch("canonical_route_id"),
+    "parent_route" => route.fetch("parent_route"),
+    "depth" => options[:depth],
+    "routing" => {
+      "model_role" => map.fetch("model_role"),
+      "risk" => options[:risk],
+      "reasoning_effort" => EFFORT.fetch(options[:risk]),
+      "floor" => route.fetch("floor"),
+      "selected_budget" => selected
+    },
+    "accounting" => {
+      "packet_input" => packet,
+      "packet_components" => input_fields.to_h { |field| [field.to_s, options[field]] },
+      "assembled_input" => assembled,
+      "assembled_components" => overhead_fields.to_h { |field| [field.to_s, options[field]] },
+      "reserved_output" => reserved,
+      "planned_context" => planned
+    },
+    "source_coverage" => source,
+    "observation" => { "state" => options[:observation], "capability_snapshot" => profile.fetch("capability_snapshot"), "tokenizer_snapshot" => profile.fetch("tokenizer_snapshot"), "pricing_snapshot" => profile.fetch("pricing_snapshot") },
+    "eligibility" => { "content" => true, "efficiency" => false, "qualification" => "structurally_eligible" },
+    "isolation" => isolated_replay ? "fixture_isolated_mock_provider_and_temp_writes" : "advisory_no_call_no_dispatch_no_write",
+    "outcome" => "structurally_eligible_shadow_recommendation"
+  })
+  receipt["plan_receipt_id"] = options[:plan_receipt_id] if options[:receipt_kind] == "final" && options[:plan_receipt_id]
+  if isolated_replay
+    receipt["isolated_effects"] = %w[declared_mock_provider_request isolated_receipt_write isolated_workspace_write]
+  end
+  receipt["receipt_id"] = identity(receipt)
+  if isolated_replay
+    # Validation has completed.  These two authorized writes are the only
+    # isolated replay effects and remain confined to the pre-validated temp
+    # workspace.
+    File.write(workspace.join("declared-mock-provider-request.json"), JSON.generate({ "schema_version" => "tw-model-context-isolated-mock-request/1", "provider" => "declared_mock_only", "live_provider_called" => false }))
+    File.write(workspace.join("isolated-shadow-receipt.json"), JSON.generate(canonical(receipt)))
+  end
+  puts JSON.generate(canonical(receipt))
+rescue CompileError => error
+  puts JSON.generate(canonical(held_receipt(options, error.outcome, error.message, bindings)))
+rescue KeyError, JSON::ParserError, NoMethodError, TypeError => error
+  puts JSON.generate(canonical(held_receipt(options, "held_model_context_route_invalid", error.message, bindings)))
+end

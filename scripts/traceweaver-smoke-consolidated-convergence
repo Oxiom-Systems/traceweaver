@@ -1,0 +1,137 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=consolidated-delivery-smoke; req=REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-031,TRACE-TW-067; ver=VER-TW-040,VER-TW-087
+# TRACEWEAVER: verifies=VER-TW-040,VER-TW-087; req=REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-031,TRACE-TW-067
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+
+ruby - "$root" <<'RUBY'
+require "json"
+require "open3"
+require "yaml"
+
+root = ARGV.fetch(0)
+helper = File.join(root, "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence")
+profile_path = File.join(root, "plugins/traceweaver-core/references/workflow-profile-template.yml")
+mirror_path = File.join(root, "plugins/traceweaver-core/skills/tw-auto/references/workflow-profile-template.yml")
+
+raise "workflow profile mirror drift" unless File.binread(profile_path) == File.binread(mirror_path)
+profile = YAML.safe_load(File.read(profile_path), permitted_classes: [], aliases: false)
+routing = profile.fetch("model_routing")
+contract = profile.fetch("consolidated_delivery")
+
+raise "main Sol invariant drift" unless routing.fetch("codex_main_model") == "gpt-5.6-sol"
+raise "Terra child invariant drift" unless routing.fetch("codex_subagent_model") == "gpt-5.6-terra"
+raise "Sol child prohibition drift" unless routing.fetch("sol_allowed_for_subagents") == false
+raise "primary is not retained Sol" unless contract.dig("primary", "model") == "gpt-5.6-sol" && contract.dig("primary", "retained_context") == true
+raise "primary phases fan out" unless contract.dig("primary", "separate_child_dispatches") == 0
+raise "reviewer is not one Terra identity" unless contract.dig("integrated_review", "model") == "gpt-5.6-terra" && contract.dig("integrated_review", "reviewer_identity_count") == 1
+raise "nested review fan-out allowed" unless contract.dig("integrated_review", "nested_reviewer_dispatches") == 0
+raise "clean freeze count drift" unless contract.dig("candidate", "clean_path_freeze_count") == 1
+raise "repair freeze cap drift" unless contract.dig("candidate", "repair_path_freeze_count_max") == 2
+raise "clean path budget drift" unless contract.dig("model_turn_budget", "clean_path") == 2
+raise "blocking path budget drift" unless contract.dig("model_turn_budget", "blocking_path_max") == 4
+raise "repair cap drift" unless contract.dig("repair", "batch_cap") == 1
+
+def route(helper, profile_path, *args)
+  stdout, stderr, status = Open3.capture3(helper, "--profile", profile_path, *args)
+  raise "route failed: #{stderr}" unless status.success?
+
+  JSON.parse(stdout)
+end
+
+def expect(value, expected, label)
+  raise "#{label}: expected #{expected.inspect}, got #{value.inspect}" unless value == expected
+end
+
+clean = route(helper, profile_path, "--change-class", "normal_mixed")
+expect(clean.fetch("primary_model"), "gpt-5.6-sol", "clean primary")
+expect(clean.fetch("reviewer_model"), "gpt-5.6-terra", "clean reviewer")
+expect(clean.fetch("sol_allowed_for_subagents"), false, "Sol child prohibition")
+expect(clean.fetch("outcome"), "integrated_candidate_review_clean", "clean route")
+expect(clean.fetch("primary_phases"), %w[authority_lock compact_plan proportional_vv_setup implementation focused_verification trace_update], "retained primary phases")
+expect(clean.fetch("candidate_freeze_count"), 1, "candidate freeze")
+expect(clean.fetch("standalone_tw_plan"), false, "plan child fan-out")
+expect(clean.fetch("standalone_tw_doc_review"), false, "mixed doc-review fan-out")
+expect(clean.fetch("planning_work_native_child_dispatches"), 0, "planning/work child count")
+expect(clean.fetch("review_native_child_dispatches"), 1, "integrated review child count")
+expect(clean.fetch("native_child_dispatches"), 1, "clean native child count")
+expect(clean.fetch("reviewer_turns"), 1, "clean reviewer turns")
+expect(clean.fetch("reviewer_identity_count"), 1, "clean reviewer identity")
+expect(clean.fetch("nested_reviewer_dispatches"), 0, "nested reviewer fan-out")
+expect(clean.fetch("total_model_turns"), 2, "clean model turns")
+expect(clean.fetch("publication"), "held_without_separate_authority", "publication hold")
+expect(clean.fetch("post_terminal_bookkeeping_model_dispatches"), 0, "terminal bookkeeping")
+
+blocking = route(helper, profile_path, "--change-class", "normal_mixed", "--findings", "blocking")
+expect(blocking.fetch("outcome"), "batch_repair_then_targeted_closure", "blocking route")
+expect(blocking.fetch("repair_batches"), 1, "repair batch cap")
+expect(blocking.fetch("native_child_dispatches"), 2, "blocking native child maximum")
+expect(blocking.fetch("planning_work_native_child_dispatches"), 0, "repair planning/work child count")
+expect(blocking.fetch("review_native_child_dispatches"), 2, "repair review child count")
+expect(blocking.fetch("reviewer_turns"), 2, "reviewer turn cap")
+expect(blocking.fetch("reviewer_identity_count"), 1, "same reviewer identity")
+expect(blocking.fetch("candidate_freeze_count"), 2, "repair candidate revision cap")
+expect(blocking.fetch("reviewer_resumption"), "same_identity", "same reviewer resumption")
+expect(blocking.fetch("total_model_turns"), 4, "blocking model-turn maximum")
+
+closure = route(helper, profile_path, "--change-class", "normal_mixed", "--findings", "blocking", "--repair-batches", "1", "--evidence-progress", "true")
+expect(closure.fetch("outcome"), "targeted_reviewer_closure", "targeted closure")
+expect(closure.fetch("reviewer_resumption"), "same_identity", "closure identity")
+expect(closure.fetch("reviewer_turns"), 2, "closure reviewer cap")
+
+no_progress = route(helper, profile_path, "--change-class", "normal_mixed", "--findings", "blocking", "--repair-batches", "1", "--evidence-progress", "false")
+expect(no_progress.fetch("outcome"), "held_no_progress", "no-progress hold")
+expect(no_progress.fetch("reviewer_resumption"), "prohibited", "no-progress redispatch")
+expect(no_progress.fetch("candidate_freeze_count"), 1, "no-progress freeze count")
+
+nonblocking = route(helper, profile_path, "--change-class", "normal_mixed", "--findings", "nonblocking")
+expect(nonblocking.fetch("outcome"), "accepted_with_nonblocking_findings", "nonblocking route")
+expect(nonblocking.fetch("reviewer_turns"), 1, "nonblocking no loop")
+expect(nonblocking.fetch("repair_batches"), 0, "nonblocking repair count")
+
+mechanical = route(helper, profile_path, "--change-class", "mechanical_closure")
+expect(mechanical.fetch("outcome"), "mechanical_closure", "mechanical route")
+expect(mechanical.fetch("native_child_dispatches"), 0, "mechanical child count")
+expect(mechanical.fetch("total_model_turns"), 0, "mechanical model count")
+expect(mechanical.fetch("candidate_freeze_count"), 0, "mechanical freeze count")
+
+authority = route(helper, profile_path, "--change-class", "authority_only")
+expect(authority.fetch("outcome"), "standalone_document_review_clean", "authority-only route")
+expect(authority.fetch("standalone_tw_doc_review"), true, "authority-only doc review")
+expect(authority.fetch("native_child_dispatches"), 1, "authority reviewer count")
+
+standalone_nonblocking = route(helper, profile_path, "--change-class", "document_only", "--findings", "nonblocking")
+expect(standalone_nonblocking.fetch("outcome"), "standalone_document_review_accepted_with_nonblocking_findings", "standalone nonblocking route")
+expect(standalone_nonblocking.fetch("repair_batches"), 0, "standalone nonblocking repair count")
+
+standalone_blocking = route(helper, profile_path, "--change-class", "authority_only", "--findings", "blocking")
+expect(standalone_blocking.fetch("outcome"), "standalone_document_batch_repair_then_targeted_closure", "standalone blocking route")
+expect(standalone_blocking.fetch("repair_batches"), 1, "standalone repair batch cap")
+expect(standalone_blocking.fetch("reviewer_identity_count"), 1, "standalone reviewer identity")
+expect(standalone_blocking.fetch("reviewer_turns"), 2, "standalone reviewer turn cap")
+expect(standalone_blocking.fetch("candidate_freeze_count"), 2, "standalone repaired freeze cap")
+
+standalone_no_progress = route(helper, profile_path, "--change-class", "document_only", "--findings", "blocking", "--repair-batches", "1", "--evidence-progress", "false")
+expect(standalone_no_progress.fetch("outcome"), "held_no_progress", "standalone no-progress hold")
+expect(standalone_no_progress.fetch("reviewer_resumption"), "prohibited", "standalone no-progress redispatch")
+
+_stdout, stderr, status = Open3.capture3(helper, "--profile", profile_path, "--change-class", "normal_mixed", "--findings", "blocking", "--repair-batches", "2")
+raise "second repair batch accepted" if status.success?
+raise "second repair batch failure is not explicit" unless stderr.include?("repair batch cap is one")
+
+skills = %w[tw-auto tw-plan tw-work tw-code-review tw-doc-review].to_h do |name|
+  [name, File.read(File.join(root, "plugins/traceweaver-core/skills", name, "SKILL.md"))]
+end
+shared_contract = "<skills-root>/tw-auto/references/workflow-profile-template.yml"
+skills.each do |name, body|
+  raise "#{name}: consolidated contract is not wired" unless body.include?(shared_contract)
+end
+raise "tw-auto: deterministic router is not wired" unless skills.fetch("tw-auto").include?("<skills-root>/tw-auto/scripts/traceweaver-route-convergence")
+raise "tw-auto: Graphify pre-review boundary missing" unless skills.fetch("tw-auto").include?("before review handoff")
+raise "integrated review controller is not shared" unless %w[tw-code-review tw-doc-review].all? { |name| skills.fetch(name).include?("<skills-root>/tw-auto/scripts/traceweaver-review-series") }
+raise "convergence router is not executable" unless File.executable?(helper)
+
+puts "consolidated convergence smoke: PASS"
+RUBY

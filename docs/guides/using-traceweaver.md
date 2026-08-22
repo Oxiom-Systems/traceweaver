@@ -9,6 +9,7 @@
 <!-- TRACEWEAVER: file-role=deep-usage-guide; req=REQ-TW-043; trace=TRACE-TW-010; ver=VAL-TW-011 -->
 <!-- TRACEWEAVER: file-role=deep-usage-guide; req=REQ-TW-065; trace=TRACE-TW-048; ver=VAL-TW-011 -->
 <!-- TRACEWEAVER: file-role=deep-usage-guide; req=REQ-TW-068; trace=TRACE-TW-054; ver=VAL-TW-016 -->
+<!-- TRACEWEAVER: file-role=v050-shadow-governance-usage-guide; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092; val=VAL-TW-040 -->
 
 TraceWeaver is an alpha advisory workflow for coding agents. It keeps agent
 work tied to intent, approved requirements or exceptions, verification
@@ -30,7 +31,8 @@ Watch the setup guide for the install, bootstrap, and first-cycle flow.
 TraceWeaver Core releases from `main`. Each release bumps the plugin version
 and publishes a `traceweaver-core--v<version>` git tag with a matching GitHub
 Release. The marketplace tracks the current release. Use the
-`traceweaver-core--v0.3.2` tag when you need a reproducible alpha snapshot.
+`traceweaver-core--v0.5.0` tag when you need a reproducible 0.5.0 alpha
+snapshot after its GitHub Release exists.
 
 ### Codex
 
@@ -46,7 +48,7 @@ Install `traceweaver-core` from the Codex plugin UI.
 Pinned local install:
 
 ```sh
-git clone --branch traceweaver-core--v0.3.2 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.5.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
@@ -94,11 +96,11 @@ a fresh session.
 
 ### Antigravity
 
-Antigravity support in `0.3.2` is local alpha install/discovery metadata only.
+Antigravity support in `0.5.0` is local alpha install/discovery metadata only.
 Runtime workflow invocation remains held.
 
 ```sh
-git clone --branch traceweaver-core--v0.3.2 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.5.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to antigravity --include-skills
 ```
@@ -120,7 +122,7 @@ scripts/traceweaver-smoke-antigravity-discovery
 TraceWeaver includes a Cursor peer manifest at
 `plugins/traceweaver-core/.cursor-plugin/plugin.json`.
 
-Cursor install/update is compatibility-preview only in `0.3.2`. The manifest is
+Cursor install/update is compatibility-preview only in `0.5.0`. The manifest is
 versioned with the Codex and Claude manifests, but TraceWeaver does not claim a
 proven Cursor marketplace or runtime install path yet.
 
@@ -164,6 +166,45 @@ bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-ski
 
 Find `<latest>` on the
 [Releases page](https://github.com/Oxiom-Systems/traceweaver/releases).
+
+## Inspect 0.5.0 Shadow Model/Context Governance
+
+TraceWeaver Core 0.5.0 provides a deterministic, inspectable, shadow-only
+model-context map and compiler. It represents model role, risk effort, packet
+budget, and context completeness independently. V1 remains authoritative, and
+the advisory compiler performs no model call, child dispatch, publication, or
+state mutation.
+
+Check that the packaged map still matches the declared callable and descendant
+inventory:
+
+```sh
+plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map --root .
+```
+
+Compile an illustrative `tw-plan` route against the repository fixture source
+manifest:
+
+```sh
+plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-compile-model-context-route \
+  --root . \
+  --route-id tw-plan \
+  --risk L3 \
+  --packet-input 191999 \
+  --source-manifest fixtures/model-context-routing/source-manifest-complete.json \
+  --baseline REQ-BASELINE-2026-04-30-001@42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5 \
+  --invocation-id example-shadow-001
+```
+
+The fixture manifest is illustrative, not project authority. The command emits
+a separate JSON shadow receipt; it does not add fields to or change a v1
+receipt. The B0--B3 budgets are experimental hypotheses, not evidence of
+savings, sufficiency, or equivalent quality. Installation uses a package
+transaction with rollback of prior touched bytes and executable modes after a
+failed phase.
+
+Active routing, descendant enforcement, served-model attestation, token savings, token sufficiency, quality equivalence, and provider replay qualification remain held.
+Active cutover is disabled and requires a future owner decision.
 
 ## First Command
 
@@ -351,7 +392,9 @@ What is available now:
 - deterministic install/discovery, traceability, no-publication, code-anchor,
   authoring, audit, and packaging smokes for the reviewed alpha surface;
 - advisory use for requirements review, planning, work handoffs, audits,
-  traceability checks, and controlled review.
+  traceability checks, and controlled review;
+- deterministic shadow-only model/context map compilation with separate
+  receipts and explicit source/delivery holds.
 
 What remains held:
 

@@ -1,0 +1,5 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-116; trace=TRACE-TW-072; ver=VER-TW-092
+schema_version: tw-model-context-source-manifest/1
+categories:
+  - { category: controlling_authority, disposition: excluded_by_authority, exclusion_authority: fixture, exclusion_rationale: invalid }
+expected: held_source_oracle_invalid

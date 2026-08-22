@@ -1,0 +1,11 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-115; trace=TRACE-TW-072; ver=VER-TW-092",
+  "attempts": [
+    "model_downgrade",
+    "risk_downgrade",
+    "silent_truncation",
+    "lossy_compaction",
+    "retry"
+  ],
+  "expected": "held_judgment_insufficient"
+}

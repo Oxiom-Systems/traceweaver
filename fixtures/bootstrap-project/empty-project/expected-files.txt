@@ -1,3 +1,4 @@
 .traceweaver/bootstrap.yml
 .traceweaver/master-orchestrator.md
+.traceweaver/model-context-map.yml
 .traceweaver/workflow-profile.yml

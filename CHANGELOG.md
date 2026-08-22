@@ -1,6 +1,45 @@
 <!-- TRACEWEAVER: file-role=plugin-release-changelog; req=REQ-TW-020; trace=TRACE-TW-010; ver=VER-TW-012 -->
+<!-- TRACEWEAVER: file-role=v050-model-governance-release-changelog; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092; val=VAL-TW-040 -->
 
 # Changelog
+
+## 0.5.0 - 2026-08-22
+
+One integrated shadow model/context-governance release with the existing v1
+runtime left authoritative.
+
+### Added
+
+- A deterministic, inspectable, shadow-only model-context map and compiler for
+  every declared TraceWeaver callable, the `lfg` alias, and registered
+  descendant templates.
+- Four independent route axes: model role, risk effort, packet budget, and
+  context completeness.
+- B0--B3 experimental budget hypotheses with lowest-eligible selection,
+  deterministic overflow ordering, exact source-oracle closure, and honest
+  held outcomes.
+- Separate canonical plan/final shadow receipts with digest, lineage, source,
+  observation, and eligibility bindings. V1 receipts remain unchanged and v1
+  remains authoritative.
+- A complete installed-package transaction with rollback of prior touched
+  bytes and executable modes after injected or real install failures.
+- Backward-compatible `tw-release-readiness/2` validation for one integrated
+  0.5.0 candidate; historical 0.4.0 PR1/PR2 records remain readable v1 evidence
+  but are not 0.5.0 prerequisites.
+
+### Changed
+
+- Bumped the Claude marketplace plus Claude, Codex, Cursor, and Antigravity
+  plugin manifests to `0.5.0`.
+- Added the model-context acceptance smoke to pull-request and `main` CI.
+- Release readiness binds a fixed candidate scope while excluding its own
+  record and the separately checked graph-freshness receipt.
+
+### Held
+
+Active routing, descendant enforcement, served-model attestation, token savings, token sufficiency, quality equivalence, and provider replay qualification remain held.
+Active cutover is disabled and requires a future owner decision. The B0--B3
+values are not qualified and do not establish material whole-workflow savings.
 
 ## 0.4.0 - 2026-08-21
 
@@ -62,8 +101,8 @@ increment.
 
 - Canonical HTML cutover, Graphify installation, live consumer runtime
   validation, independent served-model attestation, workflow enforcement,
-  autonomous publication, and REQ-TW-091 every-merge releases are not delivered
-  by 0.4.0.
+  autonomous publication, and the retired every-merge release proposal are not
+  delivered by 0.4.0. This is historical held wording, not 0.5.0 authority.
 
 ## 0.3.2 - 2026-07-28
 

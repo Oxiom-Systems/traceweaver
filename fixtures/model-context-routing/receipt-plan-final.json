@@ -1,0 +1,6 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-118; trace=TRACE-TW-072; ver=VER-TW-092",
+  "schema_version": "tw-model-context-routing-fixture/1",
+  "scenario": "canonical_plan_final_pair",
+  "expected": "pass_canonical_identity"
+}

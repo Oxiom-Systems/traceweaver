@@ -6,16 +6,18 @@ Status: alpha advisory policy
 
 This policy governs `tw-auto`, the TraceWeaver-controlled autonomous alpha
 workflow, and `lfg` when packaged by TraceWeaver as a compatibility alias to
-`tw-auto`. It composes selected CE-compatible planning, work, and review skills
-with TraceWeaver authority gates and file-based trace records.
+`tw-auto`. It applies selected CE-compatible planning and work methods inside
+one retained Sol main context, followed by one integrated Terra review and
+file-based TraceWeaver controls.
 
 ## Product Intent
 
 TraceWeaver-controlled autonomy repackages the Compound Engineering method with
-systems-engineering authority. It should preserve the simple CE rhythm: idea,
-brainstorm, plan, work, review, and compound learning. The difference is that
-each handoff must carry intent, requirements quality, authority, traceability,
-verification, validation, and change-control checks.
+systems-engineering authority. It preserves the simple CE rhythm: idea,
+brainstorm, plan, work, review, and compound learning. For normal approved
+mixed work, plan and work are retained-context phases rather than separate
+model handoffs. Intent, requirements quality, authority, traceability,
+verification, validation, and change-control checks remain required.
 
 Selected CE skills are implementation components for this controlled method.
 They are not the authority by themselves. A TraceWeaver wrapper or alias must
@@ -78,13 +80,12 @@ from the accepted baseline and Intent Contract, then must run
 | --- | --- | --- |
 | `loading_authority` | Baseline, Intent Contract, and matrix are being loaded. | Continue only if all required authority files exist or matrix bootstrap succeeds. |
 | `bootstrapping_authority` | Requirements baseline or Intent Contract is missing in a fresh project. | Create draft authority files, then stop for `tw-requirements-review` and human baseline review before implementation. |
-| `bootstrapping_matrix` | Root matrix is missing and a placeholder matrix is being created from accepted authority. | Continue to planning after matrix exists and records bootstrap status. |
-| `planning` | CE-compatible planning is running against approved authority. | Continue to authority gate. |
-| `authority_gate` | TraceWeaver checks that work is authorized. | Continue to work only when approved authority or approved exception exists. |
-| `working` | CE-compatible work executes within the approved capsule. | Continue to trace update. |
-| `trace_update` | Trace record and matrix rows are updated. | Continue to review only when writes succeed. |
-| `reviewing` | CE-compatible code/doc review runs. | Continue to fix cycle or stop based on severity policy. |
-| `fix_cycle` | A bounded review-fix cycle is running. | Continue only while progress is visible and cycle budget remains. |
+| `bootstrapping_matrix` | Root matrix is missing and a placeholder matrix is being created from accepted authority. | Continue in the retained primary after matrix bootstrap checks pass. |
+| `primary_delivery` | The Sol main context performs one authority lock, compact plan, proportional V&V setup, implementation, focused verification, and trace update. | Freeze one candidate after all phases pass; dispatch no planning or work child. |
+| `integrated_review` | One Terra reviewer covers code, tests, relevant normative docs, traceability, correctness, and triggered risk lenses. | Accept clean/nonblocking results or return all eligible blockers together. |
+| `batch_repair` | The same Sol main context repairs all eligible blockers in one batch and reruns focused deterministic checks. | Freeze one targeted repaired revision and resume the same reviewer once. |
+| `targeted_closure` | The same Terra reviewer checks the repair delta and regressions. | Accept or stop `held_no_progress`; never start another series or reviewer. |
+| `mechanical_closure` | Hashes, receipts, status, and generated views are written after terminal review. | Dispatch zero models and never reopen semantic review. |
 | `verification_validation_recording` | Verification evidence and validation question/status are recorded. | Stop before commit/push/PR with next step. |
 | `stopped_for_authority` | Missing/changing authority requires human decision or record update. | Create gap/change/exception/clarification. |
 | `stopped_for_review` | Blocking review findings remain. | Run scoped fix work or human review. |
@@ -93,17 +94,17 @@ from the accepted baseline and Intent Contract, then must run
 
 ## Progress And Cycle Limits
 
-Every review-bearing route uses the persistent controller defined by the
-canonical `scoped-review-protocol.md`. One explicitly authorized routine series
-permits one discovery stage followed by one repair-verification cycle. One
-final cycle is available only through an owner- or approved
-change-control-authority decision receipt bound to the series, retained finding
-fingerprint, P0/P1/blocking-P2 severity and context, authorization reason, and
-final-cycle limit; agent-generated or self-authorized exceptions are invalid.
-Two cycles remain the absolute cap. The budget belongs to the immutable series
-generation and follows it across command, run, session, branch, wrapper, and
-publication-preparation boundaries. It decrements once per logical
-repair-verification attempt, never once per child dispatch.
+Every review-bearing route uses the persistent identity rules in the canonical
+`scoped-review-protocol.md`. A normal clean path has one Sol primary turn and
+one Terra integrated-review turn. If blocking findings exist, the same Sol
+context may perform one batched repair and resume the same reviewer identity
+once for targeted closure. The normal automatic convergence budget therefore
+ends after one repair batch and at most four counted model turns.
+
+The existing REQ-TW-037/056/057 severe-blocker exception is not an automatic
+continuation. It requires a fresh explicit owner or approved change-control
+decision under the scoped-review protocol, remains outside the normal
+convergence budget, and cannot be inferred from severity or agent judgment.
 
 Accepted-review reuse and post-acceptance bookkeeping consume no cycle when
 the semantic-authority, behavior, verification, and policy-epoch identity is
@@ -123,11 +124,11 @@ Stop before another cycle when:
 - behavior duplicates or expands existing behavior without authority;
 - continuing requires new or changed requirements.
 
-Projects may reduce the routine budget through reviewed project-local policy.
-They cannot increase or reset an active series. One final severe-exception
-cycle is available only through the external receipt defined above; a broader
-change requires explicit authority for a distinct successor generation after
-the current series terminates.
+Projects may reduce the normal automatic budget through reviewed project-local
+policy. They cannot increase or reset it automatically. A broader change
+requires new authority and a distinct delivery scope after the current series
+terminates. Only the separately authorized severe-blocker decision above may
+open the protocol's exceptional final cycle.
 
 ## Severity Policy
 
@@ -175,7 +176,7 @@ The following remain held:
 
 Every `tw-auto` outcome must end with exactly one recommended next step:
 
-- continue internally with another bounded cycle;
+- continue internally with the next retained-context phase;
 - run an embedded TraceWeaver review gate only when `tw-auto` can execute it as
   part of the current loop;
 - create or update a gap/change/exception/clarification;

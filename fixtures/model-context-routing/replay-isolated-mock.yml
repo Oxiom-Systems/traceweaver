@@ -1,0 +1,5 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-120; trace=TRACE-TW-072; ver=VER-TW-092
+mode: isolated_shadow_replay
+authorization: fixture_isolated_mock_only
+permitted_effects: [declared_mock_provider_request, isolated_receipt_write, isolated_workspace_write]
+expected: pass_only_declared_mock_provider_and_isolated_writes

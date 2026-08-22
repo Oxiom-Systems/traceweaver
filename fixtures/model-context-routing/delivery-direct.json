@@ -1,0 +1,8 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-117; trace=TRACE-TW-072; ver=VER-TW-092",
+  "delivery_mode": "direct",
+  "locator": "fixtures/model-context-routing/delivery-direct-source.txt",
+  "digest": "sha256:7cfe73d0b02cc270a087701526337e169fe4b9467bc825b11e14e34169cb03cb",
+  "bytes_base64": "VHJhY2VXZWF2ZXIgZGlyZWN0IGRlbGl2ZXJ5IGJ5dGVzLgo=",
+  "expected": "pass_exact_bytes"
+}

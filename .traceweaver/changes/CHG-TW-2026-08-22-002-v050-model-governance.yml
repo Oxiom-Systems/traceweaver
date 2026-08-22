@@ -1,0 +1,101 @@
+change_id: CHG-TW-2026-08-22-002
+status: owner_approved
+decision_id: TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001
+owner: Oxiom Systems
+created_at: 2026-08-22
+released_base_sha: e1b2886ea51ceae03249c4ae09ff75308678970a
+branch: codex/v050-model-context-routing
+decision_source: docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md
+decision_source_sha256: 83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5
+linked_intent: INTENT-TW-011
+linked_need: NEED-TW-013
+linked_requirements:
+  approved_model_governance:
+    - REQ-TW-109
+    - REQ-TW-110
+    - REQ-TW-111
+    - REQ-TW-112
+    - REQ-TW-113
+    - REQ-TW-114
+    - REQ-TW-115
+    - REQ-TW-116
+    - REQ-TW-117
+    - REQ-TW-118
+    - REQ-TW-119
+    - REQ-TW-120
+    - REQ-TW-121
+    - REQ-TW-122
+    - REQ-TW-123
+  deferred_prior_program:
+    - REQ-TW-093..108
+reason: >
+  Deliver TraceWeaver Core 0.5.0 as one complete model-governance-only change
+  instead of reopening the unfinished product-lifecycle Slice 1--8 program or
+  creating a chain of micro authority/review cycles.
+approved_disposition: >
+  Normalize and accept the complete model-governance requirement set, create
+  one implementation plan and scoped document review, define one L3 V&V
+  package, implement, run one consolidated code-review/fix series, verify and
+  validate the exact candidate, then prepare exact 0.5.0 through a controlled,
+  green, merge-ready PR. Per the subsequent owner execution boundary, stop
+  before merge; tag, release, and the post-merge receipt require a later
+  explicit owner direction.
+implementation_mode: advisory_shadow_compile
+authoritative_runtime: v1
+release_target: traceweaver-core--v0.5.0
+evidence_chain:
+  artifact: ART-TW-079
+  trace: TRACE-TW-072
+  acceptance_test: ATP-TW-049
+  result: RESULT-TW-049
+  verification: VER-TW-092
+  validation: VAL-TW-040
+approval:
+  decision: approved_complete_shadow_model_governance_delivery_and_conditional_exact_0_5_0_release
+  decision_source: explicit owner direction on 2026-08-22
+  decided_at: 2026-08-22
+allowed_scope:
+  - controlled authority root and baseline-hash reconciliation
+  - central model-context map, profile, SEC binding, lowest-eligible compiler, and separate shadow receipts
+  - declared callable, alias, descendant-prompt, and generic-family inventory
+  - frozen six-category source oracle, delivery, accounting, overflow, and honest hold logic
+  - v1 invariance and isolated-replay boundary fixtures
+  - transactional installed package projection and byte/mode-exact rollback
+  - integrated release-readiness schema, exact 0.5.0 metadata, commit, push, PR, and pre-merge checks
+must_not_change:
+  - gpt-5.6-sol main and explicit gpt-5.6-terra child model policy
+  - L0 through L3 risk-selected effort mapping
+  - v1 dispatch, receipt schema, identity, bytes, authority, evidence, terminal, or publication behavior
+  - imported CE component bodies
+  - active routing cutover state
+  - Markdown and YAML authority roles
+held_claims:
+  - active routing or descendant enforcement
+  - independently attested served-model identity
+  - token sufficiency, material savings, or quality equivalence
+  - provider or production replay qualification
+  - deferred product-lifecycle and semantic-HTML program
+deferred_prior_program:
+  predecessor_decision: TW-DECISION-2026-08-22-V050-DIRECT-AUTHORITY-TRANSITION-001
+  reserved_ids: INTENT-TW-009..010, NEED-TW-009..012, REQ-TW-093..108, DEC-TW-004..008, IF-TW-001..005, RISK-TW-001..010, ART-TW-078, TRACE-TW-071, ATP-TW-048, RESULT-TW-048, VER-TW-091, VAL-TW-039
+  disposition: deferred_intact_outside_v050_model_governance
+  req_tw_108_disposition: deferred_PLM_release_gate_non_applicable_to_exact_v050_shadow_release
+  copied_parent_paths: none
+review_policy:
+  discovery_cycles: 1
+  routine_repair_cycles: 1
+  requirement_or_intent_change_returns_to_owner: true
+  ordinary_blocking_finding_repair_stays_in_same_series: true
+current_execution_boundary:
+  terminal: ready_to_merge
+  prohibited_without_new_owner_direction: [merge, tag, github_release, post_merge_release_receipt]
+  source: explicit Oxiom Systems direction on 2026-08-22
+baseline_reconciliation:
+  prior_reviewed_canonical_hash_sha256: dae781e0cc1793798378f5af81a99503581e83dfbc9ce38876c465f4521f6300
+  current_canonical_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+  cause: owner_authorized_ready_to_merge_stop_boundary_and_its_controlled_decision_hash_link
+  semantic_requirement_delta: none
+  authority: allowed_scope_controlled_authority_root_and_baseline_hash_reconciliation
+next_recommended_steps:
+  - Finalize the same-candidate evidence carriers, bounded trace/graph reconciliation, and consolidated reviewer confirmation after the completed implementation and accepted proxy validation.
+  - Commit, push, open the exact PR, close required checks, and stop ready to merge; keep merge, tag, GitHub Release, post-merge receipt, active cutover, and the deferred lifecycle program held.

@@ -1,5 +1,6 @@
 # TRACEWEAVER: file-role=code-traceability-ci-workflow; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
 # TRACEWEAVER: verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
+# TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-109,REQ-TW-122; trace=TRACE-TW-072
 name: Smoke tests
 
 # Runs the TraceWeaver discovery/traceability smokes on pull requests and on
@@ -31,6 +32,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -45,6 +48,9 @@ jobs:
 
       - name: Skill Execution Contract smoke
         run: scripts/traceweaver-smoke-skill-execution-contract
+
+      - name: Shadow model-context routing smoke
+        run: scripts/traceweaver-smoke-model-context-routing
 
       - name: Terra native-child routing contract
         run: scripts/traceweaver-smoke-terra-routing
@@ -83,6 +89,9 @@ jobs:
 
       - name: Workflow-profile regression smoke
         run: scripts/traceweaver-smoke-workflow-profile
+
+      - name: Consolidated Sol delivery convergence smoke
+        run: scripts/traceweaver-smoke-consolidated-convergence
 
       - name: No-publication regression smoke
         run: scripts/traceweaver-smoke-no-publication

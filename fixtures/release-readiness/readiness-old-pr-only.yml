@@ -1,0 +1,30 @@
+---
+traceweaver_anchor: "TRACEWEAVER: file-role=release-readiness-old-pr-negative-fixture; verifies=VER-TW-092; req=REQ-TW-122,REQ-TW-123; trace=TRACE-TW-072"
+id: FIXTURE-RELEASE-V2-OLD-PRS-ONLY
+status: ready_for_version_bump
+date: 2026-08-22
+version: 0.5.0
+requirement: REQ-TW-122
+trace: TRACE-TW-072
+verification: VER-TW-092
+release_readiness:
+  schema_version: tw-release-readiness/2
+  terminal_status: ready_for_version_bump
+  version: 0.5.0
+  candidate_scope:
+    algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
+    paths:
+      - fixtures/release-readiness/scope/alpha.txt
+      - fixtures/release-readiness/scope/beta.txt
+    excluded_paths:
+      - .traceweaver/tw-graph-freshness.json
+      - fixtures/release-readiness/readiness-old-pr-only.yml
+    digest: sha256:16dadfe99da47c8cd030886a2a56a2664ec1e6440141b5eacfe1834652096dd4
+  prerequisites:
+    pr1_merge_pr: "#57"
+    pr1_merge_sha: f90fbd6d6560bd746aa5be3878960053052095b5
+    pr2_merge_pr: "#58"
+    pr2_merge_sha: 4e25807cfec3a158f58fd6d4543a1a64e2ab463c
+---
+
+The historical 0.4.0 PRs cannot satisfy the integrated 0.5.0 candidate gate.

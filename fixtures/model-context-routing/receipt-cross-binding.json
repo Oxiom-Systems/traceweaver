@@ -1,0 +1,6 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-118; trace=TRACE-TW-072; ver=VER-TW-092",
+  "schema_version": "tw-model-context-routing-fixture/1",
+  "scenario": "baseline_invocation_route_parent_depth_mismatch",
+  "expected": "held_receipt_invalid"
+}

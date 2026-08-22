@@ -1,0 +1,9 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-123; trace=TRACE-TW-072; ver=VER-TW-092",
+  "reviewer": {
+    "identity": "compiler",
+    "relationship": "compiler_author",
+    "independent": false
+  },
+  "expected": "held_oracle_review_invalid"
+}

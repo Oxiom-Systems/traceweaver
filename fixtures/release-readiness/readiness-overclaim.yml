@@ -1,0 +1,38 @@
+---
+traceweaver_anchor: "TRACEWEAVER: file-role=release-readiness-overclaim-negative-fixture; verifies=VER-TW-092; req=REQ-TW-122,REQ-TW-123; trace=TRACE-TW-072"
+id: FIXTURE-RELEASE-V2-OVERCLAIM
+status: ready_for_version_bump
+date: 2026-08-22
+version: 0.5.0
+requirement: REQ-TW-122
+trace: TRACE-TW-072
+verification: VER-TW-092
+release_readiness:
+  schema_version: tw-release-readiness/2
+  terminal_status: ready_for_version_bump
+  version: 0.5.0
+  candidate_scope:
+    algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
+    paths:
+      - fixtures/release-readiness/scope/alpha.txt
+      - fixtures/release-readiness/scope/beta.txt
+    excluded_paths:
+      - .traceweaver/tw-graph-freshness.json
+      - fixtures/release-readiness/readiness-overclaim.yml
+    digest: sha256:16dadfe99da47c8cd030886a2a56a2664ec1e6440141b5eacfe1834652096dd4
+  candidate_identity:
+    plan_id: TW-PLAN-2026-08-22-V050-MODEL-GOVERNANCE-001
+    plan_review_id: TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001
+    code_review_series_id: TW-CODE-REVIEW-V050-FIXTURE-CLEAN
+    acceptance_test_id: ATP-TW-049
+    acceptance_result_id: RESULT-TW-049
+    verification_id: VER-TW-092
+    validation_id: VAL-TW-040
+    trace_id: TRACE-TW-072
+    authoritative_runtime: v1
+    model_context_mode: advisory_shadow_compile
+    active_cutover: enabled
+    reviewed_scope_digest: sha256:16dadfe99da47c8cd030886a2a56a2664ec1e6440141b5eacfe1834652096dd4
+---
+
+Active cutover is intentionally overclaimed and must be rejected.

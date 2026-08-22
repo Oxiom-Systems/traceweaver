@@ -109,13 +109,12 @@ require_contains "$work" "before review handoff" "work_update_boundary"
 require_contains "$work" "Graphify failure does not block" "work_non_blocking"
 require_contains "$work" "semantic_refresh_held" "work_semantic_refresh_boundary"
 
-require_contains "$auto" "must not execute Graphify" "auto_read_only_master"
-require_contains "$auto" "Graphify receipt" "auto_child_receipt"
-auto_executable_surface="$(grep -Ev '^[[:space:]]*<!--' "$auto")"
-if printf '%s\n' "$auto_executable_surface" |
-  grep -Eq -- 'graphify (query|path|affected|update)|traceweaver-graphify-advisory|TRACEWEAVER_GRAPHIFY_BIN|command -v graphify|((GRAPHIFY|graphify)[A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*(GRAPHIFY|graphify)[A-Za-z0-9_]*)[[:space:]]*=|[$][{]?((GRAPHIFY|graphify)[A-Za-z0-9_]*|[A-Za-z_][A-Za-z0-9_]*(GRAPHIFY|graphify)[A-Za-z0-9_]*)'; then
-  fail "auto_contains_direct_graphify_command"
-fi
+require_contains "$auto" "<skills-root>/tw-auto/references/workflow-profile-template.yml" "auto_consolidated_contract"
+require_contains "$auto" "before review handoff" "auto_graphify_pre_review_boundary"
+require_contains "$auto" "in this same Sol context" "auto_graphify_same_primary"
+require_regex "$auto" "derived.*not authority" "auto_graphify_authority_boundary"
+require_contains "$auto" 'Authoritative `tw-graph refresh/check`' "auto_tw_graph_route"
+require_contains "$auto" "after terminal acceptance as zero-model mechanical closure" "auto_tw_graph_post_terminal_boundary"
 
 fixture_root="$TMP_DIR/repo with spaces"
 mkdir -p "$fixture_root"

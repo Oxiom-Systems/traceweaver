@@ -1,0 +1,75 @@
+---
+traceweaver_anchor: "TRACEWEAVER: file-role=release-readiness-ref-version-fixture; verifies=VER-TW-092; req=REQ-TW-122,REQ-TW-123; trace=TRACE-TW-072"
+id: FIXTURE-RELEASE-V2-EXACT-REF-VERSION
+status: ready_for_version_bump
+date: 2026-08-22
+version: 0.5.0
+requirement: REQ-TW-122
+trace: TRACE-TW-072
+verification: VER-TW-092
+release_readiness:
+  schema_version: tw-release-readiness/2
+  terminal_status: ready_for_version_bump
+  version: 0.5.0
+  candidate_scope:
+    algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
+    paths:
+      - fixtures/release-readiness/scope/alpha.txt
+      - fixtures/release-readiness/scope/beta.txt
+    excluded_paths:
+      - .traceweaver/tw-graph-freshness.json
+      - fixtures/release-readiness/readiness-ref-version.yml
+    digest: sha256:16dadfe99da47c8cd030886a2a56a2664ec1e6440141b5eacfe1834652096dd4
+  candidate_identity:
+    plan_id: TW-PLAN-2026-08-22-V050-MODEL-GOVERNANCE-001
+    plan_review_id: TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001
+    code_review_series_id: TW-CODE-REVIEW-V050-REF-FIXTURE-CLEAN
+    acceptance_test_id: ATP-TW-049
+    acceptance_result_id: RESULT-TW-049
+    verification_id: VER-TW-092
+    validation_id: VAL-TW-040
+    trace_id: TRACE-TW-072
+    authoritative_runtime: v1
+    model_context_mode: advisory_shadow_compile
+    active_cutover: disabled
+    reviewed_scope_digest: sha256:16dadfe99da47c8cd030886a2a56a2664ec1e6440141b5eacfe1834652096dd4
+  prerequisites:
+    accepted_plan: accepted
+    plan_document_review: passed
+    code_review_series: closed
+    acceptance_result: passed
+    verification_result: passed
+    validation_result: accepted
+    bounded_traceability: passed
+    graph_freshness: passed
+    package_projection: passed
+    installer_rollback: passed
+    manifest_equality: passed
+    public_claim_scan: passed
+    v1_invariance: passed
+    global_backlog: visible_non_gating
+    runtime_exact_sha_checks: required_by_release_workflow
+    automatic_release_receipt: required_by_release_workflow
+  evidence:
+    plan: fixtures/release-readiness/scope/alpha.txt
+    plan_document_review: fixtures/release-readiness/scope/alpha.txt
+    code_review_series: fixtures/release-readiness/scope/alpha.txt
+    acceptance_result: fixtures/release-readiness/scope/beta.txt
+    verification_result: fixtures/release-readiness/scope/beta.txt
+    validation_result: fixtures/release-readiness/scope/beta.txt
+    traceability: fixtures/release-readiness/scope/beta.txt
+    graph_freshness: .traceweaver/tw-graph-freshness.json
+  held_claims:
+    - active_routing
+    - descendant_enforcement
+    - independently_attested_served_model
+    - actual_or_material_token_savings
+    - token_sufficiency
+    - quality_equivalence
+    - provider_replay_qualification
+    - active_cutover
+---
+
+The five release manifests are expected to be exactly 0.5.0. The reviewed
+scope digest is the candidate ref; the main-only workflow binds the future
+merge SHA and check URLs after merge without self-reference.

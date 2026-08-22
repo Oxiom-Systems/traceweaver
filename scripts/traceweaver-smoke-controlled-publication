@@ -7,6 +7,8 @@ set -euo pipefail
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FIXTURE_ROOT="$ROOT_DIR/fixtures/controlled-publication-route"
 VALIDATOR="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
+REVIEW_VALIDATOR="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review"
+INTEGRATED_REVIEW="$FIXTURE_ROOT/reviews/mixed-integrated-clean.json"
 TW_SKILL="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md"
 CE_SKILL="$ROOT_DIR/plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md"
 TMP_DIR="$(mktemp -d)"
@@ -50,6 +52,9 @@ load_fixture() {
   trace_status=""
   verification_status=""
   review_status=""
+  review_record_file="${TRACEWEAVER_PUBLICATION_REVIEW_RECORD:-}"
+  candidate_kind="${TRACEWEAVER_PUBLICATION_CANDIDATE_KIND:-}"
+  candidate_digest="${TRACEWEAVER_PUBLICATION_CANDIDATE_DIGEST:-}"
   authority_tree_status=""
   staged_tree_status=""
   target_status=""
@@ -79,6 +84,8 @@ publication_decision() {
     echo "blocked failed_verification"
   elif [[ "$review_status" != "clean" ]]; then
     echo "blocked review_findings"
+  elif ! "$REVIEW_VALIDATOR" --record "$review_record_file" --candidate-kind "$candidate_kind" --candidate-digest "$candidate_digest" >/dev/null 2>&1; then
+    echo "blocked review_scope_invalid"
   elif [[ "$authority_tree_status" != "clean" ]]; then
     echo "blocked dirty_or_untracked_authority"
   elif [[ "$staged_tree_status" != "coherent" ]]; then
@@ -129,6 +136,9 @@ export TRACEWEAVER_PUBLICATION_CAPSULE="$publication_capsule"
 export TRACEWEAVER_PUBLICATION_CONTEXT="$publication_context"
 export TRACEWEAVER_PUBLICATION_LEDGER="$publication_ledger"
 export TRACEWEAVER_PUBLICATION_REPO="$capsule_repo"
+export TRACEWEAVER_PUBLICATION_REVIEW_RECORD="$INTEGRATED_REVIEW"
+export TRACEWEAVER_PUBLICATION_CANDIDATE_KIND="mixed"
+export TRACEWEAVER_PUBLICATION_CANDIDATE_DIGEST="sha256:1111111111111111111111111111111111111111111111111111111111111111"
 
 assert_case() {
   local fixture_name="$1"
@@ -163,6 +173,37 @@ assert_case credential-remote-uncertainty
 assert_case real-remote-missing-capsule
 assert_case clean-real-remote-authorized
 assert_case clean-no-real-remote
+
+review_positive="$($REVIEW_VALIDATOR \
+  --record "$INTEGRATED_REVIEW" \
+  --candidate-kind "$TRACEWEAVER_PUBLICATION_CANDIDATE_KIND" \
+  --candidate-digest "$TRACEWEAVER_PUBLICATION_CANDIDATE_DIGEST")"
+jq -e '.outcome == "publication_review_eligible" and .review_route == "tw-code-review" and .new_model_dispatches == 0' <<<"$review_positive" >/dev/null
+echo "controlled_publication_mixed_integrated_review=pass"
+
+document_only_review="$TMP_DIR/document-only-review.json"
+jq '.review_route = "tw-doc-review" | .coverage = ["authority_and_document_semantics"]' "$INTEGRATED_REVIEW" >"$document_only_review"
+if "$REVIEW_VALIDATOR" --record "$document_only_review" --candidate-kind mixed --candidate-digest "$TRACEWEAVER_PUBLICATION_CANDIDATE_DIGEST" >/dev/null 2>&1; then
+  echo "controlled_publication_document_review_for_mixed=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_document_review_for_mixed=blocked"
+
+incomplete_review="$TMP_DIR/incomplete-integrated-review.json"
+jq '.coverage -= ["held_claims"]' "$INTEGRATED_REVIEW" >"$incomplete_review"
+if "$REVIEW_VALIDATOR" --record "$incomplete_review" --candidate-kind mixed --candidate-digest "$TRACEWEAVER_PUBLICATION_CANDIDATE_DIGEST" >/dev/null 2>&1; then
+  echo "controlled_publication_incomplete_integrated_scope=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_incomplete_integrated_scope=blocked"
+
+wrong_candidate_review="$TMP_DIR/wrong-candidate-review.json"
+jq '.candidate_digest = "sha256:2222222222222222222222222222222222222222222222222222222222222222"' "$INTEGRATED_REVIEW" >"$wrong_candidate_review"
+if "$REVIEW_VALIDATOR" --record "$wrong_candidate_review" --candidate-kind mixed --candidate-digest "$TRACEWEAVER_PUBLICATION_CANDIDATE_DIGEST" >/dev/null 2>&1; then
+  echo "controlled_publication_wrong_candidate_review=failed" >&2
+  exit 1
+fi
+echo "controlled_publication_wrong_candidate_review=blocked"
 
 if [[ -f "$git_marker" || -f "$gh_marker" ]]; then
   echo "controlled_publication_no_external_mutation=failed" >&2
@@ -297,6 +338,7 @@ work="$TMP_DIR/work"
 "$REAL_GIT" init -q "$work"
 "$REAL_GIT" -C "$work" config user.email fixture@example.invalid
 "$REAL_GIT" -C "$work" config user.name "TraceWeaver Fixture"
+"$REAL_GIT" -C "$work" config commit.gpgsign false
 touch "$work/fixture.txt"
 "$REAL_GIT" -C "$work" add fixture.txt
 "$REAL_GIT" -C "$work" commit -qm fixture

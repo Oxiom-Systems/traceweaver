@@ -1,0 +1,440 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=installer-transaction-smoke; req=REQ-TW-121; trace=TRACE-TW-072; ver=VER-TW-092
+# TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-121; trace=TRACE-TW-072
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+case_id=""
+
+if [[ "${1:-}" == "--case" ]]; then
+  case_id="${2:-}"
+  [[ -n "$case_id" ]] || { echo "installer_transaction_finding=missing_case_id" >&2; exit 2; }
+  shift 2
+fi
+if [[ "$#" -ne 0 ]]; then
+  echo "installer_transaction_finding=unexpected_arguments" >&2
+  exit 2
+fi
+case "$case_id" in
+  ""|MC121_INSTALL_SUCCESS|MC121_ROLLBACK_MATRIX|MC121_UNOWNED_CONFLICT) ;;
+  *) echo "installer_transaction_finding=unknown_case_id case=$case_id" >&2; exit 2 ;;
+esac
+
+tmp_root="$(mktemp -d "${TMPDIR:-/tmp}/traceweaver-installer-transaction.XXXXXX")"
+trap 'rm -rf "$tmp_root"' EXIT
+
+tree_digest() {
+  ruby -rdigest -rfind - "$1" <<'RUBY'
+root = ARGV.fetch(0)
+unless File.exist?(root)
+  puts "absent"
+  exit
+end
+records = []
+Find.find(root) do |path|
+  stat = File.lstat(path)
+  relative = path == root ? "." : path.delete_prefix("#{root}/")
+  kind = if stat.directory?
+    "directory"
+  elsif stat.file?
+    "file"
+  elsif stat.symlink?
+    "symlink"
+  else
+    "other"
+  end
+  payload = case kind
+  when "file" then Digest::SHA256.file(path).hexdigest
+  when "symlink" then Digest::SHA256.hexdigest(File.readlink(path))
+  else "-"
+  end
+  records << [relative, kind, format("%04o", stat.mode & 0o7777), payload].join("\t")
+end
+puts Digest::SHA256.hexdigest(records.sort.join("\n"))
+RUBY
+}
+
+assert_equal() {
+  local label="$1"
+  local expected="$2"
+  local actual="$3"
+  if [[ "$expected" != "$actual" ]]; then
+    echo "${label}=failed expected=${expected} actual=${actual}" >&2
+    exit 1
+  fi
+}
+
+install_codex() {
+  local home="$1"
+  bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" \
+    --to codex --include-skills --codexHome "$home"
+}
+
+install_antigravity() {
+  local home="$1"
+  bun run "$repo_root/src/index.ts" install "$repo_root/plugins/traceweaver-core" \
+    --to antigravity --include-skills --geminiHome "$home"
+}
+
+assert_success_projection() {
+  local target="$1"
+  local home="$2"
+  local source_manifest
+  local install_manifest
+  local target_root
+  if [[ "$target" == "codex" ]]; then
+    source_manifest="$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json"
+    target_root="$home/.codex/traceweaver-core"
+    install_manifest="$target_root/install-manifest.json"
+    [[ -f "$target_root/skills/tw-auto/references/model-context-map.yml" ]]
+    [[ -f "$target_root/skills/tw-auto/references/workflow-profile-template.yml" ]]
+    [[ -x "$target_root/skills/tw-auto/scripts/traceweaver-route-convergence" ]]
+    [[ -x "$target_root/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review" ]]
+  else
+    source_manifest="$repo_root/plugins/traceweaver-core/.antigravity-plugin/plugin.json"
+    target_root="$home/config/plugins/traceweaver-core"
+    install_manifest="$target_root/install-manifest.json"
+    [[ -f "$target_root/skills/tw-auto/references/model-context-map.yml" ]]
+    [[ -f "$target_root/skills/tw-auto/references/workflow-profile-template.yml" ]]
+    [[ -x "$target_root/skills/tw-auto/scripts/traceweaver-route-convergence" ]]
+    [[ -x "$target_root/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review" ]]
+    [[ -d "$target_root/agents" ]]
+  fi
+  [[ -f "$install_manifest" ]]
+  [[ -f "$target_root/plugin.json" ]]
+  [[ -f "$target_root/$generated_routing_artifact" ]]
+  cmp "$repo_root/plugins/traceweaver-core/references/model-context-map.yml" "$target_root/references/model-context-map.yml"
+  cmp "$repo_root/plugins/traceweaver-core/skills/tw-auto/references/model-context-map.yml" "$target_root/skills/tw-auto/references/model-context-map.yml"
+  cmp "$repo_root/plugins/traceweaver-core/references/workflow-profile-template.yml" "$target_root/references/workflow-profile-template.yml"
+  cmp "$repo_root/plugins/traceweaver-core/skills/tw-auto/references/workflow-profile-template.yml" "$target_root/skills/tw-auto/references/workflow-profile-template.yml"
+  python3 - "$target" "$repo_root/plugins/traceweaver-core" "$source_manifest" "$repo_root/plugins/traceweaver-core/references/model-context-map.yml" "$install_manifest" "$target_root/$generated_routing_artifact" "$target_root" <<'PY'
+import hashlib
+import json
+import os
+import re
+import sys
+
+target, source_root, source_manifest_path, map_path, install_manifest_path, routing_path, target_root = sys.argv[1:]
+source_manifest = json.load(open(source_manifest_path, encoding="utf-8"))
+install_manifest = json.load(open(install_manifest_path, encoding="utf-8"))
+routing = json.load(open(routing_path, encoding="utf-8"))
+map_bytes = open(map_path, "rb").read()
+map_text = map_bytes.decode("utf-8")
+schema = re.search(r"^schema_version:\s*(\S+)\s*$", map_text, re.M).group(1)
+declared_digest = re.search(r"^map_digest:\s*(\S+)\s*$", map_text, re.M).group(1)
+expected_file_digest = "sha256:" + hashlib.sha256(map_bytes).hexdigest()
+assert install_manifest["pluginVersion"] == source_manifest["version"]
+assert install_manifest["pluginManifest"]["version"] == source_manifest["version"]
+assert install_manifest["modelContextMap"]["schemaVersion"] == schema
+assert install_manifest["modelContextMap"]["mapDigest"] == declared_digest
+assert install_manifest["modelContextMap"]["fileSha256"] == expected_file_digest
+assert install_manifest["modelContextProfile"]["schemaVersion"] == "tw-model-context-profile/1"
+assert install_manifest["modelContextCapability"]["contextWindow"] == 272000
+assert install_manifest["modelContextCapability"]["maximumShardFanout"] == 8
+assert install_manifest["modelContextCapability"]["maximumRouteDepth"] == 4
+assert install_manifest["generatedRoutingArtifact"] == routing["generatedRoutingArtifact"] if "generatedRoutingArtifact" in routing else True
+assert routing["pluginVersion"] == source_manifest["version"]
+assert routing["modelContextMap"] == install_manifest["modelContextMap"]
+assert routing["modelContextProfile"] == install_manifest["modelContextProfile"]
+assert routing["modelContextCapability"] == install_manifest["modelContextCapability"]
+
+packaged_skills = sorted(name for name in os.listdir(os.path.join(source_root, "skills")) if os.path.isdir(os.path.join(source_root, "skills", name)))
+callable_skills = sorted(name for name in packaged_skills if name.startswith("tw-") or name == "lfg")
+source_agents = sorted(name for name in os.listdir(os.path.join(source_root, "agents")) if name.endswith(".md"))
+source_references = sorted(
+    os.path.relpath(os.path.join(root, name), os.path.join(source_root, "references"))
+    for root, _, files in os.walk(os.path.join(source_root, "references"))
+    for name in files
+)
+if target == "codex":
+    expected_skills = packaged_skills
+    expected_internal = sorted(set(packaged_skills) - set(callable_skills))
+    expected_agents = sorted(re.sub(r"(?:\.agent)?\.md$", ".toml", name) for name in source_agents)
+else:
+    expected_skills = callable_skills
+    expected_internal = sorted(set(packaged_skills) - set(callable_skills))
+    expected_agents = source_agents
+assert install_manifest["skills"] == expected_skills
+assert install_manifest["callableSkills"] == callable_skills
+assert install_manifest["internalPackagedSkills"] == expected_internal
+assert install_manifest["agents"] == expected_agents
+assert install_manifest["references"] == source_references
+assert sorted(os.listdir(install_manifest["packagedSkillsRoot"])) == expected_skills, (target, "skills", sorted(os.listdir(install_manifest["packagedSkillsRoot"])), expected_skills)
+assert sorted(os.listdir(install_manifest["agentsRoot"])) == expected_agents, (target, "agents", sorted(os.listdir(install_manifest["agentsRoot"])), expected_agents)
+if target == "antigravity":
+    assert os.path.realpath(install_manifest["internalPackagedSkillsRoot"]) == os.path.realpath(os.path.join(target_root, "internal-skills")), (install_manifest["internalPackagedSkillsRoot"], target_root)
+    assert sorted(os.listdir(install_manifest["internalPackagedSkillsRoot"])) == expected_internal, (sorted(os.listdir(install_manifest["internalPackagedSkillsRoot"])), expected_internal)
+PY
+
+  local installed_generator="$target_root/skills/tw-auto/scripts/traceweaver-generate-model-context-map"
+  local empty_consumer="$tmp_root/installed-generator-$target-consumer"
+  local inventory_json="$tmp_root/installed-generator-$target-inventory.json"
+  mkdir -p "$empty_consumer"
+  "$installed_generator" --root "$empty_consumer" --format json >"$inventory_json"
+  python3 - "$inventory_json" <<'PY'
+import json
+import sys
+
+inventory = json.load(open(sys.argv[1], encoding="utf-8"))
+assert inventory["schema_version"] == "tw-model-context-inventory/1", inventory
+assert inventory["top_level_callable_count"] == 28, inventory
+assert inventory["declared_route_count"] == 87, inventory
+assert len(inventory["routes"]) == 87, inventory
+PY
+  if [[ "$target" == "codex" ]]; then
+    "$home/.codex/skills/tw-auto/scripts/traceweaver-generate-model-context-map" \
+      --root "$empty_consumer" --format json >"$tmp_root/installed-generator-$target-direct-inventory.json"
+    cmp "$inventory_json" "$tmp_root/installed-generator-$target-direct-inventory.json"
+  fi
+}
+
+generated_routing_artifact="model-context-routing.json"
+
+run_success_case() {
+  for target in codex antigravity; do
+    local home="$tmp_root/success-$target"
+    mkdir -p "$home"
+    if [[ "$target" == "codex" ]]; then install_codex "$home" >"$tmp_root/success-$target.out"; else install_antigravity "$home" >"$tmp_root/success-$target.out"; fi
+    assert_success_projection "$target" "$home"
+    local installed_plugin_manifest
+    local source_plugin_manifest
+    if [[ "$target" == "codex" ]]; then
+      installed_plugin_manifest="$home/.codex/traceweaver-core/plugin.json"
+      source_plugin_manifest="$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json"
+    else
+      installed_plugin_manifest="$home/config/plugins/traceweaver-core/plugin.json"
+      source_plugin_manifest="$repo_root/plugins/traceweaver-core/.antigravity-plugin/plugin.json"
+    fi
+    printf '{"id":"traceweaver-core","version":"0.0.0","replacement_test":"different bytes"}\n' >"$installed_plugin_manifest"
+    if [[ "$target" == "codex" ]]; then install_codex "$home" >>"$tmp_root/success-$target.out"; else install_antigravity "$home" >>"$tmp_root/success-$target.out"; fi
+    cmp "$source_plugin_manifest" "$installed_plugin_manifest"
+    assert_success_projection "$target" "$home"
+    echo "installer_transaction_version_replacement_target=$target"
+    echo "installer_transaction_success_target=$target"
+  done
+}
+
+seed_pre_existing_target() {
+  local target="$1"
+  local home="$2"
+  if [[ "$target" == "codex" ]]; then
+    install_codex "$home" >/dev/null
+    mkdir -p "$home/.codex/skills/local-unowned-skill"
+    printf 'leave this local skill alone\n' >"$home/.codex/skills/local-unowned-skill/SKILL.md"
+    ln -s 'install-manifest.json' "$home/.codex/traceweaver-core/local-install-manifest-link"
+    chmod 0711 "$home/.codex"
+    chmod 0710 "$home/.codex/traceweaver-core"
+    chmod 0640 "$home/.codex/traceweaver-core/install-manifest.json"
+  else
+    install_antigravity "$home" >/dev/null
+    printf 'preserve the prior package root exactly\n' >"$home/config/plugins/traceweaver-core/local-note.txt"
+    ln -s 'install-manifest.json' "$home/config/plugins/traceweaver-core/local-install-manifest-link"
+    chmod 0710 "$home/config/plugins/traceweaver-core"
+    chmod 0640 "$home/config/plugins/traceweaver-core/install-manifest.json"
+  fi
+}
+
+run_injected_failure() {
+  local target="$1"
+  local target_state="$2"
+  local phase="$3"
+  local home="$tmp_root/${target}-${target_state}-${phase}"
+  mkdir -p "$home"
+  if [[ "$target_state" == "pre_existing" ]]; then seed_pre_existing_target "$target" "$home"; fi
+  local before
+  before="$(tree_digest "$home")"
+  local install_exit_code
+  set +e
+  if [[ "$target" == "codex" ]]; then
+    TRACEWEAVER_INSTALL_FAIL_PHASE="$phase" install_codex "$home" >"$tmp_root/${target}-${target_state}-${phase}.out" 2>"$tmp_root/${target}-${target_state}-${phase}.err"
+  else
+    TRACEWEAVER_INSTALL_FAIL_PHASE="$phase" install_antigravity "$home" >"$tmp_root/${target}-${target_state}-${phase}.out" 2>"$tmp_root/${target}-${target_state}-${phase}.err"
+  fi
+  install_exit_code=$?
+  set -e
+  if [[ "$install_exit_code" -eq 0 ]]; then
+    echo "installer_transaction_failure_injection=failed target=$target target_state=$target_state phase=$phase expected_nonzero" >&2
+    exit 1
+  fi
+  grep -Fq "traceweaver_install_rollback=restored_prior_projection" "$tmp_root/${target}-${target_state}-${phase}.err"
+  grep -Fq "TraceWeaver injected installer failure at $phase" "$tmp_root/${target}-${target_state}-${phase}.err"
+  assert_equal "installer_transaction_tree_restore target=$target state=$target_state phase=$phase" "$before" "$(tree_digest "$home")"
+  echo "installer_transaction_rollback_target=$target state=$target_state phase=$phase"
+}
+
+run_rollback_matrix() {
+  local phases=(
+    after_preflight_snapshot
+    after_skills_projection
+    after_references_projection
+    after_agents_projection
+    after_direct_callables_projection
+    after_generated_routing_projection
+    after_plugin_manifest_projection
+    after_install_manifest_write
+    after_reconciliation_cleanup
+  )
+  for target in codex antigravity; do
+    for target_state in pre_existing absent; do
+      for phase in "${phases[@]}"; do run_injected_failure "$target" "$target_state" "$phase"; done
+    done
+  done
+  run_concurrent_codex_sentinel
+}
+
+run_concurrent_codex_sentinel() {
+  local home="$tmp_root/concurrent-codex-sentinel"
+  local signal="$tmp_root/concurrent-codex-snapshot-signal.json"
+  local sentinel="$home/.codex/sessions/concurrent-unrelated.txt"
+  install_codex "$home" >/dev/null
+  mkdir -p "$(dirname "$sentinel")"
+  printf 'before installer snapshot\n' >"$sentinel"
+  local traceweaver_before
+  traceweaver_before="$(tree_digest "$home/.codex/traceweaver-core")"
+
+  (
+    TRACEWEAVER_INSTALL_FAIL_PHASE=after_skills_projection \
+      TRACEWEAVER_INSTALL_TEST_AFTER_SNAPSHOT_SIGNAL="$signal" \
+      install_codex "$home"
+  ) >"$tmp_root/concurrent-codex-sentinel.out" 2>"$tmp_root/concurrent-codex-sentinel.err" &
+  local installer_pid=$!
+  local signal_ready=false
+  for _ in {1..500}; do
+    if [[ -f "$signal" ]]; then
+      signal_ready=true
+      break
+    fi
+    if ! kill -0 "$installer_pid" 2>/dev/null; then break; fi
+    sleep 0.01
+  done
+  if [[ "$signal_ready" != true ]]; then
+    set +e
+    wait "$installer_pid"
+    local install_exit_code=$?
+    set -e
+    echo "installer_transaction_concurrent_sentinel=failed snapshot_signal_missing exit=$install_exit_code" >&2
+    exit 1
+  fi
+
+  printf 'changed concurrently after installer snapshot\n' >"$sentinel"
+  touch "$signal.release"
+  set +e
+  wait "$installer_pid"
+  local install_exit_code=$?
+  set -e
+  if [[ "$install_exit_code" -eq 0 ]]; then
+    echo "installer_transaction_concurrent_sentinel=failed expected_nonzero" >&2
+    exit 1
+  fi
+  grep -Fq "traceweaver_install_rollback=restored_prior_projection" "$tmp_root/concurrent-codex-sentinel.err"
+  grep -Fq "TraceWeaver injected installer failure at after_skills_projection" "$tmp_root/concurrent-codex-sentinel.err"
+  assert_equal "installer_transaction_concurrent_traceweaver_restore" "$traceweaver_before" "$(tree_digest "$home/.codex/traceweaver-core")"
+  assert_equal \
+    "installer_transaction_concurrent_unrelated_preserved" \
+    "changed concurrently after installer snapshot" \
+    "$(tr -d '\n' <"$sentinel")"
+  python3 - "$signal" "$home/.codex" "$sentinel" <<'PY'
+import json
+import os
+import sys
+
+signal_path, codex_root, sentinel = sys.argv[1:]
+payload = json.load(open(signal_path, encoding="utf-8"))
+codex_root = os.path.realpath(codex_root)
+sentinel = os.path.realpath(sentinel)
+targets = {os.path.realpath(target) for target in payload["targets"]}
+assert payload["schemaVersion"] == "tw-installer-snapshot-scope/1", payload
+assert codex_root not in targets, targets
+assert sentinel not in targets, targets
+assert not any(target.startswith(f"{codex_root}/sessions/") for target in targets), targets
+assert f"{codex_root}/traceweaver-core" in targets, (codex_root, targets)
+assert f"{codex_root}/agents/traceweaver-core" in targets, (codex_root, targets)
+assert any(target.startswith(f"{codex_root}/skills/") for target in targets), (codex_root, targets)
+PY
+  echo "installer_transaction_concurrent_codex_sentinel=pass"
+}
+
+run_unowned_conflict() {
+  local home="$tmp_root/unowned-conflict"
+  mkdir -p "$home/.codex/skills/tw-work"
+  printf 'unowned direct callable\n' >"$home/.codex/skills/tw-work/SKILL.md"
+  chmod 0640 "$home/.codex/skills/tw-work/SKILL.md"
+  local before
+  before="$(tree_digest "$home")"
+  local install_exit_code
+  set +e
+  install_codex "$home" >"$tmp_root/unowned-conflict.out" 2>"$tmp_root/unowned-conflict.err"
+  install_exit_code=$?
+  set -e
+  if [[ "$install_exit_code" -eq 0 ]]; then
+    echo "installer_transaction_unowned_conflict=failed expected_nonzero" >&2
+    exit 1
+  fi
+  grep -Fq "will not overwrite existing global callable skill directories" "$tmp_root/unowned-conflict.err"
+  assert_equal "installer_transaction_unowned_conflict_tree" "$before" "$(tree_digest "$home")"
+  echo "installer_transaction_unowned_conflict=pass"
+  run_symlink_boundary_negatives
+}
+
+run_symlink_boundary_negative() {
+  local target="$1"
+  local variant="$2"
+  local home="$tmp_root/symlink-$target-$variant-home"
+  local external="$tmp_root/symlink-$target-$variant-external"
+  mkdir -p "$home" "$external"
+  printf 'external sentinel must remain byte-identical\n' >"$external/sentinel.txt"
+  local external_before
+  external_before="$(tree_digest "$external")"
+
+  if [[ "$target" == "codex" ]]; then
+    mkdir -p "$home/.codex"
+    if [[ "$variant" == "leaf" ]]; then
+      ln -s "$external" "$home/.codex/traceweaver-core"
+    else
+      ln -s "$external" "$home/.codex/skills"
+    fi
+  else
+    mkdir -p "$home/config"
+    if [[ "$variant" == "leaf" ]]; then
+      mkdir -p "$home/config/plugins"
+      ln -s "$external" "$home/config/plugins/traceweaver-core"
+    else
+      ln -s "$external" "$home/config/plugins"
+    fi
+  fi
+  local home_before
+  home_before="$(tree_digest "$home")"
+
+  local install_exit_code
+  set +e
+  if [[ "$target" == "codex" ]]; then
+    install_codex "$home" >"$tmp_root/symlink-$target-$variant.out" 2>"$tmp_root/symlink-$target-$variant.err"
+  else
+    install_antigravity "$home" >"$tmp_root/symlink-$target-$variant.out" 2>"$tmp_root/symlink-$target-$variant.err"
+  fi
+  install_exit_code=$?
+  set -e
+  if [[ "$install_exit_code" -eq 0 ]]; then
+    echo "installer_transaction_symlink_boundary=failed target=$target variant=$variant expected_nonzero" >&2
+    exit 1
+  fi
+  grep -Fq "refuses a symbolic-link destination component" "$tmp_root/symlink-$target-$variant.err"
+  assert_equal "installer_transaction_symlink_home target=$target variant=$variant" "$home_before" "$(tree_digest "$home")"
+  assert_equal "installer_transaction_symlink_external target=$target variant=$variant" "$external_before" "$(tree_digest "$external")"
+  echo "installer_transaction_symlink_boundary_target=$target variant=$variant"
+}
+
+run_symlink_boundary_negatives() {
+  for target in codex antigravity; do
+    for variant in leaf parent; do
+      run_symlink_boundary_negative "$target" "$variant"
+    done
+  done
+}
+
+if [[ -z "$case_id" || "$case_id" == "MC121_INSTALL_SUCCESS" ]]; then run_success_case; fi
+if [[ -z "$case_id" || "$case_id" == "MC121_ROLLBACK_MATRIX" ]]; then run_rollback_matrix; fi
+if [[ -z "$case_id" || "$case_id" == "MC121_UNOWNED_CONFLICT" ]]; then run_unowned_conflict; fi
+
+echo "installer_transaction_smoke=pass"

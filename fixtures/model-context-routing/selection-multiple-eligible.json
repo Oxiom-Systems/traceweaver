@@ -1,0 +1,8 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-114; trace=TRACE-TW-072; ver=VER-TW-092",
+  "route_id": "tw-plan",
+  "floor": "B3",
+  "packet_input": 1000,
+  "reserved_output": 1000,
+  "expected": "B3"
+}

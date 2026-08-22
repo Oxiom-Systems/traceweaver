@@ -1,0 +1,195 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-116; trace=TRACE-TW-072; ver=VER-TW-092",
+  "schema_version": "tw-model-context-source-manifest/1",
+  "oracle_id": "ORACLE-TW-049-COMPLETE-001",
+  "oracle_reviewer": {
+    "identity": "fixture-independent-reviewer",
+    "relationship": "did_not_implement_compiler_or_author_source_oracle",
+    "independent": true
+  },
+  "temporal_or_external_facts": {
+    "sec": false,
+    "route": false,
+    "task": true
+  },
+  "required_sources": [
+    {
+      "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
+      "digest": "sha256:4b99eb5fa71506fbb8710ea479513407e51a03555d0aa43a47089f7bdf2ae56b"
+    },
+    {
+      "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md",
+      "digest": "sha256:83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5"
+    },
+    {
+      "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md",
+      "digest": "sha256:60d9bf513683e61651f7d65cff5be2939bfdd0ee3a4817b85f4dadb88eb92a3c"
+    },
+    {
+      "locator": "fixtures/model-context-routing/acceptance-cases.yml",
+      "digest": "sha256:1c929521dd51ff2662c8be6dffc22df57e84056d038ac5f50e48bc0c71d4c9b0"
+    },
+    {
+      "locator": "plugins/traceweaver-core/references/model-context-map.yml",
+      "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+    },
+    {
+      "locator": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
+      "digest": "sha256:0bf1e297f78cc20e6d846812a9fc992996f5aa12a43da97d6b2aa7fcc28e927f"
+    },
+    {
+      "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+      "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead"
+    },
+    {
+      "locator": "plugins/traceweaver-core/skills/ce-plan/SKILL.md",
+      "digest": "sha256:b4f8768827552f2fdf55ad29e5f1144156ad983f683e8e751cb08900d3f391e5"
+    },
+    {
+      "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory",
+      "digest": "sha256:2c419279f88f88350dd6c8dbdbbfcf19596cf1b093b6b0caa9b78e9339651847"
+    },
+    {
+      "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+      "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1"
+    },
+    {
+      "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child",
+      "digest": "sha256:1bb98139c91fece82c483e0b8fc3ab9cde6685bf4fd7437ed42c8f1f17054e5b"
+    },
+    {
+      "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
+      "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447"
+    },
+    {
+      "locator": "requirements.md",
+      "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+    },
+    {
+      "locator": "scripts/traceweaver-smoke-consolidated-convergence",
+      "digest": "sha256:6f3d22daf0130e037fb0f52b82b7a2d8508a65be8f5c1850776272d5cff8d56f"
+    }
+  ],
+  "categories": [
+    {
+      "category": "controlling_authority",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md",
+          "digest": "sha256:83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "requirements.md",
+          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    },
+    {
+      "category": "task_scope",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
+          "digest": "sha256:4b99eb5fa71506fbb8710ea479513407e51a03555d0aa43a47089f7bdf2ae56b",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
+          "digest": "sha256:0bf1e297f78cc20e6d846812a9fc992996f5aa12a43da97d6b2aa7fcc28e927f",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    },
+    {
+      "category": "skill_contract",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
+          "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    },
+    {
+      "category": "implementation_dependencies",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "plugins/traceweaver-core/references/model-context-map.yml",
+          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+          "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "plugins/traceweaver-core/skills/ce-plan/SKILL.md",
+          "digest": "sha256:b4f8768827552f2fdf55ad29e5f1144156ad983f683e8e751cb08900d3f391e5",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory",
+          "digest": "sha256:2c419279f88f88350dd6c8dbdbbfcf19596cf1b093b6b0caa9b78e9339651847",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+          "digest": "sha256:c9bb41fe69065400276014fd1f643eb5090228b169a00ea92d9003be03b631a1",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child",
+          "digest": "sha256:1bb98139c91fece82c483e0b8fc3ab9cde6685bf4fd7437ed42c8f1f17054e5b",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    },
+    {
+      "category": "current_external_sources",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "fixtures/model-context-routing/acceptance-cases.yml",
+          "digest": "sha256:1c929521dd51ff2662c8be6dffc22df57e84056d038ac5f50e48bc0c71d4c9b0",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    },
+    {
+      "category": "accepted_evidence",
+      "disposition": "satisfied",
+      "sources": [
+        {
+          "locator": "docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-definition.md",
+          "digest": "sha256:60d9bf513683e61651f7d65cff5be2939bfdd0ee3a4817b85f4dadb88eb92a3c",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "scripts/traceweaver-smoke-consolidated-convergence",
+          "digest": "sha256:6f3d22daf0130e037fb0f52b82b7a2d8508a65be8f5c1850776272d5cff8d56f",
+          "delivery_mode": "locator",
+          "contained": true
+        }
+      ]
+    }
+  ]
+}

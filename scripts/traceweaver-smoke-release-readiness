@@ -1,56 +1,946 @@
 #!/usr/bin/env bash
+# TRACEWEAVER: file-role=release-readiness-smoke; verifies=VER-TW-092; req=REQ-TW-122,REQ-TW-123; trace=TRACE-TW-072
+# TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-122; trace=TRACE-TW-072
 set -euo pipefail
 
 checker="scripts/traceweaver-check-release-readiness"
 evaluator="scripts/traceweaver-evaluate-release-check-runs"
+v2_ready="fixtures/release-readiness/model-context-v050-candidate.yml"
+runtime_ready="fixtures/release-readiness/runtime-receipt-ready.json"
 fixture_sha="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+fixture_scope_digest="sha256:1111111111111111111111111111111111111111111111111111111111111111"
+released_base="e1b2886ea51ceae03249c4ae09ff75308678970a"
 worktree_head="$(git rev-parse HEAD)"
 temp_dir="$(mktemp -d)"
-trap 'rm -rf "$temp_dir"' EXIT
+repo_temp_dir="fixtures/release-readiness/.memsearch/release-readiness-smoke.$$"
+mkdir -p "$repo_temp_dir"
+trap 'rm -rf "$temp_dir" "$repo_temp_dir"' EXIT
 
+expect_rejected() {
+  local label="$1"
+  shift
+  if "$@" >"$temp_dir/$label.out" 2>"$temp_dir/$label.err"; then
+    echo "${label}=unexpected_pass" >&2
+    exit 1
+  fi
+}
+
+check_v2_pass() {
+  local fixture="$1"
+  ruby "$checker" --receipt "$fixture" --version 0.5.0 --root . --merge-sha "$worktree_head"
+}
+
+check_runtime_pass() {
+  local receipt="$1"
+  ruby "$checker" \
+    --runtime-receipt "$receipt" \
+    --version 0.5.0 \
+    --tag traceweaver-core--v0.5.0 \
+    --merge-sha "$fixture_sha" \
+    --scope-digest "$fixture_scope_digest" \
+    --workflow-prefix https://github.com/Oxiom-Systems/traceweaver/actions/runs/
+}
+
+run_frozen_case() {
+  case "$1" in
+    MC122_READINESS_V2_PASS)
+      check_v2_pass "$v2_ready" >/dev/null
+      echo "MC122_READINESS_V2_PASS=pass_exact_integrated_candidate"
+      ;;
+    MC122_OLD_PR_NOT_PREREQUISITE)
+      expect_rejected mc122_old_pr ruby "$checker" --receipt fixtures/release-readiness/readiness-old-pr-only.yml --version 0.5.0 --root .
+      echo "MC122_OLD_PR_NOT_PREREQUISITE=held_release_candidate_incomplete"
+      ;;
+    MC122_HELD_CLAIM_SCAN)
+      expect_rejected mc122_overclaim ruby "$checker" --receipt fixtures/release-readiness/readiness-overclaim.yml --version 0.5.0 --root .
+      echo "MC122_HELD_CLAIM_SCAN=held_release_claim_invalid"
+      ;;
+    MC122_BOUNDED_TRACE_NOT_GLOBAL_CLOSURE)
+      check_v2_pass fixtures/release-readiness/readiness-trace-scope.yml >/dev/null
+      echo "MC122_BOUNDED_TRACE_NOT_GLOBAL_CLOSURE=pass_trace_072_with_global_backlog_visible"
+      ;;
+    MC122_EXACT_REF_VERSION)
+      check_v2_pass fixtures/release-readiness/readiness-ref-version.yml >/dev/null
+      echo "MC122_EXACT_REF_VERSION=pass_five_versions_and_exact_ref"
+      ;;
+    *)
+      echo "unknown_release_readiness_case=$1" >&2
+      exit 2
+      ;;
+  esac
+}
+
+if [ "${1:-}" = "--case" ]; then
+  [ "$#" -eq 2 ] || { echo "usage: traceweaver-smoke-release-readiness [--case CASE_ID]" >&2; exit 2; }
+  run_frozen_case "$2"
+  exit 0
+elif [ "$#" -ne 0 ]; then
+  echo "usage: traceweaver-smoke-release-readiness [--case CASE_ID]" >&2
+  exit 2
+fi
+
+# Legacy v1 remains accepted without making the historical PRs prerequisites
+# for a v2 integrated candidate.
 ruby "$checker" \
   --receipt fixtures/release-readiness/ready-0.4.0.yml \
   --version 0.4.0 \
   --root . \
-  --merge-sha "$worktree_head"
+  --merge-sha "$worktree_head" >/dev/null
 
-if ruby "$checker" \
-  --receipt fixtures/release-readiness/held-0.4.0.yml \
-  --version 0.4.0 >/dev/null 2>&1; then
-  echo "release_readiness_held_fixture=unexpected_pass" >&2
+expect_rejected release_readiness_held_fixture \
+  ruby "$checker" --receipt fixtures/release-readiness/held-0.4.0.yml --version 0.4.0
+
+sed 's/0\.4\.0/0.5.0/g' fixtures/release-readiness/ready-0.4.0.yml >"$temp_dir/legacy-v1-v050.yml"
+expect_rejected release_readiness_v1_v050_bypass_fixture \
+  ruby "$checker" --receipt "$temp_dir/legacy-v1-v050.yml" --version 0.5.0 --root .
+
+v2_output="$(check_v2_pass "$v2_ready")"
+grep -Fq 'release_readiness_schema=tw-release-readiness/2' <<<"$v2_output"
+
+expect_rejected release_readiness_old_pr_fixture \
+  ruby "$checker" --receipt fixtures/release-readiness/readiness-old-pr-only.yml --version 0.5.0 --root .
+expect_rejected release_readiness_overclaim_fixture \
+  ruby "$checker" --receipt fixtures/release-readiness/readiness-overclaim.yml --version 0.5.0 --root .
+grep -Fq 'candidate_identity active_cutover must be "disabled"' "$temp_dir/release_readiness_overclaim_fixture.err"
+
+missing_claim_fixture="$repo_temp_dir/missing-held-claim.yml"
+sed \
+  -e "s#fixtures/release-readiness/model-context-v050-candidate.yml#$missing_claim_fixture#" \
+  -e '/    - active_routing$/d' \
+  "$v2_ready" >"$missing_claim_fixture"
+expect_rejected release_readiness_missing_held_claim_fixture \
+  ruby "$checker" --receipt "$missing_claim_fixture" --version 0.5.0 --root .
+grep -Fq 'missing required held claims: active_routing' "$temp_dir/release_readiness_missing_held_claim_fixture.err"
+
+check_v2_pass fixtures/release-readiness/readiness-trace-scope.yml >/dev/null
+check_v2_pass fixtures/release-readiness/readiness-ref-version.yml >/dev/null
+
+expect_rejected release_readiness_version_fixture \
+  ruby "$checker" --receipt "$v2_ready" --version 0.5.1 --root .
+
+sed 's/sha256:16dadfe99da47c8cd030886a2a56a2664ec1e6440141b5eacfe1834652096dd4/sha256:0000000000000000000000000000000000000000000000000000000000000000/g' \
+  "$v2_ready" >"$temp_dir/bad-scope.yml"
+expect_rejected release_readiness_scope_fixture \
+  ruby "$checker" --receipt "$temp_dir/bad-scope.yml" --version 0.5.0 --root .
+
+expect_rejected release_readiness_merge_sha_fixture \
+  ruby "$checker" --receipt "$v2_ready" --version 0.5.0 --root . --merge-sha 0000000000000000000000000000000000000000
+
+candidate_record=docs/validation/traceweaver-plugin-0.5.0-release-candidate.md
+candidate_state_pending=0
+if [ -f "$candidate_record" ]; then
+  ruby -rdate -ryaml -e '
+    source = File.read(ARGV.fetch(0))
+    front = source[/\A---\n(.*?)\n---/m, 1] or abort("candidate front matter missing")
+    data = YAML.safe_load(front, permitted_classes: [Date], aliases: false)
+    readiness = data.fetch("release_readiness")
+    scope = readiness.fetch("candidate_scope")
+    expected = [".traceweaver/tw-graph-freshness.json", ARGV.fetch(0)].sort
+    abort("candidate schema mismatch") unless readiness["schema_version"] == "tw-release-readiness/2"
+    abort("candidate scope paths invalid") unless scope["paths"].is_a?(Array) && !scope["paths"].empty? && scope["paths"].uniq.length == scope["paths"].length
+    abort("candidate exclusions mismatch") unless scope["excluded_paths"].sort == expected
+    abort("candidate excluded path entered scope") unless (scope["paths"] & expected).empty?
+  ' "$candidate_record"
+  if grep -Eq '\bPENDING(_[A-Z0-9]+)*\b' "$candidate_record"; then
+    expect_rejected release_readiness_pending_integrated_candidate \
+      ruby "$checker" --receipt "$candidate_record" --version 0.5.0 --root .
+    grep -Fq 'receipt contains a PENDING placeholder' "$temp_dir/release_readiness_pending_integrated_candidate.err"
+    candidate_state_gate=pass_pending_rejected
+  else
+    if ruby "$checker" \
+        --receipt "$candidate_record" \
+        --version 0.5.0 \
+        --root . \
+        --merge-sha "$worktree_head" >"$temp_dir/current-candidate.out" 2>"$temp_dir/current-candidate.err"; then
+      candidate_state_gate=pass_final_ready
+    else
+      candidate_state_gate=held_terminal_carrier_rebind_required
+      candidate_state_pending=1
+    fi
+  fi
+fi
+
+ruby -e '
+  source = File.read(ARGV.fetch(0))
+  changed = source.sub("terminal_status: ready_for_version_bump", "terminal_status: PENDING_MUTATED_GATE")
+  abort("pending mutation did not apply") if changed == source
+  File.write(ARGV.fetch(1), changed)
+' "$v2_ready" "$temp_dir/mutated-pending-v2.yml"
+expect_rejected release_readiness_mutated_pending_fixture \
+  ruby "$checker" --receipt "$temp_dir/mutated-pending-v2.yml" --version 0.5.0 --root .
+grep -Fq 'receipt contains a PENDING placeholder' "$temp_dir/release_readiness_mutated_pending_fixture.err"
+
+runtime_output="$(check_runtime_pass "$runtime_ready")"
+grep -Fq 'release_runtime_receipt=valid' <<<"$runtime_output"
+
+runtime_negative() {
+  local label="$1"
+  local filter="$2"
+  local expected="$3"
+  jq "$filter" "$runtime_ready" >"$temp_dir/$label.json"
+  expect_rejected "$label" check_runtime_pass "$temp_dir/$label.json"
+  grep -Fq "$expected" "$temp_dir/$label.err"
+}
+
+runtime_negative runtime_bad_schema '.schema = "traceweaver-release-runtime-receipt/0"' 'runtime receipt schema must be'
+runtime_negative runtime_bad_tag '.tag = "traceweaver-core--v0.4.0"' 'runtime receipt tag must be'
+runtime_negative runtime_bad_merge_sha '.merge_sha = "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"' 'runtime receipt merge_sha must be'
+runtime_negative runtime_bad_scope '.candidate_scope_digest = "sha256:2222222222222222222222222222222222222222222222222222222222222222"' 'runtime receipt candidate_scope_digest must be'
+runtime_negative runtime_bad_workflow '.workflow_url = "https://example.invalid/actions/runs/123"' 'runtime receipt workflow_url is invalid'
+runtime_negative runtime_bad_required_ci '.required_ci.state = "pending"' 'runtime receipt required_ci state is not ready'
+
+# Exercise the production-only contract in an isolated clone rooted at the
+# fixed released base. No smoke scratch path enters the real repository delta.
+source_root="$PWD"
+production_repo="$temp_dir/production-repo"
+git clone --quiet --no-hardlinks . "$production_repo"
+git -C "$production_repo" checkout --quiet --detach "$released_base"
+[ "$(git -C "$production_repo" rev-parse HEAD)" = "$released_base" ]
+
+carrier_paths=(
+  docs/validation/traceweaver-plugin-0.5.0-release-candidate.md
+  .traceweaver/tw-graph-freshness.json
+  docs/validation/traceweaver-2026-08-22-v050-model-governance-code-review.md
+  docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md
+  docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md
+  docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-result.md
+  docs/generated/traceability-dashboard.md
+  docs/generated/traceability-data.json
+  docs/generated/traceability-graph.mmd
+  .traceweaver/intent-contract.current.yml
+)
+
+is_carrier_path() {
+  local candidate="$1"
+  local carrier
+  for carrier in "${carrier_paths[@]}"; do
+    [ "$candidate" != "$carrier" ] || return 0
+  done
+  return 1
+}
+
+list_source_provisional_delta() {
+  {
+    git -C "$source_root" diff --name-only --no-renames "$released_base" --
+    git -C "$source_root" ls-files --others --exclude-standard
+  } | sort -u
+}
+
+if git -C "$source_root" diff --name-only --diff-filter=D "$released_base" -- | grep -q .; then
+  echo "production_provisional_deleted_path=unsupported" >&2
   exit 1
 fi
 
-if ruby "$checker" \
-  --receipt fixtures/release-readiness/ready-0.4.0.yml \
-  --version 0.4.1 >/dev/null 2>&1; then
-  echo "release_readiness_version_fixture=unexpected_pass" >&2
+copy_current_path() {
+  local path="$1"
+  if [ ! -f "$source_root/$path" ] || [ -L "$source_root/$path" ]; then
+    echo "production_provisional_path_invalid=$path" >&2
+    exit 1
+  fi
+  mkdir -p "$production_repo/$(dirname "$path")"
+  cp -p "$source_root/$path" "$production_repo/$path"
+}
+
+provisional_behavior_paths=()
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  is_carrier_path "$path" && continue
+  provisional_behavior_paths+=("$path")
+  copy_current_path "$path"
+done < <(list_source_provisional_delta)
+
+for required_delta in \
+  plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence \
+  plugins/traceweaver-core/references/tw-graph-lifecycle.md; do
+  if ! printf '%s\n' "${provisional_behavior_paths[@]}" | grep -Fxq "$required_delta"; then
+    echo "production_provisional_behavior_delta=missing path=$required_delta" >&2
+    exit 1
+  fi
+done
+
+production_map="$production_repo/plugins/traceweaver-core/references/model-context-map.yml"
+production_oracle="$production_repo/plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json"
+production_inventory="$temp_dir/production-inventory.json"
+"$production_repo/plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map" \
+  --root "$production_repo" \
+  --map "$production_map" \
+  --format json >"$production_inventory"
+
+map_digest="$(ruby -ryaml -e 'print YAML.safe_load(File.read(ARGV.fetch(0)), permitted_classes: [], aliases: false).fetch("map_digest")' "$production_map")"
+oracle_digest="$(jq -r .oracle_digest "$production_oracle")"
+inventory_digest="$(jq -r .inventory_digest "$production_inventory")"
+oracle_review_id="$(jq -r .review_id "$production_oracle")"
+oracle_reviewer_identity="$(jq -r .reviewer.identity "$production_oracle")"
+oracle_reviewer_relationship="$(jq -r .reviewer.relationship "$production_oracle")"
+map_file_sha256="sha256:$(shasum -a 256 "$production_map" | awk '{print $1}')"
+oracle_file_sha256="sha256:$(shasum -a 256 "$production_oracle" | awk '{print $1}')"
+
+list_production_delta() {
+  {
+    git -C "$production_repo" diff --name-only --no-renames "$released_base" --
+    git -C "$production_repo" ls-files --others --exclude-standard
+  } | sort -u
+}
+
+calculate_paths_digest() {
+  ruby -rdigest -e '
+    root = ARGV.shift
+    records = ARGV.sort.map do |path|
+      absolute = File.join(root, path)
+      mode = (File.stat(absolute).mode & 0o111).zero? ? "100644" : "100755"
+      "#{path}\0#{mode}\0#{Digest::SHA256.file(absolute).hexdigest}\n"
+    end
+    print "sha256:#{Digest::SHA256.hexdigest(records.join)}"
+  ' "$production_repo" "$@"
+}
+
+production_behavior_paths=()
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  is_carrier_path "$path" && continue
+  production_behavior_paths+=("$path")
+done < <(list_production_delta)
+if [ "${#production_behavior_paths[@]}" -ne "${#provisional_behavior_paths[@]}" ] ||
+   [ "$(printf '%s\n' "${production_behavior_paths[@]}")" != "$(printf '%s\n' "${provisional_behavior_paths[@]}")" ]; then
+  echo "production_provisional_behavior_delta=copy_mismatch" >&2
   exit 1
 fi
+for required_delta in \
+  plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence \
+  plugins/traceweaver-core/references/tw-graph-lifecycle.md; do
+  if ! printf '%s\n' "${production_behavior_paths[@]}" | grep -Fxq "$required_delta"; then
+    echo "production_synthetic_behavior_delta=missing path=$required_delta" >&2
+    exit 1
+  fi
+done
+echo "production_provisional_behavior_delta=pass paths=${#production_behavior_paths[@]}"
+reviewed_behavior_digest="$(calculate_paths_digest "${production_behavior_paths[@]}")"
+reviewed_behavior_path_count="${#production_behavior_paths[@]}"
 
-sed 's/sha256:[0-9a-f]\{64\}/sha256:0000000000000000000000000000000000000000000000000000000000000000/' \
-  fixtures/release-readiness/ready-0.4.0.yml > "$temp_dir/bad-scope.yml"
-if ruby "$checker" \
-  --receipt "$temp_dir/bad-scope.yml" \
-  --version 0.4.0 \
-  --root . >/dev/null 2>&1; then
-  echo "release_readiness_scope_fixture=unexpected_pass" >&2
-  exit 1
-fi
+# Populate the excluded graph-freshness carrier only after the provisional
+# behavior identity is fixed. The smoke does not refresh the real repository
+# graph and this carrier never enters semantic review identity or candidate
+# scope.
+copy_current_path .traceweaver/tw-graph-freshness.json
 
-if ruby "$checker" \
-  --receipt fixtures/release-readiness/ready-0.4.0.yml \
-  --version 0.4.0 \
-  --root . \
-  --merge-sha 0000000000000000000000000000000000000000 >/dev/null 2>&1; then
-  echo "release_readiness_merge_sha_fixture=unexpected_pass" >&2
-  exit 1
-fi
+mkdir -p "$production_repo/docs/validation"
+cat >"$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-code-review.md" <<EOF
+---
+id: TW-CODE-REVIEW-2026-08-22-V050-CONSOLIDATED-001
+status: closed_clean
+reviewer: independent-code-review-fixture
+reviewer_relationship: did_not_author_or_edit_reviewed_package
+reviewed_behavior_digest: $reviewed_behavior_digest
+reviewed_behavior_path_count: $reviewed_behavior_path_count
+reviewed_findings:
+  open_p0: 0
+  open_p1: 0
+  repair_cycle_count: 1
+artifact_bindings:
+  map:
+    path: plugins/traceweaver-core/references/model-context-map.yml
+    file_sha256: $map_file_sha256
+    semantic_digest: $map_digest
+  oracle:
+    path: plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
+    file_sha256: $oracle_file_sha256
+    semantic_digest: $oracle_digest
+  inventory:
+    generator: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map
+    semantic_digest: $inventory_digest
+    route_count: 87
+    route_category_cell_count: 522
+---
 
-ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/ready.json > "$temp_dir/ready.json"
-ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/pending.json > "$temp_dir/pending.json"
-ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/failed.json > "$temp_dir/failed.json"
-ruby "$evaluator" --sha bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb --input fixtures/release-check-runs/pending.json > "$temp_dir/wrong-sha.json"
+Production readiness fixture code review bound to real model-context artifacts.
+EOF
+cat >"$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md" <<EOF
+---
+record_type: traceweaver_acceptance_result
+schema_version: 1
+result_id: RESULT-TW-049
+requirement_id: REQ-TW-122
+need_ids: [NEED-TW-013]
+linked_trace_id: TRACE-TW-072
+linked_atp_id: ATP-TW-049
+linked_result_id: RESULT-TW-049
+linked_verification_id: VER-TW-092
+linked_validation_id: VAL-TW-040
+owner: Oxiom Systems
+date: "2026-08-22"
+status: pass
+reviewed_behavior_digest: $reviewed_behavior_digest
+reviewed_behavior_path_count: $reviewed_behavior_path_count
+artifact_bindings:
+  map:
+    path: plugins/traceweaver-core/references/model-context-map.yml
+    file_sha256: $map_file_sha256
+    semantic_digest: $map_digest
+  oracle:
+    path: plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
+    file_sha256: $oracle_file_sha256
+    semantic_digest: $oracle_digest
+  inventory:
+    generator: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map
+    semantic_digest: $inventory_digest
+    route_count: 87
+    route_category_cell_count: 522
+structured_acceptance:
+  closure_claim: The bounded 0.5.0 shadow model-governance acceptance package passed.
+  functional_acceptance_evidence:
+    status: present
+    evidence:
+      - scripts/traceweaver-smoke-model-context-routing
+      - scripts/traceweaver-smoke-installer-transaction
+      - scripts/traceweaver-smoke-release-readiness
+  non_functional_acceptance_evidence:
+    status: present
+    applicability: applicable
+    evidence:
+      - traceability-matrix.md
+      - .traceweaver/tw-graph-freshness.json
+  tested_baseline_or_artifact_version: $reviewed_behavior_digest
+  observed_result: Real map, oracle, inventory, installer, release, and v1 boundaries passed.
+  final_disposition: pass
+  evidence_location:
+    - docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md
+  next_trigger: Merge authorization or behavior-digest change.
+---
+
+Production readiness fixture structured acceptance result.
+EOF
+cat >"$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md" <<EOF
+---
+id: VER-TW-092
+status: passed
+reviewed_behavior_digest: $reviewed_behavior_digest
+reviewed_behavior_path_count: $reviewed_behavior_path_count
+artifact_bindings:
+  map:
+    path: plugins/traceweaver-core/references/model-context-map.yml
+    file_sha256: $map_file_sha256
+    semantic_digest: $map_digest
+  oracle:
+    path: plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
+    file_sha256: $oracle_file_sha256
+    semantic_digest: $oracle_digest
+  inventory:
+    generator: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map
+    semantic_digest: $inventory_digest
+    route_count: 87
+    route_category_cell_count: 522
+evidence_claims:
+  package_projection: passed
+  installer_rollback: passed
+  manifest_equality: passed
+  public_claim_scan: passed
+  v1_invariance: passed
+executed_checks:
+  model_context_routing: passed
+  installer_transaction: passed
+  release_readiness: passed
+  structured_acceptance: passed
+  generated_view_drift: passed
+  current_snapshot_drift: passed
+  manifest_equality: passed
+  public_claim_scan: passed
+  v1_invariance: passed
+---
+
+Production readiness fixture verification result bound to executed checks.
+EOF
+cat >"$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-result.md" <<EOF
+---
+id: VAL-TW-040
+status: accepted
+rater: $oracle_reviewer_identity
+rater_relationship: $oracle_reviewer_relationship
+oracle_review_id: $oracle_review_id
+reviewed_oracle_cells: 522
+reviewed_behavior_digest: $reviewed_behavior_digest
+reviewed_behavior_path_count: $reviewed_behavior_path_count
+artifact_bindings:
+  map:
+    path: plugins/traceweaver-core/references/model-context-map.yml
+    file_sha256: $map_file_sha256
+    semantic_digest: $map_digest
+  oracle:
+    path: plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
+    file_sha256: $oracle_file_sha256
+    semantic_digest: $oracle_digest
+  inventory:
+    generator: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map
+    semantic_digest: $inventory_digest
+    route_count: 87
+    route_category_cell_count: 522
+scenario_results:
+  b0: passed
+  b1: passed
+  b2: passed
+  b3: passed
+  negative_holds: passed
+  v1_invariance: passed
+  claim_boundary: passed
+  complete_oracle_review: passed
+---
+
+Production readiness fixture validation by the exact canonical oracle reviewer.
+EOF
+
+# Generate the deterministic carrier views only after the reviewed evidence
+# binds the behavior digest. Their bytes intentionally depend on the structured
+# acceptance result, so they must remain full-scope release inputs without
+# entering the behavior digest that the acceptance result itself records.
+"$production_repo/scripts/traceweaver-generate-traceability-views" \
+  --root "$production_repo" >/dev/null
+"$production_repo/scripts/traceweaver-smoke-verify" --write >/dev/null
+
+acceptance_relative=docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md
+acceptance_sha256="$(shasum -a 256 "$production_repo/$acceptance_relative" | awk '{print $1}')"
+jq -e \
+  --arg path "$acceptance_relative" \
+  --arg digest "$acceptance_sha256" \
+  '.generated_from[] | select(.path == $path and .sha256 == $digest)' \
+  "$production_repo/docs/generated/traceability-data.json" >/dev/null
+
+changed_derived_carriers=(
+  docs/generated/traceability-dashboard.md
+  docs/generated/traceability-data.json
+  .traceweaver/intent-contract.current.yml
+)
+for path in "${changed_derived_carriers[@]}"; do
+  if git -C "$production_repo" diff --quiet "$released_base" -- "$path"; then
+    echo "production_derived_carrier_delta=missing path=$path" >&2
+    exit 1
+  fi
+done
+
+post_carrier_behavior_paths=()
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  is_carrier_path "$path" && continue
+  post_carrier_behavior_paths+=("$path")
+done < <(list_production_delta)
+post_carrier_behavior_digest="$(calculate_paths_digest "${post_carrier_behavior_paths[@]}")"
+[ "$post_carrier_behavior_digest" = "$reviewed_behavior_digest" ]
+[ "${#post_carrier_behavior_paths[@]}" -eq "$reviewed_behavior_path_count" ]
+
+production_scope=()
+while IFS= read -r path; do
+  [ -n "$path" ] || continue
+  [ "$path" = ".traceweaver/tw-graph-freshness.json" ] && continue
+  [ "$path" = "docs/validation/traceweaver-plugin-0.5.0-release-candidate.md" ] && continue
+  production_scope+=("$path")
+done < <(list_production_delta)
+for carrier in "${changed_derived_carriers[@]}"; do
+  scoped=0
+  for path in "${production_scope[@]}"; do
+    [ "$path" != "$carrier" ] || scoped=1
+  done
+  if [ "$scoped" -ne 1 ]; then
+    echo "production_derived_carrier_scope=missing path=$carrier" >&2
+    exit 1
+  fi
+done
+
+calculate_production_digest() {
+  calculate_paths_digest "${production_scope[@]}"
+}
+
+production_digest="$(calculate_production_digest)"
+production_scope_yaml="$(printf '      - %s\n' "${production_scope[@]}")"
+production_candidate="$production_repo/docs/validation/traceweaver-plugin-0.5.0-release-candidate.md"
+cat >"$production_candidate" <<EOF
+---
+id: TW-RELEASE-CANDIDATE-2026-08-22-0.5.0-001
+status: ready_for_version_bump
+date: 2026-08-22
+version: 0.5.0
+tag: traceweaver-core--v0.5.0
+released_base: $released_base
+requirement: REQ-TW-122
+trace: TRACE-TW-072
+verification: VER-TW-092
+validation: VAL-TW-040
+release_readiness:
+  schema_version: tw-release-readiness/2
+  terminal_status: ready_for_version_bump
+  version: 0.5.0
+  candidate_scope:
+    algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
+    paths:
+$production_scope_yaml
+    excluded_paths:
+      - .traceweaver/tw-graph-freshness.json
+      - docs/validation/traceweaver-plugin-0.5.0-release-candidate.md
+    digest: $production_digest
+  candidate_identity:
+    plan_id: TW-PLAN-2026-08-22-V050-MODEL-GOVERNANCE-001
+    plan_review_id: TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001
+    code_review_series_id: TW-CODE-REVIEW-2026-08-22-V050-CONSOLIDATED-001
+    acceptance_test_id: ATP-TW-049
+    acceptance_result_id: RESULT-TW-049
+    verification_id: VER-TW-092
+    validation_id: VAL-TW-040
+    trace_id: TRACE-TW-072
+    authoritative_runtime: v1
+    model_context_mode: advisory_shadow_compile
+    active_cutover: disabled
+    map_digest: $map_digest
+    oracle_digest: $oracle_digest
+    inventory_digest: $inventory_digest
+    oracle_review_id: $oracle_review_id
+    oracle_reviewer_identity: $oracle_reviewer_identity
+    oracle_reviewer_relationship: $oracle_reviewer_relationship
+    reviewed_behavior_digest: $reviewed_behavior_digest
+    reviewed_behavior_path_count: $reviewed_behavior_path_count
+    reviewed_scope_digest: $production_digest
+  prerequisites:
+    accepted_plan: accepted
+    plan_document_review: passed
+    code_review_series: closed
+    acceptance_result: passed
+    verification_result: passed
+    validation_result: accepted
+    bounded_traceability: passed
+    graph_freshness: passed
+    package_projection: passed
+    installer_rollback: passed
+    manifest_equality: passed
+    public_claim_scan: passed
+    v1_invariance: passed
+    global_backlog: visible_non_gating
+    runtime_exact_sha_checks: required_by_release_workflow
+    automatic_release_receipt: required_by_release_workflow
+  evidence:
+    plan: docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md
+    plan_document_review: docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md
+    code_review_series: docs/validation/traceweaver-2026-08-22-v050-model-governance-code-review.md
+    acceptance_result: docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md
+    verification_result: docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md
+    validation_result: docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-result.md
+    traceability: traceability-matrix.md
+    graph_freshness: .traceweaver/tw-graph-freshness.json
+    package_projection: docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md
+    installer_rollback: docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md
+    manifest_equality: docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md
+    public_claim_scan: docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md
+    v1_invariance: docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md
+  held_claims:
+    - active_routing
+    - descendant_enforcement
+    - independently_attested_served_model
+    - actual_or_material_token_savings
+    - token_sufficiency
+    - quality_equivalence
+    - provider_replay_qualification
+    - active_cutover
+---
+
+Production-only readiness contract fixture.
+EOF
+
+check_production_pass() {
+  ruby "$production_repo/$checker" \
+    --receipt "$production_candidate" \
+    --version 0.5.0 \
+    --root "$production_repo" \
+    --merge-sha "$released_base"
+}
+
+refresh_production_digest() {
+  local next_digest
+  next_digest="$(calculate_production_digest)"
+  ruby -e '
+    path, old_digest, new_digest = ARGV
+    source = File.read(path)
+    count = source.scan(old_digest).length
+    abort("expected two production digest bindings, got #{count}") unless count == 2
+    File.write(path, source.gsub(old_digest, new_digest))
+  ' "$production_candidate" "$production_digest" "$next_digest"
+  production_digest="$next_digest"
+}
+
+expect_production_scope_binding_rejected() {
+  local label="$1"
+  local missing_path="$2"
+  local expected_error="$3"
+  local path
+  local reduced_scope=()
+  for path in "${production_scope[@]}"; do
+    [ "$path" = "$missing_path" ] || reduced_scope+=("$path")
+  done
+  if [ "${#reduced_scope[@]}" -ne "$(( ${#production_scope[@]} - 1 ))" ]; then
+    echo "${label}=scope_path_not_found" >&2
+    exit 1
+  fi
+  local reduced_digest
+  reduced_digest="$(calculate_paths_digest "${reduced_scope[@]}")"
+  local backup="$temp_dir/$label-candidate-good.md"
+  cp "$production_candidate" "$backup"
+  ruby -e '
+    path, missing_path, old_digest, reduced_digest = ARGV
+    source = File.read(path)
+    scope_line = "      - #{missing_path}\n"
+    abort("expected one candidate-scope path") unless source.scan(scope_line).length == 1
+    abort("expected two production digest bindings") unless source.scan(old_digest).length == 2
+    source = source.sub(scope_line, "").gsub(old_digest, reduced_digest)
+    File.write(path, source)
+  ' "$production_candidate" "$missing_path" "$production_digest" "$reduced_digest"
+  expect_rejected "$label" check_production_pass
+  grep -Fq "$expected_error" "$temp_dir/$label.err"
+  cp "$backup" "$production_candidate"
+}
+
+check_production_pass >/dev/null
+
+expect_production_scope_binding_rejected \
+  production_missing_canonical_map \
+  plugins/traceweaver-core/references/model-context-map.yml \
+  'canonical model-context map must be bound by candidate_scope'
+expect_production_scope_binding_rejected \
+  production_missing_canonical_oracle \
+  plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json \
+  'canonical model-context oracle must be bound by candidate_scope'
+expect_production_scope_binding_rejected \
+  production_missing_generated_dashboard \
+  docs/generated/traceability-dashboard.md \
+  'production candidate scope omits changed paths: docs/generated/traceability-dashboard.md'
+
+touch "$production_repo/omitted-changed-path.txt"
+expect_rejected production_omitted_changed_path check_production_pass
+grep -Fq 'production candidate scope omits changed paths: omitted-changed-path.txt' "$temp_dir/production_omitted_changed_path.err"
+rm "$production_repo/omitted-changed-path.txt"
+
+cp "$production_candidate" "$temp_dir/production-candidate-good.md"
+ruby -e '
+  path = ARGV.fetch(0)
+  source = File.read(path).sub(
+    "id: TW-RELEASE-CANDIDATE-2026-08-22-0.5.0-001",
+    "id: TW-RELEASE-CANDIDATE-WRONG"
+  )
+  File.write(path, source)
+' "$production_candidate"
+expect_rejected production_bad_top_level_id check_production_pass
+grep -Fq 'production receipt id must be "TW-RELEASE-CANDIDATE-2026-08-22-0.5.0-001"' "$temp_dir/production_bad_top_level_id.err"
+cp "$temp_dir/production-candidate-good.md" "$production_candidate"
+
+ruby -e '
+  path = ARGV.fetch(0)
+  source = File.read(path).sub(
+    "package_projection: docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md",
+    "package_projection: docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md"
+  )
+  File.write(path, source)
+' "$production_candidate"
+expect_rejected production_bad_evidence_binding check_production_pass
+grep -Fq 'production evidence package_projection must be' "$temp_dir/production_bad_evidence_binding.err"
+cp "$temp_dir/production-candidate-good.md" "$production_candidate"
+
+ruby -e '
+  path, expected = ARGV
+  source = File.read(path)
+  original = "    map_digest: #{expected}"
+  replacement = "    map_digest: sha256:#{"0" * 64}"
+  abort("map digest mutation did not apply") unless source.scan(original).length == 1
+  File.write(path, source.sub(original, replacement))
+' "$production_candidate" "$map_digest"
+expect_rejected production_bad_candidate_map_digest check_production_pass
+grep -Fq 'candidate_identity map_digest must be' "$temp_dir/production_bad_candidate_map_digest.err"
+cp "$temp_dir/production-candidate-good.md" "$production_candidate"
+
+code_review_fixture="$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-code-review.md"
+cp "$code_review_fixture" "$temp_dir/production-code-review-good.md"
+cat >"$code_review_fixture" <<'EOF'
+---
+id: TW-CODE-REVIEW-2026-08-22-V050-CONSOLIDATED-001
+status: closed_clean
+reviewer: independent-code-review-fixture
+reviewer_relationship: did_not_author_or_edit_reviewed_package
+---
+
+Skeletal self-asserted review evidence must not authorize release readiness.
+EOF
+refresh_production_digest
+expect_rejected production_skeletal_code_review check_production_pass
+grep -Fq 'code review evidence reviewed_behavior_digest mismatch' "$temp_dir/production_skeletal_code_review.err"
+cp "$temp_dir/production-code-review-good.md" "$code_review_fixture"
+refresh_production_digest
+
+acceptance_fixture="$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md"
+cp "$acceptance_fixture" "$temp_dir/production-acceptance-good.md"
+ruby -e '
+  path = ARGV.fetch(0)
+  source = File.read(path)
+  changed = source.sub(/^  observed_result:.*\n/, "")
+  abort("skeletal acceptance mutation did not apply") if changed == source
+  File.write(path, changed)
+' "$acceptance_fixture"
+refresh_production_digest
+expect_rejected production_skeletal_acceptance check_production_pass
+grep -Fq 'structured acceptance-result checker rejected production evidence' "$temp_dir/production_skeletal_acceptance.err"
+cp "$temp_dir/production-acceptance-good.md" "$acceptance_fixture"
+refresh_production_digest
+
+verification_fixture="$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-verification-result.md"
+cp "$verification_fixture" "$temp_dir/production-verification-good.md"
+ruby -e '
+  path, expected = ARGV
+  source = File.read(path)
+  original = "reviewed_behavior_digest: #{expected}"
+  replacement = "reviewed_behavior_digest: sha256:#{"0" * 64}"
+  abort("reviewed behavior digest mutation did not apply") unless source.scan(original).length == 1
+  File.write(path, source.sub(original, replacement))
+' "$verification_fixture" "$reviewed_behavior_digest"
+refresh_production_digest
+expect_rejected production_bad_reviewed_behavior_digest check_production_pass
+grep -Fq 'verification result evidence reviewed_behavior_digest mismatch' "$temp_dir/production_bad_reviewed_behavior_digest.err"
+cp "$temp_dir/production-verification-good.md" "$verification_fixture"
+refresh_production_digest
+
+ruby -e '
+  path = ARGV.fetch(0)
+  source = File.read(path).sub("status: passed", "status: failed")
+  File.write(path, source)
+' "$verification_fixture"
+refresh_production_digest
+expect_rejected production_bad_evidence_status check_production_pass
+grep -Fq 'verification result evidence status must be "passed"' "$temp_dir/production_bad_evidence_status.err"
+cp "$temp_dir/production-verification-good.md" "$verification_fixture"
+refresh_production_digest
+
+validation_fixture="$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-result.md"
+cp "$validation_fixture" "$temp_dir/production-validation-good.md"
+ruby -e '
+  path, expected = ARGV
+  source = File.read(path)
+  original = "rater: #{expected}"
+  abort("validation rater mutation did not apply") unless source.scan(original).length == 1
+  File.write(path, source.sub(original, "rater: generic-pre-validation-reviewer"))
+' "$validation_fixture" "$oracle_reviewer_identity"
+refresh_production_digest
+expect_rejected production_bad_validation_rater check_production_pass
+grep -Fq 'validation result rater must equal the canonical oracle reviewer identity' "$temp_dir/production_bad_validation_rater.err"
+cp "$temp_dir/production-validation-good.md" "$validation_fixture"
+refresh_production_digest
+
+ruby -e '
+  path, expected = ARGV
+  source = File.read(path)
+  original = "rater_relationship: #{expected}"
+  abort("validation relationship mutation did not apply") unless source.scan(original).length == 1
+  File.write(path, source.sub(original, "rater_relationship: pre_validation_fixture"))
+' "$validation_fixture" "$oracle_reviewer_relationship"
+refresh_production_digest
+expect_rejected production_bad_validation_relationship check_production_pass
+grep -Fq 'validation result rater relationship must equal the canonical oracle reviewer relationship' "$temp_dir/production_bad_validation_relationship.err"
+cp "$temp_dir/production-validation-good.md" "$validation_fixture"
+refresh_production_digest
+
+cp "$production_oracle" "$temp_dir/production-oracle-good.json"
+ruby -rjson -rdigest -e '
+  def canonical(value)
+    case value
+    when Hash
+      value.keys.sort.each_with_object({}) { |key, output| output[key] = canonical(value.fetch(key)) }
+    when Array
+      value.map { |entry| canonical(entry) }
+    else
+      value
+    end
+  end
+  path = ARGV.fetch(0)
+  data = JSON.parse(File.read(path))
+  data.fetch("reviewer")["identity"] = "independent-validation-reviewer"
+  payload = data.reject { |key, _value| key == "oracle_digest" }
+  data["oracle_digest"] = "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(payload)))}"
+  File.write(path, JSON.pretty_generate(data) + "\n")
+' "$production_oracle"
+refresh_production_digest
+expect_rejected production_generic_pre_validation_reviewer check_production_pass
+grep -Fq 'canonical model-context oracle uses a generic pre-validation reviewer' "$temp_dir/production_generic_pre_validation_reviewer.err"
+cp "$temp_dir/production-oracle-good.json" "$production_oracle"
+refresh_production_digest
+
+ruby -rjson -rdigest -e '
+  def canonical(value)
+    case value
+    when Hash
+      value.keys.sort.each_with_object({}) { |key, output| output[key] = canonical(value.fetch(key)) }
+    when Array
+      value.map { |entry| canonical(entry) }
+    else
+      value
+    end
+  end
+  path = ARGV.fetch(0)
+  data = JSON.parse(File.read(path))
+  data.fetch("reviewer")["relationship"] = "pre_validation_fixture"
+  payload = data.reject { |key, _value| key == "oracle_digest" }
+  data["oracle_digest"] = "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(payload)))}"
+  File.write(path, JSON.pretty_generate(data) + "\n")
+' "$production_oracle"
+refresh_production_digest
+expect_rejected production_bad_oracle_reviewer_relationship check_production_pass
+grep -Fq 'canonical model-context oracle reviewer relationship is invalid' "$temp_dir/production_bad_oracle_reviewer_relationship.err"
+cp "$temp_dir/production-oracle-good.json" "$production_oracle"
+refresh_production_digest
+
+ruby -rjson -e '
+  path = ARGV.fetch(0)
+  data = JSON.parse(File.read(path))
+  data["oracle_digest"] = "sha256:#{"0" * 64}"
+  File.write(path, JSON.pretty_generate(data) + "\n")
+' "$production_oracle"
+refresh_production_digest
+expect_rejected production_bad_oracle_digest check_production_pass
+grep -Fq 'canonical model-context oracle digest mismatch' "$temp_dir/production_bad_oracle_digest.err"
+cp "$temp_dir/production-oracle-good.json" "$production_oracle"
+refresh_production_digest
+
+ruby -rjson -rdigest -e '
+  def canonical(value)
+    case value
+    when Hash
+      value.keys.sort.each_with_object({}) { |key, output| output[key] = canonical(value.fetch(key)) }
+    when Array
+      value.map { |entry| canonical(entry) }
+    else
+      value
+    end
+  end
+  path = ARGV.fetch(0)
+  data = JSON.parse(File.read(path))
+  cells = data.fetch("route_category_cells")
+  cells.fetch(1)["route_id"] = cells.fetch(0).fetch("route_id")
+  cells.fetch(1)["category"] = cells.fetch(0).fetch("category")
+  payload = data.reject { |key, _value| key == "oracle_digest" }
+  data["oracle_digest"] = "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(payload)))}"
+  File.write(path, JSON.pretty_generate(data) + "\n")
+' "$production_oracle"
+refresh_production_digest
+expect_rejected production_duplicate_oracle_cell check_production_pass
+grep -Fq 'canonical model-context oracle cells are not unique' "$temp_dir/production_duplicate_oracle_cell.err"
+cp "$temp_dir/production-oracle-good.json" "$production_oracle"
+refresh_production_digest
+
+graph_fixture="$production_repo/.traceweaver/tw-graph-freshness.json"
+cp "$graph_fixture" "$temp_dir/production-graph-good.json"
+ruby -rjson -e '
+  path = ARGV.fetch(0)
+  data = JSON.parse(File.read(path))
+  data["cycle_id"] = "TW-AUTHORITY-GATE-WRONG"
+  File.write(path, JSON.pretty_generate(data) + "\n")
+' "$graph_fixture"
+expect_rejected production_bad_graph_cycle check_production_pass
+grep -Fq 'graph freshness cycle_id is invalid' "$temp_dir/production_bad_graph_cycle.err"
+cp "$temp_dir/production-graph-good.json" "$graph_fixture"
+check_production_pass >/dev/null
+
+ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/ready.json >"$temp_dir/ready.json"
+ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/pending.json >"$temp_dir/pending.json"
+ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/failed.json >"$temp_dir/failed.json"
+ruby "$evaluator" --sha bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb --input fixtures/release-check-runs/pending.json >"$temp_dir/wrong-sha.json"
 
 [ "$(jq -r .state "$temp_dir/ready.json")" = ready ]
 [ "$(jq -r .state "$temp_dir/pending.json")" = pending ]
@@ -67,6 +957,10 @@ workflow=.github/workflows/release-on-version-bump.yml
 grep -q '^  checks: read$' "$workflow"
 grep -q 'traceweaver-evaluate-release-check-runs' "$workflow"
 grep -q 'release-runtime-receipt.json' "$workflow"
+grep -q 'gh release download' "$workflow"
+grep -q -- '--runtime-receipt "$runtime_receipt"' "$workflow"
+grep -q -- '--scope-digest "${{ steps.version.outputs.candidate_scope_digest }}"' "$workflow"
+grep -q -- '--workflow-prefix "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/"' "$workflow"
 grep -q -- '--merge-sha "\$GITHUB_SHA"' "$workflow"
 grep -q 'previous_version=' "$workflow"
 grep -q 'should_release=false' "$workflow"
@@ -76,6 +970,15 @@ grep -q "steps.version.outputs.should_release == 'true'" "$workflow"
 grep -q 'held_ci_failed' "$workflow"
 grep -q 'held_tag_conflict' "$workflow"
 grep -q 'held_release_metadata_write_unavailable' "$workflow"
+ruby -e '
+  source = File.read(ARGV.fetch(0))
+  after_on = source.split(/^on:\n/, 2)[1] or abort("release workflow event block missing")
+  event_block = after_on.split(/^concurrency:/, 2)[0]
+  normalized = event_block.lines.reject { |line| line.strip.empty? || line.start_with?("#") }.map(&:rstrip).join("\n")
+  expected = "  push:\n    branches: [main]"
+  abort("release workflow must trigger only on push to main") unless normalized == expected
+  abort("release workflow must not trigger on pull requests") if source.match?(/^\s*pull_request(?:_target)?:/)
+' "$workflow"
 if grep -Eq 'pr3_reconciled_head|pr3_ci_run|tag_absent_before_merge' "$checker"; then
   echo "release_readiness_self_reference=unexpected_required_field" >&2
   exit 1
@@ -91,14 +994,63 @@ if [ -z "$wait_line" ] || [ -z "$release_line" ] || [ "$wait_line" -ge "$release
   exit 1
 fi
 
-echo "release_readiness_positive_fixture=pass"
+for public_doc in README.md plugins/traceweaver-core/README.md docs/guides/using-traceweaver.md CHANGELOG.md; do
+  ruby -e '
+    source = File.read(ARGV.fetch(0))
+    checks = {
+      release_version: /0\.5\.0/,
+      deterministic_shadow_map: /deterministic.*inspectable.*shadow-only.*map.*compiler/im,
+      experimental_budgets: /B0--B3.*experimental|experimental.*B0--B3/im,
+      v1_authoritative: /v1.*authoritative|authoritative.*v1/im,
+      separate_receipts: /separate.*receipt|receipt.*separate/im,
+      install_rollback: /install.*transaction.*rollback|transactional.*install.*rollback/im,
+      active_cutover: /active cutover.*disabled|active-cutover.*disabled/im,
+      held_claims: /Active routing, descendant enforcement, served-model attestation, token savings, token sufficiency, quality equivalence, and provider replay qualification remain held\./m
+    }
+    checks.each { |name, pattern| abort("#{ARGV.fetch(0)} missing #{name}") unless source.match?(pattern) }
+  ' "$public_doc"
+done
+
+echo "release_readiness_legacy_v1_fixture=pass"
+echo "release_readiness_legacy_v1_v050_bypass_rejected=pass"
+echo "release_readiness_v2_integrated_fixture=pass"
+echo "release_readiness_v2_old_pr_rejected=pass"
+echo "release_readiness_v2_overclaim_rejected=pass"
+echo "release_readiness_v2_missing_held_claim_rejected=pass"
+echo "release_readiness_v2_bounded_trace_fixture=pass"
+echo "release_readiness_v2_exact_ref_version_fixture=pass"
 echo "release_readiness_negative_held_fixture=pass"
 echo "release_readiness_negative_version_fixture=pass"
 echo "release_readiness_negative_scope_fixture=pass"
 echo "release_readiness_negative_merge_sha_fixture=pass"
+echo "release_readiness_mutated_pending_fixture=pass"
+echo "release_readiness_production_delta_inventory=pass"
+echo "release_readiness_production_top_level_identity=pass"
+echo "release_readiness_production_structured_evidence=pass"
+echo "release_readiness_production_map_oracle_scope_bindings=pass"
+echo "release_readiness_production_real_artifact_digests=pass"
+echo "release_readiness_production_522_unique_oracle_cells=pass"
+echo "release_readiness_production_skeletal_evidence_rejected=pass"
+echo "release_readiness_production_structured_acceptance_checker=pass"
+echo "release_readiness_production_shared_behavior_digest=pass"
+echo "release_readiness_production_derived_carrier_digest_cycle=pass"
+echo "release_readiness_production_derived_carrier_scope=pass"
+echo "release_readiness_production_derived_carrier_drift_checks=pass"
+echo "release_readiness_production_exact_oracle_rater=pass"
+echo "release_readiness_graph_receipt_cycle=pass"
+echo "release_runtime_receipt_schema_and_identity=pass"
+echo "release_runtime_receipt_required_ci=pass"
 echo "release_exact_sha_check_run_fixtures=pass"
 echo "release_live_codeql_actions_matrix_fixture=pass"
 echo "release_workflow_exact_sha_gate=pass"
 echo "release_workflow_version_bump_only_gate=pass"
 echo "release_workflow_absent_tag_recovery_gate=pass"
 echo "release_readiness_non_self_referential_scope=pass"
+echo "release_public_shadow_claim_boundary=pass"
+echo "release_workflow_push_main_only=pass"
+echo "release_candidate_state_gate=${candidate_state_gate:-not_present}"
+if [ "$candidate_state_pending" -ne 0 ]; then
+  echo "release_candidate_terminal_carrier_rebind=held" >&2
+  cat "$temp_dir/current-candidate.err" >&2
+  exit 1
+fi

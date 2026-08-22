@@ -1,0 +1,943 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=model-context-routing-acceptance-smoke; req=REQ-TW-109,REQ-TW-123; trace=TRACE-TW-072; ver=VER-TW-092
+# TRACEWEAVER: verifies=ATP-TW-049; req=REQ-TW-109,REQ-TW-123; trace=TRACE-TW-072; ver=VER-TW-092
+# TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-109,REQ-TW-123; trace=TRACE-TW-072
+
+root="$(cd "$(dirname "$0")/.." && pwd)"
+case_id=""
+if [[ "${1:-}" == "--case" ]]; then
+  [[ -n "${2:-}" ]] || { echo "model_context_finding=missing_case_id" >&2; exit 2; }
+  case_id="$2"
+  shift 2
+fi
+[[ "$#" -eq 0 ]] || { echo "model_context_finding=unexpected_arguments" >&2; exit 2; }
+
+ruby -rdate -ryaml -rjson -ropen3 -rdigest -rtmpdir -rfileutils -rpathname - "$root" "$case_id" <<'RUBY'
+# frozen_string_literal: true
+
+root = File.expand_path(ARGV.fetch(0))
+selected_id = ARGV.fetch(1)
+fixture_root = File.join(root, "fixtures/model-context-routing")
+manifest = YAML.safe_load(File.read(File.join(fixture_root, "acceptance-cases.yml")), permitted_classes: [Date], aliases: false)
+abort "model_context_finding=case_schema" unless manifest["schema_version"] == "tw-model-context-acceptance-cases/1"
+cases = manifest.fetch("cases")
+abort "model_context_finding=case_count" unless cases.length == 72
+ids = cases.map { |entry| entry.fetch("id") }
+abort "model_context_finding=duplicate_case_id" unless ids.uniq.length == ids.length
+abort "model_context_finding=requirement_coverage" unless cases.map { |entry| entry.fetch("req") }.uniq.sort == (109..123).map { |number| "REQ-TW-#{number}" }
+abort "model_context_finding=unknown_case_id" unless selected_id.empty? || ids.include?(selected_id)
+selected = selected_id.empty? ? ids : [selected_id]
+by_id = cases.to_h { |entry| [entry.fetch("id"), entry] }
+
+MAP = File.join(root, "plugins/traceweaver-core/references/model-context-map.yml")
+MIRROR = File.join(root, "plugins/traceweaver-core/skills/tw-auto/references/model-context-map.yml")
+GENERATOR = File.join(root, "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map")
+COMPILER = File.join(root, "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-compile-model-context-route")
+VALIDATOR = File.join(root, "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-validate-model-context-receipt")
+PROFILE = File.join(root, ".traceweaver/v050-model-governance-workflow-profile.yml")
+SOURCE_MANIFEST = File.join(fixture_root, "source-manifest-complete.json")
+BASELINE = "REQ-BASELINE-2026-04-30-001@dae781e0cc1793798378f5af81a99503581e83dfbc9ce38876c465f4521f6300"
+SOURCE_CATEGORIES = %w[controlling_authority task_scope skill_contract implementation_dependencies current_external_sources accepted_evidence].freeze
+FLOORS = {
+  "B0" => %w[tw-graph tw-setup tw-update],
+  "B1" => %w[tw-authority-gate tw-commit tw-commit-push-pr tw-requirements-review tw-sessions tw-strategy tw-test-browser tw-test-xcode tw-worktree],
+  "B2" => %w[tw-brainstorm tw-code-review tw-compound tw-compound-refresh tw-debug tw-doc-review tw-grill tw-ideate tw-resolve-pr-feedback tw-traceability-check],
+  "B3" => %w[tw-audit tw-auto tw-plan tw-vv-define tw-work]
+}.freeze
+IMPORTED_ENGINES = {
+  "ce-brainstorm" => "tw-brainstorm", "ce-code-review" => "tw-code-review", "ce-compound" => "tw-compound",
+  "ce-compound-refresh" => "tw-compound-refresh", "ce-debug" => "tw-debug", "ce-doc-review" => "tw-doc-review",
+  "ce-ideate" => "tw-ideate", "ce-plan" => "tw-plan", "ce-resolve-pr-feedback" => "tw-resolve-pr-feedback",
+  "ce-sessions" => "tw-sessions", "ce-work" => "tw-work"
+}.freeze
+GENERIC_FAMILIES = [["tw-commit", "publication_preparer"], ["tw-commit-push-pr", "publication_delegate"], ["tw-debug", "diagnosis_worker"], ["tw-worktree", "worktree_operator"]].freeze
+ROUTE_KINDS = {
+  "implementation" => %w[tw-auto tw-work tw-worktree],
+  "review" => %w[tw-audit tw-code-review tw-doc-review tw-resolve-pr-feedback tw-test-browser tw-test-xcode tw-traceability-check],
+  "publication" => %w[tw-commit tw-commit-push-pr]
+}.freeze
+DIRECT_CONTROL_DEPENDENCIES = {
+  "tw-auto" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+    plugins/traceweaver-core/skills/tw-plan/SKILL.md
+    plugins/traceweaver-core/skills/tw-work/SKILL.md
+  ],
+  "tw-plan" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/ce-plan/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+  ],
+  "tw-work" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/ce-work/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+    plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors
+    plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors
+    plugins/traceweaver-core/skills/tw-vv-define/scripts/traceweaver-check-vv-capsule
+  ],
+  "tw-code-review" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/ce-code-review/SKILL.md
+    plugins/traceweaver-core/skills/ce-doc-review/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+  ],
+  "tw-doc-review" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/ce-doc-review/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+  ],
+  "tw-commit" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/skills/ce-commit/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review
+  ],
+  "tw-commit-push-pr" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/skills/ce-commit-push-pr/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review
+    plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule
+  ]
+}.transform_values { |paths| paths.sort.freeze }.freeze
+
+def shell(*command)
+  Open3.capture3(*command)
+end
+
+def json_command(*command)
+  output, error, status = shell(*command)
+  [JSON.parse(output), error, status]
+rescue JSON::ParserError => exception
+  raise "json_command_failure=#{command.join(" ")} error=#{exception.message} output=#{output.inspect} stderr=#{error.inspect}"
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.to_h do |key|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      [key, canonical(value.fetch(source_key))]
+    end
+  when Array then value.map { |entry| canonical(entry) }
+  when Date then value.iso8601
+  else value
+  end
+end
+
+def digest(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def file_digest(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def deep_copy(value)
+  JSON.parse(JSON.generate(value))
+end
+
+def load_fixture(path)
+  case File.extname(path)
+  when ".json", ".jsonl" then JSON.parse(File.read(path))
+  when ".yml", ".yaml" then YAML.safe_load(File.read(path), permitted_classes: [Date], aliases: false)
+  else File.binread(path)
+  end
+end
+
+def fixture_path(root, entry)
+  directory = entry.fetch("id").start_with?("MC122_") ? "fixtures/release-readiness" : "fixtures/model-context-routing"
+  File.join(root, directory, entry.fetch("fixture"))
+end
+
+def write_map(tmp, name, map)
+  map["map_digest"] = digest(map.reject { |key, _| key == "map_digest" })
+  path = File.join(tmp, name)
+  File.write(path, YAML.dump(map))
+  path
+end
+
+def assert_held(receipt, outcome)
+  raise "expected_#{outcome}_got=#{receipt["outcome"]}" unless receipt["outcome"] == outcome
+end
+
+def manifest_for_delivery(root, template, fixture)
+  manifest = deep_copy(template)
+  source = deep_copy(fixture)
+  locator = source["locator"]
+  if locator && !locator.include?("..") && File.file?(File.join(root, locator))
+    source["digest"] ||= file_digest(File.join(root, locator))
+    source["parent_source_digest"] ||= source["digest"] if source["delivery_mode"] == "shard" && source["fresh"] == true
+  end
+  manifest["categories"][0]["sources"] = [source]
+  if source["digest"].is_a?(String)
+    manifest["required_sources"] = [{ "locator" => source["locator"], "digest" => source["digest"] }]
+  else
+    manifest.delete("required_sources")
+  end
+  manifest
+end
+
+def manifest_source!(manifest, locator)
+  source = manifest.fetch("categories")
+    .flat_map { |category| category.fetch("sources", []) }
+    .find { |candidate| candidate["locator"] == locator }
+  raise "delivery_source_missing=#{locator}" unless source
+
+  source
+end
+
+def source_manifest_for_route(route_id)
+  # The owner-controlled adequacy review supplies the route's obligations;
+  # this system-temporary file is only a delivery candidate.  It cannot become
+  # the authority artifact or a root-bound receipt binding.
+  return SOURCE_MANIFEST if route_id == "tw-plan"
+
+  review = JSON.parse(File.read(File.join(fixture_root = File.dirname(SOURCE_MANIFEST), "oracle-review-complete.json")))
+  cells = review.fetch("route_category_cells").select { |cell| cell.fetch("route_id") == route_id }
+  return SOURCE_MANIFEST unless cells.length == SOURCE_CATEGORIES.length
+  categories = cells.sort_by { |cell| SOURCE_CATEGORIES.index(cell.fetch("category")) }.map do |cell|
+    if cell.fetch("disposition") == "satisfied"
+      {
+        "category" => cell.fetch("category"),
+        "disposition" => "satisfied",
+        "sources" => cell.fetch("source_refs").map { |reference| reference.slice("locator", "digest").merge("delivery_mode" => "locator", "contained" => true) }
+      }
+    else
+      cell.slice("category", "disposition", "exclusion_authority", "exclusion_rationale")
+    end
+  end
+  path = File.join($model_context_smoke_tmp, "delivery-#{route_id.gsub(/[^A-Za-z0-9_-]/, "_")}.json")
+  File.write(path, JSON.generate({ "schema_version" => "tw-model-context-source-manifest/1", "oracle_id" => "ORACLE-TW-049-DELIVERY-CANDIDATE-#{route_id}", "temporal_or_external_facts" => { "sec" => false, "route" => false, "task" => false }, "categories" => categories }))
+  path
+end
+
+# Successful shadow receipts must bind a physical manifest below the project
+# root.  The tests deliberately manufacture candidate manifests under the
+# system temp directory, so stage them into a disposable *copy* of the project
+# before compiling.  This preserves the important distinction: the temporary
+# candidate is never itself a receipt binding, while all locator/digest checks
+# still run against ordinary, non-symlinked project files.
+def path_within?(base, candidate)
+  base_path = Pathname.new(base).expand_path
+  candidate_path = Pathname.new(candidate).expand_path
+  candidate_path == base_path || candidate_path.to_s.start_with?("#{base_path}/")
+end
+
+def copy_oracle_sources!(source_root, destination_root, oracle, skip_prefixes: [], label: "oracle")
+  oracle.fetch("route_category_cells").flat_map { |cell| cell.fetch("source_refs", []) }
+    .map { |reference| reference.fetch("locator") }
+    .reject { |locator| skip_prefixes.any? { |prefix| locator.start_with?(prefix) } }
+    .uniq
+    .sort
+    .each do |locator|
+      locator_path = Pathname.new(locator)
+      raise "unsafe_#{label}_source_locator=#{locator}" if locator_path.absolute? || locator_path.each_filename.include?("..")
+
+      source = File.join(source_root, locator)
+      destination = File.join(destination_root, locator)
+      raise "#{label}_source_outside_root=#{locator}" unless path_within?(source_root, source)
+      raise "#{label}_source_missing=#{locator}" unless File.file?(source)
+      raise "#{label}_source_symlink=#{locator}" if File.symlink?(source)
+      raise "#{label}_destination_outside_root=#{locator}" unless path_within?(destination_root, destination)
+
+      FileUtils.mkdir_p(File.dirname(destination))
+      FileUtils.cp(source, destination)
+    end
+end
+
+def bound_project_for(root)
+  @bound_projects ||= {}
+  return @bound_projects[root] if @bound_projects[root]
+
+  project = File.join($model_context_smoke_tmp, "bound-project-#{Digest::SHA256.hexdigest(root)[0, 12]}")
+  FileUtils.mkdir_p(File.join(project, "plugins"))
+  FileUtils.cp_r(File.join(root, "plugins/traceweaver-core"), File.join(project, "plugins"))
+  FileUtils.mkdir_p(File.join(project, ".traceweaver"))
+  FileUtils.cp(File.join(root, ".traceweaver/v050-model-governance-workflow-profile.yml"), File.join(project, ".traceweaver/v050-model-governance-workflow-profile.yml"))
+  FileUtils.cp_r(File.join(root, "docs"), project) if File.directory?(File.join(root, "docs"))
+  if File.directory?(File.join(root, "fixtures/model-context-routing"))
+    FileUtils.mkdir_p(File.join(project, "fixtures"))
+    FileUtils.cp_r(File.join(root, "fixtures/model-context-routing"), File.join(project, "fixtures"))
+  end
+  FileUtils.cp(File.join(root, "README.md"), File.join(project, "README.md")) if File.file?(File.join(root, "README.md"))
+
+  # The isolated delivery project must contain every digest-bound source that
+  # the canonical oracle can select.  Derive that inventory from the oracle so
+  # a newly approved requirement or evidence artifact cannot silently leave
+  # alias/source-delivery tests exercising an incomplete synthetic project.
+  oracle_path = File.join(root, "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json")
+  oracle = JSON.parse(File.read(oracle_path))
+  copy_oracle_sources!(root, project, oracle, label: "oracle")
+
+  @bound_projects[root] = project
+end
+
+def bind_manifest_to_project(root, manifest_path)
+  return [root, manifest_path] if path_within?(root, manifest_path)
+
+  project = bound_project_for(root)
+  destination_dir = File.join(project, ".traceweaver/model-context-smoke-manifests")
+  FileUtils.mkdir_p(destination_dir)
+  destination = File.join(destination_dir, "#{Digest::SHA256.file(manifest_path).hexdigest}.json")
+  FileUtils.cp(manifest_path, destination) unless File.exist?(destination)
+  [project, destination]
+end
+
+def assert_compiler_validator_closure!(root, receipt)
+  return unless receipt["outcome"] == "structurally_eligible_shadow_recommendation"
+
+  @closure_index ||= 0
+  @closure_index += 1
+  receipt_path = File.join($model_context_smoke_tmp, "compiler-validator-closure-#{@closure_index}.json")
+  File.write(receipt_path, JSON.generate(receipt))
+  output, error, status = shell(VALIDATOR, "--root", root, "--receipt", receipt_path)
+  raise "compiler_validator_closure=#{error}:#{output}" unless status.success? && JSON.parse(output).fetch("outcome") == "pass"
+end
+
+def compile(root, route_id:, invocation:, packet: 1, reserved: 4000, map: nil, source_manifest: SOURCE_MANIFEST, parent_route: nil, depth: nil, fanout: nil, receipt_kind: nil, plan_receipt_id: nil, observation: nil, extra: [])
+  packet_arguments = packet.nil? ? [] : ["--packet-input", packet.to_s]
+  source_manifest = source_manifest == SOURCE_MANIFEST ? source_manifest_for_route(route_id) : source_manifest
+  effective_root, effective_manifest = bind_manifest_to_project(root, source_manifest)
+  arguments = [COMPILER, "--root", effective_root, "--route-id", route_id, "--risk", "L3", *packet_arguments, "--reserved-output", reserved.to_s, "--source-manifest", effective_manifest, "--baseline", BASELINE, "--invocation-id", invocation]
+  arguments += ["--map", map] if map
+  arguments += ["--parent-route", parent_route] if parent_route
+  arguments += ["--depth", depth.to_s] unless depth.nil?
+  arguments += ["--shard-fanout", fanout.to_s] unless fanout.nil?
+  arguments += ["--receipt-kind", receipt_kind] if receipt_kind
+  arguments += ["--plan-receipt-id", plan_receipt_id] if plan_receipt_id
+  arguments += ["--observation", observation] if observation
+  arguments.concat(extra)
+  receipt, error, status = json_command(*arguments)
+  raise "compiler_exit=#{error}" unless status.success?
+  assert_compiler_validator_closure!(effective_root, receipt)
+  receipt
+end
+
+def assert_canonical_oracle_mandatory_rejection!(root)
+  # The compiler intentionally accepts only the map-owned canonical oracle.
+  # Copy the complete package into an isolated temporary project so this is a
+  # real canonical-oracle validation, not merely a caller manifest mismatch.
+  Dir.mktmpdir("traceweaver-model-context-oracle-") do |project|
+    FileUtils.mkdir_p(File.join(project, "plugins"))
+    FileUtils.cp_r(File.join(root, "plugins/traceweaver-core"), File.join(project, "plugins"))
+    FileUtils.mkdir_p(File.join(project, ".traceweaver"))
+    FileUtils.cp(PROFILE, File.join(project, ".traceweaver/v050-model-governance-workflow-profile.yml"))
+    source_oracle = JSON.parse(File.read(File.join(root, "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json")))
+    copy_oracle_sources!(root, project, source_oracle, label: "canonical_oracle_test")
+    oracle_path = File.join(project, "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json")
+    oracle = JSON.parse(File.read(oracle_path))
+    mandatory = oracle.fetch("route_category_cells").find { |cell| cell.fetch("route_id") == "tw-plan" && cell.fetch("category") == "controlling_authority" }
+    mandatory["disposition"] = "excluded_by_authority"
+    mandatory.delete("source_refs")
+    mandatory["exclusion_authority"] = "TAMPERED-EXCLUSION"
+    mandatory["exclusion_rationale"] = "must be rejected before delivery recall"
+    oracle["oracle_digest"] = digest(oracle.reject { |key, _| key == "oracle_digest" })
+    File.write(oracle_path, JSON.generate(oracle))
+    receipt = compile(project, route_id: "tw-plan", invocation: "canonical-oracle-mandatory-rejection", source_manifest: SOURCE_MANIFEST)
+    assert_held(receipt, "held_source_oracle_invalid")
+    raise "canonical_oracle_mandatory_reason=#{receipt["held_reason"]}" unless receipt["held_reason"].to_s.start_with?("oracle_mandatory_category_excluded")
+  end
+end
+
+def assert_installed_direct_callable!(root, tmp)
+  home = File.join(tmp, "installed-codex-home")
+  antigravity_home = File.join(tmp, "installed-antigravity-home")
+  consumer = File.join(tmp, "installed-empty-consumer")
+  FileUtils.mkdir_p(consumer)
+  output, error, status = shell(
+    "bun", "run", File.join(root, "src/index.ts"), "install", File.join(root, "plugins/traceweaver-core"),
+    "--to", "codex", "--include-skills", "--codexHome", home
+  )
+  raise "direct_callable_install=#{error}:#{output}" unless status.success?
+  output, error, status = shell(
+    "bun", "run", File.join(root, "src/index.ts"), "install", File.join(root, "plugins/traceweaver-core"),
+    "--to", "antigravity", "--include-skills", "--geminiHome", antigravity_home
+  )
+  raise "antigravity_callable_install=#{error}:#{output}" unless status.success?
+  direct_root = File.join(home, ".codex/skills/tw-auto/scripts")
+  generator = File.join(direct_root, "traceweaver-generate-model-context-map")
+  compiler = File.join(direct_root, "traceweaver-compile-model-context-route")
+  validator = File.join(direct_root, "traceweaver-validate-model-context-receipt")
+  raise "direct_callable_missing" unless [generator, compiler, validator].all? { |path| File.file?(path) && File.executable?(path) }
+  antigravity_root = File.join(antigravity_home, "config/plugins/traceweaver-core/skills/tw-auto/scripts")
+  antigravity_generator = File.join(antigravity_root, "traceweaver-generate-model-context-map")
+  antigravity_compiler = File.join(antigravity_root, "traceweaver-compile-model-context-route")
+  antigravity_validator = File.join(antigravity_root, "traceweaver-validate-model-context-receipt")
+  raise "antigravity_callable_missing" unless [antigravity_generator, antigravity_compiler, antigravity_validator].all? { |path| File.file?(path) && File.executable?(path) }
+  # A direct-installed callable must ignore a consumer-controlled lookalike
+  # package.  Otherwise the consumer can replace the packaged control map
+  # before the generator ever gets to validate it.
+  shadow_map = File.join(consumer, "plugins/traceweaver-core/references/model-context-map.yml")
+  FileUtils.mkdir_p(File.dirname(shadow_map))
+  File.write(shadow_map, "schema_version: consumer-shadow-map\\n")
+  source_inventory, source_error, source_status = json_command(GENERATOR, "--root", root, "--format", "json")
+  raise "source_generator=#{source_error}" unless source_status.success?
+  inventory, generator_error, generator_status = json_command(generator, "--root", consumer, "--format", "json")
+  antigravity_inventory, antigravity_error, antigravity_status = json_command(antigravity_generator, "--root", consumer, "--format", "json")
+  unless generator_status.success? && antigravity_status.success? && inventory["top_level_callable_count"] == 28 && inventory["declared_route_count"] == 87 && antigravity_inventory["top_level_callable_count"] == 28 && antigravity_inventory["declared_route_count"] == 87 && [source_inventory, inventory, antigravity_inventory].map { |value| value["inventory_digest"] }.uniq.length == 1
+    raise "installed_inventory_parity=source:#{source_error}:codex:#{generator_error}:antigravity:#{antigravity_error}"
+  end
+  manifest_path = File.join(tmp, "installed-empty-manifest.json")
+  File.write(manifest_path, JSON.generate({ "schema_version" => "tw-model-context-source-manifest/1" }))
+  receipt, compiler_error, compiler_status = json_command(
+    compiler, "--root", consumer, "--route-id", "tw-plan", "--risk", "L3", "--packet-input", "1", "--reserved-output", "4000",
+    "--source-manifest", manifest_path, "--baseline", "installed-empty", "--invocation-id", "installed-direct-callable"
+  )
+  raise "direct_compiler=#{compiler_error}" unless compiler_status.success? && receipt["schema_version"] == "tw-model-context-receipt/1" && receipt["outcome"] == "held_model_context_route_invalid" && receipt["receipt_id"].is_a?(String)
+  invalid_receipt_path = File.join(tmp, "installed-empty-receipt.json")
+  File.write(invalid_receipt_path, "{}")
+  _validator_output, validator_error, validator_status = shell(validator, "--root", consumer, "--receipt", invalid_receipt_path)
+  validator_result = JSON.parse(validator_error.lines.last)
+  raise "direct_validator=#{validator_error}" unless !validator_status.success? && validator_result["schema_version"] == "tw-model-context-receipt-validation/1" && validator_result["outcome"] == "held_receipt_invalid"
+
+  # Exercise the actual installed compiler-to-validator closure, not merely
+  # inventory loading.  PACKAGE_ROOT artifacts remain authoritative despite
+  # the consumer's malformed shadow map; project evidence/profile stay below
+  # the consumer root.  One route at each authorized floor catches a
+  # source-checkout-only path from masking an installed explicit-map failure.
+  FileUtils.mkdir_p(File.join(consumer, ".traceweaver"))
+  FileUtils.cp(PROFILE, File.join(consumer, ".traceweaver/v050-model-governance-workflow-profile.yml"))
+  FileUtils.cp_r(File.join(root, "docs"), consumer)
+  FileUtils.cp(File.join(root, "README.md"), File.join(consumer, "README.md"))
+  installed_oracle = JSON.parse(File.read(File.join(home, ".codex/traceweaver-core/references/model-context-oracle-adequacy-review.json")))
+  copy_oracle_sources!(root, consumer, installed_oracle, skip_prefixes: ["plugins/traceweaver-core/"], label: "installed")
+  installed_scenarios = [
+    ["tw-setup", compiler, validator],
+    ["tw-authority-gate", compiler, validator],
+    ["tw-code-review", antigravity_compiler, antigravity_validator],
+    ["tw-plan", antigravity_compiler, antigravity_validator]
+  ]
+  installed_scenarios.each do |route_id, route_compiler, route_validator|
+    cells = installed_oracle.fetch("route_category_cells").select { |cell| cell.fetch("route_id") == route_id }
+    raise "installed_oracle_route=#{route_id}" unless cells.length == SOURCE_CATEGORIES.length
+    categories = cells.sort_by { |cell| SOURCE_CATEGORIES.index(cell.fetch("category")) }.map do |cell|
+      if cell.fetch("disposition") == "satisfied"
+        {
+          "category" => cell.fetch("category"), "disposition" => "satisfied",
+          "sources" => cell.fetch("source_refs").map { |reference| reference.slice("locator", "digest").merge("delivery_mode" => "locator", "contained" => true) }
+        }
+      else
+        cell.slice("category", "disposition", "exclusion_authority", "exclusion_rationale")
+      end
+    end
+    route_manifest = File.join(consumer, ".traceweaver/installed-#{route_id}-delivery.json")
+    File.write(route_manifest, JSON.generate({ "schema_version" => "tw-model-context-source-manifest/1", "oracle_id" => "ORACLE-TW-049-INSTALLED-#{route_id}", "temporal_or_external_facts" => { "sec" => false, "route" => false, "task" => false }, "categories" => categories }))
+    installed_receipt, installed_error, installed_status = json_command(
+      route_compiler, "--root", consumer, "--route-id", route_id, "--risk", "L3", "--packet-input", "1", "--reserved-output", "4000",
+      "--source-manifest", route_manifest, "--baseline", "installed-#{route_id}", "--invocation-id", "installed-#{route_id}"
+    )
+    raise "installed_compile=#{route_id}:#{installed_error}:#{installed_receipt["held_reason"]}" unless installed_status.success? && installed_receipt["outcome"] == "structurally_eligible_shadow_recommendation"
+    installed_receipt_path = File.join(consumer, ".traceweaver/installed-#{route_id}-receipt.json")
+    File.write(installed_receipt_path, JSON.generate(installed_receipt))
+    validation_output, validation_error, validation_status = shell(route_validator, "--root", consumer, "--receipt", installed_receipt_path)
+    raise "installed_validate=#{route_id}:#{validation_error}:#{validation_output}" unless validation_status.success? && JSON.parse(validation_output).fetch("outcome") == "pass"
+  end
+end
+
+def validate_oracle_review!(root, review, inventory, map_digest)
+  raise "oracle_review_schema" unless review.fetch("schema_version") == "tw-model-context-oracle-adequacy-review/1"
+  reviewer = review.fetch("reviewer")
+  unless reviewer.fetch("identity") != "compiler" && reviewer.fetch("independent") == true && reviewer.fetch("relationship") == "did_not_implement_compiler_or_author_source_oracle"
+    raise "oracle_review_independence"
+  end
+  raise "oracle_review_map_digest" unless review.fetch("map_digest") == map_digest
+  raise "oracle_review_inventory_digest" unless review.fetch("inventory_digest") == inventory.fetch("inventory_digest")
+  raise "oracle_review_digest" unless review.fetch("oracle_digest") == digest(review.reject { |key, _| key == "oracle_digest" })
+  routes = inventory.fetch("routes").map { |route| route.fetch("route_id") }.sort
+  raise "oracle_review_route_count" unless review.fetch("route_count") == routes.length && review.fetch("category_count") == SOURCE_CATEGORIES.length
+  cells = review.fetch("route_category_cells")
+  raise "oracle_review_cell_count" unless cells.length == routes.length * SOURCE_CATEGORIES.length
+  actual = cells.group_by { |cell| cell.fetch("route_id") }
+  raise "oracle_review_route_coverage" unless actual.keys.sort == routes
+  mandatory_all = YAML.safe_load(File.read(MAP), permitted_classes: [], aliases: false).dig("source_oracle", "mandatory_all_routes")
+  actual.each do |route_id, route_cells|
+    raise "oracle_review_category_coverage=#{route_id}" unless route_cells.map { |cell| cell.fetch("category") }.sort == SOURCE_CATEGORIES.sort
+    route_cells.each do |cell|
+      disposition = cell.fetch("disposition")
+      raise "oracle_review_open=#{route_id}" if disposition == "held" || !%w[satisfied excluded_by_authority].include?(disposition)
+      if disposition == "excluded_by_authority"
+        raise "oracle_review_mandatory_exclusion=#{route_id}" if mandatory_all.include?(cell.fetch("category"))
+        raise "oracle_review_exclusion=#{route_id}" unless cell["exclusion_authority"].is_a?(String) && !cell["exclusion_authority"].empty? && cell["exclusion_rationale"].is_a?(String) && !cell["exclusion_rationale"].empty?
+      else
+        references = cell["source_refs"]
+        raise "oracle_review_source_ref=#{route_id}" unless references.is_a?(Array) && !references.empty?
+        route = inventory.fetch("routes").find { |candidate| candidate.fetch("route_id") == route_id }
+        expected_skill_locator = if route.fetch("kind") == "imported_prompt"
+          route.fetch("prompt_path")
+        elsif route.fetch("kind") == "generic_family"
+          "plugins/traceweaver-core/references/model-context-map.yml"
+        else
+          "plugins/traceweaver-core/skills/#{route.fetch("canonical_route_id")}/SKILL.md"
+        end
+        references.each do |reference|
+          raise "oracle_review_source_category=#{route_id}" unless reference["source_manifest_category"] == cell.fetch("category")
+          if cell.fetch("category") == "skill_contract"
+            raise "oracle_review_skill_locator=#{route_id}" unless reference["locator"] == expected_skill_locator && reference["digest"] == file_digest(File.join(root, expected_skill_locator))
+          else
+            raise "oracle_review_source_binding=#{route_id}" unless reference["digest"] == file_digest(File.join(root, reference.fetch("locator")))
+          end
+        end
+      end
+    end
+    canonical_route = inventory.fetch("routes").find { |route| route.fetch("route_id") == route_id }.fetch("canonical_route_id")
+    if ROUTE_KINDS.values.flatten.include?(canonical_route)
+      %w[implementation_dependencies accepted_evidence].each do |category|
+        cell = route_cells.find { |candidate| candidate.fetch("category") == category }
+        raise "oracle_review_route_kind=#{route_id}" unless cell.fetch("disposition") == "satisfied" && cell.fetch("source_refs").is_a?(Array) && !cell.fetch("source_refs").empty?
+      end
+    end
+  end
+  DIRECT_CONTROL_DEPENDENCIES.each do |route_id, expected|
+    route_cells = actual.fetch(route_id)
+    implementation = route_cells.find { |cell| cell.fetch("category") == "implementation_dependencies" }
+    locators = implementation.fetch("source_refs").map { |reference| reference.fetch("locator") }.sort
+    raise "oracle_review_direct_dependency_closure=#{route_id}" unless locators == expected
+  end
+  lfg_dependencies = actual.fetch("lfg").find { |cell| cell.fetch("category") == "implementation_dependencies" }
+    .fetch("source_refs").map { |reference| reference.fetch("locator") }.sort
+  raise "oracle_review_alias_dependency_parity" unless lfg_dependencies == DIRECT_CONTROL_DEPENDENCIES.fetch("tw-auto")
+  raise "oracle_review_open_cells" unless review.fetch("open_or_uncertain_cells") == []
+end
+
+map_doc = YAML.safe_load(File.read(MAP), permitted_classes: [], aliases: false)
+
+# All generated requests, receipts, ledgers, and deliberately-invalid maps
+# live outside the repository.  Advisory verification must not leave fixture
+# state in a consumer checkout.
+Dir.mktmpdir("traceweaver-model-context-smoke-") do |tmp|
+  $model_context_smoke_tmp = tmp
+  selected.each do |id|
+    entry = by_id.fetch(id)
+    path = fixture_path(root, entry)
+    raise "missing_frozen_fixture=#{id}:#{path}" unless File.file?(path)
+    fixture = load_fixture(path)
+    case id
+    when "MC109_CANONICAL_DIGEST"
+      raise "map_fixture" unless fixture.fetch("canonical_map") == "plugins/traceweaver-core/references/model-context-map.yml"
+      raise "map_mirror_drift" unless File.binread(MAP) == File.binread(MIRROR)
+      status_output, status_error, status = shell(GENERATOR, "--root", root)
+      raise "generator_failed=#{status_error}" unless status.success? && status_output.include?("model_context_top_level_callables=28")
+      raise "map_digest" unless map_doc.fetch("map_digest") == digest(map_doc.reject { |key, _| key == "map_digest" })
+    when "MC109_AXIS_INDEPENDENCE"
+      axes = fixture.fetch("axes")
+      raise "axis_fixture" unless axes == %w[model_role risk_effort packet_budget context_completeness]
+      axes.each do |axis|
+        changed = deep_copy(map_doc)
+        changed[axis] = "#{changed.fetch(axis)}-fixture-mutation"
+        raise "axis_leak=#{axis}" unless (axes - [axis]).all? { |other| changed.fetch(other) == map_doc.fetch(other) } && changed.fetch(axis) != map_doc.fetch(axis)
+      end
+      additive = load_fixture(File.join(fixture_root, "map-unknown-additive.yml"))
+      changed = deep_copy(map_doc)
+      changed["unauthorized_field"] = additive.fetch("unauthorized_field")
+      _output, _error, status = shell(GENERATOR, "--root", root, "--map", write_map(tmp, "#{id}-unknown-additive.yml", changed))
+      raise "unknown_additive_accepted" if status.success?
+    when "MC109_UNSUPPORTED_SCHEMA", "MC109_INVALID_ENUM", "MC109_DIGEST_MISMATCH"
+      changed = deep_copy(map_doc)
+      changed["schema_version"] = fixture.fetch("schema_version") if id == "MC109_UNSUPPORTED_SCHEMA"
+      changed["model_role"] = fixture.fetch("model_role") if id == "MC109_INVALID_ENUM"
+      changed["map_digest"] = fixture.fetch("map_digest") if id == "MC109_DIGEST_MISMATCH"
+      map_path = if id == "MC109_DIGEST_MISMATCH"
+        candidate = File.join(tmp, "#{id}.yml")
+        File.write(candidate, YAML.dump(changed))
+        candidate
+      else
+        write_map(tmp, "#{id}.yml", changed)
+      end
+      _output, _error, status = shell(GENERATOR, "--root", root, "--map", map_path)
+      raise "invalid_map_accepted=#{id}" if status.success?
+    when "MC109_DUPLICATE_ROUTE"
+      changed = deep_copy(map_doc)
+      changed.fetch("top_level_route_floors").fetch("B3") << fixture.fetch("duplicate_route_id")
+      _output, _error, status = shell(GENERATOR, "--root", root, "--map", write_map(tmp, "#{id}.yml", changed))
+      raise "duplicate_route_accepted" if status.success?
+    when "MC110_EXACT_ROUTE", "MC110_ALIAS_ROUTE", "MC110_ZERO_ROUTE"
+      receipt = compile(root, route_id: fixture.fetch("route_id"), invocation: "#{id}-fixture")
+      if id == "MC110_EXACT_ROUTE"
+        raise "exact_route" unless receipt["outcome"] == "structurally_eligible_shadow_recommendation" && receipt["route_id"] == fixture.fetch("route_id")
+      elsif id == "MC110_ALIAS_ROUTE"
+        raise "alias_route" unless receipt["outcome"] == "structurally_eligible_shadow_recommendation" && receipt["canonical_route_id"] == fixture.fetch("canonical_route_id")
+      else
+        assert_held(receipt, entry.fetch("expected"))
+        held_path = File.join(tmp, "#{id}-held.json")
+        File.write(held_path, JSON.generate(receipt))
+        _output, error, status = shell(VALIDATOR, "--root", root, "--receipt", held_path)
+        raise "held_receipt_validation=#{error}" unless status.success?
+      end
+    when "MC110_MULTIPLE_ROUTE"
+      raise "multiple_fixture" unless fixture.fetch("matches") == 2
+      changed = deep_copy(map_doc)
+      changed.fetch("discovery").fetch("generic_families") << deep_copy(changed.fetch("discovery").fetch("generic_families").first)
+      receipt = compile(root, route_id: fixture.fetch("route_id"), invocation: "#{id}-fixture", map: write_map(tmp, "#{id}.yml", changed))
+      assert_held(receipt, entry.fetch("expected"))
+    when "MC110_V1_BYTE_INVARIANCE"
+      before = File.binread(path)
+      output, error, status = shell("ruby", File.join(fixture_root, "strict-v1-consumer.rb"), path, root)
+      raise "v1_byte_invariance=#{error}" unless status.success? && output.include?("strict_v1_consumer=pass") && File.binread(path) == before
+    when "MC110_STRICT_LEGACY_CONSUMER"
+      v1_path = File.join(fixture_root, "v1-receipts.json")
+      before = File.binread(v1_path)
+      output, error, status = shell("ruby", path, v1_path)
+      raise "legacy_consumer=#{error}" unless status.success? && output.include?("pass") && File.binread(v1_path) == before
+    when "MC111_INVENTORY_EXACT"
+      inventory, error, status = json_command(GENERATOR, "--root", root, "--format", "json")
+      raise "inventory_failed=#{error}" unless status.success?
+      routes = inventory.fetch("routes")
+      kinds = routes.group_by { |route| route.fetch("kind") }.transform_values(&:length)
+      raise "inventory_counts" unless inventory.fetch("top_level_callable_count") == fixture.fetch("top_level_callable_count") && kinds == fixture.fetch("expected_kinds")
+      raise "inventory_order" unless routes.map { |route| route.fetch("route_id") } == routes.map { |route| route.fetch("route_id") }.sort
+      actual_engines = map_doc.dig("discovery", "imported_engines").to_h { |engine| [engine.fetch("engine"), engine.fetch("parent_route")] }
+      actual_families = map_doc.dig("discovery", "generic_families").map { |family| [family.fetch("parent_route"), family.fetch("family")] }
+      raise "exact_engine_set" unless actual_engines == IMPORTED_ENGINES && actual_families == GENERIC_FAMILIES
+    when "MC111_INVENTORY_OMISSION"
+      changed = deep_copy(map_doc)
+      changed.fetch("top_level_route_floors").fetch("B3").delete(fixture.fetch("omitted_route"))
+      _output, _error, status = shell(GENERATOR, "--root", root, "--map", write_map(tmp, "#{id}.yml", changed))
+      raise "inventory_omission_accepted" if status.success?
+    when "MC111_ALIAS_DUPLICATION"
+      changed = deep_copy(map_doc)
+      changed.fetch("aliases")[fixture.fetch("duplicate_alias")] = "tw-plan"
+      _output, _error, status = shell(GENERATOR, "--root", root, "--map", write_map(tmp, "#{id}.yml", changed))
+      raise "alias_duplicate_accepted" if status.success?
+    when "MC111_UNKNOWN_DESCENDANT"
+      changed = deep_copy(map_doc)
+      changed.fetch("discovery").fetch("imported_engines").find { |engine| engine.fetch("engine") == "ce-plan" }["engine"] = "ce-#{fixture.fetch("route_id").split("::").last}"
+      _output, _error, status = shell(GENERATOR, "--root", root, "--map", write_map(tmp, "#{id}.yml", changed))
+      raise "unknown_descendant_accepted" if status.success?
+    when "MC112_DECLARED_ONLY", "MC112_PARTLY_OBSERVED", "MC112_FULL_UNATTESTED"
+      receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-#{fixture.fetch('inventory_observation')}")
+      raise "active_enforcement_claim" unless fixture.fetch("active_enforcement") == false && receipt["active_enforcement"] == false
+      protected = deep_copy(receipt)
+      protected["active_enforcement"] = true
+      protected["receipt_id"] = digest(protected.reject { |key, _| key == "receipt_id" })
+      protected_path = File.join(tmp, "#{id}-active-enforcement.json")
+      File.write(protected_path, JSON.generate(protected))
+      _output, _error, status = shell(VALIDATOR, "--root", root, "--receipt", protected_path)
+      raise "active_enforcement_protected_mutation_accepted" if status.success?
+    when "MC113_PACKET_ARITHMETIC"
+      receipt = compile(root, route_id: "tw-graph", invocation: "#{id}-fixture", packet: nil, extra: ["--direct-input", fixture.fetch("direct").to_s, "--injected-locator", fixture.fetch("injected_locator").to_s, "--required-conversation", fixture.fetch("required_conversation").to_s, "--injected-tool-results", fixture.fetch("injected_tool_results").to_s, "--injected-shard-summaries", fixture.fetch("injected_shard_summaries").to_s])
+      raise "packet_arithmetic" unless receipt.dig("accounting", "packet_input") == fixture.fetch("packet_input")
+    when "MC113_ASSEMBLED_ARITHMETIC"
+      receipt = compile(root, route_id: "tw-graph", invocation: "#{id}-fixture", packet: nil, reserved: fixture.fetch("reserved_output"), extra: ["--direct-input", fixture.fetch("packet_input").to_s, "--system", fixture.fetch("system").to_s, "--developer", fixture.fetch("developer").to_s, "--tool-schemas", fixture.fetch("tool_schemas").to_s, "--host-metadata", fixture.fetch("host_metadata").to_s])
+      raise "assembled_arithmetic" unless receipt.dig("accounting", "assembled_input") == fixture.fetch("assembled_input") && receipt.dig("accounting", "planned_context") == fixture.fetch("planned_context")
+    when "MC113_WORKFLOW_NO_DOUBLE_COUNT"
+      output, error, status = shell(VALIDATOR, "--root", root, "--workflow-ledger", path)
+      raise "cached_double_count=#{error}" unless status.success? && JSON.parse(output).fetch("whole_workflow_usage") == fixture.fetch("whole_workflow_usage")
+      duplicate_path = File.join(fixture_root, "accounting-workflow-cached-double-count.json")
+      _output, error, status = shell(VALIDATOR, "--root", root, "--workflow-ledger", duplicate_path)
+      raise "cached_double_count_mutation_accepted" if status.success? || !error.include?("workflow_usage_total")
+    when "MC113_SNAPSHOT_RESET"
+      profile_doc = YAML.safe_load(File.read(PROFILE), permitted_classes: [], aliases: false)
+      output, error, status = shell(VALIDATOR, "--root", root, "--workflow-ledger", path)
+      raise "snapshot_reset=#{error}" unless status.success? && JSON.parse(output).fetch("qualification_state") == fixture.fetch("expected_qualification") && profile_doc.dig("model_context", "qualification_state") == "unqualified"
+    when "MC114_EXACT_FLOOR_MAP"
+      raise "floor_fixture" unless FLOORS.all? { |budget, routes| fixture.fetch(budget) == routes } && map_doc.fetch("top_level_route_floors") == FLOORS
+    when "MC114_ALL_B3_MUTATION"
+      changed = deep_copy(map_doc)
+      changed["top_level_route_floors"] = { "B3" => fixture.fetch("B3") }
+      _output, _error, status = shell(GENERATOR, "--root", root, "--map", write_map(tmp, "#{id}.yml", changed))
+      raise "all_b3_accepted" if status.success?
+    when "MC114_LOWEST_OF_MULTIPLE", "MC114_CAP_MINUS_ONE", "MC114_CAP_EQUAL", "MC114_CAP_PLUS_ONE"
+      receipt = compile(root, route_id: fixture.fetch("route_id"), invocation: "#{id}-fixture", packet: fixture.fetch("packet_input"), reserved: fixture.fetch("reserved_output"))
+      raise "selection=#{id}" unless receipt.dig("routing", "selected_budget") == fixture.fetch("expected")
+    when "MC114_PROFILE_HASH"
+      profile_doc = YAML.safe_load(File.read(PROFILE), permitted_classes: [], aliases: false)
+      payload = profile_doc.dup
+      fixture.fetch("hash_excluded_top_level_fields").each { |field| payload.delete(field) }
+      raise "profile_hash" unless fixture.fetch("profile") == ".traceweaver/v050-model-governance-workflow-profile.yml" && profile_doc.fetch("profile_hash") == digest(payload)
+    when "MC115_PROMOTION_ORDER"
+      receipt = compile(root, route_id: "tw-graph", invocation: "#{id}-fixture", packet: fixture.fetch("packet_input"), reserved: fixture.fetch("reserved_output"))
+      raise "promotion_order" unless fixture.fetch("from") == "B0" && receipt.dig("routing", "selected_budget") == fixture.fetch("expected")
+    when "MC115_LOCATOR_ORDER", "MC115_SHARD_BOUNDS"
+      ordered = map_doc.dig("overflow", "ordered_actions")
+      action = fixture.fetch("next_action")
+      raise "overflow_order=#{id}" unless ordered.index(action) && ordered.index(action) > ordered.index("promote_budget_class")
+      if id == "MC115_SHARD_BOUNDS"
+        receipt = compile(root, route_id: "tw-graph", invocation: "#{id}-fixture", packet: fixture.fetch("packet_input"), reserved: fixture.fetch("reserved_output"), fanout: fixture.fetch("fanout"), depth: fixture.fetch("depth"), extra: ["--overflow", "shard"])
+        assert_held(receipt, "held_context_insufficient")
+        raise "shard_bounds" unless receipt.dig("overflow_recommendation", "next_action") == action && receipt.dig("overflow_recommendation", "maximum_fanout") == fixture.fetch("fanout") && receipt.dig("overflow_recommendation", "maximum_depth") == fixture.fetch("depth")
+      else
+        receipt = compile(root, route_id: "tw-graph", invocation: "#{id}-fixture", packet: fixture.fetch("packet_input"), reserved: fixture.fetch("reserved_output"), extra: ["--overflow", "locator"])
+        assert_held(receipt, "held_context_insufficient")
+        raise "locator_recommendation" unless receipt.dig("overflow_recommendation", "next_action") == action && receipt.dig("overflow_recommendation", "effect_performed") == false
+      end
+    when "MC115_TERMINAL_HOLD"
+      assert_held(compile(root, route_id: "tw-graph", invocation: "#{id}-fixture", packet: fixture.fetch("packet_input"), reserved: fixture.fetch("reserved_output")), entry.fetch("expected"))
+    when "MC115_NO_DOWNGRADE_TRUNCATE_RETRY"
+      raise "prohibited_fixture" unless fixture.fetch("attempts") == %w[model_downgrade risk_downgrade silent_truncation lossy_compaction retry]
+      %w[downgrade truncate lossy retry].each { |attempt| assert_held(compile(root, route_id: "tw-graph", invocation: "#{id}-#{attempt}", packet: 272_001, extra: ["--overflow", attempt]), entry.fetch("expected")) }
+    when "MC116_EXACT_TAXONOMY"
+      raise "source_taxonomy" unless fixture.fetch("categories").map { |category| category.fetch("category") } == SOURCE_CATEGORIES
+      raise "source_complete" unless compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", source_manifest: path).dig("eligibility", "content") == true
+      temporal_positive = File.join(fixture_root, "source-manifest-temporal-external-required.json")
+      temporal_negative = File.join(fixture_root, "source-manifest-temporal-external-excluded.json")
+      raise "temporal_external_positive" unless compile(root, route_id: "tw-plan", invocation: "#{id}-temporal-positive", source_manifest: temporal_positive).dig("eligibility", "content") == true
+      assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-temporal-negative", source_manifest: temporal_negative), "held_source_oracle_invalid")
+      malformed = JSON.parse(File.read(SOURCE_MANIFEST))
+      malformed.fetch("categories").first["sources"] = { "not" => "an-array" }
+      malformed_path = File.join(tmp, "#{id}-malformed-shape.json")
+      File.write(malformed_path, JSON.generate(malformed))
+      malformed_receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-malformed-shape", source_manifest: malformed_path)
+      assert_held(malformed_receipt, "held_source_oracle_invalid")
+      raise "malformed_shape_not_canonical" unless malformed_receipt["schema_version"] == "tw-model-context-receipt/1" && malformed_receipt["receipt_id"].is_a?(String)
+    when "MC116_EMPTY_ORACLE", "MC116_ALL_EXCLUDED", "MC116_MANDATORY_EXCLUDED"
+      manifest_path = File.join(tmp, "#{id}.json")
+      File.write(manifest_path, JSON.generate(fixture))
+      assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", source_manifest: manifest_path), entry.fetch("expected"))
+    when "MC116_SEEDED_OMISSION"
+      manifest = JSON.parse(File.read(SOURCE_MANIFEST))
+      missing = fixture.fetch("required_source")
+      manifest["required_sources"] << { "locator" => missing, "digest" => file_digest(File.join(root, missing)) }
+      manifest_path = File.join(tmp, "#{id}.json")
+      File.write(manifest_path, JSON.generate(manifest))
+      assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", source_manifest: manifest_path), entry.fetch("expected"))
+    when "MC116_DISCOVERED_DEPENDENCY"
+      manifest = JSON.parse(File.read(SOURCE_MANIFEST))
+      manifest["discovered_dependencies"] = fixture.fetch("discovered_dependencies")
+      manifest_path = File.join(tmp, "#{id}.json")
+      File.write(manifest_path, JSON.generate(manifest))
+      assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", source_manifest: manifest_path), entry.fetch("expected"))
+    when "MC117_DIRECT_BYTES", "MC117_CONTAINED_LOCATOR", "MC117_FRESH_SHARD", "MC117_TRAVERSAL", "MC117_STALE_OR_LOSSY", "MC117_IMPLICIT_INHERITANCE"
+      positive_manifests = {
+        "MC117_DIRECT_BYTES" => "source-manifest-delivery-direct.json",
+        "MC117_CONTAINED_LOCATOR" => "source-manifest-delivery-locator.json",
+        "MC117_FRESH_SHARD" => "source-manifest-delivery-shard.json"
+      }
+      manifest_path = if (named_manifest = positive_manifests[id])
+        candidate = File.join(fixture_root, named_manifest)
+        source = manifest_source!(JSON.parse(File.read(candidate)), fixture.fetch("locator"))
+        fixture.each { |field, value| next if %w[expected _traceweaver].include?(field); raise "delivery_fixture_not_exercised=#{id}:#{field}" unless source[field] == value }
+        candidate
+      else
+        candidate = File.join(tmp, "#{id}.json")
+        File.write(candidate, JSON.generate(manifest_for_delivery(root, JSON.parse(File.read(SOURCE_MANIFEST)), fixture)))
+        candidate
+      end
+      receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", source_manifest: manifest_path)
+      entry.fetch("expected").start_with?("pass_") ? (raise "delivery_positive=#{id}" unless receipt["outcome"] == "structurally_eligible_shadow_recommendation") : assert_held(receipt, entry.fetch("expected"))
+      if id == "MC117_DIRECT_BYTES"
+        direct = JSON.parse(File.read(manifest_path))
+        direct_source = manifest_source!(direct, fixture.fetch("locator"))
+        raise "direct_payload_fixture" unless direct_source.fetch("bytes_base64") == fixture.fetch("bytes_base64")
+        missing_payload = deep_copy(direct)
+        manifest_source!(missing_payload, fixture.fetch("locator")).delete("bytes_base64")
+        missing_path = File.join(tmp, "#{id}-missing-bytes.json")
+        File.write(missing_path, JSON.generate(missing_payload))
+        assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-missing-bytes", source_manifest: missing_path), "held_source_delivery_invalid")
+        tampered_payload = deep_copy(direct)
+        manifest_source!(tampered_payload, fixture.fetch("locator"))["bytes_base64"] = "VGFtcGVyZWQgZGlyZWN0IGJ5dGVzLgo="
+        tampered_path = File.join(tmp, "#{id}-tampered-bytes.json")
+        File.write(tampered_path, JSON.generate(tampered_payload))
+        assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-tampered-bytes", source_manifest: tampered_path), "held_source_delivery_invalid")
+      end
+      if id == "MC117_STALE_OR_LOSSY"
+        mismatch = deep_copy(fixture)
+        mismatch["fresh"] = true
+        mismatch["lossy"] = false
+        mismatch["parent_source_digest"] = mismatch.fetch("mismatched_parent_source_digest")
+        mismatch_manifest = File.join(tmp, "#{id}-mismatched-parent.json")
+        File.write(mismatch_manifest, JSON.generate(manifest_for_delivery(root, JSON.parse(File.read(SOURCE_MANIFEST)), mismatch)))
+        assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-mismatched-parent", source_manifest: mismatch_manifest), "held_source_delivery_invalid")
+      end
+      if id == "MC117_TRAVERSAL"
+        # A lexical `..` rejection alone would still permit a symlinked parent
+        # directory to escape the project.  Exercise an explicit map override
+        # through a system-temporary symlinked ancestor; the compiler must hold
+        # before loading it.
+        Dir.mktmpdir("traceweaver-model-context-escape-") do |outside|
+          File.write(File.join(outside, "map.yml"), File.binread(MAP))
+          escaped_parent = File.join(tmp, "symlink-parent")
+          File.symlink(outside, escaped_parent)
+          assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-symlink-parent", map: File.join(escaped_parent, "map.yml")), "held_model_context_route_invalid")
+        end
+      end
+    when "MC118_PLAN_FINAL_IDENTITY"
+      raise "receipt_fixture" unless fixture.fetch("scenario") == "canonical_plan_final_pair"
+      plan = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", receipt_kind: "plan")
+      final = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", receipt_kind: "final", plan_receipt_id: plan.fetch("receipt_id"))
+      plan_path, final_path = File.join(tmp, "#{id}-plan.json"), File.join(tmp, "#{id}-final.json")
+      File.write(plan_path, JSON.generate(plan)); File.write(final_path, JSON.generate(final))
+      output, error, status = shell(VALIDATOR, "--root", root, "--receipt", final_path, "--plan-receipt", plan_path, "--expected-route-id", "tw-plan", "--expected-baseline", BASELINE, "--expected-invocation-id", "#{id}-fixture")
+      raise "plan_final_identity=#{error}" unless status.success? && JSON.parse(output).fetch("outcome") == "pass"
+      forged_plan = deep_copy(plan)
+      forged_plan.fetch("accounting")["planned_context"] += 1
+      forged_plan["receipt_id"] = digest(forged_plan.reject { |key, _| key == "receipt_id" })
+      forged_plan_path = File.join(tmp, "#{id}-forged-plan.json")
+      File.write(forged_plan_path, JSON.generate(forged_plan))
+      _output, error, status = shell(VALIDATOR, "--root", root, "--receipt", final_path, "--plan-receipt", forged_plan_path)
+      raise "plan_semantic_tamper_accepted=#{error}" if status.success?
+    when "MC118_PROTECTED_TAMPER"
+      raise "tamper_fixture" unless fixture.fetch("scenario") == "protected_mutation"
+      receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture")
+      mutations = {
+        "profile_digest" => lambda { |candidate| candidate["profile_digest"] = "sha256:#{"f" * 64}" },
+        "selected_budget" => lambda { |candidate| candidate.fetch("routing")["selected_budget"] = "B0" },
+        "accounting" => lambda { |candidate| candidate.fetch("accounting")["planned_context"] += 1 },
+        "source_coverage" => lambda { |candidate| candidate.fetch("source_coverage")["delivered_sources"] = [] },
+        "eligibility" => lambda { |candidate| candidate.fetch("eligibility")["qualification"] = "unqualified" },
+        "isolation" => lambda { |candidate| candidate["isolation"] = "tampered_isolation" }
+      }
+      mutations.each do |name, mutate|
+        candidate = deep_copy(receipt)
+        mutate.call(candidate)
+        candidate["receipt_id"] = digest(candidate.reject { |key, _| key == "receipt_id" })
+        receipt_path = File.join(tmp, "#{id}-#{name}.json")
+        File.write(receipt_path, JSON.generate(candidate))
+        _output, error, status = shell(VALIDATOR, "--root", root, "--receipt", receipt_path)
+        raise "tamper_accepted=#{name}:#{error}" if status.success?
+      end
+    when "MC118_NONIDENTICAL_DUPLICATE"
+      raise "duplicate_fixture" unless fixture.fetch("scenario") == "nonidentical_duplicate"
+      receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture")
+      prior = deep_copy(receipt); prior["outcome"] = "changed_without_new_identity"
+      receipt_path, ledger_path = File.join(tmp, "#{id}.json"), File.join(tmp, "#{id}.jsonl")
+      File.write(receipt_path, JSON.generate(receipt)); File.write(ledger_path, "#{JSON.generate(prior)}\n")
+      _output, error, status = shell(VALIDATOR, "--root", root, "--receipt", receipt_path, "--ledger", ledger_path)
+      raise "duplicate_outcome=#{error}" unless !status.success? && error.include?(entry.fetch("expected"))
+    when "MC118_REPLAY_LINEAGE"
+      raise "replay_fixture" unless fixture.fetch("scenario") == "lineage_replay"
+      prior = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", receipt_kind: "plan")
+      receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", receipt_kind: "final", plan_receipt_id: prior.fetch("receipt_id"))
+      receipt_path, ledger_path = File.join(tmp, "#{id}.json"), File.join(tmp, "#{id}.jsonl")
+      File.write(receipt_path, JSON.generate(receipt)); File.write(ledger_path, "#{JSON.generate(prior)}\n")
+      _output, error, status = shell(VALIDATOR, "--root", root, "--receipt", receipt_path, "--ledger", ledger_path)
+      raise "replay_outcome=#{error}" unless !status.success? && error.include?(entry.fetch("expected"))
+    when "MC118_CROSS_BINDING"
+      raise "cross_binding_fixture" unless fixture.fetch("scenario") == "baseline_invocation_route_parent_depth_mismatch"
+      plan = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", receipt_kind: "plan")
+      final = compile(root, route_id: "tw-auto", invocation: "#{id}-fixture", receipt_kind: "final", plan_receipt_id: plan.fetch("receipt_id"))
+      plan_path, final_path = File.join(tmp, "#{id}-plan.json"), File.join(tmp, "#{id}-final.json")
+      File.write(plan_path, JSON.generate(plan)); File.write(final_path, JSON.generate(final))
+      _output, error, status = shell(VALIDATOR, "--root", root, "--receipt", final_path, "--plan-receipt", plan_path)
+      raise "cross_binding_outcome=#{error}" unless !status.success? && error.include?(entry.fetch("expected"))
+    when "MC118_V1_NOT_EMBEDDED"
+      serialized = JSON.generate(fixture)
+      raise "v1_shadow_field" if serialized.include?("model_context") || serialized.include?("shadow_receipt")
+      output, error, status = shell("ruby", File.join(fixture_root, "strict-v1-consumer.rb"), path, root)
+      raise "v1_producer_shape=#{error}" unless status.success? && output.include?("strict_v1_consumer=pass")
+    when "MC119_OBSERVATION_ENUM"
+      allowed = fixture.fetch("allowed")
+      raise "observation_fixture" unless allowed.sort == %w[estimated host_measured unavailable]
+      allowed.each { |observation| raise "observation_not_recorded" unless compile(root, route_id: "tw-plan", invocation: "#{id}-#{observation}", observation: observation).dig("observation", "state") == observation }
+    when "MC119_CONTENT_ELIGIBLE_EFFICIENCY_FALSE"
+      receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture")
+      raise "eligibility_independence" unless fixture.fetch("content_eligibility") == receipt.dig("eligibility", "content") && fixture.fetch("efficiency_eligibility") == receipt.dig("eligibility", "efficiency")
+    when "MC119_EFFICIENCY_FORCED_TRUE"
+      receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture")
+      receipt["eligibility"]["efficiency"] = fixture.fetch("efficiency_eligibility"); receipt["receipt_id"] = digest(receipt.reject { |key, _| key == "receipt_id" })
+      receipt_path = File.join(tmp, "#{id}.json"); File.write(receipt_path, JSON.generate(receipt))
+      _output, error, status = shell(VALIDATOR, "--root", root, "--receipt", receipt_path)
+      raise "efficiency_forced_outcome=#{error}" unless !status.success? && error.include?("held_receipt_invalid")
+    when "MC120_ADVISORY_NO_EFFECTS"
+      receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture")
+      %w[model_call_performed child_dispatch_performed state_mutation_performed].each { |field| raise "advisory_effect=#{field}" unless receipt[field] == fixture.fetch(field) }
+      raise "tracked_write_claim" unless fixture.fetch("tracked_repository_write") == false
+    when "MC120_REPLAY_WITHOUT_AUTHORITY"
+      raise "replay_boundary_fixture" unless fixture.fetch("mode") == "isolated_shadow_replay" && fixture.fetch("authorization") == "absent"
+      assert_held(compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", extra: ["--mode", fixture.fetch("mode")]), entry.fetch("expected"))
+    when "MC120_ISOLATED_REPLAY_BOUNDARY"
+      expected_effects = %w[declared_mock_provider_request isolated_receipt_write isolated_workspace_write]
+      raise "isolated_replay_fixture" unless fixture.fetch("mode") == "isolated_shadow_replay" && fixture.fetch("authorization") == "fixture_isolated_mock_only" && fixture.fetch("permitted_effects") == expected_effects
+      workspace = File.join(tmp, "#{id}-isolated-workspace")
+      FileUtils.mkdir_p(workspace)
+      protected_before = [File.binread(MAP), File.binread(PROFILE), File.binread(File.join(root, "plugins/traceweaver-core/references/skill-execution-contracts.yml"))]
+      receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-fixture", extra: ["--mode", fixture.fetch("mode"), "--isolated-authorization", fixture.fetch("authorization"), "--isolated-workspace", workspace])
+      raise "mock_replay_effect" unless receipt["outcome"] == "structurally_eligible_shadow_recommendation" && receipt["model_call_performed"] == false && receipt["child_dispatch_performed"] == false && receipt["state_mutation_performed"] == true && receipt["isolated_effects"] == expected_effects
+      raise "isolated_replay_artifacts" unless File.file?(File.join(workspace, "declared-mock-provider-request.json")) && File.file?(File.join(workspace, "isolated-shadow-receipt.json"))
+      raise "isolated_replay_repo_mutation" unless protected_before == [File.binread(MAP), File.binread(PROFILE), File.binread(File.join(root, "plugins/traceweaver-core/references/skill-execution-contracts.yml"))]
+      receipt_path = File.join(tmp, "#{id}-isolated-receipt.json")
+      File.write(receipt_path, JSON.generate(receipt))
+      output, error, status = shell(VALIDATOR, "--root", root, "--receipt", receipt_path)
+      raise "isolated_replay_receipt=#{error}" unless status.success? && JSON.parse(output).fetch("outcome") == "pass"
+      # A held isolated replay is forbidden from creating a workspace or from
+      # touching any pre-existing directory outside the declared temp boundary.
+      missing = File.join(tmp, "#{id}-missing-workspace")
+      missing_receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-missing", extra: ["--mode", fixture.fetch("mode"), "--isolated-authorization", fixture.fetch("authorization"), "--isolated-workspace", missing])
+      assert_held(missing_receipt, "held_replay_not_authorized")
+      raise "isolated_missing_workspace_written" if File.exist?(missing)
+      outside_receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-outside", extra: ["--mode", fixture.fetch("mode"), "--isolated-authorization", fixture.fetch("authorization"), "--isolated-workspace", root])
+      assert_held(outside_receipt, "held_replay_not_authorized")
+      target = File.join(tmp, "#{id}-symlink-target")
+      FileUtils.mkdir_p(target)
+      escaped = File.join(tmp, "#{id}-symlink-workspace")
+      File.symlink(target, escaped)
+      symlink_receipt = compile(root, route_id: "tw-plan", invocation: "#{id}-symlink", extra: ["--mode", fixture.fetch("mode"), "--isolated-authorization", fixture.fetch("authorization"), "--isolated-workspace", escaped])
+      assert_held(symlink_receipt, "held_replay_not_authorized")
+      raise "isolated_symlink_target_written" unless Dir.children(target).empty?
+    when "MC120_PUBLICATION_SEPARATE"
+      receipt = compile(root, route_id: "tw-commit", invocation: "#{id}-fixture")
+      raise "publication_boundary" unless fixture.fetch("mode") == receipt.fetch("mode") && fixture.fetch("publication_permitted") == false && receipt["state_mutation_performed"] == false
+    when "MC121_INSTALL_SUCCESS", "MC121_ROLLBACK_MATRIX", "MC121_UNOWNED_CONFLICT"
+      output, error, status = shell(File.join(root, "scripts/traceweaver-smoke-installer-transaction"), "--case", id)
+      raise "installer_delegate=#{id}:#{error}:#{output}" unless status.success?
+      assert_installed_direct_callable!(root, tmp) if id == "MC121_INSTALL_SUCCESS"
+    when "MC122_READINESS_V2_PASS", "MC122_OLD_PR_NOT_PREREQUISITE", "MC122_HELD_CLAIM_SCAN", "MC122_BOUNDED_TRACE_NOT_GLOBAL_CLOSURE", "MC122_EXACT_REF_VERSION"
+      output, error, status = shell(File.join(root, "scripts/traceweaver-smoke-release-readiness"), "--case", id)
+      raise "readiness_delegate=#{id}:#{error}:#{output}" unless status.success?
+    when "MC123_INDEPENDENT_COMPLETE_REVIEW"
+      inventory, error, status = json_command(GENERATOR, "--root", root, "--format", "json")
+      raise "oracle_inventory=#{error}" unless status.success?
+      validate_oracle_review!(root, fixture, inventory, map_doc.fetch("map_digest"))
+    when "MC123_SELF_REVIEW", "MC123_UNEXPLAINED_EXCLUSION", "MC123_OPEN_OR_UNCERTAIN"
+      complete = JSON.parse(File.read(File.join(fixture_root, "oracle-review-complete.json")))
+      invalid = deep_copy(complete)
+      if id == "MC123_SELF_REVIEW"
+        raise "self_review_fixture" unless fixture.dig("reviewer", "identity") == "compiler" && fixture.dig("reviewer", "independent") == false
+        invalid["reviewer"] = fixture.fetch("reviewer")
+      elsif id == "MC123_UNEXPLAINED_EXCLUSION"
+        raise "unexplained_exclusion_fixture" unless fixture.fetch("unexplained_exclusion") == true
+        external = invalid.fetch("route_category_cells").find { |cell| cell.fetch("disposition") == "excluded_by_authority" }
+        external.delete("exclusion_rationale")
+      else
+        raise "open_or_uncertain_fixture" unless fixture.fetch("open_or_uncertain_category") == true
+        invalid["open_or_uncertain_cells"] << { "route_id" => "tw-plan", "category" => "accepted_evidence", "state" => "open" }
+      end
+      inventory, error, status = json_command(GENERATOR, "--root", root, "--format", "json")
+      raise "oracle_inventory=#{error}" unless status.success?
+      begin
+        validate_oracle_review!(root, invalid, inventory, map_doc.fetch("map_digest"))
+        raise "oracle_invalid_accepted=#{id}"
+      rescue RuntimeError => exception
+        raise exception if exception.message == "oracle_invalid_accepted=#{id}"
+      end
+      assert_canonical_oracle_mandatory_rejection!(root) if id == "MC123_UNEXPLAINED_EXCLUSION"
+    else
+      raise "unimplemented_case=#{id}"
+    end
+    puts "model_context_case=#{id} expected=#{entry.fetch("expected")} actual=pass"
+  end
+end
+
+puts "model_context_routing_smoke=pass cases=#{selected.length}"
+RUBY

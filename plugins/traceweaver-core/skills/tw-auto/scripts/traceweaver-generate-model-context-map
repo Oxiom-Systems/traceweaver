@@ -1,0 +1,393 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=model-context-declared-route-generator; req=REQ-TW-109,REQ-TW-111,REQ-TW-114; trace=TRACE-TW-072; ver=VER-TW-092
+# TRACEWEAVER: entrypoint=generate_model_context_map_inventory; req=REQ-TW-111; trace=TRACE-TW-072; ver=VER-TW-092
+
+require "digest"
+require "json"
+require "optparse"
+require "pathname"
+require "yaml"
+
+MAP_SCHEMA = "tw-model-context-map/1"
+INVENTORY_SCHEMA = "tw-model-context-inventory/1"
+FLOORS = {
+  "B0" => %w[tw-graph tw-setup tw-update],
+  "B1" => %w[tw-authority-gate tw-commit tw-commit-push-pr tw-requirements-review tw-sessions tw-strategy tw-test-browser tw-test-xcode tw-worktree],
+  "B2" => %w[tw-brainstorm tw-code-review tw-compound tw-compound-refresh tw-debug tw-doc-review tw-grill tw-ideate tw-resolve-pr-feedback tw-traceability-check],
+  "B3" => %w[tw-audit tw-auto tw-plan tw-vv-define tw-work]
+}.freeze
+SOURCE_CATEGORIES = %w[
+  controlling_authority task_scope skill_contract implementation_dependencies
+  current_external_sources accepted_evidence
+].freeze
+IMPORTED_ENGINES = {
+  "ce-brainstorm" => "tw-brainstorm",
+  "ce-code-review" => "tw-code-review",
+  "ce-compound" => "tw-compound",
+  "ce-compound-refresh" => "tw-compound-refresh",
+  "ce-debug" => "tw-debug",
+  "ce-doc-review" => "tw-doc-review",
+  "ce-ideate" => "tw-ideate",
+  "ce-plan" => "tw-plan",
+  "ce-resolve-pr-feedback" => "tw-resolve-pr-feedback",
+  "ce-sessions" => "tw-sessions",
+  "ce-work" => "tw-work"
+}.freeze
+GENERIC_FAMILIES = [
+  ["tw-commit", "publication_preparer"],
+  ["tw-commit-push-pr", "publication_delegate"],
+  ["tw-debug", "diagnosis_worker"],
+  ["tw-worktree", "worktree_operator"]
+].freeze
+ROUTE_KINDS = {
+  "implementation" => %w[tw-auto tw-work tw-worktree],
+  "review" => %w[tw-audit tw-code-review tw-doc-review tw-resolve-pr-feedback tw-test-browser tw-test-xcode tw-traceability-check],
+  "publication" => %w[tw-commit tw-commit-push-pr]
+}.freeze
+
+def secure_package_root?(candidate)
+  return false unless candidate.directory? && !candidate.symlink?
+
+  real_root = candidate.realpath
+  %w[
+    references/model-context-map.yml
+    references/skill-execution-contracts.yml
+    skills/tw-auto/scripts/traceweaver-generate-model-context-map
+  ].all? do |relative|
+    cursor = candidate
+    relative.split("/").each do |part|
+      cursor = cursor.join(part)
+      return false if cursor.symlink?
+    end
+    cursor.file? && cursor.realpath.to_s.start_with?("#{real_root}/")
+  end
+rescue Errno::ENOENT
+  false
+end
+
+def discover_package_root!
+  # Source-packaged callables reside at <package>/skills/tw-auto/scripts;
+  # Codex also projects a direct callable at <codexHome>/.codex/skills/tw-auto
+  # while preserving the controlled package at sibling traceweaver-core.
+  candidates = [
+    Pathname.new(File.expand_path("../../..", __dir__)),
+    Pathname.new(File.expand_path("../../../traceweaver-core", __dir__))
+  ]
+  root = candidates.find { |candidate| secure_package_root?(candidate) }
+  raise "missing_or_unsafe_traceweaver_package_root" unless root
+
+  root.realpath
+end
+
+PACKAGE_ROOT = discover_package_root!
+# A source checkout is the one supported situation where a project-local
+# plugins/traceweaver-core control tree is authoritative.  Every installed
+# projection (Codex direct/namespaced and Antigravity package layouts alike)
+# must use the package bytes and never accept a consumer shadow.
+SOURCE_CHECKOUT_RUNTIME = PACKAGE_ROOT.parent.basename.to_s == "plugins" && PACKAGE_ROOT.parent.parent.join(".git").exist?
+INSTALLED_RUNTIME = !SOURCE_CHECKOUT_RUNTIME
+
+class MapError < StandardError; end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, out|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      out[key] = canonical(value.fetch(source_key))
+    end
+  when Array then value.map { |entry| canonical(entry) }
+  else value
+  end
+end
+
+def digest(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def yaml(path)
+  value = YAML.safe_load(File.read(path), permitted_classes: [], aliases: false)
+  raise MapError, "#{path} must be a mapping" unless value.is_a?(Hash)
+
+  value
+rescue Errno::ENOENT
+  raise MapError, "missing:#{path}"
+rescue Psych::Exception => error
+  raise MapError, "invalid_yaml:#{error.message}"
+end
+
+def string!(value, field)
+  raise MapError, "missing_or_invalid:#{field}" unless value.is_a?(String) && !value.strip.empty?
+
+  value
+end
+
+def exact_keys!(value, keys, field)
+  raise MapError, "invalid_#{field}" unless value.is_a?(Hash) && value.keys.sort == keys.sort
+end
+
+def safe_relative!(value, field)
+  value = string!(value, field)
+  path = Pathname.new(value)
+  raise MapError, "unsafe_path:#{field}" if path.absolute? || value.split("/").include?("..")
+
+  value
+end
+
+# Installed TraceWeaver callables carry this script under
+# <codex-home>/.codex/skills/tw-auto while their controlled references live in
+# the adjacent packaged traceweaver-core directory.  A project may therefore
+# be a consumer project with no plugins/ tree at all.  Resolve the logical
+# package locator against the project first (source checkout), then the
+# installed package; in either case reject a symlink at any component.
+def contained_path(base, relative, type)
+  candidate = base.join(relative).cleanpath
+  return nil unless type == :file ? candidate.file? : candidate.directory?
+
+  path = base
+  candidate.relative_path_from(base).each_filename do |part|
+    path = path.join(part)
+    return nil if path.symlink?
+  end
+  resolved = candidate.realpath
+  real_base = base.realpath
+  return nil unless resolved.to_s == real_base.to_s || resolved.to_s.start_with?("#{real_base}/")
+
+  resolved
+rescue Errno::ENOENT, ArgumentError
+  nil
+end
+
+def reference_path(root, locator, type = :file)
+  safe_relative!(locator, "reference_locator")
+  controlled = locator.start_with?("plugins/traceweaver-core/")
+  packaged_relative = locator.delete_prefix("plugins/traceweaver-core/")
+  # Install projections expose only the 28 public callables under skills/.
+  # Imported CE prompt bodies remain package-controlled, but live below the
+  # non-callable internal-skills/ subtree.  This fallback is deliberately
+  # limited to ce-* paths and is never searched in a consumer project.
+  packaged_relatives = [packaged_relative]
+  if packaged_relative.start_with?("skills/ce-")
+    packaged_relatives << packaged_relative.sub(/\Askills\/ce-/, "internal-skills/ce-")
+  end
+  # A direct installed callable must never let a consumer project shadow the
+  # packaged control plane.  Source checkouts continue to prefer their own
+  # controlled plugin tree so authoring remains deterministic.
+  candidates = if controlled && INSTALLED_RUNTIME
+                 packaged_relatives.map { |relative| [PACKAGE_ROOT, relative] }
+               elsif controlled
+                 [[root, locator], *packaged_relatives.map { |relative| [PACKAGE_ROOT, relative] }]
+               else
+                 [[root, locator]]
+               end
+  resolved = candidates.map { |base, relative| contained_path(base, relative, type) }.compact.first
+  raise MapError, "missing_or_unsafe_reference:#{locator}" unless resolved
+
+  resolved
+end
+
+def logical_locator(root, path)
+  root_path = root.realpath
+  package_path = PACKAGE_ROOT.realpath
+  resolved = Pathname.new(path).realpath
+  return resolved.relative_path_from(root_path).to_s if resolved.to_s.start_with?("#{root_path}/")
+  if resolved.to_s.start_with?("#{package_path}/")
+    relative = resolved.relative_path_from(package_path).to_s
+    # Antigravity keeps imported CE bodies physically internal so they are not
+    # host-callable.  Inventory identity is logical, though: canonical prompt
+    # paths retain their public package spelling across source, Codex, and
+    # Antigravity installations.
+    relative = relative.sub(/\Ainternal-skills\/ce-/, "skills/ce-")
+    return "plugins/traceweaver-core/#{relative}"
+  end
+
+  raise MapError, "unmapped_reference:#{resolved}"
+end
+
+def contracts(root)
+  registry = yaml(reference_path(root, "plugins/traceweaver-core/references/skill-execution-contracts.yml"))
+  entries = registry["contracts"]
+  raise MapError, "invalid_sec_contracts" unless entries.is_a?(Array)
+  names = entries.map { |entry| entry.is_a?(Hash) ? entry["skill"] : nil }
+  raise MapError, "invalid_sec_callable_inventory" unless names.all? { |name| name.is_a?(String) } && names == names.sort && names.uniq == names
+
+  entries
+end
+
+def validate_map!(map)
+  raise MapError, "unsupported_schema" unless map["schema_version"] == MAP_SCHEMA
+  exact_keys!(map, %w[schema_version map_id map_status canonicalization model_role risk_effort packet_budget context_completeness authoritative_runtime mode active_cutover active_enforcement qualification_states efficiency_eligibility profile_contract profile_schema top_level_route_floors aliases discovery source_oracle route_kinds accounting overflow receipt held_claims map_digest], "map_keys")
+  %w[map_id model_role risk_effort packet_budget context_completeness map_digest].each { |field| string!(map[field], field) }
+  raise MapError, "invalid_model_role" unless map["model_role"] == "advisory_shadow_context_recommendation"
+  raise MapError, "invalid_risk_effort" unless map["risk_effort"] == "profile_risk_selected"
+  raise MapError, "invalid_packet_budget" unless map["packet_budget"] == "profile_budget_class"
+  raise MapError, "invalid_context_completeness" unless map["context_completeness"] == "owner_controlled_six_category_oracle"
+  raise MapError, "invalid_runtime_boundary" unless map["authoritative_runtime"] == "v1" && map["mode"] == "advisory_shadow_compile" && map["active_cutover"] == "disabled" && map["active_enforcement"] == false
+  raise MapError, "invalid_qualification_states" unless map["qualification_states"] == %w[unqualified structurally_eligible qualified] && map["efficiency_eligibility"] == false
+  raise MapError, "invalid_profile_contract" unless map["profile_contract"] == "plugins/traceweaver-core/references/workflow-profile-template.yml" && map["profile_schema"] == "tw-model-context-profile/1"
+  actual = digest(map.reject { |key, _| key == "map_digest" })
+  raise MapError, "map_digest_mismatch" unless map["map_digest"] == actual
+
+  floors = map["top_level_route_floors"]
+  raise MapError, "invalid_floor_map" unless floors == FLOORS
+  raise MapError, "invalid_aliases" unless map["aliases"] == { "lfg" => "tw-auto" }
+
+  oracle = map["source_oracle"]
+  exact_keys!(oracle, %w[categories dispositions mandatory_all_routes mandatory_implementation_review_publication conditional_temporal_external temporal_external_routes mandatory_category_exclusion_allowed empty_or_all_excluded_allowed compiler_may_author_oracle recall_requirement adequacy_review_locator adequacy_review_schema], "source_oracle")
+  raise MapError, "invalid_source_categories" unless oracle["categories"] == SOURCE_CATEGORIES
+  raise MapError, "invalid_source_dispositions" unless oracle["dispositions"] == %w[satisfied excluded_by_authority held]
+  raise MapError, "invalid_source_mandatory" unless oracle["mandatory_all_routes"] == SOURCE_CATEGORIES.first(3)
+  raise MapError, "compiler_authored_oracle" unless oracle["compiler_may_author_oracle"] == false
+  raise MapError, "invalid_source_oracle_policy" unless oracle["mandatory_implementation_review_publication"] == %w[implementation_dependencies accepted_evidence] && oracle["conditional_temporal_external"] == "current_external_sources" && oracle["mandatory_category_exclusion_allowed"] == false && oracle["empty_or_all_excluded_allowed"] == false && oracle["recall_requirement"] == "100_percent"
+  raise MapError, "invalid_adequacy_review_locator" unless safe_relative!(oracle["adequacy_review_locator"], "adequacy_review_locator") == "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json"
+  raise MapError, "invalid_adequacy_review_schema" unless oracle["adequacy_review_schema"] == "tw-model-context-oracle-adequacy-review/1"
+  temporal_routes = oracle["temporal_external_routes"]
+  raise MapError, "invalid_temporal_external_routes" unless temporal_routes.is_a?(Array) && temporal_routes == temporal_routes.sort && temporal_routes.uniq == temporal_routes && temporal_routes.all? { |route| FLOORS.values.flatten.include?(route) }
+
+  raise MapError, "route_kind_set_mismatch" unless map["route_kinds"] == ROUTE_KINDS
+
+  discovery = map["discovery"]
+  exact_keys!(discovery, %w[sec_registry top_level_callable_prefix alias imported_engines generic_families], "discovery")
+  raise MapError, "invalid_discovery_root" unless discovery["sec_registry"] == "plugins/traceweaver-core/references/skill-execution-contracts.yml" && discovery["top_level_callable_prefix"] == "tw-" && discovery["alias"] == { "route_id" => "lfg", "canonical_route_id" => "tw-auto" }
+  engines = discovery["imported_engines"]
+  raise MapError, "invalid_imported_engines" unless engines.is_a?(Array)
+  expected_engines = IMPORTED_ENGINES.map do |engine, parent_route|
+    { "engine" => engine, "parent_route" => parent_route, "prompt_directories" => %w[references/agents references/personas] }
+  end
+  raise MapError, "imported_engine_set_mismatch" unless engines == expected_engines
+  engines.each do |entry|
+    dirs = entry["prompt_directories"]
+    raise MapError, "invalid_prompt_directories" unless dirs == %w[references/agents references/personas]
+  end
+  families = discovery["generic_families"]
+  raise MapError, "invalid_generic_families" unless families.is_a?(Array)
+  family_keys = families.map do |family|
+    exact_keys!(family, %w[parent_route family], "generic_family")
+    [string!(family["parent_route"], "generic_parent_route"), string!(family["family"], "generic_family")]
+  end
+  raise MapError, "generic_family_set_mismatch" unless family_keys == GENERIC_FAMILIES
+  exact_keys!(map["accounting"], %w[packet_input assembled_input planned_context pricing_metadata], "accounting")
+  exact_keys!(map["overflow"], %w[ordered_actions prohibited], "overflow")
+  exact_keys!(map["receipt"], %w[schema_version kinds canonical_identity v1_embedding isolated_replay], "receipt")
+  raise MapError, "invalid_accounting" unless map["accounting"] == { "packet_input" => "direct_plus_injected_locator_plus_required_conversation_plus_injected_tool_results_plus_injected_shard_summaries", "assembled_input" => "system_plus_developer_plus_tool_schemas_plus_host_metadata_plus_packet_input", "planned_context" => "assembled_input_plus_reserved_output", "pricing_metadata" => "optional_non_release_prerequisite" }
+  raise MapError, "invalid_overflow" unless map["overflow"] == { "ordered_actions" => %w[promote_budget_class digest_checked_locator fresh_bounded_shard_or_reisolation held], "prohibited" => %w[model_downgrade risk_downgrade required_source_deletion silent_truncation lossy_compaction unbounded_retry] }
+  raise MapError, "invalid_receipt" unless map["receipt"] == { "schema_version" => "tw-model-context-receipt/1", "kinds" => %w[plan final], "canonical_identity" => "sha256-recursively-key-sorted-json-arrays-preserved-receipt-id-excluded", "v1_embedding" => "prohibited", "isolated_replay" => "separately_authorized_only" }
+  raise MapError, "invalid_held_claims" unless map["held_claims"] == %w[active_descendant_enforcement active_routing provider_replay_qualification served_model_attestation token_sufficiency material_token_savings quality_equivalence active_cutover]
+end
+
+def floor_for(route)
+  FLOORS.find { |_budget, routes| routes.include?(route) }&.first || raise(MapError, "missing_floor:#{route}")
+end
+
+def route_record(route_id:, canonical_route_id:, parent_route:, kind:, floor:, prompt_path: nil, family: nil)
+  record = {
+    "route_id" => route_id,
+    "canonical_route_id" => canonical_route_id,
+    "parent_route" => parent_route,
+    "kind" => kind,
+    "floor" => floor,
+    "cardinality" => 1,
+    "reachability" => "declared_static",
+    "isolation" => "shadow_only_no_active_enforcement"
+  }
+  record["prompt_path"] = prompt_path if prompt_path
+  record["generic_family"] = family if family
+  record
+end
+
+def inventory(root, map)
+  sec = contracts(root)
+  canonical_names = sec.map { |entry| entry.fetch("skill") }
+  expected_top_levels = (FLOORS.values.flatten + ["lfg"]).sort
+  raise MapError, "sec_callable_surface_mismatch" unless canonical_names == expected_top_levels
+
+  top = canonical_names.map do |name|
+    if name == "lfg"
+      route_record(route_id: name, canonical_route_id: "tw-auto", parent_route: "tw-auto", kind: "alias", floor: "B3")
+    else
+      route_record(route_id: name, canonical_route_id: name, parent_route: nil, kind: "top_level", floor: floor_for(name))
+    end
+  end
+
+  discovery = map.fetch("discovery")
+  descendants = discovery.fetch("imported_engines").flat_map do |engine|
+    engine_name = engine.fetch("engine")
+    parent = engine.fetch("parent_route")
+    raise MapError, "unknown_descendant_parent:#{parent}" unless canonical_names.include?(parent)
+    engine_root = reference_path(root, "plugins/traceweaver-core/skills/#{engine_name}", :directory)
+    files = engine.fetch("prompt_directories").flat_map do |directory|
+      base = engine_root.join(directory)
+      next [] unless base.directory?
+      Dir.glob(base.join("*.md").to_s).sort
+    end
+    files.map do |file|
+      path = Pathname.new(file)
+      raise MapError, "prompt_symlink:#{path}" if path.symlink?
+      relative = logical_locator(root, path)
+      role = path.basename(".md").to_s
+      route_record(
+        route_id: "#{parent}::#{engine_name}::#{role}",
+        canonical_route_id: parent,
+        parent_route: parent,
+        kind: "imported_prompt",
+        floor: floor_for(parent),
+        prompt_path: relative
+      )
+    end
+  end
+
+  generic = discovery.fetch("generic_families").map do |family|
+    parent = family.fetch("parent_route")
+    raise MapError, "unknown_generic_parent:#{parent}" unless canonical_names.include?(parent)
+    name = family.fetch("family")
+    route_record(
+      route_id: "#{parent}::generic::#{name}",
+      canonical_route_id: parent,
+      parent_route: parent,
+      kind: "generic_family",
+      floor: floor_for(parent),
+      family: name
+    )
+  end
+
+  routes = (top + descendants + generic).sort_by { |entry| entry.fetch("route_id") }
+  ids = routes.map { |entry| entry.fetch("route_id") }
+  raise MapError, "duplicate_declared_route" unless ids.uniq == ids
+  {
+    "schema_version" => INVENTORY_SCHEMA,
+    "map_id" => map.fetch("map_id"),
+    "map_digest" => map.fetch("map_digest"),
+    "top_level_callable_count" => 28,
+    "declared_route_count" => routes.length,
+    "routes" => routes,
+    "inventory_digest" => digest(routes)
+  }
+end
+
+options = { root: File.expand_path("../../../../..", __dir__), format: "status" }
+OptionParser.new do |parser|
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--map PATH") { |value| options[:map] = value }
+  parser.on("--format FORMAT", %w[status json]) { |value| options[:format] = value }
+end.parse!
+
+begin
+  root = Pathname.new(options.fetch(:root)).expand_path.realpath
+  map_path = options[:map] ? Pathname.new(options[:map]).expand_path : reference_path(root, "plugins/traceweaver-core/references/model-context-map.yml")
+  map = yaml(map_path)
+  validate_map!(map)
+  result = inventory(root, map)
+  if options[:format] == "json"
+    puts JSON.generate(canonical(result))
+  else
+    puts "model_context_map_status=fresh"
+    puts "model_context_top_level_callables=#{result.fetch("top_level_callable_count")}"
+    puts "model_context_declared_routes=#{result.fetch("declared_route_count")}"
+    puts "model_context_inventory_digest=#{result.fetch("inventory_digest")}"
+  end
+rescue MapError, KeyError => error
+  warn "model_context_map_status=held_model_context_inventory_invalid reason=#{error.message}"
+  exit 2
+end

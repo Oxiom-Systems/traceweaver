@@ -1,10 +1,15 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# TRACEWEAVER: file-role=installed-skill-execution-contract-resolver; req=REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072; ver=VER-TW-092
+
 # TRACEWEAVER: entrypoint=resolve_skill_execution_contract; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090
+# TRACEWEAVER: entrypoint=resolve_shadow_model_context_binding; req=REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072; ver=VER-TW-092
 require "digest"
+require "date"
 require "json"
 require "optparse"
+require "pathname"
 require "yaml"
 
 REQUIRED_DEFAULTS = %w[authority packaged_references trace_records workflow_profile graph_action verification validation holds allowed_writes next_wrapper].freeze
@@ -33,16 +38,68 @@ def terminal(state, detail, status: 2)
   exit status
 end
 
-def installed_or_source_path(repository_root, package_root, reference)
-  source_path = File.join(repository_root, reference)
-  installed_path = if reference.start_with?("plugins/traceweaver-core/")
-    File.join(package_root, reference.delete_prefix("plugins/traceweaver-core/"))
-  else
-    source_path
-  end
-  return source_path if File.file?(source_path)
-  return installed_path if File.file?(installed_path)
+def secure_regular_reference(root, reference)
+  return nil unless reference.is_a?(String) && !reference.empty?
 
+  parts = reference.split("/", -1)
+  return nil if reference.start_with?("/") || parts.any? { |part| part.empty? || part == "." || part == ".." }
+
+  root_path = Pathname.new(root)
+  return nil unless root_path.directory? && !root_path.symlink?
+
+  real_root = root_path.realpath
+  cursor = root_path
+  parts.each do |part|
+    cursor = cursor.join(part)
+    return nil if cursor.symlink?
+  end
+  return nil unless cursor.file?
+
+  real_path = cursor.realpath
+  return nil unless real_path.to_s.start_with?("#{real_root}/")
+
+  real_path.to_s
+rescue Errno::ENOENT, Errno::EACCES
+  nil
+end
+
+def discover_package_root
+  # Source and namespaced installed callables live below <package>/skills.
+  # Codex direct-callable copies live below <codex-root>/skills while the
+  # complete controlled package remains at sibling <codex-root>/traceweaver-core.
+  candidates = [
+    File.expand_path("../../..", __dir__),
+    File.expand_path("../../../traceweaver-core", __dir__)
+  ]
+  matches = candidates.uniq.select do |candidate|
+    secure_regular_reference(candidate, "references/skill-execution-contracts.yml") &&
+      secure_regular_reference(candidate, "skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract")
+  end
+  matches.one? ? Pathname.new(matches.first).realpath.to_s : nil
+end
+
+def installed_or_source_path(repository_root, package_root, reference)
+  source_path = repository_root && secure_regular_reference(repository_root, reference)
+  installed_reference = reference.delete_prefix("plugins/traceweaver-core/")
+  installed_path = if installed_reference != reference
+    secure_regular_reference(package_root, installed_reference)
+  end
+  return source_path if source_path
+  return installed_path if installed_path
+
+  nil
+end
+
+def source_repository_root(package_root)
+  package_path = Pathname.new(package_root)
+  return nil unless package_path.basename.to_s == "traceweaver-core" && package_path.parent.basename.to_s == "plugins"
+
+  repository_root = package_path.parent.parent
+  git_entry = repository_root.join(".git")
+  return nil unless git_entry.exist? && !git_entry.symlink?
+
+  repository_root.realpath.to_s
+rescue Errno::ENOENT, Errno::EACCES
   nil
 end
 
@@ -57,11 +114,14 @@ OptionParser.new do |parser|
   parser.on("--available-model MODELS", "Deprecated; child dispatch concern") { |v| options[:available_models] = v }
   parser.on("--expected-definition-hash HASH") { |v| options[:expected_hash] = v }
   parser.on("--invocation-id ID") { |v| options[:invocation_id] = v }
+  parser.on("--model-context-metadata", "Emit the separate shadow map binding; do not resolve or change a v1 receipt") { options[:model_context_metadata] = true }
 end.parse!
 
-terminal("invalid_contract", "skill_required") unless options[:skill]
-root = File.expand_path("../../..", __dir__)
-registry_path = options[:registry] || File.join(root, "references", "skill-execution-contracts.yml")
+terminal("invalid_contract", "skill_required") unless options[:skill] || options[:model_context_metadata]
+package_root = discover_package_root
+terminal("missing_contract", "controlled_package_root_missing_or_ambiguous") unless package_root
+repository_root = source_repository_root(package_root)
+registry_path = options[:registry] || secure_regular_reference(package_root, "references/skill-execution-contracts.yml")
 terminal("missing_contract", "registry_missing:#{registry_path}") unless File.file?(registry_path)
 begin
   registry = YAML.safe_load(File.read(registry_path), permitted_classes: [], aliases: false)
@@ -69,6 +129,42 @@ rescue Psych::Exception => error
   terminal("invalid_contract", "registry_yaml:#{error.class}")
 end
 terminal("invalid_contract", "registry_not_mapping") unless registry.is_a?(Hash)
+if options[:model_context_metadata]
+  binding = registry["model_context_map"]
+  required_binding = %w[schema_version map_path mirror_path map_digest profile_path compiler_path receipt_validator_path mode authoritative_runtime v1_receipt_projection]
+  terminal("invalid_contract", "model_context_binding_missing") unless binding.is_a?(Hash) && required_binding.all? { |field| binding[field].is_a?(String) && !binding[field].empty? }
+  terminal("invalid_contract", "model_context_binding_schema") unless binding["schema_version"] == "tw-model-context-map/1"
+  terminal("invalid_contract", "model_context_binding_mode") unless binding["mode"] == "advisory_shadow_compile" && binding["authoritative_runtime"] == "v1"
+  terminal("invalid_contract", "model_context_v1_boundary") unless binding["v1_receipt_projection"] == "separate_shadow_artifact_only_v1_unchanged"
+  %w[map_path mirror_path profile_path compiler_path receipt_validator_path].each do |field|
+    reference = binding.fetch(field)
+    terminal("invalid_contract", "model_context_reference_invalid:#{field}") if reference.start_with?("/") || reference.split("/").include?("..")
+  end
+  map_path = installed_or_source_path(repository_root, package_root, binding.fetch("map_path"))
+  mirror_path = installed_or_source_path(repository_root, package_root, binding.fetch("mirror_path"))
+  terminal("invalid_contract", "model_context_map_missing") unless map_path && mirror_path
+  terminal("stale_contract", "model_context_map_mirror") unless File.binread(map_path) == File.binread(mirror_path)
+  begin
+    map = YAML.safe_load(File.read(map_path), permitted_classes: [Date], aliases: false)
+  rescue Psych::Exception => error
+    terminal("invalid_contract", "model_context_map_yaml:#{error.class}")
+  end
+  terminal("invalid_contract", "model_context_map_schema") unless map.is_a?(Hash) && map["schema_version"] == binding["schema_version"]
+  map_payload = map.reject { |key, _| key.to_s == "map_digest" }
+  actual_map_digest = "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(map_payload)))}"
+  terminal("stale_contract", "model_context_map_digest") unless map["map_digest"] == actual_map_digest && binding["map_digest"] == actual_map_digest
+  metadata = {
+    "schema_version" => "tw-model-context-sec-binding/1",
+    "terminal_state" => "resolved_shadow_metadata",
+    "model_context_map" => binding,
+    "binding_digest" => sha(binding),
+    "model_call_performed" => false,
+    "v1_receipt_changed" => false,
+    "authority_promotion" => false
+  }
+  puts JSON.generate(canonical(metadata))
+  exit 0
+end
 defaults = registry["defaults"]
 contracts = registry["contracts"]
 profiles = registry["route_profiles"]
@@ -103,8 +199,6 @@ terminal("invalid_contract", "route_profile_missing:#{profile_name}") unless pro
 terminal("invalid_contract", "skill_reference_missing") unless entry["skill_reference"].is_a?(String)
 skill_metadata = metadata.fetch(options[:skill])
 target_metadata = alias_target ? metadata.fetch(alias_target) : nil
-repository_root = File.expand_path("../../../../..", __dir__)
-package_root = File.expand_path("../../..", __dir__)
 skill_path = installed_or_source_path(repository_root, package_root, entry.fetch("skill_reference"))
 terminal("invalid_contract", "reference_missing:#{entry.fetch('skill_reference')}") unless skill_path
 actual_skill_hash = "sha256:#{Digest::SHA256.file(skill_path).hexdigest}"

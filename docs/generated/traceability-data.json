@@ -6,15 +6,19 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "ccf0c3cbd6598c36cbcdff766c226933241ee10a34e0523900770a86f9b616bd"
+      "sha256": "489aecaf35ca4de99eb5e1c4b403e47f6ee2dd590d01ddf9bf250a7c69c88c02"
     },
     {
       "path": "requirements.md",
-      "sha256": "94197a77d927f1edf09f8695f614d221451e597abdb60f605d848e43a72b241c"
+      "sha256": "2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "be2d3159778dc86ca401d58f340f879a3ded8c4f3e5fa7795ed8e67f311d851d"
+      "sha256": "11971ccf62b1e9a9e1fcfc22f2e1717c2f04a8eff014717c57d6b4606652c3ad"
+    },
+    {
+      "path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md",
+      "sha256": "2a4e9dc6a11e6c7f924c033df18bb79f5a56f5e0c92a070cfefa4adb5948909c"
     },
     {
       "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md",
@@ -30,17 +34,17 @@
     }
   ],
   "row_counts": {
-    "requirements": 90,
+    "requirements": 105,
     "trace_rows": 65,
     "atp_entries": 39,
     "result_records": 40,
     "verification_records": 86,
-    "validation_records": 35,
-    "code_anchor_records": 321,
-    "structured_acceptance_results": 3,
-    "structured_acceptance_coverage": 90,
-    "structured_acceptance_missing_requirements": 87,
-    "structured_acceptance_non_closed_requirements": 88
+    "validation_records": 36,
+    "code_anchor_records": 434,
+    "structured_acceptance_results": 4,
+    "structured_acceptance_coverage": 105,
+    "structured_acceptance_missing_requirements": 101,
+    "structured_acceptance_non_closed_requirements": 102
   },
   "requirements": [
     {
@@ -1423,6 +1427,171 @@
       "trace_ids": [
         "TRACE-TW-064"
       ]
+    },
+    {
+      "id": "REQ-TW-109",
+      "type": "Model Governance",
+      "summary": "Versioned canonical four-axis model-context map and digest.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 map schema/canonicalization/independence/digest fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for 0.5.0 shadow implementation",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-110",
+      "type": "Failure Boundary",
+      "summary": "Invalid or stale v2 route data holds shadow/replay eligibility; explicitly invoked separate shadow artifacts do not change v1 receipt schema, identity, bytes, or outcome.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 invalid-state, byte-invariance, and strict legacy-consumer fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for 0.5.0 shadow implementation",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-111",
+      "type": "Inventory",
+      "summary": "Deterministic exact callable, alias, descendant-prompt, and generic-family route inventory.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 inventory, omission, alias, duplicate, and order fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for declared shadow routes; observed runtime instances held",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-112",
+      "type": "Claim Control",
+      "summary": "Static descendant declarations cannot support active-enforcement claims.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 observation-state and bypass-claim fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved negative claim boundary; active enforcement held",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-113",
+      "type": "Accounting",
+      "summary": "Normalize packet, assembled, output, planned-context, and workflow usage to one frozen capability/tokenizer snapshot.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 arithmetic and snapshot-reset boundaries",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for shadow implementation",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-114",
+      "type": "Experimental Profile",
+      "summary": "Version exact B0--B3 hypotheses/floors and choose the lowest structurally eligible class at or above the route floor.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 exact-floor, all-B3, multiple-eligible, profile-hash, transition, and reset fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved; B0--B3 sufficiency remains unqualified",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-115",
+      "type": "Overflow",
+      "summary": "Deterministic promote/locator/shard/re-isolate/hold order with frozen limits; no downgrade or truncation.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 overflow, limit, and terminal-hold fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for shadow implementation",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-116",
+      "type": "Source Oracle",
+      "summary": "Compiler-independent exact six-category oracle with mandatory derivation, non-empty closure, and 100 percent manifest recall.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 taxonomy, empty/all-excluded, recall, omission, exclusion, and discovered-dependency fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for shadow implementation",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-117",
+      "type": "Context Delivery",
+      "summary": "Direct, repository-contained digest locator, or registered fresh shard only; no implicit/lossy delivery.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 delivery-mode positive/negative fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for shadow implementation",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-118",
+      "type": "Receipt Integrity",
+      "summary": "A separate canonical shadow plan/final envelope protects route, lineage, identities, coverage, accounting, observation, eligibility, evidence links, and outcome without altering v1 or claiming authenticity.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 identity, tamper, replay, binding, v1 byte-invariance, and strict-consumer fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for repository/package integrity; external authenticity held",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-119",
+      "type": "Evidence Eligibility",
+      "summary": "Freeze observation enum and separate content eligibility from efficiency eligibility; efficiency false for 0.5.0.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 observation/eligibility matrix fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved; savings and served-model claims held",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-120",
+      "type": "Mode Boundary",
+      "summary": "Advisory compile has no call/dispatch/write; authorized isolated replay permits only declared provider and isolated evidence effects and preserves v1/external publication state.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 side-effect and denied-write/provider-state snapshots",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Advisory behavior approved; live/provider replay held",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-121",
+      "type": "Package Transaction",
+      "summary": "Roll back skills, references, agents, manifests, and routing projections byte/mode-exactly after injected failure.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 isolated install and injected-failure snapshots",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for 0.5.0 package implementation",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-122",
+      "type": "Release Constraint",
+      "summary": "Exact 0.5.0 shadow publication requires the accepted bounded TRACE-TW-072 candidate gates and leaves v1 authoritative; the visible global backlog and active cutover are non-gating.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 bounded-trace/global-backlog, readiness, version, digest, held-claim, rollback, PR, and release-receipt checks",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved release/change-control constraint; conditional exact 0.5.0 authority",
+      "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-123",
+      "type": "Independent Review",
+      "summary": "Oracle-adequacy reviewer is independent of compiler/oracle authorship and dispositions every real release route/category; sampling cannot replace complete closure.",
+      "source_need": "NEED-TW-013",
+      "verification_method": "ATP-TW-049 reviewer identity/relationship, complete route/category, empty/all-excluded, and uncertainty fixtures",
+      "validation_path": "VAL-TW-040",
+      "owner": "Oxiom Systems",
+      "status": "Approved for shadow implementation",
+      "trace_ids": []
     }
   ],
   "traces": [
@@ -4190,9 +4359,884 @@
       "Result": "Held pending installed-host dogfood and owner observation; deterministic implementation prerequisite VER-TW-087 passed locally",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "Static/local implementation proof is current, but VAL-TW-035 is not satisfied. Graphify is optional navigation only. Terra, tw-graph, semantic HTML, staging, publication, release, and deploy remain separately held."
+    },
+    {
+      "ID": "VAL-TW-040",
+      "Source Need": "NEED-TW-013",
+      "Scenario / Intended Use": "A maintainer installs TraceWeaver Core 0.5.0, inspects the shadow map, obtains deterministic route recommendations or exact honest holds, and confirms v1 behavior is unchanged.",
+      "Stakeholder / Representative": "`/root/v050_independent_validation`, independent of compiler implementation and source-oracle authorship",
+      "Acceptance Signal": "Installed map/profile/SEC identities match the release candidate; representative B0--B3 routes are understandable; invalid/incomplete candidates hold; no active, served-model, savings, sufficiency, or quality-equivalence claim appears; owner records accept/reject and rationale.",
+      "Evidence Path": "`docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md`; canonical 522-cell oracle review; Codex and Antigravity real-install scenarios; `docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-result.md`",
+      "Result": "Accepted: all 522 cells dispositioned with matching source digests; Codex B0/B1 and Antigravity B2/B3 compiler-to-validator scenarios, honest negatives, v1 invariance, and held-claim boundary passed",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "This validates usability and honest boundaries only. Active cutover, live descendant observation, provider replay, quantitative savings, token sufficiency, served-model attestation, and quality equivalence remain held."
     }
   ],
   "code_anchor_evidence": [
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/model-context-map.yml",
+      "Requirement": "REQ-TW-109; REQ-TW-111; REQ-TW-114; REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role",
+      "Role": "canonical-shadow-model-context-map"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/model-context-map.yml",
+      "Requirement": "REQ-TW-109; REQ-TW-111; REQ-TW-114; REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role; mirror",
+      "Role": "packaged-shadow-model-context-map"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json",
+      "Requirement": "REQ-TW-116; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "controlled-data; validation-evidence",
+      "Role": "canonical-522-cell-source-oracle-adequacy-review"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/model-context-oracle-adequacy-review.json",
+      "Requirement": "REQ-TW-116; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "controlled-data; mirror",
+      "Role": "packaged-522-cell-source-oracle-adequacy-review"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/workflow-profile-template.yml",
+      "Requirement": "REQ-TW-109; REQ-TW-113; REQ-TW-114; REQ-TW-115; REQ-TW-116; REQ-TW-119; REQ-TW-120",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role",
+      "Role": "canonical-shadow-budget-and-source-policy-profile"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/workflow-profile-template.yml",
+      "Requirement": "REQ-TW-109; REQ-TW-113; REQ-TW-114; REQ-TW-115; REQ-TW-116; REQ-TW-119; REQ-TW-120",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role; mirror",
+      "Role": "packaged-shadow-budget-and-source-policy-profile"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/skill-execution-contracts.yml",
+      "Requirement": "REQ-TW-109; REQ-TW-110; REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role",
+      "Role": "v1-preserving-shadow-map-sec-binding"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map",
+      "Requirement": "REQ-TW-109; REQ-TW-111; REQ-TW-114",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "declared-route-inventory-and-map-validator"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-compile-model-context-route",
+      "Requirement": "REQ-TW-110; REQ-TW-113; REQ-TW-114; REQ-TW-115; REQ-TW-116; REQ-TW-117; REQ-TW-118; REQ-TW-119; REQ-TW-120",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "deterministic-shadow-route-compiler"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-validate-model-context-receipt",
+      "Requirement": "REQ-TW-110; REQ-TW-113; REQ-TW-118; REQ-TW-119; REQ-TW-120",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "protected-shadow-receipt-validator"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-skill-execution-contract-registry",
+      "Requirement": "REQ-TW-109; REQ-TW-110; REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "entrypoint",
+      "Role": "deterministic-shadow-binding-registry-generator"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract",
+      "Requirement": "REQ-TW-110; REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "entrypoint",
+      "Role": "installed-source-or-direct-shadow-binding-resolver"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child",
+      "Requirement": "REQ-TW-110",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "entrypoint",
+      "Role": "authoritative-v1-receipt-invariance-adapter"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-setup/scripts/traceweaver-bootstrap-project",
+      "Requirement": "REQ-TW-110; REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "entrypoint",
+      "Role": "installed-source-or-direct-shadow-bootstrap-projection"
+    },
+    {
+      "Artifact Path": "src/index.ts",
+      "Requirement": "REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "atomic-installed-package-transaction-and-rollback"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/",
+      "Requirement": "REQ-TW-109; REQ-TW-110; REQ-TW-111; REQ-TW-112; REQ-TW-113; REQ-TW-114; REQ-TW-115; REQ-TW-116; REQ-TW-117; REQ-TW-118; REQ-TW-119; REQ-TW-120; REQ-TW-121; REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-72-case-model-governance-fixture-suite"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/acceptance-cases.yml",
+      "Requirement": "REQ-TW-109; REQ-TW-110; REQ-TW-111; REQ-TW-112; REQ-TW-113; REQ-TW-114; REQ-TW-115; REQ-TW-116; REQ-TW-117; REQ-TW-118; REQ-TW-119; REQ-TW-120; REQ-TW-121; REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/accounting-assembled.json",
+      "Requirement": "REQ-TW-113",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/accounting-packet.json",
+      "Requirement": "REQ-TW-113",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/accounting-workflow-cached-double-count.json",
+      "Requirement": "REQ-TW-113",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/accounting-workflow-cached.json",
+      "Requirement": "REQ-TW-113",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/advisory-side-effect-snapshot.yml",
+      "Requirement": "REQ-TW-120",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/capability-tokenizer-changed.yml",
+      "Requirement": "REQ-TW-113",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/delivery-direct.json",
+      "Requirement": "REQ-TW-117",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/delivery-inherited.json",
+      "Requirement": "REQ-TW-117",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/delivery-locator.json",
+      "Requirement": "REQ-TW-117",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/delivery-shard.json",
+      "Requirement": "REQ-TW-117",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/delivery-stale-lossy.json",
+      "Requirement": "REQ-TW-117",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/delivery-traversal.json",
+      "Requirement": "REQ-TW-117",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/eligibility-content-only.json",
+      "Requirement": "REQ-TW-119",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/eligibility-efficiency-true.json",
+      "Requirement": "REQ-TW-119",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/install-failure-matrix.yml",
+      "Requirement": "REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/install-success.yml",
+      "Requirement": "REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/install-unowned-conflict.yml",
+      "Requirement": "REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/inventory-alias-duplicate.yml",
+      "Requirement": "REQ-TW-111",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/inventory-expected.yml",
+      "Requirement": "REQ-TW-111",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/inventory-omitted.yml",
+      "Requirement": "REQ-TW-111",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/inventory-unknown-descendant.yml",
+      "Requirement": "REQ-TW-111",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/map-axis-mutations.yml",
+      "Requirement": "REQ-TW-109",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/map-digest-mismatch.yml",
+      "Requirement": "REQ-TW-109",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/map-duplicate-route.yml",
+      "Requirement": "REQ-TW-109",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/map-invalid-enum.yml",
+      "Requirement": "REQ-TW-109",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/map-unknown-additive.yml",
+      "Requirement": "REQ-TW-109",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/map-unsupported-schema.yml",
+      "Requirement": "REQ-TW-109",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/map-valid.yml",
+      "Requirement": "REQ-TW-109",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/observation-declared-only.json",
+      "Requirement": "REQ-TW-112",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/observation-full-unattested.json",
+      "Requirement": "REQ-TW-112",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/observation-matrix.json",
+      "Requirement": "REQ-TW-119",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/observation-partial.json",
+      "Requirement": "REQ-TW-112",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/oracle-review-complete.json",
+      "Requirement": "REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/oracle-review-open.json",
+      "Requirement": "REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/oracle-review-self.json",
+      "Requirement": "REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/oracle-review-unexplained.json",
+      "Requirement": "REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/overflow-exhausted.json",
+      "Requirement": "REQ-TW-115",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/overflow-locator.json",
+      "Requirement": "REQ-TW-115",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/overflow-prohibited.json",
+      "Requirement": "REQ-TW-115",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/overflow-promote.json",
+      "Requirement": "REQ-TW-115",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/overflow-shard.json",
+      "Requirement": "REQ-TW-115",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/profile-valid.yml",
+      "Requirement": "REQ-TW-114",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/publication-boundary.yml",
+      "Requirement": "REQ-TW-120",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/receipt-cross-binding.json",
+      "Requirement": "REQ-TW-118",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/receipt-duplicate.jsonl",
+      "Requirement": "REQ-TW-118",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-nonidentical-duplicate-receipt-ledger-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/receipt-ledger.jsonl",
+      "Requirement": "REQ-TW-118",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-empty-receipt-ledger-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/receipt-plan-final.json",
+      "Requirement": "REQ-TW-118",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/receipt-replay.jsonl",
+      "Requirement": "REQ-TW-118",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-lineage-replay-receipt-ledger-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/receipt-tampered.json",
+      "Requirement": "REQ-TW-118",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/replay-isolated-mock.yml",
+      "Requirement": "REQ-TW-120",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/replay-no-authority.yml",
+      "Requirement": "REQ-TW-120",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/route-exact.json",
+      "Requirement": "REQ-TW-110",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/route-floors-all-b3.yml",
+      "Requirement": "REQ-TW-114",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/route-floors-expected.yml",
+      "Requirement": "REQ-TW-114",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/route-lfg-alias.json",
+      "Requirement": "REQ-TW-110",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/route-multiple.yml",
+      "Requirement": "REQ-TW-110",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/route-unknown.json",
+      "Requirement": "REQ-TW-110",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/selection-cap-equal.json",
+      "Requirement": "REQ-TW-114",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/selection-cap-minus-one.json",
+      "Requirement": "REQ-TW-114",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/selection-cap-plus-one.json",
+      "Requirement": "REQ-TW-114",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/selection-multiple-eligible.json",
+      "Requirement": "REQ-TW-114",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-manifest-complete.json",
+      "Requirement": "REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-manifest-delivery-direct.json",
+      "Requirement": "REQ-TW-117",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-manifest-delivery-locator.json",
+      "Requirement": "REQ-TW-117",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-manifest-delivery-shard.json",
+      "Requirement": "REQ-TW-117",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-manifest-new-dependency.json",
+      "Requirement": "REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-manifest-omitted.json",
+      "Requirement": "REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-manifest-temporal-external-excluded.json",
+      "Requirement": "REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-manifest-temporal-external-required.json",
+      "Requirement": "REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-oracle-all-excluded.yml",
+      "Requirement": "REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-oracle-empty.yml",
+      "Requirement": "REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/source-oracle-mandatory-excluded.yml",
+      "Requirement": "REQ-TW-116",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/strict-v1-consumer.rb",
+      "Requirement": "REQ-TW-110",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/model-context-routing/v1-receipts.json",
+      "Requirement": "REQ-TW-110; REQ-TW-118",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "frozen-atp-tw-049-input"
+    },
+    {
+      "Artifact Path": "fixtures/release-readiness/model-context-v050-candidate.yml",
+      "Requirement": "REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "exact-v050-candidate-readiness-input"
+    },
+    {
+      "Artifact Path": "fixtures/release-readiness/readiness-old-pr-only.yml",
+      "Requirement": "REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "old-pr-non-prerequisite-negative"
+    },
+    {
+      "Artifact Path": "fixtures/release-readiness/readiness-overclaim.yml",
+      "Requirement": "REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "held-claim-overreach-negative"
+    },
+    {
+      "Artifact Path": "fixtures/release-readiness/readiness-ref-version.yml",
+      "Requirement": "REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "exact-ref-version-negative"
+    },
+    {
+      "Artifact Path": "fixtures/release-readiness/readiness-trace-scope.yml",
+      "Requirement": "REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "bounded-trace-scope-negative"
+    },
+    {
+      "Artifact Path": "fixtures/release-readiness/runtime-receipt-ready.json",
+      "Requirement": "REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "fixture; verifies",
+      "Role": "release-runtime-receipt-positive-and-mutation-input"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-model-context-routing",
+      "Requirement": "REQ-TW-109; REQ-TW-110; REQ-TW-111; REQ-TW-112; REQ-TW-113; REQ-TW-114; REQ-TW-115; REQ-TW-116; REQ-TW-117; REQ-TW-118; REQ-TW-119; REQ-TW-120; REQ-TW-121; REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role; verifies",
+      "Role": "frozen-atp-tw-049-acceptance-runner"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-installer-transaction",
+      "Requirement": "REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role; verifies",
+      "Role": "complete-package-byte-mode-rollback-matrix"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-skill-execution-contract",
+      "Requirement": "REQ-TW-109; REQ-TW-110; REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "verifies",
+      "Role": "shadow-binding-and-v1-sec-invariance-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-bootstrap-project",
+      "Requirement": "REQ-TW-110; REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "verifies",
+      "Role": "source-bootstrap-shadow-projection-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-codex-discovery",
+      "Requirement": "REQ-TW-110; REQ-TW-121",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "verifies",
+      "Role": "real-installed-direct-callable-projection-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-workflow-profile",
+      "Requirement": "REQ-TW-109; REQ-TW-114",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "verifies",
+      "Role": "profile-hash-and-shadow-policy-regression-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-check-release-readiness",
+      "Requirement": "REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "entrypoint",
+      "Role": "exact-candidate-evidence-and-release-readiness-gate"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-release-readiness",
+      "Requirement": "REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "verifies",
+      "Role": "release-readiness-and-runtime-receipt-negative-smoke"
+    },
+    {
+      "Artifact Path": ".github/workflows/smoke-tests.yml",
+      "Requirement": "REQ-TW-109; REQ-TW-122",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "verifies",
+      "Role": "full-history-pr-verification-workflow"
+    },
+    {
+      "Artifact Path": ".github/workflows/release-on-version-bump.yml",
+      "Requirement": "REQ-TW-122",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "file-role; publication-boundary",
+      "Role": "main-only-exact-sha-release-and-runtime-receipt-workflow"
+    },
+    {
+      "Artifact Path": "docs/validation/traceweaver-plugin-0.5.0-release-candidate.md",
+      "Requirement": "REQ-TW-122; REQ-TW-123",
+      "Trace": "TRACE-TW-072",
+      "Verification": "VER-TW-092",
+      "Anchor Type": "release-candidate; evidence-envelope",
+      "Role": "exact-reviewed-scope-and-held-claim-release-gate"
+    },
     {
       "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series",
       "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
@@ -4208,6 +5252,38 @@
       "Verification": "VER-TW-087",
       "Anchor Type": "file-role; entrypoint",
       "Role": "compatibility-route-review-entrypoint"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence",
+      "Requirement": "REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087",
+      "Trace": "TRACE-TW-031; TRACE-TW-067",
+      "Verification": "VER-TW-040; VER-TW-087",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "retained-Sol-integrated-Terra-delivery-router"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review",
+      "Requirement": "REQ-TW-053; REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087",
+      "Trace": "TRACE-TW-033; TRACE-TW-067",
+      "Verification": "VER-TW-040; VER-TW-042; VER-TW-087",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "exact-integrated-review-publication-prerequisite-validator"
+    },
+    {
+      "Artifact Path": "fixtures/controlled-publication-route/reviews/mixed-integrated-clean.json",
+      "Requirement": "REQ-TW-053; REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087",
+      "Trace": "TRACE-TW-033; TRACE-TW-067",
+      "Verification": "VER-TW-042; VER-TW-087",
+      "Anchor Type": "fixture; verifies",
+      "Role": "mixed-candidate-integrated-review-publication-positive"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/tw-graph-lifecycle.md",
+      "Requirement": "REQ-TW-088",
+      "Trace": "TRACE-TW-066",
+      "Verification": "VER-TW-086",
+      "Anchor Type": "file-role",
+      "Role": "post-terminal-zero-model-tw-graph-projection-lifecycle"
     },
     {
       "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
@@ -4328,6 +5404,14 @@
       "Verification": "VER-TW-087",
       "Anchor Type": "file-role; verifies",
       "Role": "convergence-transition-fixture-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-consolidated-convergence",
+      "Requirement": "REQ-TW-056; REQ-TW-082; REQ-TW-083; REQ-TW-086; REQ-TW-087",
+      "Trace": "TRACE-TW-031; TRACE-TW-067",
+      "Verification": "VER-TW-040; VER-TW-087",
+      "Anchor Type": "file-role; verifies",
+      "Role": "two-turn-clean-and-four-turn-batched-repair-convergence-smoke"
     },
     {
       "Artifact Path": "scripts/traceweaver-smoke-scoped-review",
@@ -6764,6 +7848,15 @@
   ],
   "structured_acceptance_results": [
     {
+      "path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md",
+      "result_id": "RESULT-TW-049",
+      "requirement_id": "REQ-TW-122",
+      "status": "pass",
+      "final_disposition": "pass",
+      "owner": "Oxiom Systems",
+      "next_trigger": "Explicit merge authorization or any change to the reviewed behavior digest."
+    },
+    {
       "path": "docs/validation/traceweaver-graphify-wrapper-owner-acceptance-req-tw-089.md",
       "result_id": "SAR-TW-2026-07-23-GRAPHIFY-WRAPPER-REQ-TW-089",
       "requirement_id": "REQ-TW-089",
@@ -7708,6 +8801,162 @@
       ],
       "next_triggers": [
         "Wrapper lifecycle placement change, Graphify receipt contract change, semantic-refresh claim, or representative scenario regression."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-109",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-110",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-111",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-112",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-113",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-114",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-115",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-116",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-117",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-118",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-119",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-120",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-121",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-122",
+      "coverage_status": "acceptance_passed",
+      "structured_acceptance_result_ids": [
+        "RESULT-TW-049"
+      ],
+      "final_dispositions": [
+        "pass"
+      ],
+      "owners": [
+        "Oxiom Systems"
+      ],
+      "next_triggers": [
+        "Explicit merge authorization or any change to the reviewed behavior digest."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-123",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
       ]
     }
   ]

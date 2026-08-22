@@ -8,14 +8,14 @@ argument-hint: "[approved task or plan path]"
 
 ## Invocation Contract
 
-Before any other control-path action, run
+For a standalone `tw-work` invocation, run
 `<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
 exactly once with `--skill tw-work`, the selected `--risk`, and a stable
 `--invocation-id`. Continue only when it returns `terminal_state: resolved`;
 missing, invalid, stale, or ambiguous contracts stop the invocation. This
 resolves the checklist only. It does not dispatch a child or require
-served-model attestation; use the native-child routing adapter only when an
-actual child is requested.
+served-model attestation. When work is embedded in consolidated `tw-auto`, use
+the already resolved parent invocation and retained main context.
 
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-054; trace=TRACE-TW-035; ver=VER-TW-044 -->
 <!-- TRACEWEAVER: file-role=implementation-worker-skill; req=REQ-TW-057; trace=TRACE-TW-042; ver=VER-TW-054 -->
@@ -26,13 +26,14 @@ actual child is requested.
 <!-- TRACEWEAVER: file-role=review-series-repair-wrapper; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087 -->
 <!-- TRACEWEAVER: file-role=optional-graphify-work-refresh-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
 <!-- TRACEWEAVER: entrypoint=graphify_post_verification_refresh; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: file-role=consolidated-work-phase; req=REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-031,TRACE-TW-067; ver=VER-TW-040,VER-TW-087 -->
 
 # TraceWeaver Work
 
 ## Purpose
 
 Implement approved behavior through the TraceWeaver work loop. `tw-work` is the
-TraceWeaver implementation facade that `tw-auto` calls instead of raw `ce-work`.
+TraceWeaver implementation facade that `tw-auto` applies instead of raw `ce-work`.
 It keeps the familiar CE worker as the underlying coding engine, but adds the
 TraceWeaver responsibilities that must happen during implementation: authority
 visibility, trace-anchor authoring, verification evidence, matrix evidence, and
@@ -42,6 +43,15 @@ Use `tw-work` for behavior-bearing code, scripts, skill instructions, fixtures,
 smokes, manifests, runtime harnesses, and validation artifacts. Do not use it to
 approve or rewrite requirements.
 
+## Consolidated Delivery Route
+
+Load the `consolidated_delivery` block from the packaged sibling
+`<skills-root>/tw-auto/references/workflow-profile-template.yml`. For normal
+approved work, apply this skill as an embedded phase in the retained
+`gpt-5.6-sol` main context. The same primary owns implementation, focused
+verification, trace/matrix updates, and one batched repair. Do not dispatch
+builder, verifier, trace, or repair children.
+
 ## Review-Series Repair Contract
 
 When work belongs to a review series, resolve the packaged sibling
@@ -49,24 +59,23 @@ When work belongs to a review series, resolve the packaged sibling
 generation through `tw-auto/scripts/traceweaver-review-series`. Preserve the
 frozen scope, series, current repair-verification attempt, ledger digest,
 eligible blocker set, evidence history, four semantic identity inputs, audit
-metadata, and remaining budget. Record this `tw-work` call as a distinct
-dispatch under the current attempt.
+metadata, and remaining budget. An embedded repair resumes the existing Sol
+context; it is a counted repair turn, not a new worker identity or child.
 
-Repair only retained in-scope blockers and genuine in-scope repair regressions.
-Never open discovery, reset the budget, widen scope, or turn non-blocking
-wording/style debt into another cycle. One routine repair-and-rerun is
-available. One final cycle requires the controller's owner- or approved
-change-control-authority receipt bound to the series, retained fingerprint,
-severity/context, authorization reason, and final-cycle limit.
+Collect all eligible P0/P1 and blocking P2 findings before editing, repair them
+in one batch, and rerun focused affected verification. Non-blocking P2/P3 debt
+does not consume repair work. One repair batch is the normal automatic maximum;
+the same blocker without relevant evidence progress returns `held_no_progress`.
+Only a fresh explicit owner or approved change-control decision may invoke the
+REQ-TW-037/056/057 severe-blocker exception outside that automatic budget.
 
 ## Native Child Routing
 
-Before any TraceWeaver-owned native Codex builder, verifier, or repair call,
-run the packaged sibling `tw-auto/scripts/traceweaver-route-native-child`
-against the canonical workflow-profile contract. Use only its explicit
-dispatch parameters and finalize its receipt with independent host/execution
-attestation. A held route makes child output ineligible; never inherit a model,
-fall back, or edit an imported CE-derived body to bypass the overlay.
+Normal consolidated work has no native builder, verifier, or repair call. The
+current Sol main session performs those phases directly. The native-child
+routing adapter `tw-auto/scripts/traceweaver-route-native-child` is used later
+by `tw-auto` for the one Terra integrated reviewer, not to turn this work phase
+into a child. Sol remains prohibited for subagents.
 
 ## Required Inputs
 
@@ -86,9 +95,9 @@ broaden requirements to make implementation possible.
 
 ## Authority-Gate Preflight
 
-`tw-work` is the only implementation entrypoint. Immediately before it delegates
-to the TraceWeaver-packaged `ce-work` engine, it must run or require
-`tw-authority-gate` for the exact approved task, plan, changed-file scope,
+`tw-work` is the only implementation entrypoint. Immediately before it applies
+the TraceWeaver-packaged `ce-work` engine, it must run or require
+the `tw-authority-gate` rules for the exact approved task, compact plan, changed-file scope,
 requirement IDs, trace IDs, verification target, validation question, baseline
 ID/hash, and must-not-change boundaries.
 
@@ -98,19 +107,19 @@ state, tied to unreviewed requirements, or cannot identify the allowed
 implementation scope, `tw-work` must stop before packaged `ce-work` and return
 the exact missing authority or human decision needed.
 
-When the gate passes, `tw-work` passes the approved authority capsule to
-packaged `ce-work` in no-publication mode. Packaged `ce-work` remains the coding
+When the gate passes, `tw-work` applies the packaged `ce-work` method in the
+same primary context and in no-publication mode. Packaged `ce-work` remains the coding
 engine only; it does not approve authority, traceability, review completion, or
 publication.
 
 ## Workflow Profile Preflight
 
-Before the first builder mutation, `tw-work` requires a frozen
-`tw-workflow-profile/1` profile created by `tw-plan`. It must identify the
+Before the first mutation, `tw-work` requires a frozen
+`tw-workflow-profile/1` profile selected during the compact planning phase. It must identify the
 deterministically selected L0-L3 risk, selected controls, child roles, model
 availability/choice/rationale, reviewer cap, repair-cycle cap, deploy and
 dogfood requirements, estimate-derived process guards, revision, and canonical
-profile hash. The profile is immutable after the first builder dispatch.
+profile hash. The profile is immutable after the first mutation.
 
 `tw-work` must not silently add controls, reviewers, or a model fallback after
 building starts. It returns `refused_profile_immutable` unless a new profile
@@ -133,41 +142,38 @@ delivery underrun. There is no in-task exception.
 
 ## V&V Definition Preflight
 
-Before any mutation, `tw-work` uses the frozen profile's proportional
-precondition for the exact work item. L0 has no V&V capsule and no exception
-ceremony; it may proceed only with the profile's applicable deterministic check.
-L1 consumes exactly one compact work-item capsule (authority reference, focused
-verification, one validation question, expected evidence) and must not demand a
-per-requirement validation document. L2/L3 consume the full v1 preconditions:
+Before any mutation, the same primary performs proportional V&V/test-first
+setup for the exact work item. L0 records its applicable deterministic check.
+L1 defines one compact work item with the authority reference, focused
+verification, one validation question, and expected evidence. L2/L3 define the
+full v1 controls, including rollback and owner-decision controls for L3.
 
-1. a full V&V definition capsule produced by `tw-vv-define`, linked to the matrix,
-   and accepted by the skill-local checker with review evidence:
+When a capsule is required, the retained primary may create/update it and run
+the deterministic checker mechanically:
 
    ```sh
    plugins/traceweaver-core/skills/tw-vv-define/scripts/traceweaver-check-vv-capsule \
      --root <repo-root> \
-     --capsule <capsule-path> \
-     --require-review-passed
+     --capsule <capsule-path>
    ```
 
-   The capsule must satisfy the checker schema: each behavior-bearing
-   requirement has its REQ/TRACE/VER/VAL IDs, executable verification artifact,
-   expected-failing (RED) evidence, validation artifact, and review-passed
-   evidence path. `tw-work` verifies this prior evidence; it does not create
-   the RED artifact at work time.
-2. an L1 compact capsule accepted by the same checker. Its
-   `schema_version` is `tw-vv-compact/1`, its `workflow_profile` is `L1`, and
-   it has no `requirements[]` or `validation_artifact` fan-out fields.
+The pre-mutation check covers schema, authority bindings, test-first/RED
+evidence, validation intent, and required high-risk controls. Independent V&V
+adequacy is one lens of the integrated terminal reviewer; it does not require a
+separate pre-work review-passed receipt on the normal REQ-TW-065 proportional
+path.
 
-3. for L3 only, the full capsule also contains non-empty rollback and
-   owner-decision high-risk controls; missing controls are
-   `held_missing_control`.
+If separately approved authority or project policy explicitly activates a
+REQ-TW-076..078-style pre-reviewed V&V capsule, consume that pre-existing
+review decision and run the same checker with `--require-review-passed`. A
+missing review-passed state holds before mutation. Do not create a new pre-work
+reviewer or review cycle to satisfy this conditional; authority must already
+provide the review-passed capsule or change before work resumes.
 
-For L1-L3, a missing, invalid, non-review-passed where required, or
-wrong-work-item capsule is a stop before mutation and before packaged `ce-work`.
-Return control to `tw-auto`, which routes the work item back to
-`tw-vv-define`; do not infer a capsule, backfill RED evidence, or treat a later
-test run as a substitute.
+A missing or invalid required
+definition stops before mutation. Do not dispatch `tw-vv-define`, a verifier,
+or a capsule reviewer on the normal consolidated path; do not infer evidence or
+treat a later test run as a substitute for required setup.
 
 <!-- Provenance: rigor mechanism adapted in original TraceWeaver wording from
 obra/superpowers test-driven-development and verification-before-completion,
@@ -176,7 +182,7 @@ pinned d884ae04; source text is not copied. -->
 ### Implementation Without V&V Definition: Refusal Rule
 
 For this static/advisory alpha contract, a behavior-bearing implementation has
-no authorized work-loop entry when its reviewed V&V definition or scoped
+no authorized work-loop entry when its valid V&V definition or scoped
 exception is absent. Stop and name the missing capsule or decision. This is a
 policy/skill-instruction contract, not runtime enforcement; any claim of a
 mechanically enforced host block remains held pending runtime proof.
@@ -236,16 +242,15 @@ complete/done/accepted wording.
    exists. If it is Authority Baseline Mode or Publication Mode, return control
    to `tw-auto` with that classification.
 2. Run the authority-gate preflight above before implementation.
-3. Run the V&V Definition Preflight for behavior-bearing changes. If the
-   review-passed V&V capsule or recorded scoped not-applicable/approved
-   exception is absent or invalid, stop before mutation and return control to
-   `tw-auto` for routing to `tw-vv-define`.
+3. Perform the V&V Definition Preflight for behavior-bearing changes in this
+   same context. If the required definition or recorded scoped
+   not-applicable/approved exception is absent or invalid, stop before mutation.
 4. Apply the closure-claim validation gate when the work package claims a
    requirement, task, PR, or implementation is complete, accepted, closed, or
    done. Missing or invalid structured acceptance evidence blocks completion
    wording even if implementation verification passed.
-5. Invoke the TraceWeaver-packaged `ce-work` implementation flow in
-   no-publication mode with the approved authority capsule, verification target,
+5. Apply the TraceWeaver-packaged `ce-work` implementation flow in this primary
+   context and in no-publication mode with the approved authority capsule, verification target,
    changed-file scope, and matrix-update requirement.
 6. Build the changed-file scope from behavior-bearing files plus linked
    tests/fixtures/smokes, including newly created untracked files. Keep authority
@@ -267,11 +272,13 @@ complete/done/accepted wording.
 11. When implementation, verification, scanner, and trace/matrix updates are
    complete, `tw-work` may perform review-staging for an explicit scoped file
    list that belongs to this work item. Review-staging is allowed only to make
-   `tw-code-review` / `tw-doc-review` artifact identity coherent. It is not
+   the integrated `tw-code-review` artifact identity coherent. Standalone
+   document-only work may instead use `tw-doc-review`. Review-staging is not
    publication authority.
-12. Return control to `tw-auto` with changed files, staged files when
-   review-staging was used, verification evidence, source-anchor changes,
-   matrix evidence changes, open gaps, held claims, and the next review command.
+12. Freeze the candidate once and continue in the same `tw-auto` invocation to
+   the one integrated `tw-code-review` reviewer. Include changed files,
+   verification evidence, source-anchor and matrix changes, open gaps, and held
+   claims. Do not route a second document review for the mixed candidate.
 
 ## Authoring Rules
 
@@ -371,14 +378,16 @@ structured pause reason to `tw-auto`. If the helper returns
 `traceweaver-check-code-anchors --unresolved-mappings <path>` so the unresolved
 mapping blocks acceptance as a structured finding.
 
-## Optional Graphify Post-Verification Refresh
+## Optional Graphify Pre-Review Refresh
 
-After focused verification passes, and only when the work package changed
-behavior-bearing or trace-bearing artifacts, locate the packaged sibling
+After focused verification passes and before review handoff, when the work
+changed behavior-bearing or trace-bearing artifacts, locate the packaged sibling
 `tw-auto/scripts/traceweaver-graphify-advisory` helper and run `refresh --root
 <project-root>` with one `--changed-file` argument per relevant changed path.
-The helper owns exactly one root-bound `graphify update .` before review handoff.
-Include its root, explicit graph path, command, and outcome in the work receipt.
+The retained Sol main context invokes the helper directly; it dispatches no
+child. The helper owns exactly one root-bound `graphify update .` before review
+handoff. Include its root, explicit graph path, command, and outcome in the work
+receipt carried to `tw-auto` and the integrated reviewer.
 
 Graphify failure does not block verification, traceability, or review: record
 `graphify_status=degraded` or `not_installed` and continue from authoritative
@@ -420,23 +429,24 @@ verification, and review-staging for the implementation slice. Do not return
 standalone `tw-authority-gate` or `tw-traceability-check` as the normal next
 user command after work.
 
-When work is ready for review, return the highest-level next wrapper:
-`/tw-code-review ...` for changed code-like files, scoped `/tw-doc-review ...`
-only for normative semantic-authority changes, or return control to
-`/tw-auto ...` when the automation loop should continue. Status/hash/receipt/projection
+When consolidated work is ready for review, remain in the same `/tw-auto`
+invocation and dispatch its one integrated `/tw-code-review` reviewer. Do not
+emit a separate `/tw-doc-review` for a mixed candidate. Status/hash/receipt/projection
 bookkeeping uses the deterministic `mechanical_closure` route and dispatches no
 reviewer after exact accepted-review reuse. Recommend standalone lower gates only for an
 explicit diagnostic, audit, baseline-authority review, or a human-decision pause
 where no higher wrapper can proceed.
 
-## Mandatory tw-graph Lifecycle
+## Post-Terminal tw-graph Lifecycle
 
 Load `references/tw-graph-lifecycle.md` before applying this lifecycle.
 
-After one accepted change cycle changes authority, trace, evidence, or verified
-behavior, `tw-work` owns exactly one `tw-graph refresh` and immediately
-runs `tw-graph check`. Same-cycle re-entry is idempotent; later source change
-requires a new authorized cycle. Graphify is separate optional enrichment.
+Do not refresh generated graph state during implementation or semantic review.
+After terminal acceptance, the retained `/tw-auto` Sol context owns exactly one
+mechanical `tw-graph refresh` followed immediately by `tw-graph check`.
+Same-cycle exact re-entry is idempotent, dispatches zero models, and cannot
+reopen the accepted integrated review. This authoritative `tw-graph` closure is
+separate from the optional pre-review Graphify refresh above.
 
 ## Output
 

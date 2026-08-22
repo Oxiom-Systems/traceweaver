@@ -1,6 +1,6 @@
 ---
 name: tw-plan
-description: TraceWeaver-controlled planning wrapper. Use when planning meaningful work that must stay bounded by requirements, Intent Contract authority, traceability, verification, validation, and no-publication controls before implementation.
+description: TraceWeaver-controlled planning guidance. Use as an embedded phase of consolidated delivery, or standalone only when the user explicitly requests a plan artifact or planning-only result.
 argument-hint: "[feature description, requirements doc path, or plan path]"
 ---
 
@@ -8,19 +8,21 @@ argument-hint: "[feature description, requirements doc path, or plan path]"
 
 ## Invocation Contract
 
-Before any other control-path action, run
+For a standalone `tw-plan` invocation, run
 `<skills-root>/tw-auto/scripts/traceweaver-resolve-skill-execution-contract`
 exactly once with `--skill tw-plan`, the selected `--risk`, and a stable
 `--invocation-id`. Continue only when it returns `terminal_state: resolved`;
 missing, invalid, stale, or ambiguous contracts stop the invocation. This
 resolves the checklist only. It does not dispatch a child or require
-served-model attestation; use the native-child routing adapter only when an
-actual child is requested.
+served-model attestation. When `tw-plan` is an embedded phase of `tw-auto`, use
+the already resolved parent invocation; do not create another invocation or
+model dispatch.
 
 <!-- TRACEWEAVER: file-role=planning-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-036; ver=VER-TW-046 -->
 <!-- TRACEWEAVER: file-role=planning-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=optional-graphify-planning-route; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084 -->
 <!-- TRACEWEAVER: entrypoint=graphify_planning_orientation; req=REQ-TW-090; trace=TRACE-TW-064; ver=VER-TW-084 -->
+<!-- TRACEWEAVER: file-role=consolidated-planning-phase; req=REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-031,TRACE-TW-067; ver=VER-TW-040,VER-TW-087 -->
 
 # TraceWeaver Plan
 
@@ -37,9 +39,23 @@ planning when the resulting plan may become TraceWeaver implementation input.
 Do not use it to approve, rewrite, broaden, or silently reinterpret
 requirements.
 
+## Consolidated Delivery Route
+
+Load the `consolidated_delivery` block from the packaged sibling
+`<skills-root>/tw-auto/references/workflow-profile-template.yml`. For normal
+approved behavior or a mixed candidate, planning is a compact embedded phase
+performed by the retained `gpt-5.6-sol` main session. It dispatches no planning
+child, creates no plan artifact, and does not trigger plan document review.
+
+Use standalone mode only when the user explicitly requests a plan artifact or
+planning-only result, or when material normative authority must change before
+implementation. A complex implementation does not by itself require
+standalone planning.
+
 ## Native Child Routing
 
-Before any TraceWeaver-owned native Codex planning call, run the packaged
+Only a separately authorized standalone planning call may need a native child.
+Before that call, run the packaged
 sibling `tw-auto/scripts/traceweaver-route-native-child` against the canonical
 workflow-profile contract. Use only its explicit dispatch parameters and
 finalize its receipt with independent host/execution attestation. A held route
@@ -85,6 +101,10 @@ TraceWeaver-packaged `ce-plan` engine, it must run or require the
 `tw-requirements-review` preflight for any new, changed, candidate, unclear,
 unreviewed, or authority-impacting requirement text.
 
+In consolidated delivery, apply that preflight in the retained main context;
+it is not a requirements-review child. Accepted unchanged authority is cited
+once and is not reviewed again.
+
 When requirements are already accepted and unchanged, `tw-plan` may cite the
 existing accepted requirements-review evidence instead of rerunning the review.
 That citation must identify the accepted requirement IDs, baseline hash, and
@@ -124,14 +144,15 @@ risk candidates, or clarification questions, but it must not approve them.
 5. Confirm the baseline ID/hash, requirement IDs, trace/matrix context,
    verification target, validation question, and held claims that bound the
    planning run.
-6. Delegate planning to the TraceWeaver-packaged `ce-plan` engine only after the
-   requirements-quality preflight and authority context are passable, accepted
-   as unchanged, or explicitly held with allowed use recorded.
-7. Keep `ce-plan` in no-publication mode. It may create or update a plan
-   artifact, but it must not implement code, stage files, commit, push, open
-   PRs, update PRs, claim runtime readiness, or claim publication readiness.
-8. Return the plan with its accepted authority scope, held claims, verification
-   targets, next TraceWeaver command, and any unresolved authority gaps.
+6. In consolidated delivery, return the compact plan directly to the same Sol
+   context and continue into the `tw-work` phase without a child, artifact, or
+   document-review handoff.
+7. In explicitly standalone mode only, delegate to the TraceWeaver-packaged
+   `ce-plan` engine after the preflight. Keep it in no-publication mode; it may
+   create or update the requested plan artifact but may not implement or
+   publish.
+8. Return the accepted authority scope, held claims, verification targets, and
+   unresolved authority gaps in the form appropriate to the selected mode.
 
 ## Optional Graphify Planning Context
 
@@ -168,15 +189,11 @@ review gate.
 return standalone `tw-requirements-review` as the normal next user command when
 accepted unchanged requirements can be cited and planning can proceed.
 
-After plan creation or update, recommend the highest-level executable next
-wrapper: normally `/tw-doc-review <plan>` for plan acceptance. The frozen
-profile determines the V&V route: L0 records no capsule or exception ceremony
-and goes to its applicable deterministic check; L1 uses `/tw-vv-define <plan>`
-to produce one compact work-item capsule; L2/L3 use `/tw-vv-define <plan>` for
-the compatible full v1 capsule. Route to `/tw-work <plan>` only with the
-profile's required evidence. Do not create per-requirement validation documents
-for L1.
-Use `/tw-auto <plan-or-task>` for a multi-step closure loop. Recommend standalone
+In consolidated delivery, remain in the same `/tw-auto` invocation and proceed
+to the embedded `tw-work` phase with proportional V&V/test-first setup. Do not
+emit `/tw-doc-review`, `/tw-vv-define`, or `/tw-work` as separate user or child
+handoffs. For an explicitly requested standalone plan, return the plan to the
+user; review it only when it changes normative authority. Recommend standalone
 `tw-requirements-review` only for explicit requirements diagnostics,
 baseline-authority review, or when planning is blocked because no higher wrapper
 can proceed without a human authority decision.

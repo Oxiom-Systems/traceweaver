@@ -1,0 +1,211 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "workflow_profile": "L3",
+  "work_item_id": "TASK-TW-2026-08-22-V050-MODEL-GOVERNANCE-001",
+  "plan_ref": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
+  "acceptance_cases": {
+    "manifest": "fixtures/model-context-routing/acceptance-cases.yml",
+    "frozen_case_count": 72,
+    "case_id_prefix_by_requirement": {
+      "REQ-TW-109": "MC109_",
+      "REQ-TW-110": "MC110_",
+      "REQ-TW-111": "MC111_",
+      "REQ-TW-112": "MC112_",
+      "REQ-TW-113": "MC113_",
+      "REQ-TW-114": "MC114_",
+      "REQ-TW-115": "MC115_",
+      "REQ-TW-116": "MC116_",
+      "REQ-TW-117": "MC117_",
+      "REQ-TW-118": "MC118_",
+      "REQ-TW-119": "MC119_",
+      "REQ-TW-120": "MC120_",
+      "REQ-TW-121": "MC121_",
+      "REQ-TW-122": "MC122_",
+      "REQ-TW-123": "MC123_"
+    },
+    "installer_failure_phases": [
+      "after_preflight_snapshot",
+      "after_skills_projection",
+      "after_references_projection",
+      "after_agents_projection",
+      "after_direct_callables_projection",
+      "after_generated_routing_projection",
+      "after_plugin_manifest_projection",
+      "after_install_manifest_write",
+      "after_reconciliation_cleanup"
+    ],
+    "installer_target_states": ["pre_existing", "absent"],
+    "frozen_case_rule": "no_remove_rename_weaken_or_skip"
+  },
+  "high_risk_controls": {
+    "rollback": "Abandon or revert the exact integrated branch/PR; injected installer failures restore the complete prior touched projection byte/mode-exactly; active cutover is disabled.",
+    "owner_decision": "TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001"
+  },
+  "requirements": [
+    {
+      "req_id": "REQ-TW-109",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-110",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-111",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-112",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-113",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-114",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-115",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-116",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-117",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-118",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-119",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-120",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-121",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-122",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-123",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-22-v050-model-governance-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-PLAN-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-plan-doc-review.md"}]
+    }
+  ]
+}

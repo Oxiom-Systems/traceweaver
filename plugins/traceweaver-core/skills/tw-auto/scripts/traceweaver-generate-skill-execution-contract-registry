@@ -1,9 +1,14 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
+# TRACEWEAVER: file-role=skill-execution-contract-registry-generator; req=REQ-TW-109,REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072; ver=VER-TW-092
+
 # TRACEWEAVER: entrypoint=generate_skill_execution_contract_registry; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090
+# TRACEWEAVER: entrypoint=bind_shadow_model_context_registry; req=REQ-TW-109,REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072; ver=VER-TW-092
 require "optparse"
 require "digest"
+require "date"
+require "json"
 require "pathname"
 require "yaml"
 
@@ -22,6 +27,32 @@ source = File.read(registry_path)
 registry = YAML.safe_load(source, permitted_classes: [], aliases: false)
 abort("sec_registry_generator=invalid_registry") unless registry.is_a?(Hash) && registry["contracts"].is_a?(Array)
 
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.to_h do |key|
+      raw = value.key?(key) ? value[key] : value.fetch(key.to_sym)
+      [key, canonical(raw)]
+    end
+  when Array then value.map { |item| canonical(item) }
+  when Date then value.iso8601
+  else value
+  end
+end
+
+map_reference = "plugins/traceweaver-core/references/model-context-map.yml"
+map_mirror_reference = "plugins/traceweaver-core/skills/tw-auto/references/model-context-map.yml"
+map_path = root.join(map_reference)
+map_mirror_path = root.join(map_mirror_reference)
+abort("sec_registry_generator=missing_model_context_map") unless map_path.file? && map_mirror_path.file?
+abort("sec_registry_generator=model_context_map_mirror_drift") unless File.binread(map_path) == File.binread(map_mirror_path)
+map = YAML.safe_load(File.read(map_path), permitted_classes: [Date], aliases: false)
+abort("sec_registry_generator=invalid_model_context_map") unless map.is_a?(Hash) && map["schema_version"] == "tw-model-context-map/1"
+recorded_map_digest = map["map_digest"]
+map_payload = map.reject { |key, _| key.to_s == "map_digest" }
+actual_map_digest = "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(map_payload)))}"
+abort("sec_registry_generator=model_context_map_digest_mismatch") unless recorded_map_digest == actual_map_digest
+
 contracts = registry.fetch("contracts")
 skills = contracts.map { |entry| entry.fetch("skill") }
 abort("sec_registry_generator=contract_order_not_lexical") unless skills == skills.sort && skills.uniq == skills
@@ -35,8 +66,8 @@ def packaged_references(source, skill)
     filename = reference.delete_prefix("references/")
     if filename == "scoped-review-protocol.md" && %w[tw-code-review tw-doc-review tw-work].include?(skill)
       "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
-    elsif filename == "workflow-profile-template.yml" && skill == "tw-plan"
-      "plugins/traceweaver-core/references/#{filename}"
+    elsif filename == "workflow-profile-template.yml" && %w[tw-auto tw-plan tw-work tw-code-review tw-doc-review].include?(skill)
+      "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
     elsif filename == "tw-graph-lifecycle.md"
       "plugins/traceweaver-core/references/#{filename}"
     else
@@ -68,6 +99,24 @@ metadata_lines = ["skill_metadata:"] + metadata.map do |skill, entry|
   "  #{skill}: { #{fields} }"
 end
 generated = source.sub(/^callable_count:\s*\d+$/, "callable_count: #{skills.length}")
+model_context_lines = <<~YAML
+  model_context_map:
+    schema_version: tw-model-context-map/1
+    map_path: #{map_reference}
+    mirror_path: #{map_mirror_reference}
+    map_digest: #{recorded_map_digest}
+    profile_path: plugins/traceweaver-core/references/workflow-profile-template.yml
+    compiler_path: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-compile-model-context-route
+    receipt_validator_path: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-validate-model-context-receipt
+    mode: advisory_shadow_compile
+    authoritative_runtime: v1
+    v1_receipt_projection: separate_shadow_artifact_only_v1_unchanged
+YAML
+if generated.match?(/^model_context_map:\n.*?(?=^defaults:)/m)
+  generated = generated.sub(/^model_context_map:\n.*?(?=^defaults:)/m, model_context_lines)
+else
+  generated = generated.sub(/^defaults:/, "#{model_context_lines}defaults:")
+end
 generated = generated.sub(/^skill_metadata:\n.*?(?=^contracts:)/m, "#{metadata_lines.join("\n")}\n")
 abort("sec_registry_generator=registry_sections_missing") if generated == source && registry.fetch("callable_count") != skills.length
 

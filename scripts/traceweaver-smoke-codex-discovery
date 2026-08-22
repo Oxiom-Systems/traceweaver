@@ -11,6 +11,7 @@ set -euo pipefail
 # TRACEWEAVER: verifies=VER-TW-056; req=REQ-TW-061; trace=TRACE-TW-044
 # TRACEWEAVER: file-role=optional-graphify-install-discovery-smoke; req=REQ-TW-089; trace=TRACE-TW-064; ver=VER-TW-084
 # TRACEWEAVER: verifies=VER-TW-084; req=REQ-TW-090; trace=TRACE-TW-064
+# TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072
 
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 tmp_root="$(mktemp -d)"
@@ -272,9 +273,11 @@ required_skill_local_files=(
   "tw-auto/references/trace-anchor-authoring.md"
   "tw-traceability-check/scripts/traceweaver-check-code-anchors"
   "tw-traceability-check/scripts/traceweaver-author-code-anchors"
+  "tw-commit-push-pr/scripts/traceweaver-check-publication-review"
   "tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
   "tw-auto/scripts/traceweaver-graphify-advisory"
   "tw-auto/scripts/traceweaver-route-native-child"
+  "tw-auto/scripts/traceweaver-route-convergence"
   "tw-auto/scripts/traceweaver-resolve-skill-execution-contract"
   "tw-auto/scripts/traceweaver-generate-skill-execution-contract-registry"
   "tw-graph/scripts/traceweaver-semantic-html-preview"
@@ -430,15 +433,25 @@ done
 
 test -x "$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
 test -x "$callable_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule"
+test -x "$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-check-publication-review"
+test -x "$callable_skills_root/tw-commit-push-pr/scripts/traceweaver-check-publication-review"
 test -x "$packaged_skills_root/tw-auto/scripts/traceweaver-route-review"
 test -x "$callable_skills_root/tw-auto/scripts/traceweaver-route-review"
 test -x "$packaged_skills_root/tw-auto/scripts/traceweaver-review-series"
 test -x "$callable_skills_root/tw-auto/scripts/traceweaver-review-series"
 test -x "$packaged_skills_root/tw-auto/scripts/traceweaver-route-native-child"
 test -x "$callable_skills_root/tw-auto/scripts/traceweaver-route-native-child"
+test -x "$packaged_skills_root/tw-auto/scripts/traceweaver-route-convergence"
+test -x "$callable_skills_root/tw-auto/scripts/traceweaver-route-convergence"
 "$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-validate-publication-capsule" --help >/dev/null
 echo "installed_publication_capsule_validator=pass"
+"$packaged_skills_root/tw-commit-push-pr/scripts/traceweaver-check-publication-review" \
+  --record "$repo_root/fixtures/controlled-publication-route/reviews/mixed-integrated-clean.json" \
+  --candidate-kind mixed \
+  --candidate-digest sha256:1111111111111111111111111111111111111111111111111111111111111111 >/dev/null
+echo "installed_publication_review_validator=pass"
 echo "installed_native_child_routing_adapter=pass"
+echo "installed_consolidated_delivery_router=pass"
 
 installed_preview_root="$tmp_root/installed-semantic-preview-root"
 mkdir -p "$installed_preview_root/.traceweaver"
@@ -460,6 +473,28 @@ callable_graphify_status="$(TRACEWEAVER_GRAPHIFY_BIN="$tmp_root/not-installed" "
 grep -Fq "graphify_status=not_installed" <<<"$packaged_graphify_status"
 grep -Fq "graphify_status=not_installed" <<<"$callable_graphify_status"
 echo "installed_graphify_advisory_helper=pass"
+
+direct_sec_receipt="$tmp_root/direct-sec-receipt.json"
+"$callable_skills_root/tw-auto/scripts/traceweaver-resolve-skill-execution-contract" \
+  --skill tw-plan \
+  --risk L2 \
+  --invocation-id installed-direct-callable >"$direct_sec_receipt"
+assert_equal "installed_direct_sec_terminal" "resolved" "$(json_query "$direct_sec_receipt" terminal_state)"
+assert_equal "installed_direct_sec_skill" "tw-plan" "$(json_query "$direct_sec_receipt" contract.skill)"
+echo "installed_direct_sec_resolution=pass"
+
+direct_bootstrap_root="$tmp_root/direct-bootstrap-root"
+mkdir -p "$direct_bootstrap_root"
+direct_bootstrap_output="$tmp_root/direct-bootstrap.out"
+"$callable_skills_root/tw-setup/scripts/traceweaver-bootstrap-project" \
+  --root "$direct_bootstrap_root" >"$direct_bootstrap_output"
+grep -Fq "bootstrap_result=bootstrapped_template_manual_launch_only" "$direct_bootstrap_output"
+assert_file "$direct_bootstrap_root/.traceweaver/model-context-map.yml"
+assert_equal \
+  "installed_direct_bootstrap_model_context_map" \
+  "$(hash_file "$references_root/model-context-map.yml")" \
+  "$(hash_file "$direct_bootstrap_root/.traceweaver/model-context-map.yml")"
+echo "installed_direct_bootstrap=pass"
 
 assert_file "$references_root/traceweaver-model-defaults.md"
 grep -Fq "Compatibility pointer" "$references_root/traceweaver-model-defaults.md"

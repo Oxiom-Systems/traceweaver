@@ -1,0 +1,4 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-120; trace=TRACE-TW-072; ver=VER-TW-092
+mode: advisory_shadow_compile
+publication_permitted: false
+expected: pass_compile_cannot_publish

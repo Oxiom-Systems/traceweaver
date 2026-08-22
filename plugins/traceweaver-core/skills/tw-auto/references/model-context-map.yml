@@ -1,0 +1,89 @@
+# TRACEWEAVER: file-role=model-context-canonical-map; req=REQ-TW-109,REQ-TW-111,REQ-TW-114,REQ-TW-116; trace=TRACE-TW-072; ver=VER-TW-092
+# This is a shadow-only declaration. It does not alter v1 routing or establish
+# active descendant enforcement, model attestation, savings, or sufficiency.
+schema_version: tw-model-context-map/1
+map_id: MC-MAP-TW-0.5.0-001
+map_status: approved_shadow_hypothesis
+canonicalization: sha256-recursively-key-sorted-json-arrays-preserved-map-digest-excluded
+model_role: advisory_shadow_context_recommendation
+risk_effort: profile_risk_selected
+packet_budget: profile_budget_class
+context_completeness: owner_controlled_six_category_oracle
+authoritative_runtime: v1
+mode: advisory_shadow_compile
+active_cutover: disabled
+active_enforcement: false
+qualification_states: [unqualified, structurally_eligible, qualified]
+efficiency_eligibility: false
+profile_contract: plugins/traceweaver-core/references/workflow-profile-template.yml
+profile_schema: tw-model-context-profile/1
+
+# REQ-TW-114: the complete top-level callable inventory is the 27 SEC tw-*
+# callables plus the one explicit lfg alias.  Floors are not model identities.
+top_level_route_floors:
+  B0: [tw-graph, tw-setup, tw-update]
+  B1: [tw-authority-gate, tw-commit, tw-commit-push-pr, tw-requirements-review, tw-sessions, tw-strategy, tw-test-browser, tw-test-xcode, tw-worktree]
+  B2: [tw-brainstorm, tw-code-review, tw-compound, tw-compound-refresh, tw-debug, tw-doc-review, tw-grill, tw-ideate, tw-resolve-pr-feedback, tw-traceability-check]
+  B3: [tw-audit, tw-auto, tw-plan, tw-vv-define, tw-work]
+aliases:
+  lfg: tw-auto
+
+# Closed discovery grammar. Imported CE bodies are read-only input files; the
+# resulting records are declared templates, not runtime descendant observations.
+discovery:
+  sec_registry: plugins/traceweaver-core/references/skill-execution-contracts.yml
+  top_level_callable_prefix: tw-
+  alias: { route_id: lfg, canonical_route_id: tw-auto }
+  imported_engines:
+    - { engine: ce-brainstorm, parent_route: tw-brainstorm, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-code-review, parent_route: tw-code-review, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-compound, parent_route: tw-compound, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-compound-refresh, parent_route: tw-compound-refresh, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-debug, parent_route: tw-debug, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-doc-review, parent_route: tw-doc-review, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-ideate, parent_route: tw-ideate, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-plan, parent_route: tw-plan, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-resolve-pr-feedback, parent_route: tw-resolve-pr-feedback, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-sessions, parent_route: tw-sessions, prompt_directories: [references/agents, references/personas] }
+    - { engine: ce-work, parent_route: tw-work, prompt_directories: [references/agents, references/personas] }
+  generic_families:
+    - { parent_route: tw-commit, family: publication_preparer }
+    - { parent_route: tw-commit-push-pr, family: publication_delegate }
+    - { parent_route: tw-debug, family: diagnosis_worker }
+    - { parent_route: tw-worktree, family: worktree_operator }
+
+source_oracle:
+  categories: [controlling_authority, task_scope, skill_contract, implementation_dependencies, current_external_sources, accepted_evidence]
+  dispositions: [satisfied, excluded_by_authority, held]
+  mandatory_all_routes: [controlling_authority, task_scope, skill_contract]
+  mandatory_implementation_review_publication: [implementation_dependencies, accepted_evidence]
+  conditional_temporal_external: current_external_sources
+  temporal_external_routes: []
+  mandatory_category_exclusion_allowed: false
+  empty_or_all_excluded_allowed: false
+  compiler_may_author_oracle: false
+  recall_requirement: 100_percent
+  adequacy_review_locator: plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
+  adequacy_review_schema: tw-model-context-oracle-adequacy-review/1
+
+route_kinds:
+  implementation: [tw-auto, tw-work, tw-worktree]
+  review: [tw-audit, tw-code-review, tw-doc-review, tw-resolve-pr-feedback, tw-test-browser, tw-test-xcode, tw-traceability-check]
+  publication: [tw-commit, tw-commit-push-pr]
+
+accounting:
+  packet_input: direct_plus_injected_locator_plus_required_conversation_plus_injected_tool_results_plus_injected_shard_summaries
+  assembled_input: system_plus_developer_plus_tool_schemas_plus_host_metadata_plus_packet_input
+  planned_context: assembled_input_plus_reserved_output
+  pricing_metadata: optional_non_release_prerequisite
+overflow:
+  ordered_actions: [promote_budget_class, digest_checked_locator, fresh_bounded_shard_or_reisolation, held]
+  prohibited: [model_downgrade, risk_downgrade, required_source_deletion, silent_truncation, lossy_compaction, unbounded_retry]
+receipt:
+  schema_version: tw-model-context-receipt/1
+  kinds: [plan, final]
+  canonical_identity: sha256-recursively-key-sorted-json-arrays-preserved-receipt-id-excluded
+  v1_embedding: prohibited
+  isolated_replay: separately_authorized_only
+held_claims: [active_descendant_enforcement, active_routing, provider_replay_qualification, served_model_attestation, token_sufficiency, material_token_savings, quality_equivalence, active_cutover]
+map_digest: sha256:2eab40f5e2e459dfb1ff1f655b0fb0cdacfe8c40478f04368d7185b219c988f2

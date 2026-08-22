@@ -3,12 +3,42 @@ set -euo pipefail
 
 # TRACEWEAVER: file-role=project-bootstrap-helper; req=REQ-TW-084; req=REQ-TW-085
 # TRACEWEAVER: entrypoint=bootstrap_model_route_projection; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
+# TRACEWEAVER: entrypoint=bootstrap_shadow_model_context_projection; req=REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072; ver=VER-TW-092
 # Project-local static bootstrap only: no global configuration or runtime claim.
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PLUGIN_ROOT="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+package_candidate="$(cd "$SCRIPT_DIR/../../.." && pwd -P)"
+direct_package_candidate="$package_candidate/traceweaver-core"
+package_roots=()
+valid_package_root() {
+  local candidate="$1" relative path parent
+  [[ -d "$candidate" && ! -L "$candidate" ]] || return 1
+  for relative in \
+    references/master-orchestrator-prompt-template.md \
+    references/workflow-profile-template.yml \
+    references/model-context-map.yml \
+    skills/tw-graph/scripts/traceweaver-tw-graph \
+    skills/tw-setup/scripts/traceweaver-bootstrap-project; do
+    path="$candidate/$relative"
+    [[ -f "$path" && ! -L "$path" ]] || return 1
+    parent="$(dirname "$path")"
+    while [[ "$parent" != "$candidate" ]]; do
+      [[ -d "$parent" && ! -L "$parent" ]] || return 1
+      parent="$(dirname "$parent")"
+    done
+  done
+}
+valid_package_root "$package_candidate" && package_roots+=("$package_candidate")
+valid_package_root "$direct_package_candidate" && package_roots+=("$direct_package_candidate")
+if [[ "${#package_roots[@]}" -ne 1 ]]; then
+  echo "bootstrap_result=held_missing_or_ambiguous_controlled_package"
+  echo "project_ready=false"
+  exit 1
+fi
+PLUGIN_ROOT="${package_roots[0]}"
 MASTER_TEMPLATE="${TRACEWEAVER_MASTER_TEMPLATE:-$PLUGIN_ROOT/references/master-orchestrator-prompt-template.md}"
 PROFILE_TEMPLATE="$PLUGIN_ROOT/references/workflow-profile-template.yml"
+MAP_TEMPLATE="$PLUGIN_ROOT/references/model-context-map.yml"
 REQ_TEMPLATE="$PLUGIN_ROOT/references/requirements-baseline-template.md"
 MATRIX_TEMPLATE="$PLUGIN_ROOT/references/traceability-matrix-bootstrap-template.md"
 INTENT_TEMPLATE="$PLUGIN_ROOT/references/intent-contract-template.yml"
@@ -27,7 +57,7 @@ while [[ $# -gt 0 ]]; do
 done
 [[ -n "$root" && -d "$root" ]] || { echo "bootstrap_usage_error=valid_root_required"; exit 2; }
 root="$(cd -P "$root" && pwd -P)"
-if [[ ! -f "$MASTER_TEMPLATE" || ! -f "$PROFILE_TEMPLATE" ]] || grep -Eq '\{\{[^}]+\}\}' "$MASTER_TEMPLATE"; then
+if [[ ! -f "$MASTER_TEMPLATE" || ! -f "$PROFILE_TEMPLATE" || ! -f "$MAP_TEMPLATE" ]] || grep -Eq '\{\{[^}]+\}\}' "$MASTER_TEMPLATE"; then
   echo "bootstrap_result=held_missing_master_contract"; echo "project_ready=false"; exit 1
 fi
 
@@ -48,7 +78,7 @@ validate_future_path() {
 
 tw="$root/.traceweaver"
 validate_future_path "$tw"
-for path in "$tw/master-orchestrator.md" "$tw/bootstrap.yml" "$tw/workflow-profile.yml"; do validate_future_path "$path"; done
+for path in "$tw/master-orchestrator.md" "$tw/bootstrap.yml" "$tw/workflow-profile.yml" "$tw/model-context-map.yml"; do validate_future_path "$path"; done
 if [[ "$owner" -eq 1 ]]; then for path in "$root/requirements.md" "$root/traceability-matrix.md" "$tw/intent-contract.yml"; do validate_future_path "$path"; done; fi
 if [[ "$managed" -eq 1 ]]; then validate_future_path "$root/AGENTS.md"; fi
 if [[ -n "$role" && -n "$capsule" ]]; then
@@ -63,7 +93,8 @@ child_model="$(awk '$1 == "codex_subagent_model:" { print $2; exit }' "$PROFILE_
 child_effort="$(awk '$1 == "L0:" { print $2; exit }' "$PROFILE_TEMPLATE")"
 route_adapter="$(awk '$1 == "adapter:" { print $2; exit }' "$PROFILE_TEMPLATE")"
 unavailable_consequence="$(awk '$1 == "terra_unavailable_consequence:" { print $2; exit }' "$PROFILE_TEMPLATE")"
-[[ -n "$main_model" && -n "$child_model" && -n "$child_effort" && -n "$route_adapter" && -n "$unavailable_consequence" ]] \
+map_digest="$(awk '$1 == "map_digest:" { print $2; exit }' "$MAP_TEMPLATE")"
+[[ -n "$main_model" && -n "$child_model" && -n "$child_effort" && -n "$route_adapter" && -n "$unavailable_consequence" && "$map_digest" =~ ^sha256:[0-9a-f]{64}$ ]] \
   || { echo "bootstrap_result=held_invalid_model_routing_contract"; echo "project_ready=false"; exit 1; }
 if [[ "$native" -eq 1 ]]; then
   native_capability=caller_reported_available_unattested
@@ -90,6 +121,14 @@ model_routing:
   outcome: not_dispatched_bootstrap_profile_only
   unavailable_consequence: $unavailable_consequence
   unattested_consequence: held_model_unattested
+model_context:
+  schema_version: tw-model-context-map/1
+  map: .traceweaver/model-context-map.yml
+  map_digest: $map_digest
+  mode: advisory_shadow_compile
+  authoritative_runtime: v1
+  active_cutover: disabled
+  receipt_projection: separate_shadow_artifact_only_v1_unchanged
 receipts: [$receipt]
 deployment: { permission: $([[ "$deploy" -eq 1 ]] && echo explicitly_authorized || echo not_authorized), receipt: not_executed }
 chrome_dogfood: { permission: $([[ "$dogfood" -eq 1 ]] && echo explicitly_authorized || echo not_authorized), receipt: not_executed }
@@ -112,6 +151,15 @@ model_routing:
   requested_reasoning_effort: $child_effort
   served_model: unattested
   dispatch_state: not_dispatched_bootstrap_profile_only
+model_context:
+  contract: workflow-profile-template.yml#model_context
+  map: .traceweaver/model-context-map.yml
+  map_digest: $map_digest
+  mode: advisory_shadow_compile
+  authoritative_runtime: v1
+  qualification_state: unqualified
+  active_cutover: disabled
+  efficiency_eligibility: false
 selected_controls: [project_local_contract, manual_launch_only]
 child_roles:
   builder: { model: $child_model, reasoning_effort: $child_effort, maximum_timebox_minutes: 0 }
@@ -134,6 +182,7 @@ preflight_copy() { [[ -e "$2" && ! -L "$2" ]] && ! cmp -s "$1" "$2" && { echo "b
 preflight_copy "$MASTER_TEMPLATE" "$tw/master-orchestrator.md" master_orchestrator
 preflight_copy "$tmp_boot" "$tw/bootstrap.yml" bootstrap
 preflight_copy "$tmp_profile" "$tw/workflow-profile.yml" workflow_profile
+preflight_copy "$MAP_TEMPLATE" "$tw/model-context-map.yml" model_context_map
 if [[ "$owner" -eq 1 ]]; then for template in "$REQ_TEMPLATE" "$MATRIX_TEMPLATE" "$INTENT_TEMPLATE"; do [[ -f "$template" ]] || { echo "bootstrap_result=held_missing_authority_template"; echo "project_ready=false"; exit 1; }; done; fi
 if [[ -n "$role" && ! "$role" =~ ^(builder|verifier|reviewer|deployer|dogfooder|registrar)$ ]]; then echo "bootstrap_result=denied_roleless_child"; echo "project_ready=false"; exit 1; fi
 if [[ -n "$role" && -z "$capsule" ]]; then echo "bootstrap_role=top_level_master_read_only"; echo "bootstrap_result=held_missing_delegation_capsule"; echo "project_ready=false"; exit 1; fi
@@ -144,6 +193,7 @@ copy_new() { local temp; [[ -e "$2" ]] && return; temp="$(mktemp "$tw/.bootstrap
 copy_new "$MASTER_TEMPLATE" "$tw/master-orchestrator.md"
 copy_new "$tmp_boot" "$tw/bootstrap.yml"
 copy_new "$tmp_profile" "$tw/workflow-profile.yml"
+copy_new "$MAP_TEMPLATE" "$tw/model-context-map.yml"
 if [[ "$owner" -eq 1 ]]; then
   for spec in "$REQ_TEMPLATE:requirements.md" "$MATRIX_TEMPLATE:traceability-matrix.md" "$INTENT_TEMPLATE:.traceweaver/intent-contract.yml"; do template="${spec%%:*}"; destination="$root/${spec#*:}"; if [[ ! -e "$destination" ]]; then temp="$(mktemp "$tw/.bootstrap.XXXXXX")"; cp "$template" "$temp"; mv "$temp" "$destination"; fi; done
 else echo "bootstrap_authority=held_owner_authorization_required"; fi

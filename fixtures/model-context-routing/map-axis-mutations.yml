@@ -1,0 +1,5 @@
+# TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-109; trace=TRACE-TW-072; ver=VER-TW-092
+schema_version: tw-model-context-routing-fixture/1
+scenario: independent_axis_mutations
+axes: [model_role, risk_effort, packet_budget, context_completeness]
+expected: pass_only_requested_axis_changes

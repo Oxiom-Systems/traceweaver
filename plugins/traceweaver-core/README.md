@@ -3,6 +3,7 @@
 <!-- TRACEWEAVER: file-role=plugin-readme; req=REQ-TW-052; trace=TRACE-TW-036; ver=VER-TW-046 -->
 <!-- TRACEWEAVER: file-role=strategy-ideation-plugin-readme; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
 <!-- TRACEWEAVER: file-role=plugin-readme; req=REQ-TW-068; trace=TRACE-TW-054; ver=VAL-TW-016 -->
+<!-- TRACEWEAVER: file-role=v050-shadow-governance-plugin-guide; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092; val=VAL-TW-040 -->
 
 TraceWeaver Core adds systems-engineering authority control to agentic software
 work. This alpha plugin wires requirement quality, traceability checks, and
@@ -35,7 +36,8 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.4.0` (reconciled release candidate; publication occurs only
+Plugin version: `0.5.0` (integrated shadow-governance release candidate;
+publication occurs only
 after exact-merge-SHA smoke and CodeQL pass)
 
 Included skills:
@@ -98,6 +100,9 @@ Included references:
 - `references/exception-template.yml`
 - `references/traceweaver-runtime-policy.md`
 - `references/traceweaver-controlled-autonomy-policy.md`
+- `references/workflow-profile-template.yml`
+- `references/skill-execution-contracts.yml`
+- `references/model-context-map.yml`
 - `references/automation-loop-state-template.yml`
 - `references/traceability-matrix-bootstrap-template.md`
 - `references/ce-upstream-source-inventory.md`
@@ -172,9 +177,9 @@ package. Bump every peer plugin manifest carried by the release:
 - `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.4.0`.
+`traceweaver-core--v0.5.0`.
 
-The 0.4.0 tag is available only after its GitHub Release is published; this
+The 0.5.0 tag is available only after its GitHub Release is published; this
 draft candidate does not claim that the tag exists.
 
 Tagging and the GitHub Release are automated: when the single release PR's
@@ -185,30 +190,53 @@ commit that bumps the plugin version lands on `main`, the `Release on version bu
 push may resume an interrupted publication only while its tag is absent, and
 becomes a successful no-op after that tag exists. The workflow first checks all five release
 manifests for exact equality and a repository-owned, fail-closed dated release
-receipt; PR1 and PR2 retain `0.3.2`, so they could not initiate the 0.4.0
-release. The receipt hashes a fixed candidate file set and does not
-predict its own commit SHA. On `main`, the serialized workflow waits for smoke
+receipt. The 0.5.0 readiness-v2 record binds one integrated candidate instead
+of treating the historical 0.4.0 PR1/PR2 sequence as a prerequisite. The
+receipt hashes a fixed candidate file set and does not predict its own commit
+SHA. On `main`, the serialized workflow waits for smoke
 and every observed CodeQL matrix job on the exact merge SHA, rejects any
 tag-to-SHA conflict, and attaches its runtime evidence receipt to the GitHub
 Release.
 
-## What's New in 0.4.0
+## What's New in 0.5.0
 
-The reconciled 0.4.0 package adds deterministic generated JSON, persistent
-bounded review convergence with accepted-review reuse, and deterministic Skill
-Execution Contracts for every callable `tw-*` skill and the `lfg` alias. Native
-Codex dispatch requests Sol for coordination and explicit Terra children with
-risk-selected effort; receipts keep requested and independently attested served
-model facts separate, holding the result when service is unattested.
+TraceWeaver Core 0.5.0 adds a deterministic, inspectable, shadow-only
+model-context map and compiler adjacent to the existing workflow profile and
+Skill Execution Contract. Model role, risk effort, packet budget, and context
+completeness remain independent fields. Normal approved mixed delivery now
+keeps authority lock, compact planning, V&V setup, implementation, focused
+verification, trace updates, and one possible repair batch in the retained Sol
+main context. It dispatches one Terra integrated reviewer, with at most one
+targeted continuation of that same reviewer after repair on the normal
+automatic path. The existing severe-blocker exception still requires a fresh
+explicit owner or approved change-control decision; it is not an automatic
+loop continuation.
 
-It also adds mandatory provider-independent `tw-graph` operations for duplicate
-discovery, impact, paths, relationship search, and freshness. Graphify remains
-optional enrichment. Static semantic-HTML templates and a deterministic derived
-preview improve navigation, but Markdown and YAML remain canonical authority.
-The accompanying Vestro/Air Router route is bounded and read-only: it does not
-run live router/broker operations or modify consumer repositories.
+The B0--B3 values are experimental hypotheses and may be only unqualified or
+structurally eligible in this release. They do not prove savings, sufficiency,
+or equivalent quality. V1 remains authoritative; explicit shadow compilation
+does not alter ordinary v1 routing, terminal state, evidence eligibility, or
+publication behavior.
 
-Quick start after the integrated 0.4.0 release:
+Shadow plan/final artifacts use separate receipts rather than adding fields to
+v1 receipt envelopes. The Codex installed surface is updated through a package
+transaction with rollback of prior touched bytes and executable modes after a
+failed phase.
+
+Active routing, descendant enforcement, served-model attestation, token savings, token sufficiency, quality equivalence, and provider replay qualification remain held.
+Active cutover is disabled and remains outside 0.5.0.
+
+In a source checkout of the integrated 0.5.0 release, verify the map and frozen
+acceptance package:
+
+```sh
+plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map --root .
+scripts/traceweaver-smoke-model-context-routing
+```
+
+Inspect `references/model-context-map.yml` and
+`references/workflow-profile-template.yml`, then continue using the retained
+provider-independent graph commands:
 
 ```text
 tw-graph status
@@ -224,11 +252,11 @@ the merged contract, Terra-routing, graph, and derived-preview implementations.
 
 Canonical filenames are case-sensitive across Git hosts. A legacy project that
 tracks uppercase `REQUIREMENTS.md` must perform an explicit, reviewed case-only
-rename to `requirements.md`; 0.4.0 does not silently reinterpret or rename an
+  rename to `requirements.md`; 0.5.0 does not silently reinterpret or rename an
 authority source.
 
-0.4.0 does not make HTML canonical, install Graphify, prove live consumer
-runtime behavior or independent served-model attestation, enforce workflows,
+0.5.0 does not make HTML canonical, install Graphify, prove live consumer
+runtime behavior, actively enforce descendant routing, attest the served model,
 or autonomously publish. Those claims remain separately gated.
 
 ## Skill Entry Points
@@ -250,11 +278,13 @@ or autonomously publish. Those claims remain separately gated.
 - `tw-traceability-check` checks whether behavior traces to
   approved authority, implementation, test-first verification, and validation
   evidence.
-- `tw-auto` runs the advisory controlled-autonomy loop: CE-compatible
-  plan/work/review sequencing plus TraceWeaver authority, traceability,
-  test-first verification, matrix-update, and next-step controls.
-- `tw-plan` wraps the packaged `ce-plan` planning engine with TraceWeaver
-  authority, requirements-quality, traceability, and no-publication controls.
+- `tw-auto` runs consolidated advisory delivery: the retained Sol main context
+  performs authority lock, compact plan, work, verification, trace updates, and
+  one possible repair batch, then uses one Terra integrated-review identity.
+- `tw-plan` is an embedded `tw-auto` phase for normal approved work. Call it
+  standalone only when the user requests a plan artifact or the work is
+  planning-only; review that artifact separately only when normative authority
+  changes.
 - `tw-brainstorm` wraps packaged `ce-brainstorm` so vague ideas and requirement
   source material enter TraceWeaver as source evidence before
   `tw-requirements-review`.
@@ -328,16 +358,20 @@ tw-strategy when product direction needs grounding
 -> tw-brainstorm
 -> tw-requirements-review
 -> authority-baseline record
--> tw-plan
--> tw-authority-gate
--> test-first verification evidence
--> tw-work
--> tw-traceability-check
--> tw-code-review / tw-doc-review
--> verification evidence record
--> validation evidence record
+-> tw-auto retained Sol primary
+   (authority lock -> compact plan -> proportional V&V setup -> work
+    -> focused verification -> trace/matrix update -> candidate freeze)
+-> one Terra tw-code-review integrated review
+   (code + tests + relevant normative docs + traceability + risk lenses)
+-> optional one-batch Sol repair -> same Terra reviewer targeted closure
+-> zero-model mechanical receipts/status/generated views
 -> tw-compound
 ```
+
+`tw-doc-review` remains a standalone route for authority-only or document-only
+semantic changes. It is not a second review for a mixed implementation
+candidate. Publication, deployment, and release remain held until separately
+authorized.
 
 `authority-baseline`, `verification`, and `validation` are record outputs in
 this alpha, not installed `tw-*` skills or slash commands. A later unit may add
@@ -363,9 +397,10 @@ enforcing mode remain held until U9 or a later accepted runtime proof.
 
 `tw-auto` is the first packaged TraceWeaver-controlled automation surface. It
 provides advisory automation with the Intent Contract, traceability matrix,
-bounded review-fix cycle, severity policy, and stop-before commit/push/PR
-boundary. The packaged `lfg` name delegates to `tw-auto` so users who expect the
-CE autonomous entrypoint do not bypass TraceWeaver authority controls.
+one integrated review identity, at most one batched repair, severity policy,
+and stop-before commit/push/PR boundary. The packaged `lfg` name delegates to
+`tw-auto` so users who expect the CE autonomous entrypoint do not bypass
+TraceWeaver authority controls.
 
 There are two valid blank-project starts:
 

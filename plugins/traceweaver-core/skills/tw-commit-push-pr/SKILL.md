@@ -35,10 +35,27 @@ publication authorization capsule after every gate below passes. The capsule is
 an execution boundary, not a waiver: any later tree, target, credential, review,
 or check-state change invalidates it.
 
+## Review Reuse Boundary
+
+This publication wrapper dispatches no reviewer. Validate and reuse the clean
+terminal review already bound to the exact semantic candidate. For a behavior
+or mixed candidate, run the skill-local
+`scripts/traceweaver-check-publication-review` with the exact candidate kind,
+digest, and review record. It must prove one integrated `tw-code-review` scope
+covering behavior, linked tests, relevant normative docs, traceability and V&V,
+correctness, triggered risk lenses, and held claims. A standalone
+`tw-doc-review` cannot satisfy a mixed candidate.
+
+For a separate authority-only or document-only semantic candidate, require one
+clean standalone `tw-doc-review` record. Mechanical terminal carriers reuse the
+accepted semantic review and never cause another model dispatch.
+
 ## Native Child Routing
 
-Before any TraceWeaver-owned native Codex delegate call, run the packaged
-sibling `tw-auto/scripts/traceweaver-route-native-child` against the canonical
+This wrapper normally dispatches no reviewer and reuses the accepted review as
+described above. Before any other TraceWeaver-owned native Codex delegate call,
+run the packaged sibling
+`tw-auto/scripts/traceweaver-route-native-child` against the canonical
 workflow-profile contract. Use only its explicit dispatch parameters and
 finalize its receipt with independent host/execution attestation. A held route
 makes delegate output ineligible; never inherit a model, fall back, or edit an
@@ -75,8 +92,10 @@ unreviewed, or contradictory, stop and report the coherence blocker.
    review.
 3. Require `tw-traceability-check` for matrix, trace, validation, code-anchor,
    and held-claim coherence.
-4. Require clean `tw-code-review` and/or `tw-doc-review` for the changed
-   surfaces.
+4. Validate the exact clean review record through the review reuse boundary.
+   Mixed candidates have one integrated `tw-code-review`; do not add a second
+   document review for normative docs, matrix/evidence changes, or mechanical
+   carriers within that candidate.
 5. Confirm linked verification evidence passed.
 6. Block stale authority, missing trace, failed tests, review findings,
    dirty/untracked authority files, staged/working-tree split, target mismatch,

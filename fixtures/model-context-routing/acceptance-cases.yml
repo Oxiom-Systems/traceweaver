@@ -1,0 +1,118 @@
+# TRACEWEAVER: file-role=model-context-routing-frozen-acceptance-cases; req=REQ-TW-109,REQ-TW-123; trace=TRACE-TW-072; ver=VER-TW-092; verifies=VER-TW-092
+schema_version: tw-model-context-acceptance-cases/1
+frozen_at: 2026-08-22
+authority: TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001
+acceptance_test: ATP-TW-049
+full_command: scripts/traceweaver-smoke-model-context-routing
+case_command: scripts/traceweaver-smoke-model-context-routing --case CASE_ID
+rules:
+  removal_rename_weakening_or_skip: prohibited
+  implementation_may_add_cases: true
+  every_case_records_actual_and_expected: true
+  unexpected_skip: failure
+fixtures:
+  valid_map: fixtures/model-context-routing/map-valid.yml
+  valid_profile: fixtures/model-context-routing/profile-valid.yml
+  complete_manifest: fixtures/model-context-routing/source-manifest-complete.json
+  legacy_v1_receipts: fixtures/model-context-routing/v1-receipts.json
+  strict_legacy_consumer: fixtures/model-context-routing/strict-v1-consumer.rb
+  receipt_ledger: fixtures/model-context-routing/receipt-ledger.jsonl
+  release_candidate: fixtures/release-readiness/model-context-v050-candidate.yml
+installer_failure_phases:
+  - after_preflight_snapshot
+  - after_skills_projection
+  - after_references_projection
+  - after_agents_projection
+  - after_direct_callables_projection
+  - after_generated_routing_projection
+  - after_plugin_manifest_projection
+  - after_install_manifest_write
+  - after_reconciliation_cleanup
+installer_target_states: [pre_existing, absent]
+cases:
+  - { id: MC109_CANONICAL_DIGEST, req: REQ-TW-109, fixture: map-valid.yml, expected: pass_digest_match }
+  - { id: MC109_AXIS_INDEPENDENCE, req: REQ-TW-109, fixture: map-axis-mutations.yml, expected: pass_only_requested_axis_changes }
+  - { id: MC109_UNSUPPORTED_SCHEMA, req: REQ-TW-109, fixture: map-unsupported-schema.yml, expected: held_model_context_route_invalid }
+  - { id: MC109_INVALID_ENUM, req: REQ-TW-109, fixture: map-invalid-enum.yml, expected: held_model_context_route_invalid }
+  - { id: MC109_DUPLICATE_ROUTE, req: REQ-TW-109, fixture: map-duplicate-route.yml, expected: held_model_context_route_invalid }
+  - { id: MC109_DIGEST_MISMATCH, req: REQ-TW-109, fixture: map-digest-mismatch.yml, expected: held_model_context_route_invalid }
+
+  - { id: MC110_EXACT_ROUTE, req: REQ-TW-110, fixture: route-exact.json, expected: pass_one_route }
+  - { id: MC110_ALIAS_ROUTE, req: REQ-TW-110, fixture: route-lfg-alias.json, expected: pass_alias_to_tw_auto }
+  - { id: MC110_ZERO_ROUTE, req: REQ-TW-110, fixture: route-unknown.json, expected: held_model_context_route_invalid }
+  - { id: MC110_MULTIPLE_ROUTE, req: REQ-TW-110, fixture: route-multiple.yml, expected: held_model_context_route_invalid }
+  - { id: MC110_V1_BYTE_INVARIANCE, req: REQ-TW-110, fixture: v1-receipts.json, expected: pass_byte_identical_without_explicit_shadow_invocation }
+  - { id: MC110_STRICT_LEGACY_CONSUMER, req: REQ-TW-110, fixture: strict-v1-consumer.rb, expected: pass_no_unknown_v1_fields }
+
+  - { id: MC111_INVENTORY_EXACT, req: REQ-TW-111, fixture: inventory-expected.yml, expected: pass_each_declared_route_once_in_lexical_order }
+  - { id: MC111_INVENTORY_OMISSION, req: REQ-TW-111, fixture: inventory-omitted.yml, expected: held_model_context_inventory_invalid }
+  - { id: MC111_ALIAS_DUPLICATION, req: REQ-TW-111, fixture: inventory-alias-duplicate.yml, expected: held_model_context_inventory_invalid }
+  - { id: MC111_UNKNOWN_DESCENDANT, req: REQ-TW-111, fixture: inventory-unknown-descendant.yml, expected: held_model_context_inventory_invalid }
+
+  - { id: MC112_DECLARED_ONLY, req: REQ-TW-112, fixture: observation-declared-only.json, expected: active_enforcement_false }
+  - { id: MC112_PARTLY_OBSERVED, req: REQ-TW-112, fixture: observation-partial.json, expected: active_enforcement_false }
+  - { id: MC112_FULL_UNATTESTED, req: REQ-TW-112, fixture: observation-full-unattested.json, expected: active_enforcement_false }
+
+  - { id: MC113_PACKET_ARITHMETIC, req: REQ-TW-113, fixture: accounting-packet.json, expected: pass_exact_sum }
+  - { id: MC113_ASSEMBLED_ARITHMETIC, req: REQ-TW-113, fixture: accounting-assembled.json, expected: pass_exact_sum }
+  - { id: MC113_WORKFLOW_NO_DOUBLE_COUNT, req: REQ-TW-113, fixture: accounting-workflow-cached.json, expected: pass_cached_input_not_double_counted }
+  - { id: MC113_SNAPSHOT_RESET, req: REQ-TW-113, fixture: capability-tokenizer-changed.yml, expected: qualification_unqualified }
+
+  - { id: MC114_EXACT_FLOOR_MAP, req: REQ-TW-114, fixture: route-floors-expected.yml, expected: pass_exact_authorized_floors }
+  - { id: MC114_ALL_B3_MUTATION, req: REQ-TW-114, fixture: route-floors-all-b3.yml, expected: held_model_context_map_invalid }
+  - { id: MC114_LOWEST_OF_MULTIPLE, req: REQ-TW-114, fixture: selection-multiple-eligible.json, expected: pass_lowest_eligible_class }
+  - { id: MC114_CAP_MINUS_ONE, req: REQ-TW-114, fixture: selection-cap-minus-one.json, expected: pass_current_class }
+  - { id: MC114_CAP_EQUAL, req: REQ-TW-114, fixture: selection-cap-equal.json, expected: pass_current_class }
+  - { id: MC114_CAP_PLUS_ONE, req: REQ-TW-114, fixture: selection-cap-plus-one.json, expected: pass_promote_or_hold }
+  - { id: MC114_PROFILE_HASH, req: REQ-TW-114, fixture: profile-valid.yml, expected: pass_hash_excludes_only_profile_status_accounting_and_profile_hash }
+
+  - { id: MC115_PROMOTION_ORDER, req: REQ-TW-115, fixture: overflow-promote.json, expected: pass_first_higher_eligible_class }
+  - { id: MC115_LOCATOR_ORDER, req: REQ-TW-115, fixture: overflow-locator.json, expected: pass_after_class_exhaustion }
+  - { id: MC115_SHARD_BOUNDS, req: REQ-TW-115, fixture: overflow-shard.json, expected: pass_within_fanout_depth }
+  - { id: MC115_TERMINAL_HOLD, req: REQ-TW-115, fixture: overflow-exhausted.json, expected: held_context_insufficient }
+  - { id: MC115_NO_DOWNGRADE_TRUNCATE_RETRY, req: REQ-TW-115, fixture: overflow-prohibited.json, expected: held_judgment_insufficient }
+
+  - { id: MC116_EXACT_TAXONOMY, req: REQ-TW-116, fixture: source-manifest-complete.json, expected: pass_six_categories_once }
+  - { id: MC116_EMPTY_ORACLE, req: REQ-TW-116, fixture: source-oracle-empty.yml, expected: held_source_oracle_invalid }
+  - { id: MC116_ALL_EXCLUDED, req: REQ-TW-116, fixture: source-oracle-all-excluded.yml, expected: held_source_oracle_invalid }
+  - { id: MC116_MANDATORY_EXCLUDED, req: REQ-TW-116, fixture: source-oracle-mandatory-excluded.yml, expected: held_source_oracle_invalid }
+  - { id: MC116_SEEDED_OMISSION, req: REQ-TW-116, fixture: source-manifest-omitted.json, expected: held_source_manifest_incomplete }
+  - { id: MC116_DISCOVERED_DEPENDENCY, req: REQ-TW-116, fixture: source-manifest-new-dependency.json, expected: held_source_manifest_stale }
+
+  - { id: MC117_DIRECT_BYTES, req: REQ-TW-117, fixture: delivery-direct.json, expected: pass_exact_bytes }
+  - { id: MC117_CONTAINED_LOCATOR, req: REQ-TW-117, fixture: delivery-locator.json, expected: pass_digest_match }
+  - { id: MC117_FRESH_SHARD, req: REQ-TW-117, fixture: delivery-shard.json, expected: pass_parent_source_bound }
+  - { id: MC117_TRAVERSAL, req: REQ-TW-117, fixture: delivery-traversal.json, expected: held_source_delivery_invalid }
+  - { id: MC117_STALE_OR_LOSSY, req: REQ-TW-117, fixture: delivery-stale-lossy.json, expected: held_source_delivery_invalid }
+  - { id: MC117_IMPLICIT_INHERITANCE, req: REQ-TW-117, fixture: delivery-inherited.json, expected: held_source_delivery_invalid }
+
+  - { id: MC118_PLAN_FINAL_IDENTITY, req: REQ-TW-118, fixture: receipt-plan-final.json, expected: pass_canonical_identity }
+  - { id: MC118_PROTECTED_TAMPER, req: REQ-TW-118, fixture: receipt-tampered.json, expected: held_receipt_invalid }
+  - { id: MC118_NONIDENTICAL_DUPLICATE, req: REQ-TW-118, fixture: receipt-duplicate.jsonl, expected: held_receipt_duplicate }
+  - { id: MC118_REPLAY_LINEAGE, req: REQ-TW-118, fixture: receipt-replay.jsonl, expected: held_receipt_replay }
+  - { id: MC118_CROSS_BINDING, req: REQ-TW-118, fixture: receipt-cross-binding.json, expected: held_receipt_invalid }
+  - { id: MC118_V1_NOT_EMBEDDED, req: REQ-TW-118, fixture: v1-receipts.json, expected: pass_no_shadow_fields }
+
+  - { id: MC119_OBSERVATION_ENUM, req: REQ-TW-119, fixture: observation-matrix.json, expected: pass_closed_enum }
+  - { id: MC119_CONTENT_ELIGIBLE_EFFICIENCY_FALSE, req: REQ-TW-119, fixture: eligibility-content-only.json, expected: pass_independent_axes }
+  - { id: MC119_EFFICIENCY_FORCED_TRUE, req: REQ-TW-119, fixture: eligibility-efficiency-true.json, expected: held_efficiency_claim_ineligible }
+
+  - { id: MC120_ADVISORY_NO_EFFECTS, req: REQ-TW-120, fixture: advisory-side-effect-snapshot.yml, expected: pass_no_call_dispatch_or_write }
+  - { id: MC120_REPLAY_WITHOUT_AUTHORITY, req: REQ-TW-120, fixture: replay-no-authority.yml, expected: held_replay_not_authorized }
+  - { id: MC120_ISOLATED_REPLAY_BOUNDARY, req: REQ-TW-120, fixture: replay-isolated-mock.yml, expected: pass_only_declared_mock_provider_and_isolated_writes }
+  - { id: MC120_PUBLICATION_SEPARATE, req: REQ-TW-120, fixture: publication-boundary.yml, expected: pass_compile_cannot_publish }
+
+  - { id: MC121_INSTALL_SUCCESS, req: REQ-TW-121, fixture: install-success.yml, expected: pass_complete_projection }
+  - { id: MC121_ROLLBACK_MATRIX, req: REQ-TW-121, fixture: install-failure-matrix.yml, expected: pass_each_phase_and_target_state_byte_mode_exact }
+  - { id: MC121_UNOWNED_CONFLICT, req: REQ-TW-121, fixture: install-unowned-conflict.yml, expected: held_install_conflict_prior_state_unchanged }
+
+  - { id: MC122_READINESS_V2_PASS, req: REQ-TW-122, fixture: model-context-v050-candidate.yml, expected: pass_exact_integrated_candidate }
+  - { id: MC122_OLD_PR_NOT_PREREQUISITE, req: REQ-TW-122, fixture: readiness-old-pr-only.yml, expected: held_release_candidate_incomplete }
+  - { id: MC122_HELD_CLAIM_SCAN, req: REQ-TW-122, fixture: readiness-overclaim.yml, expected: held_release_claim_invalid }
+  - { id: MC122_BOUNDED_TRACE_NOT_GLOBAL_CLOSURE, req: REQ-TW-122, fixture: readiness-trace-scope.yml, expected: pass_trace_072_with_global_backlog_visible }
+  - { id: MC122_EXACT_REF_VERSION, req: REQ-TW-122, fixture: readiness-ref-version.yml, expected: pass_five_versions_and_exact_ref }
+
+  - { id: MC123_INDEPENDENT_COMPLETE_REVIEW, req: REQ-TW-123, fixture: oracle-review-complete.json, expected: pass_every_release_route_category_dispositioned }
+  - { id: MC123_SELF_REVIEW, req: REQ-TW-123, fixture: oracle-review-self.json, expected: held_oracle_review_invalid }
+  - { id: MC123_UNEXPLAINED_EXCLUSION, req: REQ-TW-123, fixture: oracle-review-unexplained.json, expected: held_oracle_review_invalid }
+  - { id: MC123_OPEN_OR_UNCERTAIN, req: REQ-TW-123, fixture: oracle-review-open.json, expected: held_oracle_review_invalid }

@@ -1,6 +1,6 @@
 ---
 name: tw-doc-review
-description: TraceWeaver-controlled document review wrapper. Use when reviewing requirements, plans, matrices, Intent Contracts, validation records, evidence records, or authority documents that may become TraceWeaver implementation authority.
+description: Standalone TraceWeaver authority/document review. Use only for authority-only or document-only semantic changes; mixed implementation candidates are reviewed once through tw-code-review.
 ---
 
 <!-- TRACEWEAVER: entrypoint=skill_execution_contract_resolution; req=REQ-TW-092; trace=TRACE-TW-070; ver=VER-TW-090 -->
@@ -20,15 +20,25 @@ actual child is requested.
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-052; trace=TRACE-TW-046; ver=VER-TW-059 -->
 <!-- TRACEWEAVER: file-role=review-wrapper-skill; req=REQ-TW-086; req=REQ-TW-087 -->
 <!-- TRACEWEAVER: file-role=review-series-document-review-wrapper; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067; ver=VER-TW-087 -->
+<!-- TRACEWEAVER: file-role=standalone-document-review-boundary; req=REQ-TW-056,REQ-TW-082,REQ-TW-083,REQ-TW-086,REQ-TW-087; trace=TRACE-TW-031,TRACE-TW-067; ver=VER-TW-040,VER-TW-087 -->
 
 # TraceWeaver Document Review
 
 ## Purpose
 
-Run document review as a TraceWeaver-controlled review step instead of a raw CE
-document review. This wrapper preserves the CE document-review behavior while
-requiring requirement-quality and authority/traceability checks when a document
-can affect implementation authority or accepted evidence.
+Review an authority-only or document-only semantic candidate in one independent
+context. This wrapper preserves useful CE document-review behavior while
+including requirement-quality and authority/traceability lenses.
+
+Load the `consolidated_delivery` block from the packaged sibling
+`<skills-root>/tw-auto/references/workflow-profile-template.yml`. Do not invoke
+this skill for a mixed candidate containing implementation plus relevant
+normative documents; `tw-code-review` covers that entire frozen candidate in
+one integrated reviewer context.
+
+In standalone mode, imported CE checklists and personas are lenses inside the
+single Terra reviewer. `ce-doc-review` must not spawn nested reviewer
+subagents.
 
 ## Native Child Routing
 
@@ -52,15 +62,14 @@ remaining budget. Exact accepted-review reuse and verified post-acceptance
 mechanical closure dispatch no reviewer; bookkeeping without a matching
 accepted review remains review-required.
 
-Use exactly one review-bearing dispatch and one reviewer persona for the
-attempt. When specialist or validator concerns apply, include them in that
-reviewer's bounded concern set; do not dispatch another reviewer. Route P0/P1
-and blocking P2 through the current repair-verification attempt, route
-disputed P2 through its decision path, and record non-blocking P2/P3 without an
-extra review cycle. Stop after one routine repair-verification cycle, or sooner
-for unchanged blocked work, as `held_no_progress`. One final cycle requires an
-explicit receipt-bound exception authorized by the owner or approved
-change-control authority; two is the absolute maximum.
+Use exactly one reviewer identity. Treat personas as lenses in that context.
+Return all eligible P0/P1 and blocking P2 findings together for one batched Sol
+repair, then resume the same reviewer identity once for targeted closure.
+Non-blocking P2/P3 does not cause another turn. The normal automatic budget is
+two reviewer turns and one repair batch; unchanged blockers without evidence progress
+return `held_no_progress`.
+Only a fresh explicit owner or approved change-control decision may invoke the
+REQ-TW-037/056/057 severe-blocker exception outside that automatic budget.
 
 ## Required Authority Inputs
 
@@ -85,33 +94,37 @@ authority until the authority files exist and review passes.
 
 ## Workflow
 
-1. Identify the document type: requirements, plan, matrix, Intent Contract,
+1. Confirm the scope is authority-only or document-only. If it is part of a
+   mixed implementation candidate, stop this route and include the document in
+   the one integrated `tw-code-review` scope without another dispatch.
+2. Identify the document type: requirements, plan, matrix, Intent Contract,
    validation record, evidence record, release note, or other authority-adjacent
    document.
-2. Classify the review target using the operating-mode policy. Treat unrelated
+3. Classify the review target using the operating-mode policy. Treat unrelated
    historical wording drift as non-blocking debt unless it changes accepted
    scope, pending gate, held claims, runtime/publication claims, artifact
    identity, or material authority.
-3. Run `tw-requirements-review` before CE document review only when normative
+4. Apply `tw-requirements-review` as a lens in this same reviewer context only when normative
    requirement meaning, accepted scope, validation intent, allowed/held
    behavior, must-not-change constraints, or publication policy changed.
-4. Use the persistent review-series controller for the supplied generation.
+5. Use the persistent review-series controller for the supplied generation.
    Discovery is valid only for an explicitly authorized new generation;
    otherwise resume the current repair-verification attempt. Bookkeeping-only
    changes use `evaluate_reuse` and stop without a reviewer only after the four
    semantic inputs match an existing accepted review and no new blocker exists.
-   A matrix or Intent Contract change that alters normative authority still
-   routes through `tw-traceability-check` before one document review.
-5. Run `ce-doc-review` only after the requirement-quality and authority/trace
+   For a matrix or Intent Contract change that alters normative authority,
+   apply the `tw-traceability-check` rules as another lens in this same review
+   context; do not dispatch a second reviewer.
+6. Apply the packaged `ce-doc-review` method only after the requirement-quality and authority/trace
    preflight is passable, or after remaining limits are explicitly recorded as
    held conditions.
-6. Keep `ce-doc-review` in TraceWeaver no-publication mode. It may report
+7. Keep `ce-doc-review` in TraceWeaver no-publication mode. It may report
    findings and policy-allowed local fixes, but it must not stage, commit, push,
    open PRs, update PRs, or claim release/clean-replacement readiness.
-7. Report structured traceability/hash/status findings before CE document-review
+8. Report structured traceability/hash/status findings before CE document-review
    findings. Preserve severity, status, affected IDs, file/line anchors when
    available, claim impact, and remediation.
-8. Report document-review findings together with requirement-quality status,
+9. Report document-review findings together with requirement-quality status,
    traceability/hash/status consistency, accepted scope, held claims, and the
    next required command or human decision.
 
@@ -122,9 +135,9 @@ checks for document authority review. Do not return standalone
 `tw-requirements-review` or `tw-traceability-check` as the normal next user
 command when those checks are embedded in the document review path.
 
-If the document review is clean, record the accepted review and scoped
-bookkeeping atomically, run the mechanical consistency check, and stop without
-another review dispatch. If the document is blocked by
+If the document review is clean, return terminal semantic acceptance; the
+retained primary records bookkeeping atomically and mechanically with no
+reviewer. If the document is blocked by
 requirements quality or authority identity, recommend the highest-level wrapper
 that can repair it, normally `/tw-work ...` for an accepted authority patch or
 `/tw-auto ...` for a multi-step loop. Recommend standalone lower gates only for
@@ -149,13 +162,14 @@ Return:
 - selected reviewer personas, active-reviewer count, and repair-cycle result
 - terminal receipt reference when this review contributes to terminal state
 
-## Mandatory tw-graph Lifecycle
+## Post-Terminal tw-graph Lifecycle
 
 Load `references/tw-graph-lifecycle.md` before applying this lifecycle.
 
-Require a passing `tw-graph check` before clean document-review completion.
-Read-only review never refreshes stale output; it returns the finding to the
-owning cycle. Optional Graphify cannot satisfy this mandatory check.
+Do not refresh generated graph state during semantic review. After terminal
+acceptance, the retained primary performs the required `tw-graph` refresh/check
+mechanically and atomically with other bookkeeping. That output cannot reopen
+review. Optional Graphify cannot satisfy the mandatory authority-graph check.
 
 ## Gate
 

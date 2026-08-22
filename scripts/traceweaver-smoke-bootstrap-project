@@ -4,6 +4,7 @@ set -euo pipefail
 # TRACEWEAVER: file-role=bootstrap-model-route-projection-smoke; req=REQ-TW-060; trace=TRACE-TW-065; ver=VER-TW-085
 # TRACEWEAVER: verifies=VER-TW-085; req=REQ-TW-060; trace=TRACE-TW-065
 # TRACEWEAVER: file-role=bootstrap-project-smoke; req=REQ-TW-084; req=REQ-TW-085
+# TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-110,REQ-TW-121; trace=TRACE-TW-072
 # Fixture proof only: no automatic-host or live child-dispatch claim.
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -70,6 +71,13 @@ contains "$out" "bootstrap_model_route_not_dispatched" model_route_not_dispatche
 grep -Fq "requested_child_model: gpt-5.6-terra" "$empty/.traceweaver/bootstrap.yml"
 grep -Fq "served_model: unattested" "$empty/.traceweaver/bootstrap.yml"
 echo "bootstrap_smoke_central_model_route_projection=pass"
+
+cmp "$ROOT_DIR/plugins/traceweaver-core/references/model-context-map.yml" "$empty/.traceweaver/model-context-map.yml"
+grep -Fq "mode: advisory_shadow_compile" "$empty/.traceweaver/bootstrap.yml"
+grep -Fq "authoritative_runtime: v1" "$empty/.traceweaver/bootstrap.yml"
+grep -Fq "active_cutover: disabled" "$empty/.traceweaver/workflow-profile.yml"
+grep -Fq "receipt_projection: separate_shadow_artifact_only_v1_unchanged" "$empty/.traceweaver/bootstrap.yml"
+echo "bootstrap_smoke_shadow_model_context_projection=pass"
 
 grep -Fq "automatic_host_activation: held_fresh_task_runtime_proof_required" "$empty/.traceweaver/bootstrap.yml"
 grep -Fq "template_manual_launch_only" "$ROOT_DIR/docs/guides/traceweaver-from-prompt-to-proof.md"
