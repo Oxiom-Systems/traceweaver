@@ -6,15 +6,15 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "489aecaf35ca4de99eb5e1c4b403e47f6ee2dd590d01ddf9bf250a7c69c88c02"
+      "sha256": "bd0fbac9b1795eeba6783f7434570c640fb73e45f13ead16dcce9dd5f80977e0"
     },
     {
       "path": "requirements.md",
-      "sha256": "2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+      "sha256": "6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "11971ccf62b1e9a9e1fcfc22f2e1717c2f04a8eff014717c57d6b4606652c3ad"
+      "sha256": "088b3f739104a8d5a3d7b8257aab8484e71ee944ba04b7eee76a306dd860a4dc"
     },
     {
       "path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md",
@@ -34,17 +34,17 @@
     }
   ],
   "row_counts": {
-    "requirements": 105,
-    "trace_rows": 65,
-    "atp_entries": 39,
-    "result_records": 40,
-    "verification_records": 86,
-    "validation_records": 36,
-    "code_anchor_records": 434,
+    "requirements": 111,
+    "trace_rows": 66,
+    "atp_entries": 40,
+    "result_records": 41,
+    "verification_records": 87,
+    "validation_records": 37,
+    "code_anchor_records": 521,
     "structured_acceptance_results": 4,
-    "structured_acceptance_coverage": 105,
-    "structured_acceptance_missing_requirements": 101,
-    "structured_acceptance_non_closed_requirements": 102
+    "structured_acceptance_coverage": 111,
+    "structured_acceptance_missing_requirements": 107,
+    "structured_acceptance_non_closed_requirements": 108
   },
   "requirements": [
     {
@@ -1592,6 +1592,84 @@
       "owner": "Oxiom Systems",
       "status": "Approved for shadow implementation",
       "trace_ids": []
+    },
+    {
+      "id": "REQ-TW-124",
+      "type": "Operational / Evidence Integrity",
+      "summary": "Require complete content-free observations and independently signed execution-bound measurement attestations; estimated, unsigned, self-attested, replayed, or incompletely bound values cannot qualify.",
+      "source_need": "NEED-TW-013; REQ-TW-060; REQ-TW-113; REQ-TW-118 through REQ-TW-120",
+      "verification_method": "ATP-TW-050 schema, public collector trust, real signature/provenance, observation-to-signed-execution binding, atomic bounded replay ledger, safe locator, and privacy fixtures plus the 24-process fresh/nonempty CI stress regression",
+      "validation_path": "VAL-TW-041 evidence usability and exact-cell acceptance",
+      "owner": "Oxiom Systems",
+      "status": "Deterministic offline mechanism implemented and fixture-verified; provider/host collection, real observations, qualification, and claims held.",
+      "trace_ids": [
+        "TRACE-TW-073"
+      ]
+    },
+    {
+      "id": "REQ-TW-125",
+      "type": "System / Evaluation Control",
+      "summary": "Freeze exact matched cells, policy, corpus, power/confidence, sample/stopping rules, thresholds, exclusions, blinding/agreement, expiry, and reset rules before any qualification replay.",
+      "source_need": "NEED-TW-013; REQ-TW-114; REQ-TW-119; REQ-TW-120; REQ-TW-123",
+      "verification_method": "ATP-TW-050 frozen policy/corpus identity, preregistration, pairing, exact power, pilot separation, stopping, exclusion, and reset fixtures",
+      "validation_path": "VAL-TW-041 comparison credibility",
+      "owner": "Oxiom Systems",
+      "status": "Deterministic offline policy/evaluation mechanism implemented and fixture-verified; provider replay and cell qualification held.",
+      "trace_ids": [
+        "TRACE-TW-073"
+      ]
+    },
+    {
+      "id": "REQ-TW-126",
+      "type": "Quality / Validation Control",
+      "summary": "Require all hard invariants, absolute quality floors, blinded dual-evaluator agreement, and one-sided paired non-inferiority; efficiency cannot compensate for failure.",
+      "source_need": "NEED-TW-013; REQ-TW-116; REQ-TW-117; REQ-TW-122; REQ-TW-123",
+      "verification_method": "ATP-TW-050 raw score/rating, agreement, independence, exact order-bound, and efficiency-noncompensation fixtures",
+      "validation_path": "VAL-TW-041 cell-specific quality acceptance",
+      "owner": "Oxiom Systems",
+      "status": "Deterministic offline quality mechanism implemented and fixture-verified; real quality-equivalence claims held pending exact-cell evidence.",
+      "trace_ids": [
+        "TRACE-TW-073"
+      ]
+    },
+    {
+      "id": "REQ-TW-127",
+      "type": "Performance / Claim Control",
+      "summary": "Compute per-cell token/context/latency results and uncertainty only from valid signed matched pairs; pilot, underpowered, or partial data cannot support material, route-family, or global claims.",
+      "source_need": "NEED-TW-013; REQ-TW-113; REQ-TW-119; REQ-TW-122",
+      "verification_method": "ATP-TW-050 raw whole-workflow accounting, exact interval, invalid/partial pair, underpowered, and inclusive-boundary fixtures",
+      "validation_path": "VAL-TW-041 cell-specific materiality acceptance",
+      "owner": "Oxiom Systems",
+      "status": "Deterministic offline accounting mechanism implemented and fixture-verified; actual results and claims remain held pending RESULT-TW-050, completed VER-TW-093, VAL-TW-041, and EXC-TW-016 disposition.",
+      "trace_ids": [
+        "TRACE-TW-073"
+      ]
+    },
+    {
+      "id": "REQ-TW-128",
+      "type": "Functional / Operational",
+      "summary": "Prove cell sufficiency only from successful positive scenarios with declared delivery cost attributed; safe negative holds never count as sufficiency or toward the positive sample.",
+      "source_need": "NEED-TW-013; REQ-TW-114; REQ-TW-115; REQ-TW-117",
+      "verification_method": "ATP-TW-050 positive/negative separation, declared delivery, overflow, retry, promotion, and cost-attribution fixtures",
+      "validation_path": "VAL-TW-041 cell-specific intended-use acceptance",
+      "owner": "Oxiom Systems",
+      "status": "Deterministic offline sufficiency predicate implemented and fixture-verified; observed sufficiency remains held pending current exact-cell evidence.",
+      "trace_ids": [
+        "TRACE-TW-073"
+      ]
+    },
+    {
+      "id": "REQ-TW-129",
+      "type": "State / Configuration Control",
+      "summary": "Promote, expire, and reset qualification per exact current, verified, cell-validated identity; never inherit, generalize, or activate qualification.",
+      "source_need": "NEED-TW-013; REQ-TW-112; REQ-TW-114; REQ-TW-118; REQ-TW-119; REQ-TW-122",
+      "verification_method": "ATP-TW-050 complete governed-identity bindings, prerequisite-bundle derivation, promotion, incomplete V&V, inheritance, alias, cross-cell, drift/reset, coverage, and cutover-boundary fixtures",
+      "validation_path": "VAL-TW-041 exact-cell decision trail",
+      "owner": "Oxiom Systems",
+      "status": "Deterministic offline qualification/reset predicate implemented and fixture-verified; no cell is qualified and active cutover remains separately held.",
+      "trace_ids": [
+        "TRACE-TW-073"
+      ]
     }
   ],
   "traces": [
@@ -2309,6 +2387,17 @@
       "validation": "VAL-TW-035 held",
       "status": "Implementation, deterministic verification, and bounded code review passed locally",
       "next_step": "Prepare an exact convergence-only review-staging/publication capsule without starting later pillars"
+    },
+    {
+      "id": "TRACE-TW-073",
+      "owner": "Oxiom Systems",
+      "needs": "NEED-TW-013",
+      "requirements": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "artifact": "Canonical/mirrored harness contract, evaluator, independent validator, public-only trust, hash-bound fixture suite, caller-scoped replay state, frozen smoke, templates, CI, and component verification result",
+      "verification": "ATP-TW-050 deterministic component 71/71 passed; RESULT-TW-050 pending; VER-TW-093 partial/component evidence only",
+      "validation": "VAL-TW-041 planned; no exact cell accepted",
+      "status": "Deterministic offline component implemented and fixture-verified; integrated review pending",
+      "next_step": "Provider/host collection, real metric result, completed verification, exact-cell validation/qualification, claims, publication/release, deployment, and active cutover held"
     }
   ],
   "atp_entries": [
@@ -2662,6 +2751,15 @@
       "Expected Result": "Exact four-field semantic identity reuse and post-acceptance bookkeeping closure dispatch zero reviewers; bookkeeping before a matching accepted review requires review; authority change dispatches one document reviewer; behavior or meaningful verification change dispatches one code reviewer; raw/audit-only changes dispatch zero reviewers; one routine repair cycle is charged once; a second cycle is refused without the authorized complete severe-exception receipt and allowed once with it; only retained findings and genuine regressions re-enter; blockers terminate held_no_progress when progress or budget fails; policy/envelope expansion terminates held_scope_expansion; zero blockers terminate candidate_review_saturated while authority acceptance remains separate; protocol mirror parity passes.",
       "Owner": "Oxiom Systems",
       "Status": "Accepted procedure definition; not executed. Implementation, CI, active-host runtime, publication, and release remain held."
+    },
+    {
+      "ID": "ATP-TW-050",
+      "Requirement": "REQ-TW-124 through REQ-TW-129",
+      "Procedure / Scenario": "Freeze and exercise the approved observation and qualification schemas, independent collector provenance and signature binding, exact-cell matched-pair policy, quality and agreement controls, whole-workflow accounting, positive-scenario sufficiency, overflow handling, qualification/reset transitions, privacy boundary, and exact-claim boundary.",
+      "Setup / Context": "Deterministic offline `ART-TW-080` harness, frozen manifest/golden statistics, public-only fixture trust, evaluator, independent validator, 71 hash-bound positive/adversarial cases, and future cell-specific templates",
+      "Expected Result": "Deterministic offline component executed: every frozen case produced the exact approved fixture pass, invalid, safe-hold, or reset outcome; 71/71 passed. Provider replay and independently attested qualified-host execution were not performed.",
+      "Owner": "Oxiom Systems",
+      "Status": "Component passed locally; real measurement, completed VER-TW-093, VAL-TW-041, qualification, and claims remain held."
     }
   ],
   "result_records": [
@@ -3024,6 +3122,15 @@
       "Evidence Artifact": "`docs/validation/evidence/review-series-convergence-red.txt`; `scripts/traceweaver-smoke-review-series-convergence`; `docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md`; `docs/validation/traceweaver-2026-08-21-review-series-convergence-code-review.md`; controller/router/wrapper/protocol/policy/profile/receipt paths and CI step",
       "Result": "Passed locally. Exact semantic identity, audit-only raw pins, zero-review reuse/mechanical closure, correct authority/behavior routing, one routine cycle, complete externally authorized severe exception, self/mismatched authorization rejection, retained-finding/regression-only scope, durable locked state, terminal precedence, protocol parity, regression smokes, and bounded code review passed. VAL-TW-035 remains open.",
       "Date / Session": "2026-08-21"
+    },
+    {
+      "ID": "RESULT-TW-050",
+      "Requirement / Need": "REQ-TW-124 through REQ-TW-129",
+      "ATP / Method": "ATP-TW-050",
+      "Tested Ref / Context": "Exact raw observation and qualification results bound to one tested ref plus exact map/profile/SEC/oracle/capability/tokenizer/policy/corpus/cell-validation identities",
+      "Evidence Artifact": "`fixtures/metric-routing-harness/result-tw-050-template.json` defines the future shape; synthetic evaluator/validator evidence is component test evidence, not a raw metric result",
+      "Result": "Pending. No qualified collector/host run, matched provider replay, route qualification, or quantitative result exists or is claimed.",
+      "Date / Session": "Not executed"
     }
   ],
   "verification_evidence": [
@@ -3972,6 +4079,17 @@
       "Evidence Path": "`docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md`; `scripts/traceweaver-smoke-review-series-convergence`; `docs/validation/evidence/review-series-convergence-red.txt`",
       "Date / Session": "2026-08-21",
       "Notes": "Active-host runtime, VAL-TW-035, staging, publication, Terra, graph, HTML, release, and deploy remain held."
+    },
+    {
+      "ID": "VER-TW-093",
+      "Requirement": "REQ-TW-124 through REQ-TW-129",
+      "Method": "Same-candidate deterministic and qualified-host evidence verification",
+      "Procedure / Command": "Execute ATP-TW-050 against the exact `ART-TW-080` candidate; verify policy/corpus preregistration, qualified independent collector attestation, signature and observation-to-execution binding, atomic replay, single-axis pairs, recomputed power, quality floors/non-inferiority/agreement, token and latency accounting, sufficiency, privacy, complete qualification/reset bindings, semantic evidence templates, exact-cell coverage, and held claims.",
+      "Tested Ref": "`docs/validation/traceweaver-2026-08-23-metric-routing-verification-result.md`; deterministic fixtures/evaluator/validator; future `RESULT-TW-050` and qualified host receipts",
+      "Result": "Partial/component evidence only: deterministic offline ATP passed 71/71; 24-process fresh/nonempty replay, oversized-ledger, 28 template deletion, and evidence-tamper negatives passed. Independently attested provider/host evidence, RESULT-TW-050, qualification, and claims remain pending.",
+      "Evidence Path": "`TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001`; local `ART-TW-080` deterministic candidate",
+      "Date / Session": "2026-08-24",
+      "Notes": "Component evidence is governed by `RS-GEN-2026-08-23-METRIC-ROUTING-IMPLEMENTATION-001`; terminal review disposition and same-candidate verification are separate carriers."
     }
   ],
   "validation_evidence": [
@@ -4370,9 +4488,716 @@
       "Result": "Accepted: all 522 cells dispositioned with matching source digests; Codex B0/B1 and Antigravity B2/B3 compiler-to-validator scenarios, honest negatives, v1 invariance, and held-claim boundary passed",
       "Owner": "Oxiom Systems",
       "Deferred Trigger / Notes": "This validates usability and honest boundaries only. Active cutover, live descendant observation, provider replay, quantitative savings, token sufficiency, served-model attestation, and quality equivalence remain held."
+    },
+    {
+      "ID": "VAL-TW-041",
+      "Source Need": "NEED-TW-013",
+      "Scenario / Intended Use": "An owner inspects one exact metric-routing cell's current attested matched-pair packet and accepts or rejects whether the measured recommendation preserves intended quality while reducing context cost.",
+      "Stakeholder / Representative": "Oxiom Systems, independent of the evaluated compiler/agent and qualified collector",
+      "Acceptance Signal": "Every exact-cell hard invariant, absolute quality floor, agreement floor, non-inferiority bound, token/latency threshold, positive-scenario sufficiency condition, provenance/privacy condition, and current identity check passes; otherwise the cell remains or returns unqualified. Representative mechanism review validates only the harness, never another cell.",
+      "Evidence Path": "`docs/validation/traceweaver-2026-08-23-metric-routing-validation-definition.md`; future cell-specific RESULT-TW-050/VER-TW-093 packet or explicitly approved cell-bound proxy",
+      "Result": "Planned; deterministic mechanism evidence exists, but no exact cell is accepted and no proxy is authorized.",
+      "Owner": "Oxiom Systems",
+      "Deferred Trigger / Notes": "Required independently for every qualified exact cell. Active cutover remains a separate owner gate."
     }
   ],
   "code_anchor_evidence": [
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/metric-routing-harness.yml",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "file-role",
+      "Role": "canonical-deterministic-metric-routing-contract"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/metric-routing-harness.yml",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "file-role; mirror",
+      "Role": "packaged-deterministic-metric-routing-contract"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-evaluate-metric-routing",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "deterministic-offline-metric-routing-evaluator"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-validate-metric-routing-evidence",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "independent-closed-envelope-evidence-validator"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "fixture; verifies",
+      "Role": "hash-bound-71-case-atp-tw-050-component-suite"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/acceptance-cases.yml",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "immutable-reviewed-atp-tw-050-manifest; frozen-sha256-c15c289205d8a392588d17f8e35a17fbdc3e5dc485346d7855a77c70e511dc1a; exact-71-case-REQ-and-outcome-inventory-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/golden-statistics.yml",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "immutable-reviewed-atp-tw-050-golden-statistics; frozen-sha256-ded5bc102b15c14c23eb940e54c92c0e3ce82720fbf65ad3ed97aa7732e219d2; exact-policy-and-boundary-values-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-cached-input.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-invalid.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-latency-above.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-latency-below.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-latency-equal.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-partial.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-token-above.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-token-below.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-token-equal.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-underpowered.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/accounting-valid.json",
+      "Requirement": "REQ-TW-127",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/adaptive-stopping.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/attestation-cross-cell.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/attestation-duplicate-key.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/attestation-estimated.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/attestation-incomplete.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/attestation-replay.jsonl",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/attestation-self-attested.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/attestation-tampered.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/attestation-unsigned.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/attestation-valid.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/capability-drift.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/changed-axis.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/claim-hold-boundary.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/collector-trust.yml",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/corpus-drift.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/corpus-valid.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/deletion-prohibited.json",
+      "Requirement": "REQ-TW-128",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/downgrade-prohibited.json",
+      "Requirement": "REQ-TW-128",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/duplicate-pair.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/hidden-promotion.json",
+      "Requirement": "REQ-TW-128",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/key-substitution.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/locator-absolute.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/locator-oversized.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/locator-symlink.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/locator-traversal.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/lossy-compaction-prohibited.json",
+      "Requirement": "REQ-TW-128",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/matched-pairs-pilot.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/matched-pairs-valid.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/negative-safe-hold.json",
+      "Requirement": "REQ-TW-128",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/observation-content-leak.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/observation-valid.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/oracle-drift.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/overflow-prohibited.json",
+      "Requirement": "REQ-TW-128",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/policy-drift.yml",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/policy-valid.yml",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/positive-sufficiency-valid.json",
+      "Requirement": "REQ-TW-128",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/post-result-exclusion.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/power-boundary.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/profile-drift.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/qualification-alias-inheritance.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/qualification-cross-cell.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/qualification-expired.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/qualification-identity-drift.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/qualification-missing-validation.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/qualification-valid.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-agreement-fail.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-floor-fail.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-hard-invariant-fail.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-kappa-equal.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-kappa-zero-variance.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-missing-rating.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-non-inferiority-equal.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-non-inferiority-fail.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-nonindependent.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-scores-valid.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-unblinded.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/quality-with-efficiency.json",
+      "Requirement": "REQ-TW-126",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/replacement-over-cap.json",
+      "Requirement": "REQ-TW-125",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/result-tw-050-template.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/signature-suite-drift.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/tokenizer-drift.json",
+      "Requirement": "REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/truncation-prohibited.json",
+      "Requirement": "REQ-TW-128",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/trust-digest-drift.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/trust-root-rotation.json",
+      "Requirement": "REQ-TW-124",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/unbounded-retry.json",
+      "Requirement": "REQ-TW-128",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/val-tw-041-template.yml",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "fixtures/metric-routing-harness/ver-tw-093-template.yml",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "hash-bound-controlled-data-exception; structured-_traceweaver-REQ-TRACE-VER-metadata-and-canonical-inventory-digest-manually-inspected"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-metric-routing-harness",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "Exception",
+      "Role": "immutable-reviewed-atp-tw-050-smoke-anchor-compatibility; frozen-sha256-2af738b150f32b39596fdc79c3d840a2cbdaabc1b1ff6bc30cd8466df7102942; carries-ver-VER-TW-093-and-verifies-ATP-TW-050"
+    },
+    {
+      "Artifact Path": ".github/workflows/smoke-tests.yml",
+      "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
+      "Trace": "TRACE-TW-073",
+      "Verification": "VER-TW-093",
+      "Anchor Type": "file-role; verifies",
+      "Role": "deterministic-metric-routing-atp-ci-entry"
+    },
     {
       "Artifact Path": "plugins/traceweaver-core/references/model-context-map.yml",
       "Requirement": "REQ-TW-109; REQ-TW-111; REQ-TW-114; REQ-TW-116",
@@ -8951,6 +9776,66 @@
     },
     {
       "requirement_id": "REQ-TW-123",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-124",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-125",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-126",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-127",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-128",
+      "coverage_status": "missing_structured_acceptance_result",
+      "structured_acceptance_result_ids": [],
+      "final_dispositions": [],
+      "owners": [],
+      "next_triggers": [
+        "Create a structured acceptance result or reviewed held-validation record before claiming requirement closure."
+      ]
+    },
+    {
+      "requirement_id": "REQ-TW-129",
       "coverage_status": "missing_structured_acceptance_result",
       "structured_acceptance_result_ids": [],
       "final_dispositions": [],

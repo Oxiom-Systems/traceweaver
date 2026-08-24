@@ -33,7 +33,7 @@
         },
         {
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91",
+          "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118",
           "delivery_mode": "locator",
           "contained": true
         }
@@ -187,7 +187,7 @@
     },
     {
       "locator": "requirements.md",
-      "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+      "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
     },
     {
       "locator": "scripts/traceweaver-smoke-consolidated-convergence",

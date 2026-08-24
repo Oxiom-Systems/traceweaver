@@ -1,0 +1,1 @@
+{"_traceweaver":{"req":"REQ-TW-128","trace":"TRACE-TW-073","verifies":"VER-TW-093"},"category":"sufficiency","schema_version":"tw-metric-routing-fixture/1","test":{"declared_delivery_cost":true,"positive_scenario_completed":true,"prohibited_behavior":["downgrade"],"retry_bounded":true,"state_promotion":"fixture_only"}}

@@ -1,0 +1,21 @@
+{
+  "_traceweaver": "TRACEWEAVER: file-role=metric-routing-publication-review-carrier; verifies=VER-TW-093; req=REQ-TW-124,REQ-TW-125,REQ-TW-126,REQ-TW-127,REQ-TW-128,REQ-TW-129; trace=TRACE-TW-073",
+  "schema_version": "tw-publication-review/1",
+  "candidate_kind": "mixed",
+  "candidate_digest": "sha256:e91f6ee740acfcd4868d78cda802bf0daa38a3be8fbd5383bac4fb7b4a96db63",
+  "status": "clean",
+  "review_route": "tw-code-review",
+  "reviewer_identity": "terra-integrated-reviewer:/root/metric_harness_integrated_review",
+  "reviewer_identity_count": 1,
+  "review_turn_count": 2,
+  "nested_reviewer_dispatches": 0,
+  "coverage": [
+    "behavior",
+    "correctness",
+    "held_claims",
+    "linked_tests",
+    "relevant_normative_docs",
+    "traceability_vv",
+    "triggered_risk_lenses"
+  ]
+}

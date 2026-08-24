@@ -25,7 +25,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
         }
       ]
     },
@@ -286,7 +286,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
         }
       ]
     },
@@ -547,7 +547,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
         }
       ]
     },
@@ -2796,7 +2796,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
         }
       ]
     },
@@ -3918,7 +3918,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
         }
       ]
     },
@@ -5834,7 +5834,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
         }
       ]
     },
@@ -6231,5 +6231,5 @@
 
   ],
   "expected": "pass_every_release_route_category_dispositioned",
-  "oracle_digest": "sha256:31f9378b16b8a0920221149d755a682887e9f533718eaa78444e70163a09ec06"
+  "oracle_digest": "sha256:4230a7b1312aac93fb0a5aa55bf5d7ddd8483d32abd12758f36cbd828d1f939b"
 }

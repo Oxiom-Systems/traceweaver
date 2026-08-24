@@ -1,0 +1,88 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "workflow_profile": "L3",
+  "workflow_profile_revision": 1,
+  "workflow_profile_hash": "sha256:de1b8121909d9f7c2fdedaa637e6f812ed83b8a88459dc886e627df5cc5bbeef",
+  "work_item_id": "TraceWeaver-qn57",
+  "plan_ref": "docs/plans/2026-08-23-001-feat-deterministic-metric-routing-harness-plan.md",
+  "plan_hash_sha256": "4c2228674358df3be0ccbd3e6d37df267cb9a96cdb888fa34a17c619603f2bed",
+  "baseline_ref": "REQ-BASELINE-2026-04-30-001@aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5",
+  "acceptance_test_id": "ATP-TW-050",
+  "acceptance_cases": "fixtures/metric-routing-harness/acceptance-cases.yml",
+  "golden_statistics": "fixtures/metric-routing-harness/golden-statistics.yml",
+  "verification_definition": "docs/validation/traceweaver-2026-08-23-metric-routing-verification-definition.md",
+  "validation_definition": "docs/validation/traceweaver-2026-08-23-metric-routing-validation-definition.md",
+  "red_evidence_definition": "docs/validation/traceweaver-2026-08-23-metric-routing-red-evidence.md",
+  "high_risk_controls": {
+    "rollback": "Reverse only task-specific unstaged harness, fixture, V&V, and trace edits while preserving the pre-existing staged metric-authority promotion; no runtime or external state is changed.",
+    "owner_decision": "Oxiom Systems /tw-auto direction on 2026-08-23 constrained by TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001."
+  },
+  "requirements": [
+    {
+      "req_id": "REQ-TW-124",
+      "trace_id": "TRACE-TW-073",
+      "ver_id": "VER-TW-093",
+      "val_id": "VAL-TW-041",
+      "verification_artifact": "scripts/traceweaver-smoke-metric-routing-harness",
+      "red_evidence": "docs/validation/evidence/metric-routing-harness-red.txt",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-23-metric-routing-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-073 / VER-TW-093 / VAL-TW-041 (pending merge)",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}, {"gate": "tw-code-review", "id": "TW-CODE-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-125",
+      "trace_id": "TRACE-TW-073",
+      "ver_id": "VER-TW-093",
+      "val_id": "VAL-TW-041",
+      "verification_artifact": "scripts/traceweaver-smoke-metric-routing-harness",
+      "red_evidence": "docs/validation/evidence/metric-routing-harness-red.txt",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-23-metric-routing-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-073 / VER-TW-093 / VAL-TW-041 (pending merge)",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}, {"gate": "tw-code-review", "id": "TW-CODE-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-126",
+      "trace_id": "TRACE-TW-073",
+      "ver_id": "VER-TW-093",
+      "val_id": "VAL-TW-041",
+      "verification_artifact": "scripts/traceweaver-smoke-metric-routing-harness",
+      "red_evidence": "docs/validation/evidence/metric-routing-harness-red.txt",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-23-metric-routing-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-073 / VER-TW-093 / VAL-TW-041 (pending merge)",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}, {"gate": "tw-code-review", "id": "TW-CODE-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-127",
+      "trace_id": "TRACE-TW-073",
+      "ver_id": "VER-TW-093",
+      "val_id": "VAL-TW-041",
+      "verification_artifact": "scripts/traceweaver-smoke-metric-routing-harness",
+      "red_evidence": "docs/validation/evidence/metric-routing-harness-red.txt",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-23-metric-routing-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-073 / VER-TW-093 / VAL-TW-041 (pending merge)",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}, {"gate": "tw-code-review", "id": "TW-CODE-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-128",
+      "trace_id": "TRACE-TW-073",
+      "ver_id": "VER-TW-093",
+      "val_id": "VAL-TW-041",
+      "verification_artifact": "scripts/traceweaver-smoke-metric-routing-harness",
+      "red_evidence": "docs/validation/evidence/metric-routing-harness-red.txt",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-23-metric-routing-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-073 / VER-TW-093 / VAL-TW-041 (pending merge)",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}, {"gate": "tw-code-review", "id": "TW-CODE-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}]
+    },
+    {
+      "req_id": "REQ-TW-129",
+      "trace_id": "TRACE-TW-073",
+      "ver_id": "VER-TW-093",
+      "val_id": "VAL-TW-041",
+      "verification_artifact": "scripts/traceweaver-smoke-metric-routing-harness",
+      "red_evidence": "docs/validation/evidence/metric-routing-harness-red.txt",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-23-metric-routing-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-073 / VER-TW-093 / VAL-TW-041 (pending merge)",
+      "reviews": [{"gate": "tw-doc-review", "id": "TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}, {"gate": "tw-code-review", "id": "TW-CODE-REVIEW-2026-08-23-METRIC-ROUTING-VV-001", "status": "passed", "evidence_path": "docs/validation/traceweaver-2026-08-23-metric-routing-vv-integrated-review.md"}]
+    }
+  ]
+}

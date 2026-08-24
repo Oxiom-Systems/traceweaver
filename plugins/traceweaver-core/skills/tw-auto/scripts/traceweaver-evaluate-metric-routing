@@ -1,0 +1,954 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=deterministic-metric-routing-evaluator; req=REQ-TW-124,REQ-TW-125,REQ-TW-126,REQ-TW-127,REQ-TW-128,REQ-TW-129; trace=TRACE-TW-073; ver=VER-TW-093
+# TRACEWEAVER: entrypoint=evaluate_metric_routing; req=REQ-TW-124,REQ-TW-125,REQ-TW-126,REQ-TW-127,REQ-TW-128,REQ-TW-129; trace=TRACE-TW-073; ver=VER-TW-093
+
+require "base64"
+require "digest"
+require "json"
+require "openssl"
+require "optparse"
+require "pathname"
+require "yaml"
+
+REFERENCE = "plugins/traceweaver-core/references/metric-routing-harness.yml"
+FIXTURE_ROOT = "fixtures/metric-routing-harness"
+MAX_BYTES = 1_048_576
+MAX_REPLAY_LEDGER_BYTES = 1_048_576
+HELD_CLAIMS = {
+  "active_cutover" => "held", "deployment" => "held", "exact_cell_qualification" => "held",
+  "external_calls" => "held", "external_spend" => "held", "host_collection" => "held",
+  "host_instrumentation" => "held", "provider_replay" => "held", "publication" => "held",
+  "quantitative_latency_claim" => "held", "quantitative_quality_claim" => "held",
+  "quantitative_sufficiency_claim" => "held", "quantitative_token_claim" => "held",
+  "release" => "held", "result_tw_050" => "held", "served_model" => "held",
+  "validation_tw_041" => "held", "verification_tw_093" => "held"
+}.freeze
+EXECUTION_FIELDS = %w[accounting_identity clock_identity outcome_identity overflow_identity request_identity response_identity served_model_identity topology_identity].freeze
+POLICY_CELL_FIELDS = %w[budget_delivery_identity candidate_definition_identity changed_axis control_definition_identity route_identity].freeze
+POLICY_TRUST_FIELDS = %w[collector_id collector_key_spki_sha256 trust_registry_digest trust_root_id].freeze
+POLICY_RESET_TRIGGERS = %w[capability_identity collector_key_spki_sha256 corpus_identity map_identity policy_identity profile_identity sec_identity source_oracle_identity tokenizer_identity trust_registry_digest validation_identity].freeze
+QUALIFICATION_BINDING_FIELDS = %w[
+  budget_delivery_identity capability_identity candidate_definition_identity collector_id
+  collector_key_spki_sha256 control_definition_identity corpus_identity map_identity
+  measurement_attestation_identity method_suite policy_identity profile_identity
+  prerequisite_bundle_identity risk_effort route_identity sec_identity
+  served_model_identity signature_suite source_oracle_identity tokenizer_identity
+  trust_registry_digest trust_root_id verification_identity
+].freeze
+QUALIFICATION_PREREQUISITES = {
+  "attestation" => %W[
+    #{FIXTURE_ROOT}/collector-trust.yml
+    #{FIXTURE_ROOT}/observation-valid.json
+    #{FIXTURE_ROOT}/attestation-valid.json
+  ],
+  "policy" => %W[
+    #{FIXTURE_ROOT}/policy-valid.yml
+    #{FIXTURE_ROOT}/corpus-valid.json
+    #{FIXTURE_ROOT}/matched-pairs-valid.json
+  ],
+  "quality" => ["#{FIXTURE_ROOT}/quality-scores-valid.json"],
+  "accounting" => ["#{FIXTURE_ROOT}/accounting-valid.json"],
+  "sufficiency" => ["#{FIXTURE_ROOT}/positive-sufficiency-valid.json"]
+}.freeze
+MUTATION_BASES = {
+  "attestation" => "#{FIXTURE_ROOT}/attestation-valid.json",
+  "observation" => "#{FIXTURE_ROOT}/observation-valid.json",
+  "qualification" => "#{FIXTURE_ROOT}/qualification-valid.json"
+}.freeze
+MUTATION_PATHS = {
+  "attestation" => %w[signature estimated execution.overflow_identity collector_key_spki_sha256 trust_registry_digest trust_root_id signature_suite collector_role cell_id],
+  "observation" => %w[prompt],
+  "qualification" => %w[
+    test.claim_hold_assertion test.evidence_transfer test.expired test.structural_current
+    test.validation_identity test.observed_bindings.capability_identity
+    test.observed_bindings.policy_identity test.observed_bindings.profile_identity
+    test.observed_bindings.route_identity test.observed_bindings.source_oracle_identity
+    test.observed_bindings.tokenizer_identity
+  ]
+}.freeze
+
+class MetricError < StandardError; end
+class DuplicateKey < MetricError; end
+
+def canonical(value)
+  return value.map { |item| canonical(item) } if value.is_a?(Array)
+  return value.keys.map(&:to_s).sort.to_h { |key| [key, canonical(value.fetch(key))] } if value.is_a?(Hash)
+
+  value
+end
+
+def record_identity(value, own_field)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value.reject { |key, _| key == own_field })))}"
+end
+
+def digest?(value)
+  value.is_a?(String) && value.match?(/\Asha256:[0-9a-f]{64}\z/)
+end
+
+def rational!(value)
+  Rational(value.to_s)
+rescue ArgumentError, ZeroDivisionError
+  raise MetricError, "invalid_rational"
+end
+
+def closed!(value, keys, code)
+  raise MetricError, code unless value.is_a?(Hash)
+  trace = value["_traceweaver"]
+  if trace
+    raise MetricError, code unless trace.is_a?(Hash) && trace.keys.sort == %w[req trace verifies] && trace["req"].is_a?(String) && trace["req"].match?(/\AREQ-TW-(124|125|126|127|128|129)(,REQ-TW-(124|125|126|127|128|129))*\z/) && trace["trace"] == "TRACE-TW-073" && trace["verifies"] == "VER-TW-093"
+  end
+  raise MetricError, code unless (value.keys - ["_traceweaver"]).sort == keys.sort
+end
+
+def allowed!(value, keys, code)
+  raise MetricError, code unless value.is_a?(Hash)
+  closed!(value, value.keys.reject { |key| key == "_traceweaver" }, code) if value.key?("_traceweaver")
+  raise MetricError, code unless (value.keys - keys - ["_traceweaver"]).empty?
+end
+
+def primitive_values!(value)
+  case value
+  when Hash then value.each_value { |entry| primitive_values!(entry) }
+  when Array then value.each { |entry| primitive_values!(entry) }
+  when Float then raise MetricError, "float_not_allowed"
+  when String, Integer, TrueClass, FalseClass, NilClass then value
+  else raise MetricError, "value_not_allowed"
+  end
+end
+
+def safe_relative?(locator)
+  locator.is_a?(String) && !locator.empty? && !Pathname.new(locator).absolute? &&
+    locator.split("/").all? { |part| !part.empty? && part != "." && part != ".." }
+end
+
+def safe_file(root, locator)
+  raise MetricError, "unsafe_locator" unless safe_relative?(locator)
+
+  candidate = File.join(root, locator)
+  cursor = root
+  locator.split("/").each do |part|
+    cursor = File.join(cursor, part)
+    raise MetricError, "unsafe_locator" if File.symlink?(cursor)
+  end
+  raise MetricError, "unsafe_locator" unless File.file?(candidate) && File.size(candidate) <= MAX_BYTES
+  resolved = File.realpath(candidate)
+  raise MetricError, "unsafe_locator" unless resolved.start_with?("#{root}/")
+
+  resolved
+rescue Errno::ENOENT
+  raise MetricError, "unsafe_locator"
+end
+
+def skip_space(raw, index)
+  index += 1 while index < raw.length && raw[index].match?(/\s/)
+  index
+end
+
+def json_string!(raw, index)
+  raise MetricError, "invalid_json" unless raw[index] == '"'
+  start = index
+  index += 1
+  while index < raw.length
+    if raw[index] == "\\"
+      index += 2
+    elsif raw[index] == '"'
+      index += 1
+      return [JSON.parse(raw[start...index]), index]
+    else
+      index += 1
+    end
+  end
+  raise MetricError, "invalid_json"
+end
+
+def scan_json!(raw, index = 0)
+  index = skip_space(raw, index)
+  case raw[index]
+  when "{"
+    seen = {}
+    index = skip_space(raw, index + 1)
+    return index + 1 if raw[index] == "}"
+    loop do
+      key, index = json_string!(raw, index)
+      raise DuplicateKey, "duplicate_json_key" if seen[key]
+      seen[key] = true
+      index = skip_space(raw, index)
+      raise MetricError, "invalid_json" unless raw[index] == ":"
+      index = scan_json!(raw, index + 1)
+      index = skip_space(raw, index)
+      return index + 1 if raw[index] == "}"
+      raise MetricError, "invalid_json" unless raw[index] == ","
+      index = skip_space(raw, index + 1)
+    end
+  when "["
+    index = skip_space(raw, index + 1)
+    return index + 1 if raw[index] == "]"
+    loop do
+      index = scan_json!(raw, index)
+      index = skip_space(raw, index)
+      return index + 1 if raw[index] == "]"
+      raise MetricError, "invalid_json" unless raw[index] == ","
+      index = skip_space(raw, index + 1)
+    end
+  when '"'
+    _value, index = json_string!(raw, index)
+    index
+  else
+    match = /\A(?:true|false|null|-?(?:0|[1-9][0-9]*)(?:\.[0-9]+)?(?:[eE][+-]?[0-9]+)?)/.match(raw[index..])
+    raise MetricError, "invalid_json" unless match
+
+    index + match[0].length
+  end
+end
+
+def json_document(raw)
+  duplicate = false
+  begin
+    finish = skip_space(raw, scan_json!(raw))
+    raise MetricError, "invalid_json" unless finish == raw.length
+  rescue DuplicateKey
+    duplicate = true
+  end
+  value = JSON.parse(raw)
+  primitive_values!(value)
+  exact = JSON.generate(canonical(value))
+  return value if !duplicate && (raw == exact || raw == "#{exact}\n")
+
+  if value.is_a?(Hash) && (value["category"] == "attestation" || value["category"] == "observation" || value["base"].to_s.include?("attestation"))
+    return { "__parse_failure" => duplicate ? "duplicate_json_key" : "noncanonical_json", "category" => value["category"] }
+  end
+  raise MetricError, duplicate ? "duplicate_json_key" : "noncanonical_json"
+rescue JSON::ParserError
+  raise MetricError, "invalid_json"
+end
+
+def yaml_document(path)
+  value = YAML.safe_load(File.binread(path), permitted_classes: [], aliases: false)
+  primitive_values!(value)
+  raise MetricError, "yaml_mapping" unless value.is_a?(Hash)
+
+  value
+rescue Psych::Exception
+  raise MetricError, "invalid_yaml"
+end
+
+def raw_document(root, locator)
+  path = safe_file(root, locator)
+  documents = if locator.end_with?(".jsonl")
+                File.binread(path).lines.map { |line| json_document(line) }
+              elsif locator.end_with?(".json")
+                [json_document(File.binread(path))]
+              else
+                [yaml_document(path)]
+              end
+  [documents, "sha256:#{Digest::SHA256.file(path).hexdigest}"]
+end
+
+def validate_template_party!(value, code)
+  closed!(value, %w[identity relationship], code)
+  raise MetricError, code unless value.values.all? { |field| field.is_a?(String) && field.start_with?("required_future_") }
+end
+
+def required_placeholders!(record, fields, code)
+  raise MetricError, code unless fields.all? { |field| record[field].is_a?(String) && record[field].start_with?("required_future_") }
+end
+
+def validate_result_template!(result)
+  closed!(result, %w[accounting_summary candidate_identity claim_disposition corpus_identity evidence_path exact_cell_identity fixture_boundary method_suite outcome pair_summary policy_identity quality_summary raters raw_observation_locators requirements result_id reviewer schema_version state_summary status sufficiency_summary tested_ref trust_identity], "result_template")
+  raise MetricError, "result_template" unless result["schema_version"] == "tw-metric-routing-result-template/1" && result["status"] == "pending_no_observed_result" && result["result_id"] == "RESULT-TW-050" && result["requirements"] == %w[REQ-TW-124 REQ-TW-125 REQ-TW-126 REQ-TW-127 REQ-TW-128 REQ-TW-129] && result["method_suite"] == "tw-metric-exact-paired/1" && result["claim_disposition"] == HELD_CLAIMS && result["fixture_boundary"] == "template_only_not_a_result" && result["outcome"] == "pending_provider_and_host_evidence"
+  required_placeholders!(result, %w[accounting_summary candidate_identity corpus_identity evidence_path exact_cell_identity policy_identity quality_summary state_summary sufficiency_summary tested_ref trust_identity], "result_template")
+  validate_template_party!(result["reviewer"], "result_template")
+  raise MetricError, "result_template" unless result["raters"].is_a?(Array) && result["raters"].length == 1
+  validate_template_party!(result["raters"].first, "result_template")
+  raise MetricError, "result_template" unless result["raw_observation_locators"] == ["required_future_repository_relative_observation_locator"]
+  summary = result["pair_summary"]
+  closed!(summary, %w[absolute_values distribution_summary exclusions invalid_pair_count partial_pair_count percentages uncertainty valid_pair_count], "result_template")
+  required_placeholders!(summary, %w[absolute_values distribution_summary percentages uncertainty], "result_template")
+  raise MetricError, "result_template" unless summary["exclusions"] == ["required_future_pre_result_exclusion"] && summary.values_at("valid_pair_count", "invalid_pair_count", "partial_pair_count").all? { |field| field == "required_nonnegative_integer" }
+end
+
+def validate_verification_template!(verification)
+  closed!(verification, %w[actual_result candidate_identity claim_disposition command corpus_identity deviations evidence_path exact_cell_identity exit_status expected_result fixture_boundary method method_suite outcome policy_identity requirements schema_version setup status tested_ref trust_identity verification_id verifier], "verification_template")
+  raise MetricError, "verification_template" unless verification["schema_version"] == "tw-metric-routing-verification-template/1" && verification["status"] == "pending_host_and_provider_evidence" && verification["verification_id"] == "VER-TW-093" && verification["requirements"] == %w[REQ-TW-124 REQ-TW-125 REQ-TW-126 REQ-TW-127 REQ-TW-128 REQ-TW-129] && verification["method_suite"] == "tw-metric-exact-paired/1" && verification["claim_disposition"] == HELD_CLAIMS && verification["fixture_boundary"] == "template_only_not_a_verification_pass" && verification["outcome"] == "pending_host_and_provider_evidence"
+  required_placeholders!(verification, %w[actual_result candidate_identity command corpus_identity deviations evidence_path exact_cell_identity exit_status expected_result method policy_identity setup tested_ref trust_identity], "verification_template")
+  validate_template_party!(verification["verifier"], "verification_template")
+end
+
+def validate_validation_template!(validation)
+  closed!(validation, %w[acceptance_signal actual_result candidate_identity claim_disposition corpus_identity deviations evidence_path exact_cell_identity fixture_boundary method_suite outcome owner policy_identity rater relationship_and_independence representative_scenario requirements schema_version status trust_identity validation_id], "validation_template")
+  raise MetricError, "validation_template" unless validation["schema_version"] == "tw-metric-routing-validation-template/1" && validation["status"] == "planned_not_accepted" && validation["validation_id"] == "VAL-TW-041" && validation["requirements"] == %w[REQ-TW-124 REQ-TW-125 REQ-TW-126 REQ-TW-127 REQ-TW-128 REQ-TW-129] && validation["method_suite"] == "tw-metric-exact-paired/1" && validation["claim_disposition"] == HELD_CLAIMS && validation["fixture_boundary"] == "template_only_not_stakeholder_validation" && validation["outcome"] == "planned_not_accepted" && validation["owner"] == "Oxiom Systems_or_approved_independent_proxy"
+  required_placeholders!(validation, %w[acceptance_signal actual_result candidate_identity corpus_identity deviations evidence_path exact_cell_identity policy_identity relationship_and_independence representative_scenario trust_identity], "validation_template")
+  validate_template_party!(validation["rater"], "validation_template")
+end
+
+def evidence_template_contracts
+  {
+    "result" => ["#{FIXTURE_ROOT}/result-tw-050-template.json", "tw-metric-routing-result-template/1", "pending_no_observed_result"],
+    "validation" => ["#{FIXTURE_ROOT}/val-tw-041-template.yml", "tw-metric-routing-validation-template/1", "planned_not_accepted"],
+    "verification" => ["#{FIXTURE_ROOT}/ver-tw-093-template.yml", "tw-metric-routing-verification-template/1", "pending_host_and_provider_evidence"]
+  }
+end
+
+def load_evidence_templates(root)
+  expected = evidence_template_contracts
+  {
+    "result" => raw_document(root, expected.fetch("result").first).first.fetch(0),
+    "validation" => yaml_document(safe_file(root, expected.fetch("validation").first)),
+    "verification" => yaml_document(safe_file(root, expected.fetch("verification").first))
+  }
+end
+
+def validate_evidence_templates!(root, template_contracts)
+  closed!(template_contracts, %w[result validation verification], "template_contract")
+  evidence_template_contracts.each do |name, (locator, schema, status)|
+    closed!(template_contracts[name], %w[locator schema_version status], "template_contract")
+    raise MetricError, "template_contract" unless template_contracts[name] == { "locator" => locator, "schema_version" => schema, "status" => status }
+  end
+  templates = load_evidence_templates(root)
+  validate_result_template!(templates["result"])
+  validate_validation_template!(templates["validation"])
+  validate_verification_template!(templates["verification"])
+end
+
+def remove_template_field!(record, dotted_path)
+  target = record
+  parts = dotted_path.split(".")
+  leaf = parts.pop
+  parts.each { |part| target = target.fetch(part) }
+  target.delete(leaf)
+end
+
+def evidence_template_self_test!(root)
+  templates = load_evidence_templates(root)
+  validators = {
+    "result" => method(:validate_result_template!),
+    "validation" => method(:validate_validation_template!),
+    "verification" => method(:validate_verification_template!)
+  }
+  validators.each { |name, validator| validator.call(templates.fetch(name)) }
+  negative_fields = {
+    "result" => %w[raw_observation_locators pair_summary.valid_pair_count pair_summary.invalid_pair_count pair_summary.partial_pair_count pair_summary.uncertainty quality_summary accounting_summary sufficiency_summary state_summary reviewer raters evidence_path],
+    "verification" => %w[requirements setup command tested_ref expected_result actual_result exit_status deviations verifier trust_identity],
+    "validation" => %w[trust_identity method_suite rater actual_result relationship_and_independence evidence_path]
+  }
+  rejected = 0
+  negative_fields.each do |name, fields|
+    fields.each do |field|
+      candidate = JSON.parse(JSON.generate(templates.fetch(name)))
+      remove_template_field!(candidate, field)
+      begin
+        validators.fetch(name).call(candidate)
+      rescue MetricError
+        rejected += 1
+        next
+      end
+      raise MetricError, "evidence_template_self_test"
+    end
+  end
+  state_mutations = {
+    "result" => lambda { |candidate| candidate.fetch("claim_disposition")["publication"] = "passed" },
+    "validation" => lambda { |candidate| candidate["owner"] = "unapproved_owner" },
+    "verification" => lambda { |candidate| candidate["status"] = "passed" }
+  }
+  state_mutations.each do |name, mutation|
+    candidate = JSON.parse(JSON.generate(templates.fetch(name)))
+    mutation.call(candidate)
+    begin
+      validators.fetch(name).call(candidate)
+    rescue MetricError
+      rejected += 1
+      next
+    end
+    raise MetricError, "evidence_template_self_test"
+  end
+  {
+    "negative_mutations_rejected" => rejected,
+    "positive_templates_validated" => validators.length,
+    "schema_version" => "tw-metric-routing-evidence-template-self-test/1",
+    "status" => "pass"
+  }
+end
+
+def mutate!(record, mutation, category)
+  closed!(mutation, %w[op path value] - (mutation["op"] == "delete" ? ["value"] : []), "mutation_schema")
+  path = mutation["path"]
+  raise MetricError, "mutation_path" unless MUTATION_PATHS.fetch(category).include?(path)
+  target = record
+  parts = path.split(".")
+  leaf = parts.pop
+  parts.each do |part|
+    raise MetricError, "mutation_path" unless target[part].is_a?(Hash)
+    target = target[part]
+  end
+  case mutation["op"]
+  when "replace"
+    raise MetricError, "mutation_path" unless target.key?(leaf)
+    target[leaf] = mutation["value"]
+  when "delete"
+    raise MetricError, "mutation_path" unless target.key?(leaf)
+    target.delete(leaf)
+  when "add"
+    raise MetricError, "mutation_path" unless !target.key?(leaf)
+    target[leaf] = mutation["value"]
+  else
+    raise MetricError, "mutation_operation"
+  end
+end
+
+def materialize(root, documents)
+  documents.flat_map do |document|
+    next [document] if document["__parse_failure"]
+    next [document] unless document["schema_version"] == "tw-metric-routing-mutation/1"
+
+    closed!(document, %w[base category mutations schema_version], "mutation_schema")
+    raise MetricError, "mutation_schema" unless MUTATION_BASES.key?(document["category"]) && document["mutations"].is_a?(Array)
+    expected = MUTATION_BASES.fetch(document["category"])
+    raise MetricError, "mutation_base" unless document["base"] == expected
+    base, = raw_document(root, expected)
+    raise MetricError, "mutation_base" unless base.length == 1 && !base[0]["__parse_failure"]
+    record = JSON.parse(JSON.generate(base[0]))
+    document["mutations"].each { |mutation| mutate!(record, mutation, document["category"]) }
+    [record]
+  end
+end
+
+def verify_reference!(root)
+  reference = yaml_document(safe_file(root, REFERENCE))
+  closed!(reference, %w[acceptance_test_id artifact_id canonical_identity evidence_envelope evidence_templates fixture_inventory fixture_only_positive_outcomes held_claims method_suite network_forbidden offline_only policy provider_calls_forbidden reference_identity schema_version strict_input_rules trust], "reference_schema")
+  raise MetricError, "reference_schema" unless reference["schema_version"] == "tw-metric-routing-harness/1" && reference["reference_identity"] == record_identity(reference, "reference_identity")
+  inventory = reference["fixture_inventory"]
+  closed!(inventory, %w[entries schema_version], "fixture_inventory")
+  raise MetricError, "fixture_inventory" unless inventory["schema_version"] == "tw-metric-routing-fixture-inventory/1" && inventory["entries"].is_a?(Array)
+  inventory["entries"].each do |entry|
+    closed!(entry, %w[locator sha256], "fixture_inventory")
+    raise MetricError, "fixture_digest" unless entry["sha256"] == "sha256:#{Digest::SHA256.file(safe_file(root, entry["locator"])).hexdigest}"
+  end
+  validate_evidence_templates!(root, reference["evidence_templates"])
+  reference
+end
+
+def choose(n, k)
+  return 0 if k.negative? || k > n
+  k = [k, n - k].min
+  (1..k).reduce(1) { |value, index| value * (n - k + index) / index }
+end
+
+def sign_cutoff(n, alpha)
+  (0..n).find do |candidate|
+    (candidate..n).sum { |count| Rational(choose(n, count), 2**n) } <= alpha
+  end
+end
+
+def sign_power(n, cutoff, favorable_probability)
+  (cutoff..n).sum do |count|
+    Rational(choose(n, count)) * favorable_probability**count * (1 - favorable_probability)**(n - count)
+  end
+end
+
+def validate_sign_design!(sign)
+  closed!(sign, %w[alpha alternative_favorable_probability fixed_minimum_valid_positive_pairs fixed_stopping maximum_valid_pairs null_favorable_probability power_target powered_minimum], "policy_schema")
+  alpha = rational!(sign["alpha"])
+  null_probability = rational!(sign["null_favorable_probability"])
+  alternative_probability = rational!(sign["alternative_favorable_probability"])
+  target = rational!(sign["power_target"])
+  fixed_minimum = sign["fixed_minimum_valid_positive_pairs"]
+  maximum = sign["maximum_valid_pairs"]
+  raise MetricError, "policy_power" unless alpha == Rational(1, 20) && null_probability == Rational(1, 2) && alternative_probability == Rational(4, 5) && target == Rational(4, 5)
+  raise MetricError, "policy_power" unless fixed_minimum == 10 && maximum == 18 && sign["fixed_stopping"] == true
+
+  computed = (fixed_minimum..maximum).find do |count|
+    cutoff = sign_cutoff(count, alpha)
+    cutoff && sign_power(count, cutoff, alternative_probability) >= target
+  end
+  raise MetricError, "policy_power" unless computed == sign["powered_minimum"] && computed == 18 && sign_cutoff(computed, alpha) == 13
+
+  computed
+end
+
+def order_rank(n)
+  (1..n).select { |rank| (0..rank - 1).sum { |count| Rational(choose(n, count), 2**n) } <= Rational(1, 20) }.max
+end
+
+def weighted_kappa(left, right)
+  raise MetricError, "rating_shape" unless left.length == right.length && !left.empty?
+  weight = lambda { |a, b| Rational((a - b)**2, 16) }
+  observed = left.zip(right).sum { |a, b| weight.call(a, b) } / left.length
+  expected = (0..4).to_a.product((0..4).to_a).sum { |a, b| weight.call(a, b) * Rational(left.count(a) * right.count(b), left.length**2) }
+  return nil unless expected.positive?
+  1 - observed / expected
+end
+
+def default_record(root, locator)
+  documents, = raw_document(root, locator)
+  raise MetricError, "default_record" unless documents.length == 1 && !documents[0]["__parse_failure"]
+  documents[0]
+end
+
+def trust_and_observation(root, documents)
+  trust = documents.find { |record| record["schema_version"] == "tw-metric-routing-collector-trust/1" } || default_record(root, "#{FIXTURE_ROOT}/collector-trust.yml")
+  observation = documents.find { |record| record["schema_version"] == "tw-metric-routing-observation/1" } || default_record(root, "#{FIXTURE_ROOT}/observation-valid.json")
+  [trust, observation]
+end
+
+def trust_valid?(trust)
+  closed!(trust, %w[collectors schema_version trust_root_id], "trust_schema")
+  return false unless trust["schema_version"] == "tw-metric-routing-collector-trust/1" && trust["trust_root_id"].is_a?(String) && trust["collectors"].is_a?(Array) && trust["collectors"].length == 1
+  collector = trust["collectors"][0]
+  closed!(collector, %w[collector_id public_key_pem public_key_spki_sha256 role signature_suite], "trust_schema")
+  return false unless collector["collector_id"].is_a?(String) && collector["role"] == "independent_collector" && collector["signature_suite"] == "rsa-sha256-pkcs1-v1_5" && digest?(collector["public_key_spki_sha256"]) && collector["public_key_pem"].is_a?(String)
+  key = OpenSSL::PKey.read(collector["public_key_pem"])
+  key.is_a?(OpenSSL::PKey::RSA) && key.n.num_bits >= 2048 && key.e.to_i >= 65_537 && collector["public_key_spki_sha256"] == "sha256:#{Digest::SHA256.hexdigest(key.public_key.to_der)}"
+rescue OpenSSL::PKey::PKeyError, MetricError
+  false
+end
+
+def consume_replay!(state_dir, attestation)
+  ledger = File.join(state_dir, "attestation-replay-ledger.jsonl")
+  raise MetricError, "replay_ledger" if File.symlink?(ledger)
+  execution_identity = record_identity(attestation["execution"], "none")
+  attestation_identity = record_identity(attestation, "signature")
+  key = "#{attestation["nonce"]}\t#{attestation_identity}\t#{execution_identity}\t#{attestation["cell_id"]}"
+  encoded = "#{key}\n"
+  flags = File::RDWR | File::CREAT
+  flags |= File::NOFOLLOW if File.const_defined?(:NOFOLLOW)
+  File.open(ledger, flags, 0o600) do |file|
+    raise MetricError, "replay_ledger" unless file.stat.file?
+    raise MetricError, "replay_ledger" unless file.flock(File::LOCK_EX)
+    raise MetricError, "replay_ledger" if file.stat.size > MAX_REPLAY_LEDGER_BYTES
+
+    file.rewind
+    replayed = file.each_line.any? { |line| line.chomp == key }
+    return true if replayed
+
+    raise MetricError, "replay_ledger" if file.stat.size + encoded.bytesize > MAX_REPLAY_LEDGER_BYTES
+    file.seek(0, IO::SEEK_END)
+    file.write(encoded)
+    file.flush
+    file.fsync
+    false
+  ensure
+    file.flock(File::LOCK_UN) rescue nil
+  end
+end
+
+def assess_attestations(root, documents, state_dir)
+  return ["held_attestation_noncanonical", {}] if documents.any? { |record| record["__parse_failure"] }
+  locators = documents.select { |record| record["category"] == "locator" }
+  locators.each do |record|
+    closed!(record, %w[category schema_version test], "locator_schema")
+    closed!(record["test"], %w[locator], "locator_schema")
+    begin
+      safe_file(root, record["test"]["locator"])
+    rescue MetricError
+      return ["held_locator_unsafe", {}]
+    end
+  end
+  records = materialize(root, documents)
+  observation = records.find { |record| record["schema_version"] == "tw-metric-routing-observation/1" }
+  if observation && %w[prompt tool_result secret source_content].any? { |field| observation.key?(field) }
+    return ["held_privacy_content_forbidden", {}]
+  end
+  attestations = records.select { |record| record["schema_version"] == "tw-metric-routing-attestation/1" }
+  return [nil, {}] if attestations.empty?
+  trust, observation = trust_and_observation(root, records)
+  return ["held_attestation_trust_or_suite_mismatch", {}] unless trust_valid?(trust)
+  trust_digest = "sha256:#{Digest::SHA256.file(safe_file(root, "#{FIXTURE_ROOT}/collector-trust.yml")).hexdigest}"
+  collector = trust["collectors"][0]
+  begin
+    closed!(observation, %w[cell_id collector_id content_free counts execution_identity observation_identity schema_version signature_suite trust_registry_digest trust_root_id], "observation_schema")
+    closed!(observation["counts"], %w[paired_runs], "observation_schema")
+  rescue MetricError
+    return ["held_privacy_content_forbidden", {}]
+  end
+  return ["held_privacy_content_forbidden", {}] unless observation["content_free"] == true && observation["counts"]["paired_runs"].is_a?(Integer) && observation["counts"]["paired_runs"].positive?
+  return ["held_attestation_trust_or_suite_mismatch", {}] unless observation["cell_id"].is_a?(String) && !observation["cell_id"].empty? && observation["collector_id"] == collector["collector_id"] && digest?(observation["execution_identity"]) && digest?(observation["observation_identity"]) && observation["trust_registry_digest"] == trust_digest && observation["trust_root_id"] == trust["trust_root_id"] && observation["signature_suite"] == collector["signature_suite"] && observation["observation_identity"] == record_identity(observation, "observation_identity")
+  attestations.each do |attestation|
+    allowed!(attestation, %w[attestation_id cell_id collector_id collector_key_spki_sha256 collector_role estimated execution nonce observation_identity schema_version signature signature_suite trust_registry_digest trust_root_id], "attestation_schema")
+    required = %w[attestation_id cell_id collector_id collector_key_spki_sha256 collector_role estimated execution nonce observation_identity schema_version signature_suite trust_registry_digest trust_root_id]
+    return ["held_attestation_incomplete", {}] unless required.all? { |field| attestation.key?(field) }
+    return ["held_attestation_self_attested", {}] unless attestation["collector_role"] == "independent_collector"
+    return ["held_attestation_trust_or_suite_mismatch", {}] unless attestation["collector_id"] == collector["collector_id"] && attestation["collector_key_spki_sha256"] == collector["public_key_spki_sha256"] && attestation["trust_registry_digest"] == trust_digest && attestation["trust_root_id"] == trust["trust_root_id"] && attestation["signature_suite"] == collector["signature_suite"]
+    return ["held_attestation_estimated", {}] unless attestation["estimated"] == false
+    return ["held_attestation_cross_cell", {}] unless attestation["cell_id"] == observation["cell_id"] && attestation["observation_identity"] == observation["observation_identity"]
+    return ["held_attestation_incomplete", {}] unless attestation["execution"].is_a?(Hash) && attestation["execution"].keys.sort == EXECUTION_FIELDS && EXECUTION_FIELDS.all? { |field| digest?(attestation["execution"][field]) }
+    return ["held_attestation_incomplete", {}] unless observation["execution_identity"] == record_identity(attestation["execution"], "none")
+    return ["held_attestation_signature_missing", {}] unless attestation["signature"].is_a?(String) && !attestation["signature"].empty?
+    begin
+      signature = Base64.strict_decode64(attestation["signature"])
+      payload = JSON.generate(canonical(attestation.reject { |field, _value| field == "signature" }))
+      key = OpenSSL::PKey.read(collector["public_key_pem"])
+      return ["held_attestation_signature_invalid", {}] unless key.verify(OpenSSL::Digest::SHA256.new, signature, payload)
+    rescue ArgumentError, OpenSSL::PKey::PKeyError
+      return ["held_attestation_signature_invalid", {}]
+    end
+    return ["held_attestation_replayed", {}] if consume_replay!(state_dir, attestation)
+  end
+  [nil, { "attestation_count" => attestations.length }]
+end
+
+def fixture_tests(documents, category)
+  documents.select { |record| record["schema_version"] == "tw-metric-routing-fixture/1" && record["category"] == category }.map do |record|
+    closed!(record, %w[category schema_version test], "fixture_schema")
+    raise MetricError, "fixture_schema" unless record["test"].is_a?(Hash)
+    record["test"]
+  end
+end
+
+def assess_pairs(root, documents, policy, corpus)
+  expected_policy = policy || default_record(root, "#{FIXTURE_ROOT}/policy-valid.yml")
+  expected_corpus = corpus || default_record(root, "#{FIXTURE_ROOT}/corpus-valid.json")
+  (fixture_tests(documents, "policy") + fixture_tests(documents, "pairs")).each do |test|
+    allowed!(test, %w[candidate_definition_identity cell_identity changed_axis control_definition_identity corpus_identity exclusion_phase pair_ids policy_identity replacement_count sign_design stopping], "pair_schema")
+    return "held_policy_identity_mismatch" if test["policy_identity"] && test["policy_identity"] != expected_policy["policy_identity"]
+    return "held_corpus_identity_mismatch" if test["corpus_identity"] && test["corpus_identity"] != expected_corpus["corpus_identity"]
+    return "held_adaptive_stopping" if test["stopping"] == "adaptive"
+    return "held_post_result_exclusion" if test["exclusion_phase"] == "post_result"
+    return "held_replacement_over_cap" if test["replacement_count"].is_a?(Integer) && test["replacement_count"] > 1
+    return "held_duplicate_pair" if test["pair_ids"].is_a?(Array) && test["pair_ids"].uniq.length != test["pair_ids"].length
+    return "held_changed_axis" if test.key?("changed_axis") && test["changed_axis"] != "route_strategy"
+    return "held_pilot_or_underpowered" if test["pair_ids"].is_a?(Array) && test["pair_ids"].length < 10
+    if test["pair_ids"].is_a?(Array) && test["pair_ids"].length >= 10
+      cell = expected_policy["cell"]
+      return "held_changed_axis" unless test["cell_identity"] == cell["route_identity"] && test["control_definition_identity"] == cell["control_definition_identity"] && test["candidate_definition_identity"] == cell["candidate_definition_identity"]
+    end
+    validate_sign_design!(test["sign_design"]) if test["sign_design"]
+  end
+  nil
+end
+
+def assess_policy(root, documents)
+  policy = documents.find { |record| record["schema_version"] == "tw-metric-routing-policy/1" }
+  corpus = documents.find { |record| record["schema_version"] == "tw-metric-routing-corpus/1" }
+  return [nil, nil] unless policy || corpus
+  raise MetricError, "policy_packet" unless policy && corpus
+  closed!(corpus, %w[corpus_id corpus_identity scenario_count schema_version], "corpus_schema")
+  raise MetricError, "corpus_schema" unless corpus["corpus_id"].is_a?(String) && corpus["scenario_count"] == 10 && corpus["corpus_identity"] == record_identity(corpus, "corpus_identity")
+  closed!(policy, %w[accounting cell corpus_identity exclusions method_suite policy_identity quality reset_triggers schema_version sign_design signature_suite stopping trust], "policy_schema")
+  trust_digest = "sha256:#{Digest::SHA256.file(safe_file(root, "#{FIXTURE_ROOT}/collector-trust.yml")).hexdigest}"
+  raise MetricError, "policy_schema" unless policy["method_suite"] == "tw-metric-exact-paired/1" && policy["policy_identity"] == record_identity(policy, "policy_identity") && policy["corpus_identity"] == corpus["corpus_identity"] && policy["signature_suite"] == "rsa-sha256-pkcs1-v1_5"
+  closed!(policy["cell"], POLICY_CELL_FIELDS, "policy_schema")
+  raise MetricError, "policy_schema" unless policy["cell"]["changed_axis"] == "route_strategy" && (POLICY_CELL_FIELDS - ["changed_axis"]).all? { |field| digest?(policy["cell"][field]) }
+  closed!(policy["trust"], POLICY_TRUST_FIELDS, "policy_schema")
+  raise MetricError, "policy_schema" unless policy["trust"]["collector_id"].is_a?(String) && !policy["trust"]["collector_id"].empty? && digest?(policy["trust"]["collector_key_spki_sha256"]) && policy["trust"]["trust_registry_digest"] == trust_digest && policy["trust"]["trust_root_id"].is_a?(String)
+  closed!(policy["stopping"], %w[fixed maximum_valid_pairs], "policy_schema")
+  closed!(policy["exclusions"], %w[phase replacement_cap_fraction replacement_cap_pairs], "policy_schema")
+  raise MetricError, "policy_schema" unless policy["stopping"] == { "fixed" => true, "maximum_valid_pairs" => 18 } && policy["exclusions"] == { "phase" => "pre_result", "replacement_cap_fraction" => "1/10", "replacement_cap_pairs" => 1 }
+  closed!(policy["quality"], %w[absolute_score_floor agreement_method blinded_independent_raters_minimum lower_bound minimum_pairwise_kappa noninferiority_method], "policy_schema")
+  raise MetricError, "policy_schema" unless policy["quality"] == { "absolute_score_floor" => 3, "agreement_method" => "minimum_pairwise_quadratic_weighted_kappa", "blinded_independent_raters_minimum" => 2, "lower_bound" => "-1/4", "minimum_pairwise_kappa" => "4/5", "noninferiority_method" => "one_sided_distribution_free_order_statistic" }
+  closed!(policy["accounting"], %w[aggregation interval_method latency_upper_bound token_lower_bound], "policy_schema")
+  raise MetricError, "policy_schema" unless policy["accounting"] == { "aggregation" => "whole_workflow_once", "interval_method" => "one_sided_distribution_free_order_statistic", "latency_upper_bound" => "6/5", "token_lower_bound" => "1/5" }
+  raise MetricError, "policy_schema" unless policy["reset_triggers"] == POLICY_RESET_TRIGGERS
+  validate_sign_design!(policy["sign_design"])
+  [policy, corpus]
+end
+
+def assess_quality(documents)
+  details = {}
+  fixture_tests(documents, "quality").each do |test|
+    allowed!(test, %w[efficiency_pairs hard_invariants paired_quality_differences rater_metadata rating_packets score_packets], "quality_schema")
+    invariants = test["hard_invariants"]
+    return ["held_quality_hard_invariant", details] unless invariants.is_a?(Array) && !invariants.empty? && invariants.all? { |item| closed!(item, %w[id observed], "quality_schema"); item["id"].is_a?(String) && item["observed"] == true }
+    scores = test["score_packets"]
+    if test["efficiency_pairs"] && scores.is_a?(Array) && scores.any? { |packet| packet.is_a?(Hash) && packet["dimensions"].is_a?(Hash) && packet["dimensions"].values.any? { |score| score.is_a?(Integer) && score < 3 } }
+      return ["held_quality_conjunctive_failure", details]
+    end
+    return ["held_quality_floor", details] unless scores.is_a?(Array) && !scores.empty? && scores.all? { |packet| closed!(packet, %w[dimensions scenario_id], "quality_schema"); packet["dimensions"].is_a?(Hash) && !packet["dimensions"].empty? && packet["dimensions"].values.all? { |score| score.is_a?(Integer) && score >= 3 && score <= 4 } }
+    raters = test["rater_metadata"]
+    return ["held_quality_missing_rating", details] unless raters.is_a?(Array) && raters.length >= 2 && raters.all? { |rater| closed!(rater, %w[blinded id independent], "quality_schema"); rater["id"].is_a?(String) && [true, false].include?(rater["blinded"]) && [true, false].include?(rater["independent"]) }
+    ids = raters.map { |rater| rater["id"] }
+    return ["held_quality_missing_rating", details] unless ids.uniq.length == ids.length
+    return ["held_quality_unblinded", details] unless raters.all? { |rater| rater["blinded"] }
+    return ["held_quality_nonindependent", details] unless raters.all? { |rater| rater["independent"] }
+    packets = test["rating_packets"]
+    return ["held_quality_missing_rating", details] unless packets.is_a?(Array) && !packets.empty? && packets.all? { |packet| closed!(packet, %w[ratings scenario_id], "quality_schema"); packet["scenario_id"].is_a?(String) && packet["ratings"].is_a?(Hash) && packet["ratings"].keys.sort == ids.sort && packet["ratings"].values.all? { |rating| rating.is_a?(Integer) && (0..4).cover?(rating) } }
+    kappas = ids.combination(2).map { |left, right| weighted_kappa(packets.map { |packet| packet["ratings"][left] }, packets.map { |packet| packet["ratings"][right] }) }
+    return ["held_quality_kappa_undefined", details] if kappas.any?(&:nil?)
+    minimum = kappas.min
+    details["minimum_pairwise_kappa"] = minimum.to_s
+    return ["held_quality_kappa_below_threshold", details] if minimum < Rational(4, 5)
+    differences = test["paired_quality_differences"]
+    return ["held_quality_noninferiority_below_threshold", details] unless differences.is_a?(Array) && differences.length >= 10
+    values = differences.map { |value| rational!(value) }.sort
+    rank = order_rank(values.length)
+    raise MetricError, "order_rank" unless rank
+    lower = values.fetch(rank - 1)
+    details["quality_difference_lower_bound"] = lower.to_s
+    return ["held_quality_noninferiority_below_threshold", details] if lower < Rational(-1, 4)
+  rescue MetricError
+    raise
+  end
+  [nil, details]
+end
+
+def workflow!(workflow)
+  closed!(workflow, %w[complete executions monotonic_latency_ns], "accounting_schema")
+  raise MetricError, "accounting_schema" unless workflow["complete"] == true && workflow["monotonic_latency_ns"].is_a?(Integer) && workflow["monotonic_latency_ns"].positive? && workflow["executions"].is_a?(Array) && !workflow["executions"].empty?
+  ids = []
+  direct_input = 0
+  cached_input = 0
+  output = 0
+  scope_counts = Hash.new(0)
+  workflow["executions"].each do |execution|
+    closed!(execution, %w[cached_input direct_input execution_id output scope], "accounting_schema")
+    raise MetricError, "accounting_schema" unless execution["execution_id"].is_a?(String) && %w[coordinator child retry shard].include?(execution["scope"]) && %w[cached_input direct_input output].all? { |field| execution[field].is_a?(Integer) && execution[field] >= 0 }
+    ids << execution["execution_id"]
+    direct_input += execution["direct_input"]
+    cached_input += execution["cached_input"]
+    output += execution["output"]
+    scope_counts[execution["scope"]] += 1
+  end
+  summary = {
+    "cached_input" => cached_input,
+    "direct_input" => direct_input,
+    "execution_count" => ids.length,
+    "monotonic_latency_ns" => workflow["monotonic_latency_ns"],
+    "output" => output,
+    "scope_counts" => %w[child coordinator retry shard].to_h { |scope| [scope, scope_counts[scope]] },
+    "total_tokens" => direct_input + cached_input + output
+  }
+  [summary, ids]
+end
+
+def rational_summary(values)
+  sorted = values.sort
+  midpoint = sorted.length / 2
+  median = if sorted.length.odd?
+             sorted[midpoint]
+           else
+             (sorted[midpoint - 1] + sorted[midpoint]) / 2
+           end
+  { "maximum" => sorted.last.to_s, "median" => median.to_s, "minimum" => sorted.first.to_s }
+end
+
+def assess_accounting(documents)
+  details = {}
+  fixture_tests(documents, "accounting").each do |test|
+    closed!(test, %w[exclusions maximum_valid_pairs pairs stopping], "accounting_schema")
+    return ["held_adaptive_stopping", details] unless test["stopping"] == "fixed" && test["maximum_valid_pairs"] == 18
+    return ["held_post_result_exclusion", details] unless test["exclusions"].is_a?(Array) && test["exclusions"].all? { |entry| closed!(entry, %w[pair_id phase], "accounting_schema"); entry["phase"] == "pre_result" && entry["pair_id"].is_a?(String) }
+    return ["held_accounting_underpowered", details] unless test["pairs"].is_a?(Array)
+    excluded_pair_ids = test["exclusions"].map { |entry| entry["pair_id"] }
+    pair_ids = []
+    reductions = []
+    ratios = []
+    pair_summaries = []
+    invalid_count = 0
+    partial_count = 0
+    test["pairs"].reject { |pair| excluded_pair_ids.include?(pair["pair_id"]) }.each do |pair|
+      closed!(pair, %w[baseline candidate pair_id], "accounting_schema")
+      pair_ids << pair["pair_id"]
+      unless pair["pair_id"].is_a?(String)
+        invalid_count += 1
+        next
+      end
+      unless pair["baseline"].is_a?(Hash) && pair["candidate"].is_a?(Hash) && pair["baseline"]["complete"] == true && pair["candidate"]["complete"] == true
+        partial_count += 1
+        next
+      end
+      baseline, baseline_ids = workflow!(pair["baseline"])
+      candidate, candidate_ids = workflow!(pair["candidate"])
+      if (baseline_ids + candidate_ids).uniq.length != baseline_ids.length + candidate_ids.length || baseline["total_tokens"] <= 0
+        invalid_count += 1
+        next
+      end
+      reduction = Rational(baseline["total_tokens"] - candidate["total_tokens"], baseline["total_tokens"])
+      ratio = Rational(candidate["monotonic_latency_ns"], baseline["monotonic_latency_ns"])
+      reductions << reduction
+      ratios << ratio
+      pair_summaries << { "baseline" => baseline, "candidate" => candidate, "latency_ratio" => ratio.to_s, "pair_id" => pair["pair_id"], "token_reduction" => reduction.to_s }
+    end
+    invalid_count += pair_ids.length - pair_ids.uniq.length
+    details["excluded_pair_ids"] = excluded_pair_ids.sort
+    details["exclusion_count"] = excluded_pair_ids.length
+    details["harness_overhead"] = "excluded_from_measurement"
+    details["invalid_pair_count"] = invalid_count
+    details["pair_summaries"] = pair_summaries
+    details["partial_pair_count"] = partial_count
+    details["valid_pair_count"] = reductions.length
+    return ["held_accounting_invalid_pair", details] if invalid_count.positive?
+    return ["held_accounting_partial_pair", details] if partial_count.positive?
+    return ["held_accounting_underpowered", details] if reductions.length < 10
+    rank = order_rank(reductions.length)
+    raise MetricError, "order_rank" unless rank
+    token_lower = reductions.sort.fetch(rank - 1)
+    latency_upper = ratios.sort.fetch(ratios.length - rank)
+    details["aggregate_absolute"] = {
+      "baseline_cached_input" => pair_summaries.sum { |pair| pair["baseline"]["cached_input"] },
+      "baseline_direct_input" => pair_summaries.sum { |pair| pair["baseline"]["direct_input"] },
+      "baseline_output" => pair_summaries.sum { |pair| pair["baseline"]["output"] },
+      "baseline_total_tokens" => pair_summaries.sum { |pair| pair["baseline"]["total_tokens"] },
+      "candidate_cached_input" => pair_summaries.sum { |pair| pair["candidate"]["cached_input"] },
+      "candidate_direct_input" => pair_summaries.sum { |pair| pair["candidate"]["direct_input"] },
+      "candidate_output" => pair_summaries.sum { |pair| pair["candidate"]["output"] },
+      "candidate_total_tokens" => pair_summaries.sum { |pair| pair["candidate"]["total_tokens"] }
+    }
+    details["confidence"] = "19/20"
+    details["latency_ratio_distribution"] = rational_summary(ratios)
+    details["latency_ratio_upper_bound"] = latency_upper.to_s
+    details["order_statistic_rank"] = rank
+    details["token_reduction_distribution"] = rational_summary(reductions)
+    details["token_reduction_lower_bound"] = token_lower.to_s
+    return ["held_token_reduction_below_threshold", details] if token_lower < Rational(1, 5)
+    return ["held_latency_ratio_above_threshold", details] if latency_upper > Rational(6, 5)
+  end
+  [nil, details]
+end
+
+def assess_sufficiency(documents)
+  names = { "overflow" => "held_positive_sufficiency_overflow", "truncation" => "held_positive_sufficiency_truncation", "deletion" => "held_positive_sufficiency_deletion", "downgrade" => "held_positive_sufficiency_downgrade", "lossy_compaction" => "held_positive_sufficiency_lossy" }
+  tests = fixture_tests(documents, "sufficiency")
+  tests.each do |test|
+    allowed!(test, %w[declared_delivery_cost negative_control positive_scenario_completed prohibited_behavior retry_bounded state_promotion], "sufficiency_schema")
+    found = Array(test["prohibited_behavior"]).find { |item| names.key?(item) }
+    return names.fetch(found) if found
+    return "held_positive_sufficiency_retry" unless test["retry_bounded"] == true
+    return "held_positive_sufficiency_hidden_promotion" if test["state_promotion"] == "qualified"
+    return "held_negative_control_not_sufficient" if test["negative_control"] == true
+    return "held_positive_sufficiency_overflow" unless test["positive_scenario_completed"] == true && test["declared_delivery_cost"] == true && test["state_promotion"] == "fixture_only"
+  end
+  [tests.empty? ? nil : "fixture_only_sufficiency_predicate_passed", {}]
+end
+
+def qualification_prerequisite_bundle(root)
+  records = QUALIFICATION_PREREQUISITES.transform_values do |locators|
+    locators.to_h do |locator|
+      path = safe_file(root, locator)
+      [locator, "sha256:#{Digest::SHA256.file(path).hexdigest}"]
+    end
+  end
+  [record_identity(records, "none"), records]
+end
+
+def expected_qualification_bindings(root)
+  trust = default_record(root, "#{FIXTURE_ROOT}/collector-trust.yml")
+  attestation = default_record(root, "#{FIXTURE_ROOT}/attestation-valid.json")
+  policy = default_record(root, "#{FIXTURE_ROOT}/policy-valid.yml")
+  corpus = default_record(root, "#{FIXTURE_ROOT}/corpus-valid.json")
+  map = yaml_document(safe_file(root, "plugins/traceweaver-core/references/model-context-map.yml"))
+  oracle_raw = File.binread(safe_file(root, "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json"))
+  finish = skip_space(oracle_raw, scan_json!(oracle_raw))
+  raise MetricError, "source_oracle" unless finish == oracle_raw.length
+  oracle = JSON.parse(oracle_raw)
+  primitive_values!(oracle)
+  raise MetricError, "source_oracle" unless oracle.is_a?(Hash)
+  profile = yaml_document(safe_file(root, ".traceweaver/v050-model-governance-workflow-profile.yml"))
+  bundle_identity, = qualification_prerequisite_bundle(root)
+  collector = trust["collectors"].fetch(0)
+  {
+    "budget_delivery_identity" => "sha256:#{Digest::SHA256.hexdigest("fixture-budget-delivery-B1-direct")}",
+    "capability_identity" => "sha256:#{Digest::SHA256.hexdigest(profile.dig("model_context", "capability_snapshot"))}",
+    "candidate_definition_identity" => policy.dig("cell", "candidate_definition_identity"),
+    "collector_id" => collector["collector_id"],
+    "collector_key_spki_sha256" => collector["public_key_spki_sha256"],
+    "control_definition_identity" => policy.dig("cell", "control_definition_identity"),
+    "corpus_identity" => corpus["corpus_identity"],
+    "map_identity" => map["map_digest"],
+    "measurement_attestation_identity" => record_identity(attestation, "signature"),
+    "method_suite" => policy["method_suite"],
+    "policy_identity" => policy["policy_identity"],
+    "profile_identity" => profile["profile_hash"],
+    "prerequisite_bundle_identity" => bundle_identity,
+    "risk_effort" => "xhigh",
+    "route_identity" => policy.dig("cell", "route_identity"),
+    "sec_identity" => profile.dig("model_context", "v1_native_child_contract_identity"),
+    "served_model_identity" => attestation.dig("execution", "served_model_identity"),
+    "signature_suite" => collector["signature_suite"],
+    "source_oracle_identity" => oracle["oracle_digest"],
+    "tokenizer_identity" => "sha256:#{Digest::SHA256.hexdigest(profile.dig("model_context", "tokenizer_snapshot"))}",
+    "trust_registry_digest" => "sha256:#{Digest::SHA256.file(safe_file(root, "#{FIXTURE_ROOT}/collector-trust.yml")).hexdigest}",
+    "trust_root_id" => trust["trust_root_id"],
+    "verification_identity" => "sha256:#{Digest::SHA256.hexdigest("VER-TW-093-fixture-prerequisites")}"
+  }
+end
+
+def qualification_prerequisites_pass?(root, state_dir)
+  loaded = QUALIFICATION_PREREQUISITES.transform_values do |locators|
+    locators.flat_map { |locator| raw_document(root, locator).first }
+  end
+  attestation_outcome, = assess_attestations(root, loaded.fetch("attestation"), state_dir)
+  policy, corpus = assess_policy(root, loaded.fetch("policy"))
+  pair_outcome = assess_pairs(root, loaded.fetch("policy"), policy, corpus)
+  quality_outcome, = assess_quality(loaded.fetch("quality"))
+  accounting_outcome, = assess_accounting(loaded.fetch("accounting"))
+  sufficiency_outcome, = assess_sufficiency(loaded.fetch("sufficiency"))
+  attestation_outcome.nil? && pair_outcome.nil? && quality_outcome.nil? && accounting_outcome.nil? && sufficiency_outcome == "fixture_only_sufficiency_predicate_passed"
+end
+
+def assess_qualification(root, documents, state_dir)
+  tests = fixture_tests(materialize(root, documents), "qualification")
+  tests.each do |test|
+    allowed!(test, %w[bindings cell_identity claim_boundary claim_hold_assertion evidence_transfer expired observed_bindings structural_current validation_identity verification_current], "qualification_schema")
+    return ["held_exact_cell_evidence_nontransferable", {}] unless test["evidence_transfer"] == "exact_cell"
+    return ["held_exact_cell_validation_missing", {}] unless digest?(test["validation_identity"])
+    return ["structurally_eligible_reset", {}] if test["expired"] == true || test["structural_current"] != true
+    closed!(test["bindings"], QUALIFICATION_BINDING_FIELDS, "qualification_schema")
+    closed!(test["observed_bindings"], QUALIFICATION_BINDING_FIELDS, "qualification_schema")
+    expected = expected_qualification_bindings(root)
+    identity_payload = { "bindings" => test["bindings"], "validation_identity" => test["validation_identity"] }
+    return ["structurally_eligible_reset", {}] unless test["bindings"] == expected && test["observed_bindings"] == test["bindings"] && test["cell_identity"] == record_identity(identity_payload, "none")
+    return ["held_claim_boundary_preserved", {}] if test["claim_hold_assertion"] == true
+    return ["held_exact_cell_validation_missing", {}] unless test["verification_current"] == true && test["claim_boundary"] == "held"
+    return ["held_exact_cell_validation_missing", {}] unless qualification_prerequisites_pass?(root, state_dir)
+    bundle_identity, = qualification_prerequisite_bundle(root)
+    return ["fixture_qualification_predicate_passed", { "prerequisite_bundle_identity" => bundle_identity }]
+  end
+  [tests.empty? ? nil : "fixture_qualification_predicate_passed", {}]
+end
+
+options = {}
+OptionParser.new do |parser|
+  parser.on("--root ROOT") { |value| options[:root] = value }
+  parser.on("--case ID") { |value| options[:case] = value }
+  parser.on("--fixtures LIST") { |value| options[:fixtures] = value }
+  parser.on("--state-dir PATH") { |value| options[:state_dir] = value }
+  parser.on("--self-test NAME") { |value| options[:self_test] = value }
+end.parse!
+if options[:self_test]
+  raise MetricError, "arguments" unless options.keys.sort == %i[root self_test] && ARGV.empty? && options[:self_test] == "evidence-templates"
+  raise MetricError, "root" if File.symlink?(options[:root])
+  root = File.realpath(options[:root])
+  raise MetricError, "root" unless File.directory?(root)
+  result = evidence_template_self_test!(root)
+  $stdout.write(JSON.generate(canonical(result)))
+  exit 0
+end
+raise MetricError, "arguments" unless options.keys.sort == %i[case fixtures root state_dir] && ARGV.empty?
+raise MetricError, "root" if File.symlink?(options[:root])
+root = File.realpath(options[:root])
+raise MetricError, "root" unless File.directory?(root)
+raise MetricError, "state_dir" if File.symlink?(options[:state_dir])
+state_dir = File.realpath(options[:state_dir])
+raise MetricError, "state_dir" unless File.directory?(state_dir) && File.basename(state_dir).start_with?("traceweaver-metric-routing-") && !state_dir.start_with?("#{root}/")
+reference = verify_reference!(root)
+locators = options[:fixtures].split(",")
+raise MetricError, "fixtures" if locators.empty? || locators.any?(&:empty?)
+documents, digests = locators.each_with_object([[], {}]) do |locator, accumulator|
+  values, digest = raw_document(root, locator)
+  accumulator[0].concat(values)
+  accumulator[1][locator] = digest
+end
+outcome, evidence = assess_attestations(root, documents, state_dir)
+policy, corpus = assess_policy(root, documents)
+outcome ||= assess_pairs(root, documents, policy, corpus)
+quality_outcome, quality_evidence = assess_quality(documents)
+outcome ||= quality_outcome
+accounting_outcome, accounting_evidence = assess_accounting(documents)
+outcome ||= accounting_outcome
+sufficiency_outcome, = assess_sufficiency(documents)
+outcome ||= sufficiency_outcome
+qualification_outcome, qualification_evidence = assess_qualification(root, documents, state_dir)
+outcome ||= qualification_outcome
+outcome ||= "fixture_predicate_passed"
+evidence["accounting"] = accounting_evidence unless accounting_evidence.empty?
+evidence["qualification"] = qualification_evidence unless qualification_evidence.empty?
+evidence["quality"] = quality_evidence unless quality_evidence.empty?
+payload = {
+  "case_id" => options[:case],
+  "decision_evidence" => { "fixture_digests" => digests, "fixture_only" => true, "method_suite" => reference["method_suite"], "reference_identity" => reference["reference_identity"], "statistics" => evidence },
+  "held_claims" => HELD_CLAIMS,
+  "outcome" => outcome,
+  "schema_version" => "tw-metric-routing-evaluator-evidence/1"
+}
+payload["evidence_identity"] = record_identity(payload, "evidence_identity")
+$stdout.write(JSON.generate(canonical(payload)))

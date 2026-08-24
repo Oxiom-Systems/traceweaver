@@ -5,16 +5,23 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+baseline_hash_sha256: aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
-baseline_review_scope: original accepted baseline plus approved amendments and the owner-approved 0.5.0 shadow model-governance delivery authority
+baseline_review_scope: original accepted baseline plus approved amendments, released 0.5.0 shadow model-governance authority, and the owner-approved post-0.5.0 metric-routing planning envelope
 v050_model_governance_decision_id: TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001
 v050_model_governance_decision_source: docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md
 v050_model_governance_decision_sha256: 83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5
 v050_model_governance_requirements_review_id: TW-REQ-AUTH-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-001
 v050_model_governance_scope: REQ-TW-109_through_REQ-TW-123_shadow_only_v1_authoritative
 v050_model_governance_release_authority: conditional_same_candidate_verification_review_rollback_validation_PR_checks_and_release_receipt
+metric_routing_envelope_id: TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001
+metric_routing_envelope_document_set_sha256: 879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409
+metric_routing_formal_authority_acceptance_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001
+metric_routing_formal_authority_acceptance_receipt: docs/validation/traceweaver-2026-08-23-metric-routing-formal-authority-acceptance.md
+metric_routing_change_id: CHG-TW-2026-08-22-003
+metric_routing_scope: REQ-TW-124_through_REQ-TW-129_planning_authority_after_clean_scoped_review
+metric_routing_promotion_status: controlled_master_root_promotion_complete_scoped_document_review_clean_consolidated_planning_allowed_implementation_and_claims_held
 u0_repair_draft:
   amendment_id: REQ-AMEND-2026-07-22-001
   status: conditionally_approved_no_behavior_authority_until_active_EXC_TW_011
@@ -67,7 +74,7 @@ lean_convergence_implementation_status: bounded_static_controller_protocol_polic
 lean_convergence_verification_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md
 lean_convergence_code_review_id: TW-CODE-REVIEW-2026-08-21-REVIEW-SERIES-CONVERGENCE-001
 lean_convergence_code_review_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-code-review.md
-candidate_requirements_working_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+candidate_requirements_working_hash_sha256: aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5
 baseline_hash_authority_status: accepted_requirements_including_req_tw_048_static_advisory_source_evidence_with_req_tw_049_req_tw_050_req_tw_051_req_tw_052_req_tw_053_req_tw_055_req_tw_056_candidate_authority_doc_review_passed_planning_input_req_tw_054_prior_scanner_wording_authority_doc_review_passed_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_planning_input_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_req_tw_057_implementation_gate_candidate_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_and_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_passed_authority_doc_review_passed_req_tw_048_amendment_doc_review_passed_u9_unit10_auth_safe_fresh_exec_and_active_host_runtime_probes_code_review_passed_authority_doc_review_passed_reviewed_held_u9_unit11_active_host_reconciled_runtime_pass_code_review_passed_authority_doc_review_passed_constrained_runtime_accepted_dogfood_classifier_code_review_passed_authority_doc_review_passed_skill_behavior_audit_unit1_behavior_contracts_authority_doc_review_passed_runtime_held_wrapper_direct_callable_expansion_recorded_code_review_passed_authority_doc_review_passed_runtime_held_review_wrapper_skills_recorded_authority_doc_review_passed_runtime_held_ce_350_skill_surface_inventory_source_refreshed_authority_doc_review_passed_parity_held_tw_wrapper_backlog_reviewed_against_ce_350_authority_doc_review_passed_per_wrapper_proof_pending_controlled_publication_gate_recorded_authority_doc_review_passed_behavior_held_controlled_publication_route_fixture_smoke_passed_fixture_only_per_target_publication_gate_required_publication_runtime_held_code_test_trace_anchor_prior_requirement_recorded_authority_doc_review_passed_scanner_held_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_structured_traceability_findings_fixture_smoke_patched_code_review_passed_authority_doc_review_passed_runtime_held_tw_auto_closure_loop_requirement_recorded_authority_doc_review_passed_tw_auto_code_review_passed_behavior_held_tw_skill_behavior_fixture_smoke_passed_code_review_passed_authority_doc_review_passed_active_host_tw_traceability_check_structured_runtime_passed_authority_doc_review_passed_clean_ce_delegation_fixture_recorded_code_review_passed_authority_doc_review_passed_req_tw_057_code_traceability_scanner_fixture_smoke_passed_install_discovery_passed_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_tw_auto_runtime_driver_boundary_code_review_passed_status_hash_doc_review_passed_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_publication_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 active_authority_review_gate: traceweaver_core_0_2_2_release_published_post_release_evidence_doc_review_passed
@@ -2263,6 +2270,11 @@ held_claims:
     claim: one_time_0_3_recovery_bootstrap
     reason: The U0 recovery exception is inactive until the owner original-plan and amendment hashes, final canonical baseline hash, exact U1-U6 allowlists, expiry, hard process ceiling, independent Sol ACCEPT receipt, and reviewed semantic diff digest are recorded in .traceweaver/exceptions/EXC-TW-011-0.3-recovery-bootstrap.yml.
     close_condition: U1-U6 integrate with focused verification, the owner rejects the repair, or the process hard ceiling is reached; U7 and publication/install/deploy/product claims remain outside scope.
+  - id: EXC-TW-016
+    linked_requirements: [REQ-TW-124, REQ-TW-125, REQ-TW-126, REQ-TW-127, REQ-TW-128, REQ-TW-129]
+    claim: metric_routing_implementation_instrumentation_replay_qualification_quantitative_claims_cutover_publication_or_release
+    reason: The owner-approved envelope authorizes controlled master-root promotion and planning after one clean scoped review; it does not authorize implementation, host/provider instrumentation, replay, qualification, active cutover, publication, release, or any savings, latency, sufficiency, quality-equivalence, or served-model claim.
+    close_condition: A separately authorized consolidated plan implements and verifies ATP-TW-050; current exact-cell RESULT-TW-050 and VER-TW-093 pass; every qualified cell has current cell-specific VAL-TW-041 acceptance or an approved proxy; and any cutover, publication, or release passes its separate owner gate.
 
 closed_exceptions:
   - id: EXC-TW-005
@@ -2279,6 +2291,10 @@ must_not_change:
   - Do not let TraceWeaver CE wrappers redefine Core requirements quality, traceability, verification, validation, risk/gap, or baseline semantics.
   - Do not vendor CE files without upstream source pin or an accepted local-cache-only limitation.
   - Do not include private paths, protected source names, raw standards text, copied source material, or unsupported compliance claims in public artifacts.
+  - Do not record prompt, tool-result, secret, or source-content bytes in metric observations; only approved counts, enums, digests, and repository-contained locators may cross the metric interface.
+  - Do not use pilot, estimated, unsigned, self-attested, replayed, underpowered, pooled, inherited, cross-cell, or mechanism-only evidence to qualify a metric-routing cell or support quantitative claims.
+  - Do not change model role, risk effort, tools, authority, required sources, scenario, or environment inside a matched packet-budget or delivery comparison.
+  - Do not make any metric-qualified v2 route active without a separate owner-approved cutover gate.
 
 blocked_assumptions:
   - id: ASM-TW-001
@@ -2339,7 +2355,7 @@ workflow_controls:
 task_capsule_minimum:
   task_id: required
   baseline_id: REQ-BASELINE-2026-04-30-001
-  baseline_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+  baseline_hash_sha256: aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5
   authorized_by: approved requirement ID or approved exception ID required for meaningful implementation
   intent_served: at least one INTENT-TW ID
   verification_required: required
@@ -2954,7 +2970,9 @@ v050_shadow_model_governance_2026_08_22:
     result: RESULT-TW-049
     verification: VER-TW-092
     validation: VAL-TW-040
-  status: owner_approved_integrated_delivery_validation_accepted_merge_ready_preparation_in_progress
+  status: released_as_traceweaver_core_v0_5_0_predecessor_baseline
+  release_tag: traceweaver-core--v0.5.0
+  release_predecessor_commit: 3a1f3c56b093e61b88e9f6282637878e8ebbf163
   implementation_mode: advisory_shadow_compile
   authoritative_runtime: v1
   workflow:
@@ -2975,9 +2993,9 @@ v050_shadow_model_governance_2026_08_22:
     - package-wide transactional install rollback
     - integrated release-readiness schema and exact 0.5.0 metadata
     - controlled PR and pre-merge checks after all same-candidate gates pass
-  current_execution_boundary:
-    terminal: ready_to_merge
-    authorized:
+  historical_execution_boundary:
+    terminal: released
+    prior_authorized:
       - implementation and the single consolidated repair series
       - same-candidate verification, validation, trace, graph, and evidence reconciliation
       - commit, push, pull-request creation, review-thread closure, and required PR checks
@@ -3007,8 +3025,89 @@ v050_shadow_model_governance_2026_08_22:
     reserved_ids: INTENT-TW-009..010, NEED-TW-009..012, REQ-TW-093..108, DEC-TW-004..008, IF-TW-001..005, RISK-TW-001..010, ART-TW-078, TRACE-TW-071, ATP-TW-048, RESULT-TW-048, VER-TW-091, VAL-TW-039
     disposition: preserved_on_historical_worktree_deferred_outside_0_5_0_not_a_release_gate_or_release_content
 
+metric_routing_authority_2026_08_23:
+  envelope_id: TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001
+  source_document_set_sha256: 879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409
+  source_paths:
+    - docs/traceability/metric-routing.md
+    - docs/validation/traceweaver-2026-08-22-metric-routing-requirements-authority-envelope.md
+  source_component_sha256:
+    docs/traceability/metric-routing.md: aef6f037a4db0de646c0709cfeaa421751a5b3083e2651a1c3345bbe0e2a270d
+    docs/validation/traceweaver-2026-08-22-metric-routing-requirements-authority-envelope.md: 658477ec0dd95e720c3fe61c733884987d4e719ed51e1f3b73d7f94382ca105a
+  acceptance:
+    owner: Oxiom Systems
+    accepted_at: 2026-08-23
+    receipt_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001
+    receipt_path: docs/validation/traceweaver-2026-08-23-metric-routing-formal-authority-acceptance.md
+    change_id: CHG-TW-2026-08-22-003
+  predecessor:
+    release: TraceWeaver Core 0.5.0
+    tag: traceweaver-core--v0.5.0
+    commit: 3a1f3c56b093e61b88e9f6282637878e8ebbf163
+    authoritative_runtime: v1
+  intent: INTENT-TW-011
+  need: NEED-TW-013
+  requirements:
+    - REQ-TW-124
+    - REQ-TW-125
+    - REQ-TW-126
+    - REQ-TW-127
+    - REQ-TW-128
+    - REQ-TW-129
+  interface_specification: IF-TW-006
+  design_decision: DEC-TW-010
+  risks:
+    - RISK-TW-012
+    - RISK-TW-013
+  evidence_chain:
+    artifact: ART-TW-080
+    trace: TRACE-TW-073
+    acceptance_test: ATP-TW-050
+    result: RESULT-TW-050
+    verification: VER-TW-093
+    validation: VAL-TW-041
+  evaluation_defaults:
+    pilot_valid_pairs: 3
+    pilot_qualifies: false
+    one_sided_alpha_max: 0.05
+    paired_power_min: 0.80
+    valid_positive_pairs_per_exact_cell_min: 10
+    invalid_pair_replacement_cap: lower_of_one_pair_or_10_percent_of_qualification_sample
+    hard_invariant_success: 100_percent
+    applicable_rubric_dimension_floor: 3_of_4
+    blinded_independent_evaluators_min: 2
+    weighted_cohens_kappa_min: 0.80
+    one_sided_95_percent_quality_difference_lower_bound_min: -0.25
+    paired_median_whole_workflow_token_reduction_95_percent_lower_bound_min: 20_percent
+    paired_median_monotonic_latency_ratio_95_percent_upper_bound_max: 1.20
+    qualification_scope: exact_evaluated_cell_only
+  interface:
+    observation_schema: tw-model-context-observation/1
+    qualification_schema: tw-model-context-qualification/1
+    canonical_identity: SHA-256_over_recursively_key_sorted_JSON_array_order_preserved_own_identity_excluded
+    measurement_truth: requires_owner_approved_independent_signed_execution_bound_collector_attestation
+    content_boundary: counts_enums_digests_and_repository_contained_locators_only
+    invalid_conditions: non_identical_duplicate_replay_cross_cell_reuse_protected_mutation_missing_provenance_invalid_signature_or_incomplete_binding
+  promotion:
+    previous_requirements_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+    promoted_requirements_hash_sha256: aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5
+    scoped_review_id: TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-PROMOTED-BASELINE-001
+    scoped_review_status: accepted_clean
+    accepted_review_identity: sha256:ae7fec240a034d09942785ca4454ab903d5127bc22924674930af8730e827a8e
+    review_receipt: docs/validation/traceweaver-2026-08-23-metric-routing-promoted-baseline-doc-review.md
+  allowed_scope:
+    - controlled master-root promotion of the exact accepted authority snapshot
+    - one consolidated scoped document review and mechanical bookkeeping closure
+    - one consolidated metric-routing implementation and V&V plan only after the scoped review passes
+  held_scope:
+    - metric harness, collector, instrumentation, fixtures, policy engine, qualification ledger, and product behavior implementation
+    - provider replay, external service calls, spend, or host mutation
+    - route qualification or observed-sufficiency state
+    - served-model, savings, token-sufficiency, latency, quality-equivalence, materiality, global, or route-family claims
+    - v2 active cutover, autonomous routing, publication, release, deployment, or consumer mutation
+  next_gate: one_consolidated_tw_plan_for_ART_TW_080_and_ATP_TW_050
+
 next_recommended_steps:
-  - Finish the exact 0.5.0 model-governance evidence carriers, consolidated review confirmation, trace and graph reconciliation, commit, push, PR, and required checks; stop when the PR is demonstrably ready to merge.
-  - Do not merge, tag, create a GitHub Release, or create a post-merge release receipt without a new explicit Oxiom Systems direction.
-  - Keep the older 0.4.0 PR sequencing and deferred product-lifecycle Slices 1--8 as historical/deferred context, not active 0.5.0 agent goals.
-  - Keep active routing, descendant enforcement, independent served-model attestation, quantitative savings or sufficiency, quality equivalence, provider replay, semantic-HTML cutover, deployment, and autonomous publication held for later evidence.
+  - Draft one consolidated tw-plan for the whole ART-TW-080 implementation and ATP-TW-050 V&V package; do not split it into requirement-by-requirement approval or review loops.
+  - Keep implementation, instrumentation, provider replay, route qualification, quantitative claims, v2 active cutover, publication, release, deployment, and consumer mutation held until their later explicit gates.
+  - Treat released TraceWeaver Core 0.5.0 and v1 routing behavior as the unchanged predecessor baseline.

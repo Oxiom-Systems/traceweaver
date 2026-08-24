@@ -1,0 +1,296 @@
+---
+# TRACEWEAVER: file-role=canonical-deterministic-metric-routing-contract; req=REQ-TW-124,REQ-TW-125,REQ-TW-126,REQ-TW-127,REQ-TW-128,REQ-TW-129; trace=TRACE-TW-073; verifies=VER-TW-093
+schema_version: tw-metric-routing-harness/1
+artifact_id: ART-TW-080
+acceptance_test_id: ATP-TW-050
+method_suite: tw-metric-exact-paired/1
+offline_only: true
+network_forbidden: true
+provider_calls_forbidden: true
+fixture_only_positive_outcomes: true
+canonical_identity:
+  encoding: recursively_key_sorted_json_arrays_preserved
+  own_identity_exclusion: reference_identity
+  digest: sha256
+strict_input_rules:
+  json_duplicate_keys: rejected
+  json_noncanonical: rejected
+  json_float_values: rejected
+  yaml_safe_load: required_aliases_and_classes_disabled
+  maximum_file_bytes: 1048576
+  locator: repository_relative_regular_nonsymlink_realpath_contained
+  closed_field_allowlists: required_for_every_record
+trust:
+  signature_suite: rsa-sha256-pkcs1-v1_5
+  public_key_minimum_bits: 2048
+  public_exponent_minimum: 65537
+  public_material_only: true
+  signed_payload_exclusion: signature
+  independent_collector_required: true
+  replay_state: caller_created_temp_directory_atomic_exclusive_lock
+  replay_ledger_maximum_bytes: 1048576
+  replay_append: fsync_before_unlock
+  attestation_mutations: closed_canonical_base_materialization_only
+policy:
+  alpha: 1/20
+  null_favorable_probability: 1/2
+  alternative_favorable_probability: 4/5
+  power_target: 4/5
+  fixed_minimum_valid_positive_pairs: 10
+  powered_minimum: 18
+  powered_cutoff: 13
+  fixed_stopping: true
+  replacement_cap_pairs: 1
+  replacement_cap_fraction: 1/10
+  absolute_score_floor: 3
+  blinded_independent_raters_minimum: 2
+  minimum_pairwise_quadratic_kappa: 4/5
+  quality_lower_bound: "-1/4"
+  token_reduction_lower_bound: 1/5
+  latency_ratio_upper_bound: 6/5
+  threshold_comparisons: inclusive
+  powered_minimum_derivation: recomputed_binomial_sign_power_not_literal_only
+  observation_execution_identity: canonical_sha256_of_signed_execution
+  exact_cell_binding_fields:
+  - budget_delivery_identity
+  - candidate_definition_identity
+  - changed_axis
+  - control_definition_identity
+  - route_identity
+  qualification_binding_fields:
+  - budget_delivery_identity
+  - capability_identity
+  - candidate_definition_identity
+  - collector_id
+  - collector_key_spki_sha256
+  - control_definition_identity
+  - corpus_identity
+  - map_identity
+  - measurement_attestation_identity
+  - method_suite
+  - policy_identity
+  - profile_identity
+  - prerequisite_bundle_identity
+  - risk_effort
+  - route_identity
+  - sec_identity
+  - served_model_identity
+  - signature_suite
+  - source_oracle_identity
+  - tokenizer_identity
+  - trust_registry_digest
+  - trust_root_id
+  - verification_identity
+  reset_triggers:
+  - capability_identity
+  - collector_key_spki_sha256
+  - corpus_identity
+  - map_identity
+  - policy_identity
+  - profile_identity
+  - sec_identity
+  - source_oracle_identity
+  - tokenizer_identity
+  - trust_registry_digest
+  - validation_identity
+held_claims:
+  active_cutover: held
+  deployment: held
+  exact_cell_qualification: held
+  external_calls: held
+  external_spend: held
+  host_collection: held
+  host_instrumentation: held
+  provider_replay: held
+  publication: held
+  quantitative_latency_claim: held
+  quantitative_quality_claim: held
+  quantitative_sufficiency_claim: held
+  quantitative_token_claim: held
+  release: held
+  result_tw_050: held
+  served_model: held
+  validation_tw_041: held
+  verification_tw_093: held
+evidence_envelope:
+  fixture_only: true
+  method_suite: tw-metric-exact-paired/1
+  reference_identity_required: true
+  held_claim_map_required: true
+evidence_templates:
+  result:
+    locator: fixtures/metric-routing-harness/result-tw-050-template.json
+    schema_version: tw-metric-routing-result-template/1
+    status: pending_no_observed_result
+  validation:
+    locator: fixtures/metric-routing-harness/val-tw-041-template.yml
+    schema_version: tw-metric-routing-validation-template/1
+    status: planned_not_accepted
+  verification:
+    locator: fixtures/metric-routing-harness/ver-tw-093-template.yml
+    schema_version: tw-metric-routing-verification-template/1
+    status: pending_host_and_provider_evidence
+fixture_inventory:
+  schema_version: tw-metric-routing-fixture-inventory/1
+  entries:
+  - locator: fixtures/metric-routing-harness/acceptance-cases.yml
+    sha256: sha256:c15c289205d8a392588d17f8e35a17fbdc3e5dc485346d7855a77c70e511dc1a
+  - locator: fixtures/metric-routing-harness/accounting-cached-input.json
+    sha256: sha256:9655ccb0d5a9627873f8d54d00dc66f66111d9f069dab953d0d20934991d55f5
+  - locator: fixtures/metric-routing-harness/accounting-invalid.json
+    sha256: sha256:f951f418d993ffaf51a053e7e7facba7ea7fceffdd8912d8f0389ef4b1876424
+  - locator: fixtures/metric-routing-harness/accounting-latency-above.json
+    sha256: sha256:565a4ad4239a49a54f1b7dace1a13cd6f42514999d08d9df2c61f69ae5a6de60
+  - locator: fixtures/metric-routing-harness/accounting-latency-below.json
+    sha256: sha256:27fc036ed7ecdec612d76a4507239dd23dbc8780262356d43bf8cbc7ec0f7ec0
+  - locator: fixtures/metric-routing-harness/accounting-latency-equal.json
+    sha256: sha256:ee4b6e5efe3359623ae0c254f1a37ca1c428571ebe00cb85322bc624ac2a6f9b
+  - locator: fixtures/metric-routing-harness/accounting-partial.json
+    sha256: sha256:b2c3aa427a9495da02212256c72e5e0ad0d1ecd1e3c56503044853d2b738caab
+  - locator: fixtures/metric-routing-harness/accounting-token-above.json
+    sha256: sha256:5fb6e2f5dfe5a01bc1f0019030a74e5372685b3c9f012987e0b8ee4293f34697
+  - locator: fixtures/metric-routing-harness/accounting-token-below.json
+    sha256: sha256:684c374d7fce6aa95ecdeccdf1899a779242e9654cbec9ba31b2599c080491d3
+  - locator: fixtures/metric-routing-harness/accounting-token-equal.json
+    sha256: sha256:ee4b6e5efe3359623ae0c254f1a37ca1c428571ebe00cb85322bc624ac2a6f9b
+  - locator: fixtures/metric-routing-harness/accounting-underpowered.json
+    sha256: sha256:abc1d8f4c2b249c3ca072e3b3417c221e5a9b45507da318167069e699bb6895d
+  - locator: fixtures/metric-routing-harness/accounting-valid.json
+    sha256: sha256:ee4b6e5efe3359623ae0c254f1a37ca1c428571ebe00cb85322bc624ac2a6f9b
+  - locator: fixtures/metric-routing-harness/adaptive-stopping.json
+    sha256: sha256:597fa797e0ec52ce62a51bc74643264b4d5d6e5aad56ae1c2ac9f9577d358461
+  - locator: fixtures/metric-routing-harness/attestation-cross-cell.json
+    sha256: sha256:1bfd3798d8bc19c9e301ee4dc338e7d9b22f711256702164f8538ec42d448b0d
+  - locator: fixtures/metric-routing-harness/attestation-duplicate-key.json
+    sha256: sha256:9c84f1dba0fd3875456e20e33abd9f40ea5192d84237950473e9266a624bd6c9
+  - locator: fixtures/metric-routing-harness/attestation-estimated.json
+    sha256: sha256:1b6e5203a43e6f7eadcd884ca29f837bcad28e0be016368bf227bd24838d3a60
+  - locator: fixtures/metric-routing-harness/attestation-incomplete.json
+    sha256: sha256:c1fb709a1bb85dcec17d8a868143d3a143a34c429d09e0e834e11dad886f3542
+  - locator: fixtures/metric-routing-harness/attestation-replay.jsonl
+    sha256: sha256:f59dce6b9956102007ec6a5751b0212c1988263276712b589f637a0dc96eaaa6
+  - locator: fixtures/metric-routing-harness/attestation-self-attested.json
+    sha256: sha256:9463cecf6f83af320343947ad8ffc43392fb782991bcef160481f7d219f924da
+  - locator: fixtures/metric-routing-harness/attestation-tampered.json
+    sha256: sha256:21d4856daf359ebf3b710a34b8f65a37f76d575da4766653b838e3d64438aeee
+  - locator: fixtures/metric-routing-harness/attestation-unsigned.json
+    sha256: sha256:223256aa896f549e8b34acc064800f6046325b823e76f83cf89fcd759586cf7d
+  - locator: fixtures/metric-routing-harness/attestation-valid.json
+    sha256: sha256:49eccc66a211d5ae83bd3926a79d69a394fdbdc888254b09691364548a7ee15a
+  - locator: fixtures/metric-routing-harness/capability-drift.json
+    sha256: sha256:5d0c9aa19a0799e80e6f975f26c678ca71a5a07064db205d6713965e5f3b4d3f
+  - locator: fixtures/metric-routing-harness/changed-axis.json
+    sha256: sha256:f4c17721f7f576c1a61dab9ad3d16438af2e59c415d8762ca90a56dcbac6b636
+  - locator: fixtures/metric-routing-harness/claim-hold-boundary.json
+    sha256: sha256:893107015e26eda81ff402df42cf5810e09175b78254dc665c5a1e506de876dd
+  - locator: fixtures/metric-routing-harness/collector-trust.yml
+    sha256: sha256:3b55d47dd578ff81f21fc3f0fbe8028bec73f05482be71eed185a18282f3c315
+  - locator: fixtures/metric-routing-harness/corpus-drift.json
+    sha256: sha256:c4031f7ca3bb7edc118a5ee2cf10b25dc24a6f0e60c93eac163bfd3c02f43e21
+  - locator: fixtures/metric-routing-harness/corpus-valid.json
+    sha256: sha256:daa71ea2239b23fbe601a3c4e68fecfcb8ab71803226aee0596aede970dddd55
+  - locator: fixtures/metric-routing-harness/deletion-prohibited.json
+    sha256: sha256:eeb7806d26ef6eca226b90142d0821437a2aa8de06e946c26553367aa3cada99
+  - locator: fixtures/metric-routing-harness/downgrade-prohibited.json
+    sha256: sha256:640a75192dc19cbb6efe2e900542df7b5d0a361626592de7f08267c88edb1bd5
+  - locator: fixtures/metric-routing-harness/duplicate-pair.json
+    sha256: sha256:6e1ac0837f1c6f034928abdf582c915fddac0afaaf997e7542743269a5a33274
+  - locator: fixtures/metric-routing-harness/golden-statistics.yml
+    sha256: sha256:ded5bc102b15c14c23eb940e54c92c0e3ce82720fbf65ad3ed97aa7732e219d2
+  - locator: fixtures/metric-routing-harness/hidden-promotion.json
+    sha256: sha256:2df5bb8bb594753a12e05276167aa47b3acf40df7e5e6b3a093f660c81964f0e
+  - locator: fixtures/metric-routing-harness/key-substitution.json
+    sha256: sha256:c813f7281744c17334ebd25be1f17f7636982f013f4ed287b7798516e8d80047
+  - locator: fixtures/metric-routing-harness/locator-absolute.json
+    sha256: sha256:1e28e0cd799fc5b0d2091bf7c9f08e55b9fff9d41aff4f2aa90104182435a46a
+  - locator: fixtures/metric-routing-harness/locator-oversized.json
+    sha256: sha256:16b2a085fa9a744cab331157a2742e30e14b3511c7cf1add310be543f059737f
+  - locator: fixtures/metric-routing-harness/locator-symlink.json
+    sha256: sha256:e1c1696c91fe8213c0655bb325a5191d6d9fe21cc67808cb9a81ed8b52f52920
+  - locator: fixtures/metric-routing-harness/locator-traversal.json
+    sha256: sha256:488b134b36bfed8e1a6e7c198c8dac3fc1613b981d0e6e26dc688a3ae23320a0
+  - locator: fixtures/metric-routing-harness/lossy-compaction-prohibited.json
+    sha256: sha256:2e1e26b7010f50d086a06745caa9c5bdb4c7af5f7625baa3806cda59727821f7
+  - locator: fixtures/metric-routing-harness/matched-pairs-pilot.json
+    sha256: sha256:0fc894f812b739fec26cbaa5e7d1c842614ea80f6b394bc7705e16eda6b7339a
+  - locator: fixtures/metric-routing-harness/matched-pairs-valid.json
+    sha256: sha256:03a5bf7afb3ba75b946b842a8c08176ec8bffe9e172a0ec838dcc2f4e277cfa3
+  - locator: fixtures/metric-routing-harness/negative-safe-hold.json
+    sha256: sha256:903d147182730b197b52873825785d065e7a2488e9c07dadaf38ccc3f2b4a7c6
+  - locator: fixtures/metric-routing-harness/observation-content-leak.json
+    sha256: sha256:5b66299a2710aa962dbb1e2a86e101c2e63ef815ae06fae3965f336cb0e7ba58
+  - locator: fixtures/metric-routing-harness/observation-valid.json
+    sha256: sha256:1806eee669d794755aedcc1fdfd6a576b41591d716d0a766181c286b18fd2558
+  - locator: fixtures/metric-routing-harness/oracle-drift.json
+    sha256: sha256:1d177efe2cf43079983b47d49db95ad090ff64f0c6661a25dd06adacb1041956
+  - locator: fixtures/metric-routing-harness/overflow-prohibited.json
+    sha256: sha256:9599e80bf413c3c858f12bb0d2fa6c39a447e32f9c139e30c2fbd38ee2fbb696
+  - locator: fixtures/metric-routing-harness/policy-drift.yml
+    sha256: sha256:9e8cfc40adf50020337c93ccf4c22735e4497021dde576a5088e38316a1ec22c
+  - locator: fixtures/metric-routing-harness/policy-valid.yml
+    sha256: sha256:8a02d290bee5e44174bad3e4355cabc6a793a97356f8a1983c01f785b472ec93
+  - locator: fixtures/metric-routing-harness/positive-sufficiency-valid.json
+    sha256: sha256:b601f8520256c8c0ec88372322161f80e87f174ed892d948f5242e17c97c2fbb
+  - locator: fixtures/metric-routing-harness/post-result-exclusion.json
+    sha256: sha256:5273c0cec73b3897c6fb89ffd1679d5f1acdc313f3fb2e8ed862f20abaab1b70
+  - locator: fixtures/metric-routing-harness/power-boundary.json
+    sha256: sha256:ecee078a1b03d1a287343b39fabdd49637a032a81fd9132cdcb377ad75344c71
+  - locator: fixtures/metric-routing-harness/profile-drift.json
+    sha256: sha256:5fca7cfc35f98649b8602ac1c50b371041016f1d0dbf9d3b49de951dffa8aa45
+  - locator: fixtures/metric-routing-harness/qualification-alias-inheritance.json
+    sha256: sha256:15823c5586a38a8fa9224902433da3a27a75c5e597f737ec71ef0a68ed9ce1a3
+  - locator: fixtures/metric-routing-harness/qualification-cross-cell.json
+    sha256: sha256:019476fbb1099f8f66c2739f3ffbf5acf0b33119db4da8e5b9eb2a924c76d0d8
+  - locator: fixtures/metric-routing-harness/qualification-expired.json
+    sha256: sha256:f691d913ad95c09196efa0cef4f98df93cdd8b7932479f388eef4dff72733c29
+  - locator: fixtures/metric-routing-harness/qualification-identity-drift.json
+    sha256: sha256:94b726a8bb996c2586f9390a9991152fe8f42301db200677d565df58b3d00776
+  - locator: fixtures/metric-routing-harness/qualification-missing-validation.json
+    sha256: sha256:b650f01055c731e77c6790f4fb12f964786f17cba08146bed261b94a70c3f00e
+  - locator: fixtures/metric-routing-harness/qualification-valid.json
+    sha256: sha256:85cf3392bd00d387a80418846babd694b29b07a2154bd2b2e7293799a1c06bc3
+  - locator: fixtures/metric-routing-harness/quality-agreement-fail.json
+    sha256: sha256:5d9fc4d2affb78d7876a8f3e0c7bdcb4bb3d0214432f8e52fcfc2add39e2dcfa
+  - locator: fixtures/metric-routing-harness/quality-floor-fail.json
+    sha256: sha256:384acffdd15be68daac06e8c09b45f9a5a0414d0cb73fe5582c7be501a82b3fd
+  - locator: fixtures/metric-routing-harness/quality-hard-invariant-fail.json
+    sha256: sha256:354fa9cab7893f5a31b6a907fd94687045a26c734faa6c8042ad596d0f307684
+  - locator: fixtures/metric-routing-harness/quality-kappa-equal.json
+    sha256: sha256:e5eeb510f00063494e943334527f8dc81a902e9c15ef1359e33ba8078b954ab7
+  - locator: fixtures/metric-routing-harness/quality-kappa-zero-variance.json
+    sha256: sha256:4ff507f1c53a4f9c83fc07138d2ad84b4d520865a4436647ef9d92ab37ca3b40
+  - locator: fixtures/metric-routing-harness/quality-missing-rating.json
+    sha256: sha256:a08602697d8891635ab7dddff8f7597ead678387d955d66bbae4df8f945a29b3
+  - locator: fixtures/metric-routing-harness/quality-non-inferiority-equal.json
+    sha256: sha256:a0855c9f8d7117959332aa2af35267771e9f029671cf221bb9021275b8b205db
+  - locator: fixtures/metric-routing-harness/quality-non-inferiority-fail.json
+    sha256: sha256:94129a9c6c101a04c5877c38501eaa7b4a68a8b6bd56c7843afc6115ac8a2a86
+  - locator: fixtures/metric-routing-harness/quality-nonindependent.json
+    sha256: sha256:9f1faba9d5e89e67cb65e851d0c436e9a4a56961e0cb7460f5ebf92884386b34
+  - locator: fixtures/metric-routing-harness/quality-scores-valid.json
+    sha256: sha256:9aeb951600d757d68416348379116bf23664c01f5840d0a4b229f0861f28b07d
+  - locator: fixtures/metric-routing-harness/quality-unblinded.json
+    sha256: sha256:d2097e47b51d0a25a5190c0579e1c78232ab2b2b04b84e1147f71903a33fd25f
+  - locator: fixtures/metric-routing-harness/quality-with-efficiency.json
+    sha256: sha256:353f2c0d9e0a427aaf825f7715a6c406e1da67be4ec71b98ece3cabb1b4dc037
+  - locator: fixtures/metric-routing-harness/replacement-over-cap.json
+    sha256: sha256:f319adfe5c39b77028ce4dbd2536a23dda97a3877a45f71ba298d85f0c2c4f45
+  - locator: fixtures/metric-routing-harness/result-tw-050-template.json
+    sha256: sha256:59d5eedcd6ac22475ddab7cedaafc0d82b5933c48273957194001315a664768f
+  - locator: fixtures/metric-routing-harness/signature-suite-drift.json
+    sha256: sha256:3a19882ab5378c76c992a763fff6dc7e0b757266444b53c9cc0c96ea06c45c53
+  - locator: fixtures/metric-routing-harness/tokenizer-drift.json
+    sha256: sha256:303c94a63c46ca2ff5dbeb9433d1df88befb6f77854bf2d856aeae9cb4aaf38c
+  - locator: fixtures/metric-routing-harness/truncation-prohibited.json
+    sha256: sha256:e66d4d12c50841fdd9f1aef97609deb3e10fa6ba54552b65ed2aedfa669ccd70
+  - locator: fixtures/metric-routing-harness/trust-digest-drift.json
+    sha256: sha256:608224e5ddfe7fb9701b98a060473b6b2954f567783521b75576626a3c7d00d7
+  - locator: fixtures/metric-routing-harness/trust-root-rotation.json
+    sha256: sha256:d96080605710fe22d4ec1742acaefbc26b2e02e3bd56932f5af75ce1e2ecfca0
+  - locator: fixtures/metric-routing-harness/unbounded-retry.json
+    sha256: sha256:fbedc5412b2efe1d912600577a43429b1518d1f0156df3b5030b8863be287541
+  - locator: fixtures/metric-routing-harness/val-tw-041-template.yml
+    sha256: sha256:1cf2701c4852806646fee511f81bc08b356bc40c1666ca848eb2346894610335
+  - locator: fixtures/metric-routing-harness/ver-tw-093-template.yml
+    sha256: sha256:34cdb0b7895e99f06225f7b6dec1c06c29e0346f9a2520e70e40aa80c7e37430
+reference_identity: sha256:a6db3a7ec9cb0fd0b554591deac970572dcd14080cadaa611c46b63dc47b8b94

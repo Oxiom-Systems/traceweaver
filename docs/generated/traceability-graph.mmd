@@ -18,15 +18,6 @@ flowchart LR
   smoke --> graph
 
   subgraph Latest_Trace_Rows["Latest trace rows from authority matrix"]
-    trace_TRACE_TW_056["TRACE-TW-056"]
-    req_REQ_TW_070["REQ-TW-070"] --> trace_TRACE_TW_056
-    req_REQ_TW_071["REQ-TW-071"] --> trace_TRACE_TW_056
-    req_REQ_TW_072["REQ-TW-072"] --> trace_TRACE_TW_056
-    req_REQ_TW_073["REQ-TW-073"] --> trace_TRACE_TW_056
-    req_REQ_TW_074["REQ-TW-074"] --> trace_TRACE_TW_056
-    req_REQ_TW_075["REQ-TW-075"] --> trace_TRACE_TW_056
-    trace_TRACE_TW_056 --> ver_VER_TW_075["VER-TW-075"]
-    trace_TRACE_TW_056 --> val_VAL_TW_018["VAL-TW-018"]
     trace_TRACE_TW_057["TRACE-TW-057"]
     req_REQ_TW_076["REQ-TW-076"] --> trace_TRACE_TW_057
     trace_TRACE_TW_057 --> ver_VER_TW_077["VER-TW-077"]
@@ -85,4 +76,13 @@ flowchart LR
     req_REQ_TW_057["REQ-TW-057"] --> trace_TRACE_TW_067
     trace_TRACE_TW_067 --> ver_VER_TW_087_local_pass["VER-TW-087 local pass"]
     trace_TRACE_TW_067 --> val_VAL_TW_035_held["VAL-TW-035 held"]
+    trace_TRACE_TW_073["TRACE-TW-073"]
+    req_REQ_TW_124["REQ-TW-124"] --> trace_TRACE_TW_073
+    req_REQ_TW_125["REQ-TW-125"] --> trace_TRACE_TW_073
+    req_REQ_TW_126["REQ-TW-126"] --> trace_TRACE_TW_073
+    req_REQ_TW_127["REQ-TW-127"] --> trace_TRACE_TW_073
+    req_REQ_TW_128["REQ-TW-128"] --> trace_TRACE_TW_073
+    req_REQ_TW_129["REQ-TW-129"] --> trace_TRACE_TW_073
+    trace_TRACE_TW_073 --> ver_ATP_TW_050_deterministic_component_71_71_passed_RESULT_TW_050_pending_VER_TW_093_partial_component_evidence_only["ATP-TW-050 deterministic component 71/71 passed; RESULT-TW-050 pending; VER-TW-093 partial/component evidence only"]
+    trace_TRACE_TW_073 --> val_VAL_TW_041_planned_no_exact_cell_accepted["VAL-TW-041 planned; no exact cell accepted"]
   end

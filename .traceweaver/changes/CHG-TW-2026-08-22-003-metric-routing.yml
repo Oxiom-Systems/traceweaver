@@ -1,0 +1,57 @@
+id: CHG-TW-2026-08-22-003
+record_type: traceweaver_change_control
+status: promoted_scoped_document_review_clean_consolidated_planning_allowed_implementation_held
+owner: Oxiom Systems
+date: "2026-08-23"
+linked_intent: INTENT-TW-011
+linked_requirements:
+  - REQ-TW-124
+  - REQ-TW-125
+  - REQ-TW-126
+  - REQ-TW-127
+  - REQ-TW-128
+  - REQ-TW-129
+source:
+  envelope_id: TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001
+  accepted_document_set_sha256: 879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409
+  formal_acceptance_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001
+  formal_acceptance_path: docs/validation/traceweaver-2026-08-23-metric-routing-formal-authority-acceptance.md
+reason: >-
+  Promote the owner-approved post-0.5.0 metric-routing evidence and exact-cell
+  qualification authority into the three controlling master roots without
+  changing released 0.5.0 behavior or authorizing provider replay, claims,
+  publication, or cutover.
+affected_authority:
+  needs: [NEED-TW-013]
+  requirements: [REQ-TW-124, REQ-TW-125, REQ-TW-126, REQ-TW-127, REQ-TW-128, REQ-TW-129]
+  decisions: [DEC-TW-010]
+  interfaces: [IF-TW-006]
+  risks: [RISK-TW-012, RISK-TW-013]
+  evidence: [ART-TW-080, TRACE-TW-073, ATP-TW-050, RESULT-TW-050, VER-TW-093, VAL-TW-041]
+controlled_master_roots:
+  - requirements.md
+  - traceability-matrix.md
+  - .traceweaver/intent-contract.yml
+starting_baseline:
+  release: traceweaver-core--v0.5.0
+  ref: 3a1f3c56b093e61b88e9f6282637878e8ebbf163
+  requirements_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+promoted_baseline:
+  requirements_hash_sha256: aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5
+  scoped_review_id: TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-PROMOTED-BASELINE-001
+  scoped_review_status: accepted_clean
+  accepted_review_identity: sha256:ae7fec240a034d09942785ca4454ab903d5127bc22924674930af8730e827a8e
+change_classification: impact_reviewed
+allowed_scope:
+  - exact master-root promotion and canonical baseline rebinding
+  - mechanical approval/status update of the accepted envelope and scoped trace record
+  - one scoped authority/document review
+  - one consolidated plan after the promoted baseline passes review
+held_scope:
+  - implementation before the clean promoted-baseline review
+  - provider replay, host instrumentation activation, metric collection, and external spend
+  - quantitative, sufficiency, equivalence, qualification, route-family, or global claims
+  - publication or release
+  - active routing, enforcement, or cutover
+review_gate: TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-PROMOTED-BASELINE-001
+next_step: Draft one consolidated plan for ART-TW-080 and ATP-TW-050; implementation remains held.

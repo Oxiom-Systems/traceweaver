@@ -1,10 +1,10 @@
 ---
 id: TW-REQ-MASTER-2026-04-30-001
-status: accepted_controlled_baseline_with_owner_approved_0_5_0_model_governance
+status: accepted_controlled_baseline_with_released_0_5_0_predecessor_and_owner_approved_metric_routing_authority
 date: 2026-04-30
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
-acceptance_state: accepted_for_approved_requirements_and_2026_08_22_model_governance_delivery_authority
+baseline_hash_sha256: aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5
+acceptance_state: accepted_for_approved_requirements_released_0_5_0_and_2026_08_23_metric_routing_planning_authority_clean_promoted_baseline_review_passed
 acceptance_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
 accepted_at: 2026-04-30
 last_amendment_id: REQ-AMEND-2026-05-03-001
@@ -46,6 +46,18 @@ v050_model_governance_current_amendment_id: CHG-TW-2026-08-22-002
 v050_model_governance_current_amended_at: 2026-08-22
 v050_model_governance_scope: REQ-TW-109_through_REQ-TW-123_shadow_only_v1_authoritative_active_cutover_held
 v050_model_governance_release_authority: conditional_same_candidate_verification_review_rollback_validation_PR_checks_and_release_receipt
+metric_routing_envelope_id: TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001
+metric_routing_source_document_set_sha256: 879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409
+metric_routing_formal_authority_acceptance_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001
+metric_routing_formal_authority_acceptance_receipt: docs/validation/traceweaver-2026-08-23-metric-routing-formal-authority-acceptance.md
+metric_routing_change_id: CHG-TW-2026-08-22-003
+metric_routing_requirements_review_id: TW-REQ-REVIEW-2026-08-22-METRIC-ROUTING-001
+metric_routing_authority_gate_id: TW-AUTH-GATE-2026-08-22-METRIC-ROUTING-001
+metric_routing_scoped_review_id: TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-PROMOTED-BASELINE-001
+metric_routing_accepted_at: 2026-08-23
+metric_routing_scope: REQ-TW-124_through_REQ-TW-129_planning_authority_provider_replay_claims_publication_and_cutover_held
+metric_routing_promotion_status: master_root_promotion_complete_scoped_document_review_clean_one_consolidated_plan_allowed_implementation_held
+metric_routing_release_allocation: unassigned_post_0_5_0
 u0_repair_amendment_id: REQ-AMEND-2026-07-22-001
 u0_repair_amendment_status: conditionally_approved_effective_only_when_EXC_TW_011_is_active_with_exact_Sol_ACCEPT_receipt_and_bound_hashes
 u0_repair_owner_plan_sha256: e24ce4feb81921d513d72ade0beee66d76f018805cb062ad03a4a2c0f07d84d5
@@ -83,6 +95,16 @@ logical router, protocol/policy consolidation, wrapper handoffs, deterministic
 fixtures, and CI invocation. VER-TW-087 and the one bounded code review now pass.
 VAL-TW-035, active-host runtime, staging, publication, and every later pillar
 remain held until their separate gates pass.
+
+TraceWeaver Core `0.5.0` is now the immutable predecessor for the metric-routing
+authority accepted by Oxiom Systems on 2026-08-23. The accepted source snapshot
+is `TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001` at document-set SHA-256
+`879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409`.
+`REQ-TW-124..129`, `DEC-TW-010`, `IF-TW-006`, `RISK-TW-012..013`, and their
+evidence chain passed controlled baseline promotion and the one clean scoped
+document review. They may now drive one consolidated plan. Deterministic metric
+implementation, provider replay, quantitative claims, publication, release
+allocation, and active cutover remain separately held.
 
 Source brainstorm documents remain evidence and rationale. This file converts
 that evidence into controlled requirements with stable IDs, stakeholder intent,
@@ -144,6 +166,20 @@ Acceptance evidence:
   `docs/validation/traceweaver-2026-08-21-review-series-convergence-code-review.md`.
   Validation, active-host runtime, staging, publication, and later pillars
   remain separately gated.
+- metric-routing formal-authority acceptance evidence:
+  `TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001`;
+- metric-routing accepted source:
+  `TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001` at document-set SHA-256
+  `879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409`;
+- metric-routing acceptance result: `REQ-TW-124..129`, `DEC-TW-010`,
+  `IF-TW-006`, `RISK-TW-012..013`, and
+  `ART-TW-080 / TRACE-TW-073 / ATP-TW-050 / RESULT-TW-050 / VER-TW-093 /
+  VAL-TW-041` are accepted as one post-0.5.0 planning-authority unit. The
+  promoted baseline passed
+  `TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-PROMOTED-BASELINE-001`; one
+  consolidated plan may now use it.
+  Provider replay, external effects, claims, publication, release allocation,
+  and active cutover remain separately held.
 
 U6 implementation artifacts, U7 claim records, Intent Contracts, and task
 capsules must cite the accepted `baseline_id` and `baseline_hash_sha256`.
@@ -282,6 +318,7 @@ until dynamic/runtime validation approves enforcing mode.
 | SRC-REQ-005 | `docs/brainstorms/2026-05-01-traceweaver-grill-intent-deepening-requirements.md` | `63bc4ba5677ef411569f1663620a7ef4a0f7afefff654f11fc853c5f7e323c33` | CE-DOC-REVIEW-2026-05-04-REQ-TW-048-AMENDMENT-CLEAN-001 | Optional post-ideation intent-deepening interview requirements for `tw-grill`, including bootstrap mode when no authority exists and delta/gap mode when partial authority exists; inspired by Matt Pocock's MIT-licensed `grill-with-docs` pattern with attribution; promoted for static/advisory source-evidence behavior only. |
 | SRC-PLAN-002 | `docs/plans/2026-05-01-003-feat-traceweaver-controlled-autonomy-plan.md` | canonical SHA-256 `a6a16c0accbc5e4c7d1e4a4c0ac1237d1d8a15e127c290bc7a83dfe910a6b0a2` with all `baseline_hash_sha256` values replaced by `CANONICAL_HASH_PLACEHOLDER` | CE-DOC-REVIEW-2026-05-01-CONTROLLED-AUTONOMY-REQ-CLEAN-001 | Candidate implementation plan for `tw-auto` after controlled-autonomy authority promotion. |
 | SRC-V050-MG-001 | `docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md` | `83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5` | `TW-REQ-AUTH-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-001` | Direct owner authority, normalized model/context-governance requirements, one-cycle delivery route, experimental B0--B3 map, release boundary, and explicit deferral of the broad lifecycle program outside 0.5.0. |
+| SRC-V050-MR-001 | `docs/validation/traceweaver-2026-08-22-metric-routing-requirements-authority-envelope.md` plus `docs/traceability/metric-routing.md` | accepted pre-promotion document-set SHA-256 `879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409` using lexical `path + NUL + bytes + NUL` framing | `TW-REQ-REVIEW-2026-08-22-METRIC-ROUTING-001`; `TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001`; promoted-baseline scoped review pending | Exact owner-approved post-0.5.0 metric observation, matched-evaluation, quality, sufficiency, exact-cell qualification, claim-control, and held-boundary authority source. |
 
 If any source artifact changes after baseline acceptance, the changed source may
 not update requirement authority until a validation delta records the new source
@@ -551,6 +588,44 @@ its historical worktree and is deferred outside this release. It is neither a
 | REQ-TW-122 | Exact TraceWeaver Core 0.5.0 shadow publication requires the accepted plan, one clean plan/document review, one closed code-review/fix series, ATP-TW-049/RESULT-TW-049/VER-TW-092/VAL-TW-040, clean bounded TRACE-TW-072 traceability and graph checks, package projection and byte-exact rollback, and the exact reviewed candidate ref. The pre-existing wider baseline closure backlog remains visible and non-gating; no global-closure claim is authorized. V1 remains authoritative. The release shall not claim token savings/sufficiency, active enforcement, served-model attestation, or active cutover. Active cutover requires a future owner decision and is non-gating to 0.5.0. | INTENT-TW-011 | ATP-TW-049 readiness negatives, bounded-chain/global-backlog distinction, version/digest/held-claim checks, rollback, PR checks, exact-ref, and release receipt. | Does 0.5.0 provide a useful governance map without overclaiming shadow evidence or whole-baseline closure? | SRC-V050-MG-001 | approved release/change-control constraint; conditional exact 0.5.0 authority |
 | REQ-TW-123 | An oracle-adequacy reviewer who did not author the candidate compiler or oracle shall record identity and relationship and disposition every real release-oracle category for every route as satisfied, explicitly excluded by authority, or held. Missing identity, self-review, empty/all-excluded oracle, unexplained exclusion, uncertainty, or open category holds structural eligibility. Representative usability scenarios may supplement but never replace the complete category disposition. | INTENT-TW-011 | ATP-TW-049 reviewer identity/relationship, complete real-oracle category disposition, empty/all-excluded, exclusion, uncertainty, and self-review fixtures. | Is the claim of context completeness independently challengeable for every released route/category? | SRC-V050-MG-001 | approved for 0.5.0 shadow implementation |
 
+### Post-0.5.0 Metric-Routing Evidence And Qualification
+
+Oxiom Systems accepted this complete authority set through
+`TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001`, bound to
+`TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001` at document-set SHA-256
+`879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409`.
+The six requirements are one planning-authority unit. Their exact accepted
+meaning is reproduced below; they may drive one consolidated plan only after
+the promoted baseline passes its scoped document review.
+
+| Req ID | Requirement | Intent | Verification method | Validation question | Source | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| REQ-TW-124 | Every execution used for qualification shall carry one canonical `IF-TW-006` observation plus an independently signed, execution-bound measurement attestation produced by a qualified collector outside the evaluated compiler and agent. The attestation shall bind provider/host request and response identities, served-model evidence, token/accounting fields, monotonic clock source, latency, execution topology, outcome, and overflow. Estimated, unsigned, self-attested, replayed, or incompletely bound values may be reported but shall not qualify a route. Counts, enums, digests, and repository-contained locators are allowed; prompt, tool-result, secret, and source-content bytes are prohibited. | INTENT-TW-011 | ATP-TW-050 schema, collector trust, signature, execution binding, canonicalization, duplicate, replay, tamper, accounting, clock, missing-field, estimated/self-attested, and content-leak negative fixtures. | Can an owner establish what actually ran and what it cost without trusting the evaluated agent or exposing task content? | SRC-V050-MR-001 | owner-approved planning authority; promoted-baseline review passed; implementation, replay, and claims held |
+| REQ-TW-125 | Before any replay used for qualification, TraceWeaver shall freeze a versioned matched-evaluation policy that binds exact route-cell identity, control and candidate definitions, scenario corpus, single-axis pairing invariants, pilot-versus-qualification use, power/confidence method, minimum and maximum valid-pair counts, stopping rule, admissible exclusions, absolute quality floors, non-inferiority margins, token-materiality threshold, latency limit, blinding/inter-rater rule, aggregation rule, expiry, and reset triggers. A changed policy shall create a new identity and shall not mix evidence with its predecessor. | INTENT-TW-011 | ATP-TW-050 policy completeness, pre-registration, power/confidence, single-axis pair, pilot non-qualification, drift, post-hoc exclusion, cross-policy mixing, stopping, retry-limit, and reset fixtures. | Are comparisons fixed before results are visible, sufficiently powered for their claim, and attributable to the budget/context change rather than another changed axis? | SRC-V050-MR-001 | owner-approved planning authority; promoted-baseline review passed; implementation, replay, and claims held |
+| REQ-TW-126 | A candidate shall pass quality equivalence only when every hard authority, source-completeness, evidence, safety, and terminal-correctness invariant passes; every scored candidate dimension meets the frozen absolute floor; and the preregistered one-sided paired non-inferiority bound meets the accepted margin. Judgment-bearing dimensions shall be scored blind by at least two independent evaluators and shall meet the frozen inter-rater agreement floor before use. A token or latency improvement shall never compensate for a hard-invariant, absolute-floor, agreement, or non-inferiority failure. | INTENT-TW-011 | ATP-TW-050 seeded authority/source/evidence/terminal regressions, absolute-floor, blinded dual scoring, inter-rater, confidence/margin boundary, evaluator-independence, and compensation-prohibition fixtures. | Does the smaller allocation preserve both an acceptable absolute outcome and the judgment quality of its matched control? | SRC-V050-MR-001 | owner-approved planning authority; promoted-baseline review passed; implementation, replay, and claims held |
+| REQ-TW-127 | TraceWeaver shall calculate whole-workflow input, output, cached-input, and total-token deltas plus monotonic latency deltas only from valid `REQ-TW-124`-attested matched pairs. It shall report absolute values, percentages, valid/invalid pair counts, exclusions, uncertainty intervals, and distribution summaries per exact route cell. A material-savings or acceptable-latency result shall require the preregistered `DEC-TW-010` confidence bound and threshold; partial coverage, pilot data, or underpowered cells shall not support a material, global, or route-family claim. | INTENT-TW-011 | ATP-TW-050 arithmetic, cached-input, child/retry/shard aggregation, attestation, latency-clock, confidence/threshold boundary, pilot/underpowered hold, invalid-pair exclusion, per-cell isolation, and partial-coverage claim fixtures. | Are reported savings and latency outcomes actual, materially bounded with uncertainty, and limited to the exact routes measured? | SRC-V050-MR-001 | owner-approved planning authority; promoted-baseline review passed; implementation, replay, and claims held |
+| REQ-TW-128 | A packet-budget/delivery cell shall be marked observed-sufficient only when every required positive qualification scenario completes its intended task with valid attested measurement, quality equivalence, complete authority/source/evidence delivery, and no budget-class promotion or context/judgment hold. Locator, shard, or re-isolation behavior counts only when it is part of the preregistered cell strategy and its full cost is attributed. Negative held/error scenarios verify safe control behavior but shall never count toward sufficiency or the positive-scenario sample minimum. Prohibited truncation, deletion, downgrade, lossy compaction, and unbounded retry shall fail the cell. | INTENT-TW-011 | ATP-TW-050 positive nominal/boundary completion, declared locator/shard/re-isolation, promotion, retry, negative safe-hold, prohibited-overflow, sample-separation, and cost-attribution fixtures. | Does the proposed cell complete representative intended work without treating a safe refusal or hidden promotion as evidence of sufficiency? | SRC-V050-MR-001 | owner-approved planning authority; promoted-baseline review passed; implementation, replay, and claims held |
+| REQ-TW-129 | Qualification shall be recorded per exact route, served-model and measurement attestation, risk effort, budget/delivery strategy, map, profile, SEC, source oracle, capability, tokenizer, evaluation policy, corpus, and cell-validation identity. Only a structurally eligible cell with current `REQ-TW-124..128` verification and cell-specific `VAL-TW-041` acceptance may transition to `qualified`; no parent, alias, sibling, aggregate, mechanism-only validation, or historical result may confer qualification. Expired or changed evidence shall deterministically return the cell to `structurally_eligible` when structural checks remain current or to `unqualified` otherwise. Qualification shall remain advisory until a separate owner-approved active-cutover gate passes. | INTENT-TW-011 | ATP-TW-050 promotion, incomplete verification/validation, inheritance, alias, cross-cell, expiry, capability/tokenizer/profile/oracle/policy drift, downgrade-state, coverage, and cutover-boundary fixtures. | Can every qualified recommendation be traced to current technical and stakeholder evidence for that exact cell without silently activating it? | SRC-V050-MR-001 | owner-approved planning authority; promoted-baseline review passed; implementation, replay, claims, and cutover held |
+
+#### Approved Interface Specification
+
+| ID | Controlled statement | Allocation | Status |
+| --- | --- | --- | --- |
+| IF-TW-006 | Define canonical versioned append-only `tw-model-context-observation/1` and `tw-model-context-qualification/1` evidence envelopes. Observation identity binds baseline, execution/pair/cell, route lineage, map/profile/SEC/oracle/capability/tokenizer, requested and served model evidence, risk effort, budget/delivery, qualified collector trust root, signature and execution binding, accounting, monotonic latency, topology, overflow, terminal result, authority/source/evidence completeness, artifact digests, and privacy classification. Qualification identity binds the exact cell, evaluation policy, corpus, pair/exclusion counts, quality, token/context/latency, sufficiency, transition/reset, route coverage, reviewer identity/relationship, and allowed/held claims. Identity is SHA-256 over recursively key-sorted JSON with array order preserved and the record identity excluded; digest integrity never replaces collector authenticity. | REQ-TW-124..129 | Owner approved as an allocated interface specification, not a seventh source of implementation authority; implementation and replay held pending later gates. |
+
+#### Approved Design Decision
+
+| ID | Controlled statement | Status |
+| --- | --- | --- |
+| DEC-TW-010 | Use measurement-first matched pairs per exact route cell. Three valid pairs are pilot-only. Qualification preregisters one-sided `alpha <= 0.05`, power `>= 0.80`, and at least ten valid positive-scenario pairs per cell, using a larger powered minimum when required. Stop on any hard, provenance, signature, privacy, absolute-floor, or safe-control failure; cap invalid replacement at the preregistered lower of one pair or 10%; prohibit post-result exclusions; require 100% hard-invariant success and score `>= 3` on each applicable 0--4 dimension; use at least two independent blinded evaluators with weighted Cohen's kappa `>= 0.80`; require one-sided 95% lower quality-difference bounds `>= -0.25`, 95% lower paired median whole-workflow token reduction `>= 20%` for material savings, and 95% upper paired median monotonic-latency ratio `<= 1.20`; qualify and validate only exact cells; keep active cutover separate. | Owner approved as the frozen planning default. Any semantic threshold or method change requires change control and a new evaluation-policy identity. |
+
+#### Approved Risk Controls
+
+| ID | Risk | Control | Status |
+| --- | --- | --- | --- |
+| RISK-TW-012 | Biased, pooled, incomplete, estimated, underpowered, or unattested evidence falsely qualifies a route or exaggerates savings. | Frozen policy/corpus, exact-cell identity, matched single-axis pairs, preregistered power/confidence/stopping rules, bounded replacement, blinded dual quality review, absolute floors, complete negative results, no inheritance, deterministic reset, and current per-cell V&V. | Owner approved control; residual metric and claim risk held until `RESULT-TW-050 / VER-TW-093 / VAL-TW-041` pass and `EXC-TW-016` is reduced or closed. |
+| RISK-TW-013 | Metric capture leaks task content or instrumentation changes, fabricates, or double-counts the behavior being measured. | Content-free schemas, counts/digests/locators only, qualified independent signed collector, execution binding, privacy negatives, separated harness overhead, exact phase accounting, tamper/replay rejection, and owner-visible invalid runs. | Owner approved control; collector implementation, host instrumentation, provider replay, and external effects remain held. |
+
 ### 0.5.0 Decision And Risk
 
 | ID | Controlled statement | Status |
@@ -590,6 +665,7 @@ its historical worktree and is deferred outside this release. It is neither a
 | REQ-TW-076 - REQ-TW-081 | User stakeholder direction 2026-07-22 for the 0.3 validation-first program; superpowers hook mechanism (github.com/obra/superpowers) as external source evidence; `docs/plans/2026-07-22-traceweaver-0.3-validation-first-matrix-proposals.md` proposed matrix rows | Candidate V&V definition phase, `tw-vv-define` skill, `tw-work` hard V&V preflight, SessionStart discipline-injection hook, advisory PreToolUse TDD gate hook, and hook host-portability evidence requirements recorded as planning input only | Candidate requirements recorded; not yet requirements-reviewed or doc-reviewed; no matrix merge, skill, hook, or fixture implementation exists yet | Requirements review (`tw-requirements-review`) and a scoped `tw-doc-review` remain required before these rows drive `tw-vv-define`/`tw-work` implementation, hook authoring, or any matrix merge; runtime, enforcing-mode, and per-host hook runtime-proof claims remain held regardless of review outcome |
 | REQ-TW-088 | Owner direction 2026-08-11 for a deterministic TraceWeaver-owned `tw-graph` projection with lifecycle refresh and mandatory PR freshness checking while Markdown remains authoritative | Requirements-quality-passed candidate baseline patch in `requirements.md`, `.traceweaver/intent-contract.yml`, `traceability-matrix.md`, and `TW-REQ-REVIEW-2026-08-11-REQ-TW-060-088-AUTHORITY-BASELINE-001`; optional Graphify enrichment remains independently governed by REQ-TW-089/090 | TRACE-TW-066 / VER-TW-086 / VAL-TW-034 allocated; deterministic graph, tracked receipt, same-cycle reconciliation, setup bootstrap, wrapper lifecycle, CI freshness, packaged static preview assets, and negative fixtures implemented locally | active-host and consumer validation, semantic-HTML authority cutover, hook installation, publication, release, and authority mutation remain held; Graphify cannot satisfy mandatory freshness or become authority/evidence |
 | REQ-TW-109 - REQ-TW-123 | `TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001`; one integrated 0.5.0 implementation plan; central model-context map, compiler, receipts, source oracle, installer projection/rollback, and release-readiness v2 | ART-TW-079 / TRACE-TW-072 / ATP-TW-049 / RESULT-TW-049 / VER-TW-092 | VAL-TW-040 owner-approved proxy validation required for release; active cutover and quantitative savings/sufficiency claims held | Build, consolidated review, verification, rollback, validation disposition, PR checks, and release receipt must close on one candidate |
+| REQ-TW-124 - REQ-TW-129 | `TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001`; accepted source document-set SHA-256 `879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409`; `TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-PROMOTED-BASELINE-001`; `DEC-TW-010`; `IF-TW-006`; `RISK-TW-012..013`; one consolidated metric harness/V&V plan | ART-TW-080 / TRACE-TW-073 / ATP-TW-050 / RESULT-TW-050 / VER-TW-093 | Per-cell VAL-TW-041 planned; promoted-baseline scoped review passed; no quantitative or qualification result exists | Planning use is active for one consolidated plan. Deterministic implementation, provider replay, host instrumentation, metric collection, claims, publication, release allocation, and active cutover remain held by their named gates. |
 
 ## Approved Exceptions And Held Claims
 
@@ -601,7 +677,7 @@ its historical worktree and is deferred outside this release. It is neither a
 | EXC-TW-004 | Held claim | REQ-TW-022 | Release-ready and upstream-ready claims are held until R31 and later release gates pass. | R31 real-project validation and release records pass. |
 | EXC-TW-005 | Closed bootstrap exception | REQ-TW-001, REQ-TW-002 | Draft baseline formation, review-finding resolution, first Intent Contract draft, and acceptance evidence were authorized before the first accepted baseline. | Closed by `CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001` and recorded `baseline_hash_sha256`; this exception cannot authorize implementation or release claims. |
 | EXC-TW-006 | Held limitation option | REQ-TW-017, REQ-TW-029 | Local-cache-only CE source use is not accepted until a limitation record with the required fields exists. | Upstream CE source pin is resolved, or a complete accepted local-cache limitation is recorded. |
-| EXC-TW-016 | Held claim | REQ-TW-112, REQ-TW-119, REQ-TW-122 | TraceWeaver Core 0.5.0 does not claim active route enforcement, independently attested served-model identity, token sufficiency, material token savings, quality equivalence, or active cutover. | A future owner decision accepts complete live descendant observation, bypass negatives, independently attested host telemetry, matched quality and material whole-workflow savings evidence, and active-cutover rollback proof. |
+| EXC-TW-016 | Held claim | REQ-TW-112, REQ-TW-119, REQ-TW-122, REQ-TW-124 - REQ-TW-129 | TraceWeaver Core 0.5.0 and the promoted metric-routing authority do not claim active route enforcement, independently attested served-model identity, observed token/context/latency values, packet sufficiency, quality equivalence, material savings, exact-cell qualification, route-family/global results, or active cutover. | Reduce or close only for exact cells after authorized provider replay produces current RESULT-TW-050, VER-TW-093, and cell-specific VAL-TW-041 that meet DEC-TW-010. Active enforcement/cutover additionally require complete live descendant observation, bypass negatives, independently attested host evidence, and separately approved rollback/cutover proof. |
 | EXC-TW-017 | Deferred program | REQ-TW-093 - REQ-TW-108 (reserved outside this controlled baseline) | The broad product-lifecycle/semantic-HTML Slices 1--8 remain on their historical worktree and are not 0.5.0 release gates or content. | A future owner decision reactivates and re-baselines that program without reusing its IDs. |
 
 ## Change Control
@@ -612,20 +688,17 @@ This file is the master requirements baseline. Changes to it must:
 - add new IDs instead of renumbering existing IDs;
 - update source trace and validation questions;
 - update the Current Traceability Matrix when requirement status changes;
-- run `/ce-doc-review` before using the changed baseline for U6
-  implementation, U7 claims, release claims, Intent Contracts, or task
-  capsules.
+- run one scoped `/tw-doc-review` before using the changed baseline for new
+  implementation, claims, Intent Contracts, or task capsules.
 
 ## Next Required Work
 
-1. Execute the one integrated TraceWeaver Core 0.5.0 model-governance delivery
-   authorized by
-   `TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001`:
-   one implementation plan and document review, one L3 V&V package, build,
-   one consolidated code review and repair pass, same-candidate verification,
-   rollback, traceability, proxy validation, PR checks, and controlled release.
-   Keep v1 routing authoritative and active cutover plus all quantitative
-   savings/sufficiency claims held.
+1. Draft one consolidated `/tw-plan` for the complete deterministic
+   `ART-TW-080` harness and `ATP-TW-050` V&V package against the promoted,
+   clean-reviewed authority. Do not implement before that plan and its V&V
+   definition are accepted. Keep provider replay,
+   host instrumentation, metric collection, quantitative and qualification
+   claims, publication, release allocation, and active cutover held.
 
 1. Keep the prior 0.5.0 lifecycle/semantic-HTML Slices 1--8 outside this
    branch and release. Their `REQ-TW-093..108` identifiers remain reserved and
