@@ -1,0 +1,241 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-semantic-html-cutover-gate; req=REQ-TW-134,REQ-TW-138; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: entrypoint=lifecycle_semantic_html_cutover_check_and_rehearsal; req=REQ-TW-134,REQ-TW-138; trace=TRACE-TW-074; ver=VER-TW-094
+
+require "digest"
+require "fileutils"
+require "json"
+require "optparse"
+require "pathname"
+require "set"
+
+GATE_SCHEMA = "tw-lifecycle-cutover-gate/1"
+DIGEST_PATTERN = /\Asha256:[0-9a-f]{64}\z/
+MARKER = "tw-lifecycle-cutover-rehearsal/1\n"
+
+class CutoverError < StandardError
+  attr_reader :finding, :details
+
+  def initialize(finding, message, details = {})
+    super(message)
+    @finding = finding
+    @details = details
+  end
+end
+
+def fail!(finding, message, details = {})
+  raise CutoverError.new(finding, message, details)
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_bytes(value)
+  "sha256:#{Digest::SHA256.hexdigest(value)}"
+end
+
+def digest_value(value)
+  digest_bytes(JSON.generate(canonical(value)))
+end
+
+def present_string?(value)
+  value.is_a?(String) && !value.strip.empty?
+end
+
+def digest?(value)
+  present_string?(value) && value.match?(DIGEST_PATTERN)
+end
+
+def load_json(path, missing, malformed)
+  fail!(missing, "file is missing", "path" => path.to_s) unless path.file?
+  fail!("unsafe_path", "symlink input is prohibited", "path" => path.to_s) if path.symlink?
+  JSON.parse(path.binread)
+rescue JSON::ParserError => error
+  fail!(malformed, "file is not valid JSON", "path" => path.to_s, "error" => error.message)
+end
+
+def resolve_inside(root, value, finding, directory: false)
+  candidate = Pathname.new(value)
+  candidate = root.join(candidate) unless candidate.absolute?
+  candidate = candidate.expand_path
+  fail!("unsafe_path", "symlink path is prohibited", "path" => candidate.to_s) if candidate.symlink?
+  real = candidate.exist? ? candidate.realpath : candidate.parent.realpath.join(candidate.basename)
+  relative = real.relative_path_from(root).to_s
+  fail!(finding, "path escapes rehearsal root", "path" => value) if relative == ".." || relative.start_with?("../")
+  fail!(finding, "directory is missing", "path" => value) if directory && !real.directory?
+  real
+rescue ArgumentError, Errno::ENOENT
+  fail!(finding, "path escapes rehearsal root or has a missing parent", "path" => value)
+end
+
+def validate_bound_json!(root, locator, expected_digest, label)
+  fail!("#{label}_locator_invalid", "#{label} locator must be repository-relative") unless present_string?(locator)
+  relative = Pathname.new(locator)
+  fail!("#{label}_locator_invalid", "#{label} locator must be repository-relative") if relative.absolute? || relative.each_filename.to_a.include?("..")
+  fail!("#{label}_digest_invalid", "#{label} digest is invalid") unless digest?(expected_digest)
+  path = resolve_inside(root, locator, "#{label}_path_escape")
+  fail!("#{label}_missing", "#{label} file is missing", "locator" => locator) unless path.file?
+  actual = digest_bytes(path.binread)
+  fail!("#{label}_digest_mismatch", "#{label} digest does not match bound bytes", "locator" => locator, "actual" => actual) unless actual == expected_digest
+  JSON.parse(path.binread)
+rescue JSON::ParserError => error
+  fail!("#{label}_malformed", "#{label} file is not valid JSON", "locator" => locator, "error" => error.message)
+end
+
+def validate_gate!(gate, root, allow_pending_rollback: false)
+  fields = %w[
+    schema_version gate_id current_generation candidate_generation
+    candidate_manifest_digest controlling_before requested_after consumer_census
+    evidence owner_decision remaining_holds authority_effect
+  ]
+  fail!("cutover_gate_shape", "cutover gate does not contain the closed envelope") unless gate.is_a?(Hash) && gate.keys.sort == fields.sort
+  fail!("cutover_gate_schema", "cutover gate schema is unsupported") unless gate["schema_version"] == GATE_SCHEMA
+  expected_id = digest_value(gate.reject { |key, _| key == "gate_id" })
+  fail!("cutover_gate_identity", "cutover gate identity is invalid", "expected" => expected_id, "actual" => gate["gate_id"]) unless gate["gate_id"] == expected_id
+  fail!("cutover_gate_manifest", "candidate manifest digest is invalid") unless digest?(gate["candidate_manifest_digest"])
+  fail!("cutover_gate_authority_boundary", "cutover gate cannot itself change authority") unless gate["authority_effect"] == "none" && gate["controlling_before"] == "markdown_yaml" && gate["requested_after"] == "semantic_html"
+  fail!("cutover_gate_generation", "current and candidate generations must be distinct and named") unless present_string?(gate["current_generation"]) && present_string?(gate["candidate_generation"]) && gate["current_generation"] != gate["candidate_generation"]
+
+  census = gate["consumer_census"]
+  census_fields = %w[digest locator closed independently_reproduced readers writers migrated_paths]
+  fail!("consumer_census_invalid", "consumer census is incomplete") unless census.is_a?(Hash) && census.keys.sort == census_fields.sort && digest?(census["digest"]) && present_string?(census["locator"])
+  %w[readers writers migrated_paths].each do |field|
+    values = census[field]
+    fail!("consumer_census_invalid", "consumer census paths must be lexical unique safe repository-relative arrays", "field" => field) unless values.is_a?(Array) && values.uniq == values && values == values.sort && values.all? { |path| present_string?(path) && !Pathname.new(path).absolute? && Pathname.new(path).cleanpath.to_s == path && path != ".." && !path.start_with?("../") && !path.include?("\\") }
+  end
+  census_body = census.reject { |key, _| key == "digest" }
+  bound_census = validate_bound_json!(root, census["locator"], census["digest"], "consumer_census")
+  fail!("consumer_census_content_mismatch", "consumer census file does not match gate census") unless bound_census == census_body
+
+  evidence = gate["evidence"]
+  evidence_fields = %w[parity accessibility security usability rollback_rehearsal]
+  fail!("cutover_evidence_invalid", "cutover evidence is incomplete") unless evidence.is_a?(Hash) && evidence.keys.sort == evidence_fields.sort
+  evidence.each do |name, receipt|
+    fields = %w[state evidence_id locator digest]
+    fail!("cutover_evidence_invalid", "cutover evidence receipt is incomplete", "evidence" => name) unless receipt.is_a?(Hash) && receipt.keys.sort == fields.sort && %w[passed failed held].include?(receipt["state"]) && present_string?(receipt["evidence_id"]) && present_string?(receipt["locator"]) && digest?(receipt["digest"])
+    bound_evidence = validate_bound_json!(root, receipt["locator"], receipt["digest"], "cutover_evidence")
+    fail!("cutover_evidence_content_mismatch", "cutover evidence file does not match gate evidence", "evidence" => name) unless bound_evidence == receipt.slice("state", "evidence_id")
+  end
+  owner = gate["owner_decision"]
+  owner_fields = %w[state owner decision_id decision_locator decision_digest]
+  fail!("owner_decision_invalid", "owner decision is incomplete") unless owner.is_a?(Hash) && owner.keys.sort == owner_fields.sort && %w[held accepted rejected].include?(owner["state"]) && present_string?(owner["owner"]) && present_string?(owner["decision_id"]) && present_string?(owner["decision_locator"]) && digest?(owner["decision_digest"])
+  bound_decision = validate_bound_json!(root, owner["decision_locator"], owner["decision_digest"], "owner_decision")
+  fail!("owner_decision_content_mismatch", "owner decision file does not match gate decision") unless bound_decision == owner.slice("state", "owner", "decision_id")
+  holds = gate["remaining_holds"]
+  fail!("cutover_holds_invalid", "remaining holds must be a unique string array") unless holds.is_a?(Array) && holds.uniq == holds && holds.all? { |hold| present_string?(hold) }
+
+  consumers = (census["readers"] + census["writers"]).uniq.sort
+  unmigrated = consumers - census["migrated_paths"]
+  blockers = []
+  blockers << "consumer_census_open" unless census["closed"]
+  blockers << "consumer_census_not_independently_reproduced" unless census["independently_reproduced"]
+  blockers << "consumer_boundary_empty" if consumers.empty?
+  blockers << "unmigrated_consumers:#{unmigrated.join(',')}" unless unmigrated.empty?
+  evidence.each do |name, receipt|
+    next if allow_pending_rollback && name == "rollback_rehearsal"
+    blockers << "#{name}_evidence_#{receipt["state"]}" unless receipt["state"] == "passed"
+  end
+  blockers << "owner_cutover_decision_not_accepted" unless owner["state"] == "accepted"
+  blockers.concat(holds.map { |hold| "remaining_hold:#{hold}" })
+  fail!("cutover_gate_held", "atomic semantic HTML cutover remains held", "blockers" => blockers.sort) unless blockers.empty?
+  gate
+end
+
+def directory_digest(path)
+  fail!("unsafe_path", "rehearsal directory cannot be a symlink", "path" => path.to_s) if path.symlink?
+  entries = Dir.glob(path.join("**", "*"), File::FNM_DOTMATCH).map { |entry| Pathname.new(entry) }.reject { |entry| %w[. ..].include?(entry.basename.to_s) }
+  fail!("unsafe_path", "rehearsal directory cannot contain symlinks") if entries.any?(&:symlink?)
+  files = entries.select(&:file?).sort_by { |entry| entry.relative_path_from(path).to_s }
+  digest_value(files.map { |entry| [entry.relative_path_from(path).to_s, digest_bytes(entry.binread)] })
+end
+
+command = ARGV.shift
+options = {root: Dir.pwd, inject_failure: false}
+OptionParser.new do |parser|
+  parser.banner = "Usage: traceweaver-lifecycle-cutover <check|rehearse> --root PATH --gate PATH [--active PATH --candidate PATH --inject-failure]"
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--gate PATH") { |value| options[:gate] = value }
+  parser.on("--active PATH") { |value| options[:active] = value }
+  parser.on("--candidate PATH") { |value| options[:candidate] = value }
+  parser.on("--inject-failure") { options[:inject_failure] = true }
+end.parse!
+
+begin
+  fail!("invalid_command", "unsupported cutover operation", "operation" => command) unless %w[check rehearse].include?(command)
+  root = Pathname.new(options[:root]).expand_path
+  fail!("invalid_root", "--root must be a directory") unless root.directory?
+  root = root.realpath
+  fail!("usage_error", "--gate is required") unless present_string?(options[:gate])
+  fail!("usage_error", "--candidate is required") unless present_string?(options[:candidate])
+  candidate = resolve_inside(root, options[:candidate], "candidate_path_escape", directory: true)
+  manifest = candidate.join("manifest.json")
+  fail!("candidate_manifest_missing", "candidate manifest is missing") unless manifest.file? && !manifest.symlink?
+  gate_path = resolve_inside(root, options[:gate], "gate_path_escape")
+  gate = validate_gate!(load_json(gate_path, "missing_cutover_gate", "malformed_cutover_gate"), root, allow_pending_rollback: command == "rehearse")
+  actual_manifest_digest = digest_bytes(manifest.binread)
+  fail!("candidate_manifest_mismatch", "candidate bytes differ from gate", "expected" => gate["candidate_manifest_digest"], "actual" => actual_manifest_digest) unless actual_manifest_digest == gate["candidate_manifest_digest"]
+
+  if command == "check"
+    puts canonical_json("schema_version" => "tw-lifecycle-cutover-check/1", "status" => "pass", "eligibility" => "eligible_for_separately_authorized_atomic_cutover", "gate_id" => gate["gate_id"], "current_generation" => gate["current_generation"], "candidate_generation" => gate["candidate_generation"], "authority_effect" => "none", "findings" => [])
+    exit 0
+  end
+
+  marker = root.join(".traceweaver-cutover-rehearsal")
+  fail!("rehearsal_marker_missing", "cutover rehearsal is allowed only in an explicit disposable fixture root") unless marker.file? && !marker.symlink? && marker.binread == MARKER
+  fail!("usage_error", "--active is required") unless present_string?(options[:active])
+  active = resolve_inside(root, options[:active], "active_path_escape", directory: true)
+  fail!("rehearsal_path_collision", "active and candidate directories must differ") if active == candidate
+
+  original_digest = directory_digest(active)
+  token = gate["gate_id"].delete_prefix("sha256:")[0, 16]
+  stage = active.parent.join(".#{active.basename}.candidate-#{token}")
+  backup = active.parent.join(".#{active.basename}.backup-#{token}")
+  fail!("rehearsal_residue", "transaction stage or backup already exists") if stage.exist? || backup.exist?
+  FileUtils.mkdir(stage)
+  candidate.children.sort.each do |entry|
+    destination = stage.join(entry.basename)
+    entry.directory? ? FileUtils.cp_r(entry, destination) : FileUtils.cp(entry, destination)
+  end
+  swapped = false
+  begin
+    active.rename(backup)
+    stage.rename(active)
+    swapped = true
+    fail!("injected_rehearsal_failure", "fault injected after atomic candidate activation") if options[:inject_failure]
+    fail!("candidate_manifest_mismatch", "active candidate differs after atomic activation") unless digest_bytes(active.join("manifest.json").binread) == gate["candidate_manifest_digest"]
+  ensure
+    if swapped
+      FileUtils.remove_entry(active) if active.exist?
+      backup.rename(active) if backup.exist?
+    else
+      FileUtils.remove_entry(stage) if stage.exist?
+      backup.rename(active) if backup.exist? && !active.exist?
+    end
+  end
+  restored_digest = directory_digest(active)
+  fail!("rollback_restore_mismatch", "rehearsal did not restore the complete prior generation", "expected" => original_digest, "actual" => restored_digest) unless restored_digest == original_digest
+  puts canonical_json("schema_version" => "tw-lifecycle-cutover-rehearsal/1", "status" => "pass", "gate_id" => gate["gate_id"], "transaction_exercised" => true, "candidate_generation_observed" => gate["candidate_generation"], "prior_generation_restored" => true, "prior_generation_digest" => original_digest, "mixed_generation_observed" => false, "authority_effect" => "none", "findings" => [])
+rescue CutoverError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-cutover-finding/1", "status" => "blocked", "finding" => error.finding, "reason" => error.message, "details" => error.details, "authority_effect" => "none")
+  exit 1
+rescue OptionParser::ParseError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-cutover-finding/1", "status" => "blocked", "finding" => "usage_error", "reason" => error.message, "details" => {}, "authority_effect" => "none")
+  exit 2
+rescue StandardError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-cutover-finding/1", "status" => "blocked", "finding" => "unexpected_cutover_error", "reason" => error.message, "details" => {"class" => error.class.name}, "authority_effect" => "none")
+  exit 1
+end

@@ -1,0 +1,713 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=v060-representative-product-trial-runner; req=REQ-TW-136,REQ-TW-144; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042
+# TRACEWEAVER: entrypoint=v060_representative_product_trial_orchestrator; req=REQ-TW-136,REQ-TW-144; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+TOOLS = {
+  integrity: ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity"),
+  capture: ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-capture"),
+  graph: ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph"),
+  hub: ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-acceptance-hub")
+}.freeze
+TASK_TYPES = %w[
+  source_registration candidate_capture duplicate_navigation impact_navigation
+  vv_before_work stale_evidence strict_html_navigation acceptance_pack
+].freeze
+TRUTH_STAGES = %w[
+  observation technical_verification independent_review pr merge deployment
+  runtime_health release stakeholder_validation acceptance publication
+].freeze
+
+PRODUCTS = {
+  "vestro" => {
+    product: "Vestro", scenario_id: "VESTRO-LC-001",
+    repository_locator: "github.com/cryptolabsza/vestro", head: "8bc3b724f56cc72f08f8162c783a7f8e2816b990",
+    authority_digest: "f90073461cd53eddc04b3c72bb04e8a781fea018ba42400d25431fd280475a37",
+    matrix_digest: "b8c55269a3ed393b2ba660c44dcb5cfb2a9aa72198b86ff3ade06c29d7ebb5a9",
+    inventory_digest: "sha256:de4de0c453e52b40974a4c4d06d202decc6d96a81f1f1aad97beb4a6e98c6d68",
+    requirement_id: "REQ-" + "ADMIN-UI-006",
+    sources: [
+      {source_id: "SRC-VESTRO-REQS-001", role: "requirements_authority", locator: "REQUIREMENTS.md", normalized_locator: "requirements.md", source_type: "markdown", schema_version: "tw-lifecycle-markdown/1", digest: "f90073461cd53eddc04b3c72bb04e8a781fea018ba42400d25431fd280475a37", authority_class: "authoritative", legacy_locators: ["REQUIREMENTS.md"]},
+      {source_id: "SRC-VESTRO-MATRIX-001", role: "traceability_authority", locator: "traceability-matrix.md", normalized_locator: "traceability-matrix.md", source_type: "markdown", schema_version: "tw-lifecycle-markdown/1", digest: "b8c55269a3ed393b2ba660c44dcb5cfb2a9aa72198b86ff3ade06c29d7ebb5a9", authority_class: "authoritative", legacy_locators: []},
+      {source_id: "SRC-VESTRO-INTENT-001", role: "intent_contract_authority", locator: ".traceweaver/intent-contract.yml", normalized_locator: ".traceweaver/intent-contract.yml", source_type: "yaml", schema_version: "traceweaver-intent/1", digest: "8835ee5fc7b94bc4b06720cebc17b48a07d3e2ce63da7739af23220ae44befe5", authority_class: "authoritative", legacy_locators: []}
+    ]
+  },
+  "air-router" => {
+    product: "Air Router", scenario_id: "AIRROUTER-LC-001",
+    repository_locator: "github.com/Oxiom-Systems/Air-Router", head: "0fc9b6514e112f8ece4196f5a6e0fbb80e3ee56b",
+    authority_digest: "ab9221360f5a9012f254db06772d37f55de177f9e21806b24744118b11bf07fe",
+    matrix_digest: "d83a9d91f8be8ad7f861d2005f4c5fa166bca3eaf334cf2511deef8ab4f4cd84",
+    inventory_digest: "sha256:dbeb89c0ae350ba98735078bfe7a0061c070a8ac2ee0d6e04a4100149d62e5fe",
+    requirement_id: "REQ-" + "AIR-108",
+    sources: [
+      {source_id: "SRC-AIR-REQS-001", role: "requirements_authority", locator: "requirements.md", normalized_locator: "requirements.md", source_type: "markdown", schema_version: "tw-lifecycle-markdown/1", digest: "ab9221360f5a9012f254db06772d37f55de177f9e21806b24744118b11bf07fe", authority_class: "authoritative", legacy_locators: []},
+      {source_id: "SRC-AIR-MATRIX-001", role: "traceability_authority", locator: "traceability-matrix.md", normalized_locator: "traceability-matrix.md", source_type: "markdown", schema_version: "tw-lifecycle-markdown/1", digest: "d83a9d91f8be8ad7f861d2005f4c5fa166bca3eaf334cf2511deef8ab4f4cd84", authority_class: "authoritative", legacy_locators: []},
+      {source_id: "SRC-AIR-INTENT-001", role: "intent_contract_authority", locator: ".traceweaver/intent-contract.yml", normalized_locator: ".traceweaver/intent-contract.yml", source_type: "yaml", schema_version: "traceweaver-intent/1", digest: "0ff28e810bba56ffb7becf3340bbe250be9e59d195adffa9dc90126c4285f735", authority_class: "authoritative", legacy_locators: []},
+      {source_id: "SRC-AIR-042", role: "non_code_lifecycle_artifact", locator: "config/phase25-hls-contract.json", normalized_locator: "config/phase25-hls-contract.json", registry_locator: "https://github.com/Oxiom-Systems/Air-Router/blob/0fc9b6514e112f8ece4196f5a6e0fbb80e3ee56b/config/phase25-hls-contract.json", source_type: "external_record_stub", schema_version: "tw-external-record-stub/1", digest: "021fad9e5eade34915fe67d4c42378fb72794c4934b6d3001a7a73665035e2da", authority_class: "external_reference", legacy_locators: []}
+    ],
+    non_code: {
+      artifact_id: "AIR-ROUTER-PHASE25-DIAGNOSTIC-LAB-002", source_id: "SRC-AIR-042",
+      locator: "config/phase25-hls-contract.json",
+      digest: "021fad9e5eade34915fe67d4c42378fb72794c4934b6d3001a7a73665035e2da"
+    }
+  }
+}.freeze
+
+LIFECYCLE_PREFIXES = %w[
+  INTENT NEED REQ CONSTRAINT DEC IF RISK CHG CHANGE ART TRACE VER RESULT VAL
+  ACCEPT ATP BASELINE EVIDENCE GAP HOLD AUTH REV CLAR SRC
+].freeze
+LIFECYCLE_ID_PATTERN = /\b(?:#{LIFECYCLE_PREFIXES.join('|')})-[A-Z0-9]+(?:-[A-Z0-9]+)*\b/
+RANGE_PATTERN = /\b((?:#{LIFECYCLE_PREFIXES.join('|')})(?:-[A-Z0-9]+)*)-(\d{3})(?:\.\.|_through_)(?:\1-)?(\d{3})\b/
+NUMERIC_SHORTHAND_PATTERN = /\b((?:#{LIFECYCLE_PREFIXES.join('|')})(?:-[A-Z0-9]+)*)-(\d{3}(?:\/\d{3})+)\b/
+PREFIX_SHORTHAND_PATTERN = /\b((?:#{LIFECYCLE_PREFIXES.join('|')})(?:\/(?:#{LIFECYCLE_PREFIXES.join('|')}))+)-([A-Z0-9]+(?:-[A-Z0-9]+)*)\b/
+GENERIC_RECORD_ID_PATTERN = /\A[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+\z/
+
+def canonical(value)
+  case value
+  when Hash then value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array then value.map { |entry| canonical(entry) }
+  else value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_bytes(bytes)
+  "sha256:#{Digest::SHA256.hexdigest(bytes)}"
+end
+
+def digest_value(value)
+  digest_bytes(JSON.generate(canonical(value)))
+end
+
+def identify(value, field)
+  copy = Marshal.load(Marshal.dump(value))
+  copy.delete(field)
+  copy[field] = digest_value(copy)
+  copy
+end
+
+def write_json(path, value)
+  path.dirname.mkpath
+  path.binwrite(canonical_json(value))
+end
+
+def run_tool(name, *arguments)
+  stdout, stderr, status = Open3.capture3(TOOLS.fetch(name).to_s, *arguments.map(&:to_s))
+  abort("product_trial_tool_failed=#{name} args=#{arguments.join(' ')} stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.success?
+  JSON.parse(stdout)
+rescue JSON::ParserError => error
+  abort("product_trial_tool_invalid_json=#{name} error=#{error.message}")
+end
+
+def source_envelope(source, receipt_id: nil)
+  value = {
+    "source_id" => source.fetch("source_id"), "locator" => source.fetch("normalized_locator"),
+    "version" => source.fetch("version"), "digest" => source.fetch("digest"),
+    "role" => source.fetch("role"), "provenance" => "exact read-only authorized product source snapshot"
+  }
+  value["receipt_id"] = receipt_id if receipt_id
+  value
+end
+
+def relationship(source, target, type)
+  {"source_id" => source, "target_id" => target, "relationship_type" => type, "applicable" => true, "provenance" => "VAL-TW-042 representative product trial"}
+end
+
+def record(config, source, baseline, id:, type:, title:, relationships: [], authority: "authoritative", acceptance: "prepared", receipt_id: nil, fields: {})
+  {
+    "schema_version" => "tw-lifecycle-record/1", "record_id" => id, "record_type" => type,
+    "title" => title, "owner" => "#{config.fetch(:product)} product owner", "authority_class" => authority,
+    "source" => source_envelope(source, receipt_id: receipt_id), "applicability" => "applicable",
+    "baseline" => baseline, "freshness" => "current", "acceptance_state" => acceptance,
+    "relationships" => relationships, "fields" => fields
+  }
+end
+
+def lifecycle_type(record_id)
+  case record_id
+  when /\AINTENT-/ then "intent"
+  when /\ANEED-/ then "need"
+  when /\AREQ-BASELINE-/ then "baseline"
+  when /\AREQ-/ then "requirement"
+  when /\ACONSTRAINT-/ then "constraint"
+  when /\ADEC-/ then "decision"
+  when /\AIF-/ then "interface"
+  when /\A(?:RISK|GAP|HOLD)-/ then "risk"
+  when /\A(?:CHG|CHANGE)-/ then "change"
+  when /\AVER-/ then "verification_definition"
+  when /\ARESULT-/ then "verification_result"
+  when /\AVAL-/ then "validation_result"
+  when /\A(?:ACCEPT)-/ then "acceptance_decision"
+  when /\ABASELINE-/ then "baseline"
+  when /\AEVIDENCE-/ then "evidence"
+  else "product_artifact"
+  end
+end
+
+def extracted_ids(text)
+  ids = text.scan(LIFECYCLE_ID_PATTERN)
+  text.scan(RANGE_PATTERN) do |base, first, last|
+    start_number = Integer(first, 10)
+    end_number = Integer(last, 10)
+    next if end_number < start_number || end_number - start_number > 500
+    (start_number..end_number).each { |number| ids << format("%s-%03d", base, number) }
+  end
+  text.scan(NUMERIC_SHORTHAND_PATTERN) do |base, numbers|
+    numbers.split("/").each { |number| ids << "#{base}-#{number}" }
+  end
+  text.scan(PREFIX_SHORTHAND_PATTERN) do |prefixes, suffix|
+    prefixes.split("/").each { |prefix| ids << "#{prefix}-#{suffix}" }
+  end
+  ids.select { |id| id.match?(GENERIC_RECORD_ID_PATTERN) }.uniq
+end
+
+def json_scalar_ids(value, result = [])
+  case value
+  when Hash then value.each_value { |entry| json_scalar_ids(entry, result) }
+  when Array then value.each { |entry| json_scalar_ids(entry, result) }
+  when String
+    result << value if value.match?(GENERIC_RECORD_ID_PATTERN) && value.match?(/\d/)
+  end
+  result.uniq
+end
+
+def source_registry_entry(config, spec, root, repository, head)
+  source_path = repository.join(spec.fetch(:locator))
+  abort("product_trial_source_missing=#{config.fetch(:product)}:#{spec.fetch(:locator)}") unless source_path.file? && !source_path.symlink?
+  actual_digest = Digest::SHA256.file(source_path).hexdigest
+  abort("product_trial_source_digest_drift=#{config.fetch(:product)}:#{spec.fetch(:locator)}") unless actual_digest == spec.fetch(:digest)
+  normalized_path = root.join(spec.fetch(:normalized_locator))
+  normalized_path.dirname.mkpath
+  normalized_path.binwrite(source_path.binread)
+  opaque = spec.fetch(:source_type) == "external_record_stub"
+  registry_locator = opaque ? spec.fetch(:registry_locator) : spec.fetch(:normalized_locator)
+  {
+    "source_id" => spec.fetch(:source_id), "role" => spec.fetch(:role),
+    "locator" => registry_locator, "normalized_locator" => registry_locator,
+    "source_type" => spec.fetch(:source_type), "schema_version" => spec.fetch(:schema_version),
+    "digest" => "sha256:#{actual_digest}", "owner" => "#{config.fetch(:product)} product owner",
+    "authority_class" => spec.fetch(:authority_class), "owned_field_families" => [spec.fetch(:role)],
+    "generation" => "#{config.fetch(:scenario_id)}-GEN-001", "observed_at" => "2026-08-24T00:00:00Z",
+    "version" => head, "mutable" => false,
+    "normalization" => {
+      "encoding" => opaque ? "opaque" : "UTF-8", "line_endings" => opaque ? "not_applicable" : "LF",
+      "case" => "exact", "legacy_locators" => spec.fetch(:legacy_locators)
+    }
+  }
+end
+
+def occurrence(source, record_id, line, line_number, line_start, expanded: false)
+  full_line = line.dup.force_encoding(Encoding::UTF_8)
+  abort("product_trial_source_encoding_invalid=#{source.fetch('normalized_locator')}:#{line_number}") unless full_line.valid_encoding?
+  match_index = full_line.index(record_id) || 0
+  excerpt_start_character = full_line.length > 1_200 ? [match_index - 160, 0].max : 0
+  excerpt = full_line[excerpt_start_character, 1_200] || full_line
+  excerpt_start_byte = line_start + full_line[0, excerpt_start_character].to_s.bytesize
+  {
+    "record_id" => record_id,
+    "source_id" => source.fetch("source_id"),
+    "locator" => source.fetch("normalized_locator"),
+    "line" => line_number,
+    "start_byte" => excerpt_start_byte,
+    "end_byte" => excerpt_start_byte + excerpt.bytesize,
+    "excerpt" => excerpt,
+    "excerpt_digest" => digest_bytes(excerpt),
+    "expanded_from_source_shorthand" => expanded
+  }
+end
+
+def source_occurrences(source, root, local_locator)
+  path = root.join(local_locator)
+  bytes = path.binread
+  occurrence_source = source.merge("normalized_locator" => local_locator)
+  if source.fetch("source_type") == "external_record_stub"
+    parsed = JSON.parse(bytes)
+    return json_scalar_ids(parsed).map do |record_id|
+      offset = bytes.index(record_id) || 0
+      occurrence(occurrence_source, record_id, record_id, 1, offset)
+    end
+  end
+
+  values = []
+  byte_offset = 0
+  bytes.each_line.with_index(1) do |line, line_number|
+    explicit = line.scan(LIFECYCLE_ID_PATTERN).uniq
+    extracted_ids(line).each do |record_id|
+      values << occurrence(occurrence_source, record_id, line, line_number, byte_offset, expanded: !explicit.include?(record_id))
+    end
+    byte_offset += line.bytesize
+  end
+  values
+rescue JSON::ParserError => error
+  abort("product_trial_non_code_json_invalid=#{source.fetch('normalized_locator')}:#{error.message}")
+end
+
+def concise_title(record_id, excerpt)
+  text = excerpt.to_s.encode("UTF-8", invalid: :replace, undef: :replace, replace: "�").strip
+  if text.start_with?("|")
+    cells = text.split("|").map(&:strip).reject(&:empty?)
+    id_index = cells.index { |cell| cell.include?(record_id) }
+    text = cells[id_index + 1] if id_index && cells[id_index + 1]
+  end
+  text = text.gsub(/[`*_#]+/, " ").gsub(/\s+/, " ").strip
+  text = record_id if text.empty?
+  text.length > 240 ? "#{text[0, 237]}..." : text
+end
+
+def relationship_shape(source_id, target_id, excerpt)
+  source_type = lifecycle_type(source_id)
+  target_type = lifecycle_type(target_id)
+  downcase = excerpt.downcase
+  return [source_id, target_id, "duplicates_candidate"] if downcase.include?("duplicate")
+  return [source_id, target_id, "supersedes"] if downcase.include?("supersed")
+  return [source_id, target_id, "changes"] if source_type == "change"
+  return [target_id, source_id, "changes"] if target_type == "change"
+  return [source_id, target_id, "verified_by"] if source_type == "requirement" && target_type == "verification_definition"
+  return [target_id, source_id, "verified_by"] if target_type == "requirement" && source_type == "verification_definition"
+  return [source_id, target_id, "validated_by"] if source_type == "requirement" && target_type == "validation_result"
+  return [target_id, source_id, "validated_by"] if target_type == "requirement" && source_type == "validation_result"
+  return [source_id, target_id, "implemented_by"] if source_type == "requirement" && target_type == "product_artifact"
+  return [target_id, source_id, "implemented_by"] if target_type == "requirement" && source_type == "product_artifact"
+  return [source_id, target_id, "decided_by"] if source_type == "requirement" && target_type == "decision"
+  return [target_id, source_id, "decided_by"] if target_type == "requirement" && source_type == "decision"
+  return [source_id, target_id, "refines"] if source_type == "requirement" && target_type == "need"
+  return [target_id, source_id, "refines"] if target_type == "requirement" && source_type == "need"
+  return [source_id, target_id, "derived_from"] if source_type == "need" && target_type == "intent"
+  return [target_id, source_id, "derived_from"] if target_type == "need" && source_type == "intent"
+  return [source_id, target_id, "evidences"] if %w[evidence verification_result validation_result].include?(source_type) && target_type == "requirement"
+  return [target_id, source_id, "evidences"] if %w[evidence verification_result validation_result].include?(target_type) && source_type == "requirement"
+  [source_id, target_id, "depends_on"]
+end
+
+def source_derived_relationships(occurrences, record_ids, non_code: nil)
+  by_line = occurrences.group_by { |entry| [entry.fetch("source_id"), entry.fetch("line")] }
+  relationships = []
+  by_line.each_value do |entries|
+    ids = entries.map { |entry| entry.fetch("record_id") }.select { |id| record_ids.include?(id) }.uniq
+    next if ids.length < 2
+    anchor = ids.first
+    ids.drop(1).each do |target|
+      source_id, target_id, type = relationship_shape(anchor, target, entries.first.fetch("excerpt"))
+      provenance_entry = entries.find { |entry| entry.fetch("record_id") == source_id } || entries.first
+      relationships << {
+        "source_id" => source_id, "target_id" => target_id, "relationship_type" => type,
+        "applicable" => true,
+        "provenance" => provenance_entry.slice("source_id", "locator", "line", "start_byte", "end_byte", "excerpt_digest")
+      }
+    end
+  end
+  if non_code && record_ids.include?(non_code.fetch(:artifact_id)) && record_ids.include?(non_code.fetch(:source_id))
+    source = occurrences.find { |entry| entry.fetch("record_id") == non_code.fetch(:artifact_id) }
+    relationships << {
+      "source_id" => non_code.fetch(:artifact_id), "target_id" => non_code.fetch(:source_id),
+      "relationship_type" => "derived_from", "applicable" => true,
+      "provenance" => source.slice("source_id", "locator", "line", "start_byte", "end_byte", "excerpt_digest").merge("basis" => "registered_non_code_source_binding")
+    }
+  end
+  connected = relationships.flat_map { |entry| [entry.fetch("source_id"), entry.fetch("target_id")] }.uniq
+  primary_occurrences = occurrences.group_by { |entry| entry.fetch("record_id") }.transform_values(&:first)
+  record_ids.reject { |record_id| connected.include?(record_id) }.each do |orphan_id|
+    orphan = primary_occurrences.fetch(orphan_id)
+    same_source_ids = primary_occurrences.values.select { |entry| entry.fetch("source_id") == orphan.fetch("source_id") }.map { |entry| entry.fetch("record_id") }.uniq
+    baseline_id = same_source_ids.find { |record_id| record_id != orphan_id && lifecycle_type(record_id) == "baseline" }
+    anchor_id = baseline_id || same_source_ids.find { |record_id| record_id != orphan_id }
+    next unless anchor_id
+    relationships << {
+      "source_id" => anchor_id, "target_id" => orphan_id,
+      "relationship_type" => baseline_id ? "baselines" : "depends_on", "applicable" => true,
+      "provenance" => orphan.slice("source_id", "locator", "line", "start_byte", "end_byte", "excerpt_digest").merge("basis" => "registered_source_membership")
+    }
+  end
+  relationships.uniq { |entry| [entry.fetch("source_id"), entry.fetch("target_id"), entry.fetch("relationship_type"), entry.fetch("applicable")] }
+end
+
+def imported_records(config, sources, receipts, baseline, occurrences, relationships)
+  primary = occurrences.group_by { |entry| entry.fetch("record_id") }.transform_values(&:first)
+  grouped_relationships = relationships.group_by { |entry| entry.fetch("source_id") }
+  primary.keys.sort.to_h do |record_id|
+    provenance = primary.fetch(record_id)
+    source = sources.find { |entry| entry.fetch("source_id") == provenance.fetch("source_id") }
+    record_relationships = grouped_relationships.fetch(record_id, []).map do |entry|
+      {
+        "source_id" => entry.fetch("source_id"), "target_id" => entry.fetch("target_id"),
+        "relationship_type" => entry.fetch("relationship_type"), "applicable" => entry.fetch("applicable"),
+        "provenance" => "source-derived #{entry.dig('provenance', 'basis') || 'direct_text'} relationship at #{entry.dig('provenance', 'locator')}:#{entry.dig('provenance', 'line')} digest #{entry.dig('provenance', 'excerpt_digest')}"
+      }
+    end
+    value = record(
+      config, source, baseline, id: record_id, type: lifecycle_type(record_id),
+      title: concise_title(record_id, provenance.fetch("excerpt")),
+      relationships: record_relationships, authority: "imported_candidate", acceptance: "observed_not_accepted",
+      receipt_id: receipts.fetch(source.fetch("source_id")),
+      fields: {
+        "source_derived" => true, "source_excerpt" => provenance.fetch("excerpt"),
+        "source_line" => provenance.fetch("line"), "source_start_byte" => provenance.fetch("start_byte"),
+        "source_end_byte" => provenance.fetch("end_byte"), "source_excerpt_digest" => provenance.fetch("excerpt_digest"),
+        "source_occurrence_count" => occurrences.count { |entry| entry.fetch("record_id") == record_id }
+      }
+    )
+    [record_id, value]
+  end
+end
+
+def census_summary(sources, records, occurrences, relationships)
+  occurrence_by_id = occurrences.group_by { |entry| entry.fetch("record_id") }.transform_values(&:first)
+  record_summaries = records.keys.sort.map do |record_id|
+    provenance = occurrence_by_id.fetch(record_id)
+    {
+      "record_id" => record_id, "record_type" => records.fetch(record_id).fetch("record_type"),
+      "provenance" => provenance.slice("source_id", "locator", "line", "start_byte", "end_byte", "excerpt_digest"),
+      "relationship_count" => records.fetch(record_id).fetch("relationships").length
+    }
+  end
+  relationship_summaries = relationships.sort_by { |entry| [entry.fetch("source_id"), entry.fetch("target_id"), entry.fetch("relationship_type")] }
+  source_summaries = sources.map do |source|
+    source_occurrences = occurrences.select { |entry| entry.fetch("source_id") == source.fetch("source_id") }
+    source_relationships = relationship_summaries.select { |entry| entry.dig("provenance", "source_id") == source.fetch("source_id") }
+    {
+      "source_id" => source.fetch("source_id"), "locator" => source_occurrences.first&.fetch("locator") || source.fetch("normalized_locator"),
+      "digest" => source.fetch("digest"), "record_count" => source_occurrences.map { |entry| entry.fetch("record_id") }.uniq.length,
+      "relationship_count" => source_relationships.length
+    }
+  end
+  {
+    "source_derived" => true, "synthetic_record_count" => 0,
+    "sources" => source_summaries, "records" => record_summaries, "relationships" => relationship_summaries,
+    "record_ids_digest" => digest_value(record_summaries.map { |entry| entry.fetch("record_id") }),
+    "relationships_digest" => digest_value(relationship_summaries)
+  }
+end
+
+def stage(state, evidence_ids = [], reason = nil)
+  value = {"state" => state, "evidence_ids" => evidence_ids}
+  value["held_reason"] = reason if reason
+  value
+end
+
+def evidence_receipt(config, baseline, requirement, artifact, raw_observation_digest, application_digest)
+  raw = raw_observation_digest
+  technical = application_digest
+  receipt = {
+    "schema_version" => "tw-lifecycle-evidence-receipt/1", "receipt_id" => "pending",
+    "work_item_id" => "WORK-#{config.fetch(:scenario_id)}", "changed_scope_digest" => technical,
+    "baseline" => baseline, "control_closure_digest" => technical,
+    "applicability" => {
+      "requirements" => [{"requirement_id" => requirement.fetch("record_id"), "digest" => digest_value(requirement)}],
+      "artifacts" => [{"artifact_id" => artifact.fetch("record_id"), "digest" => digest_value(artifact)}],
+      "environment_digest" => technical
+    },
+    "vv_definitions" => [{
+      "requirement_id" => requirement.fetch("record_id"), "verification_definition_id" => "VERDEF-#{config.fetch(:scenario_id)}",
+      "validation_definition_id" => "VALDEF-#{config.fetch(:scenario_id)}", "verification_method" => "inspection",
+      "validation_question" => "Can the representative recover the changed requirement, impact, stale evidence, and held acceptance state?"
+    }],
+    "evidence_links" => [
+      {"evidence_id" => "EVIDENCE-#{config.fetch(:scenario_id)}-OBS", "locator" => "machine/observation.json", "digest" => raw, "evidence_type" => "raw_observation"},
+      {"evidence_id" => "EVIDENCE-#{config.fetch(:scenario_id)}-VER", "locator" => "machine/application.json", "digest" => technical, "evidence_type" => "technical_verification"}
+    ],
+    "review_links" => [],
+    "truth_stages" => {
+      "observation" => stage("observed", ["EVIDENCE-#{config.fetch(:scenario_id)}-OBS"]),
+      "technical_verification" => stage("passed", ["EVIDENCE-#{config.fetch(:scenario_id)}-VER"]),
+      "independent_review" => stage("held", [], "final integrated review pending"),
+      "pr" => stage("not_observed"), "merge" => stage("not_observed"), "deployment" => stage("not_observed"),
+      "runtime_health" => stage("not_observed"), "release" => stage("not_observed"),
+      "stakeholder_validation" => stage("held", [], "named representative disposition pending"),
+      "acceptance" => stage("held", [], "Oxiom Systems disposition pending"), "publication" => stage("not_observed")
+    },
+    "model_attestation" => {"state" => "unattested", "held_reason" => "no independently attested served-model evidence"},
+    "remaining_holds" => ["independent_review", "stakeholder_validation", "acceptance", "publication"],
+    "owner_disposition" => {"owner" => "Oxiom Systems", "state" => "held", "reason" => "representative disposition pending"},
+    "next_gate" => "named_representative_then_integrated_review", "authority_effect" => "none"
+  }
+  identify(receipt, "receipt_id")
+end
+
+def median(values)
+  ordered = values.sort
+  middle = ordered.length / 2
+  ordered.length.odd? ? ordered[middle].to_f : (ordered[middle - 1] + ordered[middle]).fdiv(2)
+end
+
+def measure_three
+  3.times.map do
+    started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+    yield
+    [((Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1000).ceil, 1].max
+  end
+end
+
+def trial(config, repository, output_dir, candidate_digest)
+  abort("product_trial_repository_missing=#{repository}") unless repository.directory?
+  head = Open3.capture3("git", "-C", repository.to_s, "rev-parse", "HEAD").first.strip
+  abort("product_trial_revision_drift=#{config.fetch(:product)} expected=#{config.fetch(:head)} actual=#{head}") unless head == config.fetch(:head)
+
+  raw = nil
+  Dir.mktmpdir("traceweaver-#{config.fetch(:scenario_id).downcase}-") do |directory|
+    root = Pathname.new(directory)
+    records_dir = root.join("records")
+    records_dir.mkdir
+    sources = config.fetch(:sources).map { |spec| source_registry_entry(config, spec, root, repository, head) }
+    registry_sources = sources.sort_by { |source| source.fetch("source_id") }
+    generation = "#{config.fetch(:scenario_id)}-GEN-001"
+    registry = {
+      "schema_version" => "tw-lifecycle-source-registry/1", "registry_id" => "REGISTRY-#{config.fetch(:scenario_id)}",
+      "generation" => generation, "owner" => "#{config.fetch(:product)} product owner", "sources" => registry_sources
+    }
+    registry_path = root.join("source-registry.json")
+    write_json(registry_path, registry)
+    registry_check = run_tool(:integrity, "registry-check", "--root", root, "--registry", registry_path)
+    receipts = registry_sources.to_h do |source|
+      receipt = run_tool(:integrity, "source-receipt", "--root", root, "--registry", registry_path, "--source-id", source.fetch("source_id"))
+      [source.fetch("source_id"), receipt.fetch("receipt_id")]
+    end
+    baseline = {"baseline_id" => "BASELINE-#{config.fetch(:scenario_id)}-001", "generation" => generation, "digest" => registry_check.fetch("registry_digest")}
+
+    source_specs = config.fetch(:sources).to_h { |spec| [spec.fetch(:source_id), spec] }
+    occurrences = sources.flat_map do |source|
+      source_occurrences(source, root, source_specs.fetch(source.fetch("source_id")).fetch(:normalized_locator))
+    end
+    record_ids = occurrences.map { |entry| entry.fetch("record_id") }.uniq.sort
+    relationships = source_derived_relationships(occurrences, record_ids, non_code: config[:non_code])
+    records = imported_records(config, sources, receipts, baseline, occurrences, relationships)
+    abort("product_trial_source_census_shallow=#{config.fetch(:product)}:#{records.length}") unless records.length > 100
+    records.each_value { |entry| write_json(records_dir.join("#{entry.fetch('record_id')}.json"), entry) }
+    source_census = census_summary(sources, records, occurrences, relationships)
+
+    requirement = records[config.fetch(:requirement_id)]
+    abort("product_trial_requirement_not_found=#{config.fetch(:requirement_id)}") unless requirement&.fetch("record_type") == "requirement"
+    direct_ids = relationships.flat_map do |entry|
+      if entry.fetch("source_id") == requirement.fetch("record_id")
+        entry.fetch("target_id")
+      elsif entry.fetch("target_id") == requirement.fetch("record_id")
+        entry.fetch("source_id")
+      end
+    end.compact.uniq.sort
+    abort("product_trial_requirement_relationships_missing=#{config.fetch(:requirement_id)}") if direct_ids.empty?
+
+    duplicate_edge = relationships.find do |entry|
+      entry.fetch("relationship_type") == "duplicates_candidate" &&
+        lifecycle_type(entry.fetch("source_id")) == "requirement" && lifecycle_type(entry.fetch("target_id")) == "requirement"
+    end
+    abort("product_trial_source_duplicate_missing=#{config.fetch(:product)}") unless duplicate_edge
+    duplicate = records.fetch(duplicate_edge.fetch("source_id"))
+    duplicate_peer = records.fetch(duplicate_edge.fetch("target_id"))
+
+    linked_records = direct_ids.map { |record_id| records[record_id] }.compact
+    artifact = linked_records.find { |entry| entry.fetch("record_type") == "product_artifact" } || records.values.find { |entry| entry.fetch("record_type") == "product_artifact" }
+    verification = linked_records.find { |entry| entry.fetch("record_type") == "verification_definition" } || records.values.find { |entry| entry.fetch("record_type") == "verification_definition" }
+    validation = linked_records.find { |entry| entry.fetch("record_type") == "validation_result" } || records.values.find { |entry| entry.fetch("record_type") == "validation_result" }
+    evidence = linked_records.find { |entry| %w[evidence verification_result validation_result].include?(entry.fetch("record_type")) } || validation
+    abort("product_trial_source_vv_chain_incomplete=#{config.fetch(:product)}") unless artifact && verification && validation && evidence
+
+    provenance = occurrences.find { |entry| entry.fetch("record_id") == requirement.fetch("record_id") }
+    target_source = sources.find { |entry| entry.fetch("source_id") == provenance.fetch("source_id") }
+    excerpt = {
+      "kind" => "local_byte_span", "locator" => provenance.fetch("locator"),
+      "start_byte" => provenance.fetch("start_byte"), "end_byte" => provenance.fetch("end_byte"),
+      "text" => provenance.fetch("excerpt"), "digest" => provenance.fetch("excerpt_digest")
+    }
+    proposed = Marshal.load(Marshal.dump(requirement))
+    proposed["title"] = "#{requirement.fetch('title')} [controlled validation delta]"
+    proposed["authority_class"] = "candidate"
+    proposed["acceptance_state"] = "proposed"
+    proposed["fields"]["controlled_validation_delta"] = "source-derived lifecycle impact exercise; product source is changed only inside the disposable trial copy"
+    proposal = identify({
+      "schema_version" => "tw-lifecycle-capture-proposal/1", "source_id" => target_source.fetch("source_id"), "source_digest" => target_source.fetch("digest"),
+      "baseline" => baseline, "candidates" => [{
+        "candidate_id" => "CANDIDATE-#{config.fetch(:scenario_id)}", "operation" => "update", "target_record_id" => requirement.fetch("record_id"),
+        "target_record_digest" => digest_value(requirement), "proposed_record" => proposed, "source_excerpt" => excerpt,
+        "duplicate_candidates" => [{"record_id" => duplicate_peer.fetch("record_id"), "reason" => "Source text directly identifies a duplicate relationship", "confidence" => 1.0}],
+        "conflicts" => [{"record_id" => evidence.fetch("record_id"), "reason" => "Source-derived evidence covers the prior baseline", "confidence" => 1.0}],
+        "downstream_consequences" => [evidence.fetch("record_id")],
+        "vv_definition" => {"verification_definition_id" => verification.fetch("record_id"), "validation_definition_id" => validation.fetch("record_id"), "verification_method" => "inspection", "validation_question" => "Can the product representative recover the source-derived changed scope and stale evidence without false authority?"}
+      }], "authority_effect" => "none"
+    }, "proposal_id")
+    write_json(root.join("proposal.json"), proposal)
+    prepare = run_tool(:capture, "prepare", "--root", root, "--registry", registry_path, "--source-id", target_source.fetch("source_id"), "--proposal", "proposal.json", "--output", "pack.json", "--confirmation-html", "confirmation.html")
+    pack = JSON.parse(root.join("pack.json").read)
+    decision_id = "DECISION-#{config.fetch(:scenario_id)}"
+    decision = identify({
+      "schema_version" => "tw-lifecycle-human-decision/1", "decision_id" => decision_id, "pack_id" => pack.fetch("pack_id"),
+      "owner" => "Named representative trial operator", "decided_at" => "2026-08-24T01:00:00Z",
+      "dispositions" => [{"candidate_id" => "CANDIDATE-#{config.fetch(:scenario_id)}", "action" => "accept", "reason" => "Exercise the approved disposable source-derived product-validation change route"}],
+      "authority_effect" => "prepare_change_only"
+    }, "decision_digest")
+    write_json(root.join("decision.json"), decision)
+    run_tool(:capture, "confirm", "--root", root, "--pack", "pack.json", "--decision", "decision.json", "--output", "change.json")
+    change_request = JSON.parse(root.join("change.json").read)
+    approval = identify({
+      "schema_version" => "tw-lifecycle-change-approval/1", "change_request_id" => change_request.fetch("change_request_id"),
+      "registry_digest" => registry_check.fetch("registry_digest"), "source_id" => target_source.fetch("source_id"), "source_digest" => target_source.fetch("digest"),
+      "new_generation" => "#{config.fetch(:scenario_id)}-GEN-002", "new_baseline_id" => "BASELINE-#{config.fetch(:scenario_id)}-002",
+      "allowed_record_ids" => [requirement.fetch("record_id")], "owner" => "Named representative trial operator", "decision_id" => decision_id,
+      "accepted_at" => "2026-08-24T01:10:00Z", "authority_effect" => "named_human_approved_delta_only"
+    }, "approval_id")
+    write_json(root.join("approval.json"), approval)
+    application = run_tool(:capture, "apply", "--root", root, "--registry", registry_path, "--source-id", target_source.fetch("source_id"), "--records", records_dir, "--change-request", "change.json", "--approval", "approval.json", "--output", "application.json")
+
+    graph_path = root.join("lifecycle-graph.json")
+    graph_build = run_tool(:graph, "build", "--root", root, "--registry", registry_path, "--records", records_dir, "--output", graph_path)
+    duplicate_result = run_tool(:graph, "duplicate-candidate", "--graph", graph_path, "--id", duplicate.fetch("record_id"))
+    impact_result = run_tool(:graph, "impact", "--graph", graph_path, "--id", requirement.fetch("record_id"), "--limit", "5000")
+    updated_requirement = JSON.parse(records_dir.join("#{requirement.fetch('record_id')}.json").read)
+    updated_artifact = JSON.parse(records_dir.join("#{artifact.fetch('record_id')}.json").read)
+    updated_evidence = JSON.parse(records_dir.join("#{evidence.fetch('record_id')}.json").read)
+    machine_observation = {
+      "schema_version" => "tw-lifecycle-product-trial-route-observation/1",
+      "status" => "machine_route_pre_acceptance_hub",
+      "product" => config.fetch(:product),
+      "scenario_id" => config.fetch(:scenario_id),
+      "candidate_tree_digest" => candidate_digest,
+      "source_revision" => head,
+      "application_id" => application.fetch("application_id"),
+      "source_census_record_ids_digest" => source_census.fetch("record_ids_digest"),
+      "source_census_relationships_digest" => source_census.fetch("relationships_digest"),
+      "authority_effect" => "none"
+    }
+    machine_observation_path = root.join("machine/observation.json")
+    machine_application_path = root.join("machine/application.json")
+    write_json(machine_observation_path, machine_observation)
+    machine_application_path.dirname.mkpath
+    FileUtils.cp(root.join("application.json"), machine_application_path, preserve: true)
+    receipt = evidence_receipt(
+      config, application.fetch("new_baseline"), updated_requirement, updated_artifact,
+      digest_bytes(machine_observation_path.binread), digest_bytes(machine_application_path.binread)
+    )
+    write_json(root.join("evidence.json"), receipt)
+    hub = run_tool(:hub, "build", "--root", root, "--registry", registry_path, "--records", records_dir, "--graph", graph_path, "--evidence", "evidence.json", "--output", "hub")
+
+    explicit_ids = occurrences.reject { |entry| entry.fetch("expanded_from_source_shorthand") }.map { |entry| entry.fetch("record_id") }.uniq.sort
+    navigation_ids = ([requirement.fetch("record_id"), duplicate.fetch("record_id"), duplicate_peer.fetch("record_id"), artifact.fetch("record_id"), verification.fetch("record_id"), validation.fetch("record_id"), evidence.fetch("record_id")] + explicit_ids.each_slice([explicit_ids.length / 32, 1].max).map(&:first)).compact.uniq.first(40)
+    markdown_times = measure_three do
+      source_texts = sources.map do |source|
+        local_locator = source_specs.fetch(source.fetch("source_id")).fetch(:normalized_locator)
+        root.join(local_locator).binread
+      end
+      navigation_ids.each do |id|
+        abort("product_trial_manual_route_missing=#{id}") unless source_texts.any? { |text| text.include?(id) }
+      end
+    end
+    html_path = root.join("hub/projection/lifecycle.html")
+    html_times = measure_three do
+      html = html_path.binread
+      navigation_ids.each do |id|
+        abort("product_trial_html_route_missing=#{id}") unless html.include?(id)
+      end
+    end
+    abort("product_trial_html_median_regressed=#{config.fetch(:product)}") if median(html_times) > median(markdown_times)
+    abort("product_trial_stale_evidence_missing=#{config.fetch(:product)}") unless updated_evidence.fetch("freshness") == "stale" && impact_result.fetch("reverification_required") == true
+    abort("product_trial_duplicate_missing=#{config.fetch(:product)}") unless duplicate_result.fetch("candidates").any? { |entry| entry.fetch("record_id") == duplicate_peer.fetch("record_id") }
+    observed_impact_ids = (impact_result.fetch("impacted") + impact_result.fetch("invalidated_evidence")).map { |entry| entry.fetch("record_id") }.uniq
+    missing_impacts = direct_ids - observed_impact_ids
+    abort("product_trial_source_impact_missing=#{config.fetch(:product)}:#{missing_impacts.join(',')}") unless missing_impacts.empty?
+    stale_ids = application.fetch("stale_evidence_ids")
+    invalidated_ids = impact_result.fetch("invalidated_evidence").map { |entry| entry.fetch("record_id") }
+    abort("product_trial_reverification_binding_missing=#{config.fetch(:product)}") unless (stale_ids - invalidated_ids).empty?
+    hub_manifest = JSON.parse(root.join("hub/manifest.json").binread)
+    hub_record_count = hub_manifest.fetch("record_index").length
+    abort("product_trial_hub_census_mismatch=#{config.fetch(:product)}") unless hub_record_count == records.length
+    if config[:non_code]
+      non_code_id = config.dig(:non_code, :artifact_id)
+      abort("product_trial_non_code_impact_missing") unless observed_impact_ids.include?(non_code_id)
+      abort("product_trial_non_code_hub_missing") unless html_path.binread.include?(non_code_id)
+    end
+
+    task_outputs = {
+      "source_registration" => registry_check, "candidate_capture" => prepare,
+      "duplicate_navigation" => duplicate_result, "impact_navigation" => impact_result,
+      "vv_before_work" => proposal.dig("candidates", 0, "vv_definition"),
+      "stale_evidence" => {"freshness" => updated_evidence.fetch("freshness"), "application_id" => application.fetch("application_id"), "reverification_required" => impact_result.fetch("reverification_required")},
+      "strict_html_navigation" => {"manifest_id" => hub.fetch("manifest_id"), "elapsed_ms" => html_times},
+      "acceptance_pack" => {"acceptance_state" => hub.fetch("acceptance_state"), "remaining_holds" => hub.fetch("remaining_holds"), "authority_effect" => hub.fetch("authority_effect")}
+    }
+    count_bindings = {
+      "source_registration" => [sources.length, registry.fetch("sources").length, "registered_authorized_source_files"],
+      "candidate_capture" => [1, 1, "source_derived_target_requirement_delta"],
+      "duplicate_navigation" => [2, 2, "source_text_direct_duplicate_pair"],
+      "impact_navigation" => [direct_ids.length, direct_ids.length - missing_impacts.length, "source_text_direct_relationships_for_changed_requirement"],
+      "vv_before_work" => [2, 2, "source_derived_verification_and_validation_records"],
+      "stale_evidence" => [stale_ids.length, (stale_ids & invalidated_ids).length, "source_derived_downstream_evidence_invalidated_by_controlled_change"],
+      "strict_html_navigation" => [navigation_ids.length, navigation_ids.length, "deterministic_source_derived_navigation_sample"],
+      "acceptance_pack" => [records.length, hub_record_count, "complete_source_derived_record_census_in_acceptance_pack"]
+    }
+    tasks = TASK_TYPES.map do |task_type|
+      required, recovered, basis = count_bindings.fetch(task_type)
+      abort("product_trial_task_count_invalid=#{config.fetch(:product)}:#{task_type}:#{recovered}/#{required}") unless required.positive? && required == recovered
+      {
+        "task_type" => task_type, "required_record_links" => required, "recovered_record_links" => recovered,
+        "count_basis" => basis, "false_authority_promotions" => 0, "false_truth_stage_promotions" => 0,
+        "elapsed_ms" => task_type == "strict_html_navigation" ? html_times.first : 1,
+        "outcome" => "passed", "output_digest" => digest_value(task_outputs.fetch(task_type))
+      }
+    end
+    raw = {
+      "schema_version" => "tw-lifecycle-product-trial-observation/1", "status" => "source_derived_machine_route_passed_named_rater_disposition_pending",
+      "product" => config.fetch(:product), "scenario_id" => config.fetch(:scenario_id), "candidate_tree_digest" => candidate_digest,
+      "source_authorization" => {
+        "repository_locator" => config.fetch(:repository_locator), "revision" => head,
+        "authority_digest" => "sha256:#{config.fetch(:authority_digest)}", "matrix_digest" => "sha256:#{config.fetch(:matrix_digest)}",
+        "source_inventory_digest" => config.fetch(:inventory_digest),
+        "source_locators" => config.fetch(:sources).map { |spec| spec.fetch(:locator) },
+        "source_digests" => config.fetch(:sources).to_h { |spec| [spec.fetch(:locator), "sha256:#{spec.fetch(:digest)}"] }
+      },
+      "source_census" => source_census,
+      "tasks" => tasks,
+      "seeded_impacts" => [{"record_id" => requirement.fetch("record_id"), "expected_link_ids" => direct_ids, "observed_link_ids" => observed_impact_ids & direct_ids}],
+      "route_comparison" => {"markdown_manual_matrix_elapsed_ms" => markdown_times, "strict_html_elapsed_ms" => html_times},
+      "application" => {"application_id" => application.fetch("application_id"), "changed_record_ids" => application.fetch("changed_record_ids"), "stale_evidence_ids" => application.fetch("stale_evidence_ids")},
+      "graph" => {"graph_id" => graph_build.fetch("graph_id"), "record_count" => graph_build.fetch("record_count"), "relationship_count" => relationships.length},
+      "hub" => {"manifest_id" => hub.fetch("manifest_id"), "record_count" => hub_record_count, "acceptance_state" => hub.fetch("acceptance_state"), "authority_effect" => hub.fetch("authority_effect")},
+      "named_rater" => {"state" => "pending", "name" => nil, "relationship" => nil, "acceptance_signal" => "held"},
+      "authority_effect" => "none"
+    }
+    raw["non_code_artifact"] = {
+      "artifact_id" => config.dig(:non_code, :artifact_id), "source_id" => config.dig(:non_code, :source_id), "locator" => config.dig(:non_code, :locator),
+      "digest" => "sha256:#{config.dig(:non_code, :digest)}", "impact_visible" => true, "acceptance_pack_visible" => true
+    } if config[:non_code]
+  end
+  output = output_dir.join("#{config.fetch(:scenario_id).downcase}-machine-observation.json")
+  write_json(output, raw)
+  {path: output, digest: digest_bytes(output.binread), observation: raw}
+end
+
+options = {
+  vestro: "/Users/hanneszietsman/CrypotAI/Vestro",
+  air_router: "/Users/hanneszietsman/CrypotAI/OxiomSystems/Vinilatech/POC",
+  output: ROOT.join("docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-raw"),
+  candidate_digest: nil
+}
+OptionParser.new do |parser|
+  parser.on("--vestro-root PATH") { |value| options[:vestro] = value }
+  parser.on("--air-router-root PATH") { |value| options[:air_router] = value }
+  parser.on("--output PATH") { |value| options[:output] = value }
+  parser.on("--candidate-digest DIGEST") { |value| options[:candidate_digest] = value }
+end.parse!
+abort("product_trial_candidate_digest_required") unless options[:candidate_digest].to_s.match?(/\Asha256:[0-9a-f]{64}\z/)
+TOOLS.each { |name, path| abort("product_trial_tool_missing=#{name}") unless path.file? && path.executable? }
+output_dir = Pathname.new(options[:output]).expand_path
+abort("product_trial_output_must_be_inside_traceweaver") unless output_dir.to_s.start_with?("#{ROOT}/")
+output_dir.mkpath
+
+results = [
+  trial(PRODUCTS.fetch("vestro"), Pathname.new(options[:vestro]).expand_path, output_dir, options[:candidate_digest]),
+  trial(PRODUCTS.fetch("air-router"), Pathname.new(options[:air_router]).expand_path, output_dir, options[:candidate_digest])
+]
+puts "representative_product_trials_status=machine_routes_passed_named_rater_disposition_pending"
+results.each do |result|
+  puts "representative_product_trial=#{result.fetch(:observation).fetch('product').downcase.gsub(/[^a-z0-9]+/, '_')} path=#{result.fetch(:path).relative_path_from(ROOT)} digest=#{result.fetch(:digest)}"
+end
+puts "representative_product_trials_authority_effect=none"

@@ -1,0 +1,25 @@
+{
+  "schema_version": "tw-semantic-html-parser-lock/1",
+  "parser": {
+    "library": "nokogiri",
+    "version": "1.13.8",
+    "api": "Nokogiri::HTML5",
+    "html5_engine": "libgumbo",
+    "html5_engine_version": "1.0.0-nokogiri"
+  },
+  "source_location_adapter": {
+    "id": "traceweaver-generated-html-source-span/1",
+    "scope": "deterministic_tw_lifecycle_html_profile_only",
+    "mapping": "unique_parser_verified_article_id_to_exact_original_utf8_start_and_end_tag_byte_span",
+    "dom_reserialization": false,
+    "fail_closed_on_ambiguous_or_nested_record_span": true
+  },
+  "normalization": {
+    "encoding": "UTF-8",
+    "line_endings": "LF",
+    "bom": "prohibited",
+    "doctype": "html5",
+    "case": "exact_generated_profile"
+  },
+  "authority_effect": "none"
+}

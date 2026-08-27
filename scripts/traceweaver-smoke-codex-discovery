@@ -124,6 +124,7 @@ expected_direct_skills=(
   tw-graph
   tw-strategy
   tw-ideate
+  tw-lifecycle
   tw-plan
   tw-vv-define
   tw-brainstorm
@@ -155,6 +156,7 @@ expected_visible_skills=(
   tw-graph
   tw-strategy
   tw-ideate
+  tw-lifecycle
   tw-plan
   tw-vv-define
   tw-brainstorm
@@ -186,6 +188,7 @@ identity_skills=(
   tw-graph
   tw-strategy
   tw-ideate
+  tw-lifecycle
   tw-plan
   tw-vv-define
   tw-brainstorm
@@ -248,6 +251,7 @@ required_skill_local_files=(
   "tw-code-review/references/traceweaver-operating-modes.md"
   "tw-doc-review/references/traceweaver-operating-modes.md"
   "tw-auto/references/traceweaver-operating-modes.md"
+  "tw-auto/references/bounded-convergence-window-guide.md"
   "tw-auto/references/workflow-profile-template.yml"
   "tw-auto/references/scoped-review-protocol.md"
   "tw-auto/references/terminal-receipt-template.yml"
@@ -359,7 +363,7 @@ assert_equal "manifest_model_routing_l3" "xhigh" "$(json_query "$manifest" model
 assert_equal "manifest_model_routing_adapter" "tw-auto/scripts/traceweaver-route-native-child" "$(json_query "$manifest" modelRouting.adapter)"
 assert_equal "manifest_sec_registry" "references/skill-execution-contracts.yml" "$(json_query "$manifest" skillExecutionContracts.registryReference)"
 assert_equal "manifest_sec_schema" "tw-skill-execution-contract-registry/1" "$(json_query "$manifest" skillExecutionContracts.schemaVersion)"
-assert_equal "manifest_sec_callable_count" "28" "$(json_query "$manifest" skillExecutionContracts.callableCount)"
+assert_equal "manifest_sec_callable_count" "29" "$(json_query "$manifest" skillExecutionContracts.callableCount)"
 assert_equal "manifest_sec_control_route" "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract" "$(json_query "$manifest" skillExecutionContracts.controlRoute)"
 if grep -Fq '"modelDefaults"' "$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json" \
   || grep -Fq '"modelRouting"' "$repo_root/plugins/traceweaver-core/.codex-plugin/plugin.json" \
@@ -421,7 +425,7 @@ for skill_local_file in "${required_skill_local_files[@]}"; do
   echo "skill_local_file_hash_${label}=${source_hash}"
 done
 
-for reference_name in workflow-profile-template.yml scoped-review-protocol.md terminal-receipt-template.yml; do
+for reference_name in bounded-convergence-window-guide.md workflow-profile-template.yml scoped-review-protocol.md terminal-receipt-template.yml; do
   canonical_reference="$repo_root/plugins/traceweaver-core/references/$reference_name"
   skill_local_reference="$repo_root/plugins/traceweaver-core/skills/tw-auto/references/$reference_name"
   canonical_hash="$(hash_file "$canonical_reference")"
@@ -520,7 +524,7 @@ if grep -R -nE 'REQ-TW-060|gpt-5\.5|gpt-5\.6-(sol|terra)|traceweaver-route-nativ
 fi
 
 HOME="$codex_home" CODEX_HOME="$codex_root" codex debug prompt-input \
-  "Use all TraceWeaver direct skills: tw-auto tw-strategy tw-ideate tw-plan tw-vv-define tw-brainstorm tw-audit tw-authority-gate tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-grill lfg." \
+  "Use all TraceWeaver direct skills: tw-auto tw-strategy tw-ideate tw-lifecycle tw-plan tw-vv-define tw-brainstorm tw-audit tw-authority-gate tw-work tw-traceability-check tw-requirements-review tw-debug tw-code-review tw-doc-review tw-compound tw-compound-refresh tw-resolve-pr-feedback tw-sessions tw-test-browser tw-test-xcode tw-setup tw-worktree tw-grill lfg." \
   | jq -r '.. | strings' \
   | perl -ne 'print "$1\n" if /^- ([A-Za-z0-9_.:-]+): /' \
   | sort -u >"$visible_skills"

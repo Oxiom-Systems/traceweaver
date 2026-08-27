@@ -1,0 +1,114 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=v060-real-product-depth-smoke; req=REQ-TW-136,REQ-TW-144; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-136,REQ-TW-144; trace=TRACE-TW-074; val=VAL-TW-042
+
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+RUNNER = ROOT.join("scripts/traceweaver-run-v060-representative-product-trials")
+CANDIDATE_DIGEST = "sha256:#{'d' * 64}"
+PRODUCT_MINIMUMS = {
+  "Vestro" => {"sources" => 3, "records" => 100, "relationships" => 100},
+  "Air Router" => {"sources" => 4, "records" => 100, "relationships" => 100}
+}.freeze
+
+def fail!(finding, details = nil)
+  message = "v060_real_product_depth_smoke=failed finding=#{finding}"
+  message += " details=#{details}" if details
+  raise message
+end
+
+def check_observation!(observation)
+  product = observation.fetch("product")
+  minimums = PRODUCT_MINIMUMS.fetch(product)
+  census = observation["source_census"]
+  fail!("missing_source_census", product) unless census.is_a?(Hash)
+  fail!("source_census_not_source_derived", product) unless census["source_derived"] == true
+  fail!("synthetic_records_present", "#{product}:#{census['synthetic_record_count']}") unless census["synthetic_record_count"] == 0
+
+  sources = census["sources"]
+  records = census["records"]
+  relationships = census["relationships"]
+  fail!("source_census_sources_missing", product) unless sources.is_a?(Array) && sources.length >= minimums.fetch("sources")
+  fail!("source_census_records_shallow", product) unless records.is_a?(Array) && records.length >= minimums.fetch("records")
+  fail!("source_census_relationships_shallow", product) unless relationships.is_a?(Array) && relationships.length >= minimums.fetch("relationships")
+
+  source_ids = sources.map { |source| source.fetch("source_id") }
+  source_locators = sources.map { |source| source.fetch("locator") }
+  required_locators = ["requirements.md", "traceability-matrix.md", ".traceweaver/intent-contract.yml"]
+  fail!("required_source_missing", "#{product}:#{required_locators - source_locators}") unless (required_locators - source_locators).empty?
+  if product == "Air Router"
+    fail!("air_non_code_source_missing") unless source_locators.include?("config/phase25-hls-contract.json")
+  end
+
+  record_ids = records.map { |record| record.fetch("record_id") }
+  fail!("duplicate_census_record") unless record_ids.uniq.length == record_ids.length
+  records.each do |record|
+    provenance = record["provenance"]
+    fail!("record_provenance_missing", record["record_id"]) unless provenance.is_a?(Hash)
+    fail!("record_source_unknown", record["record_id"]) unless source_ids.include?(provenance["source_id"])
+    fail!("record_locator_unknown", record["record_id"]) unless source_locators.include?(provenance["locator"])
+    fail!("record_span_missing", record["record_id"]) unless provenance["line"].is_a?(Integer) && provenance["start_byte"].is_a?(Integer) && provenance["end_byte"].is_a?(Integer)
+    fail!("record_excerpt_digest_missing", record["record_id"]) unless provenance["excerpt_digest"].to_s.match?(/\Asha256:[0-9a-f]{64}\z/)
+  end
+
+  relationships.each do |relationship|
+    fail!("relationship_source_not_imported") unless record_ids.include?(relationship["source_id"])
+    fail!("relationship_target_not_imported") unless record_ids.include?(relationship["target_id"])
+    provenance = relationship["provenance"]
+    fail!("relationship_provenance_missing") unless provenance.is_a?(Hash) && provenance["line"].is_a?(Integer) && source_ids.include?(provenance["source_id"])
+  end
+
+  graph_count = observation.dig("graph", "record_count")
+  fail!("graph_not_bound_to_census", "#{product}:graph=#{graph_count}:census=#{records.length}") unless graph_count == records.length
+  fail!("legacy_eight_record_route", product) unless graph_count > 8
+
+  tasks = observation["tasks"]
+  fail!("tasks_missing", product) unless tasks.is_a?(Array) && tasks.length == 8
+  fail!("fixed_five_task_counts", product) if tasks.all? { |task| task["required_record_links"] == 5 && task["recovered_record_links"] == 5 }
+  tasks.each do |task|
+    required = task["required_record_links"]
+    recovered = task["recovered_record_links"]
+    fail!("task_count_basis_missing", "#{product}:#{task['task_type']}") unless task["count_basis"].is_a?(String) && !task["count_basis"].empty?
+    fail!("task_recovery_invalid", "#{product}:#{task['task_type']}:#{recovered}/#{required}") unless required.is_a?(Integer) && required.positive? && recovered == required
+  end
+
+  seeded = observation.fetch("seeded_impacts")
+  seeded.each do |impact|
+    fail!("seeded_impact_not_source_derived", impact["record_id"]) unless record_ids.include?(impact["record_id"])
+    missing = impact.fetch("expected_link_ids") - record_ids
+    fail!("seeded_impact_target_not_source_derived", missing.join(",")) unless missing.empty?
+  end
+end
+
+begin
+  fail!("runner_missing") unless RUNNER.file? && RUNNER.executable?
+
+  Dir.mktmpdir("v060-real-product-depth-", ROOT.join(".traceweaver").to_s) do |output|
+    stdout, stderr, status = Open3.capture3(
+      RUNNER.to_s,
+      "--output", output,
+      "--candidate-digest", CANDIDATE_DIGEST
+    )
+    fail!("runner_failed", "stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.success?
+    observations = Pathname.glob(Pathname.new(output).join("*-machine-observation.json")).sort.map do |path|
+      JSON.parse(path.binread)
+    end
+    fail!("product_observation_count", observations.length) unless observations.map { |entry| entry["product"] }.sort == PRODUCT_MINIMUMS.keys.sort
+    observations.each { |observation| check_observation!(observation) }
+  end
+
+  puts "v060_real_product_depth_smoke=passed"
+  puts "v060_real_product_depth_source_census=passed"
+  puts "v060_real_product_depth_provenance=passed"
+  puts "v060_real_product_depth_graph_binding=passed"
+  puts "v060_real_product_depth_task_counts=passed"
+  puts "v060_real_product_depth_authority_effect=none"
+rescue KeyError, JSON::ParserError, RuntimeError => error
+  warn error.message
+  exit 1
+end

@@ -1,0 +1,310 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-acceptance-hub-smoke; req=REQ-TW-131,REQ-TW-135,REQ-TW-138,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-131,REQ-TW-135,REQ-TW-138,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+HUB = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-acceptance-hub")
+GRAPH = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph")
+SCHEMA = ROOT.join("plugins/traceweaver-core/references/lifecycle/acceptance-hub.schema.json")
+
+TRUTH_STAGES = %w[
+  observation technical_verification independent_review pr merge deployment
+  runtime_health release stakeholder_validation acceptance publication
+].freeze
+
+def fail!(message)
+  warn "v060_lifecycle_acceptance_hub_smoke=failed reason=#{message}"
+  exit 1
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_bytes(value)
+  "sha256:#{Digest::SHA256.hexdigest(value)}"
+end
+
+def digest_value(value)
+  digest_bytes(JSON.generate(canonical(value)))
+end
+
+def identify(value, field)
+  copy = Marshal.load(Marshal.dump(value))
+  copy.delete(field)
+  copy[field] = digest_value(copy)
+  copy
+end
+
+def write_json(path, value)
+  FileUtils.mkdir_p(path.dirname)
+  path.binwrite(canonical_json(value))
+end
+
+def file_digest(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def run(executable, *arguments)
+  Open3.capture3(executable.to_s, *arguments.map(&:to_s))
+end
+
+def require_pass(executable, *arguments)
+  stdout, stderr, status = run(executable, *arguments)
+  fail!("expected_pass executable=#{executable.basename} args=#{arguments.join(" ")} stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.success?
+  JSON.parse(stdout)
+rescue JSON::ParserError => error
+  fail!("success_output_not_json executable=#{executable.basename} error=#{error.message}")
+end
+
+def require_blocked(executable, finding, *arguments)
+  stdout, stderr, status = run(executable, *arguments)
+  fail!("expected_blocked finding=#{finding}") if status.success?
+  parsed = JSON.parse(stdout)
+  fail!("wrong_finding expected=#{finding} actual=#{parsed["finding"].inspect} stderr=#{stderr.inspect}") unless parsed["finding"] == finding
+  parsed
+rescue JSON::ParserError => error
+  fail!("blocked_output_not_json finding=#{finding} error=#{error.message} stdout=#{stdout.inspect} stderr=#{stderr.inspect}")
+end
+
+def relationship(source, target, type)
+  {"source_id" => source, "target_id" => target, "relationship_type" => type, "applicable" => true, "provenance" => "acceptance hub fixture"}
+end
+
+def record(id:, type:, title:, source:, baseline:, relationships: [], freshness: "current")
+  {
+    "schema_version" => "tw-lifecycle-record/1", "record_id" => id, "record_type" => type,
+    "title" => title, "owner" => "Lifecycle Hub Owner", "authority_class" => "authoritative",
+    "source" => {
+      "source_id" => source["source_id"], "locator" => source["normalized_locator"], "version" => source["version"],
+      "digest" => source["digest"], "role" => source["role"], "provenance" => "exact registered lifecycle authority"
+    },
+    "applicability" => "applicable", "baseline" => baseline, "freshness" => freshness,
+    "acceptance_state" => "prepared", "relationships" => relationships,
+    "fields" => {"controlled_statement" => "Visible owner-facing lifecycle state for #{id}"}
+  }
+end
+
+def stage(state, evidence_ids = [], reason = nil)
+  value = {"state" => state, "evidence_ids" => evidence_ids}
+  value["held_reason"] = reason if reason
+  value
+end
+
+def held_receipt(baseline, requirement, artifact, root)
+  digest_a = "sha256:#{"a" * 64}"
+  digest_b = "sha256:#{"b" * 64}"
+  digest_c = "sha256:#{"c" * 64}"
+  receipt = {
+    "schema_version" => "tw-lifecycle-evidence-receipt/1", "receipt_id" => "pending", "work_item_id" => "WORK-HUB-001",
+    "changed_scope_digest" => digest_a, "baseline" => baseline, "control_closure_digest" => digest_c,
+    "applicability" => {
+      "requirements" => [{"requirement_id" => requirement["record_id"], "digest" => digest_value(requirement)}],
+      "artifacts" => [{"artifact_id" => artifact["record_id"], "digest" => digest_value(artifact)}], "environment_digest" => digest_c
+    },
+    "vv_definitions" => [{
+      "requirement_id" => requirement["record_id"], "verification_definition_id" => "VERDEF-HUB-001",
+      "validation_definition_id" => "VALDEF-HUB-001", "verification_method" => "test",
+      "validation_question" => "Can the owner recover the exact named-baseline lifecycle and every remaining hold?"
+    }],
+    "evidence_links" => [
+      {"evidence_id" => "EVIDENCE-HUB-OBS-001", "locator" => "evidence/observation.json", "digest" => file_digest(root.join("evidence/observation.json")), "evidence_type" => "raw_observation"},
+      {"evidence_id" => "EVIDENCE-HUB-VER-001", "locator" => "evidence/verification.json", "digest" => file_digest(root.join("evidence/verification.json")), "evidence_type" => "technical_verification"}
+    ],
+    "review_links" => [],
+    "truth_stages" => {
+      "observation" => stage("observed", ["EVIDENCE-HUB-OBS-001"]),
+      "technical_verification" => stage("passed", ["EVIDENCE-HUB-VER-001"]),
+      "independent_review" => stage("held", [], "integrated review pending frozen candidate"),
+      "pr" => stage("not_observed"), "merge" => stage("not_observed"), "deployment" => stage("not_observed"),
+      "runtime_health" => stage("not_observed"), "release" => stage("not_observed"),
+      "stakeholder_validation" => stage("held", [], "representative product validation pending"),
+      "acceptance" => stage("held", [], "owner acceptance pending validation"), "publication" => stage("not_observed")
+    },
+    "model_attestation" => {"state" => "unattested", "held_reason" => "served-model identity not independently attested"},
+    "remaining_holds" => ["integrated_review", "stakeholder_validation", "acceptance", "publication"],
+    "owner_disposition" => {"owner" => "Lifecycle Hub Owner", "state" => "held", "reason" => "representative validation pending"},
+    "next_gate" => "integrated_review_then_representative_validation", "authority_effect" => "none"
+  }
+  identify(receipt, "receipt_id")
+end
+
+def accepted_receipt(receipt, root)
+  copy = Marshal.load(Marshal.dump(receipt))
+  links = {}
+  stage_types = {
+    "observation" => "raw_observation", "technical_verification" => "technical_verification",
+    "independent_review" => "independent_review", "pr" => "pr", "merge" => "merge",
+    "deployment" => "deployment", "runtime_health" => "runtime_health", "release" => "release",
+    "stakeholder_validation" => "stakeholder_validation", "acceptance" => "acceptance", "publication" => "publication"
+  }
+  stage_types.each_with_index do |(name, evidence_type), index|
+    id = "EVIDENCE-HUB-#{name.upcase.tr("_", "-")}-001"
+    links[name] = id
+    locator = "evidence/#{name}.json"
+    copy["evidence_links"] << {"evidence_id" => id, "locator" => locator, "digest" => file_digest(root.join(locator)), "evidence_type" => evidence_type}
+  end
+  copy["evidence_links"] = copy["evidence_links"].uniq { |entry| entry["evidence_id"] }
+  copy["truth_stages"] = TRUTH_STAGES.each_with_object({}) do |name, result|
+    state = name == "observation" ? "observed" : "passed"
+    result[name] = stage(state, [links.fetch(name)])
+  end
+  copy["review_links"] = [{"review_id" => "REVIEW-HUB-001", "locator" => "evidence/review.json", "digest" => file_digest(root.join("evidence/review.json")), "state" => "passed"}]
+  copy["model_attestation"] = {"state" => "not_applicable"}
+  copy["remaining_holds"] = []
+  copy["owner_disposition"] = {"owner" => "Lifecycle Hub Owner", "state" => "accepted", "decision_id" => "DEC-HUB-OWNER-001", "reason" => "Named fixture acceptance after all truth stages passed"}
+  copy["next_gate"] = "separate_publication_authority"
+  identify(copy, "receipt_id")
+end
+
+def hub_arguments(root, evidence: "evidence-held.json", output: "hub-held")
+  [
+    "--root", root, "--registry", "source-registry.json", "--records", "records",
+    "--graph", "lifecycle-graph.json", "--evidence", evidence, "--output", output
+  ]
+end
+
+def relative_files(root)
+  Dir.glob(root.join("**/*").to_s).select { |path| File.file?(path) }.map { |path| Pathname.new(path).relative_path_from(root).to_s }.sort
+end
+
+fail!("missing_acceptance_hub_executable") unless HUB.file? && HUB.executable?
+fail!("missing_graph_executable") unless GRAPH.file? && GRAPH.executable?
+fail!("missing_acceptance_hub_schema") unless SCHEMA.file?
+schema = JSON.parse(SCHEMA.read)
+fail!("acceptance_hub_schema_id") unless schema["$id"] == "tw-lifecycle-acceptance-hub/1" && schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+
+Dir.mktmpdir("traceweaver-v060-lifecycle-hub-") do |directory|
+  root = Pathname.new(directory)
+  TRUTH_STAGES.each { |name| write_json(root.join("evidence/#{name}.json"), {"stage" => name, "fixture" => true}) }
+  write_json(root.join("evidence/verification.json"), {"stage" => "technical_verification", "fixture" => true})
+  write_json(root.join("evidence/review.json"), {"review" => "passed", "fixture" => true})
+  records_dir = root.join("records")
+  records_dir.mkdir
+  authority_path = root.join("authority.md")
+  authority_path.write("# Lifecycle hub authority\n\nVisible owner-facing source.\n")
+  source = {
+    "source_id" => "SRC-HUB-AUTHORITY-001", "role" => "authority_baseline", "locator" => "authority.md", "normalized_locator" => "authority.md",
+    "source_type" => "markdown", "schema_version" => "tw-lifecycle-markdown/1", "digest" => digest_bytes(authority_path.binread),
+    "owner" => "Lifecycle Hub Owner", "authority_class" => "authoritative", "owned_field_families" => ["hub_fixture_authority"],
+    "generation" => "LC-HUB-GEN-001", "observed_at" => "2026-08-24T00:00:00Z", "version" => "hub-v1", "mutable" => false,
+    "normalization" => {"encoding" => "UTF-8", "line_endings" => "LF", "case" => "exact", "legacy_locators" => []}
+  }
+  registry = {"schema_version" => "tw-lifecycle-source-registry/1", "registry_id" => "LC-HUB-REGISTRY-001", "generation" => "LC-HUB-GEN-001", "owner" => "Lifecycle Hub Owner", "sources" => [source]}
+  write_json(root.join("source-registry.json"), registry)
+  baseline = {"baseline_id" => "BASELINE-HUB-001", "generation" => "LC-HUB-GEN-001", "digest" => "sha256:#{"e" * 64}"}
+  records = [
+    record(id: "COMMITMENT-HUB-001", type: "commitment", title: "Deliver trustworthy lifecycle visibility", source: source, baseline: baseline),
+    record(id: "NEED-HUB-001", type: "need", title: "Recover lifecycle state", source: source, baseline: baseline, relationships: [relationship("NEED-HUB-001", "COMMITMENT-HUB-001", "derived_from")]),
+    record(id: "REQ-#{''}HUB-001", type: "requirement", title: "Show named-baseline evidence", source: source, baseline: baseline, relationships: [relationship("REQ-#{''}HUB-001", "NEED-HUB-001", "refines")]),
+    record(id: "RISK-HUB-001", type: "risk", title: "False acceptance risk", source: source, baseline: baseline, relationships: [relationship("RISK-HUB-001", "REQ-#{''}HUB-001", "impacts")]),
+    record(id: "CHANGE-HUB-001", type: "change", title: "Approved lifecycle change", source: source, baseline: baseline, relationships: [relationship("CHANGE-HUB-001", "REQ-#{''}HUB-001", "changes")]),
+    record(id: "DECISION-HUB-001", type: "decision", title: "Exception remains held", source: source, baseline: baseline, relationships: [relationship("DECISION-HUB-001", "RISK-HUB-001", "decided_by")]),
+    record(id: "ART-HUB-001", type: "product_artifact", title: "Lifecycle assurance artifact", source: source, baseline: baseline, relationships: [relationship("ART-HUB-001", "REQ-#{''}HUB-001", "satisfies")]),
+    record(id: "VERIFICATION-HUB-001", type: "verification_result", title: "Technical verification result", source: source, baseline: baseline, relationships: [relationship("VERIFICATION-HUB-001", "ART-HUB-001", "verified_by")]),
+    record(id: "VALIDATION-HUB-001", type: "validation_result", title: "Stakeholder validation result", source: source, baseline: baseline, relationships: [relationship("VALIDATION-HUB-001", "VERIFICATION-HUB-001", "validated_by")]),
+    record(id: "ACCEPTANCE-HUB-001", type: "acceptance_decision", title: "Acceptance decision state", source: source, baseline: baseline, relationships: [relationship("ACCEPTANCE-HUB-001", "VALIDATION-HUB-001", "accepted_by")]),
+    record(id: "EVIDENCE-HUB-001", type: "evidence", title: "Lifecycle evidence", source: source, baseline: baseline, relationships: [relationship("EVIDENCE-HUB-001", "VERIFICATION-HUB-001", "evidences")])
+  ]
+  records.each { |entry| write_json(records_dir.join("#{entry["record_id"]}.json"), entry) }
+  graph_path = root.join("lifecycle-graph.json")
+  require_pass(GRAPH, "build", "--root", root, "--registry", "source-registry.json", "--records", "records", "--output", graph_path)
+  requirement = records.find { |entry| entry["record_id"] == "REQ-#{''}HUB-001" }
+  artifact = records.find { |entry| entry["record_id"] == "ART-HUB-001" }
+  held = held_receipt(baseline, requirement, artifact, root)
+  write_json(root.join("evidence-held.json"), held)
+
+  first = require_pass(HUB, "build", *hub_arguments(root, output: "hub-a"))
+  second = require_pass(HUB, "build", *hub_arguments(root, output: "hub-b"))
+  fail!("held_hub_result") unless first["status"] == "pass" && first["acceptance_state"] == "held" && first["remaining_holds"].include?("stakeholder_validation") && first["authority_role"] == "derived_non_authoritative" && first["authority_effect"] == "none"
+  fail!("hub_double_build_identity") unless first["manifest_id"] == second["manifest_id"]
+  files_a = relative_files(root.join("hub-a"))
+  files_b = relative_files(root.join("hub-b"))
+  expected_files = %w[acceptance-pack.json hub.html manifest.json projection/index.html projection/lifecycle.html projection/manifest.json]
+  fail!("hub_output_file_set") unless files_a == expected_files && files_b == expected_files
+  files_a.each { |name| fail!("hub_double_build_bytes path=#{name}") unless root.join("hub-a", name).binread == root.join("hub-b", name).binread }
+  require_pass(HUB, "check", *hub_arguments(root, output: "hub-a"))
+
+  manifest = JSON.parse(root.join("hub-a/manifest.json").read)
+  pack = JSON.parse(root.join("hub-a/acceptance-pack.json").read)
+  html = root.join("hub-a/hub.html").read
+  fail!("hub_manifest_contract") unless manifest["schema_version"] == "tw-lifecycle-acceptance-hub/1" && manifest["manifest_id"] == first["manifest_id"] && manifest["authority_effect"] == "none" && manifest["files"].length == 5
+  fail!("named_baseline_pack") unless pack.dig("baseline", "baseline_id") == "BASELINE-HUB-001" && pack["acceptance_state"] == "held" && html.include?(pack["pack_id"])
+  records.each do |entry|
+    id = entry["record_id"]
+    fail!("hub_record_or_drill_missing id=#{id}") unless html.include?(id) && html.include?("projection/lifecycle.html##{id}")
+  end
+  %w[commitment risk change decision verification_result validation_result acceptance_decision evidence].each do |type|
+    fail!("hub_lifecycle_type_missing type=#{type}") unless html.include?("#{type} records")
+  end
+  fail!("hub_false_authority_boundary") unless html.include?("DERIVED, STATIC, NON-AUTHORITATIVE") && html.include?("Authority effect</dt><dd>none")
+  fail!("hub_active_or_remote_content") if html.match?(/<script|https?:|javascript:|data:/i)
+
+  active_output = root.join("hub-active")
+  FileUtils.cp_r(root.join("hub-a"), active_output)
+  active_output.join("hub.html").write(active_output.join("hub.html").read.sub("</body>", "<script>bad()</script></body>"))
+  require_blocked(HUB, "active_html_content", "check", *hub_arguments(root, output: "hub-active"))
+
+  hidden_output = root.join("hub-hidden")
+  FileUtils.cp_r(root.join("hub-a"), hidden_output)
+  hidden_output.join("hub.html").write(hidden_output.join("hub.html").read.sub("</body>", "<p hidden>hidden acceptance</p></body>"))
+  require_blocked(HUB, "hidden_authority_content", "check", *hub_arguments(root, output: "hub-hidden"))
+
+  edited_output = root.join("hub-edited")
+  FileUtils.cp_r(root.join("hub-a"), edited_output)
+  edited_pack = JSON.parse(edited_output.join("acceptance-pack.json").read)
+  edited_pack["acceptance_state"] = "accepted"
+  write_json(edited_output.join("acceptance-pack.json"), edited_pack)
+  require_blocked(HUB, "stale_or_hand_edited_hub", "check", *hub_arguments(root, output: "hub-edited"))
+
+  wrong_baseline = Marshal.load(Marshal.dump(held))
+  wrong_baseline["baseline"]["digest"] = "sha256:#{"f" * 64}"
+  write_json(root.join("evidence-wrong-baseline.json"), identify(wrong_baseline, "receipt_id"))
+  require_blocked(HUB, "hub_baseline_mismatch", "build", *hub_arguments(root, evidence: "evidence-wrong-baseline.json", output: "hub-wrong-baseline"))
+
+  missing_requirement = Marshal.load(Marshal.dump(held))
+  missing_requirement["applicability"]["requirements"] << {"requirement_id" => "REQ-#{''}HUB-999", "digest" => "sha256:#{"9" * 64}"}
+  missing_requirement["vv_definitions"] << {
+    "requirement_id" => "REQ-#{''}HUB-999", "verification_definition_id" => "VERDEF-HUB-999", "validation_definition_id" => "VALDEF-HUB-999",
+    "verification_method" => "inspection", "validation_question" => "Is the absent requirement refused?"
+  }
+  write_json(root.join("evidence-missing-requirement.json"), identify(missing_requirement, "receipt_id"))
+  require_blocked(HUB, "hub_requirement_missing", "build", *hub_arguments(root, evidence: "evidence-missing-requirement.json", output: "hub-missing-requirement"))
+
+  accepted = accepted_receipt(held, root)
+  write_json(root.join("evidence-accepted.json"), accepted)
+  accepted_result = require_pass(HUB, "build", *hub_arguments(root, evidence: "evidence-accepted.json", output: "hub-accepted"))
+  accepted_pack = JSON.parse(root.join("hub-accepted/acceptance-pack.json").read)
+  accepted_html = root.join("hub-accepted/hub.html").read
+  fail!("accepted_pack_state") unless accepted_result["acceptance_state"] == "accepted" && accepted_result["remaining_holds"].empty? && accepted_pack["acceptance_state"] == "accepted"
+  fail!("accepted_pack_false_authority") unless accepted_result["authority_effect"] == "none" && accepted_pack["authority_effect"] == "none" && accepted_html.include?("this hub cannot approve, validate, accept, publish, or supersede authority")
+
+  require_blocked(HUB, "hub_output_exists", "build", *hub_arguments(root, output: "hub-a"))
+end
+
+puts "v060_lifecycle_acceptance_hub_smoke=pass"
+puts "v060_lifecycle_acceptance_hub_determinism=pass"
+puts "v060_lifecycle_owner_drilldown_and_truth_stages=pass"
+puts "v060_lifecycle_named_baseline_pack_integrity=pass"
+puts "v060_lifecycle_acceptance_without_authority_promotion=pass"
+puts "v060_lifecycle_acceptance_hub_active_hidden_tamper_refusal=pass"

@@ -1,0 +1,350 @@
+# TRACEWEAVER: file-role=release-risk-workflow-profile; req=REQ-TW-037,REQ-TW-052,REQ-TW-056,REQ-TW-057,REQ-TW-060,REQ-TW-092,REQ-TW-130,REQ-TW-136,REQ-TW-143,REQ-TW-144,REQ-TW-145; trace=TRACE-TW-036,TRACE-TW-046,TRACE-TW-065,TRACE-TW-070,TRACE-TW-074; ver=VER-TW-046,VER-TW-059,VER-TW-085,VER-TW-090,VER-TW-094
+schema_version: tw-workflow-profile/1
+task_id: TW-PLAN-2026-08-24-V060-PRODUCT-LIFECYCLE-001
+profile_revision: 6
+profile_status: frozen_revision_6_bounded_convergence_passed_exact_candidate_publication_conditionally_authorized
+risk: L3
+selection_rationale: "The Core 0.6.0 successor remains L3. The owner applied the bounded-convergence guide through tw-auto to close the remaining current-source digest chain without repeating the authority gate after each in-scope failure. CHG-TW-2026-08-26-005 / EXC-TW-022 used two permitted attempts and finished with all 72 model-context cases passing, zero open P0/P1 retained-review findings, and the reviewer-bound oracle current. CHG-TW-2026-08-27-006 now authorizes the exact Core 0.6.0 PR, merge, tag, and GitHub Release route only after fresh same-candidate product, verification, traceability, review, graph, reinstall, staged-identity, and protected-main gates pass. Core 0.6.1 is reserved for later fixes."
+
+process_budget:
+  target_total_effort_percent: 20
+  hard_ceiling_total_effort_percent: 50
+  target_process_to_delivery_ratio_percent: 25
+  hard_ceiling_process_to_delivery_ratio_percent: 100
+  estimated_delivery_minutes: 1440
+  estimated_process_target_minutes: 360
+  estimated_process_ceiling_minutes: 1440
+
+model_routing:
+  schema_version: tw-codex-model-routing/1
+  codex_main_model: gpt-5.6-sol
+  codex_subagent_model: gpt-5.6-terra
+  codex_subagent_reasoning_effort: risk_selected
+  sol_allowed_for_subagents: false
+  terra_unavailable_consequence: held_model_unavailable
+  risk_reasoning_effort:
+    L0: low
+    L1: medium
+    L2: high
+    L3: xhigh
+  native_child_dispatch:
+    adapter: tw-auto/scripts/traceweaver-route-native-child
+    model_argument: explicit_required
+    reasoning_effort_argument: explicit_frozen_profile_value_required
+    fork_turns: none_or_bounded_positive
+    prohibited:
+      - model_inheritance
+      - full_history_inheritance
+      - gpt-5.6-sol
+      - luna
+      - silent_fallback
+  receipt_fields:
+    - receipt_identity
+    - task_or_dispatch_identity
+    - role
+    - workflow_profile_hash
+    - workflow_profile_file_digest
+    - trusted_attester_registry_sha256
+    - requested_model
+    - served_model
+    - requested_reasoning_effort
+    - fork_turns
+    - capability_evidence
+    - outcome
+  attestation:
+    accepted_attester_kinds:
+      - host_runtime
+      - execution_service
+    signature_algorithm: rsa-sha256
+    signature_required: true
+    trusted_attester_registry_sha256: unconfigured
+    immutable_attester_identity_required: true
+    execution_or_request_identity_required: true
+    exact_receipt_binding_required: true
+    external_trust_store_required: true
+    child_self_report_is_proof: false
+    dispatch_acceptance_is_proof: false
+    missing_or_invalid_outcome: held_model_unattested
+    mismatch_outcome: held_model_mismatch
+    served_model_when_unattested: unattested
+    replay_and_cross_receipt_rejected: true
+  evidence_eligibility:
+    attested_model_match: eligible_for_profiled_child_use
+    held_model_unavailable: ineligible
+    held_model_unattested: ineligible
+    held_model_mismatch: ineligible
+  traceweaver_owned_native_child_surfaces:
+    - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+    - plugins/traceweaver-core/skills/tw-brainstorm/SKILL.md
+    - plugins/traceweaver-core/skills/tw-code-review/SKILL.md
+    - plugins/traceweaver-core/skills/tw-commit/SKILL.md
+    - plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md
+    - plugins/traceweaver-core/skills/tw-compound/SKILL.md
+    - plugins/traceweaver-core/skills/tw-compound-refresh/SKILL.md
+    - plugins/traceweaver-core/skills/tw-debug/SKILL.md
+    - plugins/traceweaver-core/skills/tw-doc-review/SKILL.md
+    - plugins/traceweaver-core/skills/tw-ideate/SKILL.md
+    - plugins/traceweaver-core/skills/tw-plan/SKILL.md
+    - plugins/traceweaver-core/skills/tw-resolve-pr-feedback/SKILL.md
+    - plugins/traceweaver-core/skills/tw-sessions/SKILL.md
+    - plugins/traceweaver-core/skills/tw-setup/SKILL.md
+    - plugins/traceweaver-core/skills/tw-strategy/SKILL.md
+    - plugins/traceweaver-core/skills/tw-test-browser/SKILL.md
+    - plugins/traceweaver-core/skills/tw-test-xcode/SKILL.md
+    - plugins/traceweaver-core/skills/tw-work/SKILL.md
+    - plugins/traceweaver-core/skills/tw-worktree/SKILL.md
+
+consolidated_delivery:
+  schema_version: tw-consolidated-delivery/1
+  applies_to: approved_behavior_or_mixed_candidate
+  primary:
+    execution_surface: codex_main_session
+    model: gpt-5.6-sol
+    retained_context: true
+    phases:
+      - authority_lock
+      - compact_plan
+      - proportional_vv_setup
+      - implementation
+      - focused_verification
+      - trace_update
+      - batch_repair
+    separate_child_dispatches: 0
+    standalone_plan_artifact: true
+    standalone_plan_review: true
+  candidate:
+    freeze_per_review_submission: 1
+    clean_path_freeze_count: 1
+    repair_path_freeze_count_max: 2
+    freeze_after: [implementation, focused_verification, trace_update]
+    repair_revision_scope: same_series_targeted_delta
+  integrated_review:
+    model: gpt-5.6-terra
+    reviewer_identity_count: 1
+    nested_reviewer_dispatches: 0
+    lenses: [code, tests, relevant_normative_docs, traceability, correctness, security, reliability, performance, release_integrity]
+    clean_path_native_child_dispatches: 1
+    blocking_path_native_child_dispatches_max: 2
+    closure: resume_same_reviewer_for_targeted_closure
+    standalone_doc_review_for_mixed_candidate: false
+  repair:
+    batch_cap: 1
+    owner: codex_main_session
+    model: gpt-5.6-sol
+    nonblocking_p2_p3_reopens_review: false
+    unchanged_blocker_without_evidence_progress: held_no_progress
+    exceptional_validation_method_cycle:
+      cap: 1
+      status: consumed_expired
+      change_id: CHG-TW-2026-08-24-001
+      exception_id: EXC-TW-018
+      approved_by: Hannes Zietsman
+      approved_at: "2026-08-24"
+      scope: source_derived_real_product_validation_harness_and_exact_candidate_evidence_only
+      expiry: first_correction_attempt_or_next_owner_product_disposition_or_scope_expansion_or_owner_withdrawal
+    terminal_release_truth_cycle:
+      cap: 1
+      status: consumed_expired_p1_006_closed_p1_005_superseded_by_acyclic_cycle
+      change_id: CHG-TW-2026-08-24-002
+      exception_id: EXC-TW-019
+      approved_by: Hannes Zietsman
+      approved_at: "2026-08-26"
+      retained_finding_fingerprints: [P1-005-continuation, P1-006-continuation]
+      repair_owner: codex_main_session
+      reviewer_identity: existing_integrated_terra_reviewer_only
+      reviewer_continuation: one_retained_finding_only_continuation_after_fresh_exact_product_acceptance
+      scope: release_oracle_source_contract_real_capsule_terminal_path_and_controlled_evidence_bindings_only
+      expiry: first_repair_attempt_or_new_exact_product_disposition_or_retained_reviewer_result_or_scope_expansion_or_owner_withdrawal
+      publication_authority: none
+    acyclic_oracle_cycle:
+      cap: 1
+      status: consumed_expired_p1_005_closed_clean_oracle_written
+      change_id: CHG-TW-2026-08-26-003
+      exception_id: EXC-TW-020
+      approved_by: Hannes Zietsman
+      approved_at: "2026-08-26"
+      retained_finding_fingerprints: [P1-005-continuation]
+      repair_owner: codex_main_session
+      reviewer_identity: existing_integrated_terra_reviewer_only
+      reviewer_continuation: one_verification_only_continuation_after_fresh_exact_product_acceptance
+      scope: pre_oracle_source_contract_post_oracle_receipt_separation_across_three_named_release_control_scripts_and_controlled_evidence_only
+      expiry: first_repair_attempt_or_new_exact_product_disposition_or_verification_only_reviewer_result_or_scope_expansion_or_owner_withdrawal
+      publication_authority: none
+    post_oracle_ci_convergence_cycle:
+      cap: 1
+      status: consumed_nonclean_superseded_by_current_source_digest_convergence
+      change_id: CHG-TW-2026-08-26-004
+      exception_id: EXC-TW-021
+      approved_by: Hannes Zietsman
+      approved_at: "2026-08-26"
+      retained_finding_fingerprints: []
+      gap_id: GAP-TW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001
+      repair_owner: codex_main_session
+      reviewer_identity: existing_integrated_terra_reviewer_only
+      reviewer_continuation: one_verification_only_continuation_after_fresh_exact_product_acceptance_limited_to_eleven_file_delta
+      scope: ten_named_model_context_fixture_rebindings_and_one_model_context_smoke_canonical_oracle_negative_and_tw_lifecycle_dependency_expectation_only
+      focused_verification: scripts/traceweaver-smoke-model-context-routing_once
+      expiry: first_focused_correction_verification_attempt_or_new_exact_product_disposition_or_verification_only_reviewer_result_or_scope_expansion_or_owner_withdrawal
+      publication_authority: none
+    current_source_digest_convergence_cycle:
+      cap: 2
+      status: consumed_passed_two_of_two_attempts
+      change_id: CHG-TW-2026-08-26-005
+      exception_id: EXC-TW-022
+      approved_by: Hannes Zietsman
+      approved_at: "2026-08-26"
+      guide: plugins/traceweaver-core/references/bounded-convergence-window-guide.md
+      repair_owner: codex_main_session
+      reviewer_identity: existing_integrated_terra_reviewer_only
+      scope: current_source_physical_locator_and_derived_receipt_digest_rebinding_only
+      verification: scripts/traceweaver-smoke-model-context-routing
+      result: docs/validation/traceweaver-2026-08-26-v060-current-source-digest-bounded-convergence-result.md
+      terminal_result: model_context_routing_smoke_pass_cases_72
+      publication_authority: none
+  model_turn_budget:
+    counting_unit: primary_or_reviewer_turn
+    clean_path: 2
+    blocking_path_max: 4
+  mechanical_closure:
+    model_dispatches: 0
+    after_terminal_review_only: true
+    atomic_outputs: [hashes, receipts, status, generated_views]
+    excluded_from_semantic_identity: true
+    reopens_review: false
+  standalone_document_review:
+    applies_to: authority_only_or_document_only_semantic_change
+    mixed_candidate_route: integrated_review
+  publication: conditional_exact_candidate_only_under_CHG_TW_2026_08_27_006_and_single_use_capsules
+
+selected_controls:
+  - resolved_skill_execution_contract
+  - authority_baseline_mode
+  - requirements_quality_review
+  - one_scoped_tw_doc_review_before_authority_acceptance
+  - full_l3_vv_definition_before_any_implementation_slice
+  - exact_explicit_terra_xhigh_child_routing
+  - independently_attested_served_model_or_hold
+  - one_independent_reviewer_cap
+  - one_routine_repair_verification_cycle_cap
+  - one_severe_blocker_exception_cycle_cap
+  - deterministic_profile_and_baseline_digests
+  - protected_main_and_exact_candidate_identity
+  - isolated_exact_released_0_5_0_predecessor_dogfood_before_slice_1
+  - no_publication_without_separate_owner_authority
+  - rollback_rehearsal_before_semantic_authority_cutover
+  - chrome_dogfood_before_release_claim
+  - no_separate_deployment_target
+  - consolidated_sol_delivery
+  - one_integrated_terra_reviewer_identity
+  - one_batched_repair_maximum
+  - owner_approved_EXC_TW_018_final_validation_method_correction
+  - owner_approved_EXC_TW_019_terminal_release_truth_correction
+  - owner_approved_EXC_TW_020_acyclic_oracle_correction
+  - owner_approved_EXC_TW_021_post_oracle_ci_convergence_correction
+  - owner_approved_EXC_TW_022_current_source_digest_bounded_convergence
+  - owner_approved_CHG_TW_2026_08_27_006_exact_candidate_publication
+  - zero_model_terminal_bookkeeping
+child_roles:
+  builder:
+    model: gpt-5.6-terra
+    reasoning_effort: xhigh
+    maximum_timebox_minutes: 120
+  verifier:
+    model: gpt-5.6-terra
+    reasoning_effort: xhigh
+    maximum_timebox_minutes: 60
+  reviewer:
+    model: gpt-5.6-terra
+    reasoning_effort: xhigh
+    maximum_timebox_minutes: 60
+  deployer:
+    model: gpt-5.6-terra
+    reasoning_effort: xhigh
+    maximum_timebox_minutes: 0
+  dogfooder:
+    model: gpt-5.6-terra
+    reasoning_effort: xhigh
+    maximum_timebox_minutes: 45
+model_selection:
+  availability:
+    - "gpt-5.6-terra is selectable for a native child route; availability is capability evidence only and does not attest a served model."
+  choice: gpt-5.6-terra
+  rationale: "REQ-TW-060 fixes TraceWeaver-owned native children to Terra. L3 fixes requested reasoning effort to xhigh; no Sol child, inherited model, Luna child, or silent fallback is permitted."
+  unavailable_consequence: held_model_unavailable
+reviewer_cap: 1
+repair_cycle_cap: 1
+severe_blocker_exception_cycle_cap: 1
+requires_deploy: false
+requires_chrome_dogfood: true
+
+rollback:
+  pre_merge: "Do not implement Slice 1 or merge the Core 0.6.0 candidate until the exact authority baseline, integrated review, verification, traceability, and product gates pass. The recovery stash and scoped branch commits preserve the pre-candidate state."
+  post_merge: "Semantic-HTML cutover must restore the complete prior matched Markdown/YAML generation; partial file rollback is prohibited. Other behavior rolls back through a reviewed successor change bound to the accepted main SHA."
+  release: "Never rewrite the published 0.5.0 release. Core 0.6.0 publication is idempotent and must stop on a mismatched existing tag or GitHub Release."
+publication_boundary:
+  status: conditional_exact_candidate_publication_authorized_clean_gates_pending
+  review_staging:
+    status: allowed_after_scoped_semantic_review_and_deterministic_preflight
+    exact_paths_only: true
+    unrelated_paths_prohibited: true
+    effect: review_identity_freeze_only_not_publication
+  prohibited_actions:
+    - stage_without_valid_single_use_publication_capsule
+    - commit_without_valid_single_use_publication_capsule
+    - push_without_valid_single_use_publication_capsule
+    - pull_request_create_or_update_without_valid_single_use_publication_capsule
+    - merge_without_separate_valid_merge_only_capsule_and_green_required_checks
+    - tag_outside_exact_main_release_workflow
+    - GitHub_Release_outside_exact_main_release_workflow
+    - package_publish
+    - deploy
+    - external_system_mutation
+  required_before_any_publication_route:
+    - formally_accepted_0_6_0_product_lifecycle_authority_baseline
+    - slice_specific_approved_authority_and_vv_evidence
+    - independent_served_model_attestation_for_any_profiled_child_evidence
+    - required_chrome_dogfood_evidence
+    - exact_main_sha_smoke_and_CodeQL_green
+    - non_compensable_vestro_and_air_router_validation
+    - semantic_html_release_gate_or_explicit_truthful_derived_only_disposition
+    - current_owner_intent_for_exact_traceweaver_core_v0_6_0_route
+    - fresh_exact_candidate_vestro_and_air_router_cells_with_unchanged_limitations
+    - final_traceability_code_review_document_review_graph_reinstall_and_readiness_pass
+
+predecessor_profile_hash: sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7
+escalation_reason: "Record the successful bounded current-source convergence under CHG-TW-2026-08-26-005 / EXC-TW-022 and the separate owner-authorized exact Core 0.6.0 publication route under CHG-TW-2026-08-27-006. Preserve all same-candidate, product, review, capsule, protected-main, semantic-cutover, runtime, deployment, predecessor, and mixed-root controls."
+profile_hash_method: "SHA-256 of canonical UTF-8 JSON, with object keys sorted recursively and array order preserved, over task_id, profile_revision, risk, process_budget, model_routing, consolidated_delivery, selected_controls, child_roles, model_selection, reviewer_cap, repair_cycle_cap, severe_blocker_exception_cycle_cap, requires_deploy, requires_chrome_dogfood, rollback, and publication_boundary. profile_hash, accounting, profile_status, selection_rationale, immutable_after_building, predecessor_profile_hash, escalation_reason, and profile_hash_method are excluded."
+profile_hash: sha256:b2c83404cd67e946b82bb34a12534cb37e218a70b62697339925c81a40d74d10
+immutable_after_building:
+  fields:
+    - risk
+    - process_budget
+    - model_routing
+    - consolidated_delivery
+    - selected_controls
+    - child_roles
+    - model_selection
+    - reviewer_cap
+    - repair_cycle_cap
+    - severe_blocker_exception_cycle_cap
+    - requires_deploy
+    - requires_chrome_dogfood
+    - rollback
+    - publication_boundary
+    - profile_hash
+  expansion_rule: "After the first builder dispatch, create a new profile_revision with escalation_reason. Never silently add a control, reviewer, route, rollback option, or publication permission."
+
+accounting:
+  observer: orchestration_harness
+  clock: monotonic
+  child_self_report: advisory_only
+  fixed_categories:
+    - process
+    - delivery
+    - unclassified
+  unclassified_rule: counts_as_process_until_reviewer_resolves
+  receipts: []
+  terminal_rules:
+    target: "actual_process_minutes <= 0.25 * actual_delivery_minutes"
+    hard_hold: "actual_process_minutes > actual_delivery_minutes => held_process_budget"
+    no_in_task_exception: true

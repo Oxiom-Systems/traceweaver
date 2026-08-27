@@ -1,0 +1,247 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-product-lifecycle-fixed-corpus-benchmark; req=REQ-TW-139; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: entrypoint=v060_product_lifecycle_fixed_corpus_benchmark; req=REQ-TW-139; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-139; trace=TRACE-TW-074
+
+require "digest"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+GRAPH = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph")
+RECORD_COUNT = 2_000
+WARMUP_COUNT = 10
+SAMPLE_COUNT = 30
+BUILD_LIMIT_MS = 1_500.0
+QUERY_LIMIT_MS = 250.0
+REQUIRED_SEARCH_REDUCTION_PERCENT = 50.0
+RECORD_TYPES = %w[
+  commitment intent need requirement constraint decision interface risk change
+  product_artifact verification_definition verification_result
+  validation_definition validation_result acceptance_decision baseline evidence
+].freeze
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def write_json(path, value)
+  path.binwrite(canonical_json(value))
+end
+
+def digest_file(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def timed_graph(*arguments)
+  started = Process.clock_gettime(Process::CLOCK_MONOTONIC)
+  stdout, stderr, status = Open3.capture3(GRAPH.to_s, *arguments)
+  elapsed_ms = (Process.clock_gettime(Process::CLOCK_MONOTONIC) - started) * 1_000.0
+  unless status.success?
+    warn "v060_product_lifecycle_benchmark=failed operation=#{arguments.first} stdout=#{stdout.inspect} stderr=#{stderr.inspect}"
+    exit 1
+  end
+  parsed = JSON.parse(stdout)
+  unless parsed["status"] == "pass" && parsed["authority_effect"] == "none"
+    warn "v060_product_lifecycle_benchmark=failed operation=#{arguments.first} invalid_result=#{stdout.inspect}"
+    exit 1
+  end
+  [elapsed_ms, parsed]
+rescue JSON::ParserError => error
+  warn "v060_product_lifecycle_benchmark=failed operation=#{arguments.first} malformed_output=#{error.message}"
+  exit 1
+end
+
+def nearest_rank_p95(samples)
+  sorted = samples.sort
+  rank = (0.95 * sorted.length).ceil
+  sorted.fetch(rank - 1)
+end
+
+def measure(warmups, samples)
+  warmups.times { yield }
+  Array.new(samples) { yield.first }
+end
+
+unless GRAPH.file? && GRAPH.executable?
+  warn "v060_product_lifecycle_benchmark=failed reason=missing_graph_executable"
+  exit 1
+end
+
+result = nil
+Dir.mktmpdir("traceweaver-v060-benchmark-") do |directory|
+  root = Pathname.new(directory)
+  records_dir = root.join("records")
+  records_dir.mkdir
+  authority_path = root.join("authority.md")
+  authority_path.write("# Fixed lifecycle benchmark authority\n\nSeed: TW-V060-FIXED-2000-001.\n")
+  source = {
+    "source_id" => "SRC-BENCHMARK-AUTHORITY-001",
+    "role" => "authority_baseline",
+    "locator" => "authority.md",
+    "normalized_locator" => "authority.md",
+    "source_type" => "markdown",
+    "schema_version" => "tw-lifecycle-markdown/1",
+    "digest" => digest_file(authority_path),
+    "owner" => "Lifecycle Benchmark Owner",
+    "authority_class" => "authoritative",
+    "owned_field_families" => ["fixed_benchmark_records"],
+    "generation" => "LC-BENCHMARK-GEN-001",
+    "observed_at" => "2026-08-24T00:00:00Z",
+    "version" => "TW-V060-FIXED-2000-001",
+    "mutable" => false,
+    "normalization" => {"encoding" => "UTF-8", "line_endings" => "LF", "case" => "exact", "legacy_locators" => []}
+  }
+  registry = {
+    "schema_version" => "tw-lifecycle-source-registry/1",
+    "registry_id" => "LC-BENCHMARK-REGISTRY-001",
+    "generation" => "LC-BENCHMARK-GEN-001",
+    "owner" => "Lifecycle Benchmark Owner",
+    "sources" => [source]
+  }
+  registry_path = root.join("source-registry.json")
+  write_json(registry_path, registry)
+  baseline = {"baseline_id" => "BASELINE-BENCHMARK-001", "generation" => "LC-BENCHMARK-GEN-001", "digest" => "sha256:#{"b" * 64}"}
+
+  RECORD_COUNT.times do |offset|
+    number = offset + 1
+    record_id = format("REC-LC-%04d", number)
+    type = number == 1_500 ? "evidence" : RECORD_TYPES.fetch(offset % RECORD_TYPES.length)
+    relationships = []
+    if number > 1
+      relationships << {
+        "source_id" => record_id,
+        "target_id" => format("REC-LC-%04d", number - 1),
+        "relationship_type" => offset % 11 == 0 ? "impacts" : "depends_on",
+        "applicable" => true,
+        "provenance" => "fixed deterministic benchmark chain"
+      }
+    end
+    record = {
+      "schema_version" => "tw-lifecycle-record/1",
+      "record_id" => record_id,
+      "record_type" => type,
+      "title" => "Deterministic lifecycle impact assurance record #{format("%04d", number)}",
+      "owner" => "Lifecycle Benchmark Owner",
+      "authority_class" => "authoritative",
+      "source" => {
+        "source_id" => source["source_id"],
+        "locator" => source["normalized_locator"],
+        "version" => source["version"],
+        "digest" => source["digest"],
+        "role" => source["role"],
+        "provenance" => "fixed corpus source identity"
+      },
+      "applicability" => "applicable",
+      "baseline" => baseline,
+      "freshness" => number == 1_500 ? "stale" : "current",
+      "acceptance_state" => "prepared",
+      "relationships" => relationships,
+      "fields" => {"fixture_number" => format("%04d", number), "fixed_seed" => "TW-V060-FIXED-2000-001"}
+    }
+    write_json(records_dir.join("#{record_id}.json"), record)
+  end
+
+  graph_path = root.join("lifecycle-graph.json")
+  build_args = ["build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--output", graph_path.to_s]
+  timed_graph(*build_args)
+  status_args = ["status", "--graph", graph_path.to_s, "--id", "REC-LC-1000"]
+  search_args = ["search", "--graph", graph_path.to_s, "--query", "REC-LC-1000", "--limit", "5"]
+  impact_args = ["impact", "--graph", graph_path.to_s, "--id", "REC-LC-1000", "--limit", "5"]
+
+  build_samples = measure(WARMUP_COUNT, SAMPLE_COUNT) { timed_graph(*build_args) }
+  status_samples = measure(WARMUP_COUNT, SAMPLE_COUNT) { timed_graph(*status_args) }
+  search_samples = measure(WARMUP_COUNT, SAMPLE_COUNT) { timed_graph(*search_args) }
+  impact_samples = measure(WARMUP_COUNT, SAMPLE_COUNT) { timed_graph(*impact_args) }
+
+  _, status_result = timed_graph(*status_args)
+  _, search_result = timed_graph(*search_args)
+  _, impact_result = timed_graph(*impact_args)
+  unless status_result.dig("record", "record_id") == "REC-LC-1000" && search_result.dig("results", 0, "match") == "exact_id" && impact_result["impact_count"] == RECORD_COUNT - 1
+    warn "v060_product_lifecycle_benchmark=failed reason=query_semantics"
+    exit 1
+  end
+
+  baseline_search_events = {
+    "route" => "frozen_repository_scan_baseline",
+    "events_per_question" => [
+      "repository_scan_for_exact_id",
+      "repository_scan_for_text_match",
+      "recursive_repository_scan_for_impact_references"
+    ],
+    "registered_repository_wide_searches" => 3
+  }
+  graph_searches = status_result.fetch("registered_repository_wide_searches", 0) + search_result.fetch("registered_repository_wide_searches") + impact_result.fetch("registered_repository_wide_searches")
+  reduction = ((baseline_search_events["registered_repository_wide_searches"] - graph_searches).to_f / baseline_search_events["registered_repository_wide_searches"] * 100.0).round(3)
+
+  raw = {
+    "build_ms" => build_samples.map { |value| value.round(3) },
+    "status_ms" => status_samples.map { |value| value.round(3) },
+    "search_ms" => search_samples.map { |value| value.round(3) },
+    "impact_ms" => impact_samples.map { |value| value.round(3) }
+  }
+  p95 = {
+    "build_ms" => nearest_rank_p95(build_samples).round(3),
+    "status_ms" => nearest_rank_p95(status_samples).round(3),
+    "search_ms" => nearest_rank_p95(search_samples).round(3),
+    "impact_ms" => nearest_rank_p95(impact_samples).round(3)
+  }
+  checks = {
+    "build_p95" => p95["build_ms"] <= BUILD_LIMIT_MS,
+    "status_p95" => p95["status_ms"] <= QUERY_LIMIT_MS,
+    "search_p95" => p95["search_ms"] <= QUERY_LIMIT_MS,
+    "impact_p95" => p95["impact_ms"] <= QUERY_LIMIT_MS,
+    "repository_search_reduction" => reduction >= REQUIRED_SEARCH_REDUCTION_PERCENT
+  }
+  graph = JSON.parse(graph_path.read)
+  result = {
+    "schema_version" => "tw-lifecycle-benchmark/1",
+    "status" => checks.values.all? ? "pass" : "failed",
+    "corpus" => {
+      "seed" => "TW-V060-FIXED-2000-001",
+      "record_count" => RECORD_COUNT,
+      "record_type_count" => RECORD_TYPES.length,
+      "records_digest" => graph.dig("provenance", "records_digest"),
+      "graph_id" => graph["graph_id"]
+    },
+    "method" => {
+      "clock" => "Process::CLOCK_MONOTONIC",
+      "warmups_per_operation" => WARMUP_COUNT,
+      "measured_samples_per_operation" => SAMPLE_COUNT,
+      "percentile" => "nearest_rank_p95",
+      "process_boundary_included" => true,
+      "clean_deterministic_build" => true,
+      "warm_query_from_content_addressed_graph" => true
+    },
+    "thresholds_ms" => {"build_p95" => BUILD_LIMIT_MS, "warm_query_p95" => QUERY_LIMIT_MS},
+    "p95_ms" => p95,
+    "samples_ms" => raw,
+    "repository_search_comparison" => {
+      "baseline" => baseline_search_events,
+      "graph_registered_repository_wide_searches" => graph_searches,
+      "reduction_percent" => reduction,
+      "required_reduction_percent" => REQUIRED_SEARCH_REDUCTION_PERCENT,
+      "zero_search_is_aspirational" => true
+    },
+    "checks" => checks,
+    "authority_effect" => "none"
+  }
+end
+
+puts canonical_json(result)
+exit(result["status"] == "pass" ? 0 : 1)

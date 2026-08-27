@@ -1,0 +1,394 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-evidence-control; req=REQ-TW-135,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: entrypoint=lifecycle_evidence_truth_staleness_and_acceptance_pack; req=REQ-TW-135,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074; ver=VER-TW-094
+
+require "digest"
+require "json"
+require "optparse"
+require "pathname"
+require "set"
+
+EVIDENCE_SCHEMA = "tw-lifecycle-evidence-receipt/1"
+CURRENT_SCHEMA = "tw-lifecycle-current-state/1"
+PACK_SCHEMA = "tw-lifecycle-acceptance-pack/1"
+DIGEST_PATTERN = /\Asha256:[0-9a-f]{64}\z/
+TRUTH_STAGES = %w[
+  observation technical_verification independent_review pr merge deployment
+  runtime_health release stakeholder_validation acceptance publication
+].freeze
+STAGE_STATES = %w[not_observed observed passed failed held not_applicable].freeze
+EVIDENCE_TYPES = {
+  "observation" => "raw_observation",
+  "technical_verification" => "technical_verification",
+  "independent_review" => "independent_review",
+  "pr" => "pr",
+  "merge" => "merge",
+  "deployment" => "deployment",
+  "runtime_health" => "runtime_health",
+  "release" => "release",
+  "stakeholder_validation" => "stakeholder_validation",
+  "acceptance" => "acceptance",
+  "publication" => "publication"
+}.freeze
+TOP_FIELDS = %w[
+  schema_version receipt_id work_item_id changed_scope_digest baseline
+  control_closure_digest applicability vv_definitions evidence_links
+  review_links truth_stages model_attestation remaining_holds
+  owner_disposition next_gate authority_effect
+].freeze
+
+class EvidenceError < StandardError
+  attr_reader :finding, :details
+
+  def initialize(finding, message, details = {})
+    super(message)
+    @finding = finding
+    @details = details
+  end
+end
+
+def fail!(finding, message, details = {})
+  raise EvidenceError.new(finding, message, details)
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, result|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      result[key] = canonical(value.fetch(source_key))
+    end
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def identity(value, excluded = nil)
+  payload = excluded ? value.reject { |key, _| key == excluded } : value
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(payload)))}"
+end
+
+def present_string?(value)
+  value.is_a?(String) && !value.strip.empty?
+end
+
+def digest?(value)
+  present_string?(value) && value.match?(DIGEST_PATTERN)
+end
+
+def resolve_file(root, candidate, finding)
+  fail!(finding, "path is required") unless present_string?(candidate)
+  path = Pathname.new(candidate)
+  path = root.join(path) unless path.absolute?
+  path = path.expand_path
+  fail!("path_escape", "path escapes root") if !path.exist? && (path.to_s == root.parent.to_s || !path.to_s.start_with?("#{root}/"))
+  fail!(finding, "file is missing", "path" => path.to_s) unless path.file?
+  fail!("symlink_input", "input may not be a symlink", "path" => path.to_s) if path.symlink?
+  real = path.realpath
+  relative = real.relative_path_from(root).to_s
+  fail!("path_escape", "path resolves outside root", "path" => path.to_s) if relative == ".." || relative.start_with?("../")
+  real
+rescue ArgumentError
+  fail!("path_escape", "path resolves outside root", "path" => candidate)
+end
+
+def load_json(path, malformed_finding)
+  bytes = path.binread
+  fail!("unsupported_encoding", "UTF-8 BOM is prohibited") if bytes.start_with?("\xEF\xBB\xBF".b)
+  fail!("unsupported_line_endings", "input must use LF line endings") if bytes.include?("\r".b)
+  text = bytes.dup.force_encoding(Encoding::UTF_8)
+  fail!("unsupported_encoding", "input is not valid UTF-8") unless text.valid_encoding?
+  JSON.parse(text)
+rescue JSON::ParserError => error
+  fail!(malformed_finding, "input is not valid JSON", "error" => error.message)
+end
+
+def validate_bound_file!(root, locator, expected_digest, label)
+  fail!("#{label}_locator_invalid", "#{label} locator must be root-relative") unless present_string?(locator)
+  relative = Pathname.new(locator)
+  fail!("#{label}_locator_invalid", "#{label} locator must be root-relative") if relative.absolute? || relative.each_filename.to_a.include?("..")
+  fail!("#{label}_digest_invalid", "#{label} digest is invalid") unless digest?(expected_digest)
+  path = resolve_file(root, locator, "#{label}_missing")
+  actual = "sha256:#{Digest::SHA256.file(path).hexdigest}"
+  fail!("#{label}_digest_mismatch", "#{label} digest does not match bound bytes", "locator" => locator, "actual" => actual) unless actual == expected_digest
+end
+
+def validate_identity_array!(values, id_field, label, allow_empty: true)
+  fail!("#{label}_invalid", "#{label} must be an array") unless values.is_a?(Array)
+  fail!("#{label}_empty", "#{label} must not be empty") if !allow_empty && values.empty?
+  ids = []
+  values.each do |entry|
+    fail!("#{label}_invalid", "#{label} entry must contain #{id_field} and digest") unless entry.is_a?(Hash) && entry.keys.sort == ["digest", id_field].sort && present_string?(entry[id_field]) && digest?(entry["digest"])
+    ids << entry[id_field]
+  end
+  fail!("#{label}_duplicate", "#{label} IDs must be unique") unless ids.uniq == ids
+  ids
+end
+
+def validate_evidence!(receipt, root)
+  fail!("malformed_evidence_receipt", "evidence receipt root must be an object") unless receipt.is_a?(Hash)
+  fail!("evidence_unknown_field", "evidence receipt contains unsupported fields", "fields" => receipt.keys - TOP_FIELDS) unless (receipt.keys - TOP_FIELDS).empty?
+  fail!("evidence_missing_field", "evidence receipt is incomplete", "fields" => TOP_FIELDS - receipt.keys) unless (TOP_FIELDS - receipt.keys).empty?
+  fail!("unsupported_evidence_schema", "evidence schema is unsupported") unless receipt["schema_version"] == EVIDENCE_SCHEMA
+  fail!("receipt_identity_mismatch", "receipt_id does not match canonical receipt payload") unless digest?(receipt["receipt_id"]) && receipt["receipt_id"] == identity(receipt, "receipt_id")
+  fail!("evidence_identity_invalid", "work_item_id and next_gate are required") unless present_string?(receipt["work_item_id"]) && present_string?(receipt["next_gate"])
+  fail!("evidence_digest_invalid", "scope and control closure digests are invalid") unless digest?(receipt["changed_scope_digest"]) && digest?(receipt["control_closure_digest"])
+  fail!("authority_effect_invalid", "evidence receipts cannot promote authority") unless receipt["authority_effect"] == "none"
+
+  baseline = receipt["baseline"]
+  baseline_fields = %w[baseline_id generation digest]
+  fail!("baseline_invalid", "baseline identity is incomplete") unless baseline.is_a?(Hash) && baseline.keys.sort == baseline_fields.sort && baseline_fields.all? { |field| present_string?(baseline[field]) } && digest?(baseline["digest"])
+
+  applicability = receipt["applicability"]
+  fail!("applicability_invalid", "applicability envelope is invalid") unless applicability.is_a?(Hash) && applicability.keys.sort == %w[artifacts environment_digest requirements].sort && digest?(applicability["environment_digest"])
+  requirement_ids = validate_identity_array!(applicability["requirements"], "requirement_id", "requirements", allow_empty: false)
+  validate_identity_array!(applicability["artifacts"], "artifact_id", "artifacts")
+
+  vv_definitions = receipt["vv_definitions"]
+  fail!("vv_definition_missing", "vv_definitions must be a non-empty array") unless vv_definitions.is_a?(Array) && !vv_definitions.empty?
+  vv_ids = []
+  vv_definitions.each do |entry|
+    fail!("vv_definition_invalid", "V&V definition must be an object") unless entry.is_a?(Hash)
+    if entry.key?("not_applicable")
+      fail!("vv_definition_invalid", "not-applicable V&V disposition has invalid fields") unless entry.keys.sort == %w[requirement_id not_applicable].sort && present_string?(entry["requirement_id"])
+      disposition = entry["not_applicable"]
+      fields = %w[scope reason decision_id owner]
+      fail!("vv_not_applicable_invalid", "not-applicable V&V requires scoped owner decision and rationale") unless disposition.is_a?(Hash) && disposition.keys.sort == fields.sort && fields.all? { |field| present_string?(disposition[field]) }
+      vv_ids << entry["requirement_id"]
+      next
+    end
+    fields = %w[requirement_id verification_definition_id validation_definition_id verification_method validation_question]
+    fail!("vv_definition_invalid", "V&V definition is incomplete") unless entry.keys.sort == fields.sort && fields.all? { |field| present_string?(entry[field]) }
+    fail!("vv_definition_invalid", "verification_method is unsupported") unless %w[test analysis inspection demonstration].include?(entry["verification_method"])
+    vv_ids << entry["requirement_id"]
+  end
+  fail!("vv_definition_duplicate", "V&V definitions must be unique per requirement") unless vv_ids.uniq == vv_ids
+  missing_vv = requirement_ids - vv_ids
+  fail!("vv_definition_missing", "every applicable requirement requires V&V at capture", "requirements" => missing_vv) unless missing_vv.empty?
+
+  evidence_links = receipt["evidence_links"]
+  fail!("evidence_links_invalid", "evidence_links must be an array") unless evidence_links.is_a?(Array)
+  evidence_by_id = {}
+  evidence_links.each do |entry|
+    fields = %w[evidence_id locator digest evidence_type]
+    fail!("evidence_link_invalid", "evidence link is incomplete") unless entry.is_a?(Hash) && entry.keys.sort == fields.sort && fields.all? { |field| present_string?(entry[field]) }
+    fail!("evidence_link_invalid", "evidence link digest is invalid") unless digest?(entry["digest"])
+    fail!("evidence_type_invalid", "evidence_type is unsupported") unless EVIDENCE_TYPES.values.include?(entry["evidence_type"])
+    fail!("evidence_id_duplicate", "evidence IDs must be unique") if evidence_by_id.key?(entry["evidence_id"])
+    validate_bound_file!(root, entry["locator"], entry["digest"], "evidence_link")
+    evidence_by_id[entry["evidence_id"]] = entry
+  end
+
+  review_links = receipt["review_links"]
+  fail!("review_links_invalid", "review_links must be an array") unless review_links.is_a?(Array)
+  review_ids = Set.new
+  review_links.each do |entry|
+    fields = %w[review_id locator digest state]
+    fail!("review_link_invalid", "review link is incomplete") unless entry.is_a?(Hash) && entry.keys.sort == fields.sort && fields.all? { |field| present_string?(entry[field]) } && digest?(entry["digest"]) && %w[pending passed failed held].include?(entry["state"])
+    fail!("review_id_duplicate", "review IDs must be unique") if review_ids.include?(entry["review_id"])
+    validate_bound_file!(root, entry["locator"], entry["digest"], "review_link")
+    review_ids << entry["review_id"]
+  end
+
+  stages = receipt["truth_stages"]
+  fail!("truth_stage_shape", "truth_stages must contain the exact closed stage set") unless stages.is_a?(Hash) && stages.keys.sort == TRUTH_STAGES.sort
+  stages.each do |name, stage|
+    allowed = %w[state evidence_ids held_reason not_applicable_reason]
+    fail!("truth_stage_shape", "truth stage envelope is invalid", "stage" => name) unless stage.is_a?(Hash) && (stage.keys - allowed).empty? && %w[state evidence_ids].all? { |field| stage.key?(field) }
+    state = stage["state"]
+    ids = stage["evidence_ids"]
+    fail!("truth_stage_state", "truth stage state is unsupported", "stage" => name) unless STAGE_STATES.include?(state)
+    fail!("truth_stage_evidence", "truth stage evidence_ids must be unique") unless ids.is_a?(Array) && ids.all? { |id| present_string?(id) } && ids.uniq == ids
+    if %w[observed passed failed].include?(state)
+      fail!("truth_stage_evidence", "observed/passed/failed stage requires evidence", "stage" => name) if ids.empty?
+      ids.each do |id|
+        link = evidence_by_id[id]
+        fail!("truth_stage_evidence", "truth stage references unknown evidence", "stage" => name, "evidence_id" => id) unless link
+        fail!("truth_stage_evidence_type", "truth stage evidence type is mismatched", "stage" => name, "evidence_id" => id) unless link["evidence_type"] == EVIDENCE_TYPES.fetch(name)
+      end
+    else
+      fail!("truth_stage_evidence", "unobserved/held/not-applicable stage cannot cite result evidence", "stage" => name) unless ids.empty?
+    end
+    fail!("truth_stage_hold_reason", "held stage requires held_reason", "stage" => name) if state == "held" && !present_string?(stage["held_reason"])
+    fail!("truth_stage_not_applicable_reason", "not-applicable stage requires rationale", "stage" => name) if state == "not_applicable" && !present_string?(stage["not_applicable_reason"])
+  end
+
+  observed = stages.dig("observation", "state") == "observed"
+  technical_pass = stages.dig("technical_verification", "state") == "passed"
+  review_pass = stages.dig("independent_review", "state") == "passed"
+  pr_pass = stages.dig("pr", "state") == "passed"
+  merge_pass = stages.dig("merge", "state") == "passed"
+  deploy_pass = stages.dig("deployment", "state") == "passed"
+  release_pass = stages.dig("release", "state") == "passed"
+  validation_pass = stages.dig("stakeholder_validation", "state") == "passed"
+  acceptance_pass = stages.dig("acceptance", "state") == "passed"
+  publication_pass = stages.dig("publication", "state") == "passed"
+  fail!("truth_stage_transition", "technical verification requires an observation") if technical_pass && !observed
+  fail!("truth_stage_transition", "independent review cannot substitute for technical verification") if review_pass && !technical_pass
+  fail!("truth_stage_transition", "merge requires PR truth") if merge_pass && !pr_pass
+  fail!("truth_stage_transition", "deployment requires merge truth") if deploy_pass && !merge_pass
+  fail!("truth_stage_transition", "runtime health requires deployment truth") if stages.dig("runtime_health", "state") == "passed" && !deploy_pass
+  fail!("truth_stage_transition", "release requires merge, technical verification, and independent review") if release_pass && !(merge_pass && technical_pass && review_pass)
+  fail!("truth_stage_transition", "stakeholder validation requires an observation") if validation_pass && !observed
+
+  owner = receipt["owner_disposition"]
+  fail!("owner_disposition_invalid", "owner disposition is invalid") unless owner.is_a?(Hash) && (owner.keys - %w[owner state decision_id reason]).empty? && present_string?(owner["owner"]) && %w[pending accepted rejected held].include?(owner["state"])
+  fail!("owner_decision_missing", "accepted owner disposition requires decision_id") if owner["state"] == "accepted" && !present_string?(owner["decision_id"])
+  fail!("truth_stage_transition", "acceptance requires passed stakeholder validation and an explicit owner decision") if acceptance_pass && !(validation_pass && owner["state"] == "accepted" && present_string?(owner["decision_id"]))
+  fail!("truth_stage_transition", "publication requires release and acceptance truth") if publication_pass && !(release_pass && acceptance_pass)
+
+  model = receipt["model_attestation"]
+  fail!("model_attestation_invalid", "model attestation is invalid") unless model.is_a?(Hash) && (model.keys - %w[state receipt_id held_reason]).empty? && %w[attested unattested not_applicable].include?(model["state"])
+  fail!("model_attestation_invalid", "attested model requires a receipt") if model["state"] == "attested" && !digest?(model["receipt_id"])
+  fail!("model_attestation_invalid", "unattested model requires an explicit hold") if model["state"] == "unattested" && !present_string?(model["held_reason"])
+
+  holds = receipt["remaining_holds"]
+  fail!("remaining_holds_invalid", "remaining_holds must be a unique string array") unless holds.is_a?(Array) && holds.all? { |hold| present_string?(hold) } && holds.uniq == holds
+  {
+    "integrated_review" => review_pass,
+    "stakeholder_validation" => validation_pass,
+    "acceptance" => acceptance_pass,
+    "publication" => publication_pass
+  }.each do |hold, passed|
+    fail!("truth_hold_conflict", "passed truth stage remains listed as held", "hold" => hold) if passed && holds.include?(hold)
+  end
+
+  {
+    "schema_version" => "tw-lifecycle-evidence-check/1",
+    "status" => "pass",
+    "receipt_id" => receipt["receipt_id"],
+    "requirements" => requirement_ids.sort,
+    "truth_stage_states" => TRUTH_STAGES.to_h { |name| [name, stages.fetch(name).fetch("state")] },
+    "remaining_holds" => holds.sort,
+    "authority_effect" => "none",
+    "findings" => []
+  }
+end
+
+def current_state_changes(receipt, current)
+  fail!("current_state_invalid", "current state schema is invalid") unless current.is_a?(Hash) && current["schema_version"] == CURRENT_SCHEMA && current.keys.sort == %w[schema_version baseline requirements artifacts environment_digest].sort
+  baseline = current["baseline"]
+  fail!("current_state_invalid", "current baseline is invalid") unless baseline.is_a?(Hash) && baseline.keys.sort == %w[baseline_id generation digest].sort && digest?(baseline["digest"])
+  current_requirements = validate_identity_array!(current["requirements"], "requirement_id", "current_requirements", allow_empty: false)
+  current_artifacts = validate_identity_array!(current["artifacts"], "artifact_id", "current_artifacts")
+  fail!("current_state_invalid", "current environment digest is invalid") unless digest?(current["environment_digest"])
+
+  changes = []
+  expected_baseline = receipt["baseline"]
+  changes << "baseline:#{expected_baseline['baseline_id']}" unless baseline == expected_baseline
+  changes << "environment" unless current["environment_digest"] == receipt.dig("applicability", "environment_digest")
+
+  expected_requirements = receipt.dig("applicability", "requirements").to_h { |entry| [entry["requirement_id"], entry["digest"]] }
+  observed_requirements = current["requirements"].to_h { |entry| [entry["requirement_id"], entry["digest"]] }
+  (expected_requirements.keys | observed_requirements.keys).sort.each do |id|
+    changes << "requirement:#{id}" unless expected_requirements[id] == observed_requirements[id]
+  end
+
+  expected_artifacts = receipt.dig("applicability", "artifacts").to_h { |entry| [entry["artifact_id"], entry["digest"]] }
+  observed_artifacts = current["artifacts"].to_h { |entry| [entry["artifact_id"], entry["digest"]] }
+  (expected_artifacts.keys | observed_artifacts.keys).sort.each do |id|
+    changes << "artifact:#{id}" unless expected_artifacts[id] == observed_artifacts[id]
+  end
+  [changes, current_requirements, current_artifacts]
+end
+
+command = ARGV.shift
+options = {root: Dir.pwd, evidence: nil, current: nil}
+OptionParser.new do |parser|
+  parser.banner = "Usage: traceweaver-lifecycle-evidence <evidence-check|staleness|acceptance-pack> --root PATH --evidence PATH [options]"
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--evidence PATH") { |value| options[:evidence] = value }
+  parser.on("--current PATH") { |value| options[:current] = value }
+end.parse!
+
+begin
+  fail!("invalid_command", "unsupported operation", "operation" => command) unless %w[evidence-check staleness acceptance-pack].include?(command)
+  root = Pathname.new(options[:root]).expand_path
+  fail!("invalid_root", "--root must be a directory") unless root.directory?
+  root = root.realpath
+  evidence_path = resolve_file(root, options[:evidence], "missing_evidence")
+  receipt = load_json(evidence_path, "malformed_evidence_receipt")
+  check = validate_evidence!(receipt, root)
+
+  if command == "evidence-check"
+    puts canonical_json(check)
+    exit 0
+  end
+
+  if command == "staleness"
+    current_path = resolve_file(root, options[:current], "missing_current_state")
+    current = load_json(current_path, "malformed_current_state")
+    changes, = current_state_changes(receipt, current)
+    requirement_ids = receipt.dig("applicability", "requirements").map { |entry| entry["requirement_id"] }.sort
+    directly_changed = changes.grep(/\Arequirement:/).map { |entry| entry.delete_prefix("requirement:") }
+    reverify = if changes.any? { |entry| entry.start_with?("baseline:", "artifact:") || entry == "environment" }
+                 requirement_ids
+               else
+                 directly_changed & requirement_ids
+               end
+    result = {
+      "schema_version" => "tw-lifecycle-staleness-result/1",
+      "status" => "pass",
+      "evidence_receipt_id" => receipt["receipt_id"],
+      "freshness" => changes.empty? ? "current" : "stale",
+      "changed_inputs" => changes,
+      "reverify_requirements" => reverify.sort,
+      "next_gate" => changes.empty? ? receipt["next_gate"] : "reverify_changed_applicability_before_closure",
+      "authority_effect" => "none"
+    }
+    puts canonical_json(result)
+    exit 0
+  end
+
+  accepted = receipt.dig("truth_stages", "acceptance", "state") == "passed" && receipt.dig("owner_disposition", "state") == "accepted" && receipt["remaining_holds"].empty?
+  body = {
+    "schema_version" => PACK_SCHEMA,
+    "baseline" => receipt["baseline"],
+    "evidence_receipt_id" => receipt["receipt_id"],
+    "requirements" => check["requirements"],
+    "truth_stage_states" => check["truth_stage_states"],
+    "remaining_holds" => receipt["remaining_holds"].sort,
+    "owner_disposition" => receipt["owner_disposition"],
+    "acceptance_state" => accepted ? "accepted" : "held",
+    "authority_effect" => "none"
+  }
+  puts canonical_json(body.merge("pack_id" => identity(body)))
+rescue EvidenceError => error
+  puts canonical_json(
+    "schema_version" => "tw-lifecycle-evidence-finding/1",
+    "status" => "blocked",
+    "finding" => error.finding,
+    "reason" => error.message,
+    "details" => error.details,
+    "authority_effect" => "none"
+  )
+  exit 1
+rescue OptionParser::ParseError => error
+  puts canonical_json(
+    "schema_version" => "tw-lifecycle-evidence-finding/1",
+    "status" => "blocked",
+    "finding" => "usage_error",
+    "reason" => error.message,
+    "details" => {},
+    "authority_effect" => "none"
+  )
+  exit 2
+rescue StandardError => error
+  puts canonical_json(
+    "schema_version" => "tw-lifecycle-evidence-finding/1",
+    "status" => "blocked",
+    "finding" => "unexpected_evidence_error",
+    "reason" => error.message,
+    "details" => {"class" => error.class.name},
+    "authority_effect" => "none"
+  )
+  exit 1
+end

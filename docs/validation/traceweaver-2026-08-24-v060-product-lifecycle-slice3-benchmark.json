@@ -1,0 +1,83 @@
+{
+  "schema_version": "tw-lifecycle-benchmark/1",
+  "status": "pass",
+  "corpus": {
+    "seed": "TW-V060-FIXED-2000-001",
+    "record_count": 2000,
+    "record_type_count": 17,
+    "records_digest": "sha256:36f1c2e4630eca08bd5d1fdb9b11f302847b627a80973ceef0414f28022c7c20",
+    "graph_id": "sha256:e9406f30a9181e39852a67f89ec561e939d6d883e88b9eaf1731dea9c6c5ef37"
+  },
+  "method": {
+    "clock": "Process::CLOCK_MONOTONIC",
+    "warmups_per_operation": 10,
+    "measured_samples_per_operation": 30,
+    "percentile": "nearest_rank_p95",
+    "process_boundary_included": true,
+    "clean_deterministic_build": true,
+    "warm_query_from_content_addressed_graph": true
+  },
+  "thresholds_ms": {
+    "build_p95": 1500.0,
+    "warm_query_p95": 250.0
+  },
+  "p95_ms": {
+    "build_ms": 369.846,
+    "status_ms": 127.051,
+    "search_ms": 129.077,
+    "impact_ms": 134.162
+  },
+  "samples_ms": {
+    "build_ms": [
+      375.34, 362.505, 358.125, 354.649, 361.428, 360.055, 358.872,
+      356.96, 356.286, 356.405, 359.212, 359.866, 359.75, 361.301,
+      369.846, 359.906, 356.447, 359.519, 352.1, 365.52, 361.973,
+      359.054, 357.817, 359.784, 357.335, 357.161, 358.463, 358.509,
+      351.361, 354.054
+    ],
+    "status_ms": [
+      124.714, 123.673, 123.536, 122.259, 123.456, 125.341, 122.565,
+      123.635, 121.246, 124.258, 123.884, 121.75, 125.794, 122.833,
+      124.856, 125.363, 122.66, 127.88, 122.125, 123.36, 127.051,
+      121.7, 121.134, 121.886, 122.174, 125.661, 121.331, 121.908,
+      125.052, 124.286
+    ],
+    "search_ms": [
+      123.638, 127.471, 125.959, 126.168, 130.242, 127.654, 124.588,
+      125.168, 126.906, 125.281, 124.397, 124.326, 123.784, 125.439,
+      124.725, 127.082, 126.49, 125.703, 126.54, 126.441, 128.262,
+      127.376, 127.461, 129.077, 128.944, 127.268, 126.373, 127.969,
+      127.839, 126.379
+    ],
+    "impact_ms": [
+      126.084, 125.561, 124.824, 129.873, 132.102, 134.162, 134.826,
+      127.781, 129.708, 133.707, 129.155, 126.449, 129.695, 128.415,
+      127.718, 131.889, 132.016, 130.792, 131.626, 126.984, 127.513,
+      129.309, 125.701, 127.563, 127.781, 127.055, 128.97, 128.022,
+      129.264, 127.528
+    ]
+  },
+  "repository_search_comparison": {
+    "baseline": {
+      "route": "frozen_repository_scan_baseline",
+      "events_per_question": [
+        "repository_scan_for_exact_id",
+        "repository_scan_for_text_match",
+        "recursive_repository_scan_for_impact_references"
+      ],
+      "registered_repository_wide_searches": 3
+    },
+    "graph_registered_repository_wide_searches": 0,
+    "reduction_percent": 100.0,
+    "required_reduction_percent": 50.0,
+    "zero_search_is_aspirational": true
+  },
+  "checks": {
+    "build_p95": true,
+    "status_p95": true,
+    "search_p95": true,
+    "impact_p95": true,
+    "repository_search_reduction": true
+  },
+  "authority_effect": "none"
+}

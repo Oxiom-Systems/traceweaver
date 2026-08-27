@@ -248,7 +248,7 @@ fixture_inventory:
   - locator: fixtures/metric-routing-harness/qualification-missing-validation.json
     sha256: sha256:b650f01055c731e77c6790f4fb12f964786f17cba08146bed261b94a70c3f00e
   - locator: fixtures/metric-routing-harness/qualification-valid.json
-    sha256: sha256:85cf3392bd00d387a80418846babd694b29b07a2154bd2b2e7293799a1c06bc3
+    sha256: sha256:191c32258a6fb58c605906993d8cacc287389e03226fed8503de5bac866d87cd
   - locator: fixtures/metric-routing-harness/quality-agreement-fail.json
     sha256: sha256:5d9fc4d2affb78d7876a8f3e0c7bdcb4bb3d0214432f8e52fcfc2add39e2dcfa
   - locator: fixtures/metric-routing-harness/quality-floor-fail.json
@@ -293,4 +293,4 @@ fixture_inventory:
     sha256: sha256:1cf2701c4852806646fee511f81bc08b356bc40c1666ca848eb2346894610335
   - locator: fixtures/metric-routing-harness/ver-tw-093-template.yml
     sha256: sha256:34cdb0b7895e99f06225f7b6dec1c06c29e0346f9a2520e70e40aa80c7e37430
-reference_identity: sha256:a6db3a7ec9cb0fd0b554591deac970572dcd14080cadaa611c46b63dc47b8b94
+reference_identity: sha256:5dfdfa8179b53293318a4cfd13c11829e808b42cc06e69edf1dda4a87ca7cdc0

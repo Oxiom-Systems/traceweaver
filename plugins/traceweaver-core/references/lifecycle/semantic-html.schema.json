@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-html/1",
+  "title": "TraceWeaver strict static lifecycle HTML projection manifest",
+  "description": "Manifest for deterministic accessible offline semantic HTML derived from one current lifecycle graph and its registered Markdown/YAML authority. Generated HTML is non-authoritative unless a separately accepted atomic cutover closes every named gate.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "manifest_id", "profile", "authority_role",
+    "controlling_sources", "parser_lock", "graph", "source_closure_digest",
+    "record_count", "relationship_count", "records", "relationships",
+    "pages", "authority_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-html/1"},
+    "manifest_id": {"$ref": "#/$defs/digest"},
+    "profile": {"const": "strict_static_accessible_offline_printable"},
+    "authority_role": {"const": "derived_non_authoritative"},
+    "controlling_sources": {"const": "registered_markdown_yaml_and_external_receipts"},
+    "parser_lock": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["schema_version", "digest", "parser", "source_location_adapter"],
+      "properties": {
+        "schema_version": {"const": "tw-semantic-html-parser-lock/1"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "parser": {"const": "nokogiri-1.13.8-html5-libgumbo-1.0.0-nokogiri"},
+        "source_location_adapter": {"const": "traceweaver-generated-html-source-span/1"}
+      }
+    },
+    "graph": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["graph_id", "registry_id", "registry_digest", "records_digest", "baseline"],
+      "properties": {
+        "graph_id": {"$ref": "#/$defs/digest"},
+        "registry_id": {"type": "string", "minLength": 1},
+        "registry_digest": {"$ref": "#/$defs/digest"},
+        "records_digest": {"$ref": "#/$defs/digest"},
+        "baseline": {"$ref": "#/$defs/baseline"}
+      }
+    },
+    "source_closure_digest": {"$ref": "#/$defs/digest"},
+    "record_count": {"type": "integer", "minimum": 1},
+    "relationship_count": {"type": "integer", "minimum": 0},
+    "records": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/record"},
+      "minItems": 1
+    },
+    "relationships": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/relationship"}
+    },
+    "pages": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/page"},
+      "minItems": 2
+    },
+    "authority_effect": {"const": "none"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_id", "generation", "digest"],
+      "properties": {
+        "baseline_id": {"type": "string", "minLength": 1},
+        "generation": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "record": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id", "record_digest", "article_span_digest", "visible_text_digest", "source_id", "source_digest"],
+      "properties": {
+        "record_id": {"type": "string", "minLength": 1},
+        "record_digest": {"$ref": "#/$defs/digest"},
+        "article_span_digest": {"$ref": "#/$defs/digest"},
+        "visible_text_digest": {"$ref": "#/$defs/digest"},
+        "source_id": {"type": "string", "minLength": 1},
+        "source_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "relationship": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source_id", "target_id", "relationship_type", "applicable", "provenance", "digest"],
+      "properties": {
+        "source_id": {"type": "string", "minLength": 1},
+        "target_id": {"type": "string", "minLength": 1},
+        "relationship_type": {"type": "string", "minLength": 1},
+        "applicable": {"type": "boolean"},
+        "provenance": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "page": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["path", "digest", "bytes", "media_type"],
+      "properties": {
+        "path": {"type": "string", "pattern": "^[a-z0-9-]+\\.html$"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "bytes": {"type": "integer", "minimum": 1},
+        "media_type": {"const": "text/html; charset=utf-8"}
+      }
+    }
+  }
+}

@@ -1,4 +1,4 @@
-# TRACEWEAVER: file-role=v050-main-only-release-and-runtime-receipt; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092
+# TRACEWEAVER: file-role=main-only-release-and-runtime-receipt; req=REQ-TW-122,REQ-TW-145; trace=TRACE-TW-072,TRACE-TW-074; ver=VER-TW-092,VER-TW-094
 name: Release on version bump
 
 # Creates the `traceweaver-core--v<version>` git tag and a matching GitHub

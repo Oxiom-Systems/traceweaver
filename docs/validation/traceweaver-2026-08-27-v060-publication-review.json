@@ -1,0 +1,25 @@
+{
+  "schema_version": "tw-publication-review/1",
+  "candidate_kind": "mixed",
+  "candidate_digest": "sha256:4de43ade6ac8d15e278cef68f2e94b2c1eec5e5f9a919f8696f71e0f51debcec",
+  "status": "clean",
+  "review_route": "tw-code-review",
+  "reviewer_identity": "terra-integrated-reviewer:root-v060-integrated-review",
+  "reviewer_identity_count": 1,
+  "review_turn_count": 2,
+  "nested_reviewer_dispatches": 0,
+  "coverage": [
+    "behavior",
+    "correctness",
+    "held_claims",
+    "linked_tests",
+    "relevant_normative_docs",
+    "traceability_vv",
+    "triggered_risk_lenses"
+  ],
+  "review_record_id": "TW-CODE-REVIEW-2026-08-27-V060-RELEASE-CANDIDATE-001",
+  "open_p0": 0,
+  "open_p1": 0,
+  "repair_cycle_count": 1,
+  "publication_authority": "none"
+}

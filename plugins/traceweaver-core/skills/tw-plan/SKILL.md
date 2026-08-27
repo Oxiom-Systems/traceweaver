@@ -69,6 +69,8 @@ Before planning meaningful behavior, load and cite:
 - `requirements.md`
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
+- `<skills-root>/tw-auto/references/bounded-convergence-window-guide.md` when
+  the plan needs bounded repair/verification attempts after one owner decision
 - skill-local `references/traceweaver-operating-modes.md`
 - skill-local `references/verification-planner-guide.md` when planning the
   verification method, evidence, and pass/fail criteria for planned work
@@ -93,6 +95,16 @@ If authority files are missing, treat the run as authority bootstrap planning
 only. If requirements are unclear, contradictory, incomplete, stale, missing, or
 would need material change, pause or route to `tw-requirements-review` before
 delegating to `ce-plan`.
+
+## Bounded Convergence Planning
+
+When the work can fail and be repaired without changing accepted semantics,
+define one bounded convergence window instead of one approval per attempt.
+Freeze the authority plane; name the mutable candidate scope, allowed repair
+classes, static source-closure preflight, verification/pass condition,
+risk-proportional attempt budget, immediate stop conditions, post-exit evidence
+closure, and separate publication/deployment holds. Do not place a result file
+or receipt in the input identity of the same attempt that writes it.
 
 ## Requirements-Quality Preflight
 

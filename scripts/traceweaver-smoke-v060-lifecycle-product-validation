@@ -1,0 +1,279 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=v060-lifecycle-product-validation-smoke; req=REQ-TW-136,REQ-TW-144; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-136,REQ-TW-144; trace=TRACE-TW-074; val=VAL-TW-042
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+VALIDATOR = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-product-validation")
+SCHEMA = ROOT.join("plugins/traceweaver-core/references/lifecycle/product-validation.schema.json")
+
+unless VALIDATOR.file? && VALIDATOR.executable?
+  warn "v060_lifecycle_product_validation_smoke=failed reason=missing_product_validation_executable"
+  exit 1
+end
+unless SCHEMA.file? && SCHEMA.read.include?(%q{"const": "tw-lifecycle-product-validation/1"}) && SCHEMA.read.include?(%q{"source_baseline_receipt"})
+  warn "v060_lifecycle_product_validation_smoke=failed reason=missing_or_invalid_product_validation_schema"
+  exit 1
+end
+
+DIGEST_A = "sha256:#{'a' * 64}"
+DIGEST_B = "sha256:#{'b' * 64}"
+DIGEST_C = "sha256:#{'c' * 64}"
+TASK_TYPES = %w[
+  source_registration candidate_capture duplicate_navigation impact_navigation
+  vv_before_work stale_evidence strict_html_navigation acceptance_pack
+].freeze
+
+def file_digest(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def write_json(path, value)
+  FileUtils.mkdir_p(path.dirname)
+  path.write(JSON.pretty_generate(value) + "\n")
+  path
+end
+
+def raw_tasks
+  TASK_TYPES.each_with_index.map do |task_type, ordinal|
+    {
+      "task_type" => task_type,
+      "required_record_links" => 5,
+      "recovered_record_links" => ordinal.zero? ? 4 : 5,
+      "false_authority_promotions" => 0,
+      "false_truth_stage_promotions" => 0,
+      "elapsed_ms" => 100 + ordinal,
+      "outcome" => "passed"
+    }
+  end
+end
+
+def authorization(product)
+  slug = product.downcase.gsub(" ", "-")
+  {
+    "authority_id" => "AUTH-#{product.upcase.gsub(/[^A-Z]/, '')}-001",
+    "authorized_by" => "Named #{product} owner",
+    "relationship" => "product owner",
+    "repository_locator" => "external/#{slug}",
+    "revision" => Digest::SHA256.hexdigest(product)[0, 40],
+    "revision_digest" => product == "Vestro" ? DIGEST_A : DIGEST_B,
+    "source_inventory_digest" => DIGEST_C,
+    "source_locators" => ["requirements.md", "traceability-matrix.md", ".traceweaver/intent-contract.yml"]
+  }
+end
+
+def seeded_impacts
+  [{"record_id" => "REQ-#{''}SAMPLE-001", "expected_link_ids" => ["TRACE-SAMPLE-001"], "observed_link_ids" => ["TRACE-SAMPLE-001"]}]
+end
+
+def route_comparison
+  {"markdown_manual_matrix_elapsed_ms" => [150, 160, 170], "strict_html_elapsed_ms" => [120, 130, 140]}
+end
+
+def air_artifact
+  {"artifact_id" => "ART-AIR-NONCODE-001", "source_id" => "SRC-AIR-042", "locator" => "config/phase25-hls-contract.json", "digest" => DIGEST_C}
+end
+
+def write_raw_observation(dir, product, scenario_id, candidate_digest, air: false)
+  locator = "raw/#{scenario_id.downcase}.json"
+  value = {
+    "schema_version" => "tw-lifecycle-product-trial-observation/1",
+    "product" => product,
+    "scenario_id" => scenario_id,
+    "candidate_tree_digest" => candidate_digest,
+    "authority_effect" => "none",
+    "source_authorization" => authorization(product),
+    "tasks" => raw_tasks,
+    "seeded_impacts" => seeded_impacts,
+    "route_comparison" => route_comparison
+  }
+  value["non_code_artifact"] = air_artifact.merge("impact_visible" => true, "acceptance_pack_visible" => true) if air
+  path = write_json(dir.join(locator), value)
+  [locator, file_digest(path)]
+end
+
+def cell(product, scenario_id, raw_locator, raw_digest, air: false)
+  value = {
+    "product" => product,
+    "scenario_id" => scenario_id,
+    "source_authorization" => authorization(product),
+    "rater" => {
+      "name" => "Independent #{product} maintainer",
+      "relationship" => "maintainer",
+      "independence" => "Did not implement the TraceWeaver Core 0.6.0 candidate."
+    },
+    "tasks" => raw_tasks.map { |task| task.merge("raw_evidence_locator" => raw_locator, "raw_evidence_digest" => raw_digest) },
+    "seeded_impacts" => seeded_impacts,
+    "route_comparison" => route_comparison,
+    "acceptance_signal" => "accepted",
+    "acceptance_rationale" => "The complete representative route was observed without false promotion.",
+    "limitations" => ["Static repository lifecycle scope only."],
+    "raw_evidence_locator" => raw_locator,
+    "raw_evidence_digest" => raw_digest,
+    "observed_at" => "2026-08-24T12:00:00Z"
+  }
+  value["non_code_artifact"] = air_artifact.merge("impact_evidence_locator" => raw_locator, "impact_evidence_digest" => raw_digest) if air
+  value
+end
+
+def make_fixture(dir)
+  candidate_digest = DIGEST_B
+  plan_locator = "docs/validation/plan.md"
+  FileUtils.mkdir_p(dir.join(plan_locator).dirname)
+  dir.join(plan_locator).write("# Frozen product validation plan\n")
+
+  vestro_locator, vestro_digest = write_raw_observation(dir, "Vestro", "VESTRO-LC-001", candidate_digest)
+  air_locator, air_digest = write_raw_observation(dir, "Air Router", "AIRROUTER-LC-001", candidate_digest, air: true)
+  baseline = {
+    "schema_version" => "tw-lifecycle-product-source-baselines/1",
+    "authority_effect" => "none",
+    "products" => [
+      {
+        "product" => "Vestro",
+        "repository_locator" => authorization("Vestro")["repository_locator"],
+        "head" => authorization("Vestro")["revision"],
+        "worktree_state_digest" => authorization("Vestro")["revision_digest"],
+        "source_inventory_digest" => DIGEST_C,
+        "source_digests" => authorization("Vestro")["source_locators"].to_h { |locator| [locator, DIGEST_A] }
+      },
+      {
+        "product" => "Air Router",
+        "repository_locator" => authorization("Air Router")["repository_locator"],
+        "head" => authorization("Air Router")["revision"],
+        "worktree_state_digest" => authorization("Air Router")["revision_digest"],
+        "source_inventory_digest" => DIGEST_C,
+        "source_digests" => authorization("Air Router")["source_locators"].to_h { |locator| [locator, DIGEST_A] },
+        "authorized_non_code_artifact" => air_artifact
+      }
+    ]
+  }
+  baseline_locator = "docs/validation/source-baselines.json"
+  baseline_path = write_json(dir.join(baseline_locator), baseline)
+
+  result = {
+    "schema_version" => "tw-lifecycle-product-validation/1",
+    "validation_id" => "VAL-TW-042",
+    "candidate" => {
+      "release_version" => "0.6.0",
+      "baseline_id" => "TW-V060-CANDIDATE-001",
+      "requirements_hash_sha256" => DIGEST_A,
+      "tree_digest" => candidate_digest
+    },
+    "preregistration" => {
+      "plan_ref" => plan_locator,
+      "frozen_at" => "2026-08-24T11:00:00Z",
+      "scenario_ids" => %w[VESTRO-LC-001 AIRROUTER-LC-001 ACCEPT-LC-001]
+    },
+    "source_baseline_receipt" => {"locator" => baseline_locator, "digest" => file_digest(baseline_path)},
+    "cells" => [
+      cell("Vestro", "VESTRO-LC-001", vestro_locator, vestro_digest),
+      cell("Air Router", "AIRROUTER-LC-001", air_locator, air_digest, air: true)
+    ],
+    "owner_disposition" => {
+      "owner_name" => "Named Oxiom Systems owner",
+      "relationship" => "TraceWeaver release owner",
+      "decision" => "accepted",
+      "reviewed_cell_raw_digests" => [vestro_digest, air_digest],
+      "limitations_acknowledged" => true,
+      "remaining_holds" => ["publication remains separately gated"],
+      "decided_at" => "2026-08-24T13:00:00Z"
+    }
+  }
+  [result, vestro_locator, baseline_locator]
+end
+
+def run_validator(root, path)
+  Open3.capture3(VALIDATOR.to_s, "--root", root.to_s, "--result", path.to_s)
+end
+
+def write_case(dir, name, value)
+  write_json(dir.join("cases/#{name}.json"), value)
+end
+
+def assert_pass(dir, name, value, marker)
+  stdout, stderr, status = run_validator(dir, write_case(dir, name, value))
+  abort("#{name}=failed\n#{stdout}\n#{stderr}") unless status.success? && stdout.include?(marker)
+end
+
+def assert_refused(dir, name, value, marker)
+  stdout, stderr, status = run_validator(dir, write_case(dir, name, value))
+  output = stdout + stderr
+  abort("#{name}=unexpected_pass\n#{output}") if status.success?
+  abort("#{name}=wrong_finding expected=#{marker}\n#{output}") unless output.include?(marker)
+end
+
+Dir.mktmpdir("traceweaver-v060-product-validation-") do |tmp|
+  dir = Pathname.new(tmp)
+  valid, vestro_locator, baseline_locator = make_fixture(dir)
+  assert_pass(dir, "valid", valid, "product_validation_release_gate=passed")
+
+  low_recovery = Marshal.load(Marshal.dump(valid))
+  low_recovery["cells"][0]["tasks"][1]["recovered_record_links"] = 3
+  assert_refused(dir, "low_recovery", low_recovery, "recovery_below_95_percent")
+
+  false_promotion = Marshal.load(Marshal.dump(valid))
+  false_promotion["cells"][1]["tasks"][0]["false_authority_promotions"] = 1
+  assert_refused(dir, "false_promotion", false_promotion, "false_authority_promotion")
+
+  html_regression = Marshal.load(Marshal.dump(valid))
+  html_regression["cells"][0]["route_comparison"]["strict_html_elapsed_ms"] = [200, 210, 220]
+  assert_refused(dir, "html_regression", html_regression, "html_median_regressed")
+
+  missing_non_code = Marshal.load(Marshal.dump(valid))
+  missing_non_code["cells"][1].delete("non_code_artifact")
+  assert_refused(dir, "missing_non_code", missing_non_code, "air_router_non_code_artifact_missing")
+
+  compensated = Marshal.load(Marshal.dump(valid))
+  compensated["cells"][0]["acceptance_signal"] = "held"
+  assert_refused(dir, "compensated", compensated, "cell_not_independently_accepted")
+
+  wrong_owner_digests = Marshal.load(Marshal.dump(valid))
+  wrong_owner_digests["owner_disposition"]["reviewed_cell_raw_digests"] = [valid["cells"][0]["raw_evidence_digest"]]
+  assert_refused(dir, "wrong_owner_digests", wrong_owner_digests, "owner_disposition_cell_digest_mismatch")
+
+  fixture_substitute = Marshal.load(Marshal.dump(valid))
+  fixture_substitute["cells"][0]["source_authorization"]["repository_locator"] = "fixtures/vestro"
+  assert_refused(dir, "fixture_substitute", fixture_substitute, "repository_only_fixture_substitution")
+
+  unsafe_locator = Marshal.load(Marshal.dump(valid))
+  unsafe_locator["cells"][0]["raw_evidence_locator"] = "../outside.json"
+  assert_refused(dir, "unsafe_locator", unsafe_locator, "unsafe_evidence_locator")
+
+  nonexistent = Marshal.load(Marshal.dump(valid))
+  nonexistent["cells"][0]["raw_evidence_locator"] = "raw/missing.json"
+  nonexistent["cells"][0]["tasks"].each { |task| task["raw_evidence_locator"] = "raw/missing.json" }
+  assert_refused(dir, "nonexistent", nonexistent, "cell_raw_evidence_missing")
+
+  digest_mismatch = Marshal.load(Marshal.dump(valid))
+  digest_mismatch["cells"][0]["raw_evidence_digest"] = DIGEST_A
+  digest_mismatch["cells"][0]["tasks"].each { |task| task["raw_evidence_digest"] = DIGEST_A }
+  assert_refused(dir, "digest_mismatch", digest_mismatch, "cell_raw_evidence_digest_mismatch")
+
+  symlink_target = dir.join(vestro_locator)
+  symlink_locator = "raw/vestro-symlink.json"
+  FileUtils.ln_s(symlink_target.basename, dir.join(symlink_locator))
+  symlinked = Marshal.load(Marshal.dump(valid))
+  symlinked["cells"][0]["raw_evidence_locator"] = symlink_locator
+  symlinked["cells"][0]["tasks"].each { |task| task["raw_evidence_locator"] = symlink_locator }
+  assert_refused(dir, "symlinked", symlinked, "cell_raw_evidence_missing")
+
+  baseline_mismatch = Marshal.load(Marshal.dump(valid))
+  baseline_mismatch["source_baseline_receipt"]["digest"] = DIGEST_A
+  assert_refused(dir, "baseline_mismatch", baseline_mismatch, "source_baseline_receipt_digest_mismatch")
+
+  FileUtils.rm(dir.join(baseline_locator))
+  assert_refused(dir, "baseline_missing", valid, "source_baseline_receipt_missing")
+end
+
+puts "v060_lifecycle_product_validation_smoke=passed"
+puts "v060_lifecycle_product_validation_non_compensation=passed"
+puts "v060_lifecycle_product_validation_authority_boundary=passed"
+puts "v060_lifecycle_product_validation_non_code_artifact=passed"
+puts "v060_lifecycle_product_validation_content_bindings=passed"

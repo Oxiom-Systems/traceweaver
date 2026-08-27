@@ -1,0 +1,29 @@
+schema_version: tw-review-route/1
+review_id: TW-DOC-REVIEW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001
+mode: mechanical_closure
+scope:
+  change_id: CHG-TW-2026-08-26-004
+  exception_id: EXC-TW-021
+  closure: review_id_status_hash_capsule_review_reference_snapshot_and_generated_views_only
+identity_method:
+  semantic_authority: reuse_the_accepted_review_semantic_identity_normative_requirement_scope_validation_intent_allowed_and_held_behavior_and_must_not_change_rules_unchanged
+  behavior: reuse_the_accepted_review_eleven_file_preimplementation_identity_unchanged
+  verification: reuse_the_accepted_review_post_oracle_red_and_one_attempt_definition_identity_unchanged
+  bookkeeping: sha256_of_canonical_sorted_json_path_to_sha256_for_snapshot_matrix_generated_views_plan_and_capsules
+accepted:
+  semantic_authority_digest: sha256:ee2bdafc97fb33f0f2468303bf3d492a6150fb450cc92cb945aac70b5e6060e4
+  behavior_digest: sha256:c7aac82bb53da868b7f79dbe690fed2d0ef2132dfc5ea81eab0c3cf012dbc5e1
+  verification_digest: sha256:699a3b6d898931a72d5066265d7ef265097fb251f02ca71bb787935612a822e7
+  bookkeeping_digest: sha256:26271997766e904020990a531efe406f36c6e829ccc3220b74640886af9ecc09
+  session_id: revision_5_authority_document_review_clean
+candidate:
+  semantic_authority_digest: sha256:ee2bdafc97fb33f0f2468303bf3d492a6150fb450cc92cb945aac70b5e6060e4
+  behavior_digest: sha256:c7aac82bb53da868b7f79dbe690fed2d0ef2132dfc5ea81eab0c3cf012dbc5e1
+  verification_digest: sha256:699a3b6d898931a72d5066265d7ef265097fb251f02ca71bb787935612a822e7
+  bookkeeping_digest: sha256:886b4c518b256aade99436254870b119e59292a56e353e67f2cb16d94b2ac286
+  session_id: revision_5_authority_document_review_mechanical_closure
+constraints:
+  reviewer_dispatch: none
+  new_review_series: prohibited
+  semantic_behavior_or_verification_change: prohibited
+  publication_authority: none

@@ -6,15 +6,15 @@
   "generated_from": [
     {
       "path": "traceability-matrix.md",
-      "sha256": "bd0fbac9b1795eeba6783f7434570c640fb73e45f13ead16dcce9dd5f80977e0"
+      "sha256": "71de5f24e7bf5ab256e83c42c078fe2e489fb8efc481e8d26dabc3728fda438d"
     },
     {
       "path": "requirements.md",
-      "sha256": "6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
+      "sha256": "28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d"
     },
     {
       "path": ".traceweaver/intent-contract.yml",
-      "sha256": "088b3f739104a8d5a3d7b8257aab8484e71ee944ba04b7eee76a306dd860a4dc"
+      "sha256": "cfe9ae01dc1438b150dcd24c091b05436fd185dabf53828e36c0d42e762aff42"
     },
     {
       "path": "docs/validation/traceweaver-2026-08-22-v050-model-governance-acceptance-result.md",
@@ -40,7 +40,7 @@
     "result_records": 41,
     "verification_records": 87,
     "validation_records": 37,
-    "code_anchor_records": 521,
+    "code_anchor_records": 563,
     "structured_acceptance_results": 4,
     "structured_acceptance_coverage": 111,
     "structured_acceptance_missing_requirements": 107,
@@ -4503,6 +4503,318 @@
   ],
   "code_anchor_evidence": [
     {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/acceptance-hub.schema.json",
+      "Requirement": "REQ-TW-131; REQ-TW-138; REQ-TW-141",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; schema-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/acceptance-pack.schema.json",
+      "Requirement": "REQ-TW-141",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; schema-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/capture-pack.schema.json",
+      "Requirement": "REQ-TW-130; REQ-TW-137",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; schema-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/change-approval.schema.json",
+      "Requirement": "REQ-TW-137",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; schema-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/change-request.schema.json",
+      "Requirement": "REQ-TW-137",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; schema-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/cutover-gate.schema.json",
+      "Requirement": "REQ-TW-134; REQ-TW-138",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; cutover-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/evidence-receipt.schema.json",
+      "Requirement": "REQ-TW-135; REQ-TW-140",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; evidence-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/lifecycle-graph.schema.json",
+      "Requirement": "REQ-TW-139; REQ-TW-142",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; graph-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/lifecycle-record.schema.json",
+      "Requirement": "REQ-TW-130; REQ-TW-139",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; schema-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/product-validation.schema.json",
+      "Requirement": "REQ-TW-136; REQ-TW-144",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; product-validation-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/semantic-html-parser-lock.json",
+      "Requirement": "REQ-TW-133; REQ-TW-134",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-parser-lock; commentless-data-file; html-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/semantic-html.schema.json",
+      "Requirement": "REQ-TW-131; REQ-TW-133; REQ-TW-134",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; html-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/source-receipt.schema.json",
+      "Requirement": "REQ-TW-130; REQ-TW-132",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; schema-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/source-registry.schema.json",
+      "Requirement": "REQ-TW-130; REQ-TW-132",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; schema-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/lifecycle/truth-stage.schema.json",
+      "Requirement": "REQ-TW-141",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "controlled-json-schema; commentless-data-file; evidence-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md",
+      "Requirement": "REQ-TW-130 through REQ-TW-145",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "Exception",
+      "Role": "byte-stable-v1-skill-contract; frontmatter-and-entrypoint-controlled; SEC-invariance-smoke-verified"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-acceptance-hub",
+      "Requirement": "REQ-TW-131; REQ-TW-135; REQ-TW-138; REQ-TW-140; REQ-TW-141",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "lifecycle-acceptance-hub"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-capture",
+      "Requirement": "REQ-TW-130; REQ-TW-135; REQ-TW-137; REQ-TW-140; REQ-TW-141",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "lifecycle-controlled-capture"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-cutover",
+      "Requirement": "REQ-TW-134; REQ-TW-138",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "lifecycle-semantic-html-cutover"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-evidence",
+      "Requirement": "REQ-TW-135; REQ-TW-140; REQ-TW-141",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "lifecycle-evidence-control"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph",
+      "Requirement": "REQ-TW-139; REQ-TW-140; REQ-TW-142",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "lifecycle-graph-control"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity",
+      "Requirement": "REQ-TW-130; REQ-TW-132; REQ-TW-137",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "lifecycle-integrity-control"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-product-validation",
+      "Requirement": "REQ-TW-136; REQ-TW-144",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "lifecycle-product-validation"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-project",
+      "Requirement": "REQ-TW-131; REQ-TW-132; REQ-TW-133; REQ-TW-138",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "lifecycle-semantic-html-projector"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-benchmark-v060-product-lifecycle",
+      "Requirement": "REQ-TW-139",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint; verifies",
+      "Role": "fixed-corpus-lifecycle-benchmark"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-run-v060-representative-product-trials",
+      "Requirement": "REQ-TW-136; REQ-TW-144",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "read-only-representative-product-trials"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-acceptance-hub",
+      "Requirement": "REQ-TW-131; REQ-TW-135; REQ-TW-138; REQ-TW-140; REQ-TW-141",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-acceptance-hub-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-capture",
+      "Requirement": "REQ-TW-130; REQ-TW-135; REQ-TW-137; REQ-TW-140; REQ-TW-141",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-capture-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-closure",
+      "Requirement": "REQ-TW-140; REQ-TW-142",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-closure-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-cutover",
+      "Requirement": "REQ-TW-134; REQ-TW-138",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-cutover-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-evidence",
+      "Requirement": "REQ-TW-135; REQ-TW-140; REQ-TW-141",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-evidence-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-graph",
+      "Requirement": "REQ-TW-139; REQ-TW-140; REQ-TW-142",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-graph-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-html",
+      "Requirement": "REQ-TW-131; REQ-TW-132; REQ-TW-133; REQ-TW-138",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-semantic-html-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-product-validation",
+      "Requirement": "REQ-TW-136; REQ-TW-144",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-product-validation-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-schema",
+      "Requirement": "REQ-TW-130; REQ-TW-132; REQ-TW-137",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-schema-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-lifecycle-staleness",
+      "Requirement": "REQ-TW-140",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-staleness-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "Requirement": "REQ-TW-130 through REQ-TW-145",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "lifecycle-program-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-real-product-depth",
+      "Requirement": "REQ-TW-136; REQ-TW-144",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "representative-product-depth-smoke"
+    },
+    {
+      "Artifact Path": "scripts/traceweaver-smoke-v060-release-integrity",
+      "Requirement": "REQ-TW-143; REQ-TW-145",
+      "Trace": "TRACE-TW-074",
+      "Verification": "VER-TW-094",
+      "Anchor Type": "file-role; verifies",
+      "Role": "exact-candidate-release-integrity-smoke"
+    },
+    {
       "Artifact Path": "plugins/traceweaver-core/references/metric-routing-harness.yml",
       "Requirement": "REQ-TW-124; REQ-TW-125; REQ-TW-126; REQ-TW-127; REQ-TW-128; REQ-TW-129",
       "Trace": "TRACE-TW-073",
@@ -5983,6 +6295,14 @@
       "Role": "frozen-atp-tw-049-acceptance-runner"
     },
     {
+      "Artifact Path": "scripts/traceweaver-refresh-v060-model-context-oracle",
+      "Requirement": "REQ-TW-116; REQ-TW-123; REQ-TW-137; REQ-TW-145",
+      "Trace": "TRACE-TW-072; TRACE-TW-074",
+      "Verification": "VER-TW-092; VER-TW-094",
+      "Anchor Type": "file-role; entrypoint",
+      "Role": "v060-model-context-oracle-no-write-refresh"
+    },
+    {
       "Artifact Path": "scripts/traceweaver-smoke-installer-transaction",
       "Requirement": "REQ-TW-121",
       "Trace": "TRACE-TW-072",
@@ -6221,6 +6541,22 @@
       "Verification": "VER-TW-087",
       "Anchor Type": "file-role; mirror",
       "Role": "packaged-persistent-review-loop-state"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/references/bounded-convergence-window-guide.md",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role",
+      "Role": "canonical-bounded-convergence-window-guide"
+    },
+    {
+      "Artifact Path": "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md",
+      "Requirement": "REQ-TW-037; REQ-TW-056; REQ-TW-057",
+      "Trace": "TRACE-TW-067",
+      "Verification": "VER-TW-087",
+      "Anchor Type": "file-role; mirror",
+      "Role": "packaged-bounded-convergence-window-guide"
     },
     {
       "Artifact Path": "scripts/traceweaver-smoke-review-series-convergence",

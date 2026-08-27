@@ -1,0 +1,65 @@
+exception_id: EXC-TW-020
+status: consumed_expired_p1_005_closed_clean_oracle_written
+exception_type: one_time_acyclic_oracle_correction
+linked_intent: [INTENT-TW-012, INTENT-TW-013]
+linked_requirements: [REQ-TW-130, REQ-TW-135, REQ-TW-136, REQ-TW-141, REQ-TW-143, REQ-TW-144, REQ-TW-145]
+linked_change: CHG-TW-2026-08-26-003
+linked_findings: [P1-005-continuation]
+owner: Oxiom Systems
+approved_by: Hannes Zietsman
+created_at: "2026-08-26"
+approved_at: "2026-08-26"
+approval_evidence: docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-approval.md
+decision_source: >-
+  Approve CHG-TW-2026-08-26-003 and EXC-TW-020 for one acyclic-oracle
+  correction of P1-005-continuation only: separate pre-oracle inputs from
+  post-oracle GREEN and retained-review receipts across the oracle refresher,
+  v3 readiness checker, and release-integrity smoke; permit one main-thread
+  repair, exact-product rebinding if the functional digest changes, and one
+  verification-only continuation of the same integrated Terra reviewer.
+  Preserve the published 0.5.0 release, the mixed root worktree, and every
+  semantic-cutover, runtime, deployment, release, and publication hold;
+  publication remains separately gated.
+reason: >-
+  EXC-TW-019 is consumed and cannot authorize another cycle. The remaining
+  P1-005-continuation is a single reproduced dependency-cycle defect: two
+  downstream receipts are included in the pre-oracle input contract whose
+  own closure depends on that oracle and review sequence.
+allowed_claims:
+  - one bounded main-thread repair of P1-005-continuation only
+  - pre-oracle source contracts exclude post-oracle GREEN and retained-review receipts
+  - production readiness still requires exact-candidate clean review and passed release integrity
+  - one fresh exact-product binding and explicit owner disposition if functional scope changes
+  - one verification-only continuation by the same existing Terra reviewer identity
+blocked_claims:
+  - repair of any other finding
+  - another repair or reviewer cycle
+  - new reviewer, full review, reviewer fan-out, or repair subagent
+  - placeholder, predeclared, or falsely GREEN evidence
+  - publication
+  - release_ready
+  - tag
+  - GitHub_Release
+  - deployment
+  - runtime_health
+  - semantic_html_authority_cutover
+activation_preconditions:
+  requirements_review: accepted_clean
+  workflow_profile_revision: 4
+  correction_specific_red_evidence: required
+  document_review: clean_required
+  authority_gate_result: proceed_required_before_behavior_change
+expiry:
+  expires_when_any:
+    - one bounded repair attempt completes
+    - one new exact-product disposition is recorded
+    - one verification-only same-reviewer result is recorded
+    - scope expands beyond P1-005-continuation
+    - owner withdraws approval
+  after_expiry: held_owner_decision_required
+stale_reset_triggers:
+  - linked requirement or exact allowed scope changes
+  - reviewer identity changes
+  - functional scope changes after exact-product disposition
+  - any publication action is attempted
+next_step: Historical only. EXC-TW-021 controls the distinct post-oracle CI convergence gap.

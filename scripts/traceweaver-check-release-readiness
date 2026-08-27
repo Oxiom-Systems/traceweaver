@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 # Fail closed unless the dated release receipt proves this exact version is ready
 # to enter the existing main-only, version-bump release workflow.
-# TRACEWEAVER: file-role=release-readiness-checker; verifies=VER-TW-092; req=REQ-TW-122,REQ-TW-123; trace=TRACE-TW-072
+# TRACEWEAVER: file-role=release-readiness-checker; verifies=VER-TW-092,VER-TW-094; req=REQ-TW-122,REQ-TW-123,REQ-TW-145; trace=TRACE-TW-072,TRACE-TW-074
 # TRACEWEAVER: entrypoint=release_readiness_v2; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092
 require "date"
 require "digest"
@@ -41,6 +41,46 @@ READINESS_V2_TRACE = "TRACE-TW-072".freeze
 READINESS_V2_VERIFICATION = "VER-TW-092".freeze
 READINESS_V2_VALIDATION = "VAL-TW-040".freeze
 READINESS_V2_GRAPH_CYCLE = "TW-AUTHORITY-GATE-2026-08-22-V050-MODEL-GOVERNANCE-001".freeze
+READINESS_V3_SCHEMA = "tw-release-readiness/3".freeze
+READINESS_V3_VERSION = "0.6.0".freeze
+READINESS_V3_PRODUCTION_RECEIPT = "docs/validation/traceweaver-plugin-0.6.0-release-candidate.md".freeze
+READINESS_V3_PRODUCTION_ID = "TW-RELEASE-CANDIDATE-2026-08-24-0.6.0-001".freeze
+READINESS_V3_PRODUCTION_TAG = "traceweaver-core--v0.6.0".freeze
+READINESS_V3_PREDECESSOR_TAG = "traceweaver-core--v0.5.0".freeze
+READINESS_V3_PREDECESSOR_SHA = "3a1f3c56b093e61b88e9f6282637878e8ebbf163".freeze
+READINESS_V3_INTEGRATION_BASE = "e53faeb437cfee3b91f43e1b0f4ed3b1cb1e2c33".freeze
+READINESS_V3_REQUIREMENT = "REQ-TW-145".freeze
+READINESS_V3_TRACE = "TRACE-TW-074".freeze
+READINESS_V3_VERIFICATION = "VER-TW-094".freeze
+READINESS_V3_VALIDATION = "VAL-TW-042".freeze
+READINESS_V3_VV_CAPSULE = "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-capsule.json".freeze
+READINESS_V3_PREREQUISITES = {
+  "authority" => "accepted",
+  "exact_predecessor_dogfood" => "passed",
+  "slice_verification" => "passed",
+  "product_validation" => "passed",
+  "integrated_review" => "passed",
+  "scope_rollback" => "passed",
+  "graph_freshness" => "passed",
+  "manifest_equality" => "passed",
+  "clean_reinstall" => "passed",
+  "model_context_oracle" => "passed",
+  "exact_sha_ci" => "required_by_release_workflow",
+  "publication" => "required_by_release_workflow"
+}.freeze
+READINESS_V3_EVIDENCE = %w[
+  product_validation_result_json representative_validation integrated_review
+  scope_rollback reinstall release_integrity graph_freshness model_context_oracle
+].freeze
+READINESS_V3_HELD_CLAIMS = %w[
+  publication_until_exact_main_sha_ci
+  tag_and_github_release_until_main_workflow
+  deployment_not_claimed
+].freeze
+READINESS_V3_ACCEPTED_PRODUCT_VALIDATION_STATUSES = %w[
+  accepted
+  accepted_exact_candidate_publication_separately_gated
+].freeze
 READINESS_V2_MAP_PATH = "plugins/traceweaver-core/references/model-context-map.yml".freeze
 READINESS_V2_ORACLE_PATH = "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json".freeze
 READINESS_V2_INVENTORY_GENERATOR = "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map".freeze
@@ -57,6 +97,86 @@ READINESS_V2_SOURCE_CATEGORIES = %w[
   current_external_sources
   accepted_evidence
 ].freeze
+READINESS_V3_LIFECYCLE_ORACLE_REFS = {
+  "controlling_authority" => %w[
+    requirements.md traceability-matrix.md .traceweaver/intent-contract.yml
+    .traceweaver/changes/CHG-TW-2026-08-26-003-acyclic-oracle.yml
+    .traceweaver/exceptions/EXC-TW-020-acyclic-oracle.yml
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md
+  ],
+  "task_scope" => %w[
+    docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md
+    .traceweaver/workflow-profile.yml
+  ],
+  "skill_contract" => %w[plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md],
+  "implementation_dependencies" => %w[
+    plugins/traceweaver-core/references/lifecycle/acceptance-hub.schema.json
+    plugins/traceweaver-core/references/lifecycle/acceptance-pack.schema.json
+    plugins/traceweaver-core/references/lifecycle/capture-pack.schema.json
+    plugins/traceweaver-core/references/lifecycle/change-approval.schema.json
+    plugins/traceweaver-core/references/lifecycle/change-request.schema.json
+    plugins/traceweaver-core/references/lifecycle/cutover-gate.schema.json
+    plugins/traceweaver-core/references/lifecycle/evidence-receipt.schema.json
+    plugins/traceweaver-core/references/lifecycle/lifecycle-graph.schema.json
+    plugins/traceweaver-core/references/lifecycle/lifecycle-record.schema.json
+    plugins/traceweaver-core/references/lifecycle/product-validation.schema.json
+    plugins/traceweaver-core/references/lifecycle/semantic-html-parser-lock.json
+    plugins/traceweaver-core/references/lifecycle/semantic-html.schema.json
+    plugins/traceweaver-core/references/lifecycle/source-receipt.schema.json
+    plugins/traceweaver-core/references/lifecycle/source-registry.schema.json
+    plugins/traceweaver-core/references/lifecycle/truth-stage.schema.json
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-acceptance-hub
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-capture
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-cutover
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-evidence
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-product-validation
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-project
+    scripts/traceweaver-check-release-readiness
+    scripts/traceweaver-refresh-v060-model-context-oracle
+    scripts/traceweaver-run-v060-representative-product-trials
+    scripts/traceweaver-smoke-v060-real-product-depth
+    scripts/traceweaver-smoke-v060-release-integrity
+  ],
+  "accepted_evidence" => %w[
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-definition.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice1-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice2-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice4-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice5-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice6-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice7-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-benchmark.json
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-semantic-html-release-gate.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-scope-rollback-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-release-readiness.md
+    docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.json
+    docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-representative-validation.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-source-baselines-real-product-depth.json
+    docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/vestro-lc-001-machine-observation.json
+    docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/airrouter-lc-001-machine-observation.json
+    docs/validation/traceweaver-2026-08-24-v060-real-product-depth-authority-gate.md
+    docs/validation/traceweaver-2026-08-24-v060-real-product-depth-red-evidence.md
+    docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-scope-rollback-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-integrated-review-targeted-continuation.md
+    docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-change-proposal.md
+    docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-requirements-review.md
+    docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-authority-doc-review.md
+    docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-authority-gate.md
+    docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-red-evidence.md
+    docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-approval.md
+    docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-requirements-review.md
+    docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-red-evidence.md
+    docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-authority-doc-review.md
+    docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-post-promotion-authority-gate.md
+  ]
+}.transform_values { |values| values.sort.freeze }.freeze
 READINESS_V2_BEHAVIOR_DIGEST_EXCLUSIONS = [
   READINESS_V2_PRODUCTION_RECEIPT,
   GRAPH_FRESHNESS_PATH,
@@ -279,7 +399,7 @@ rescue Psych::Exception => e
   fail_check("canonical model-context map is invalid YAML: #{e.message}")
 end
 
-def load_inventory(root_path, candidate_paths, map_path, map_digest)
+def load_inventory(root_path, candidate_paths, map_path, map_digest, expected_route_count: 87)
   fail_check("model-context inventory generator must be bound by candidate_scope") unless candidate_paths.include?(READINESS_V2_INVENTORY_GENERATOR)
   generator = root_regular_file(root_path, READINESS_V2_INVENTORY_GENERATOR, "model-context inventory generator")
   fail_check("model-context inventory generator is not executable") unless generator.executable?
@@ -292,10 +412,11 @@ def load_inventory(root_path, candidate_paths, map_path, map_digest)
   fail_check("model-context inventory schema is invalid") unless inventory["schema_version"] == "tw-model-context-inventory/1"
   fail_check("model-context inventory map digest mismatch") unless inventory["map_digest"] == map_digest
   routes = inventory["routes"]
-  fail_check("model-context inventory routes are invalid") unless routes.is_a?(Array) && routes.length == 87
+  fail_check("model-context inventory routes are invalid") unless routes.is_a?(Array) && routes.length == expected_route_count
   route_ids = routes.map { |route| route.is_a?(Hash) && route["route_id"] }
-  fail_check("model-context inventory route identities are invalid") unless route_ids.all? { |route_id| route_id.is_a?(String) && !route_id.empty? } && route_ids.uniq.length == 87
-  fail_check("model-context inventory route count is invalid") unless inventory["declared_route_count"] == 87 && inventory["top_level_callable_count"] == 28
+  fail_check("model-context inventory route identities are invalid") unless route_ids.all? { |route_id| route_id.is_a?(String) && !route_id.empty? } && route_ids.uniq.length == expected_route_count
+  expected_declared = expected_route_count == 87 ? 88 : expected_route_count
+  fail_check("model-context inventory route count is invalid") unless inventory["declared_route_count"] == expected_declared && inventory["top_level_callable_count"] == 29
   actual_inventory_digest = semantic_digest(routes)
   fail_check("model-context inventory digest mismatch") unless inventory["inventory_digest"] == actual_inventory_digest
   [inventory, actual_inventory_digest]
@@ -335,7 +456,7 @@ def validate_oracle_cell!(root_path, map, inventory_by_route, cell)
   end
 end
 
-def load_canonical_oracle(root_path, candidate_paths, map, map_digest, inventory, inventory_digest)
+def load_canonical_oracle(root_path, candidate_paths, map, map_digest, inventory, inventory_digest, expected_route_count: 87)
   fail_check("canonical model-context oracle must be bound by candidate_scope") unless candidate_paths.include?(READINESS_V2_ORACLE_PATH)
   oracle_path = root_regular_file(root_path, READINESS_V2_ORACLE_PATH, "canonical model-context oracle")
   oracle = JSON.parse(File.read(oracle_path))
@@ -354,6 +475,9 @@ def load_canonical_oracle(root_path, candidate_paths, map, map_digest, inventory
     fail_check("canonical model-context oracle reviewer is invalid")
   end
   fail_check("canonical model-context oracle uses a generic pre-validation reviewer") if reviewer["identity"] == "independent-validation-reviewer"
+  unless reviewer["identity"].match?(/\Aterra-integrated-reviewer:[A-Za-z0-9_\/-]+\z/)
+    fail_check("canonical model-context oracle reviewer identity is not an authorized Terra integrated reviewer")
+  end
   unless reviewer["relationship"] == READINESS_V2_ORACLE_REVIEWER_RELATIONSHIP
     fail_check("canonical model-context oracle reviewer relationship is invalid")
   end
@@ -363,10 +487,11 @@ def load_canonical_oracle(root_path, candidate_paths, map, map_digest, inventory
   cells = oracle["route_category_cells"]
   expected_pairs = inventory_by_route.keys.product(READINESS_V2_SOURCE_CATEGORIES).sort
   actual_pairs = cells.is_a?(Array) ? cells.map { |cell| [cell["route_id"], cell["category"]] } : []
-  fail_check("canonical model-context oracle route count is invalid") unless oracle["route_count"] == 87
+  expected_cell_count = expected_route_count * READINESS_V2_SOURCE_CATEGORIES.length
+  fail_check("canonical model-context oracle route count is invalid") unless oracle["route_count"] == expected_route_count
   fail_check("canonical model-context oracle category count is invalid") unless oracle["category_count"] == 6
-  fail_check("canonical model-context oracle must contain 522 cells") unless cells.is_a?(Array) && cells.length == 522
-  fail_check("canonical model-context oracle cells are not unique") unless actual_pairs.uniq.length == 522
+  fail_check("canonical model-context oracle must contain #{expected_cell_count} cells") unless cells.is_a?(Array) && cells.length == expected_cell_count
+  fail_check("canonical model-context oracle cells are not unique") unless actual_pairs.uniq.length == expected_cell_count
   fail_check("canonical model-context oracle route/category coverage is invalid") unless actual_pairs.sort == expected_pairs
   cells.each { |cell| validate_oracle_cell!(root_path, map, inventory_by_route, cell) }
 
@@ -379,17 +504,25 @@ def load_canonical_oracle(root_path, candidate_paths, map, map_digest, inventory
       fail_check("oracle route-kind obligation is not satisfied: #{route_id}/#{category}") unless cell && cell["disposition"] == "satisfied"
     end
   end
+  if expected_route_count == 88
+    READINESS_V3_LIFECYCLE_ORACLE_REFS.each do |category, expected_locators|
+      cell = cells.find { |candidate| candidate["route_id"] == "tw-lifecycle" && candidate["category"] == category }
+      actual_locators = Array(cell && cell["source_refs"]).map { |reference| reference["locator"] }.sort
+      fail_check("Core 0.6.0 tw-lifecycle oracle source set is incomplete for #{category}") unless actual_locators == expected_locators
+    end
+  end
   fail_check("canonical model-context oracle contains open or uncertain cells") unless oracle["open_or_uncertain_cells"] == []
   [oracle, oracle_path, oracle_digest, reviewer]
 rescue JSON::ParserError => e
   fail_check("canonical model-context oracle is invalid JSON: #{e.message}")
 end
 
-def validate_model_context_artifacts(root_path, candidate_paths)
+def validate_model_context_artifacts(root_path, candidate_paths, expected_route_count: 87)
   map, map_path, map_digest = load_canonical_map(root_path, candidate_paths)
-  inventory, inventory_digest = load_inventory(root_path, candidate_paths, map_path, map_digest)
+  inventory, inventory_digest = load_inventory(root_path, candidate_paths, map_path, map_digest, expected_route_count: expected_route_count)
   oracle, oracle_path, oracle_digest, reviewer = load_canonical_oracle(
-    root_path, candidate_paths, map, map_digest, inventory, inventory_digest
+    root_path, candidate_paths, map, map_digest, inventory, inventory_digest,
+    expected_route_count: expected_route_count
   )
   {
     map_digest: map_digest,
@@ -399,16 +532,20 @@ def validate_model_context_artifacts(root_path, candidate_paths)
     inventory_digest: inventory_digest,
     oracle_review_id: oracle.fetch("review_id"),
     oracle_reviewer: reviewer,
-    route_count: 87,
-    cell_count: 522
+    route_count: expected_route_count,
+    cell_count: expected_route_count * READINESS_V2_SOURCE_CATEGORIES.length
   }
 end
 
-def assert_graph_receipt(path)
+def assert_graph_receipt(path, expected_cycle: READINESS_V2_GRAPH_CYCLE)
   data = JSON.parse(File.read(path))
   fail_check("graph freshness receipt is not a mapping") unless data.is_a?(Hash)
   fail_check("graph freshness schema_version is invalid") unless data["schema_version"] == "tw-graph-freshness-receipt/1"
-  fail_check("graph freshness cycle_id is invalid") unless data["cycle_id"] == READINESS_V2_GRAPH_CYCLE
+  if expected_cycle
+    fail_check("graph freshness cycle_id is invalid") unless data["cycle_id"] == expected_cycle
+  else
+    fail_check("graph freshness cycle_id is invalid") unless data["cycle_id"].is_a?(String) && !data["cycle_id"].empty?
+  end
   fail_check("graph freshness producer is invalid") unless data["producer"] == "traceweaver-tw-graph"
   fail_check("graph freshness authority is invalid") unless data["authority"] == "derived_freshness_evidence_only"
   %w[baseline_hash closure_identity graph_hash manifest_hash receipt_hash].each do |field|
@@ -773,7 +910,276 @@ def assert_v2(data, readiness, version, root_path, receipt_relative, paths, scop
     fail_check("#{READINESS_V2_SCHEMA} production receipt path must be #{READINESS_V2_PRODUCTION_RECEIPT}")
   end
 
+  assert_v2_manifest_versions(root_path, version) if production_receipt
+end
+
+def release_label(previous, current)
+  prior = previous.to_s.split(".").map { |value| Integer(value, 10) }
+  candidate = current.to_s.split(".").map { |value| Integer(value, 10) }
+  fail_check("release versions must use numeric major.minor.patch") unless prior.length == 3 && candidate.length == 3
+  return "major" if candidate[0] > prior[0] && candidate[1] == 0 && candidate[2] == 0
+  return "minor" if candidate[0] == prior[0] && candidate[1] > prior[1] && candidate[2] == 0
+  return "patch" if candidate[0] == prior[0] && candidate[1] == prior[1] && candidate[2] > prior[2]
+
+  fail_check("release version #{current.inspect} is not one monotonic semantic version step after #{previous.inspect}")
+rescue ArgumentError
+  fail_check("release versions must use numeric major.minor.patch")
+end
+
+def manifest_version_at(root_path, revision, relative, json_path)
+  source = git_capture(root_path, "show", "#{revision}:#{relative}")
+  data = JSON.parse(source)
+  nested_value(data, json_path).to_s
+rescue JSON::ParserError => e
+  fail_check("release base manifest is invalid JSON: #{relative}: #{e.message}")
+end
+
+def canonical_requirements_hash(path)
+  source = File.binread(path)
+  placeholder = source.sub(
+    /^(baseline_hash_sha256: ).*$/,
+    "\\1CANONICAL_HASH_PLACEHOLDER"
+  )
+  fail_check("requirements baseline_hash_sha256 field is missing") if placeholder == source
+  "sha256:#{Digest::SHA256.hexdigest(placeholder)}"
+end
+
+def assert_v3_evidence_front_matter(root_path, relative, label, expected_status, functional_digest)
+  path = root_regular_file(root_path, relative, label)
+  data, = parse_front_matter(path, label)
+  fail_check("#{label} status must be #{expected_status.inspect}") unless data["status"] == expected_status
+  if functional_digest
+    recorded = data["functional_scope_digest"] || data["candidate_tree_digest"]
+    fail_check("#{label} does not bind the frozen functional candidate") unless recorded == functional_digest
+  end
+  data
+end
+
+def load_v3_product_validation(root_path, relative)
+  path = root_regular_file(root_path, relative, "product validation result")
+  product = JSON.parse(File.read(path))
+  fail_check("product validation result is not a mapping") unless product.is_a?(Hash)
+  [product, path]
+rescue JSON::ParserError => e
+  fail_check("product validation result is invalid JSON: #{e.message}")
+end
+
+def assert_v3_terminal_validation_truth(root_path, product, product_path, functional_digest)
+  unless product.dig("candidate", "tree_digest") == functional_digest
+    fail_check("product validation result does not bind the frozen functional candidate")
+  end
+
+  capsule_path = root_regular_file(root_path, READINESS_V3_VV_CAPSULE, "V&V capsule")
+  capsule = JSON.parse(File.read(capsule_path))
+  fail_check("V&V capsule schema is invalid") unless capsule["schema_version"] == "tw-vv-capsule/1"
+  validation = capsule["product_validation"]
+  fail_check("V&V capsule product_validation is missing") unless validation.is_a?(Hash)
+  unless READINESS_V3_ACCEPTED_PRODUCT_VALIDATION_STATUSES.include?(validation["status"])
+    fail_check("V&V capsule product validation status must be accepted")
+  end
+  fail_check("V&V capsule product validation id mismatch") unless validation["validation_id"] == READINESS_V3_VALIDATION
+  unless validation["functional_scope_digest"] == functional_digest
+    fail_check("V&V capsule product validation does not bind the frozen functional candidate")
+  end
+  product_digest = file_sha256(product_path)
+  fail_check("V&V capsule product result digest mismatch") unless validation["result_digest"] == product_digest
+
+  review_statuses = Array(capsule["requirements"]).flat_map do |requirement|
+    Array(requirement.is_a?(Hash) && requirement["reviews"]).map { |review| review.is_a?(Hash) && review["status"] }
+  end
+  unless !review_statuses.empty? && review_statuses.all? { |status| status == "closed_clean" }
+    fail_check("V&V capsule contains a non-clean integrated-review status")
+  end
+  stale_hold = Array(capsule["held_claims"]).find do |claim|
+    claim.to_s.match?(/(?:product validation|product revalidation|revalidation required|historical.*product)/i)
+  end
+  fail_check("V&V capsule retains a stale product-validation hold: #{stale_hold}") if stale_hold
+
+  requirements = File.read(root_regular_file(root_path, "requirements.md", "controlled requirements"))
+  matrix = File.read(root_regular_file(root_path, "traceability-matrix.md", "traceability matrix"))
+  unless requirements.include?("successor_terminal_truth_controlled_by_exact_candidate_evidence") &&
+         requirements.include?("only the exact current content-bound result")
+    fail_check("controlled requirements do not declare exact-candidate product-validation truth")
+  end
+  unless matrix.include?("VAL-TW-042 is non-compensable and evidence-controlled") &&
+         matrix.include?("only a current product result bound to the exact functional digest")
+    fail_check("traceability matrix does not declare exact-candidate product-validation truth")
+  end
+end
+
+def assert_v3_model_context(root_path, evidence, identity, candidate_paths)
+  unless evidence["model_context_oracle"] == READINESS_V2_ORACLE_PATH
+    fail_check("model-context oracle evidence path must be #{READINESS_V2_ORACLE_PATH}")
+  end
+  context = validate_model_context_artifacts(root_path, candidate_paths, expected_route_count: 88)
+  fail_check("candidate_identity model_context_oracle_digest mismatch") unless identity["model_context_oracle_digest"] == context.fetch(:oracle_digest)
+  fail_check("candidate_identity model_context_oracle_review_id mismatch") unless identity["model_context_oracle_review_id"] == context.fetch(:oracle_review_id)
+  fail_check("candidate_identity model_context_oracle_reviewer mismatch") unless identity["model_context_oracle_reviewer"] == context.dig(:oracle_reviewer, "identity")
+  fail_check("candidate_identity model_context_route_count mismatch") unless identity["model_context_route_count"] == context.fetch(:route_count)
+  context
+end
+
+def assert_v3_common_evidence(root_path, evidence, identity, functional_digest, candidate_paths)
+  product, product_path = load_v3_product_validation(root_path, evidence.fetch("product_validation_result_json"))
+  assert_v3_terminal_validation_truth(root_path, product, product_path, functional_digest)
+  context = assert_v3_model_context(root_path, evidence, identity, candidate_paths)
+  [product, product_path, context]
+end
+
+def assert_v3_production_evidence(root_path, evidence, identity, functional_digest, candidate_paths, common)
+  requirements_path = root_regular_file(root_path, "requirements.md", "controlled requirements")
+  requirements_hash = canonical_requirements_hash(requirements_path)
+  unless identity["requirements_hash_sha256"] == requirements_hash
+    fail_check("candidate_identity requirements_hash_sha256 does not match canonical requirements")
+  end
+
+  product_relative = evidence.fetch("product_validation_result_json")
+  product, product_path, context = common
+  validator = root_regular_file(
+    root_path,
+    "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-product-validation",
+    "product validation validator"
+  )
+  fail_check("product validation validator is not executable") unless validator.executable?
+  output, error, status = Open3.capture3(
+    validator.to_s, "--root", root_path.to_s, "--result", product_path.to_s
+  )
+  unless status.success? && output.include?("product_validation_release_gate=passed")
+    fail_check("product validation result did not pass: #{[output.strip, error.strip].reject(&:empty?).join(' | ')}")
+  end
+  fail_check("product validation candidate requirements hash mismatch") unless product.dig("candidate", "requirements_hash_sha256") == requirements_hash
+
+  representative = assert_v3_evidence_front_matter(
+    root_path, evidence.fetch("representative_validation"), "representative validation",
+    "accepted", functional_digest
+  )
+  fail_check("representative validation id must be VAL-TW-042") unless representative["id"] == READINESS_V3_VALIDATION
+
+  review = assert_v3_evidence_front_matter(
+    root_path, evidence.fetch("integrated_review"), "integrated review",
+    "closed_clean", functional_digest
+  )
+  fail_check("integrated review identity mismatch") unless review["id"] == identity["review_id"]
+  fail_check("integrated review reviewer does not authorize the model-context oracle") unless review["reviewer"] == context.dig(:oracle_reviewer, "identity")
+  fail_check("integrated review must record zero open P0") unless review.dig("reviewed_findings", "open_p0") == 0
+  fail_check("integrated review must record zero open P1") unless review.dig("reviewed_findings", "open_p1") == 0
+  fail_check("integrated review repair count exceeds one") unless review.dig("reviewed_findings", "repair_cycle_count").to_i <= 1
+
+  assert_v3_evidence_front_matter(root_path, evidence.fetch("scope_rollback"), "scope and rollback verification", "passed", functional_digest)
+  assert_v3_evidence_front_matter(root_path, evidence.fetch("reinstall"), "clean reinstall verification", "passed", functional_digest)
+  assert_v3_evidence_front_matter(root_path, evidence.fetch("release_integrity"), "release-integrity verification", "passed", functional_digest)
+  assert_graph_receipt(root_path.join(evidence.fetch("graph_freshness")), expected_cycle: nil)
+end
+
+def assert_v3(data, readiness, version, root_path, receipt_relative, paths, scope_digest)
+  fail_check("#{READINESS_V3_SCHEMA} is reserved for #{READINESS_V3_VERSION}") unless version == READINESS_V3_VERSION
+  fixture = receipt_relative.start_with?("fixtures/release-readiness/")
+  production = receipt_relative == READINESS_V3_PRODUCTION_RECEIPT
+  unless fixture || production
+    fail_check("#{READINESS_V3_SCHEMA} production receipt path must be #{READINESS_V3_PRODUCTION_RECEIPT}")
+  end
+
+  expected_top = {
+    "status" => "ready_for_version_bump",
+    "version" => READINESS_V3_VERSION,
+    "tag" => READINESS_V3_PRODUCTION_TAG,
+    "requirement" => READINESS_V3_REQUIREMENT,
+    "trace" => READINESS_V3_TRACE,
+    "verification" => READINESS_V3_VERIFICATION,
+    "validation" => READINESS_V3_VALIDATION
+  }
+  expected_top.each do |field, expected|
+    fail_check("release receipt #{field} must be #{expected.inspect}") unless data[field].to_s == expected
+  end
+  if production
+    {
+      "id" => READINESS_V3_PRODUCTION_ID,
+      "released_predecessor_tag" => READINESS_V3_PREDECESSOR_TAG,
+      "released_predecessor_sha" => READINESS_V3_PREDECESSOR_SHA,
+      "integration_base" => READINESS_V3_INTEGRATION_BASE
+    }.each do |field, expected|
+      fail_check("production receipt #{field} must be #{expected.inspect}") unless data[field].to_s == expected
+    end
+  end
+
+  integration_base = data["integration_base"].to_s
+  fail_check("integration_base must be a git SHA") unless integration_base.match?(GIT_SHA)
+  assert_resolved_release_base(root_path, integration_base)
   assert_v2_manifest_versions(root_path, version)
+  manifest_path, json_path = MANIFEST_VERSION_PATHS.first
+  previous_version = manifest_version_at(root_path, integration_base, manifest_path, json_path)
+  expected_label = release_label(previous_version, version)
+  fail_check("release label must be #{expected_label.inspect}") unless readiness["release_label"] == expected_label
+  if production
+    fail_check("Core 0.6.0 must be a minor release from 0.5.0") unless previous_version == "0.5.0" && expected_label == "minor"
+  end
+
+  changelog = File.read(root_regular_file(root_path, "CHANGELOG.md", "CHANGELOG"))
+  fail_check("CHANGELOG lacks the Core 0.6.0 release section") unless changelog.match?(/^## 0\.6\.0\s+-\s+\d{4}-\d{2}-\d{2}$/)
+  readme = File.read(root_regular_file(root_path, "README.md", "README"))
+  fail_check("README lacks the pinned Core 0.6.0 install tag") unless readme.include?(READINESS_V3_PRODUCTION_TAG)
+
+  scope = readiness.fetch("candidate_scope")
+  exclusions = scope["excluded_paths"]
+  fail_check("candidate_scope excluded_paths must be a unique string array") unless exclusions.is_a?(Array) && exclusions.all? { |path| path.is_a?(String) } && exclusions.uniq.length == exclusions.length
+  exclusions.each { |path| normalized_relative_path(path, "candidate_scope excluded path") }
+  expected_exclusions = [GRAPH_FRESHNESS_PATH, receipt_relative].sort
+  fail_check("candidate_scope excluded_paths must contain only graph freshness and its own receipt") unless exclusions.sort == expected_exclusions
+  fail_check("candidate_scope includes an excluded path") unless (paths & exclusions).empty?
+
+  delta = production_delta(root_path, integration_base)
+  allowed_receipts = if fixture
+                       delta.keys.grep(%r{\Afixtures/release-readiness/.*\.md\z})
+                     else
+                       [receipt_relative]
+                     end
+  omitted = delta.keys - paths - [GRAPH_FRESHNESS_PATH] - allowed_receipts
+  fail_check("release candidate scope omits changed paths: #{omitted.sort.join(',')}") unless omitted.empty?
+  unexpected = paths - delta.keys
+  fail_check("release candidate scope includes unchanged paths: #{unexpected.sort.join(',')}") unless unexpected.empty?
+
+  functional = readiness["functional_scope"]
+  fail_check("missing functional_scope mapping") unless functional.is_a?(Hash)
+  fail_check("unsupported functional_scope algorithm") unless functional["algorithm"] == SCOPE_ALGORITHM
+  functional_paths = functional["paths"]
+  unless functional_paths.is_a?(Array) && !functional_paths.empty? && functional_paths.uniq.length == functional_paths.length && (functional_paths - paths).empty?
+    fail_check("functional_scope paths must be a unique non-empty candidate-scope subset")
+  end
+  functional_digest = file_scope_digest(root_path, functional_paths)
+  fail_check("functional_scope digest mismatch") unless functional["digest"] == functional_digest
+  identity = readiness["candidate_identity"]
+  fail_check("missing candidate_identity mapping") unless identity.is_a?(Hash)
+  fail_check("candidate_identity functional_scope_digest mismatch") unless identity["functional_scope_digest"] == functional_digest
+  fail_check("candidate_identity functional_scope_path_count mismatch") unless identity["functional_scope_path_count"] == functional_paths.length
+  fail_check("candidate_identity review_id is invalid") unless identity["review_id"].is_a?(String) && identity["review_id"].start_with?("TW-CODE-REVIEW-")
+  fail_check("candidate_identity product_validation_id mismatch") unless identity["product_validation_id"] == READINESS_V3_VALIDATION
+
+  prerequisites = readiness["prerequisites"]
+  fail_check("missing release readiness prerequisites") unless prerequisites.is_a?(Hash)
+  READINESS_V3_PREREQUISITES.each do |field, expected|
+    fail_check("prerequisite #{field} must be #{expected.inspect}") unless prerequisites[field] == expected
+  end
+  evidence = readiness["evidence"]
+  fail_check("missing release readiness evidence mapping") unless evidence.is_a?(Hash)
+  READINESS_V3_EVIDENCE.each do |field|
+    value = evidence[field]
+    fail_check("evidence #{field} path is missing") unless value.is_a?(String) && !value.empty?
+    relative = normalized_relative_path(value, "evidence #{field}")
+    root_regular_file(root_path, relative, "evidence #{field}")
+    next if field == "graph_freshness"
+    fail_check("evidence #{field} is not bound by candidate_scope") unless paths.include?(relative)
+  end
+  fail_check("graph_freshness evidence path must be #{GRAPH_FRESHNESS_PATH}") unless evidence["graph_freshness"] == GRAPH_FRESHNESS_PATH
+
+  held_claims = readiness["held_claims"]
+  fail_check("held_claims must be a unique string array") unless held_claims.is_a?(Array) && held_claims.uniq.length == held_claims.length
+  missing_holds = READINESS_V3_HELD_CLAIMS - held_claims
+  fail_check("missing required held claims: #{missing_holds.join(',')}") unless missing_holds.empty?
+
+  common = assert_v3_common_evidence(root_path, evidence, identity, functional_digest, paths)
+  assert_v3_production_evidence(root_path, evidence, identity, functional_digest, paths, common) if production
+
+  fail_check("candidate_scope digest is not the already verified digest") unless scope_digest == scope["digest"]
 end
 
 receipt = nil
@@ -880,6 +1286,9 @@ if schema.nil? || schema == "tw-release-readiness/1"
 elsif schema == READINESS_V2_SCHEMA
   receipt_relative = receipt_path.relative_path_from(root_path).to_s
   assert_v2(data, readiness, version, root_path, receipt_relative, paths, actual_scope_digest)
+elsif schema == READINESS_V3_SCHEMA
+  receipt_relative = receipt_path.relative_path_from(root_path).to_s
+  assert_v3(data, readiness, version, root_path, receipt_relative, paths, actual_scope_digest)
 else
   fail_check("unsupported release_readiness schema #{schema.inspect}")
 end

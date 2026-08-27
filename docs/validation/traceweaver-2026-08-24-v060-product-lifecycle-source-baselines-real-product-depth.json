@@ -1,0 +1,53 @@
+{
+  "schema_version": "tw-lifecycle-product-source-baselines/1",
+  "status": "source_derived_machine_observed_owner_disposition_pending",
+  "observed_at": "2026-08-24T00:00:00+02:00",
+  "authority_effect": "none",
+  "source_authorization": "TW-VALIDATION-2026-08-21-0.4.0-CONSUMERS-001 plus VAL-TW-042 read-only representative-validation authority plus CHG-TW-2026-08-24-001 and EXC-TW-018 validation-method correction",
+  "products": [
+    {
+      "product": "Vestro",
+      "repository_locator": "github.com/cryptolabsza/vestro",
+      "branch": "codex/exit-requirements-reset",
+      "head": "8bc3b724f56cc72f08f8162c783a7f8e2816b990",
+      "revision_digest": "sha256:866f65afd5bfe40bb5b0ee7f0144b9a52eaf03e3089a7cd318353eb6f9b33d03",
+      "dirty_entries": 144,
+      "worktree_state_digest": "sha256:c564ca26eb968342e1602fd160da6f0c1bfafb159a2024d86964fcf04bee16d5",
+      "source_digests": {
+        ".traceweaver/intent-contract.yml": "sha256:8835ee5fc7b94bc4b06720cebc17b48a07d3e2ce63da7739af23220ae44befe5",
+        "REQUIREMENTS.md": "sha256:f90073461cd53eddc04b3c72bb04e8a781fea018ba42400d25431fd280475a37",
+        "traceability-matrix.md": "sha256:b8c55269a3ed393b2ba660c44dcb5cfb2a9aa72198b86ff3ade06c29d7ebb5a9"
+      },
+      "source_inventory_digest": "sha256:de4de0c453e52b40974a4c4d06d202decc6d96a81f1f1aad97beb4a6e98c6d68",
+      "normalization": "case-only REQUIREMENTS.md to requirements.md in a disposable validation snapshot; source bytes unchanged"
+    },
+    {
+      "product": "Air Router",
+      "repository_locator": "github.com/Oxiom-Systems/Air-Router",
+      "branch": "docs/requirements-review",
+      "head": "0fc9b6514e112f8ece4196f5a6e0fbb80e3ee56b",
+      "revision_digest": "sha256:cca4f430b1da3067aef7e3e83c1f31a1affa87187a8d7ab0915398235ef13820",
+      "dirty_entries": 210,
+      "worktree_state_digest": "sha256:4f06cca8d20f20b6ce1aa4f54fdd3a6d12666d0b9e1b28b2722a7c7fcb8a9417",
+      "source_inventory_digest": "sha256:dbeb89c0ae350ba98735078bfe7a0061c070a8ac2ee0d6e04a4100149d62e5fe",
+      "source_digests": {
+        ".traceweaver/intent-contract.yml": "sha256:0ff28e810bba56ffb7becf3340bbe250be9e59d195adffa9dc90126c4285f735",
+        "config/phase25-hls-contract.json": "sha256:021fad9e5eade34915fe67d4c42378fb72794c4934b6d3001a7a73665035e2da",
+        "requirements.md": "sha256:ab9221360f5a9012f254db06772d37f55de177f9e21806b24744118b11bf07fe",
+        "traceability-matrix.md": "sha256:d83a9d91f8be8ad7f861d2005f4c5fa166bca3eaf334cf2511deef8ab4f4cd84"
+      },
+      "authorized_non_code_artifact": {
+        "artifact_id": "AIR-ROUTER-PHASE25-DIAGNOSTIC-LAB-002",
+        "source_id": "SRC-AIR-042",
+        "locator": "config/phase25-hls-contract.json",
+        "digest": "sha256:021fad9e5eade34915fe67d4c42378fb72794c4934b6d3001a7a73665035e2da"
+      }
+    }
+  ],
+  "held_claims": [
+    "named representative acceptance",
+    "Oxiom Systems owner disposition",
+    "integrated reviewer continuation",
+    "Core 0.6.0 publication and release readiness"
+  ]
+}

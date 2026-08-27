@@ -1,0 +1,61 @@
+id: CHG-TW-2026-08-26-005
+record_type: traceweaver_change_control
+status: consumed_passed_bounded_convergence_publication_separately_authorized
+owner: Oxiom Systems
+created_at: "2026-08-26"
+linked_intent: [INTENT-TW-012, INTENT-TW-013]
+linked_requirements: [REQ-TW-110, REQ-TW-123, REQ-TW-130, REQ-TW-143, REQ-TW-145]
+linked_trace: [TRACE-TW-072, TRACE-TW-074]
+linked_verification: [VER-TW-092, VER-TW-094]
+linked_validation: VAL-TW-042
+linked_exception: EXC-TW-022
+predecessor_change: CHG-TW-2026-08-26-004
+predecessor_exception: EXC-TW-021
+gap_id: GAP-TW-2026-08-26-V060-CURRENT-SOURCE-DIGEST-SEQUENCING-001
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_hash_sha256: 94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf
+predecessor_workflow_profile_revision: 5
+predecessor_workflow_profile_hash: sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7
+workflow_profile_revision: 6
+failure_evidence: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-focused-verification-result.md
+owner_decision_packet: docs/validation/traceweaver-2026-08-26-v060-current-source-digest-rebinding-owner-decision-packet.md
+reason: >-
+  The only CHG-004 focused attempt failed at MC110_EXACT_ROUTE because the
+  disposable probe froze fixture bindings before final revision-5 authority
+  propagation changed the physical requirements.md digest. Seven fixtures
+  contain that stale digest. No product or reviewer stage occurred.
+allowed_scope:
+  - controlled authority, profile revision 6, plan, V&V, trace, and evidence promotion completed before any fixture byte changes
+  - freeze the final post-promotion physical requirements.md SHA-256
+  - fixtures/model-context-routing/oracle-review-complete.json
+  - fixtures/model-context-routing/source-manifest-complete.json
+  - fixtures/model-context-routing/source-manifest-delivery-direct.json
+  - fixtures/model-context-routing/source-manifest-delivery-locator.json
+  - fixtures/model-context-routing/source-manifest-delivery-shard.json
+  - fixtures/model-context-routing/source-manifest-temporal-external-excluded.json
+  - fixtures/model-context-routing/source-manifest-temporal-external-required.json
+  - replace only the stale requirements.md physical digest with the final frozen post-promotion digest
+  - static comparison of every referenced repository locator and digest before smoke
+  - one full scripts/traceweaver-smoke-model-context-routing attempt
+  - after a clean result, fresh exact Vestro and Air Router rebinding and explicit owner disposition
+  - after accepted product cells, one verification-only continuation by the same existing integrated Terra reviewer limited to the cumulative eleven-file CHG-004/CHG-005 delta
+held_scope:
+  - any change to route logic, lifecycle behavior, public API, semantic meaning, or a functional file outside the seven named fixtures
+  - a smoke invocation before final authority promotion, fixture rebinding, and static all-locator digest proof
+  - any second attempt under this proposed cycle
+  - a new reviewer, full review, fan-out, repair subagent, or second reviewer continuation
+  - product mutation
+  - semantic HTML authority cutover, runtime, deployment, release-ready, tag, GitHub Release, or publication claims
+  - stage, commit, push, PR, merge, release, deploy, or external mutation
+activation_preconditions:
+  exact_owner_approval: satisfied_by_apply_this_guide_through_tw_auto_bounded_convergence_window
+  workflow_profile_revision_6: promoted_as_terminal_record
+  vv_capsule: terminal_result_bound
+  document_review: bounded_guide_already_reviewed_and_scope_unchanged
+  fresh_authority_gate: intentionally_not_repeated_between_in_scope_failures
+result: docs/validation/traceweaver-2026-08-26-v060-current-source-digest-bounded-convergence-result.md
+attempts_used: 2
+attempts_allowed: 2
+terminal_verification: model_context_routing_smoke_pass_cases_72
+publication_authority: none
+next_step: Closed successfully. Use CHG-TW-2026-08-27-006 for the separately authorized exact-candidate publication route.

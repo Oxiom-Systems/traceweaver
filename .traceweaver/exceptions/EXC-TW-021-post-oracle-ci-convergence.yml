@@ -1,0 +1,78 @@
+exception_id: EXC-TW-021
+status: consumed_expired_failed_single_focused_verification_exact_route_requirements_digest_mismatch_publication_held
+exception_type: one_time_post_oracle_ci_convergence_correction
+linked_intent: [INTENT-TW-012, INTENT-TW-013]
+linked_requirements: [REQ-TW-110, REQ-TW-123, REQ-TW-130, REQ-TW-143, REQ-TW-145]
+linked_change: CHG-TW-2026-08-26-004
+linked_trace: [TRACE-TW-072, TRACE-TW-074]
+linked_verification: [VER-TW-092, VER-TW-094]
+linked_validation: VAL-TW-042
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_hash_sha256: 8349b9c1d883c79a345eb7e10e86ab6e9f965805e34d894a28be44cde3a69a79
+workflow_profile_revision: 5
+workflow_profile_hash: sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7
+owner: Oxiom Systems
+approved_by: Hannes Zietsman
+created_at: "2026-08-26"
+approved_at: "2026-08-26"
+approval_evidence: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-owner-approval.md
+document_review: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-doc-review.md
+vv_capsule: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-vv-capsule.json
+vv_capsule_preflight: passed_require_review_passed
+authority_gate: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-post-promotion-authority-gate.md
+focused_verification_result: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-focused-verification-result.md
+decision_source: >-
+  Approve CHG-TW-2026-08-26-004 and EXC-TW-021 for one profile-revision-5
+  main-thread post-oracle CI convergence correction only: refresh the ten named
+  Core 0.5.0 model-context fixtures to current approved Core 0.6.0 map, oracle,
+  SEC, README, route-inventory, and receipt bindings; and correct
+  scripts/traceweaver-smoke-model-context-routing so its isolated
+  canonical-oracle negative invokes the compiler copied into the tampered
+  package and its tw-lifecycle direct-dependency expectation exactly matches
+  the production oracle. Permit one focused verification attempt, fresh exact
+  Vestro and Air Router product rebinding after the functional digest changes,
+  and one verification-only continuation of the same integrated Terra reviewer
+  limited to this eleven-file delta. Preserve the published Core 0.5.0 release,
+  the mixed root worktree, the accepted product limitations, and every
+  semantic-cutover, runtime, deployment, release, and publication hold;
+  publication remains separately gated.
+reason: >-
+  All prior correction/reviewer allowances are consumed. The new RED is a
+  distinct deterministic fixture/smoke convergence gap exposed after the
+  canonical Core 0.6.0 oracle write, and the eleven-file isolated probe passes
+  all 72 required cases.
+allowed_claims:
+  - one bounded main-thread revision-5 correction of the eleven named files
+  - one focused model-context verification attempt
+  - fresh exact-product rebinding and explicit owner disposition after functional change
+  - one verification-only continuation by the same existing Terra reviewer limited to the eleven-file delta
+blocked_claims:
+  - any other behavior change or repair cycle
+  - new reviewer, full review, reviewer fan-out, or repair subagent
+  - publication
+  - release_ready
+  - tag
+  - GitHub_Release
+  - deployment
+  - runtime_health
+  - semantic_html_authority_cutover
+activation_preconditions:
+  workflow_profile_revision: 5
+  correction_specific_red_evidence: passed_expected_failure_and_isolated_exact_scope_probe
+  document_review: clean_required
+  vv_capsule_review_preflight: passed_required
+  authority_gate_result: proceed_required_before_behavior_change
+expiry:
+  expires_when_any:
+    - one focused correction/verification attempt completes
+    - one new exact-product disposition is recorded
+    - one verification-only same-reviewer result is recorded
+    - scope expands beyond the eleven named files
+    - owner withdraws approval
+  after_expiry: held_owner_decision_required
+stale_reset_triggers:
+  - linked requirement or exact allowed scope changes
+  - reviewer identity changes
+  - functional scope changes after exact-product disposition
+  - any publication action is attempted
+next_step: Stop. A new owner-approved change/exception and fresh authority gate are required before any fixture rebinding or second model-context smoke.

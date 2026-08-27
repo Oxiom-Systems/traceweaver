@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-source-registry/1",
+  "title": "TraceWeaver lifecycle source registry",
+  "description": "Ordered, immutable registration of lifecycle authority, candidate, evidence, derived, and external-reference sources. Registration records provenance; it does not approve source content.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "registry_id", "generation", "owner", "sources"],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-source-registry/1"},
+    "registry_id": {"type": "string", "pattern": "^[A-Z][A-Z0-9._:-]{2,127}$"},
+    "generation": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._:-]{0,127}$"},
+    "owner": {"type": "string", "minLength": 1},
+    "sources": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"$ref": "#/$defs/source"}
+    }
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "normalization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["encoding", "line_endings", "case", "legacy_locators"],
+      "properties": {
+        "encoding": {"enum": ["UTF-8", "opaque"]},
+        "line_endings": {"enum": ["LF", "not_applicable"]},
+        "case": {"const": "exact"},
+        "legacy_locators": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id", "role", "locator", "normalized_locator", "source_type",
+        "schema_version", "digest", "owner", "authority_class",
+        "owned_field_families", "generation", "observed_at", "mutable",
+        "normalization"
+      ],
+      "properties": {
+        "source_id": {"type": "string", "pattern": "^SRC-[A-Z0-9][A-Z0-9-]{2,126}$"},
+        "role": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"},
+        "locator": {"type": "string", "minLength": 1},
+        "normalized_locator": {"type": "string", "minLength": 1},
+        "source_type": {"enum": ["markdown", "yaml", "semantic_html", "external_record_stub"]},
+        "schema_version": {"type": "string", "pattern": "^[A-Za-z0-9][A-Za-z0-9._/-]{2,127}$"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "owner": {"type": "string", "minLength": 1},
+        "authority_class": {
+          "enum": ["authoritative", "candidate", "imported_candidate", "evidence", "derived", "external_reference"]
+        },
+        "owned_field_families": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {"type": "string", "pattern": "^[a-z][a-z0-9_]{1,63}$"}
+        },
+        "generation": {"type": "string", "minLength": 1},
+        "observed_at": {"type": "string", "format": "date-time"},
+        "version": {"type": "string", "minLength": 1},
+        "mutable": {"const": false},
+        "normalization": {"$ref": "#/$defs/normalization"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"source_type": {"const": "external_record_stub"}}, "required": ["source_type"]},
+          "then": {
+            "required": ["version"],
+            "properties": {"authority_class": {"const": "external_reference"}}
+          }
+        }
+      ]
+    }
+  }
+}

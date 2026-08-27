@@ -1,0 +1,65 @@
+id: CHG-TW-2026-08-26-003
+record_type: traceweaver_change_control
+status: consumed_expired_p1_005_closed_clean_oracle_written_publication_held
+owner: Oxiom Systems
+created_at: "2026-08-26"
+approved_at: "2026-08-26"
+approved_by: Hannes Zietsman
+linked_intent: [INTENT-TW-012, INTENT-TW-013]
+linked_requirements: [REQ-TW-130, REQ-TW-135, REQ-TW-136, REQ-TW-141, REQ-TW-143, REQ-TW-144, REQ-TW-145]
+linked_trace: TRACE-TW-074
+linked_verification: VER-TW-094
+linked_validation: VAL-TW-042
+linked_exception: EXC-TW-020
+source_review: TW-INTEGRATED-REVIEW-2026-08-26-V060-RETAINED-CONTINUATION-001
+requirements_review: TW-REQ-REVIEW-2026-08-26-V060-ORACLE-SOURCE-CYCLE-001
+owner_approval_evidence: docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-approval.md
+owner_decision_source: >-
+  Approve CHG-TW-2026-08-26-003 and EXC-TW-020 for one acyclic-oracle
+  correction of P1-005-continuation only: separate pre-oracle inputs from
+  post-oracle GREEN and retained-review receipts across the oracle refresher,
+  v3 readiness checker, and release-integrity smoke; permit one main-thread
+  repair, exact-product rebinding if the functional digest changes, and one
+  verification-only continuation of the same integrated Terra reviewer.
+  Preserve the published 0.5.0 release, the mixed root worktree, and every
+  semantic-cutover, runtime, deployment, release, and publication hold;
+  publication remains separately gated.
+reason: >-
+  P1-005-continuation proves that the pre-oracle source contract circularly
+  requires terminal GREEN and retained-review receipts that can truthfully
+  exist only after oracle and review completion. Placeholders or predeclared
+  GREEN would violate truth-stage separation.
+affected_authority:
+  requirements: [REQ-TW-130, REQ-TW-135, REQ-TW-136, REQ-TW-141, REQ-TW-143, REQ-TW-144, REQ-TW-145]
+  findings: [P1-005-continuation]
+  evidence: [TRACE-TW-074, VER-TW-094, VAL-TW-042]
+controlled_master_roots:
+  - requirements.md
+  - traceability-matrix.md
+  - .traceweaver/intent-contract.yml
+allowed_scope:
+  - scripts/traceweaver-refresh-v060-model-context-oracle
+  - scripts/traceweaver-check-release-readiness
+  - scripts/traceweaver-smoke-v060-release-integrity
+  - controlled authority, profile, plan, V&V, trace, and evidence bindings necessary for this acyclic boundary
+  - one main-thread repair attempt
+  - one fresh exact-product rebinding and owner disposition if functional scope changes
+  - one verification-only continuation by the existing integrated Terra reviewer for P1-005-continuation
+held_scope:
+  - every finding other than P1-005-continuation
+  - packaged lifecycle runtime, schema, product behavior, or public API expansion
+  - consumer repository mutation
+  - a new reviewer identity, full review, reviewer fan-out, repair subagent, or second continuation
+  - placeholder, predeclared, or falsely GREEN evidence
+  - semantic HTML authority cutover, served-model, deployment, runtime-health, or release-ready claims
+  - staging, commit, push, PR, merge, tag, GitHub Release, deployment, or publication
+expiry: >-
+  First of one bounded repair attempt, one new exact-product disposition, one
+  verification-only same-reviewer result, scope expansion, or owner withdrawal.
+activation_preconditions:
+  requirements_review: accepted_clean
+  workflow_profile_revision: 4
+  correction_specific_red_evidence: required
+  document_review: clean_required
+  authority_gate_result: proceed_required_before_behavior_change
+next_step: Historical only. CHG-TW-2026-08-26-004 / EXC-TW-021 controls the distinct post-oracle CI convergence gap.

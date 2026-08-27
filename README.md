@@ -10,6 +10,7 @@
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-065; trace=TRACE-TW-048; ver=VAL-TW-011 -->
 <!-- TRACEWEAVER: file-role=first-time-root-readme; req=REQ-TW-068; trace=TRACE-TW-054; ver=VAL-TW-016 -->
 <!-- TRACEWEAVER: file-role=v050-shadow-governance-public-guide; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092; val=VAL-TW-040 -->
+<!-- TRACEWEAVER: file-role=v060-product-lifecycle-public-guide; req=REQ-TW-130,REQ-TW-135,REQ-TW-138,REQ-TW-145; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042 -->
 
 TraceWeaver keeps coding-agent work tied to intent, approved authority,
 verification evidence, validation questions, and explicit held claims.
@@ -18,10 +19,12 @@ Use it when you want Codex, Claude Code, or other agent tools to move quickly
 without losing the proof behind what changed, why it changed, and whether it is
 ready to publish.
 
-TraceWeaver Core `0.5.0` is an alpha advisory release candidate for Codex and
-Claude Code. It adds inspectable shadow model/context governance while the
-existing v1 dispatch remains authoritative. Antigravity support remains
-limited to static local install/discovery metadata.
+TraceWeaver Core `0.6.0` is an alpha advisory product-lifecycle assurance
+release for Codex and Claude Code. It links intent, requirements, changes,
+artifacts, V&V, evidence, validation, and acceptance without replacing the
+product systems that own them. Markdown/YAML remain controlling; strict HTML
+is an offline derived view. Antigravity support remains limited to static
+local install/discovery metadata.
 
 ## Intro Video
 
@@ -66,10 +69,10 @@ codex plugin marketplace add Oxiom-Systems/traceweaver
 codex plugin marketplace upgrade traceweaver
 ```
 
-After the 0.5.0 GitHub Release is published, for a pinned local alpha install:
+After the 0.6.0 GitHub Release is published, for a pinned local alpha install:
 
 ```sh
-git clone --branch traceweaver-core--v0.5.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
+git clone --branch traceweaver-core--v0.6.0 --depth 1 git@github.com:Oxiom-Systems/traceweaver.git
 cd traceweaver
 bun run src/index.ts install ./plugins/traceweaver-core --to codex --include-skills
 ```
@@ -146,7 +149,53 @@ Use the [worked bootstrap example](docs/guides/worked-authority-bootstrap-exampl
 when you want to see what belongs in the first three files before reading the
 full reference templates.
 
-## What's New in 0.5.0
+## What's New in 0.6.0
+
+TraceWeaver Core 0.6.0 adds a lightweight federated lifecycle layer. The new
+`tw-lifecycle` surface registers exact product sources, captures candidate
+records for named-human confirmation, applies only separately approved deltas,
+marks affected evidence stale, and exposes deterministic duplicate, path,
+status, and impact queries.
+
+Lifecycle records use open versioned JSON contracts for commitments, intent,
+needs, requirements, decisions, interfaces, risks, changes, product artifacts,
+V&V, evidence, validation, and acceptance. Imported, inferred, generated, and
+derived material has no authority effect until the governing source records a
+named-human decision.
+
+The offline acceptance hub is static, printable, keyboard navigable, and
+content-addressed. It preserves separate observation, verification, review,
+PR, merge, deployment, runtime, release, validation, acceptance, and
+publication truth stages. A generated graph, hub, or acceptance pack never
+approves work by itself.
+
+Release readiness now requires independent Vestro and Air Router product cells
+on one frozen candidate, including an authorized Air Router non-code artifact,
+plus integrated review, fresh graph evidence, scope/rollback proof, clean
+reinstall, five-manifest equality, and exact-main smoke/CodeQL. The serialized
+main workflow remains the only tag and GitHub Release publisher.
+
+Semantic HTML authority cutover, active routing/enforcement, served-model
+attestation, autonomous deployment, and any ERP/PLM/ALM replacement claim
+remain outside this release.
+
+### 0.6.0 Lifecycle Quick Start
+
+Start with the existing advisory flow, then inspect the lifecycle contract and
+run the applicable operation through `tw-lifecycle`:
+
+```text
+tw-auto "capture and deliver this approved product change"
+tw-lifecycle status
+tw-lifecycle impact <record-id>
+tw-lifecycle acceptance-hub-build <named-baseline inputs>
+```
+
+The package-level schemas live under `references/lifecycle/`. Product capture,
+change application, validation, and publication each retain a separate named
+human or release gate.
+
+## 0.5.0 Shadow Model/Context Governance
 
 TraceWeaver Core 0.5.0 adds a deterministic, inspectable, shadow-only
 model-context map and compiler. The map keeps model role, risk effort, packet

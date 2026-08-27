@@ -1,0 +1,458 @@
+{
+  "schema_version": "tw-review-series-ledger/1",
+  "series_generation_id": "RS-GEN-2026-08-24-V060-AUTHORITY-BASELINE-001",
+  "predecessor_series_identity": null,
+  "authorization_reason": "Oxiom Systems selected the clean Core 0.6.0 successor route and authorized one bounded authority-baseline review generation.",
+  "review_mode": "repair_verification",
+  "series_identity": "sha256:c8dac8c7d0d83962967809b13a7b872d22b631728252d1529365a355d29d19e8",
+  "frozen_scope_identity": "sha256:be5ee9a764a754ab62b14e7cd1a78d03fafd116c926dcf2a16ed18f02f17b73d",
+  "routing_scope": {
+    "target_paths": [
+      ".traceweaver/intent-contract.yml",
+      ".traceweaver/workflow-profile.yml",
+      "docs/plans/2026-08-21-traceweaver-0.5.0-plm-assurance-implementation-plan.md",
+      "docs/plans/2026-08-21-traceweaver-0.5.0-product-intent-plm-handover.md",
+      "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md",
+      "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md",
+      "requirements.md",
+      "traceability-matrix.md"
+    ],
+    "review_objective": "Determine whether the exact Core 0.6.0 successor authority candidate is coherent, verifiable, trace-complete, correctly preserves released 0.5.0, and may authorize bounded lifecycle implementation.",
+    "concerns": [
+      "architecture interface security feasibility and release integrity",
+      "authority and source sufficiency",
+      "design decisions alternatives and downstream impact",
+      "model routing review-series and publication controls",
+      "product goal and scope coherence",
+      "protected worktree and PR61 integration boundaries",
+      "requirements quality and validation intent",
+      "traceability hash and lifecycle status consistency"
+    ],
+    "policy_epoch": "tw-review-policy/2026-08-21"
+  },
+  "frozen_scope": {
+    "semantic_authority_digest": "sha256:39422814ae011e58128e9db346df22a888677b1ce5a82758aab789ca2e47f443",
+    "behavior_digest": "sha256:58f0c7457982c1d005a8e3321245ca2c89d9b97d920c382ecf4e3f6341af448e",
+    "verification_digest": "sha256:45e312366811f90d416ff99feb16d757737aa79314e4704bb6e44d17f3a3a0c3",
+    "policy_epoch": "tw-review-policy/2026-08-21",
+    "requirements_baseline_hash": "sha256:31765a5930d492df44f7488b62b1d96f56842d746d0063b61eab7caa7996c7f5",
+    "workflow_profile_hash": "sha256:b03303d7dc4308a9095c42a6eaa3af5dd1b715290f4af4f330f953a5c42fd367",
+    "target_paths": [
+      ".traceweaver/intent-contract.yml",
+      ".traceweaver/workflow-profile.yml",
+      "docs/plans/2026-08-21-traceweaver-0.5.0-plm-assurance-implementation-plan.md",
+      "docs/plans/2026-08-21-traceweaver-0.5.0-product-intent-plm-handover.md",
+      "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md",
+      "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md",
+      "requirements.md",
+      "traceability-matrix.md"
+    ],
+    "review_objective": "Determine whether the exact Core 0.6.0 successor authority candidate is coherent, verifiable, trace-complete, correctly preserves released 0.5.0, and may authorize bounded lifecycle implementation.",
+    "concerns": [
+      "architecture interface security feasibility and release integrity",
+      "authority and source sufficiency",
+      "design decisions alternatives and downstream impact",
+      "model routing review-series and publication controls",
+      "product goal and scope coherence",
+      "protected worktree and PR61 integration boundaries",
+      "requirements quality and validation intent",
+      "traceability hash and lifecycle status consistency"
+    ],
+    "canonical_protocol": {
+      "path": "plugins/traceweaver-core/references/scoped-review-protocol.md",
+      "version": "tw-scoped-review-protocol/1",
+      "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+    }
+  },
+  "formal_authority_accepted": true,
+  "authority_acceptance_state": "authority_accepted",
+  "authority_acceptance_receipt": "TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+  "accounting": {
+    "discovery_consumed": true,
+    "repair_cycles_opened": 1,
+    "routine_repair_cycle_limit": 1,
+    "repair_cycle_limit": 1,
+    "remaining_repair_cycles": 0,
+    "severe_blocker_exception": null
+  },
+  "attempts": [
+    {
+      "stage": "discovery",
+      "attempt_index": 0,
+      "attempt_identity": "sha256:b2aa5396653ba4e8e64981a6eeedd62d9c28c0b25326212849c558a26fa16834",
+      "status": "complete",
+      "opened_session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+      "dispatch_identities": [
+        "sha256:a56512bffac25040207c4cf3286577449f4a5bb830dbc4405cf6e3da18533c24"
+      ],
+      "completed_session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+      "unresolved_blocking_fingerprints": [
+        "sha256:1f45a6adf953a7cad630e1355171e4b9d45548ad7b98cd438104feca4e244110",
+        "sha256:26f82c59bfb0965fc8b2bef09b9f5f7221c78dc816cd0e3387d2c823207201c9",
+        "sha256:e902adeb13662d80eea5af4bedcd5a2babb1bac9e7bd637040ffb3088c206bb6"
+      ],
+      "relevant_evidence_digest": "sha256:0cbceae1a99397c7b56bd274ffd9a447fe50dd31f09bf07925fa7f3c7ae28759"
+    },
+    {
+      "stage": "repair_verification",
+      "attempt_index": 1,
+      "attempt_identity": "sha256:d99291805286449226ec0918485ffdd27f48591cc542de7dba02cf73ad096bcc",
+      "status": "complete",
+      "opened_session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+      "dispatch_identities": [
+        "sha256:643ffe6bc07210c028df307ef9e3f64bbbef08b9f2fba84c8b9e7ba1d0a131da"
+      ],
+      "completed_session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+      "unresolved_blocking_fingerprints": [
+
+      ],
+      "relevant_evidence_digest": "sha256:77db3498a0a8b7c128d2bd9357111fe83d77e08e9169fa606905776643ba5424"
+    }
+  ],
+  "current_attempt": null,
+  "dispatches": [
+    {
+      "dispatch_identity": "sha256:a56512bffac25040207c4cf3286577449f4a5bb830dbc4405cf6e3da18533c24",
+      "dispatch_sequence": 1,
+      "series_identity": "sha256:c8dac8c7d0d83962967809b13a7b872d22b631728252d1529365a355d29d19e8",
+      "stage": "discovery",
+      "attempt_identity": "sha256:b2aa5396653ba4e8e64981a6eeedd62d9c28c0b25326212849c558a26fa16834",
+      "wrapper": "tw-doc-review",
+      "role": "integrated_authority_reviewer",
+      "session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001"
+    },
+    {
+      "dispatch_identity": "sha256:643ffe6bc07210c028df307ef9e3f64bbbef08b9f2fba84c8b9e7ba1d0a131da",
+      "dispatch_sequence": 2,
+      "series_identity": "sha256:c8dac8c7d0d83962967809b13a7b872d22b631728252d1529365a355d29d19e8",
+      "stage": "repair_verification",
+      "attempt_identity": "sha256:d99291805286449226ec0918485ffdd27f48591cc542de7dba02cf73ad096bcc",
+      "wrapper": "tw-doc-review",
+      "role": "same_integrated_authority_reviewer_repair_verification",
+      "session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001"
+    }
+  ],
+  "finding_history": [
+    {
+      "blocking_context": "authority",
+      "claim_impact": "The implementation route has contradictory reviewer dispatch and repair-budget authority.",
+      "disposition": "open",
+      "failure_predicate": "The owner decision requires an integrated Terra review for every implementation slice while the accepted plan and frozen profile require one integrated review of the complete mixed candidate.",
+      "governing_rule": "REQ-TW-143 and tw-consolidated-delivery/1",
+      "out_of_scope": false,
+      "repair_regression": false,
+      "semantic_anchor": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md delivery authority and gates",
+      "severity": "P1",
+      "fingerprint_inputs": {
+        "governing_rule": "req-tw-143 and tw-consolidated-delivery/1",
+        "semantic_anchor": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md delivery authority and gates",
+        "failure_predicate": "the owner decision requires an integrated terra review for every implementation slice while the accepted plan and frozen profile require one integrated review of the complete mixed candidate.",
+        "claim_impact": "the implementation route has contradictory reviewer dispatch and repair-budget authority."
+      },
+      "fingerprint": "sha256:1f45a6adf953a7cad630e1355171e4b9d45548ad7b98cd438104feca4e244110",
+      "blocking": true,
+      "repair_eligible": true,
+      "stage": "discovery",
+      "attempt_identity": "sha256:b2aa5396653ba4e8e64981a6eeedd62d9c28c0b25326212849c558a26fa16834"
+    },
+    {
+      "blocking_context": "authority",
+      "claim_impact": "The authority baseline cannot transition from reviewed candidate to active accepted input without violating one of its own controls.",
+      "disposition": "open",
+      "failure_predicate": "The profile lists every stage action as prohibited before formal acceptance while formal review acceptance requires the exact candidate to be staged coherently.",
+      "governing_rule": "TraceWeaver Review-Staging Mode and tw-doc-review Gate",
+      "out_of_scope": false,
+      "repair_regression": false,
+      "semantic_anchor": ".traceweaver/workflow-profile.yml publication_boundary.prohibited_actions",
+      "severity": "P1",
+      "fingerprint_inputs": {
+        "governing_rule": "traceweaver review-staging mode and tw-doc-review gate",
+        "semantic_anchor": ".traceweaver/workflow-profile.yml publication_boundary.prohibited_actions",
+        "failure_predicate": "the profile lists every stage action as prohibited before formal acceptance while formal review acceptance requires the exact candidate to be staged coherently.",
+        "claim_impact": "the authority baseline cannot transition from reviewed candidate to active accepted input without violating one of its own controls."
+      },
+      "fingerprint": "sha256:26f82c59bfb0965fc8b2bef09b9f5f7221c78dc816cd0e3387d2c823207201c9",
+      "blocking": true,
+      "repair_eligible": true,
+      "stage": "discovery",
+      "attempt_identity": "sha256:b2aa5396653ba4e8e64981a6eeedd62d9c28c0b25326212849c558a26fa16834"
+    },
+    {
+      "blocking_context": "validation",
+      "claim_impact": "The self-dogfood claim could be satisfied by branch-local or stale host instructions instead of the released product being succeeded.",
+      "disposition": "open",
+      "failure_predicate": "The successor plan does not bind development dogfood to an isolated clean install of the latest published predecessor; the active Codex install points to a 0.3.2 mixed-root source while the latest release is Core 0.5.0.",
+      "governing_rule": "Owner dogfood direction and REQ-TW-143",
+      "out_of_scope": false,
+      "repair_regression": false,
+      "semantic_anchor": "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md consolidated delivery strategy",
+      "severity": "P1",
+      "fingerprint_inputs": {
+        "governing_rule": "owner dogfood direction and req-tw-143",
+        "semantic_anchor": "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md consolidated delivery strategy",
+        "failure_predicate": "the successor plan does not bind development dogfood to an isolated clean install of the latest published predecessor; the active codex install points to a 0.3.2 mixed-root source while the latest release is core 0.5.0.",
+        "claim_impact": "the self-dogfood claim could be satisfied by branch-local or stale host instructions instead of the released product being succeeded."
+      },
+      "fingerprint": "sha256:e902adeb13662d80eea5af4bedcd5a2babb1bac9e7bd637040ffb3088c206bb6",
+      "blocking": true,
+      "repair_eligible": true,
+      "stage": "discovery",
+      "attempt_identity": "sha256:b2aa5396653ba4e8e64981a6eeedd62d9c28c0b25326212849c558a26fa16834"
+    },
+    {
+      "blocking_context": "authority",
+      "claim_impact": "The implementation route has contradictory reviewer dispatch and repair-budget authority.",
+      "disposition": "closed",
+      "failure_predicate": "The owner decision requires an integrated Terra review for every implementation slice while the accepted plan and frozen profile require one integrated review of the complete mixed candidate.",
+      "governing_rule": "REQ-TW-143 and tw-consolidated-delivery/1",
+      "out_of_scope": false,
+      "repair_regression": false,
+      "semantic_anchor": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md delivery authority and gates",
+      "severity": "P1",
+      "fingerprint_inputs": {
+        "governing_rule": "req-tw-143 and tw-consolidated-delivery/1",
+        "semantic_anchor": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md delivery authority and gates",
+        "failure_predicate": "the owner decision requires an integrated terra review for every implementation slice while the accepted plan and frozen profile require one integrated review of the complete mixed candidate.",
+        "claim_impact": "the implementation route has contradictory reviewer dispatch and repair-budget authority."
+      },
+      "fingerprint": "sha256:1f45a6adf953a7cad630e1355171e4b9d45548ad7b98cd438104feca4e244110",
+      "blocking": false,
+      "repair_eligible": false,
+      "stage": "repair_verification",
+      "attempt_identity": "sha256:d99291805286449226ec0918485ffdd27f48591cc542de7dba02cf73ad096bcc"
+    },
+    {
+      "blocking_context": "authority",
+      "claim_impact": "The authority baseline cannot transition from reviewed candidate to active accepted input without violating one of its own controls.",
+      "disposition": "closed",
+      "failure_predicate": "The profile lists every stage action as prohibited before formal acceptance while formal review acceptance requires the exact candidate to be staged coherently.",
+      "governing_rule": "TraceWeaver Review-Staging Mode and tw-doc-review Gate",
+      "out_of_scope": false,
+      "repair_regression": false,
+      "semantic_anchor": ".traceweaver/workflow-profile.yml publication_boundary.prohibited_actions",
+      "severity": "P1",
+      "fingerprint_inputs": {
+        "governing_rule": "traceweaver review-staging mode and tw-doc-review gate",
+        "semantic_anchor": ".traceweaver/workflow-profile.yml publication_boundary.prohibited_actions",
+        "failure_predicate": "the profile lists every stage action as prohibited before formal acceptance while formal review acceptance requires the exact candidate to be staged coherently.",
+        "claim_impact": "the authority baseline cannot transition from reviewed candidate to active accepted input without violating one of its own controls."
+      },
+      "fingerprint": "sha256:26f82c59bfb0965fc8b2bef09b9f5f7221c78dc816cd0e3387d2c823207201c9",
+      "blocking": false,
+      "repair_eligible": false,
+      "stage": "repair_verification",
+      "attempt_identity": "sha256:d99291805286449226ec0918485ffdd27f48591cc542de7dba02cf73ad096bcc"
+    },
+    {
+      "blocking_context": "validation",
+      "claim_impact": "The self-dogfood claim could be satisfied by branch-local or stale host instructions instead of the released product being succeeded.",
+      "disposition": "closed",
+      "failure_predicate": "The successor plan does not bind development dogfood to an isolated clean install of the latest published predecessor; the active Codex install points to a 0.3.2 mixed-root source while the latest release is Core 0.5.0.",
+      "governing_rule": "Owner dogfood direction and REQ-TW-143",
+      "out_of_scope": false,
+      "repair_regression": false,
+      "semantic_anchor": "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md consolidated delivery strategy",
+      "severity": "P1",
+      "fingerprint_inputs": {
+        "governing_rule": "owner dogfood direction and req-tw-143",
+        "semantic_anchor": "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md consolidated delivery strategy",
+        "failure_predicate": "the successor plan does not bind development dogfood to an isolated clean install of the latest published predecessor; the active codex install points to a 0.3.2 mixed-root source while the latest release is core 0.5.0.",
+        "claim_impact": "the self-dogfood claim could be satisfied by branch-local or stale host instructions instead of the released product being succeeded."
+      },
+      "fingerprint": "sha256:e902adeb13662d80eea5af4bedcd5a2babb1bac9e7bd637040ffb3088c206bb6",
+      "blocking": false,
+      "repair_eligible": false,
+      "stage": "repair_verification",
+      "attempt_identity": "sha256:d99291805286449226ec0918485ffdd27f48591cc542de7dba02cf73ad096bcc"
+    }
+  ],
+  "current_findings": [
+    {
+      "blocking_context": "authority",
+      "claim_impact": "The implementation route has contradictory reviewer dispatch and repair-budget authority.",
+      "disposition": "closed",
+      "failure_predicate": "The owner decision requires an integrated Terra review for every implementation slice while the accepted plan and frozen profile require one integrated review of the complete mixed candidate.",
+      "governing_rule": "REQ-TW-143 and tw-consolidated-delivery/1",
+      "out_of_scope": false,
+      "repair_regression": false,
+      "semantic_anchor": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md delivery authority and gates",
+      "severity": "P1",
+      "fingerprint_inputs": {
+        "governing_rule": "req-tw-143 and tw-consolidated-delivery/1",
+        "semantic_anchor": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md delivery authority and gates",
+        "failure_predicate": "the owner decision requires an integrated terra review for every implementation slice while the accepted plan and frozen profile require one integrated review of the complete mixed candidate.",
+        "claim_impact": "the implementation route has contradictory reviewer dispatch and repair-budget authority."
+      },
+      "fingerprint": "sha256:1f45a6adf953a7cad630e1355171e4b9d45548ad7b98cd438104feca4e244110",
+      "blocking": false,
+      "repair_eligible": false
+    },
+    {
+      "blocking_context": "authority",
+      "claim_impact": "The authority baseline cannot transition from reviewed candidate to active accepted input without violating one of its own controls.",
+      "disposition": "closed",
+      "failure_predicate": "The profile lists every stage action as prohibited before formal acceptance while formal review acceptance requires the exact candidate to be staged coherently.",
+      "governing_rule": "TraceWeaver Review-Staging Mode and tw-doc-review Gate",
+      "out_of_scope": false,
+      "repair_regression": false,
+      "semantic_anchor": ".traceweaver/workflow-profile.yml publication_boundary.prohibited_actions",
+      "severity": "P1",
+      "fingerprint_inputs": {
+        "governing_rule": "traceweaver review-staging mode and tw-doc-review gate",
+        "semantic_anchor": ".traceweaver/workflow-profile.yml publication_boundary.prohibited_actions",
+        "failure_predicate": "the profile lists every stage action as prohibited before formal acceptance while formal review acceptance requires the exact candidate to be staged coherently.",
+        "claim_impact": "the authority baseline cannot transition from reviewed candidate to active accepted input without violating one of its own controls."
+      },
+      "fingerprint": "sha256:26f82c59bfb0965fc8b2bef09b9f5f7221c78dc816cd0e3387d2c823207201c9",
+      "blocking": false,
+      "repair_eligible": false
+    },
+    {
+      "blocking_context": "validation",
+      "claim_impact": "The self-dogfood claim could be satisfied by branch-local or stale host instructions instead of the released product being succeeded.",
+      "disposition": "closed",
+      "failure_predicate": "The successor plan does not bind development dogfood to an isolated clean install of the latest published predecessor; the active Codex install points to a 0.3.2 mixed-root source while the latest release is Core 0.5.0.",
+      "governing_rule": "Owner dogfood direction and REQ-TW-143",
+      "out_of_scope": false,
+      "repair_regression": false,
+      "semantic_anchor": "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md consolidated delivery strategy",
+      "severity": "P1",
+      "fingerprint_inputs": {
+        "governing_rule": "owner dogfood direction and req-tw-143",
+        "semantic_anchor": "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md consolidated delivery strategy",
+        "failure_predicate": "the successor plan does not bind development dogfood to an isolated clean install of the latest published predecessor; the active codex install points to a 0.3.2 mixed-root source while the latest release is core 0.5.0.",
+        "claim_impact": "the self-dogfood claim could be satisfied by branch-local or stale host instructions instead of the released product being succeeded."
+      },
+      "fingerprint": "sha256:e902adeb13662d80eea5af4bedcd5a2babb1bac9e7bd637040ffb3088c206bb6",
+      "blocking": false,
+      "repair_eligible": false
+    }
+  ],
+  "evidence_history": [
+    {
+      "stage": "discovery",
+      "attempt_identity": "sha256:b2aa5396653ba4e8e64981a6eeedd62d9c28c0b25326212849c558a26fa16834",
+      "relevant_evidence_digest": "sha256:0cbceae1a99397c7b56bd274ffd9a447fe50dd31f09bf07925fa7f3c7ae28759",
+      "semantic_authority_digest": "sha256:39422814ae011e58128e9db346df22a888677b1ce5a82758aab789ca2e47f443",
+      "behavior_digest": "sha256:58f0c7457982c1d005a8e3321245ca2c89d9b97d920c382ecf4e3f6341af448e",
+      "verification_digest": "sha256:45e312366811f90d416ff99feb16d757737aa79314e4704bb6e44d17f3a3a0c3",
+      "verification_outcome": "partial",
+      "evidence_changed": true,
+      "unresolved_blocking_fingerprints": [
+        "sha256:1f45a6adf953a7cad630e1355171e4b9d45548ad7b98cd438104feca4e244110",
+        "sha256:26f82c59bfb0965fc8b2bef09b9f5f7221c78dc816cd0e3387d2c823207201c9",
+        "sha256:e902adeb13662d80eea5af4bedcd5a2babb1bac9e7bd637040ffb3088c206bb6"
+      ]
+    },
+    {
+      "stage": "repair_verification",
+      "attempt_identity": "sha256:d99291805286449226ec0918485ffdd27f48591cc542de7dba02cf73ad096bcc",
+      "relevant_evidence_digest": "sha256:77db3498a0a8b7c128d2bd9357111fe83d77e08e9169fa606905776643ba5424",
+      "semantic_authority_digest": "sha256:9dc0e5360b65fffe1a7615054db79379287f9ab32ba2d7c03bb4dbaf7a3200d7",
+      "behavior_digest": "sha256:9ea17fb40a6a039ada6d96c9d7fb0663863f56c4e6e6eaab5a1107136e265771",
+      "verification_digest": "sha256:52acc3e4351ef98ce6965720c2342cf3bf53704ea141c99508c511d4919c4ba6",
+      "verification_outcome": "pass",
+      "evidence_changed": true,
+      "unresolved_blocking_fingerprints": [
+
+      ]
+    }
+  ],
+  "accepted_review": {
+    "identity": "sha256:385d982cd8a3a96d4f5d7bca9f7d154b38154f5d919c40d867dcb371ea2ed8a0",
+    "inputs": {
+      "semantic_authority_digest": "sha256:9dc0e5360b65fffe1a7615054db79379287f9ab32ba2d7c03bb4dbaf7a3200d7",
+      "behavior_digest": "sha256:9ea17fb40a6a039ada6d96c9d7fb0663863f56c4e6e6eaab5a1107136e265771",
+      "verification_digest": "sha256:52acc3e4351ef98ce6965720c2342cf3bf53704ea141c99508c511d4919c4ba6",
+      "policy_epoch": "tw-review-policy/2026-08-21"
+    },
+    "review_route": "document_review",
+    "recorded_session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001"
+  },
+  "mechanical_closures": [
+    {
+      "sequence": 1,
+      "changes": [
+        "git_index",
+        "receipt",
+        "requirements_baseline_metadata",
+        "review_id",
+        "workflow_profile_metadata"
+      ],
+      "audit_metadata": {
+        "branch": "codex/v050-product-intent-plm-plan",
+        "exact_review_staged_path_count": 10,
+        "final_eight_file_content_set": "sha256:653e94c16d8a65bfdb60af7409a9456989b2a6cb431eceea9144867c3c44797a",
+        "formal_review_owner": "retained_sol_primary",
+        "formal_review_receipt": "TW-DOC-REVIEW-2026-08-24-V060-PRODUCT-LIFECYCLE-AUTHORITY-001",
+        "head": "e53faeb437cfee3b91f43e1b0f4ed3b1cb1e2c33",
+        "requirements_baseline_hash": "sha256:d8229092d58ad5796f1f7e3384093bda6703374a43b789a954f7e48ecd418399",
+        "reviewer_fork_turns": "none",
+        "reviewer_requested_model": "gpt-5.6-terra",
+        "reviewer_requested_reasoning_effort": "xhigh",
+        "reviewer_route_outcome": "held_model_unattested",
+        "reviewer_served_model": "unattested",
+        "workflow_profile_hash": "sha256:8f986882804cebc4edd9530ec25f572d05daed37d7fe6099ff30aa77bdffa6f4"
+      },
+      "session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+      "atomic_with_accepted_review": true,
+      "reviewer_dispatch_count": 0,
+      "closure_identity": "sha256:282854a22562dc8af9f0e79fb0af95ae5fb996dac2992c441d9bdfd82b44a423"
+    }
+  ],
+  "audit_metadata_history": [
+    {
+      "requirements_baseline_hash": "sha256:31765a5930d492df44f7488b62b1d96f56842d746d0063b61eab7caa7996c7f5",
+      "workflow_profile_hash": "sha256:b03303d7dc4308a9095c42a6eaa3af5dd1b715290f4af4f330f953a5c42fd367",
+      "canonical_protocol": {
+        "path": "plugins/traceweaver-core/references/scoped-review-protocol.md",
+        "version": "tw-scoped-review-protocol/1",
+        "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+      },
+      "semantic_authority_digest": "sha256:39422814ae011e58128e9db346df22a888677b1ce5a82758aab789ca2e47f443",
+      "behavior_digest": "sha256:58f0c7457982c1d005a8e3321245ca2c89d9b97d920c382ecf4e3f6341af448e",
+      "verification_digest": "sha256:45e312366811f90d416ff99feb16d757737aa79314e4704bb6e44d17f3a3a0c3",
+      "session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001"
+    }
+  ],
+  "terminal_outcome": "candidate_review_saturated",
+  "terminal_receipts": [
+    {
+      "schema_version": "tw-review-series-receipt/1",
+      "command": "terminal_evaluation",
+      "series_generation_id": "RS-GEN-2026-08-24-V060-AUTHORITY-BASELINE-001",
+      "predecessor_series_identity": null,
+      "series_identity": "sha256:c8dac8c7d0d83962967809b13a7b872d22b631728252d1529365a355d29d19e8",
+      "frozen_scope_identity": "sha256:be5ee9a764a754ab62b14e7cd1a78d03fafd116c926dcf2a16ed18f02f17b73d",
+      "canonical_protocol": {
+        "path": "plugins/traceweaver-core/references/scoped-review-protocol.md",
+        "version": "tw-scoped-review-protocol/1",
+        "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+      },
+      "policy_epoch": "tw-review-policy/2026-08-21",
+      "ledger_digest": "sha256:e6aba593b6d605a78f158bce6875b0c2abca14d6f4bca6f3f0281db309b2e7fd",
+      "stage": "repair_verification",
+      "attempt_identity": "sha256:d99291805286449226ec0918485ffdd27f48591cc542de7dba02cf73ad096bcc",
+      "dispatch_identities": [
+        "sha256:643ffe6bc07210c028df307ef9e3f64bbbef08b9f2fba84c8b9e7ba1d0a131da"
+      ],
+      "remaining_repair_cycles": 0,
+      "unresolved_blocking_count": 0,
+      "nonblocking_debt_count": 0,
+      "terminal_outcome": "candidate_review_saturated",
+      "authority_acceptance_state": "held_authority_acceptance",
+      "authority_acceptance_receipt": null,
+      "last_session_id": "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+      "terminal_reasons": [
+        "zero_unresolved_in_scope_blockers"
+      ],
+      "receipt_sequence": 1,
+      "receipt_identity": "sha256:9af85748d9bbc1fa8c218cef7a9a4a53c66988c75a16c741a133055c2978f070"
+    }
+  ],
+  "session_history": [
+    "TW-AUTO-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+    "TW-AUTO-2026-08-24-V050-PR61-LIFECYCLE-RECONCILIATION-001"
+  ],
+  "last_session_id": "TW-AUTO-2026-08-24-V050-PR61-LIFECYCLE-RECONCILIATION-001"
+}

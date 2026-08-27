@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# TRACEWEAVER: file-role=v060-lifecycle-staleness-entrypoint; req=REQ-TW-140; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-140; trace=TRACE-TW-074
+
+root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+tool="$root/plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-evidence"
+
+if [[ "$#" -gt 0 ]]; then
+  exec "$tool" staleness --root "$root" "$@"
+fi
+
+"$root/scripts/traceweaver-smoke-v060-lifecycle-evidence"
+echo "v060_lifecycle_staleness_entrypoint=pass"

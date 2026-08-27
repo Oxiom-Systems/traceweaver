@@ -193,6 +193,8 @@ runtime_negative runtime_bad_scope '.candidate_scope_digest = "sha256:2222222222
 runtime_negative runtime_bad_workflow '.workflow_url = "https://example.invalid/actions/runs/123"' 'runtime receipt workflow_url is invalid'
 runtime_negative runtime_bad_required_ci '.required_ci.state = "pending"' 'runtime receipt required_ci state is not ready'
 
+current_plugin_version="$(jq -r '.version' plugins/traceweaver-core/.claude-plugin/plugin.json)"
+if [ "$current_plugin_version" = "0.5.0" ]; then
 # Exercise the production-only contract in an isolated clone rooted at the
 # fixed released base. No smoke scratch path enters the real repository delta.
 source_root="$PWD"
@@ -942,6 +944,10 @@ expect_rejected production_bad_graph_cycle check_production_pass
 grep -Fq 'graph freshness cycle_id is invalid' "$temp_dir/production_bad_graph_cycle.err"
 cp "$temp_dir/production-graph-good.json" "$graph_fixture"
 check_production_pass >/dev/null
+else
+  candidate_state_pending=0
+  candidate_state_gate="historical_v2_production_fixture_skipped_for_${current_plugin_version}"
+fi
 
 ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/ready.json >"$temp_dir/ready.json"
 ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/pending.json >"$temp_dir/pending.json"

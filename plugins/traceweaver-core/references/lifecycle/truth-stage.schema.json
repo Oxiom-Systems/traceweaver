@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-truth-stage/1",
+  "title": "TraceWeaver lifecycle truth stages",
+  "description": "Separate observations and decisions. No stage substitutes for a later technical, independent, stakeholder, acceptance, or publication stage.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "observation", "technical_verification", "independent_review", "pr",
+    "merge", "deployment", "runtime_health", "release",
+    "stakeholder_validation", "acceptance", "publication"
+  ],
+  "properties": {
+    "observation": {"$ref": "#/$defs/stage"},
+    "technical_verification": {"$ref": "#/$defs/stage"},
+    "independent_review": {"$ref": "#/$defs/stage"},
+    "pr": {"$ref": "#/$defs/stage"},
+    "merge": {"$ref": "#/$defs/stage"},
+    "deployment": {"$ref": "#/$defs/stage"},
+    "runtime_health": {"$ref": "#/$defs/stage"},
+    "release": {"$ref": "#/$defs/stage"},
+    "stakeholder_validation": {"$ref": "#/$defs/stage"},
+    "acceptance": {"$ref": "#/$defs/stage"},
+    "publication": {"$ref": "#/$defs/stage"}
+  },
+  "$defs": {
+    "stage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence_ids"],
+      "properties": {
+        "state": {"enum": ["not_observed", "observed", "passed", "failed", "held", "not_applicable"]},
+        "evidence_ids": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "held_reason": {"type": "string", "minLength": 1},
+        "not_applicable_reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

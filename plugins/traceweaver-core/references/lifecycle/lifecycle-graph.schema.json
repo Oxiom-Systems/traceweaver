@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-graph/1",
+  "title": "TraceWeaver deterministic lifecycle graph",
+  "description": "Provider-independent, content-addressed projection of registered lifecycle records and relationships. The graph is derived navigation evidence and has no authority effect.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "graph_id", "provenance", "baseline", "source_closure",
+    "nodes", "edges", "authority_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-graph/1"},
+    "graph_id": {"$ref": "#/$defs/digest"},
+    "provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "engine", "provider", "registry_id", "registry_digest", "generation",
+        "records_digest", "graphify_enrichment", "refresh_policy"
+      ],
+      "properties": {
+        "engine": {"const": "traceweaver-tw-graph-lifecycle-projection"},
+        "provider": {"const": "provider_independent"},
+        "registry_id": {"type": "string", "minLength": 1},
+        "registry_digest": {"$ref": "#/$defs/digest"},
+        "generation": {"type": "string", "minLength": 1},
+        "records_digest": {"$ref": "#/$defs/digest"},
+        "graphify_enrichment": {"const": false},
+        "refresh_policy": {"const": "one_refresh_per_accepted_change_cycle_and_clean_ci_rebuild"}
+      }
+    },
+    "baseline": {"$ref": "#/$defs/baseline"},
+    "source_closure": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/source_closure"}
+    },
+    "nodes": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/node"}
+    },
+    "edges": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/edge"}
+    },
+    "authority_effect": {"const": "none"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_id", "generation", "digest"],
+      "properties": {
+        "baseline_id": {"type": "string", "minLength": 1},
+        "generation": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "source_closure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id", "locator", "source_type", "digest", "version", "role",
+        "authority_class", "record_ids", "external_fetches"
+      ],
+      "properties": {
+        "source_id": {"type": "string", "minLength": 1},
+        "locator": {"type": "string", "minLength": 1},
+        "source_type": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"},
+        "version": {"type": "string", "minLength": 1},
+        "role": {"type": "string", "minLength": 1},
+        "authority_class": {"type": "string", "minLength": 1},
+        "record_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+        "receipt_id": {"$ref": "#/$defs/digest"},
+        "external_fetches": {"const": 0}
+      }
+    },
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "record_id", "record_type", "title", "owner", "authority_class",
+        "source_id", "source_locator", "source_digest", "applicability",
+        "baseline", "freshness", "acceptance_state", "record_digest",
+        "search_terms"
+      ],
+      "properties": {
+        "record_id": {"type": "string", "minLength": 1},
+        "record_type": {"type": "string", "minLength": 1},
+        "title": {"type": "string", "minLength": 1},
+        "owner": {"type": "string", "minLength": 1},
+        "authority_class": {"type": "string", "minLength": 1},
+        "source_id": {"type": "string", "minLength": 1},
+        "source_locator": {"type": "string", "minLength": 1},
+        "source_digest": {"$ref": "#/$defs/digest"},
+        "applicability": {"type": "string", "minLength": 1},
+        "baseline": {"$ref": "#/$defs/baseline"},
+        "freshness": {"type": "string", "minLength": 1},
+        "acceptance_state": {"type": "string", "minLength": 1},
+        "record_digest": {"$ref": "#/$defs/digest"},
+        "search_terms": {"type": "array", "items": {"type": "string"}, "uniqueItems": true}
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "source_id", "target_id", "relationship_type", "applicable",
+        "provenance", "source_record_digest", "baseline_digest"
+      ],
+      "properties": {
+        "source_id": {"type": "string", "minLength": 1},
+        "target_id": {"type": "string", "minLength": 1},
+        "relationship_type": {"type": "string", "minLength": 1},
+        "applicable": {"type": "boolean"},
+        "provenance": {"type": "string", "minLength": 1},
+        "source_record_digest": {"$ref": "#/$defs/digest"},
+        "baseline_digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

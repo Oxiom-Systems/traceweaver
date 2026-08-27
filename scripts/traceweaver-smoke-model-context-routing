@@ -44,7 +44,7 @@ FLOORS = {
   "B0" => %w[tw-graph tw-setup tw-update],
   "B1" => %w[tw-authority-gate tw-commit tw-commit-push-pr tw-requirements-review tw-sessions tw-strategy tw-test-browser tw-test-xcode tw-worktree],
   "B2" => %w[tw-brainstorm tw-code-review tw-compound tw-compound-refresh tw-debug tw-doc-review tw-grill tw-ideate tw-resolve-pr-feedback tw-traceability-check],
-  "B3" => %w[tw-audit tw-auto tw-plan tw-vv-define tw-work]
+  "B3" => %w[tw-audit tw-auto tw-lifecycle tw-plan tw-vv-define tw-work]
 }.freeze
 IMPORTED_ENGINES = {
   "ce-brainstorm" => "tw-brainstorm", "ce-code-review" => "tw-code-review", "ce-compound" => "tw-compound",
@@ -54,15 +54,18 @@ IMPORTED_ENGINES = {
 }.freeze
 GENERIC_FAMILIES = [["tw-commit", "publication_preparer"], ["tw-commit-push-pr", "publication_delegate"], ["tw-debug", "diagnosis_worker"], ["tw-worktree", "worktree_operator"]].freeze
 ROUTE_KINDS = {
-  "implementation" => %w[tw-auto tw-work tw-worktree],
+  "implementation" => %w[tw-auto tw-lifecycle tw-work tw-worktree],
   "review" => %w[tw-audit tw-code-review tw-doc-review tw-resolve-pr-feedback tw-test-browser tw-test-xcode tw-traceability-check],
   "publication" => %w[tw-commit tw-commit-push-pr]
 }.freeze
+BOUNDED_CONVERGENCE_GUIDE = "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md"
+BOUNDED_CONVERGENCE_GUIDE_ROUTES = %w[lfg tw-auto tw-plan tw-authority-gate tw-vv-define tw-work].freeze
 DIRECT_CONTROL_DEPENDENCIES = {
-  "tw-auto" => %w[
+  "lfg" => %w[
     plugins/traceweaver-core/references/model-context-map.yml
     plugins/traceweaver-core/references/tw-graph-lifecycle.md
     plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md
     plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
     plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
     plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
@@ -71,10 +74,56 @@ DIRECT_CONTROL_DEPENDENCIES = {
     plugins/traceweaver-core/skills/tw-plan/SKILL.md
     plugins/traceweaver-core/skills/tw-work/SKILL.md
   ],
+  "tw-auto" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/references/tw-graph-lifecycle.md
+    plugins/traceweaver-core/references/workflow-profile-template.yml
+    plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md
+    plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-review-series
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-convergence
+    plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
+    plugins/traceweaver-core/skills/tw-plan/SKILL.md
+    plugins/traceweaver-core/skills/tw-work/SKILL.md
+  ],
+  "tw-lifecycle" => %w[
+    plugins/traceweaver-core/references/lifecycle/acceptance-hub.schema.json
+    plugins/traceweaver-core/references/lifecycle/acceptance-pack.schema.json
+    plugins/traceweaver-core/references/lifecycle/capture-pack.schema.json
+    plugins/traceweaver-core/references/lifecycle/change-approval.schema.json
+    plugins/traceweaver-core/references/lifecycle/change-request.schema.json
+    plugins/traceweaver-core/references/lifecycle/cutover-gate.schema.json
+    plugins/traceweaver-core/references/lifecycle/evidence-receipt.schema.json
+    plugins/traceweaver-core/references/lifecycle/lifecycle-graph.schema.json
+    plugins/traceweaver-core/references/lifecycle/lifecycle-record.schema.json
+    plugins/traceweaver-core/references/lifecycle/product-validation.schema.json
+    plugins/traceweaver-core/references/lifecycle/semantic-html-parser-lock.json
+    plugins/traceweaver-core/references/lifecycle/semantic-html.schema.json
+    plugins/traceweaver-core/references/lifecycle/source-receipt.schema.json
+    plugins/traceweaver-core/references/lifecycle/source-registry.schema.json
+    plugins/traceweaver-core/references/lifecycle/truth-stage.schema.json
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-acceptance-hub
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-capture
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-cutover
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-evidence
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-product-validation
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-project
+    scripts/traceweaver-check-release-readiness
+    scripts/traceweaver-refresh-v060-model-context-oracle
+    scripts/traceweaver-run-v060-representative-product-trials
+    scripts/traceweaver-smoke-v060-real-product-depth
+    scripts/traceweaver-smoke-v060-release-integrity
+  ],
   "tw-plan" => %w[
     plugins/traceweaver-core/references/model-context-map.yml
     plugins/traceweaver-core/references/workflow-profile-template.yml
     plugins/traceweaver-core/skills/ce-plan/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md
     plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory
     plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
     plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-route-native-child
@@ -84,6 +133,7 @@ DIRECT_CONTROL_DEPENDENCIES = {
     plugins/traceweaver-core/references/tw-graph-lifecycle.md
     plugins/traceweaver-core/references/workflow-profile-template.yml
     plugins/traceweaver-core/skills/ce-work/SKILL.md
+    plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md
     plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md
     plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory
     plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-resolve-skill-execution-contract
@@ -92,6 +142,14 @@ DIRECT_CONTROL_DEPENDENCIES = {
     plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-author-code-anchors
     plugins/traceweaver-core/skills/tw-traceability-check/scripts/traceweaver-check-code-anchors
     plugins/traceweaver-core/skills/tw-vv-define/scripts/traceweaver-check-vv-capsule
+  ],
+  "tw-authority-gate" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md
+  ],
+  "tw-vv-define" => %w[
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md
   ],
   "tw-code-review" => %w[
     plugins/traceweaver-core/references/model-context-map.yml
@@ -326,11 +384,11 @@ def assert_compiler_validator_closure!(root, receipt)
   raise "compiler_validator_closure=#{error}:#{output}" unless status.success? && JSON.parse(output).fetch("outcome") == "pass"
 end
 
-def compile(root, route_id:, invocation:, packet: 1, reserved: 4000, map: nil, source_manifest: SOURCE_MANIFEST, parent_route: nil, depth: nil, fanout: nil, receipt_kind: nil, plan_receipt_id: nil, observation: nil, extra: [])
+def compile(root, route_id:, invocation:, packet: 1, reserved: 4000, map: nil, source_manifest: SOURCE_MANIFEST, parent_route: nil, depth: nil, fanout: nil, receipt_kind: nil, plan_receipt_id: nil, observation: nil, compiler: COMPILER, extra: [])
   packet_arguments = packet.nil? ? [] : ["--packet-input", packet.to_s]
   source_manifest = source_manifest == SOURCE_MANIFEST ? source_manifest_for_route(route_id) : source_manifest
   effective_root, effective_manifest = bind_manifest_to_project(root, source_manifest)
-  arguments = [COMPILER, "--root", effective_root, "--route-id", route_id, "--risk", "L3", *packet_arguments, "--reserved-output", reserved.to_s, "--source-manifest", effective_manifest, "--baseline", BASELINE, "--invocation-id", invocation]
+  arguments = [compiler, "--root", effective_root, "--route-id", route_id, "--risk", "L3", *packet_arguments, "--reserved-output", reserved.to_s, "--source-manifest", effective_manifest, "--baseline", BASELINE, "--invocation-id", invocation]
   arguments += ["--map", map] if map
   arguments += ["--parent-route", parent_route] if parent_route
   arguments += ["--depth", depth.to_s] unless depth.nil?
@@ -365,7 +423,8 @@ def assert_canonical_oracle_mandatory_rejection!(root)
     mandatory["exclusion_rationale"] = "must be rejected before delivery recall"
     oracle["oracle_digest"] = digest(oracle.reject { |key, _| key == "oracle_digest" })
     File.write(oracle_path, JSON.generate(oracle))
-    receipt = compile(project, route_id: "tw-plan", invocation: "canonical-oracle-mandatory-rejection", source_manifest: SOURCE_MANIFEST)
+    project_compiler = File.join(project, "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-compile-model-context-route")
+    receipt = compile(project, route_id: "tw-plan", invocation: "canonical-oracle-mandatory-rejection", source_manifest: SOURCE_MANIFEST, compiler: project_compiler)
     assert_held(receipt, "held_source_oracle_invalid")
     raise "canonical_oracle_mandatory_reason=#{receipt["held_reason"]}" unless receipt["held_reason"].to_s.start_with?("oracle_mandatory_category_excluded")
   end
@@ -406,7 +465,7 @@ def assert_installed_direct_callable!(root, tmp)
   raise "source_generator=#{source_error}" unless source_status.success?
   inventory, generator_error, generator_status = json_command(generator, "--root", consumer, "--format", "json")
   antigravity_inventory, antigravity_error, antigravity_status = json_command(antigravity_generator, "--root", consumer, "--format", "json")
-  unless generator_status.success? && antigravity_status.success? && inventory["top_level_callable_count"] == 28 && inventory["declared_route_count"] == 87 && antigravity_inventory["top_level_callable_count"] == 28 && antigravity_inventory["declared_route_count"] == 87 && [source_inventory, inventory, antigravity_inventory].map { |value| value["inventory_digest"] }.uniq.length == 1
+  unless generator_status.success? && antigravity_status.success? && inventory["top_level_callable_count"] == 29 && inventory["declared_route_count"] == 88 && antigravity_inventory["top_level_callable_count"] == 29 && antigravity_inventory["declared_route_count"] == 88 && [source_inventory, inventory, antigravity_inventory].map { |value| value["inventory_digest"] }.uniq.length == 1
     raise "installed_inventory_parity=source:#{source_error}:codex:#{generator_error}:antigravity:#{antigravity_error}"
   end
   manifest_path = File.join(tmp, "installed-empty-manifest.json")
@@ -531,6 +590,40 @@ def validate_oracle_review!(root, review, inventory, map_digest)
   raise "oracle_review_open_cells" unless review.fetch("open_or_uncertain_cells") == []
 end
 
+def assert_bounded_convergence_dependency_negatives!(root, complete, inventory, map_digest)
+  registry = YAML.safe_load(
+    File.read(File.join(root, "plugins/traceweaver-core/references/skill-execution-contracts.yml")),
+    permitted_classes: [], aliases: false
+  )
+  contracts = registry.fetch("contracts").to_h { |contract| [contract.fetch("skill"), contract] }
+  metadata = registry.fetch("skill_metadata")
+
+  BOUNDED_CONVERGENCE_GUIDE_ROUTES.each do |route_id|
+    contract = contracts.fetch(route_id)
+    canonical_skill = contract.fetch("alias_of", route_id)
+    packaged_references = metadata.fetch(canonical_skill).fetch("packaged_references")
+    raise "oracle_review_bounded_convergence_contract_reference=#{route_id}" unless packaged_references.include?(BOUNDED_CONVERGENCE_GUIDE)
+
+    invalid = deep_copy(complete)
+    implementation = invalid.fetch("route_category_cells").find do |cell|
+      cell.fetch("route_id") == route_id && cell.fetch("category") == "implementation_dependencies"
+    end
+    references = implementation.fetch("source_refs")
+    removed = references.reject! { |reference| reference.fetch("locator") == BOUNDED_CONVERGENCE_GUIDE }
+    raise "oracle_review_bounded_convergence_fixture_reference=#{route_id}" unless removed
+
+    invalid["oracle_digest"] = digest(invalid.reject { |key, _| key == "oracle_digest" })
+    begin
+      validate_oracle_review!(root, invalid, inventory, map_digest)
+      raise "oracle_review_bounded_convergence_dependency_accepted=#{route_id}"
+    rescue RuntimeError => exception
+      expected = "oracle_review_direct_dependency_closure=#{route_id}"
+      raise exception if exception.message == "oracle_review_bounded_convergence_dependency_accepted=#{route_id}"
+      raise "oracle_review_bounded_convergence_dependency_reason=#{route_id}:#{exception.message}" unless exception.message == expected
+    end
+  end
+end
+
 map_doc = YAML.safe_load(File.read(MAP), permitted_classes: [], aliases: false)
 
 # All generated requests, receipts, ledgers, and deliberately-invalid maps
@@ -548,7 +641,7 @@ Dir.mktmpdir("traceweaver-model-context-smoke-") do |tmp|
       raise "map_fixture" unless fixture.fetch("canonical_map") == "plugins/traceweaver-core/references/model-context-map.yml"
       raise "map_mirror_drift" unless File.binread(MAP) == File.binread(MIRROR)
       status_output, status_error, status = shell(GENERATOR, "--root", root)
-      raise "generator_failed=#{status_error}" unless status.success? && status_output.include?("model_context_top_level_callables=28")
+      raise "generator_failed=#{status_error}" unless status.success? && status_output.include?("model_context_top_level_callables=29")
       raise "map_digest" unless map_doc.fetch("map_digest") == digest(map_doc.reject { |key, _| key == "map_digest" })
     when "MC109_AXIS_INDEPENDENCE"
       axes = fixture.fetch("axes")
@@ -909,6 +1002,7 @@ Dir.mktmpdir("traceweaver-model-context-smoke-") do |tmp|
       inventory, error, status = json_command(GENERATOR, "--root", root, "--format", "json")
       raise "oracle_inventory=#{error}" unless status.success?
       validate_oracle_review!(root, fixture, inventory, map_doc.fetch("map_digest"))
+      assert_bounded_convergence_dependency_negatives!(root, fixture, inventory, map_doc.fetch("map_digest"))
     when "MC123_SELF_REVIEW", "MC123_UNEXPLAINED_EXCLUSION", "MC123_OPEN_OR_UNCERTAIN"
       complete = JSON.parse(File.read(File.join(fixture_root, "oracle-review-complete.json")))
       invalid = deep_copy(complete)

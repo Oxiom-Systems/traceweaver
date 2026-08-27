@@ -46,6 +46,8 @@ Before deriving V&V definition artifacts, load and cite:
 - `requirements.md`
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
+- `<skills-root>/tw-auto/references/bounded-convergence-window-guide.md` when
+  verification planning includes bounded repair/retry attempts
 - skill-local `scripts/traceweaver-check-vv-capsule` (the deterministic
   capsule validator)
 - TraceWeaver-packaged `verification-planner` for the verification method,
@@ -65,6 +67,17 @@ If the plan is not accepted, or authority is missing, contradictory, stale, or
 incomplete, stop with a human-decision pause. Do not infer or invent
 requirement IDs, trace IDs, verification IDs, or validation IDs to make the
 capsule appear complete.
+
+## Bounded Convergence Definition
+
+When verification may need repair/retry attempts without semantic change,
+define one bounded convergence window in the work-item evidence: frozen
+authority, mutable candidate scope, allowed repair classes, static
+source-closure preflight, focused command/pass condition, explicit attempt
+budget, stop conditions, post-exit evidence closure, and separate holds. Do not
+make an attempt's result or receipt an input to that same attempt. An in-scope
+failure consumes budget; only a semantic scope/authority change returns to the
+authority gate.
 
 ## Workflow
 

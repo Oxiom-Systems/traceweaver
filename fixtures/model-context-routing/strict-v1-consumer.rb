@@ -17,7 +17,7 @@ root = File.expand_path(ARGV.fetch(1, File.expand_path("../..", __dir__)))
 fixture = JSON.parse(File.read(fixture_path))
 abort "v1 fixture schema" unless fixture["schema_version"] == "tw-v1-producer-invariance/1" && fixture["base_commit"] == "1b1cafa2dc06f5309e527a6b8328fa0acf6f0250"
 records = fixture.fetch("records")
-abort "v1 SEC cardinality" unless fixture["ordinary_sec_receipt_count"] == 112 && records.length == 112
+abort "v1 SEC cardinality" unless fixture["ordinary_sec_receipt_count"] == 116 && records.length == 116
 
 registry = YAML.safe_load(File.read(File.join(root, "plugins/traceweaver-core/references/skill-execution-contracts.yml")), permitted_classes: [], aliases: false)
 expected = registry.fetch("contracts").map { |entry| entry.fetch("skill") }.sort.product(%w[L0 L1 L2 L3]).map { |skill, risk| [skill, risk] }.sort

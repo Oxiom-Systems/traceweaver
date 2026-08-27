@@ -1,0 +1,207 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-closure-smoke; req=REQ-TW-140,REQ-TW-142; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-140,REQ-TW-142; trace=TRACE-TW-074
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+GRAPH = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph")
+INTEGRITY = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity")
+
+def fail!(message)
+  warn "v060_lifecycle_closure_smoke=failed reason=#{message}"
+  exit 1
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def write_json(path, value)
+  File.write(path, "#{JSON.generate(canonical(value))}\n")
+end
+
+def digest_file(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def run(executable, *arguments)
+  Open3.capture3(executable.to_s, *arguments)
+end
+
+def require_pass(executable, *arguments)
+  stdout, stderr, status = run(executable, *arguments)
+  fail!("expected_pass executable=#{executable.basename} args=#{arguments.join(" ")} stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.success?
+  [stdout, JSON.parse(stdout)]
+rescue JSON::ParserError => error
+  fail!("success_output_not_json error=#{error.message}")
+end
+
+def require_blocked(expected_finding, executable, *arguments)
+  stdout, stderr, status = run(executable, *arguments)
+  fail!("expected_blocked finding=#{expected_finding}") if status.success?
+  combined = "#{stdout}\n#{stderr}"
+  fail!("missing_finding expected=#{expected_finding} actual=#{combined.inspect}") unless combined.include?(expected_finding)
+end
+
+def source_record(id:, type:, source:, baseline:, relationships:, receipt_id: nil)
+  envelope = {
+    "source_id" => source.fetch("source_id"),
+    "locator" => source.fetch("normalized_locator"),
+    "version" => source["version"] || source.fetch("generation"),
+    "digest" => source.fetch("digest"),
+    "role" => source.fetch("role"),
+    "provenance" => "exact registered source identity"
+  }
+  envelope["receipt_id"] = receipt_id if receipt_id
+  authority_class = receipt_id ? "external_reference" : "authoritative"
+  {
+    "schema_version" => "tw-lifecycle-record/1",
+    "record_id" => id,
+    "record_type" => type,
+    "title" => "Closure fixture #{id}",
+    "owner" => "Lifecycle Owner",
+    "authority_class" => authority_class,
+    "source" => envelope,
+    "applicability" => "applicable",
+    "baseline" => baseline,
+    "freshness" => "current",
+    "acceptance_state" => receipt_id ? "observed_not_accepted" : "prepared",
+    "relationships" => relationships,
+    "fields" => {"closure_role" => receipt_id ? "immutable_external_reference" : "local_authority"}
+  }
+end
+
+fail!("missing_graph_executable") unless GRAPH.file? && GRAPH.executable?
+fail!("missing_integrity_executable") unless INTEGRITY.file? && INTEGRITY.executable?
+
+Dir.mktmpdir("traceweaver-v060-lifecycle-closure-") do |directory|
+  root = Pathname.new(directory)
+  records_dir = root.join("records")
+  records_dir.mkdir
+  authority_path = root.join("authority.md")
+  authority_path.write("# Lifecycle authority\n\nLocal controlling source.\n")
+  local_source = {
+    "source_id" => "SRC-CLOSURE-LOCAL-001",
+    "role" => "authority_baseline",
+    "locator" => "authority.md",
+    "normalized_locator" => "authority.md",
+    "source_type" => "markdown",
+    "schema_version" => "tw-lifecycle-markdown/1",
+    "digest" => digest_file(authority_path),
+    "owner" => "Lifecycle Owner",
+    "authority_class" => "authoritative",
+    "owned_field_families" => ["local_lifecycle_authority"],
+    "generation" => "LC-CLOSURE-GEN-001",
+    "observed_at" => "2026-08-24T00:00:00Z",
+    "version" => "local-v1",
+    "mutable" => false,
+    "normalization" => {"encoding" => "UTF-8", "line_endings" => "LF", "case" => "exact", "legacy_locators" => []}
+  }
+  external_source = {
+    "source_id" => "SRC-CLOSURE-REMOTE-001",
+    "role" => "external_reference",
+    "locator" => "https://example.invalid/lifecycle/remote-record.json",
+    "normalized_locator" => "https://example.invalid/lifecycle/remote-record.json",
+    "source_type" => "external_record_stub",
+    "schema_version" => "tw-external-record-stub/1",
+    "digest" => "sha256:#{"e" * 64}",
+    "owner" => "External Source Owner",
+    "authority_class" => "external_reference",
+    "owned_field_families" => ["external_observation"],
+    "generation" => "LC-CLOSURE-GEN-001",
+    "observed_at" => "2026-08-24T00:00:00Z",
+    "version" => "remote-v7",
+    "mutable" => false,
+    "normalization" => {"encoding" => "opaque", "line_endings" => "not_applicable", "case" => "exact", "legacy_locators" => []}
+  }
+  registry = {
+    "schema_version" => "tw-lifecycle-source-registry/1",
+    "registry_id" => "LC-CLOSURE-REGISTRY-001",
+    "generation" => "LC-CLOSURE-GEN-001",
+    "owner" => "Lifecycle Owner",
+    "sources" => [local_source, external_source]
+  }
+  registry_path = root.join("source-registry.json")
+  write_json(registry_path, registry)
+  _, external_receipt = require_pass(INTEGRITY, "source-receipt", "--root", root.to_s, "--registry", registry_path.to_s, "--source-id", external_source["source_id"])
+  fail!("external_receipt_fetch") unless external_receipt["extraction_method"] == "external_immutable_reference_no_fetch" && external_receipt["authority_effect"] == "none"
+
+  baseline = {"baseline_id" => "BASELINE-CLOSURE-001", "generation" => "LC-CLOSURE-GEN-001", "digest" => "sha256:#{"b" * 64}"}
+  local_record = source_record(
+    id: "INTENT-CLOSURE-001",
+    type: "intent",
+    source: local_source,
+    baseline: baseline,
+    relationships: [
+      {"source_id" => "INTENT-CLOSURE-001", "target_id" => "EVIDENCE-CLOSURE-001", "relationship_type" => "evidences", "applicable" => true, "provenance" => "local source to immutable external observation"}
+    ]
+  )
+  external_record = source_record(
+    id: "EVIDENCE-CLOSURE-001",
+    type: "evidence",
+    source: external_source,
+    baseline: baseline,
+    receipt_id: external_receipt.fetch("receipt_id"),
+    relationships: [
+      {"source_id" => "EVIDENCE-CLOSURE-001", "target_id" => "INTENT-CLOSURE-001", "relationship_type" => "derived_from", "applicable" => true, "provenance" => "immutable external receipt"}
+    ]
+  )
+  write_json(records_dir.join("INTENT-CLOSURE-001.json"), local_record)
+  write_json(records_dir.join("EVIDENCE-CLOSURE-001.json"), external_record)
+
+  graph_a = root.join("graph-a.json")
+  graph_b = root.join("graph-b.json")
+  _, first = require_pass(GRAPH, "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--output", graph_a.to_s)
+  _, second = require_pass(GRAPH, "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--output", graph_b.to_s)
+  fail!("closure_non_deterministic") unless graph_a.binread == graph_b.binread && first["graph_id"] == second["graph_id"]
+  graph = JSON.parse(graph_a.read)
+  external_closure = graph.fetch("source_closure").find { |entry| entry["source_id"] == external_source["source_id"] }
+  fail!("external_closure_missing") unless external_closure && external_closure["receipt_id"] == external_receipt["receipt_id"] && external_closure["external_fetches"] == 0
+
+  _, check = require_pass(GRAPH, "check", "--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--graph", graph_a.to_s)
+  fail!("closure_check_not_current") unless check["freshness"] == "current"
+
+  stale_record = JSON.parse(records_dir.join("INTENT-CLOSURE-001.json").read)
+  stale_record["title"] = "Mutated after accepted-cycle refresh"
+  write_json(records_dir.join("INTENT-CLOSURE-001.json"), stale_record)
+  require_blocked("stale_graph", GRAPH, "check", "--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--graph", graph_a.to_s)
+  write_json(records_dir.join("INTENT-CLOSURE-001.json"), local_record)
+
+  omitted_dir = root.join("records-omitted")
+  FileUtils.cp_r(records_dir, omitted_dir)
+  omitted_dir.join("EVIDENCE-CLOSURE-001.json").delete
+  require_blocked("orphan_registered_source", GRAPH, "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", omitted_dir.to_s, "--output", root.join("omitted-graph.json").to_s)
+
+  wrong_receipt_dir = root.join("records-wrong-receipt")
+  FileUtils.cp_r(records_dir, wrong_receipt_dir)
+  wrong_receipt = JSON.parse(wrong_receipt_dir.join("EVIDENCE-CLOSURE-001.json").read)
+  wrong_receipt["source"]["receipt_id"] = "sha256:#{"f" * 64}"
+  write_json(wrong_receipt_dir.join("EVIDENCE-CLOSURE-001.json"), wrong_receipt)
+  require_blocked("source_receipt_mismatch", GRAPH, "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", wrong_receipt_dir.to_s, "--output", root.join("wrong-receipt-graph.json").to_s)
+
+  symlink_dir = root.join("records-symlink")
+  FileUtils.cp_r(records_dir, symlink_dir)
+  File.symlink(symlink_dir.join("INTENT-CLOSURE-001.json"), symlink_dir.join("RISK-CLOSURE-999.json"))
+  require_blocked("unsafe_path", GRAPH, "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", symlink_dir.to_s, "--output", root.join("symlink-graph.json").to_s)
+end
+
+puts "v060_lifecycle_closure_smoke=pass"
+puts "v060_lifecycle_closure_reproducibility=pass"
+puts "v060_lifecycle_external_receipt_no_fetch=pass"
+puts "v060_lifecycle_closure_freshness=pass"
+puts "v060_lifecycle_omitted_orphan_stale_unsafe=pass"

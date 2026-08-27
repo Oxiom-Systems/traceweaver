@@ -36,7 +36,7 @@ end
 
 registry = YAML.safe_load(File.read(registry_path), permitted_classes: [], aliases: false)
 skills = registry.fetch("contracts").map { |entry| entry.fetch("skill") }
-expect!(skills.length == 28 && registry.fetch("callable_count") == 28, "callable count drift")
+expect!(skills.length == 29 && registry.fetch("callable_count") == 29, "callable count drift")
 expect!(skills == skills.sort && skills.uniq == skills, "registry is not deterministic")
 expect!(skills.include?("tw-graph"), "tw-graph contract missing")
 callables = Dir.children(File.join(root, "plugins/traceweaver-core/skills")).select do |name|
@@ -73,6 +73,8 @@ metadata.each do |skill, entry|
     if filename == "scoped-review-protocol.md" && %w[tw-code-review tw-doc-review tw-work].include?(skill)
       "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
     elsif filename == "workflow-profile-template.yml" && %w[tw-auto tw-plan tw-work tw-code-review tw-doc-review].include?(skill)
+      "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
+    elsif filename == "bounded-convergence-window-guide.md" && %w[tw-auto tw-plan tw-authority-gate tw-work tw-vv-define].include?(skill)
       "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
     elsif filename == "tw-graph-lifecycle.md"
       "plugins/traceweaver-core/references/#{filename}"

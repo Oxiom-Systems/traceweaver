@@ -2,4 +2,4 @@
 B0: [tw-graph, tw-setup, tw-update]
 B1: [tw-authority-gate, tw-commit, tw-commit-push-pr, tw-requirements-review, tw-sessions, tw-strategy, tw-test-browser, tw-test-xcode, tw-worktree]
 B2: [tw-brainstorm, tw-code-review, tw-compound, tw-compound-refresh, tw-debug, tw-doc-review, tw-grill, tw-ideate, tw-resolve-pr-feedback, tw-traceability-check]
-B3: [tw-audit, tw-auto, tw-plan, tw-vv-define, tw-work]
+B3: [tw-audit, tw-auto, tw-lifecycle, tw-plan, tw-vv-define, tw-work]

@@ -55,6 +55,22 @@ authority is missing, contradictory, stale, or must materially change, stop
 with the exact human decision or authority-only route. Never infer permission
 from a skill, plan, implementation, fixture, or previous review.
 
+## Bounded Convergence Window
+
+When accepted work needs repeated repair and focused verification without a
+semantic scope change, load
+`<skills-root>/tw-auto/references/bounded-convergence-window-guide.md`. Record
+one owner decision with frozen authority, candidate scope, allowed repairs,
+static source-closure preflight, verification/pass condition, attempt budget,
+stop conditions, evidence closure, and separate holds.
+
+Keep the authority plane immutable during the window. An anticipated in-scope
+failure consumes the attempt budget and remains in this invocation; it does not
+reopen `tw-authority-gate`. Exit to change/authority control only for a semantic
+scope or authority change, unsafe or out-of-scope finding, or exhausted budget.
+Append attempt evidence and consolidate terminal status after the window exits;
+never let gate or result outputs mutate the candidate they inspect.
+
 ## Consolidated Sol Delivery
 
 For normal approved behavior or a mixed code/document candidate, keep these

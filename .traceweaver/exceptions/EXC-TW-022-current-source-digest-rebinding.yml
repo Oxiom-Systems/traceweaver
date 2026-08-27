@@ -1,0 +1,44 @@
+exception_id: EXC-TW-022
+status: consumed_passed_bounded_convergence
+exception_type: one_time_current_source_digest_sequencing_correction
+owner: Oxiom Systems
+created_at: "2026-08-26"
+linked_change: CHG-TW-2026-08-26-005
+linked_requirements: [REQ-TW-110, REQ-TW-123, REQ-TW-130, REQ-TW-143, REQ-TW-145]
+linked_trace: [TRACE-TW-072, TRACE-TW-074]
+linked_verification: [VER-TW-092, VER-TW-094]
+linked_validation: VAL-TW-042
+predecessor_exception: EXC-TW-021
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_hash_sha256: 94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf
+predecessor_workflow_profile_revision: 5
+predecessor_workflow_profile_hash: sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7
+workflow_profile_revision: 6
+failure_evidence: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-focused-verification-result.md
+decision_packet: docs/validation/traceweaver-2026-08-26-v060-current-source-digest-rebinding-owner-decision-packet.md
+proposed_claims:
+  - one authority-first seven-fixture physical requirements digest rebinding
+  - one static all-referenced-locator digest proof
+  - one full 72-case model-context smoke attempt
+  - fresh exact-product rebinding only after a clean smoke
+  - one same-existing-reviewer verification continuation only after product acceptance
+blocked_claims:
+  - any behavior expansion
+  - second attempt
+  - new reviewer or full review
+  - product mutation
+  - semantic cutover
+  - runtime
+  - deployment
+  - release_ready
+  - publication
+activation_preconditions:
+  exact_owner_approval: satisfied_by_owner_bounded_convergence_instruction
+  promoted_profile_revision_6: satisfied
+  fresh_authority_gate: intentionally_not_repeated_between_in_scope_failures
+result: docs/validation/traceweaver-2026-08-26-v060-current-source-digest-bounded-convergence-result.md
+attempts_used: 2
+terminal_verification: model_context_routing_smoke_pass_cases_72
+after_expiry: closed_no_reuse
+publication_authority: none
+next_step: Closed successfully. Any publication authority comes only from CHG-TW-2026-08-27-006 and a validated single-use capsule.

@@ -19,7 +19,7 @@
       "sources": [
         {
           "locator": "README.md",
-          "digest": "sha256:02a09ae2c65337f57dfbc154d47db3c8923cd307964e45ac7d5d099aa6f0fe97",
+          "digest": "sha256:a0c4aebed11328cee584caf940002a1fff0faef8a98334db0d93cc614284508d",
           "delivery_mode": "locator",
           "contained": true
         },
@@ -31,7 +31,7 @@
         },
         {
           "locator": "requirements.md",
-          "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118",
+          "digest": "sha256:28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d",
           "delivery_mode": "locator",
           "contained": true
         }
@@ -61,7 +61,7 @@
       "sources": [
         {
           "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
-          "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447",
+          "digest": "sha256:18edc015750b1ff26a7b0f21397ac79c5e20d96149746929d1ae2afd51570cb1",
           "delivery_mode": "locator",
           "contained": true
         }
@@ -73,7 +73,7 @@
       "sources": [
         {
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb",
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a",
           "delivery_mode": "locator",
           "contained": true
         },
@@ -86,6 +86,12 @@
         {
           "locator": "plugins/traceweaver-core/skills/ce-plan/SKILL.md",
           "digest": "sha256:b4f8768827552f2fdf55ad29e5f1144156ad983f683e8e751cb08900d3f391e5",
+          "delivery_mode": "locator",
+          "contained": true
+        },
+        {
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md",
+          "digest": "sha256:9fb3d011834590cdea00022956626eb06af53e7674da0e83fe18e005d16548e4",
           "delivery_mode": "locator",
           "contained": true
         },
@@ -137,7 +143,7 @@
   "required_sources": [
     {
       "locator": "README.md",
-      "digest": "sha256:02a09ae2c65337f57dfbc154d47db3c8923cd307964e45ac7d5d099aa6f0fe97"
+      "digest": "sha256:a0c4aebed11328cee584caf940002a1fff0faef8a98334db0d93cc614284508d"
     },
     {
       "locator": "docs/plans/2026-08-22-traceweaver-core-0.5.0-model-governance-plan.md",
@@ -153,7 +159,7 @@
     },
     {
       "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-      "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+      "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
     },
     {
       "locator": "plugins/traceweaver-core/references/traceweaver-controlled-autonomy-policy.md",
@@ -166,6 +172,10 @@
     {
       "locator": "plugins/traceweaver-core/skills/ce-plan/SKILL.md",
       "digest": "sha256:b4f8768827552f2fdf55ad29e5f1144156ad983f683e8e751cb08900d3f391e5"
+    },
+    {
+      "locator": "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md",
+      "digest": "sha256:9fb3d011834590cdea00022956626eb06af53e7674da0e83fe18e005d16548e4"
     },
     {
       "locator": "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-graphify-advisory",
@@ -181,11 +191,11 @@
     },
     {
       "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
-      "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447"
+      "digest": "sha256:18edc015750b1ff26a7b0f21397ac79c5e20d96149746929d1ae2afd51570cb1"
     },
     {
       "locator": "requirements.md",
-      "digest": "sha256:6cbee86de20dce22d800382680c78cb5c0f736a16c892db65e5e24dfdc02d118"
+      "digest": "sha256:28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d"
     },
     {
       "locator": "scripts/traceweaver-smoke-consolidated-convergence",

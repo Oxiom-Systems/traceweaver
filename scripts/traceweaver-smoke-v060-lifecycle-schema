@@ -1,0 +1,329 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-schema-source-registration-smoke; req=REQ-TW-130,REQ-TW-132,REQ-TW-137; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-130,REQ-TW-132,REQ-TW-137; trace=TRACE-TW-074
+
+require "digest"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+INTEGRITY = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity")
+SCHEMA_ROOT = ROOT.join("plugins/traceweaver-core/references/lifecycle")
+SCHEMAS = {
+  "source-registry.schema.json" => "tw-lifecycle-source-registry/1",
+  "lifecycle-record.schema.json" => "tw-lifecycle-record/1"
+}.freeze
+
+def fail!(message)
+  warn "v060_lifecycle_schema_smoke=failed reason=#{message}"
+  exit 1
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def write_json(path, value)
+  File.write(path, "#{JSON.generate(canonical(value))}\n")
+end
+
+def run_integrity(*arguments)
+  Open3.capture3(INTEGRITY.to_s, *arguments)
+end
+
+def require_pass(*arguments)
+  stdout, stderr, status = run_integrity(*arguments)
+  fail!("expected_pass args=#{arguments.join(" ")} stderr=#{stderr.inspect} stdout=#{stdout.inspect}") unless status.success?
+  [stdout, JSON.parse(stdout)]
+rescue JSON::ParserError => error
+  fail!("non_json_success_output error=#{error.message}")
+end
+
+def require_blocked(expected_finding, *arguments)
+  stdout, stderr, status = run_integrity(*arguments)
+  fail!("expected_blocked finding=#{expected_finding} args=#{arguments.join(" ")}") if status.success?
+  combined = "#{stdout}\n#{stderr}"
+  fail!("missing_finding expected=#{expected_finding} actual=#{combined.inspect}") unless combined.include?(expected_finding)
+end
+
+fail!("missing_integrity_executable") unless INTEGRITY.file? && INTEGRITY.executable?
+
+schemas = SCHEMAS.each_with_object({}) do |(filename, expected_id), result|
+  path = SCHEMA_ROOT.join(filename)
+  fail!("missing_schema path=#{path.relative_path_from(ROOT)}") unless path.file? && path.size.positive?
+  parsed = JSON.parse(path.read)
+  fail!("schema_id path=#{filename}") unless parsed["$id"] == expected_id
+  fail!("schema_draft path=#{filename}") unless parsed["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+  result[filename] = parsed
+end
+
+record_schema = schemas.fetch("lifecycle-record.schema.json")
+record_classes = record_schema.dig("properties", "record_type", "enum") || []
+expected_classes = %w[
+  commitment intent need requirement constraint decision interface risk change
+  product_artifact verification_definition verification_result
+  validation_definition validation_result acceptance_decision baseline evidence
+]
+fail!("record_class_inventory") unless expected_classes.all? { |entry| record_classes.include?(entry) }
+
+relationship_types = record_schema.dig("$defs", "relationship", "properties", "relationship_type", "enum") || []
+fail!("relationship_vocabulary_open") if relationship_types.empty? || relationship_types.include?("other")
+
+Dir.mktmpdir("traceweaver-v060-lifecycle-schema-") do |directory|
+  root = Pathname.new(directory)
+  root.join(".traceweaver").mkpath
+  root.join("requirements.md").write("# Requirements\n\nREQ-#{''}CLIENT-001 shall remain traceable.\n")
+  root.join(".traceweaver/intent-contract.yml").write("schema_version: traceweaver-intent/1\nowner: Client Owner\n")
+  root.join("authority.html").write(<<~HTML)
+    <!doctype html>
+    <html lang="en"><head><meta charset="utf-8"><title>Authority</title></head>
+    <body><main><h1 id="REQ-#{''}CLIENT-001">REQ-#{''}CLIENT-001</h1><p>Visible controlled meaning.</p></main></body></html>
+  HTML
+
+  generation = "LC-GEN-001"
+  observed_at = "2026-08-24T00:00:00Z"
+  sources = [
+    {
+      "source_id" => "SRC-CLIENT-HTML-001",
+      "role" => "derived_projection_input",
+      "locator" => "authority.html",
+      "normalized_locator" => "authority.html",
+      "source_type" => "semantic_html",
+      "schema_version" => "tw-lifecycle-html/1",
+      "digest" => "sha256:#{Digest::SHA256.file(root.join("authority.html")).hexdigest}",
+      "owner" => "Client Owner",
+      "authority_class" => "candidate",
+      "owned_field_families" => ["presentation"],
+      "generation" => generation,
+      "observed_at" => observed_at,
+      "mutable" => false,
+      "normalization" => {"encoding" => "UTF-8", "line_endings" => "LF", "case" => "exact", "legacy_locators" => []}
+    },
+    {
+      "source_id" => "SRC-CLIENT-INTENT-001",
+      "role" => "intent_contract",
+      "locator" => ".traceweaver/intent-contract.yml",
+      "normalized_locator" => ".traceweaver/intent-contract.yml",
+      "source_type" => "yaml",
+      "schema_version" => "traceweaver-intent/1",
+      "digest" => "sha256:#{Digest::SHA256.file(root.join(".traceweaver/intent-contract.yml")).hexdigest}",
+      "owner" => "Client Owner",
+      "authority_class" => "authoritative",
+      "owned_field_families" => ["decision", "allowed_scope", "held_scope"],
+      "generation" => generation,
+      "observed_at" => observed_at,
+      "mutable" => false,
+      "normalization" => {"encoding" => "UTF-8", "line_endings" => "LF", "case" => "exact", "legacy_locators" => []}
+    },
+    {
+      "source_id" => "SRC-CLIENT-REQ-001",
+      "role" => "requirements_baseline",
+      "locator" => "requirements.md",
+      "normalized_locator" => "requirements.md",
+      "source_type" => "markdown",
+      "schema_version" => "tw-requirements-markdown/1",
+      "digest" => "sha256:#{Digest::SHA256.file(root.join("requirements.md")).hexdigest}",
+      "owner" => "Client Owner",
+      "authority_class" => "authoritative",
+      "owned_field_families" => ["requirement", "verification_method", "validation_question"],
+      "generation" => generation,
+      "observed_at" => observed_at,
+      "mutable" => false,
+      "normalization" => {"encoding" => "UTF-8", "line_endings" => "LF", "case" => "exact", "legacy_locators" => ["Requirements.md"]}
+    },
+    {
+      "source_id" => "SRC-EXTERNAL-001",
+      "role" => "external_record_reference",
+      "locator" => "https://records.example.invalid/items/CLIENT-001",
+      "normalized_locator" => "https://records.example.invalid/items/CLIENT-001",
+      "source_type" => "external_record_stub",
+      "schema_version" => "tw-external-record-stub/1",
+      "digest" => "sha256:#{"a" * 64}",
+      "owner" => "External Product Owner",
+      "authority_class" => "external_reference",
+      "owned_field_families" => ["external_reference"],
+      "generation" => generation,
+      "observed_at" => observed_at,
+      "version" => "immutable-revision-7",
+      "mutable" => false,
+      "normalization" => {"encoding" => "opaque", "line_endings" => "not_applicable", "case" => "exact", "legacy_locators" => []}
+    }
+  ]
+
+  registry = {
+    "schema_version" => "tw-lifecycle-source-registry/1",
+    "registry_id" => "REGISTRY-CLIENT-001",
+    "generation" => generation,
+    "owner" => "Client Owner",
+    "sources" => sources.sort_by { |source| source.fetch("source_id") }
+  }
+  registry_path = root.join("lifecycle-registry.json")
+  write_json(registry_path, registry)
+
+  arguments = [
+    "registry-check", "--root", root.to_s, "--registry", registry_path.to_s,
+    "--require-locator", "requirements.md",
+    "--require-locator", ".traceweaver/intent-contract.yml",
+    "--require-locator", "authority.html"
+  ]
+  first_bytes, first = require_pass(*arguments)
+  second_bytes, second = require_pass(*arguments)
+  fail!("registry_non_deterministic") unless first_bytes == second_bytes
+  fail!("registry_status") unless first["status"] == "pass" && first["source_count"] == 4
+  fail!("registry_order") unless first["source_ids"] == first["source_ids"].sort
+  fail!("registry_identity") unless first["registry_digest"].match?(/\Asha256:[0-9a-f]{64}\z/)
+  fail!("registry_repeat_identity") unless first == second
+
+  receipt_args = ["source-receipt", "--root", root.to_s, "--registry", registry_path.to_s, "--source-id", "SRC-CLIENT-REQ-001"]
+  receipt_bytes, receipt = require_pass(*receipt_args)
+  receipt_bytes_again, receipt_again = require_pass(*receipt_args)
+  fail!("receipt_non_deterministic") unless receipt_bytes == receipt_bytes_again && receipt == receipt_again
+  fail!("receipt_schema") unless receipt["schema_version"] == "tw-lifecycle-source-receipt/1"
+  fail!("receipt_identity") unless receipt["receipt_id"].match?(/\Asha256:[0-9a-f]{64}\z/)
+  fail!("receipt_authority_effect") unless receipt["authority_effect"] == "none" && receipt["acceptance_state"] == "observed_not_accepted"
+
+  record = {
+    "schema_version" => "tw-lifecycle-record/1",
+    "record_id" => "REQ-#{''}CLIENT-001",
+    "record_type" => "requirement",
+    "title" => "Client traceability requirement",
+    "owner" => "Client Owner",
+    "authority_class" => "candidate",
+    "source" => {
+      "source_id" => "SRC-CLIENT-REQ-001",
+      "locator" => "requirements.md#REQ-#{''}CLIENT-001",
+      "version" => generation,
+      "digest" => sources.find { |source| source["source_id"] == "SRC-CLIENT-REQ-001" }.fetch("digest"),
+      "role" => "requirements_baseline",
+      "provenance" => "exact visible Markdown row"
+    },
+    "applicability" => "applicable",
+    "baseline" => {
+      "baseline_id" => "BASELINE-CLIENT-001",
+      "generation" => generation,
+      "digest" => first.fetch("registry_digest")
+    },
+    "freshness" => "current",
+    "acceptance_state" => "proposed",
+    "relationships" => [
+      {
+        "source_id" => "REQ-#{''}CLIENT-001",
+        "target_id" => "NEED-CLIENT-001",
+        "relationship_type" => "satisfies",
+        "applicable" => true,
+        "provenance" => "prepared candidate relationship"
+      }
+    ],
+    "fields" => {
+      "statement" => "REQ-#{''}CLIENT-001 shall remain traceable.",
+      "validation_question" => "Can the owner recover the accepted chain?"
+    }
+  }
+  record_path = root.join("record-valid.json")
+  write_json(record_path, record)
+  record_bytes, record_result = require_pass("record-check", "--root", root.to_s, "--record", record_path.to_s)
+  record_bytes_again, record_result_again = require_pass("record-check", "--root", root.to_s, "--record", record_path.to_s)
+  fail!("record_non_deterministic") unless record_bytes == record_bytes_again && record_result == record_result_again
+  fail!("record_check_status") unless record_result["status"] == "pass" && record_result["authority_effect"] == "none"
+
+  derived_accepted = Marshal.load(Marshal.dump(record))
+  derived_accepted["authority_class"] = "derived"
+  derived_accepted["source"]["receipt_id"] = receipt.fetch("receipt_id")
+  derived_accepted["acceptance_state"] = "accepted"
+  derived_accepted["acceptance"] = {
+    "decision_id" => "DEC-CLIENT-001",
+    "accepted_by" => "Client Owner",
+    "accepted_at" => observed_at,
+    "authority_source_id" => "SRC-CLIENT-REQ-001"
+  }
+  derived_path = root.join("record-derived-accepted.json")
+  write_json(derived_path, derived_accepted)
+  require_blocked("false_authority_promotion", "record-check", "--root", root.to_s, "--record", derived_path.to_s)
+
+  open_relationship = Marshal.load(Marshal.dump(record))
+  open_relationship["relationships"].first["relationship_type"] = "other"
+  open_relationship_path = root.join("record-open-relationship.json")
+  write_json(open_relationship_path, open_relationship)
+  require_blocked("unsupported_relationship_type", "record-check", "--root", root.to_s, "--record", open_relationship_path.to_s)
+
+  invalid_cases = {
+    "duplicate_source_id" => lambda do |copy|
+      copy["sources"] << copy["sources"].first
+    end,
+    "conflicting_field_ownership" => lambda do |copy|
+      copy["sources"].find { |source| source["source_id"] == "SRC-CLIENT-INTENT-001" }["owned_field_families"] << "requirement"
+    end,
+    "mutable_source" => lambda do |copy|
+      copy["sources"].first["mutable"] = true
+    end,
+    "stale_digest" => lambda do |copy|
+      copy["sources"].find { |source| source["source_id"] == "SRC-CLIENT-REQ-001" }["digest"] = "sha256:#{"0" * 64}"
+    end,
+    "path_escape" => lambda do |copy|
+      source = copy["sources"].find { |entry| entry["source_id"] == "SRC-CLIENT-REQ-001" }
+      source["locator"] = "../requirements.md"
+      source["normalized_locator"] = "../requirements.md"
+    end,
+    "recursive_registry" => lambda do |copy|
+      source = copy["sources"].find { |entry| entry["source_id"] == "SRC-CLIENT-REQ-001" }
+      source["locator"] = "lifecycle-registry.json"
+      source["normalized_locator"] = "lifecycle-registry.json"
+      source["digest"] = "sha256:#{Digest::SHA256.file(registry_path).hexdigest}"
+    end,
+    "mixed_generation" => lambda do |copy|
+      copy["sources"].first["generation"] = "LC-GEN-OTHER"
+    end,
+    "ambiguous_normalized_locator" => lambda do |copy|
+      copy["sources"].find { |source| source["source_id"] == "SRC-CLIENT-REQ-001" }["normalized_locator"] = "Requirements.md"
+    end,
+    "provenance_missing" => lambda do |copy|
+      copy["sources"].first.delete("owner")
+    end,
+    "external_authority_promotion" => lambda do |copy|
+      copy["sources"].find { |source| source["source_id"] == "SRC-EXTERNAL-001" }["authority_class"] = "authoritative"
+    end
+  }
+
+  invalid_cases.each do |expected_finding, mutate|
+    copy = Marshal.load(Marshal.dump(registry))
+    mutate.call(copy)
+    path = root.join("invalid-#{expected_finding}.json")
+    write_json(path, copy)
+    require_blocked(expected_finding, "registry-check", "--root", root.to_s, "--registry", path.to_s)
+  end
+
+  root.join("active.html").write("<!doctype html><html><body><script>alert(1)</script></body></html>\n")
+  active = Marshal.load(Marshal.dump(registry))
+  source = active["sources"].find { |entry| entry["source_id"] == "SRC-CLIENT-HTML-001" }
+  source["locator"] = "active.html"
+  source["normalized_locator"] = "active.html"
+  source["digest"] = "sha256:#{Digest::SHA256.file(root.join("active.html")).hexdigest}"
+  active_path = root.join("invalid-active-content.json")
+  write_json(active_path, active)
+  require_blocked("active_html_content", "registry-check", "--root", root.to_s, "--registry", active_path.to_s)
+
+  require_blocked(
+    "unregistered_required_locator",
+    "registry-check", "--root", root.to_s, "--registry", registry_path.to_s,
+    "--require-locator", "not-registered.md"
+  )
+end
+
+puts "v060_lifecycle_schema_smoke=pass"
+puts "v060_lifecycle_schema_contracts=pass"
+puts "v060_lifecycle_source_registry_positive=pass"
+puts "v060_lifecycle_source_registry_negative=pass"
+puts "v060_lifecycle_source_receipt_determinism=pass"
+puts "v060_lifecycle_record_envelope=pass"
+puts "v060_lifecycle_human_acceptance_boundary=pass"

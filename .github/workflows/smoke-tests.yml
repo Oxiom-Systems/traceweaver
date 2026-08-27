@@ -2,6 +2,7 @@
 # TRACEWEAVER: verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
 # TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-109,REQ-TW-122; trace=TRACE-TW-072
 # TRACEWEAVER: verifies=VER-TW-093; req=REQ-TW-124,REQ-TW-125,REQ-TW-126,REQ-TW-127,REQ-TW-128,REQ-TW-129; trace=TRACE-TW-073
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-130,REQ-TW-131,REQ-TW-132,REQ-TW-133,REQ-TW-134,REQ-TW-135,REQ-TW-136,REQ-TW-137,REQ-TW-138,REQ-TW-139,REQ-TW-140,REQ-TW-141,REQ-TW-142,REQ-TW-143,REQ-TW-144,REQ-TW-145; trace=TRACE-TW-074
 name: Smoke tests
 
 # Runs the TraceWeaver discovery/traceability smokes on pull requests and on
@@ -117,6 +118,22 @@ jobs:
 
       - name: Deterministic metric-routing evidence-template regression
         run: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-evaluate-metric-routing --root . --self-test evidence-templates
+
+      - name: Core 0.6.0 product-lifecycle assurance
+        run: |
+          scripts/traceweaver-smoke-v060-product-lifecycle
+          scripts/traceweaver-smoke-v060-lifecycle-schema
+          scripts/traceweaver-smoke-v060-lifecycle-evidence
+          scripts/traceweaver-smoke-v060-lifecycle-staleness
+          scripts/traceweaver-smoke-v060-lifecycle-graph
+          scripts/traceweaver-smoke-v060-lifecycle-closure
+          scripts/traceweaver-benchmark-v060-product-lifecycle
+          scripts/traceweaver-smoke-v060-lifecycle-html
+          scripts/traceweaver-smoke-v060-lifecycle-cutover
+          scripts/traceweaver-smoke-v060-lifecycle-capture
+          scripts/traceweaver-smoke-v060-lifecycle-acceptance-hub
+          scripts/traceweaver-smoke-v060-lifecycle-product-validation
+          scripts/traceweaver-smoke-v060-release-integrity
 
       - name: Terra native-child routing contract
         run: scripts/traceweaver-smoke-terra-routing
