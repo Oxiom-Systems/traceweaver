@@ -1,7 +1,7 @@
 {
   "schema_version": "tw-publication-review/1",
   "candidate_kind": "mixed",
-  "candidate_digest": "sha256:4de43ade6ac8d15e278cef68f2e94b2c1eec5e5f9a919f8696f71e0f51debcec",
+  "candidate_digest": "sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c",
   "status": "clean",
   "review_route": "tw-code-review",
   "reviewer_identity": "terra-integrated-reviewer:root-v060-integrated-review",

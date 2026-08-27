@@ -3,7 +3,7 @@ id: VAL-TW-042
 status: accepted
 date: 2026-08-27
 owner: Oxiom Systems
-functional_scope_digest: sha256:4de43ade6ac8d15e278cef68f2e94b2c1eec5e5f9a919f8696f71e0f51debcec
+functional_scope_digest: sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c
 functional_scope_path_count: 102
 change_id: CHG-TW-2026-08-27-006
 authority_effect: none
@@ -21,8 +21,8 @@ same accepted Vestro and Air Router revisions. The product validator returned
 
 | Product | Revision | Recovery | False promotions | Raw digest |
 | --- | --- | ---: | ---: | --- |
-| Vestro | `8bc3b724f56cc72f08f8162c783a7f8e2816b990` | 698/698 | 0 authority; 0 truth-stage | `sha256:7c087941da25426f7410dbf4d916a4a3f565a07ad98dcf950a8c09036f0c3173` |
-| Air Router | `0fc9b6514e112f8ece4196f5a6e0fbb80e3ee56b` | 820/820 | 0 authority; 0 truth-stage | `sha256:507233d09be8a3c9ea99fa5b73a0470dbb9fd4e24c70bcec82ebf9638c306f66` |
+| Vestro | `8bc3b724f56cc72f08f8162c783a7f8e2816b990` | 698/698 | 0 authority; 0 truth-stage | `sha256:5b4f4778aa8683def31bdd7993201e93ed22eadb1f766bf901061b5c1524ed4e` |
+| Air Router | `0fc9b6514e112f8ece4196f5a6e0fbb80e3ee56b` | 820/820 | 0 authority; 0 truth-stage | `sha256:f391237690754c99b383476d067b3aaebf218adc808c72c420b089213fe9bd82` |
 
 The new observations differ from the last accepted observations only in the
 frozen candidate binding, its dependent hub/HTML digests, and an improved

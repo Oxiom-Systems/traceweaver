@@ -4,7 +4,7 @@ status: closed_clean
 date: 2026-08-27
 owner: Oxiom Systems
 reviewer: terra-integrated-reviewer:root-v060-integrated-review
-functional_scope_digest: sha256:4de43ade6ac8d15e278cef68f2e94b2c1eec5e5f9a919f8696f71e0f51debcec
+functional_scope_digest: sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c
 functional_scope_path_count: 102
 reviewed_findings:
   open_p0: 0
@@ -29,7 +29,7 @@ reviewer or nested reviewer dispatch was used.
 
 **Closed clean:** zero open P0 and zero open P1 findings. The reviewer
 reproduced the 102-path functional scope digest
-`sha256:4de43ade6ac8d15e278cef68f2e94b2c1eec5e5f9a919f8696f71e0f51debcec`,
+`sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c`,
 confirmed the accepted Vestro and Air Router bindings, metric-routing parity,
 implementation traceability, and release-integrity checks, and authorized the
 candidate to proceed to the release receipt and publication capsule.
@@ -44,6 +44,19 @@ functional digest, product-result path, and product-result digest are checked.
 The canonical and packaged oracles match at semantic digest
 `sha256:69488637fc95e2a00cd9c47495d98cc06871c0d5666c3e5d37bc0f791f1e1bcd`;
 all 72 model-context cases and the release-integrity smoke pass.
+
+## PR Smoke convergence
+
+The first PR Smoke run exposed one stale MR129 positive-fixture binding: the
+qualification cell still named the prior oracle digest even though the
+canonical reviewer-bound oracle had advanced. The exact repair updates the
+fixture's declared and observed `source_oracle_identity`, recomputes its cell
+identity, and refreshes the byte-identical canonical/mirror metric-harness
+inventory and reference identities. All 71 metric-routing cases now pass,
+including `MR129_EXACT_CELL_FIXTURE_PREDICATE`; the oracle remains acyclic and
+unchanged. Fresh exact-product rebinding retained 100% recovery, zero false
+authority or truth-stage promotions, the same product revisions, and the same
+accepted limitations.
 
 ## Retained graph finding
 
