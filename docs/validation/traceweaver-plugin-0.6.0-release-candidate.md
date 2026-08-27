@@ -7,6 +7,15 @@ tag: traceweaver-core--v0.6.0
 released_predecessor_tag: traceweaver-core--v0.5.0
 released_predecessor_sha: 3a1f3c56b093e61b88e9f6282637878e8ebbf163
 integration_base: e53faeb437cfee3b91f43e1b0f4ed3b1cb1e2c33
+publication_lineage_reconciliation:
+  failed_release_run: https://github.com/Oxiom-Systems/traceweaver/actions/runs/33059479566
+  squash_merge_sha: 2419fa62edcd77a81b6f59917e7431af2026d114
+  failure: integration_base_not_ancestor_after_squash_merge
+  correction: merge_current_main_into_reviewed_candidate_branch_then_merge_commit_to_main
+  integration_base_ancestor_restored: required_before_release_retry
+  product_content_delta: none
+  functional_scope_digest_unchanged: sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8
+  candidate_scope_digest_unchanged: sha256:8535b1db4dd6ffec9070522d4d0b12aa2ab9513ffefc12f1a457e5b9724f8060
 requirement: REQ-TW-145
 trace: TRACE-TW-074
 verification: VER-TW-094
