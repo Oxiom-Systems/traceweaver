@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-source-receipt/1",
+  "title": "TraceWeaver immutable lifecycle source receipt",
+  "description": "Records an exact local observation or immutable external reference without approving extracted content.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "receipt_id", "registry_id", "registry_digest",
+    "source_id", "role", "locator", "normalized_locator", "source_type",
+    "source_schema_version", "source_digest", "source_version", "owner",
+    "authority_class", "owned_field_families", "generation", "observed_at",
+    "normalization", "extraction_method", "authority_effect", "acceptance_state"
+  ],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-source-receipt/1"},
+    "receipt_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "registry_id": {"type": "string", "minLength": 1},
+    "registry_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "source_id": {"type": "string", "minLength": 1},
+    "role": {"type": "string", "minLength": 1},
+    "locator": {"type": "string", "minLength": 1},
+    "normalized_locator": {"type": "string", "minLength": 1},
+    "source_type": {"enum": ["markdown", "yaml", "semantic_html", "external_record_stub"]},
+    "source_schema_version": {"type": "string", "minLength": 1},
+    "source_digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "source_version": {"type": "string", "minLength": 1},
+    "owner": {"type": "string", "minLength": 1},
+    "authority_class": {"enum": ["authoritative", "candidate", "imported_candidate", "evidence", "derived", "external_reference"]},
+    "owned_field_families": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string"}},
+    "generation": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "normalization": {"type": "object"},
+    "extraction_method": {"enum": ["exact_bytes_sha256", "external_immutable_reference_no_fetch"]},
+    "authority_effect": {"const": "none"},
+    "acceptance_state": {"const": "observed_not_accepted"}
+  }
+}

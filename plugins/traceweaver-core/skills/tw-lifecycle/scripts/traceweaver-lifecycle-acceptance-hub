@@ -1,0 +1,355 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-human-authority-acceptance-hub; req=REQ-TW-131,REQ-TW-135,REQ-TW-138,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: entrypoint=lifecycle_offline_hub_and_named_baseline_pack; req=REQ-TW-131,REQ-TW-135,REQ-TW-138,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074; ver=VER-TW-094
+
+require "cgi"
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+require "set"
+require "tmpdir"
+
+begin
+  require "nokogiri"
+rescue LoadError
+  NOKOGIRI_LOAD_ERROR = true
+end
+
+HUB_SCHEMA = "tw-lifecycle-acceptance-hub/1"
+PACK_SCHEMA = "tw-lifecycle-acceptance-pack/1"
+PROJECT = Pathname.new(__dir__).join("traceweaver-lifecycle-project").realpath
+EVIDENCE = Pathname.new(__dir__).join("traceweaver-lifecycle-evidence").realpath
+DEFAULT_LOCK = Pathname.new(__dir__).join("../../../references/lifecycle/semantic-html-parser-lock.json").realpath
+ALLOWED_ELEMENTS = Set.new(%w[html head meta title style body header nav main section article footer h1 h2 h3 p a code strong span dl dt dd ul li pre]).freeze
+ALLOWED_ATTRIBUTES = Set.new(%w[lang charset name content id class href aria-label aria-labelledby]).freeze
+PROHIBITED_ELEMENTS = Set.new(%w[base script iframe frame frameset object embed form link img audio video source track svg math template canvas]).freeze
+FETCH_OR_ACTIVE = /(?:@import|\burl\s*\(|\bimage-set\s*\(|javascript:|data:|https?:|\/\/)/i
+HIDDEN_CSS = /(?:display\s*:\s*none|visibility\s*:\s*hidden|opacity\s*:\s*0(?:\D|$)|clip-path\s*:|content-visibility\s*:\s*hidden)/i
+
+class HubError < StandardError
+  attr_reader :finding, :details
+
+  def initialize(finding, message, details = {})
+    super(message)
+    @finding = finding
+    @details = details
+  end
+end
+
+def fail!(finding, message, details = {})
+  raise HubError.new(finding, message, details)
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_bytes(value)
+  "sha256:#{Digest::SHA256.hexdigest(value)}"
+end
+
+def digest_value(value)
+  digest_bytes(JSON.generate(canonical(value)))
+end
+
+def present_string?(value)
+  value.is_a?(String) && !value.strip.empty?
+end
+
+def escape(value)
+  CGI.escapeHTML(value.to_s)
+end
+
+def resolve_inside(root, value, finding, must_exist: false, directory: false)
+  candidate = Pathname.new(value)
+  candidate = root.join(candidate) unless candidate.absolute?
+  candidate = candidate.expand_path
+  fail!("unsafe_path", "symlink path is prohibited", "path" => candidate.to_s) if candidate.symlink?
+  resolved = if candidate.exist?
+    candidate.realpath
+  elsif candidate.parent.directory?
+    candidate.parent.realpath.join(candidate.basename)
+  else
+    candidate
+  end
+  relative = resolved.relative_path_from(root).to_s
+  fail!(finding, "path escapes root", "path" => value) if relative == ".." || relative.start_with?("../")
+  fail!(finding, "required path is missing", "path" => value) if must_exist && !resolved.exist?
+  fail!(finding, "required directory is missing", "path" => value) if directory && !resolved.directory?
+  resolved
+rescue ArgumentError
+  fail!(finding, "path escapes root", "path" => value)
+end
+
+def load_json(path, missing, malformed)
+  fail!(missing, "file is missing", "path" => path.to_s) unless path.file?
+  fail!("unsafe_path", "symlink input is prohibited", "path" => path.to_s) if path.symlink?
+  bytes = path.binread
+  fail!("unsupported_encoding", "UTF-8 BOM is prohibited", "path" => path.to_s) if bytes.start_with?("\xEF\xBB\xBF".b)
+  fail!("unsupported_line_endings", "LF line endings are required", "path" => path.to_s) if bytes.include?("\r".b)
+  JSON.parse(bytes)
+rescue JSON::ParserError => error
+  fail!(malformed, "file is not valid JSON", "path" => path.to_s, "error" => error.message)
+end
+
+def run_json(executable, *arguments)
+  stdout, stderr, status = Open3.capture3(executable.to_s, *arguments.map(&:to_s))
+  parsed = JSON.parse(stdout)
+  return parsed if status.success?
+  fail!(parsed["finding"] || "child_control_failed", parsed["reason"] || stderr, parsed["details"] || {})
+rescue JSON::ParserError => error
+  fail!("child_control_output_invalid", "child control returned malformed JSON", "executable" => executable.to_s, "error" => error.message, "stderr" => stderr)
+end
+
+def style
+  <<~CSS
+    :root { color-scheme:light; --ink:#17252d; --muted:#51646e; --line:#d7dfdf; --paper:#fbfaf6; --surface:#fff; --accent:#0d7480; --held:#8a3b35; }
+    * { box-sizing:border-box; } body { margin:0; color:var(--ink); background:var(--paper); font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    header,nav,main,footer { width:min(1120px,calc(100% - 32px)); margin-inline:auto; } header { padding:28px 0 16px; }
+    nav { display:flex; flex-wrap:wrap; gap:14px; padding:12px 0; border-block:1px solid var(--line); } main { padding:24px 0 48px; }
+    section { margin:0 0 32px; } article { padding:18px; margin:0 0 18px; border:1px solid var(--line); background:var(--surface); }
+    h1,h2,h3 { line-height:1.2; } h2 { margin-top:0; } a { color:var(--accent); text-underline-offset:3px; } code,pre { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; }
+    pre { white-space:pre-wrap; overflow-wrap:anywhere; } dl { display:grid; grid-template-columns:minmax(150px,220px) minmax(0,1fr); }
+    dt,dd { padding:7px 0; border-top:1px solid var(--line); } dt { font-weight:700; } dd { margin:0; } .boundary { padding:12px; border:2px solid var(--held); }
+    .state { font-weight:700; } footer { padding:16px 0 32px; color:var(--muted); } @media (max-width:700px) { dl { grid-template-columns:1fr; } dd { border-top:0; padding-top:0; } }
+    @media print { body { background:#fff; font-size:11pt; } article { break-inside:avoid; } a { color:#000; } }
+  CSS
+end
+
+def render_hub(graph, records, evidence, pack)
+  stages = pack.fetch("truth_stage_states").sort.map { |name, state| "<li><strong>#{escape(name)}</strong> — <span class=\"state\">#{escape(state)}</span></li>" }.join
+  holds = pack.fetch("remaining_holds").empty? ? "<li>None recorded.</li>" : pack.fetch("remaining_holds").map { |hold| "<li><code>#{escape(hold)}</code></li>" }.join
+  groups = records.group_by { |record| record["record_type"] }.sort.map do |type, entries|
+    articles = entries.sort_by { |record| record["record_id"] }.map do |record|
+      id = record["record_id"]
+      <<~HTML
+        <article id="summary-#{escape(id)}"><p><code>#{escape(id)}</code> · <span class="state">#{escape(record["freshness"])}</span></p><h3>#{escape(record["title"])}</h3><dl><dt>Owner</dt><dd>#{escape(record["owner"])}</dd><dt>Acceptance state</dt><dd>#{escape(record["acceptance_state"])}</dd><dt>Source</dt><dd><code>#{escape(record.dig("source", "source_id"))}</code> / <code>#{escape(record.dig("source", "digest"))}</code></dd></dl><p><a href="projection/lifecycle.html##{escape(id)}">Open full record, fields, and typed relationships</a></p></article>
+      HTML
+    end.join
+    "<section aria-labelledby=\"type-#{escape(type)}\"><h2 id=\"type-#{escape(type)}\">#{escape(type)} records</h2>#{articles}</section>"
+  end.join
+  <<~HTML
+    <!doctype html>
+    <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>TraceWeaver lifecycle authority and acceptance hub</title><style>#{style}</style></head><body>
+    <header><p><a href="#main">Skip to content</a></p><h1>Lifecycle authority and acceptance hub</h1><p class="boundary"><strong>DERIVED, STATIC, NON-AUTHORITATIVE.</strong> Registered Markdown/YAML and immutable external receipts remain controlling. A held or accepted pack reports named evidence state; this hub cannot approve, validate, accept, publish, or supersede authority.</p></header>
+    <nav aria-label="Lifecycle hub pages"><a href="hub.html">Hub</a><a href="projection/index.html">Source and baseline index</a><a href="projection/lifecycle.html">All lifecycle records</a><a href="acceptance-pack.json">Machine-readable acceptance pack</a></nav>
+    <main id="main"><section aria-labelledby="baseline-title"><h2 id="baseline-title">Named baseline and pack</h2><dl><dt>Baseline</dt><dd><code>#{escape(pack.dig("baseline", "baseline_id"))}</code> / <code>#{escape(pack.dig("baseline", "generation"))}</code> / <code>#{escape(pack.dig("baseline", "digest"))}</code></dd><dt>Graph</dt><dd><code>#{escape(graph["graph_id"])}</code></dd><dt>Evidence receipt</dt><dd><code>#{escape(evidence["receipt_id"])}</code></dd><dt>Acceptance pack</dt><dd><code>#{escape(pack["pack_id"])}</code></dd><dt>Acceptance state</dt><dd><strong>#{escape(pack["acceptance_state"])}</strong></dd><dt>Authority effect</dt><dd>none</dd></dl></section>
+    <section aria-labelledby="truth-title"><h2 id="truth-title">Separate truth stages</h2><ul>#{stages}</ul></section><section aria-labelledby="holds-title"><h2 id="holds-title">Remaining holds</h2><ul>#{holds}</ul></section><section aria-labelledby="owner-title"><h2 id="owner-title">Named owner disposition</h2><pre>#{escape(JSON.pretty_generate(canonical(pack["owner_disposition"])))}</pre></section>#{groups}</main>
+    <footer>Offline and printable. Every summary links to the exact record, controlled fields, and typed relationships in the content-addressed projection.</footer></body></html>
+  HTML
+end
+
+def normalize_visible_text(node)
+  node.text.split.join(" ")
+end
+
+def validate_hub!(html, record_ids, pack)
+  fail!("parser_dependency_missing", "pinned Nokogiri HTML5 parser is unavailable") if defined?(NOKOGIRI_LOAD_ERROR)
+  runtime = {"nokogiri" => Nokogiri::VERSION, "libgumbo" => Nokogiri::VERSION_INFO.dig("other_libraries", "libgumbo")}
+  fail!("parser_runtime_mismatch", "runtime parser differs from the frozen lifecycle profile", "actual" => runtime) unless runtime == {"nokogiri" => "1.13.8", "libgumbo" => "1.0.0-nokogiri"}
+  fail!("unsupported_encoding", "hub must be valid UTF-8") unless html.encoding == Encoding::UTF_8 && html.valid_encoding?
+  fail!("unsupported_line_endings", "hub must use LF") if html.include?("\r")
+  fail!("doctype_missing", "hub requires HTML5 doctype") unless html.start_with?("<!doctype html>\n")
+  fail!("hidden_authority_content", "HTML comments are prohibited") if html.include?("<!--")
+  document = Nokogiri::HTML5.parse(html, max_errors: 100)
+  fail!("malformed_semantic_html", "HTML5 parser reported errors", "errors" => document.errors.map(&:message)) unless document.errors.empty?
+  fail!("accessibility_profile", "hub requires one English root, title, header, nav, main, and footer") unless document.at_css("html[lang='en']") && document.css("title").length == 1 && document.css("body > header").length == 1 && document.css("body > nav[aria-label]").length == 1 && document.css("body > main#main").length == 1 && document.css("body > footer").length == 1
+  document.css("*").each do |node|
+    fail!("active_html_content", "prohibited HTML element", "element" => node.name) if PROHIBITED_ELEMENTS.include?(node.name)
+    fail!("html_profile_element", "element is outside the closed profile", "element" => node.name) unless ALLOWED_ELEMENTS.include?(node.name)
+    node.attribute_nodes.each do |attribute|
+      fail!("active_html_content", "event handler is prohibited", "attribute" => attribute.name) if attribute.name.match?(/\Aon/i)
+      fail!("hidden_authority_content", "hidden, inert, inline-style, or aria-hidden content is prohibited", "attribute" => attribute.name) if %w[hidden inert style].include?(attribute.name) || (attribute.name == "aria-hidden" && attribute.value == "true")
+      fail!("html_profile_attribute", "attribute is outside the closed profile", "attribute" => attribute.name) unless ALLOWED_ATTRIBUTES.include?(attribute.name)
+    end
+  end
+  css = document.css("style").map(&:text).join("\n")
+  fail!("active_html_content", "CSS fetch primitive is prohibited") if css.match?(FETCH_OR_ACTIVE)
+  fail!("hidden_authority_content", "CSS hiding primitive is prohibited") if css.match?(HIDDEN_CSS)
+  ids = document.css("[id]").map { |node| node["id"] }
+  fail!("duplicate_html_id", "HTML IDs must be unique") unless ids.uniq == ids
+  document.css("a[href]").each do |link|
+    href = link["href"]
+    fail!("active_html_content", "external, absolute, rewritten, or encoded link is prohibited", "href" => href) if href.match?(%r{\A(?:[a-z]+:|//|/)}i) || href.include?("%") || href.include?("?") || href.include?("\\")
+  end
+  visible = normalize_visible_text(document)
+  record_ids.each do |id|
+    fail!("hub_record_missing", "record is absent from visible hub", "record_id" => id) unless document.at_css("article#summary-#{id}") && visible.include?(id) && document.at_css("a[href='projection/lifecycle.html##{id}']")
+  end
+  [pack.dig("baseline", "baseline_id"), pack["pack_id"], pack["acceptance_state"]].each do |value|
+    fail!("hub_visible_state_missing", "required pack state is not visible", "value" => value) unless visible.include?(value)
+  end
+  authority_effect = document.xpath("//dt[normalize-space(.)='Authority effect']/following-sibling::dd[1]").first
+  fail!("hub_visible_state_missing", "authority effect none is not visibly declared") unless authority_effect && normalize_visible_text(authority_effect) == "none"
+  document
+end
+
+def files_under(directory)
+  children = directory.children.sort
+  children.flat_map do |path|
+    path.directory? && !path.symlink? ? files_under(path) : [path]
+  end
+end
+
+def relative_files(directory)
+  files_under(directory).map { |path| path.relative_path_from(directory).to_s }.sort
+end
+
+def media_type(path)
+  return "text/html; charset=utf-8" if path.end_with?(".html")
+  "application/json"
+end
+
+def validate_pack_identity!(pack)
+  fail!("acceptance_pack_shape", "acceptance pack schema is unsupported") unless pack.is_a?(Hash) && pack["schema_version"] == PACK_SCHEMA
+  expected = digest_value(pack.reject { |key, _| key == "pack_id" })
+  fail!("acceptance_pack_identity", "acceptance pack identity is invalid", "expected" => expected, "actual" => pack["pack_id"]) unless pack["pack_id"] == expected && pack["authority_effect"] == "none"
+end
+
+def assemble(root, registry, records_dir, graph_path, evidence_path, parser_lock, directory)
+  projection = directory.join("projection")
+  run_json(PROJECT, "build", "--root", root, "--registry", registry, "--records", records_dir, "--graph", graph_path, "--output", projection, "--parser-lock", parser_lock)
+  run_json(EVIDENCE, "evidence-check", "--root", root, "--evidence", evidence_path)
+  pack = run_json(EVIDENCE, "acceptance-pack", "--root", root, "--evidence", evidence_path)
+  validate_pack_identity!(pack)
+  graph = load_json(graph_path, "missing_graph", "malformed_graph")
+  evidence = load_json(evidence_path, "missing_evidence", "malformed_evidence")
+  records = records_dir.children.select { |path| path.extname == ".json" }.sort.map { |path| load_json(path, "missing_record", "malformed_record") }
+  by_id = records.each_with_object({}) { |record, result| result[record.fetch("record_id")] = record }
+  fail!("hub_baseline_mismatch", "acceptance pack baseline differs from current lifecycle graph") unless pack["baseline"] == graph["baseline"]
+  pack.fetch("requirements").each do |id|
+    fail!("hub_requirement_missing", "pack requirement is absent from lifecycle graph", "record_id" => id) unless by_id[id] && by_id[id]["record_type"] == "requirement"
+  end
+  evidence.dig("applicability", "artifacts").each do |entry|
+    id = entry["artifact_id"]
+    fail!("hub_artifact_missing", "applicable artifact is absent from lifecycle graph", "record_id" => id) unless by_id[id] && by_id[id]["record_type"] == "product_artifact"
+  end
+  hub = render_hub(graph, records, evidence, pack)
+  validate_hub!(hub, by_id.keys.sort, pack)
+  directory.join("hub.html").binwrite(hub)
+  directory.join("acceptance-pack.json").binwrite(canonical_json(pack))
+  projection_manifest_path = projection.join("manifest.json")
+  projection_manifest = load_json(projection_manifest_path, "missing_projection_manifest", "malformed_projection_manifest")
+  record_index = graph.fetch("nodes").sort_by { |node| node["record_id"] }.map do |node|
+    record = by_id.fetch(node["record_id"])
+    {
+      "record_id" => record["record_id"], "record_type" => record["record_type"], "title" => record["title"], "owner" => record["owner"],
+      "freshness" => record["freshness"], "acceptance_state" => record["acceptance_state"], "record_digest" => node["record_digest"],
+      "locator" => "projection/lifecycle.html##{record["record_id"]}"
+    }
+  end
+  file_manifest = relative_files(directory).map do |relative|
+    path = directory.join(relative)
+    {"path" => relative, "digest" => digest_bytes(path.binread), "bytes" => path.size, "media_type" => media_type(relative)}
+  end
+  body = {
+    "schema_version" => HUB_SCHEMA,
+    "profile" => "strict_static_accessible_offline_printable",
+    "authority_role" => "derived_non_authoritative",
+    "controlling_sources" => "registered_markdown_yaml_and_external_receipts",
+    "baseline" => graph["baseline"], "graph_id" => graph["graph_id"],
+    "projection" => {"manifest_id" => projection_manifest["manifest_id"], "digest" => digest_bytes(projection_manifest_path.binread)},
+    "evidence" => {"receipt_id" => evidence["receipt_id"], "digest" => digest_value(evidence), "evidence_links" => evidence["evidence_links"], "review_links" => evidence["review_links"]},
+    "acceptance_pack" => {"pack_id" => pack["pack_id"], "digest" => digest_value(pack), "acceptance_state" => pack["acceptance_state"], "owner_disposition" => pack["owner_disposition"], "truth_stage_states" => pack["truth_stage_states"], "remaining_holds" => pack["remaining_holds"]},
+    "record_index" => record_index, "files" => file_manifest, "authority_effect" => "none"
+  }
+  manifest = body.merge("manifest_id" => digest_value(body))
+  directory.join("manifest.json").binwrite(canonical_json(manifest))
+  manifest
+end
+
+def compare_outputs!(actual, expected)
+  fail!("missing_hub_output", "hub output directory is missing") unless actual.directory?
+  actual_files = relative_files(actual)
+  expected_files = relative_files(expected)
+  fail!("hub_output_set", "hub output file set differs", "expected" => expected_files, "actual" => actual_files) unless actual_files == expected_files
+  actual_files.each do |relative|
+    path = actual.join(relative)
+    fail!("unsafe_path", "hub output symlink is prohibited", "path" => relative) if path.symlink?
+    if relative == "hub.html"
+      manifest = load_json(expected.join("manifest.json"), "missing_hub_manifest", "malformed_hub_manifest")
+      pack = load_json(expected.join("acceptance-pack.json"), "missing_acceptance_pack", "malformed_acceptance_pack")
+      validate_hub!(path.binread.force_encoding(Encoding::UTF_8), manifest.fetch("record_index").map { |entry| entry["record_id"] }, pack)
+    end
+    fail!("stale_or_hand_edited_hub", "stored hub differs from exact current build", "path" => relative) unless path.binread == expected.join(relative).binread
+  end
+end
+
+command = ARGV.shift
+options = {root: Dir.pwd, parser_lock: DEFAULT_LOCK.to_s}
+OptionParser.new do |parser|
+  parser.banner = "Usage: traceweaver-lifecycle-acceptance-hub <build|check> --root PATH --registry PATH --records PATH --graph PATH --evidence PATH --output PATH [--parser-lock PATH]"
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--registry PATH") { |value| options[:registry] = value }
+  parser.on("--records PATH") { |value| options[:records] = value }
+  parser.on("--graph PATH") { |value| options[:graph] = value }
+  parser.on("--evidence PATH") { |value| options[:evidence] = value }
+  parser.on("--output PATH") { |value| options[:output] = value }
+  parser.on("--parser-lock PATH") { |value| options[:parser_lock] = value }
+end.parse!
+
+temporary_paths = []
+begin
+  fail!("invalid_command", "unsupported acceptance-hub operation", "operation" => command) unless %w[build check].include?(command)
+  root = Pathname.new(options[:root]).expand_path
+  fail!("invalid_root", "--root must be a directory") unless root.directory?
+  root = root.realpath
+  %i[registry records graph evidence output].each { |key| fail!("usage_error", "--#{key} is required") unless present_string?(options[key]) }
+  registry = resolve_inside(root, options[:registry], "registry_path_escape", must_exist: true)
+  records = resolve_inside(root, options[:records], "records_path_escape", must_exist: true, directory: true)
+  graph = resolve_inside(root, options[:graph], "graph_path_escape", must_exist: true)
+  evidence = resolve_inside(root, options[:evidence], "evidence_path_escape", must_exist: true)
+  output = resolve_inside(root, options[:output], "output_path_escape")
+  fail!("output_parent_missing", "hub output parent is missing") unless output.parent.directory?
+  parser_lock = Pathname.new(options[:parser_lock]).expand_path
+
+  expected_path = Pathname.new(Dir.mktmpdir(".traceweaver-hub-", output.parent.to_s))
+  temporary_paths << expected_path
+  expected_manifest = assemble(root, registry, records, graph, evidence, parser_lock, expected_path)
+  if command == "build"
+    fail!("hub_output_exists", "hub build refuses to overwrite an existing path") if output.exist?
+    second_path = Pathname.new(Dir.mktmpdir(".traceweaver-hub-", output.parent.to_s))
+    temporary_paths << second_path
+    second_manifest = assemble(root, registry, records, graph, evidence, parser_lock, second_path)
+    compare_outputs!(expected_path, second_path)
+    fail!("non_deterministic_hub", "two complete hub builds differ") unless expected_manifest == second_manifest
+    File.rename(expected_path.to_s, output.to_s)
+    temporary_paths.delete(expected_path)
+  else
+    compare_outputs!(output, expected_path)
+  end
+  puts canonical_json(
+    "schema_version" => "tw-lifecycle-acceptance-hub-result/1", "operation" => command, "status" => "pass",
+    "manifest_id" => expected_manifest["manifest_id"], "graph_id" => expected_manifest["graph_id"],
+    "baseline" => expected_manifest["baseline"], "acceptance_state" => expected_manifest.dig("acceptance_pack", "acceptance_state"),
+    "remaining_holds" => expected_manifest.dig("acceptance_pack", "remaining_holds"), "authority_role" => "derived_non_authoritative",
+    "authority_effect" => "none", "findings" => []
+  )
+rescue HubError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-acceptance-hub-finding/1", "status" => "blocked", "finding" => error.finding, "reason" => error.message, "details" => error.details, "authority_effect" => "none")
+  exit 1
+rescue OptionParser::ParseError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-acceptance-hub-finding/1", "status" => "blocked", "finding" => "usage_error", "reason" => error.message, "details" => {}, "authority_effect" => "none")
+  exit 2
+rescue StandardError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-acceptance-hub-finding/1", "status" => "blocked", "finding" => "unexpected_acceptance_hub_error", "reason" => error.message, "details" => {"class" => error.class.name}, "authority_effect" => "none")
+  exit 1
+ensure
+  temporary_paths.each { |path| FileUtils.rm_rf(path.to_s) if path.exist? }
+end

@@ -1,0 +1,493 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-integrity-control; req=REQ-TW-130,REQ-TW-132,REQ-TW-137; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: entrypoint=lifecycle_registry_check_and_source_receipt; req=REQ-TW-130,REQ-TW-132,REQ-TW-137; trace=TRACE-TW-074; ver=VER-TW-094
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+require "set"
+require "uri"
+
+REGISTRY_SCHEMA = "tw-lifecycle-source-registry/1"
+RECEIPT_SCHEMA = "tw-lifecycle-source-receipt/1"
+RECORD_SCHEMA = "tw-lifecycle-record/1"
+CAPTURE = Pathname.new(__dir__).join("traceweaver-lifecycle-capture").realpath
+DIGEST_PATTERN = /\Asha256:[0-9a-f]{64}\z/
+SOURCE_ID_PATTERN = /\ASRC-[A-Z0-9][A-Z0-9-]{2,126}\z/
+TOKEN_PATTERN = /\A[a-z][a-z0-9_]{1,63}\z/
+GENERATION_PATTERN = /\A[A-Za-z0-9][A-Za-z0-9._:-]{0,127}\z/
+RFC3339_PATTERN = /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\z/
+SOURCE_TYPES = %w[markdown yaml semantic_html external_record_stub].freeze
+AUTHORITY_CLASSES = %w[authoritative candidate imported_candidate evidence derived external_reference].freeze
+RECORD_TYPES = %w[
+  commitment intent need requirement constraint decision interface risk change
+  product_artifact verification_definition verification_result
+  validation_definition validation_result acceptance_decision baseline evidence
+].freeze
+RELATIONSHIP_TYPES = %w[
+  derived_from refines satisfies allocated_to constrained_by decided_by
+  exposes_interface mitigates changes impacts implemented_by verified_by
+  validated_by accepted_by baselines evidences supersedes duplicates_candidate
+  depends_on invalidates reverified_by
+].freeze
+SUPPORTED_SCHEMAS = {
+  "markdown" => %w[tw-requirements-markdown/1 tw-traceability-markdown/1 tw-lifecycle-markdown/1],
+  "yaml" => %w[traceweaver-intent/1 tw-lifecycle-yaml/1 tw-source-registry-yaml/1],
+  "semantic_html" => %w[tw-lifecycle-html/1],
+  "external_record_stub" => %w[tw-external-record-stub/1]
+}.freeze
+LOCAL_EXTENSIONS = {
+  "markdown" => %w[.md],
+  "yaml" => %w[.yml .yaml],
+  "semantic_html" => %w[.html .htm]
+}.freeze
+TOP_LEVEL_FIELDS = %w[schema_version registry_id generation owner sources].freeze
+SOURCE_FIELDS = %w[
+  source_id role locator normalized_locator source_type schema_version digest
+  owner authority_class owned_field_families generation observed_at version
+  mutable normalization
+].freeze
+SOURCE_REQUIRED_FIELDS = (SOURCE_FIELDS - %w[version]).freeze
+NORMALIZATION_FIELDS = %w[encoding line_endings case legacy_locators].freeze
+
+class LifecycleError < StandardError
+  attr_reader :finding, :details
+
+  def initialize(finding, message, details = {})
+    super(message)
+    @finding = finding
+    @details = details
+  end
+end
+
+def fail!(finding, message, details = {})
+  raise LifecycleError.new(finding, message, details)
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, result|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      result[key] = canonical(value.fetch(source_key))
+    end
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_value(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def present_string?(value)
+  value.is_a?(String) && !value.strip.empty?
+end
+
+def resolve_inside_root(root, locator, finding = "path_escape")
+  fail!(finding, "locator must be a non-empty repository-relative POSIX path") unless present_string?(locator)
+  fail!(finding, "locator contains a backslash or NUL") if locator.include?("\\") || locator.include?("\0")
+  path = Pathname.new(locator)
+  fail!(finding, "absolute locator is prohibited") if path.absolute?
+  cleaned = path.cleanpath.to_s
+  fail!(finding, "locator is not normalized") unless cleaned == locator
+  fail!(finding, "locator escapes repository root") if cleaned == ".." || cleaned.start_with?("../")
+
+  current = root
+  path.each_filename do |part|
+    current = current.join(part)
+    fail!(finding, "symlink source path is prohibited", "path" => locator) if current.symlink?
+  end
+  current
+end
+
+def ensure_exact_case!(root, path, locator)
+  real = path.realpath
+  relative = real.relative_path_from(root).to_s
+  fail!("ambiguous_normalized_locator", "locator case or spelling does not match the physical source", "locator" => locator, "physical" => relative) unless relative == locator
+  real
+rescue Errno::ENOENT
+  fail!("missing_source", "registered local source is missing", "locator" => locator)
+rescue ArgumentError
+  fail!("path_escape", "registered local source resolves outside the root", "locator" => locator)
+end
+
+def validate_utf8_lf!(bytes, locator)
+  fail!("unsupported_encoding", "UTF-8 BOM is prohibited", "locator" => locator) if bytes.start_with?("\xEF\xBB\xBF".b)
+  value = bytes.dup.force_encoding(Encoding::UTF_8)
+  fail!("unsupported_encoding", "source is not valid UTF-8", "locator" => locator) unless value.valid_encoding?
+  fail!("unsupported_line_endings", "source must use LF line endings", "locator" => locator) if bytes.include?("\r".b)
+  value
+end
+
+def validate_static_html!(text, locator)
+  patterns = {
+    "active_html_content" => [
+      /<\s*(?:script|iframe|frame|frameset|object|embed|form|base|applet)\b/i,
+      /\son[a-z0-9_-]+\s*=/i,
+      /<meta\b[^>]*http-equiv\s*=\s*["']?refresh/i,
+      /\b(?:href|src|action|formaction|poster)\s*=\s*["']?\s*(?:javascript:|data:|https?:|\/\/)/i,
+      /@import\b/i,
+      /url\s*\(\s*["']?\s*(?:https?:|\/\/|data:)/i
+    ]
+  }
+  patterns.each do |finding, checks|
+    fail!(finding, "semantic HTML contains prohibited active or remote content", "locator" => locator) if checks.any? { |pattern| text.match?(pattern) }
+  end
+  fail!("malformed_semantic_html", "semantic HTML requires a doctype, html, body, and main element", "locator" => locator) unless text.match?(/\A\s*<!doctype\s+html/i) && text.match?(/<html\b/i) && text.match?(/<body\b/i) && text.match?(/<main\b/i)
+end
+
+def validate_normalization!(source)
+  normalization = source["normalization"]
+  fail!("normalization_missing", "source normalization must be an object", "source_id" => source["source_id"]) unless normalization.is_a?(Hash)
+  unknown = normalization.keys - NORMALIZATION_FIELDS
+  missing = NORMALIZATION_FIELDS - normalization.keys
+  fail!("normalization_unknown_field", "normalization contains unsupported fields", "fields" => unknown) unless unknown.empty?
+  fail!("normalization_missing", "normalization is incomplete", "fields" => missing) unless missing.empty?
+  fail!("normalization_encoding", "normalization encoding is unsupported") unless %w[UTF-8 opaque].include?(normalization["encoding"])
+  fail!("normalization_line_endings", "normalization line_endings is unsupported") unless %w[LF not_applicable].include?(normalization["line_endings"])
+  fail!("normalization_case", "normalization case must be exact") unless normalization["case"] == "exact"
+  legacy = normalization["legacy_locators"]
+  fail!("normalization_legacy_locators", "legacy_locators must be a unique string array") unless legacy.is_a?(Array) && legacy.all? { |entry| present_string?(entry) } && legacy.uniq == legacy
+  fail!("ambiguous_normalized_locator", "current locator cannot also be a legacy locator") if legacy.include?(source["normalized_locator"])
+end
+
+def load_registry(path)
+  fail!("missing_registry", "registry file is missing", "path" => path.to_s) unless path.file?
+  fail!("registry_symlink", "registry may not be a symlink") if path.symlink?
+  bytes = path.binread
+  fail!("registry_encoding", "registry must not use a UTF-8 BOM") if bytes.start_with?("\xEF\xBB\xBF".b)
+  fail!("registry_line_endings", "registry must use LF line endings") if bytes.include?("\r".b)
+  JSON.parse(bytes)
+rescue JSON::ParserError => error
+  fail!("malformed_registry", "registry is not valid JSON", "error" => error.message)
+end
+
+def validate_source!(root, registry_path, registry, source)
+  fail!("malformed_source", "source entry must be an object") unless source.is_a?(Hash)
+  unknown = source.keys - SOURCE_FIELDS
+  missing = SOURCE_REQUIRED_FIELDS.reject { |field| source.key?(field) }
+  fail!("source_unknown_field", "source contains unsupported fields", "fields" => unknown) unless unknown.empty?
+  fail!("provenance_missing", "source is missing required provenance", "fields" => missing) unless missing.empty?
+
+  source_id = source["source_id"]
+  fail!("invalid_source_id", "source_id is invalid", "source_id" => source_id) unless present_string?(source_id) && source_id.match?(SOURCE_ID_PATTERN)
+  fail!("invalid_source_role", "source role is invalid", "source_id" => source_id) unless present_string?(source["role"]) && source["role"].match?(TOKEN_PATTERN)
+  fail!("provenance_missing", "source owner is required", "source_id" => source_id) unless present_string?(source["owner"])
+  fail!("mixed_generation", "source generation differs from registry", "source_id" => source_id) unless source["generation"] == registry["generation"]
+  fail!("mutable_source", "mutable sources are prohibited", "source_id" => source_id) unless source["mutable"] == false
+  fail!("invalid_observed_at", "observed_at must be an explicit UTC RFC3339 value", "source_id" => source_id) unless present_string?(source["observed_at"]) && source["observed_at"].match?(RFC3339_PATTERN)
+
+  source_type = source["source_type"]
+  fail!("unsupported_source_type", "source_type is unsupported", "source_id" => source_id) unless SOURCE_TYPES.include?(source_type)
+  fail!("unsupported_schema", "source schema is unsupported", "source_id" => source_id, "schema_version" => source["schema_version"]) unless SUPPORTED_SCHEMAS.fetch(source_type).include?(source["schema_version"])
+  fail!("invalid_digest", "source digest is invalid", "source_id" => source_id) unless present_string?(source["digest"]) && source["digest"].match?(DIGEST_PATTERN)
+  fail!("invalid_authority_class", "authority_class is unsupported", "source_id" => source_id) unless AUTHORITY_CLASSES.include?(source["authority_class"])
+
+  field_families = source["owned_field_families"]
+  fail!("invalid_field_ownership", "owned_field_families must be a non-empty unique token array", "source_id" => source_id) unless field_families.is_a?(Array) && !field_families.empty? && field_families.uniq == field_families && field_families.all? { |entry| present_string?(entry) && entry.match?(TOKEN_PATTERN) }
+  validate_normalization!(source)
+  fail!("ambiguous_normalized_locator", "locator must resolve to its explicitly normalized locator", "source_id" => source_id) unless source["locator"] == source["normalized_locator"]
+
+  if source_type == "external_record_stub"
+    fail!("external_authority_promotion", "external stubs cannot be authoritative", "source_id" => source_id) unless source["authority_class"] == "external_reference"
+    fail!("external_version_missing", "external stubs require an immutable version", "source_id" => source_id) unless present_string?(source["version"])
+    uri = URI.parse(source["locator"])
+    fail!("external_locator_invalid", "external locator must be an absolute HTTPS URI", "source_id" => source_id) unless uri.is_a?(URI::HTTPS) && present_string?(uri.host) && uri.userinfo.nil? && uri.fragment.nil?
+    normalization = source["normalization"]
+    fail!("normalization_encoding", "external stubs must declare opaque encoding") unless normalization["encoding"] == "opaque"
+    fail!("normalization_line_endings", "external stubs must declare not_applicable line endings") unless normalization["line_endings"] == "not_applicable"
+    return
+  end
+
+  locator = source["normalized_locator"]
+  source_path = resolve_inside_root(root, locator)
+  real_source = ensure_exact_case!(root, source_path, locator)
+  real_registry = registry_path.realpath
+  if real_source == real_registry || File.basename(locator).match?(/(?:source-)?registry\.json\z/i)
+    fail!("recursive_registry", "registry cannot register itself or another source registry", "source_id" => source_id)
+  end
+  fail!("source_not_regular_file", "local source must be a regular file", "source_id" => source_id) unless real_source.file?
+  allowed_extensions = LOCAL_EXTENSIONS.fetch(source_type)
+  fail!("source_extension", "source extension does not match source_type", "source_id" => source_id) unless allowed_extensions.include?(real_source.extname.downcase)
+  bytes = real_source.binread
+  text = validate_utf8_lf!(bytes, locator)
+  validate_static_html!(text, locator) if source_type == "semantic_html"
+  computed = "sha256:#{Digest::SHA256.hexdigest(bytes)}"
+  fail!("stale_digest", "registered digest does not match exact source bytes", "source_id" => source_id, "expected" => source["digest"], "actual" => computed) unless computed == source["digest"]
+  normalization = source["normalization"]
+  fail!("normalization_encoding", "local sources must declare UTF-8 encoding") unless normalization["encoding"] == "UTF-8"
+  fail!("normalization_line_endings", "local sources must declare LF line endings") unless normalization["line_endings"] == "LF"
+end
+
+def validate_registry!(root, registry_path, registry, required_locators)
+  fail!("malformed_registry", "registry root must be an object") unless registry.is_a?(Hash)
+  unknown = registry.keys - TOP_LEVEL_FIELDS
+  missing = TOP_LEVEL_FIELDS - registry.keys
+  fail!("registry_unknown_field", "registry contains unsupported fields", "fields" => unknown) unless unknown.empty?
+  fail!("registry_missing_field", "registry is incomplete", "fields" => missing) unless missing.empty?
+  fail!("unsupported_registry_schema", "registry schema is unsupported") unless registry["schema_version"] == REGISTRY_SCHEMA
+  fail!("invalid_registry_id", "registry_id is invalid") unless present_string?(registry["registry_id"]) && registry["registry_id"].match?(/\A[A-Z][A-Z0-9._:-]{2,127}\z/)
+  fail!("invalid_generation", "registry generation is invalid") unless present_string?(registry["generation"]) && registry["generation"].match?(GENERATION_PATTERN)
+  fail!("registry_owner_missing", "registry owner is required") unless present_string?(registry["owner"])
+  sources = registry["sources"]
+  fail!("registry_empty", "registry requires at least one source") unless sources.is_a?(Array) && !sources.empty?
+
+  source_ids = sources.map { |source| source.is_a?(Hash) ? source["source_id"] : nil }
+  fail!("duplicate_source_id", "source_id values must be unique") unless source_ids.compact.uniq.length == source_ids.length
+  fail!("source_order", "sources must be ordered lexically by source_id") unless source_ids == source_ids.sort
+
+  sources.each { |source| validate_source!(root, registry_path, registry, source) }
+
+  locators = sources.map { |source| source["normalized_locator"] }
+  fail!("duplicate_locator", "normalized locators must be unique") unless locators.uniq == locators
+
+  legacy_locators = sources.flat_map { |source| source.dig("normalization", "legacy_locators") || [] }
+  fail!("ambiguous_legacy_locator", "legacy locators must be unique and cannot collide with current locators") unless legacy_locators.uniq == legacy_locators && (legacy_locators & locators).empty?
+
+  authoritative_owners = {}
+  sources.select { |source| source["authority_class"] == "authoritative" }.each do |source|
+    source["owned_field_families"].each do |family|
+      existing = authoritative_owners[family]
+      fail!("conflicting_field_ownership", "authoritative field family has multiple owners", "field_family" => family, "sources" => [existing, source["source_id"]]) if existing
+      authoritative_owners[family] = source["source_id"]
+    end
+  end
+
+  required_locators.each do |locator|
+    fail!("unregistered_required_locator", "required lifecycle locator is not registered", "locator" => locator) unless locators.include?(locator)
+  end
+
+  {
+    "schema_version" => "tw-lifecycle-registry-check/1",
+    "status" => "pass",
+    "registry_id" => registry["registry_id"],
+    "registry_digest" => digest_value(registry),
+    "generation" => registry["generation"],
+    "source_count" => sources.length,
+    "source_ids" => source_ids,
+    "authority_effect" => "none",
+    "implicit_external_fetches" => 0,
+    "findings" => []
+  }
+end
+
+def validate_record!(record)
+  fail!("malformed_lifecycle_record", "record root must be an object") unless record.is_a?(Hash)
+  allowed = %w[
+    schema_version record_id record_type title owner authority_class source
+    applicability baseline freshness acceptance_state acceptance relationships fields
+  ]
+  required = allowed - %w[acceptance]
+  unknown = record.keys - allowed
+  missing = required - record.keys
+  fail!("record_unknown_field", "record contains unsupported fields", "fields" => unknown) unless unknown.empty?
+  fail!("record_missing_field", "record is incomplete", "fields" => missing) unless missing.empty?
+  fail!("unsupported_record_schema", "record schema is unsupported") unless record["schema_version"] == RECORD_SCHEMA
+  fail!("invalid_record_id", "record_id is invalid") unless present_string?(record["record_id"]) && record["record_id"].match?(/\A[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+\z/)
+  fail!("unsupported_record_type", "record_type is unsupported") unless RECORD_TYPES.include?(record["record_type"])
+  fail!("record_owner_missing", "record owner is required") unless present_string?(record["owner"])
+  fail!("record_title_missing", "record title is required") unless present_string?(record["title"])
+  fail!("invalid_authority_class", "record authority_class is unsupported") unless AUTHORITY_CLASSES.include?(record["authority_class"])
+  fail!("invalid_applicability", "record applicability is unsupported") unless %w[applicable not_applicable unknown].include?(record["applicability"])
+  fail!("invalid_freshness", "record freshness is unsupported") unless %w[current stale held unknown].include?(record["freshness"])
+  fail!("invalid_acceptance_state", "record acceptance_state is unsupported") unless %w[proposed prepared observed_not_accepted accepted rejected held superseded].include?(record["acceptance_state"])
+  fail!("record_fields_invalid", "record fields must be an object") unless record["fields"].is_a?(Hash)
+
+  source = record["source"]
+  fail!("record_provenance_missing", "record source must be an object") unless source.is_a?(Hash)
+  source_required = %w[source_id locator version digest role provenance]
+  source_allowed = source_required + %w[receipt_id]
+  fail!("record_provenance_missing", "record source provenance is incomplete", "fields" => source_required - source.keys) unless (source_required - source.keys).empty?
+  fail!("record_source_unknown_field", "record source contains unsupported fields", "fields" => source.keys - source_allowed) unless (source.keys - source_allowed).empty?
+  fail!("record_provenance_missing", "record source fields must be non-empty") unless source_required.all? { |field| present_string?(source[field]) }
+  fail!("invalid_source_id", "record source_id is invalid") unless source["source_id"].match?(SOURCE_ID_PATTERN)
+  fail!("invalid_digest", "record source digest is invalid") unless source["digest"].match?(DIGEST_PATTERN)
+  if %w[imported_candidate external_reference evidence derived].include?(record["authority_class"])
+    fail!("source_receipt_missing", "non-authoritative observed records require an immutable source receipt") unless present_string?(source["receipt_id"]) && source["receipt_id"].match?(DIGEST_PATTERN)
+  end
+
+  baseline = record["baseline"]
+  fail!("record_baseline_invalid", "record baseline must be an object") unless baseline.is_a?(Hash)
+  baseline_required = %w[baseline_id generation digest]
+  fail!("record_baseline_invalid", "record baseline is incomplete", "fields" => baseline_required - baseline.keys) unless baseline.keys.sort == baseline_required.sort && baseline_required.all? { |field| present_string?(baseline[field]) }
+  fail!("record_baseline_invalid", "record baseline digest is invalid") unless baseline["digest"].match?(DIGEST_PATTERN)
+
+  relationships = record["relationships"]
+  fail!("record_relationships_invalid", "relationships must be an array") unless relationships.is_a?(Array)
+  identities = Set.new
+  relationships.each do |relationship|
+    required_relationship = %w[source_id target_id relationship_type applicable provenance]
+    fail!("record_relationship_invalid", "relationship must contain only the closed envelope") unless relationship.is_a?(Hash) && relationship.keys.sort == required_relationship.sort
+    fail!("relationship_source_mismatch", "relationship source_id must equal record_id") unless relationship["source_id"] == record["record_id"]
+    fail!("unsupported_relationship_type", "relationship_type is outside the closed vocabulary") unless RELATIONSHIP_TYPES.include?(relationship["relationship_type"])
+    fail!("relationship_target_invalid", "relationship target_id is invalid") unless present_string?(relationship["target_id"]) && relationship["target_id"].match?(/\A[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+\z/)
+    fail!("relationship_applicability_invalid", "relationship applicable must be boolean") unless [true, false].include?(relationship["applicable"])
+    fail!("record_provenance_missing", "relationship provenance is required") unless present_string?(relationship["provenance"])
+    identity = [relationship["target_id"], relationship["relationship_type"], relationship["applicable"]]
+    fail!("duplicate_relationship", "relationship identities must be unique", "identity" => identity) if identities.include?(identity)
+    identities << identity
+  end
+
+  if record["acceptance_state"] == "accepted"
+    fail!("false_authority_promotion", "only an authoritative record may enter accepted state") unless record["authority_class"] == "authoritative"
+    acceptance = record["acceptance"]
+    acceptance_required = %w[decision_id accepted_by accepted_at authority_source_id]
+    fail!("acceptance_decision_missing", "accepted record requires a complete named-human acceptance decision") unless acceptance.is_a?(Hash) && acceptance.keys.sort == acceptance_required.sort && acceptance_required.all? { |field| present_string?(acceptance[field]) }
+    fail!("invalid_acceptance_time", "accepted_at must be explicit UTC RFC3339") unless acceptance["accepted_at"].match?(RFC3339_PATTERN)
+    fail!("invalid_source_id", "acceptance authority_source_id is invalid") unless acceptance["authority_source_id"].match?(SOURCE_ID_PATTERN)
+  elsif record.key?("acceptance")
+    fail!("false_authority_promotion", "acceptance decision object is only valid for accepted state")
+  end
+
+  {
+    "schema_version" => "tw-lifecycle-record-check/1",
+    "status" => "pass",
+    "record_id" => record["record_id"],
+    "record_type" => record["record_type"],
+    "record_digest" => digest_value(record),
+    "authority_class" => record["authority_class"],
+    "acceptance_state" => record["acceptance_state"],
+    "authority_effect" => "none",
+    "findings" => []
+  }
+end
+
+command = ARGV.shift
+options = {root: Dir.pwd, registry: nil, record: nil, source_id: nil, required_locators: []}
+OptionParser.new do |parser|
+  parser.banner = "Usage: traceweaver-lifecycle-integrity <registry-check|source-receipt|record-check> --root PATH [options]"
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--registry PATH") { |value| options[:registry] = value }
+  parser.on("--record PATH") { |value| options[:record] = value }
+  parser.on("--source-id ID") { |value| options[:source_id] = value }
+  parser.on("--require-locator PATH") { |value| options[:required_locators] << value }
+end.parse!
+
+begin
+  fail!("invalid_command", "unsupported operation", "operation" => command) unless %w[registry-check source-receipt record-check].include?(command)
+  root = Pathname.new(options[:root]).expand_path
+  fail!("invalid_root", "--root must be a directory") unless root.directory?
+  root = root.realpath
+  unless ENV["TRACEWEAVER_CAPTURE_INTERNAL"] == "1"
+    lock_path = root.join(".traceweaver/state/lifecycle-capture.lock")
+    FileUtils.mkdir_p(lock_path.parent)
+    loop do
+      integrity_lock = File.open(lock_path.to_s, File::RDWR | File::CREAT, 0o600)
+      integrity_lock.flock(File::LOCK_SH)
+      pointer = root.join(".traceweaver/lifecycle-capture-transaction.json")
+      break unless pointer.exist?
+      integrity_lock.flock(File::LOCK_UN)
+      integrity_lock.close
+      stdout, stderr, status = Open3.capture3(CAPTURE.to_s, "recover", "--root", root.to_s)
+      fail!("capture_recovery_failed", "pending lifecycle capture transaction could not be recovered", "stdout" => stdout, "stderr" => stderr) unless status.success?
+    end
+  end
+
+  if command == "record-check"
+    fail!("missing_record", "record-check requires --record") unless present_string?(options[:record])
+    record_candidate = Pathname.new(options[:record])
+    record_path = record_candidate.absolute? ? record_candidate : root.join(record_candidate)
+    record_path = record_path.expand_path
+    fail!("record_symlink", "record may not be a symlink") if record_path.symlink?
+    record_path = record_path.realpath if record_path.exist?
+    relative_record = record_path.relative_path_from(root).to_s
+    fail!("path_escape", "record path escapes root") if relative_record == ".." || relative_record.start_with?("../")
+    fail!("missing_record", "record file is missing") unless record_path.file?
+    bytes = record_path.binread
+    fail!("record_encoding", "record must not use a UTF-8 BOM") if bytes.start_with?("\xEF\xBB\xBF".b)
+    fail!("record_line_endings", "record must use LF line endings") if bytes.include?("\r".b)
+    begin
+      record = JSON.parse(bytes)
+    rescue JSON::ParserError => error
+      fail!("malformed_lifecycle_record", "record is not valid JSON", "error" => error.message)
+    end
+    puts canonical_json(validate_record!(record))
+    exit 0
+  end
+
+  fail!("missing_registry", "--registry is required") unless present_string?(options[:registry])
+  registry_candidate = Pathname.new(options[:registry])
+  registry_path = registry_candidate.absolute? ? registry_candidate : root.join(registry_candidate)
+  registry_path = registry_path.expand_path
+  fail!("registry_symlink", "registry may not be a symlink") if registry_path.symlink?
+  registry_path = registry_path.realpath if registry_path.exist?
+  relative_registry = registry_path.relative_path_from(root).to_s
+  fail!("path_escape", "registry path escapes root") if relative_registry == ".." || relative_registry.start_with?("../")
+  registry = load_registry(registry_path)
+  check = validate_registry!(root, registry_path, registry, options[:required_locators])
+
+  if command == "registry-check"
+    puts canonical_json(check)
+    exit 0
+  end
+
+  fail!("missing_source_id", "source-receipt requires --source-id") unless present_string?(options[:source_id])
+  source = registry["sources"].find { |entry| entry["source_id"] == options[:source_id] }
+  fail!("unknown_source_id", "source_id is not registered", "source_id" => options[:source_id]) unless source
+  body = {
+    "schema_version" => RECEIPT_SCHEMA,
+    "registry_id" => registry["registry_id"],
+    "registry_digest" => check["registry_digest"],
+    "source_id" => source["source_id"],
+    "role" => source["role"],
+    "locator" => source["locator"],
+    "normalized_locator" => source["normalized_locator"],
+    "source_type" => source["source_type"],
+    "source_schema_version" => source["schema_version"],
+    "source_digest" => source["digest"],
+    "source_version" => source["version"] || source["generation"],
+    "owner" => source["owner"],
+    "authority_class" => source["authority_class"],
+    "owned_field_families" => source["owned_field_families"],
+    "generation" => source["generation"],
+    "observed_at" => source["observed_at"],
+    "normalization" => source["normalization"],
+    "extraction_method" => source["source_type"] == "external_record_stub" ? "external_immutable_reference_no_fetch" : "exact_bytes_sha256",
+    "authority_effect" => "none",
+    "acceptance_state" => "observed_not_accepted"
+  }
+  receipt = body.merge("receipt_id" => digest_value(body))
+  puts canonical_json(receipt)
+rescue LifecycleError => error
+  puts canonical_json(
+    "schema_version" => "tw-lifecycle-integrity-finding/1",
+    "status" => "blocked",
+    "finding" => error.finding,
+    "reason" => error.message,
+    "details" => error.details,
+    "authority_effect" => "none"
+  )
+  exit 1
+rescue OptionParser::ParseError => error
+  puts canonical_json(
+    "schema_version" => "tw-lifecycle-integrity-finding/1",
+    "status" => "blocked",
+    "finding" => "usage_error",
+    "reason" => error.message,
+    "details" => {},
+    "authority_effect" => "none"
+  )
+  exit 2
+rescue StandardError => error
+  puts canonical_json(
+    "schema_version" => "tw-lifecycle-integrity-finding/1",
+    "status" => "blocked",
+    "finding" => "unexpected_integrity_error",
+    "reason" => error.message,
+    "details" => {"class" => error.class.name},
+    "authority_effect" => "none"
+  )
+  exit 1
+end

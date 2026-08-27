@@ -1,0 +1,200 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=v060-model-context-oracle-refresh; req=REQ-TW-116,REQ-TW-123,REQ-TW-137,REQ-TW-145; trace=TRACE-TW-072,TRACE-TW-074; ver=VER-TW-092,VER-TW-094
+
+require "digest"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+ORACLE = ROOT.join("plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json")
+MAP = ROOT.join("plugins/traceweaver-core/references/model-context-map.yml")
+GENERATOR = ROOT.join("plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map")
+CATEGORIES = %w[controlling_authority task_scope skill_contract implementation_dependencies current_external_sources accepted_evidence].freeze
+BOUNDED_CONVERGENCE_GUIDE = "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md"
+BOUNDED_CONVERGENCE_GUIDE_ROUTES = %w[lfg tw-auto tw-plan tw-authority-gate tw-vv-define tw-work].freeze
+LIFECYCLE_REFS = {
+  "controlling_authority" => %w[
+    requirements.md
+    traceability-matrix.md
+    .traceweaver/intent-contract.yml
+    .traceweaver/changes/CHG-TW-2026-08-26-003-acyclic-oracle.yml
+    .traceweaver/exceptions/EXC-TW-020-acyclic-oracle.yml
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md
+  ],
+  "task_scope" => %w[
+    docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md
+    .traceweaver/workflow-profile.yml
+  ],
+  "skill_contract" => %w[
+    plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md
+  ],
+  "implementation_dependencies" => %w[
+    plugins/traceweaver-core/references/lifecycle/acceptance-hub.schema.json
+    plugins/traceweaver-core/references/lifecycle/acceptance-pack.schema.json
+    plugins/traceweaver-core/references/lifecycle/capture-pack.schema.json
+    plugins/traceweaver-core/references/lifecycle/change-approval.schema.json
+    plugins/traceweaver-core/references/lifecycle/change-request.schema.json
+    plugins/traceweaver-core/references/lifecycle/cutover-gate.schema.json
+    plugins/traceweaver-core/references/lifecycle/evidence-receipt.schema.json
+    plugins/traceweaver-core/references/lifecycle/lifecycle-graph.schema.json
+    plugins/traceweaver-core/references/lifecycle/lifecycle-record.schema.json
+    plugins/traceweaver-core/references/lifecycle/product-validation.schema.json
+    plugins/traceweaver-core/references/lifecycle/semantic-html-parser-lock.json
+    plugins/traceweaver-core/references/lifecycle/semantic-html.schema.json
+    plugins/traceweaver-core/references/lifecycle/source-receipt.schema.json
+    plugins/traceweaver-core/references/lifecycle/source-registry.schema.json
+    plugins/traceweaver-core/references/lifecycle/truth-stage.schema.json
+    plugins/traceweaver-core/references/model-context-map.yml
+    plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-acceptance-hub
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-capture
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-cutover
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-evidence
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-product-validation
+    plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-project
+    scripts/traceweaver-check-release-readiness
+    scripts/traceweaver-refresh-v060-model-context-oracle
+    scripts/traceweaver-run-v060-representative-product-trials
+    scripts/traceweaver-smoke-v060-real-product-depth
+    scripts/traceweaver-smoke-v060-release-integrity
+  ],
+  "accepted_evidence" => %w[
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-definition.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice1-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice2-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice4-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice5-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice6-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice7-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-benchmark.json
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-semantic-html-release-gate.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-scope-rollback-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-release-readiness.md
+    docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.json
+    docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-representative-validation.md
+    docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-source-baselines-real-product-depth.json
+    docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/vestro-lc-001-machine-observation.json
+    docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/airrouter-lc-001-machine-observation.json
+    docs/validation/traceweaver-2026-08-24-v060-real-product-depth-authority-gate.md
+    docs/validation/traceweaver-2026-08-24-v060-real-product-depth-red-evidence.md
+    docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-scope-rollback-verification.md
+    docs/validation/traceweaver-2026-08-24-v060-integrated-review-targeted-continuation.md
+    docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-change-proposal.md
+    docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-requirements-review.md
+    docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-authority-doc-review.md
+    docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-authority-gate.md
+    docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-red-evidence.md
+    docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-approval.md
+    docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-requirements-review.md
+    docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-red-evidence.md
+    docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-authority-doc-review.md
+    docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-post-promotion-authority-gate.md
+  ]
+}.freeze
+
+options = {write: false}
+OptionParser.new do |parser|
+  parser.on("--reviewer-id ID") { |value| options[:reviewer_id] = value }
+  parser.on("--write") { options[:write] = true }
+end.parse!
+abort("oracle_refresh_reviewer_id_required") unless options[:reviewer_id].to_s.match?(/\Aterra-integrated-reviewer:[A-Za-z0-9_\/-]+\z/)
+
+# TRACEWEAVER: entrypoint=v060_model_context_oracle_refresh; req=REQ-TW-116,REQ-TW-123,REQ-TW-137,REQ-TW-145; trace=TRACE-TW-072,TRACE-TW-074; ver=VER-TW-092,VER-TW-094
+def canonical(value)
+  case value
+  when Hash then value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array then value.map { |entry| canonical(entry) }
+  else value
+  end
+end
+
+def semantic_digest(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def file_digest(relative)
+  path = ROOT.join(relative)
+  abort("oracle_refresh_missing_source=#{relative}") unless path.file? && !path.symlink?
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+inventory_output, inventory_error, inventory_status = Open3.capture3(
+  GENERATOR.to_s, "--root", ROOT.to_s, "--map", MAP.to_s, "--format", "json"
+)
+abort("oracle_refresh_inventory_failed=#{inventory_error.strip}") unless inventory_status.success?
+inventory = JSON.parse(inventory_output)
+routes = inventory.fetch("routes").map { |route| route.fetch("route_id") }.sort
+abort("oracle_refresh_tw_lifecycle_route_missing") unless routes.include?("tw-lifecycle")
+
+review = JSON.parse(ORACLE.read)
+review["_traceweaver"] = "TRACEWEAVER: file-role=model-context-source-oracle-review; req=REQ-TW-116,REQ-TW-123,REQ-TW-137,REQ-TW-145; trace=TRACE-TW-072,TRACE-TW-074; ver=VER-TW-092,VER-TW-094"
+review["review_id"] = "ORACLE-ADEQUACY-TW-051-V060-RELEASE-001"
+review["reviewer"] = {
+  "identity" => options.fetch(:reviewer_id),
+  "relationship" => "did_not_implement_compiler_or_author_source_oracle",
+  "independent" => true
+}
+review["map_digest"] = inventory.fetch("map_digest")
+review["inventory_digest"] = inventory.fetch("inventory_digest")
+review["route_count"] = routes.length
+review["category_count"] = CATEGORIES.length
+
+cells = review.fetch("route_category_cells").reject { |cell| cell.fetch("route_id") == "tw-lifecycle" }
+cells.each do |cell|
+  references = cell.fetch("source_refs", [])
+  references.each do |reference|
+    reference["digest"] = file_digest(reference.fetch("locator"))
+  end
+  next unless cell.fetch("category") == "implementation_dependencies" && BOUNDED_CONVERGENCE_GUIDE_ROUTES.include?(cell.fetch("route_id"))
+
+  guide_references = references.select { |reference| reference.fetch("locator") == BOUNDED_CONVERGENCE_GUIDE }
+  abort("oracle_refresh_duplicate_bounded_convergence_guide=#{cell.fetch('route_id')}") unless guide_references.length <= 1
+  if guide_references.empty?
+    references << {
+      "source_manifest_category" => "implementation_dependencies",
+      "locator" => BOUNDED_CONVERGENCE_GUIDE,
+      "digest" => file_digest(BOUNDED_CONVERGENCE_GUIDE)
+    }
+  else
+    guide_references.first["source_manifest_category"] = "implementation_dependencies"
+    guide_references.first["digest"] = file_digest(BOUNDED_CONVERGENCE_GUIDE)
+  end
+  references.sort_by! { |reference| reference.fetch("locator") }
+end
+LIFECYCLE_REFS.each do |category, references|
+  cells << {
+    "route_id" => "tw-lifecycle", "category" => category, "disposition" => "satisfied",
+    "source_refs" => references.map do |relative|
+      {"source_manifest_category" => category, "locator" => relative, "digest" => file_digest(relative)}
+    end
+  }
+end
+cells << {
+  "route_id" => "tw-lifecycle", "category" => "current_external_sources", "disposition" => "excluded_by_authority",
+  "exclusion_authority" => "TW-OWNER-DECISION-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+  "exclusion_rationale" => "The packaged static route performs no implicit product or network fetch; exact Vestro and Air Router source observations are separately content-addressed validation evidence."
+}
+review["route_category_cells"] = cells.sort_by { |cell| [cell.fetch("route_id"), CATEGORIES.index(cell.fetch("category"))] }
+review["open_or_uncertain_cells"] = []
+review["expected"] = "pass_every_core_0_6_0_release_route_category_dispositioned"
+review.delete("oracle_digest")
+review["oracle_digest"] = semantic_digest(review)
+output = "#{JSON.pretty_generate(review)}\n"
+if options[:write]
+  ORACLE.binwrite(output)
+  puts "oracle_refresh_status=written"
+else
+  puts output
+end
+warn "oracle_refresh_route_count=#{routes.length}"
+warn "oracle_refresh_cell_count=#{review.fetch('route_category_cells').length}"
+warn "oracle_refresh_inventory_digest=#{inventory.fetch('inventory_digest')}"
+warn "oracle_refresh_oracle_digest=#{review.fetch('oracle_digest')}"

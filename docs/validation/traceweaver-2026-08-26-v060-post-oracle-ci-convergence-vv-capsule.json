@@ -1,0 +1,118 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "workflow_profile": "L3",
+  "workflow_profile_revision": 5,
+  "workflow_profile_hash": "sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7",
+  "work_item_id": "CHG-TW-2026-08-26-004",
+  "plan_ref": "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md",
+  "plan_hash_sha256": "ee0f636a146901f9f123fd8de20d57fa2198b48333e9d1b5f4c5e6cfea7ac798",
+  "baseline_ref": "REQ-BASELINE-2026-04-30-001@8349b9c1d883c79a345eb7e10e86ab6e9f965805e34d894a28be44cde3a69a79",
+  "change_id": "CHG-TW-2026-08-26-004",
+  "exception_id": "EXC-TW-021",
+  "definition_state": "document_review_passed_require_review_passed_preflight_passed_authority_proceed_exact_eleven_file_behavior_only",
+  "definition_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-definition.md",
+  "definition_hash_sha256": "beac582cf9a5915539ac4da467c830d208104d9d095b5bf03d97f5872cc03e42",
+  "focused_verification": "scripts/traceweaver-smoke-model-context-routing",
+  "expected_focused_result": "model_context_routing_smoke=pass cases=72",
+  "focused_attempt_cap": 1,
+  "historical_product_functional_scope_digest": "sha256:22d5d66acfa3b0c5abbe27ef7d478106768ee386f45c9332a1d25f72627d8719",
+  "product_rebinding_after_functional_change": "required_non_compensable_vestro_and_air_router_owner_disposition",
+  "reviewer_continuation": "one_verification_only_continuation_by_existing_integrated_terra_reviewer_after_fresh_product_acceptance_limited_to_eleven_file_delta",
+  "publication_authority": "none",
+  "high_risk_controls": {
+    "rollback": "Restore exactly the eleven pre-change SHA-256 values recorded in RED-TW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001; never rewrite released Core 0.5.0 or modify the mixed root worktree.",
+    "owner_decision": "TW-OWNER-APPROVAL-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001 authorizes only CHG-TW-2026-08-26-004 / EXC-TW-021, one focused attempt, fresh exact-product rebinding, and one same-reviewer verification continuation; publication is not authorized."
+  },
+  "requirements": [
+    {
+      "req_id": "REQ-TW-110",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-doc-review.md"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-123",
+      "trace_id": "TRACE-TW-072",
+      "ver_id": "VER-TW-092",
+      "val_id": "VAL-TW-040",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-22-v050-model-governance-validation-definition.md",
+      "matrix_row_ref": "TRACE-TW-072",
+      "reviews": [
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-doc-review.md"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-130",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-doc-review.md"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-143",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-doc-review.md"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-145",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-model-context-routing",
+      "red_evidence": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001",
+          "status": "passed",
+          "evidence_path": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-doc-review.md"
+        }
+      ]
+    }
+  ]
+}

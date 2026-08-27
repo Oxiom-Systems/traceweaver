@@ -1,0 +1,60 @@
+schema_version: tw-metric-routing-golden-statistics/1
+oracle_status: frozen_independent_prebuilder_inputs
+method_suite: tw-metric-exact-paired/1
+sign_design:
+  alpha: 1/20
+  null_favorable_probability: 1/2
+  alternative_favorable_probability: 4/5
+  power_target: 4/5
+  fixed_minimum_valid_positive_pairs: 10
+  powered_minimum:
+    n: 18
+    cutoff: 13
+    power: 3307661688832/3814697265625
+order_statistic:
+  confidence: 19/20
+  n: 10
+  rank: 2
+  lower_index: 2
+  upper_index: 9
+quadratic_weighted_kappa:
+  category_range: 0..4
+  rater_ids: [rater-a, rater-b, rater-c]
+  raw_ratings:
+    - { scenario: S01, ratings: { rater-a: 0, rater-b: 0, rater-c: 0 } }
+    - { scenario: S02, ratings: { rater-a: 0, rater-b: 0, rater-c: 0 } }
+    - { scenario: S03, ratings: { rater-a: 0, rater-b: 0, rater-c: 0 } }
+    - { scenario: S04, ratings: { rater-a: 0, rater-b: 0, rater-c: 0 } }
+    - { scenario: S05, ratings: { rater-a: 0, rater-b: 0, rater-c: 0 } }
+    - { scenario: S06, ratings: { rater-a: 0, rater-b: 0, rater-c: 0 } }
+    - { scenario: S07, ratings: { rater-a: 0, rater-b: 0, rater-c: 0 } }
+    - { scenario: S08, ratings: { rater-a: 0, rater-b: 0, rater-c: 0 } }
+    - { scenario: S09, ratings: { rater-a: 0, rater-b: 0, rater-c: 0 } }
+    - { scenario: S10, ratings: { rater-a: 0, rater-b: 4, rater-c: 0 } }
+    - { scenario: S11, ratings: { rater-a: 4, rater-b: 0, rater-c: 4 } }
+    - { scenario: S12, ratings: { rater-a: 4, rater-b: 4, rater-c: 4 } }
+    - { scenario: S13, ratings: { rater-a: 4, rater-b: 4, rater-c: 4 } }
+    - { scenario: S14, ratings: { rater-a: 4, rater-b: 4, rater-c: 4 } }
+    - { scenario: S15, ratings: { rater-a: 4, rater-b: 4, rater-c: 4 } }
+    - { scenario: S16, ratings: { rater-a: 4, rater-b: 4, rater-c: 4 } }
+    - { scenario: S17, ratings: { rater-a: 4, rater-b: 4, rater-c: 4 } }
+    - { scenario: S18, ratings: { rater-a: 4, rater-b: 4, rater-c: 4 } }
+    - { scenario: S19, ratings: { rater-a: 4, rater-b: 4, rater-c: 4 } }
+    - { scenario: S20, ratings: { rater-a: 4, rater-b: 4, rater-c: 4 } }
+  expected_pairwise_kappa:
+    rater-a__rater-b: 4/5
+    rater-a__rater-c: 1/1
+    rater-b__rater-c: 4/5
+  expected_minimum_pairwise_kappa: 4/5
+inclusive_threshold_boundaries:
+  quality_difference_lower_bound: { below: -13/50, equal: -1/4, above: -6/25 }
+  token_reduction_lower_bound: { below: 19/100, equal: 1/5, above: 21/100 }
+  latency_ratio_upper_bound: { below: 119/100, equal: 6/5, above: 121/100 }
+other_exact_thresholds:
+  valid_positive_pairs_minimum: 10
+  replacement_cap_pairs: 1
+  replacement_cap_fraction: 1/10
+  absolute_score_floor: 3
+  blinded_independent_raters_minimum: 2
+  hard_invariants_required_fraction: 1/1
+  threshold_comparisons: inclusive

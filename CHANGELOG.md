@@ -1,7 +1,46 @@
 <!-- TRACEWEAVER: file-role=plugin-release-changelog; req=REQ-TW-020; trace=TRACE-TW-010; ver=VER-TW-012 -->
 <!-- TRACEWEAVER: file-role=v050-model-governance-release-changelog; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092; val=VAL-TW-040 -->
+<!-- TRACEWEAVER: file-role=v060-product-lifecycle-release-changelog; req=REQ-TW-130,REQ-TW-135,REQ-TW-138,REQ-TW-145; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042 -->
 
 # Changelog
+
+## 0.6.0 - 2026-08-24
+
+Lightweight federated product-lifecycle assurance with existing product systems
+retained as the owners of their records.
+
+### Added
+
+- Versioned lifecycle source, record, evidence, graph, strict HTML, capture,
+  change, acceptance-hub, and representative-product validation contracts.
+- Exact-source candidate capture with visible duplicate/conflict/consequence
+  review, V&V at requirement capture, named-human disposition, and separate
+  exact-preimage transactional change approval.
+- Deterministic staleness and impact propagation, exact-ID-first lifecycle
+  navigation, and a fixed 2,000-record performance benchmark.
+- A static offline acceptance hub and content-addressed named-baseline pack
+  that retain separate truth stages and never promote generated content to
+  authority.
+- `tw-release-readiness/3`, binding the frozen functional candidate to
+  representative product validation, integrated review, rollback, reinstall,
+  fresh graph, manifests, and exact-main publication controls.
+
+### Changed
+
+- Bumped the Claude marketplace plus Claude, Codex, Cursor, and Antigravity
+  plugin manifests to `0.6.0`.
+- Added `tw-lifecycle` to the packaged callable and advisory model-context
+  inventories without changing v1 dispatch authority.
+- Kept Markdown/YAML controlling while shipping strict semantic HTML only as a
+  derived, script-free, printable, offline navigation surface.
+
+### Held
+
+Semantic-HTML authority cutover, mixed/dual authority, active descendant
+enforcement, independently attested served-model claims, autonomous deployment,
+and ERP/PLM/ALM replacement claims remain outside Core 0.6.0. The tag and
+GitHub Release remain held until the exact merged `main` SHA passes smoke and
+CodeQL in the serialized release workflow.
 
 ## 0.5.0 - 2026-08-22
 

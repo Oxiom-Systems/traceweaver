@@ -1,0 +1,51 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-product-lifecycle-red-green-harness; req=REQ-TW-130,REQ-TW-131,REQ-TW-132,REQ-TW-133,REQ-TW-134,REQ-TW-135,REQ-TW-136,REQ-TW-137,REQ-TW-138,REQ-TW-139,REQ-TW-140,REQ-TW-141,REQ-TW-142,REQ-TW-143,REQ-TW-144,REQ-TW-145; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-130,REQ-TW-131,REQ-TW-132,REQ-TW-133,REQ-TW-134,REQ-TW-135,REQ-TW-136,REQ-TW-137,REQ-TW-138,REQ-TW-139,REQ-TW-140,REQ-TW-141,REQ-TW-142,REQ-TW-143,REQ-TW-144,REQ-TW-145; trace=TRACE-TW-074; val=VAL-TW-042
+
+require "pathname"
+
+root = Pathname.new(__dir__).parent.realpath
+
+required_deliverables = {
+  "REQ-TW-130" => "plugins/traceweaver-core/references/lifecycle/source-registry.schema.json",
+  "REQ-TW-131" => "plugins/traceweaver-core/references/lifecycle/semantic-html.schema.json",
+  "REQ-TW-132" => "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity",
+  "REQ-TW-133" => "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-project",
+  "REQ-TW-134" => "scripts/traceweaver-smoke-v060-lifecycle-cutover",
+  "REQ-TW-135" => "plugins/traceweaver-core/references/lifecycle/evidence-receipt.schema.json",
+  "REQ-TW-136" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result.md",
+  "REQ-TW-137" => "plugins/traceweaver-core/references/lifecycle/lifecycle-record.schema.json",
+  "REQ-TW-138" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-semantic-html-release-gate.md",
+  "REQ-TW-139" => "scripts/traceweaver-benchmark-v060-product-lifecycle",
+  "REQ-TW-140" => "scripts/traceweaver-smoke-v060-lifecycle-staleness",
+  "REQ-TW-141" => "plugins/traceweaver-core/references/lifecycle/truth-stage.schema.json",
+  "REQ-TW-142" => "scripts/traceweaver-smoke-v060-lifecycle-closure",
+  "REQ-TW-143" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-scope-rollback-verification.md",
+  "REQ-TW-144" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-representative-validation.md",
+  "REQ-TW-145" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-release-readiness.md"
+}.freeze
+
+missing = required_deliverables.each_with_object([]) do |(requirement_id, relative_path), findings|
+  path = root.join(relative_path)
+  next if path.file? && path.size.positive?
+
+  findings << [requirement_id, relative_path]
+end
+
+if missing.empty?
+  puts "v060_product_lifecycle_status=seed_green"
+  puts "v060_product_lifecycle_requirements=#{required_deliverables.length}"
+  puts "v060_product_lifecycle_note=functional_slice_suites_and_final_ATP_TW_051_still_required"
+  exit 0
+end
+
+puts "v060_product_lifecycle_status=red"
+puts "v060_product_lifecycle_requirements=#{required_deliverables.length}"
+puts "v060_product_lifecycle_missing=#{missing.length}"
+missing.each do |requirement_id, relative_path|
+  puts "v060_product_lifecycle_finding=missing_deliverable req=#{requirement_id} path=#{relative_path}"
+end
+puts "v060_product_lifecycle_expected=each_slice_adds_functional_proof_before_seed_green_can_contribute_to_ATP_TW_051"
+exit 1

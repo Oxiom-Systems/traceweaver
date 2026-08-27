@@ -1,0 +1,434 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-semantic-html-projector; req=REQ-TW-131,REQ-TW-132,REQ-TW-133,REQ-TW-138; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: entrypoint=lifecycle_strict_html_build_and_check; req=REQ-TW-131,REQ-TW-132,REQ-TW-133,REQ-TW-138; trace=TRACE-TW-074; ver=VER-TW-094
+
+require "cgi"
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+require "set"
+
+begin
+  require "nokogiri"
+rescue LoadError
+  NOKOGIRI_LOAD_ERROR = true
+end
+
+HTML_SCHEMA = "tw-lifecycle-html/1"
+PARSER_LOCK_SCHEMA = "tw-semantic-html-parser-lock/1"
+PINNED_NOKOGIRI = "1.13.8"
+PINNED_GUMBO = "1.0.0-nokogiri"
+SPAN_ADAPTER = "traceweaver-generated-html-source-span/1"
+GRAPH = Pathname.new(__dir__).join("traceweaver-lifecycle-graph").realpath
+DEFAULT_LOCK = Pathname.new(__dir__).join("../../../references/lifecycle/semantic-html-parser-lock.json").realpath
+ALLOWED_ELEMENTS = Set.new(%w[html head meta title style body header nav main section article footer h1 h2 h3 p a code strong span dl dt dd ul li pre]).freeze
+ALLOWED_ATTRIBUTES = Set.new(%w[lang charset name content id class href aria-label aria-labelledby]).freeze
+PROHIBITED_ELEMENTS = Set.new(%w[base script iframe frame frameset object embed form link img audio video source track svg math template canvas]).freeze
+FETCH_OR_ACTIVE = /(?:@import|\burl\s*\(|\bimage-set\s*\(|javascript:|data:|https?:|\/\/)/i
+HIDDEN_CSS = /(?:display\s*:\s*none|visibility\s*:\s*hidden|opacity\s*:\s*0(?:\D|$)|clip-path\s*:|content-visibility\s*:\s*hidden)/i
+
+class ProjectError < StandardError
+  attr_reader :finding, :details
+
+  def initialize(finding, message, details = {})
+    super(message)
+    @finding = finding
+    @details = details
+  end
+end
+
+def fail!(finding, message, details = {})
+  raise ProjectError.new(finding, message, details)
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_bytes(value)
+  "sha256:#{Digest::SHA256.hexdigest(value)}"
+end
+
+def digest_value(value)
+  digest_bytes(JSON.generate(canonical(value)))
+end
+
+def present_string?(value)
+  value.is_a?(String) && !value.strip.empty?
+end
+
+def escape(value)
+  CGI.escapeHTML(value.to_s)
+end
+
+def load_json(path, missing, malformed)
+  fail!(missing, "file is missing", "path" => path.to_s) unless path.file?
+  fail!("unsafe_path", "symlink input is prohibited", "path" => path.to_s) if path.symlink?
+  bytes = path.binread
+  fail!("unsupported_encoding", "UTF-8 BOM is prohibited", "path" => path.to_s) if bytes.start_with?("\xEF\xBB\xBF".b)
+  fail!("unsupported_line_endings", "LF line endings are required", "path" => path.to_s) if bytes.include?("\r".b)
+  JSON.parse(bytes)
+rescue JSON::ParserError => error
+  fail!(malformed, "file is not valid JSON", "path" => path.to_s, "error" => error.message)
+end
+
+def resolve_inside(root, value, finding, must_exist: false, directory: false)
+  candidate = Pathname.new(value)
+  candidate = root.join(candidate) unless candidate.absolute?
+  candidate = candidate.expand_path
+  fail!("unsafe_path", "symlink path is prohibited", "path" => candidate.to_s) if candidate.symlink?
+  resolved = if candidate.exist?
+    candidate.realpath
+  elsif candidate.parent.directory?
+    candidate.parent.realpath.join(candidate.basename)
+  else
+    candidate
+  end
+  relative = resolved.relative_path_from(root).to_s
+  fail!(finding, "path escapes root", "path" => value) if relative == ".." || relative.start_with?("../")
+  fail!(finding, "required path is missing", "path" => value) if must_exist && !resolved.exist?
+  fail!(finding, "required directory is missing", "path" => value) if directory && !resolved.directory?
+  resolved
+rescue ArgumentError
+  fail!(finding, "path escapes root", "path" => value)
+end
+
+def validate_parser_lock!(path)
+  fail!("parser_dependency_missing", "pinned Nokogiri HTML5 parser is unavailable", "install" => "gem install nokogiri -v #{PINNED_NOKOGIRI}") if defined?(NOKOGIRI_LOAD_ERROR)
+  lock = load_json(path, "missing_parser_lock", "malformed_parser_lock")
+  expected = {
+    "schema_version" => PARSER_LOCK_SCHEMA,
+    "parser_library" => "nokogiri",
+    "parser_version" => PINNED_NOKOGIRI,
+    "parser_api" => "Nokogiri::HTML5",
+    "engine" => "libgumbo",
+    "engine_version" => PINNED_GUMBO,
+    "adapter" => SPAN_ADAPTER
+  }
+  actual = {
+    "schema_version" => lock["schema_version"],
+    "parser_library" => lock.dig("parser", "library"),
+    "parser_version" => lock.dig("parser", "version"),
+    "parser_api" => lock.dig("parser", "api"),
+    "engine" => lock.dig("parser", "html5_engine"),
+    "engine_version" => lock.dig("parser", "html5_engine_version"),
+    "adapter" => lock.dig("source_location_adapter", "id")
+  }
+  fail!("parser_pin_mismatch", "parser lock differs from the frozen adapter", "expected" => expected, "actual" => actual) unless actual == expected
+  runtime_gumbo = Nokogiri::VERSION_INFO.dig("other_libraries", "libgumbo")
+  runtime = {"nokogiri" => Nokogiri::VERSION, "libgumbo" => runtime_gumbo}
+  fail!("parser_runtime_mismatch", "runtime parser does not match the frozen lock", "expected" => {"nokogiri" => PINNED_NOKOGIRI, "libgumbo" => PINNED_GUMBO}, "actual" => runtime) unless runtime == {"nokogiri" => PINNED_NOKOGIRI, "libgumbo" => PINNED_GUMBO}
+  [lock, digest_bytes(path.binread)]
+end
+
+def check_graph!(root, registry_path, records_dir, graph_path)
+  stdout, stderr, status = Open3.capture3(
+    GRAPH.to_s, "check", "--root", root.to_s, "--registry", registry_path.to_s,
+    "--records", records_dir.to_s, "--graph", graph_path.to_s
+  )
+  parsed = JSON.parse(stdout)
+  return parsed if status.success? && parsed["status"] == "pass"
+  fail!(parsed["finding"] || "graph_check_failed", parsed["reason"] || stderr, parsed["details"] || {})
+rescue JSON::ParserError => error
+  fail!("graph_check_output_invalid", "graph check output is malformed", "error" => error.message, "stderr" => stderr)
+end
+
+def render_value(value)
+  case value
+  when Hash, Array
+    "<pre>#{escape(JSON.pretty_generate(canonical(value)))}</pre>"
+  else
+    escape(value)
+  end
+end
+
+def style
+  <<~CSS
+    :root { color-scheme: light; --ink:#17252d; --muted:#51646e; --line:#d7dfdf; --paper:#fbfaf6; --surface:#fff; --accent:#0d7480; --held:#8a3b35; }
+    * { box-sizing: border-box; }
+    body { margin:0; color:var(--ink); background:var(--paper); font:16px/1.55 system-ui,-apple-system,"Segoe UI",sans-serif; }
+    header, nav, main, footer { width:min(1120px,calc(100% - 32px)); margin-inline:auto; }
+    header { padding:28px 0 16px; } nav { display:flex; flex-wrap:wrap; gap:14px; padding:12px 0; border-block:1px solid var(--line); }
+    main { padding:24px 0 48px; } section { margin:0 0 32px; } article { padding:18px; margin:0 0 18px; border:1px solid var(--line); background:var(--surface); }
+    h1,h2,h3 { line-height:1.2; } h2 { margin-top:0; } a { color:var(--accent); text-underline-offset:3px; }
+    code,pre { font-family:ui-monospace,SFMono-Regular,Consolas,monospace; } pre { white-space:pre-wrap; overflow-wrap:anywhere; }
+    dl { display:grid; grid-template-columns:minmax(150px,220px) minmax(0,1fr); } dt,dd { padding:7px 0; border-top:1px solid var(--line); } dt { font-weight:700; } dd { margin:0; }
+    .boundary { padding:12px; border:2px solid var(--held); } .stable-id { font-weight:800; } .state { font-weight:700; } footer { padding:16px 0 32px; color:var(--muted); }
+    @media (max-width:700px) { dl { grid-template-columns:1fr; } dd { border-top:0; padding-top:0; } }
+    @media print { body { background:#fff; font-size:11pt; } nav { position:static; } article { break-inside:avoid; box-shadow:none; } a { color:#000; } }
+  CSS
+end
+
+def document_head(title)
+  <<~HTML
+    <!doctype html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>#{escape(title)}</title>
+      <style>#{style}</style>
+    </head>
+  HTML
+end
+
+def index_page(graph)
+  sources = graph.fetch("source_closure").map do |source|
+    "<li><code>#{escape(source["source_id"])}</code> — #{escape(source["locator"])} — <code>#{escape(source["digest"])}</code> — #{escape(source["authority_class"])}</li>"
+  end.join("\n")
+  <<~HTML
+    #{document_head("TraceWeaver lifecycle assurance — derived index")}<body>
+    <header><p><a href="#main">Skip to content</a></p><h1>Lifecycle assurance index</h1><p class="boundary"><strong>DERIVED, STATIC, NON-AUTHORITATIVE.</strong> Registered Markdown/YAML and immutable external receipts remain controlling. This view cannot approve, validate, accept, or publish.</p></header>
+    <nav aria-label="Lifecycle pages"><a href="index.html">Index</a><a href="lifecycle.html">Lifecycle records</a></nav>
+    <main id="main"><section aria-labelledby="baseline-title"><h2 id="baseline-title">Exact baseline</h2><dl><dt>Graph identity</dt><dd><code>#{escape(graph["graph_id"])}</code></dd><dt>Registry identity</dt><dd><code>#{escape(graph.dig("provenance", "registry_id"))}</code></dd><dt>Registry digest</dt><dd><code>#{escape(graph.dig("provenance", "registry_digest"))}</code></dd><dt>Baseline</dt><dd><code>#{escape(graph.dig("baseline", "baseline_id"))}</code> / <code>#{escape(graph.dig("baseline", "digest"))}</code></dd><dt>Authority role</dt><dd>derived_non_authoritative</dd></dl></section><section aria-labelledby="source-title"><h2 id="source-title">Registered source closure</h2><ul>#{sources}</ul></section><section aria-labelledby="navigation-title"><h2 id="navigation-title">Navigation</h2><p><a href="lifecycle.html">Open all lifecycle records and typed relationships</a>.</p></section></main>
+    <footer>Offline and printable. No script, remote resource, form, embedding, or hidden authority content.</footer></body></html>
+  HTML
+end
+
+def record_article(record, edges)
+  node_id = record.fetch("record_id")
+  fields = [
+    ["Record type", record["record_type"]], ["Owner", record["owner"]],
+    ["Authority class", record["authority_class"]], ["Applicability", record["applicability"]],
+    ["Freshness", record["freshness"]], ["Acceptance state", record["acceptance_state"]],
+    ["Source ID", record.dig("source", "source_id")], ["Source locator", record.dig("source", "locator")],
+    ["Source version", record.dig("source", "version")], ["Source digest", record.dig("source", "digest")],
+    ["Source provenance", record.dig("source", "provenance")], ["Baseline ID", record.dig("baseline", "baseline_id")],
+    ["Baseline generation", record.dig("baseline", "generation")], ["Baseline digest", record.dig("baseline", "digest")]
+  ]
+  fields << ["Source receipt", record.dig("source", "receipt_id")] if record.dig("source", "receipt_id")
+  fields << ["Named acceptance decision", record["acceptance"]] if record["acceptance"]
+  fields << ["Class-specific fields", record["fields"]]
+  field_html = fields.map { |name, value| "<dt>#{escape(name)}</dt><dd>#{render_value(value)}</dd>" }.join
+  relationship_html = edges.map do |edge|
+    "<li><strong>#{escape(edge["relationship_type"])}</strong> → <a href=\"##{escape(edge["target_id"])}\"><code>#{escape(edge["target_id"])}</code></a>; applicable=#{edge["applicable"]}; provenance=#{escape(edge["provenance"])}</li>"
+  end.join
+  relationship_html = "<li>No outgoing relationships.</li>" if relationship_html.empty?
+  %(<article class="record" id="#{escape(node_id)}"><p><code class="stable-id">#{escape(node_id)}</code> · <span class="state">#{escape(record["record_type"])}</span></p><h2>#{escape(record["title"])}</h2><dl>#{field_html}</dl><h3>Typed relationships</h3><ul>#{relationship_html}</ul></article>)
+end
+
+def lifecycle_page(graph, records)
+  edges_by_source = graph.fetch("edges").group_by { |edge| edge["source_id"] }
+  articles = records.sort_by { |record| record["record_id"] }.map { |record| record_article(record, edges_by_source.fetch(record["record_id"], [])) }.join("\n")
+  <<~HTML
+    #{document_head("TraceWeaver lifecycle records — derived view")}<body>
+    <header><p><a href="#main">Skip to content</a></p><h1>Lifecycle records and relationships</h1><p class="boundary"><strong>DERIVED, STATIC, NON-AUTHORITATIVE.</strong> Exact registered sources and their named human decisions remain controlling. Candidate, verification, validation, acceptance, and publication states are not interchangeable.</p></header>
+    <nav aria-label="Lifecycle pages"><a href="index.html">Index</a><a href="lifecycle.html">Lifecycle records</a></nav>
+    <main id="main"><section aria-labelledby="records-title"><h2 id="records-title">Exact record closure</h2><p>Graph <code>#{escape(graph["graph_id"])}</code>; baseline <code>#{escape(graph.dig("baseline", "baseline_id"))}</code>; #{records.length} records; #{graph.fetch("edges").length} relationships.</p></section>#{articles}</main>
+    <footer>Every stable ID, controlled field, source identity, lifecycle state, and relationship is visible without CSS interpretation or network access.</footer></body></html>
+  HTML
+end
+
+def normalize_visible_text(node)
+  node.text.split.join(" ")
+end
+
+def validate_html!(name, html, expected_record_ids, page_names)
+  fail!("unsupported_encoding", "generated HTML must be UTF-8", "page" => name) unless html.encoding == Encoding::UTF_8 && html.valid_encoding?
+  fail!("unsupported_line_endings", "generated HTML must use LF", "page" => name) if html.include?("\r")
+  fail!("doctype_missing", "generated page requires HTML5 doctype", "page" => name) unless html.start_with?("<!doctype html>\n")
+  fail!("hidden_authority_content", "HTML comments are prohibited", "page" => name) if html.match?(/<!--/)
+  document = Nokogiri::HTML5.parse(html, max_errors: 100)
+  fail!("malformed_semantic_html", "HTML5 parser reported errors", "page" => name, "errors" => document.errors.map(&:message)) unless document.errors.empty?
+  fail!("accessibility_profile", "page requires one English HTML root, title, header, nav, main, and footer", "page" => name) unless document.at_css("html[lang='en']") && document.css("title").length == 1 && document.css("body > header").length == 1 && document.css("body > nav[aria-label]").length == 1 && document.css("body > main#main").length == 1 && document.css("body > footer").length == 1
+  document.css("*").each do |node|
+    fail!("active_html_content", "prohibited HTML element", "page" => name, "element" => node.name) if PROHIBITED_ELEMENTS.include?(node.name)
+    fail!("html_profile_element", "element is outside the closed semantic profile", "page" => name, "element" => node.name) unless ALLOWED_ELEMENTS.include?(node.name)
+    node.attribute_nodes.each do |attribute|
+      fail!("active_html_content", "event handler attribute is prohibited", "page" => name, "attribute" => attribute.name) if attribute.name.match?(/\Aon/i)
+      fail!("hidden_authority_content", "hidden, inert, inline-style, or aria-hidden content is prohibited", "page" => name, "attribute" => attribute.name) if %w[hidden inert style].include?(attribute.name) || (attribute.name == "aria-hidden" && attribute.value == "true")
+      fail!("html_profile_attribute", "attribute is outside the closed semantic profile", "page" => name, "attribute" => attribute.name) unless ALLOWED_ATTRIBUTES.include?(attribute.name)
+    end
+  end
+  css = document.css("style").map(&:text).join("\n")
+  fail!("active_html_content", "CSS fetch primitive is prohibited", "page" => name) if css.match?(FETCH_OR_ACTIVE)
+  fail!("hidden_authority_content", "CSS hiding primitive is prohibited", "page" => name) if css.match?(HIDDEN_CSS)
+  ids = document.css("[id]").map { |node| node["id"] }
+  fail!("duplicate_html_id", "HTML IDs must be unique", "page" => name) unless ids.uniq == ids
+  document.css("a[href]").each do |link|
+    href = link["href"]
+    fail!("active_html_content", "external, rewritten, absolute, or encoded link is prohibited", "page" => name, "href" => href) if href.match?(%r{\A(?:[a-z]+:|//|/)}i) || href.include?("%") || href.include?("?") || href.include?("\\")
+    target, fragment = href.split("#", 2)
+    target = name if target.nil? || target.empty?
+    fail!("broken_html_link", "link target is outside the generated page set", "page" => name, "href" => href) unless page_names.include?(target)
+    if fragment && target == name
+      fail!("broken_html_link", "same-page fragment is missing", "page" => name, "href" => href) unless ids.include?(fragment)
+    end
+  end
+  if name == "lifecycle.html"
+    articles = document.css("main article.record")
+    actual_ids = articles.map { |article| article["id"] }
+    fail!("html_record_parity", "HTML record set differs from lifecycle closure", "expected" => expected_record_ids, "actual" => actual_ids) unless actual_ids == expected_record_ids
+    articles.each do |article|
+      visible_id = article.at_css("code.stable-id")
+      fail!("hidden_authority_content", "record ID must be uniquely visible and match its fragment", "record_id" => article["id"]) unless visible_id && visible_id.text == article["id"] && normalize_visible_text(article).include?(article["id"])
+    end
+  end
+  document
+end
+
+def article_span(html, record_id)
+  start_token = %(<article class="record" id="#{record_id}">)
+  binary = html.b
+  start = binary.index(start_token.b)
+  fail!("source_span_missing", "record start token is missing", "record_id" => record_id) unless start
+  fail!("source_span_ambiguous", "record start token is duplicated", "record_id" => record_id) if binary.index(start_token.b, start + start_token.bytesize)
+  finish_token = "</article>"
+  finish = binary.index(finish_token.b, start + start_token.bytesize)
+  fail!("source_span_missing", "record end token is missing", "record_id" => record_id) unless finish
+  next_start = binary.index(%(<article class="record" id=").b, start + start_token.bytesize)
+  fail!("source_span_nested", "record spans overlap or nest", "record_id" => record_id) if next_start && next_start < finish
+  binary.byteslice(start, finish + finish_token.bytesize - start)
+end
+
+def build_artifacts(root, registry_path, records_dir, graph_path, parser_lock_path)
+  lock, lock_digest = validate_parser_lock!(parser_lock_path)
+  check_graph!(root, registry_path, records_dir, graph_path)
+  graph = load_json(graph_path, "missing_graph", "malformed_graph")
+  records = records_dir.children.select { |path| path.extname == ".json" }.sort.map { |path| load_json(path, "missing_record", "malformed_lifecycle_record") }
+  by_id = records.each_with_object({}) { |record, result| result[record.fetch("record_id")] = record }
+  graph_ids = graph.fetch("nodes").map { |node| node["record_id"] }
+  fail!("projection_record_parity", "record files differ from checked graph", "graph" => graph_ids.sort, "records" => by_id.keys.sort) unless graph_ids.sort == by_id.keys.sort
+  graph.fetch("nodes").each do |node|
+    fail!("projection_record_digest", "record content differs from checked graph", "record_id" => node["record_id"]) unless digest_value(by_id.fetch(node["record_id"])) == node["record_digest"]
+  end
+  ordered_records = graph_ids.sort.map { |id| by_id.fetch(id) }
+  pages = {"index.html" => index_page(graph), "lifecycle.html" => lifecycle_page(graph, ordered_records)}
+  page_names = pages.keys.sort
+  documents = pages.to_h { |name, html| [name, validate_html!(name, html, graph_ids.sort, page_names)] }
+  record_manifest = ordered_records.map do |record|
+    id = record["record_id"]
+    article = documents.fetch("lifecycle.html").at_css("article##{id}")
+    span = article_span(pages.fetch("lifecycle.html"), id)
+    {
+      "record_id" => id,
+      "record_digest" => digest_value(record),
+      "article_span_digest" => digest_bytes(span),
+      "visible_text_digest" => digest_bytes(normalize_visible_text(article)),
+      "source_id" => record.dig("source", "source_id"),
+      "source_digest" => record.dig("source", "digest")
+    }
+  end
+  relationships = graph.fetch("edges").map do |edge|
+    body = edge.slice("source_id", "target_id", "relationship_type", "applicable", "provenance")
+    body.merge("digest" => digest_value(body))
+  end
+  page_manifest = pages.sort.map { |name, html| {"path" => name, "digest" => digest_bytes(html), "bytes" => html.bytesize, "media_type" => "text/html; charset=utf-8"} }
+  manifest_body = {
+    "schema_version" => HTML_SCHEMA,
+    "profile" => "strict_static_accessible_offline_printable",
+    "authority_role" => "derived_non_authoritative",
+    "controlling_sources" => "registered_markdown_yaml_and_external_receipts",
+    "parser_lock" => {
+      "schema_version" => lock["schema_version"],
+      "digest" => lock_digest,
+      "parser" => "nokogiri-1.13.8-html5-libgumbo-1.0.0-nokogiri",
+      "source_location_adapter" => SPAN_ADAPTER
+    },
+    "graph" => {
+      "graph_id" => graph["graph_id"],
+      "registry_id" => graph.dig("provenance", "registry_id"),
+      "registry_digest" => graph.dig("provenance", "registry_digest"),
+      "records_digest" => graph.dig("provenance", "records_digest"),
+      "baseline" => graph["baseline"]
+    },
+    "source_closure_digest" => digest_value(graph["source_closure"]),
+    "record_count" => record_manifest.length,
+    "relationship_count" => relationships.length,
+    "records" => record_manifest,
+    "relationships" => relationships,
+    "pages" => page_manifest,
+    "authority_effect" => "none"
+  }
+  manifest = manifest_body.merge("manifest_id" => digest_value(manifest_body))
+  pages.merge("manifest.json" => canonical_json(manifest))
+end
+
+def check_artifacts!(output, expected)
+  fail!("missing_projection_output", "projection output directory is missing") unless output.directory?
+  actual_names = output.children.map { |path| path.basename.to_s }.sort
+  fail!("projection_output_set", "projection output file set differs", "expected" => expected.keys.sort, "actual" => actual_names) unless actual_names == expected.keys.sort
+  expected.each do |name, value|
+    path = output.join(name)
+    fail!("unsafe_path", "projection output symlink is prohibited", "path" => path.to_s) if path.symlink?
+    stored = path.binread
+    if name.end_with?(".html")
+      manifest = JSON.parse(expected.fetch("manifest.json"))
+      validate_html!(name, stored.force_encoding(Encoding::UTF_8), manifest.fetch("records").map { |record| record["record_id"] }, expected.keys.grep(/\.html\z/).sort)
+    end
+    fail!("stale_or_hand_edited_projection", "stored projection differs from exact current build", "path" => name) unless stored == value
+  end
+end
+
+command = ARGV.shift
+options = {root: Dir.pwd, parser_lock: DEFAULT_LOCK.to_s}
+OptionParser.new do |parser|
+  parser.banner = "Usage: traceweaver-lifecycle-project <build|check> --root PATH --registry PATH --records PATH --graph PATH --output PATH [--parser-lock PATH]"
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--registry PATH") { |value| options[:registry] = value }
+  parser.on("--records PATH") { |value| options[:records] = value }
+  parser.on("--graph PATH") { |value| options[:graph] = value }
+  parser.on("--output PATH") { |value| options[:output] = value }
+  parser.on("--parser-lock PATH") { |value| options[:parser_lock] = value }
+end.parse!
+
+begin
+  fail!("invalid_command", "unsupported projection operation", "operation" => command) unless %w[build check].include?(command)
+  root = Pathname.new(options[:root]).expand_path
+  fail!("invalid_root", "--root must be a directory") unless root.directory?
+  root = root.realpath
+  %i[registry records graph output].each { |key| fail!("usage_error", "--#{key} is required") unless present_string?(options[key]) }
+  registry_path = resolve_inside(root, options[:registry], "registry_path_escape", must_exist: true)
+  records_dir = resolve_inside(root, options[:records], "records_path_escape", must_exist: true, directory: true)
+  graph_path = resolve_inside(root, options[:graph], "graph_path_escape", must_exist: true)
+  output = resolve_inside(root, options[:output], "output_path_escape")
+  parser_lock = Pathname.new(options[:parser_lock]).expand_path
+  first = build_artifacts(root, registry_path, records_dir, graph_path, parser_lock)
+  second = build_artifacts(root, registry_path, records_dir, graph_path, parser_lock)
+  fail!("non_deterministic_projection", "two in-memory builds differ") unless first == second
+  if command == "build"
+    FileUtils.mkdir_p(output)
+    fail!("unsafe_path", "projection output directory may not be a symlink") if output.symlink?
+    first.each { |name, value| output.join(name).binwrite(value) }
+  end
+  check_artifacts!(output, first)
+  manifest = JSON.parse(first.fetch("manifest.json"))
+  puts canonical_json(
+    "schema_version" => "tw-lifecycle-html-project-result/1",
+    "operation" => command,
+    "status" => "pass",
+    "freshness" => "current",
+    "manifest_id" => manifest["manifest_id"],
+    "graph_id" => manifest.dig("graph", "graph_id"),
+    "record_count" => manifest["record_count"],
+    "relationship_count" => manifest["relationship_count"],
+    "authority_role" => "derived_non_authoritative",
+    "authority_effect" => "none",
+    "findings" => []
+  )
+rescue ProjectError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-html-finding/1", "status" => "blocked", "finding" => error.finding, "reason" => error.message, "details" => error.details, "authority_effect" => "none")
+  exit 1
+rescue OptionParser::ParseError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-html-finding/1", "status" => "blocked", "finding" => "usage_error", "reason" => error.message, "details" => {}, "authority_effect" => "none")
+  exit 2
+rescue StandardError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-html-finding/1", "status" => "blocked", "finding" => "unexpected_projection_error", "reason" => error.message, "details" => {"class" => error.class.name}, "authority_effect" => "none")
+  exit 1
+end

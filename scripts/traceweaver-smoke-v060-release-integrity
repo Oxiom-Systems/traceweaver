@@ -1,0 +1,441 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=v060-release-integrity-smoke; req=REQ-TW-143,REQ-TW-145; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-143,REQ-TW-145; trace=TRACE-TW-074
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+require "yaml"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+CHECKER = ROOT.join("scripts/traceweaver-check-release-readiness")
+SCHEMA = "tw-release-readiness/3"
+ALGORITHM = "sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))"
+MANIFESTS = {
+  ".claude-plugin/marketplace.json" => %w[metadata version],
+  "plugins/traceweaver-core/.claude-plugin/plugin.json" => %w[version],
+  "plugins/traceweaver-core/.codex-plugin/plugin.json" => %w[version],
+  "plugins/traceweaver-core/.cursor-plugin/plugin.json" => %w[version],
+  "plugins/traceweaver-core/.antigravity-plugin/plugin.json" => %w[version]
+}.freeze
+INTEGRATION_BASE = "e53faeb437cfee3b91f43e1b0f4ed3b1cb1e2c33"
+ORACLE_RELATIVE = "plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json"
+MAP_RELATIVE = "plugins/traceweaver-core/references/model-context-map.yml"
+GENERATOR_RELATIVE = "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map"
+CAPSULE_RELATIVE = "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-capsule.json"
+PRE_ORACLE_REQUIRED_LIFECYCLE_REFS = %w[
+  .traceweaver/changes/CHG-TW-2026-08-26-003-acyclic-oracle.yml
+  .traceweaver/exceptions/EXC-TW-020-acyclic-oracle.yml
+  docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.json
+  docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.md
+  docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-source-baselines-real-product-depth.json
+  docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/vestro-lc-001-machine-observation.json
+  docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/airrouter-lc-001-machine-observation.json
+  docs/validation/traceweaver-2026-08-24-v060-real-product-depth-authority-gate.md
+  docs/validation/traceweaver-2026-08-24-v060-real-product-depth-red-evidence.md
+  docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-scope-rollback-verification.md
+  scripts/traceweaver-smoke-v060-real-product-depth
+  docs/validation/traceweaver-2026-08-24-v060-integrated-review-targeted-continuation.md
+  docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-change-proposal.md
+  docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-requirements-review.md
+  docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-authority-gate.md
+  docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-red-evidence.md
+  docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-approval.md
+  docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-requirements-review.md
+  docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-red-evidence.md
+  docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-authority-doc-review.md
+  docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-post-promotion-authority-gate.md
+].freeze
+POST_ORACLE_LIFECYCLE_RECEIPTS = %w[
+  docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-green-evidence.md
+  docs/validation/traceweaver-2026-08-26-v060-integrated-review-retained-finding-continuation.md
+].freeze
+REJECTED_LIFECYCLE_REFS = %w[
+  docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result.json
+  docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result.md
+  docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-source-baselines.json
+  docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-raw/vestro-lc-001-machine-observation.json
+  docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-raw/airrouter-lc-001-machine-observation.json
+  docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result-real-product-depth.json
+  docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result-real-product-depth.md
+].freeze
+
+def lifecycle_source_contract_failures(sources)
+  sources.each_with_object([]) do |(contract, source), failures|
+    PRE_ORACLE_REQUIRED_LIFECYCLE_REFS.each do |relative|
+      failures << "#{contract.basename}:missing_pre_oracle_ref:#{relative}" unless source.include?(relative)
+    end
+    POST_ORACLE_LIFECYCLE_RECEIPTS.each do |relative|
+      failures << "#{contract.basename}:retains_post_oracle_receipt:#{relative}" if source.include?(relative)
+    end
+    REJECTED_LIFECYCLE_REFS.each do |relative|
+      failures << "#{contract.basename}:retains_rejected_lifecycle_ref:#{relative}" if source.include?(relative)
+    end
+  end
+end
+
+source_contracts = [
+  CHECKER,
+  ROOT.join("scripts/traceweaver-refresh-v060-model-context-oracle")
+].to_h { |contract| [contract, contract.binread] }
+terminal_contract_failures = lifecycle_source_contract_failures(source_contracts)
+
+source_contracts.each do |contract, source|
+  POST_ORACLE_LIFECYCLE_RECEIPTS.each do |relative|
+    mutated_sources = source_contracts.merge(contract => "#{source}\n# #{relative}\n")
+    expected = "#{contract.basename}:retains_post_oracle_receipt:#{relative}"
+    unless lifecycle_source_contract_failures(mutated_sources).include?(expected)
+      terminal_contract_failures << "#{contract.basename}:post_oracle_negative_not_detected:#{relative}"
+    end
+  end
+end
+
+unless CHECKER.read.include?(SCHEMA)
+  warn "v060_release_integrity_smoke=failed reason=missing_release_readiness_v3"
+  exit 1
+end
+
+def run(*arguments, chdir: nil)
+  return Open3.capture3(*arguments.map(&:to_s)) unless chdir
+
+  Open3.capture3(*arguments.map(&:to_s), chdir: chdir.to_s)
+end
+
+def command!(*arguments, chdir:)
+  stdout, stderr, status = run(*arguments, chdir: chdir)
+  abort("command_failed=#{arguments.join(' ')}\n#{stdout}\n#{stderr}") unless status.success?
+  stdout
+end
+
+def nested_write(path, value)
+  path.dirname.mkpath
+  path.write(value)
+end
+
+def scope_digest(root, paths)
+  records = paths.sort.map do |relative|
+    path = root.join(relative)
+    mode = (path.stat.mode & 0o111).zero? ? "100644" : "100755"
+    "#{relative}\0#{mode}\0#{Digest::SHA256.file(path).hexdigest}\n"
+  end
+  "sha256:#{Digest::SHA256.hexdigest(records.join)}"
+end
+
+def receipt_source(data)
+  detached = JSON.parse(JSON.generate(data))
+  "---\n#{YAML.dump(detached).delete_prefix("---\n")}---\n\n# Synthetic Core 0.6.0 release-readiness fixture\n"
+end
+
+def check(root, receipt, overrides = [])
+  run("ruby", CHECKER, "--receipt", receipt, "--version", "0.6.0", "--root", root, "--merge-sha", command!("git", "rev-parse", "HEAD", chdir: root).strip, *overrides)
+end
+
+def assert_refused(root, receipt, marker)
+  stdout, stderr, status = check(root, receipt)
+  abort("expected_refusal=#{marker}\n#{stdout}\n#{stderr}") if status.success?
+  output = stdout + stderr
+  abort("wrong_refusal expected=#{marker}\n#{output}") unless output.include?(marker)
+end
+
+def deep_copy(value)
+  Marshal.load(Marshal.dump(value))
+end
+
+def semantic_digest(value)
+  canonical = lambda do |entry|
+    case entry
+    when Hash then entry.keys.sort.each_with_object({}) { |key, result| result[key] = canonical.call(entry.fetch(key)) }
+    when Array then entry.map { |item| canonical.call(item) }
+    else entry
+    end
+  end
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical.call(value)))}"
+end
+
+def delta_paths(root, base)
+  changed = command!("git", "diff", "--name-only", "--no-renames", base, "--", chdir: root).lines.map(&:strip)
+  untracked = command!("git", "ls-files", "--others", "--exclude-standard", chdir: root).lines.map(&:strip)
+  (changed + untracked).reject(&:empty?).uniq.sort
+end
+
+def functional_path?(path)
+  return false if path.start_with?("docs/validation/", "docs/generated/", ".traceweaver/review-series/")
+  return false if [
+    ".traceweaver/tw-graph-freshness.json",
+    ".traceweaver/intent-contract.current.yml",
+    ORACLE_RELATIVE,
+    "plugins/traceweaver-core/skills/tw-auto/references/model-context-oracle-adequacy-review.json"
+  ].include?(path)
+
+  true
+end
+
+def refresh_receipt_bindings!(data, repo, candidate_paths, functional_paths)
+  readiness = data.fetch("release_readiness")
+  functional_digest = scope_digest(repo, functional_paths)
+  candidate_digest = scope_digest(repo, candidate_paths)
+  readiness.fetch("candidate_scope")["digest"] = candidate_digest
+  readiness.fetch("functional_scope")["digest"] = functional_digest
+  identity = readiness.fetch("candidate_identity")
+  identity["functional_scope_digest"] = functional_digest
+  identity["functional_scope_path_count"] = functional_paths.length
+  oracle = JSON.parse(repo.join(ORACLE_RELATIVE).read)
+  identity["model_context_oracle_digest"] = oracle.fetch("oracle_digest")
+  identity["model_context_oracle_review_id"] = oracle.fetch("review_id")
+  identity["model_context_oracle_reviewer"] = oracle.dig("reviewer", "identity")
+  identity["model_context_route_count"] = oracle.fetch("route_count")
+end
+
+def rebind_fixture_validation!(repo, functional_paths, product_relative)
+  functional_digest = scope_digest(repo, functional_paths)
+  product_path = repo.join(product_relative)
+  product = JSON.parse(product_path.read)
+  product.fetch("candidate")["tree_digest"] = functional_digest
+  product_path.binwrite(JSON.pretty_generate(product) + "\n")
+  product_digest = "sha256:#{Digest::SHA256.file(product_path).hexdigest}"
+  capsule_path = repo.join(CAPSULE_RELATIVE)
+  capsule = JSON.parse(capsule_path.read)
+  validation = capsule.fetch("product_validation")
+  validation["status"] = "accepted"
+  validation["functional_scope_digest"] = functional_digest
+  validation["result_digest"] = product_digest
+  validation["fresh_rebinding_required"] = false
+  Array(capsule["requirements"]).each do |requirement|
+    Array(requirement.is_a?(Hash) && requirement["reviews"]).each do |review|
+      review["status"] = "closed_clean" if review.is_a?(Hash)
+    end
+  end
+  capsule["held_claims"] = Array(capsule["held_claims"]).reject do |claim|
+    claim.to_s.match?(/(?:product validation|product revalidation|revalidation required|historical.*product)/i)
+  end
+  capsule_path.binwrite(JSON.pretty_generate(capsule) + "\n")
+end
+
+Dir.mktmpdir("traceweaver-v060-release-") do |directory|
+  temp_root = Pathname.new(directory)
+  repo = temp_root.join("candidate")
+  command!("git", "clone", "--quiet", "--no-hardlinks", ROOT, repo, chdir: temp_root)
+  command!("git", "checkout", "--quiet", "--detach", INTEGRATION_BASE, chdir: repo)
+
+  deleted = command!("git", "diff", "--name-only", "--diff-filter=D", INTEGRATION_BASE, "--", chdir: ROOT).lines.map(&:strip).reject(&:empty?)
+  abort("v060_fixture_deleted_paths=#{deleted.join(',')}") unless deleted.empty?
+  source_paths = delta_paths(ROOT, INTEGRATION_BASE)
+  source_paths.each do |relative|
+    source = ROOT.join(relative)
+    abort("v060_fixture_invalid_source=#{relative}") unless source.file? && !source.symlink?
+    destination = repo.join(relative)
+    destination.dirname.mkpath
+    FileUtils.cp(source, destination, preserve: true)
+  end
+
+  refresh = repo.join("scripts/traceweaver-refresh-v060-model-context-oracle")
+  command!(refresh, "--reviewer-id", "terra-integrated-reviewer:v060_release_fixture", "--write", chdir: repo)
+
+  receipt_relative = "fixtures/release-readiness/ready-v060.md"
+  graph_relative = ".traceweaver/tw-graph-freshness.json"
+  product_relative = "docs/validation/v060-release-fixture-product.json"
+  functional_paths = delta_paths(repo, INTEGRATION_BASE).select { |path| functional_path?(path) }
+  functional_digest = scope_digest(repo, functional_paths)
+  requirements_source = repo.join("requirements.md").binread.sub(
+    /^(baseline_hash_sha256: ).*$/, "\\1CANONICAL_HASH_PLACEHOLDER"
+  )
+  requirements_hash = "sha256:#{Digest::SHA256.hexdigest(requirements_source)}"
+  product = {
+    "schema_version" => "tw-lifecycle-product-validation/1",
+    "validation_id" => "VAL-TW-042",
+    "candidate" => {
+      "release_version" => "0.6.0",
+      "requirements_hash_sha256" => requirements_hash,
+      "tree_digest" => functional_digest
+    }
+  }
+  nested_write(repo.join(product_relative), JSON.pretty_generate(product) + "\n")
+  product_digest = "sha256:#{Digest::SHA256.file(repo.join(product_relative)).hexdigest}"
+  capsule = {
+    "schema_version" => "tw-vv-capsule/1",
+    "definition_state" => "integrated_review_closed_clean_release_evidence_bound",
+    "product_validation" => {
+      "status" => "accepted",
+      "validation_id" => "VAL-TW-042",
+      "functional_scope_digest" => functional_digest,
+      "result_digest" => product_digest,
+      "fresh_rebinding_required" => false
+    },
+    "requirements" => [{"req_id" => "REQ-TW-145", "reviews" => [{"status" => "closed_clean"}]}],
+    "held_claims" => ["publication and release remain controlled by exact-main workflow evidence"]
+  }
+  nested_write(repo.join(CAPSULE_RELATIVE), JSON.pretty_generate(capsule) + "\n")
+  command!(refresh, "--reviewer-id", "terra-integrated-reviewer:v060_release_fixture", "--write", chdir: repo)
+
+  evidence = {
+    "product_validation_result_json" => product_relative,
+    "representative_validation" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-representative-validation.md",
+    "integrated_review" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-lifecycle-authority-review.md",
+    "scope_rollback" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-scope-rollback-verification.md",
+    "reinstall" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-scope-rollback-verification.md",
+    "release_integrity" => "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-semantic-html-release-gate.md",
+    "graph_freshness" => graph_relative,
+    "model_context_oracle" => ORACLE_RELATIVE
+  }
+  # The fixture-only route checks binding, not production front matter. Use an
+  # existing changed authority record as its integrated-review carrier.
+  evidence["integrated_review"] = "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-authority-review.md"
+  excluded = [graph_relative, receipt_relative]
+  candidate_paths = delta_paths(repo, INTEGRATION_BASE).reject { |path| excluded.include?(path) }
+  oracle = JSON.parse(repo.join(ORACLE_RELATIVE).read)
+  data = {
+    "id" => "TW-RELEASE-CANDIDATE-2026-08-24-0.6.0-FIXTURE",
+    "status" => "ready_for_version_bump",
+    "date" => "2026-08-24",
+    "version" => "0.6.0",
+    "tag" => "traceweaver-core--v0.6.0",
+    "released_predecessor_tag" => "traceweaver-core--v0.5.0",
+    "released_predecessor_sha" => "3a1f3c56b093e61b88e9f6282637878e8ebbf163",
+    "integration_base" => INTEGRATION_BASE,
+    "requirement" => "REQ-TW-145",
+    "trace" => "TRACE-TW-074",
+    "verification" => "VER-TW-094",
+    "validation" => "VAL-TW-042",
+    "release_readiness" => {
+      "schema_version" => SCHEMA,
+      "terminal_status" => "ready_for_version_bump",
+      "version" => "0.6.0",
+      "release_label" => "minor",
+      "candidate_scope" => {"algorithm" => ALGORITHM, "digest" => scope_digest(repo, candidate_paths), "paths" => candidate_paths, "excluded_paths" => excluded},
+      "functional_scope" => {"algorithm" => ALGORITHM, "digest" => functional_digest, "paths" => functional_paths},
+      "candidate_identity" => {
+        "functional_scope_digest" => functional_digest,
+        "functional_scope_path_count" => functional_paths.length,
+        "review_id" => "TW-CODE-REVIEW-V060-FIXTURE",
+        "product_validation_id" => "VAL-TW-042",
+        "model_context_oracle_digest" => oracle.fetch("oracle_digest"),
+        "model_context_oracle_review_id" => oracle.fetch("review_id"),
+        "model_context_oracle_reviewer" => oracle.dig("reviewer", "identity"),
+        "model_context_route_count" => oracle.fetch("route_count")
+      },
+      "prerequisites" => {
+        "authority" => "accepted", "exact_predecessor_dogfood" => "passed", "slice_verification" => "passed",
+        "product_validation" => "passed", "integrated_review" => "passed", "scope_rollback" => "passed",
+        "graph_freshness" => "passed", "manifest_equality" => "passed", "clean_reinstall" => "passed",
+        "model_context_oracle" => "passed", "exact_sha_ci" => "required_by_release_workflow",
+        "publication" => "required_by_release_workflow"
+      },
+      "evidence" => evidence,
+      "held_claims" => ["publication_until_exact_main_sha_ci", "tag_and_github_release_until_main_workflow", "deployment_not_claimed"]
+    }
+  }
+  receipt = repo.join(receipt_relative)
+  nested_write(receipt, receipt_source(data))
+
+  stdout, stderr, status = check(repo, receipt)
+  abort("v060_fixture_positive_failed\n#{stdout}\n#{stderr}") unless status.success? && stdout.include?("release_readiness_schema=#{SCHEMA}")
+
+  synthetic_capsule = repo.join(CAPSULE_RELATIVE).binread
+  repo.join(CAPSULE_RELATIVE).binwrite(ROOT.join(CAPSULE_RELATIVE).binread)
+  rebind_fixture_validation!(repo, functional_paths, product_relative)
+  command!(refresh, "--reviewer-id", "terra-integrated-reviewer:v060_release_fixture", "--write", chdir: repo)
+  real_capsule_data = deep_copy(data)
+  refresh_receipt_bindings!(real_capsule_data, repo, candidate_paths, functional_paths)
+  nested_write(receipt, receipt_source(real_capsule_data))
+  real_stdout, real_stderr, real_status = check(repo, receipt)
+  unless real_status.success? && real_stdout.include?("release_readiness_schema=#{SCHEMA}")
+    reason = (real_stdout + real_stderr).lines.find { |line| line.include?("release_readiness_check=") }.to_s.strip
+    terminal_contract_failures << "real_vv_capsule_rejected_while_synthetic_passed:#{reason}"
+  end
+  repo.join(CAPSULE_RELATIVE).binwrite(synthetic_capsule)
+  rebind_fixture_validation!(repo, functional_paths, product_relative)
+  command!(refresh, "--reviewer-id", "terra-integrated-reviewer:v060_release_fixture", "--write", chdir: repo)
+
+  wrong_label = deep_copy(data)
+  wrong_label["release_readiness"]["release_label"] = "major"
+  nested_write(receipt, receipt_source(wrong_label))
+  assert_refused(repo, receipt, "release label")
+
+  held_validation = deep_copy(data)
+  held_validation["release_readiness"]["prerequisites"]["product_validation"] = "held"
+  nested_write(receipt, receipt_source(held_validation))
+  assert_refused(repo, receipt, "prerequisite product_validation")
+
+  missing_oracle = deep_copy(data)
+  missing_oracle["release_readiness"]["evidence"].delete("model_context_oracle")
+  nested_write(receipt, receipt_source(missing_oracle))
+  assert_refused(repo, receipt, "evidence model_context_oracle path is missing")
+
+  oracle_path = repo.join(ORACLE_RELATIVE)
+  oracle_good = oracle_path.binread
+  wrong_reviewer = JSON.parse(oracle_good)
+  wrong_reviewer.fetch("reviewer")["identity"] = "luna-reviewer:not-authorized"
+  wrong_reviewer.delete("oracle_digest")
+  wrong_reviewer["oracle_digest"] = semantic_digest(wrong_reviewer)
+  oracle_path.binwrite(JSON.pretty_generate(wrong_reviewer) + "\n")
+  wrong_reviewer_data = deep_copy(data)
+  refresh_receipt_bindings!(wrong_reviewer_data, repo, candidate_paths, functional_paths)
+  nested_write(receipt, receipt_source(wrong_reviewer_data))
+  assert_refused(repo, receipt, "not an authorized Terra integrated reviewer")
+  oracle_path.binwrite(oracle_good)
+
+  incomplete_oracle = JSON.parse(oracle_good)
+  lifecycle_cell = incomplete_oracle.fetch("route_category_cells").find do |cell|
+    cell["route_id"] == "tw-lifecycle" && cell["category"] == "accepted_evidence"
+  end
+  lifecycle_cell.fetch("source_refs").pop
+  incomplete_oracle.delete("oracle_digest")
+  incomplete_oracle["oracle_digest"] = semantic_digest(incomplete_oracle)
+  oracle_path.binwrite(JSON.pretty_generate(incomplete_oracle) + "\n")
+  incomplete_data = deep_copy(data)
+  refresh_receipt_bindings!(incomplete_data, repo, candidate_paths, functional_paths)
+  nested_write(receipt, receipt_source(incomplete_data))
+  assert_refused(repo, receipt, "tw-lifecycle oracle source set is incomplete")
+  oracle_path.binwrite(oracle_good)
+
+  map_path = repo.join(MAP_RELATIVE)
+  map_good = map_path.binread
+  map_path.binwrite(map_good + "\n# stale-after-oracle-fixture\n")
+  rebind_fixture_validation!(repo, functional_paths, product_relative)
+  stale_map_data = deep_copy(data)
+  refresh_receipt_bindings!(stale_map_data, repo, candidate_paths, functional_paths)
+  nested_write(receipt, receipt_source(stale_map_data))
+  assert_refused(repo, receipt, "oracle source digest mismatch")
+  map_path.binwrite(map_good)
+  rebind_fixture_validation!(repo, functional_paths, product_relative)
+  command!(refresh, "--reviewer-id", "terra-integrated-reviewer:v060_release_fixture", "--write", chdir: repo)
+
+  capsule_path = repo.join(CAPSULE_RELATIVE)
+  capsule_good = capsule_path.binread
+  stale_capsule = JSON.parse(capsule_good)
+  stale_capsule.fetch("product_validation")["status"] = "historical_stale_after_functional_repair"
+  capsule_path.binwrite(JSON.pretty_generate(stale_capsule) + "\n")
+  command!(refresh, "--reviewer-id", "terra-integrated-reviewer:v060_release_fixture", "--write", chdir: repo)
+  stale_capsule_data = deep_copy(data)
+  refresh_receipt_bindings!(stale_capsule_data, repo, candidate_paths, functional_paths)
+  nested_write(receipt, receipt_source(stale_capsule_data))
+  assert_refused(repo, receipt, "product validation status must be accepted")
+  capsule_path.binwrite(capsule_good)
+  command!(refresh, "--reviewer-id", "terra-integrated-reviewer:v060_release_fixture", "--write", chdir: repo)
+
+  manifest_path = repo.join("plugins/traceweaver-core/.codex-plugin/plugin.json")
+  manifest = JSON.parse(manifest_path.read)
+  manifest["version"] = "0.6.1"
+  manifest_path.write(JSON.pretty_generate(manifest) + "\n")
+  manifest_data = deep_copy(data)
+  refresh_receipt_bindings!(manifest_data, repo, candidate_paths, functional_paths)
+  nested_write(receipt, receipt_source(manifest_data))
+  assert_refused(repo, receipt, "release manifest")
+end
+
+unless terminal_contract_failures.empty?
+  abort("v060_terminal_release_truth_contract=failed\n#{terminal_contract_failures.join("\n")}")
+end
+
+puts "v060_release_integrity_smoke=passed"
+puts "v060_release_pre_oracle_source_contract=passed"
+puts "v060_release_post_oracle_receipt_negative=passed"
+puts "v060_release_label_and_manifest_equality=passed"
+puts "v060_release_missing_validation_refusal=passed"
+puts "v060_release_oracle_completeness_and_reviewer_binding=passed"
+puts "v060_release_stale_map_inventory_and_product_truth_refusal=passed"
+puts "v060_release_exact_merge_sha_and_scope=passed"

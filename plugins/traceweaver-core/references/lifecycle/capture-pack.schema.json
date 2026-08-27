@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-capture-pack/1",
+  "title": "TraceWeaver prepared lifecycle capture pack",
+  "description": "Deterministic candidate pack grounded in exact registered source spans. It prepares visible human confirmation and cannot promote candidates to authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "pack_id", "proposal_id", "source_receipt",
+    "baseline", "candidates", "confirmation_surface", "status",
+    "human_confirmation_required", "authority_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-capture-pack/1"},
+    "pack_id": {"$ref": "#/$defs/digest"},
+    "proposal_id": {"$ref": "#/$defs/digest"},
+    "source_receipt": {
+      "type": "object",
+      "required": ["receipt_id", "source_id", "source_digest", "locator", "authority_effect"],
+      "properties": {
+        "receipt_id": {"$ref": "#/$defs/digest"},
+        "source_id": {"type": "string", "minLength": 1},
+        "source_digest": {"$ref": "#/$defs/digest"},
+        "locator": {"type": "string", "minLength": 1},
+        "authority_effect": {"const": "none"}
+      }
+    },
+    "baseline": {"$ref": "#/$defs/baseline"},
+    "candidates": {"type": "array", "items": {"$ref": "#/$defs/candidate"}},
+    "confirmation_surface": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["locator", "digest", "media_type"],
+      "properties": {
+        "locator": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"},
+        "media_type": {"const": "text/html; charset=utf-8"}
+      }
+    },
+    "status": {"enum": ["prepared_pending_human_confirmation", "prepared_no_candidate_change"]},
+    "human_confirmation_required": {"const": true},
+    "authority_effect": {"const": "none"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_id", "generation", "digest"],
+      "properties": {
+        "baseline_id": {"type": "string", "minLength": 1},
+        "generation": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "required": [
+        "candidate_id", "operation", "proposed_record", "source_excerpt",
+        "duplicate_candidates", "conflicts", "downstream_consequences"
+      ],
+      "properties": {
+        "candidate_id": {"type": "string", "minLength": 1},
+        "operation": {"enum": ["create", "update"]},
+        "target_record_id": {"type": "string", "minLength": 1},
+        "target_record_digest": {"$ref": "#/$defs/digest"},
+        "proposed_record": {"type": "object"},
+        "source_excerpt": {"type": "object"},
+        "duplicate_candidates": {"type": "array"},
+        "conflicts": {"type": "array"},
+        "downstream_consequences": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+        "vv_definition": {"type": "object"}
+      }
+    }
+  }
+}

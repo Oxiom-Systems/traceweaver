@@ -1,0 +1,88 @@
+id: CHG-TW-2026-08-26-004
+record_type: traceweaver_change_control
+status: consumed_failed_single_focused_verification_exact_route_requirements_digest_mismatch_publication_held
+owner: Oxiom Systems
+created_at: "2026-08-26"
+approved_at: "2026-08-26"
+approved_by: Hannes Zietsman
+linked_intent: [INTENT-TW-012, INTENT-TW-013]
+linked_requirements: [REQ-TW-110, REQ-TW-123, REQ-TW-130, REQ-TW-143, REQ-TW-145]
+linked_trace: [TRACE-TW-072, TRACE-TW-074]
+linked_verification: [VER-TW-092, VER-TW-094]
+linked_validation: VAL-TW-042
+linked_exception: EXC-TW-021
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_hash_sha256: 8349b9c1d883c79a345eb7e10e86ab6e9f965805e34d894a28be44cde3a69a79
+workflow_profile_revision: 5
+workflow_profile_hash: sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7
+gap_id: GAP-TW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001
+owner_approval_evidence: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-owner-approval.md
+owner_decision_packet: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-owner-decision-packet.md
+requirements_review: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-requirements-review.md
+historical_preapproval_authority_gate: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-gate.md
+correction_specific_red_evidence: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md
+document_review: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-doc-review.md
+vv_capsule: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-vv-capsule.json
+vv_capsule_preflight: passed_require_review_passed
+authority_gate: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-post-promotion-authority-gate.md
+focused_verification_result: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-focused-verification-result.md
+owner_decision_source: >-
+  Approve CHG-TW-2026-08-26-004 and EXC-TW-021 for one profile-revision-5
+  main-thread post-oracle CI convergence correction only: refresh the ten named
+  Core 0.5.0 model-context fixtures to current approved Core 0.6.0 map, oracle,
+  SEC, README, route-inventory, and receipt bindings; and correct
+  scripts/traceweaver-smoke-model-context-routing so its isolated
+  canonical-oracle negative invokes the compiler copied into the tampered
+  package and its tw-lifecycle direct-dependency expectation exactly matches
+  the production oracle. Permit one focused verification attempt, fresh exact
+  Vestro and Air Router product rebinding after the functional digest changes,
+  and one verification-only continuation of the same integrated Terra reviewer
+  limited to this eleven-file delta. Preserve the published Core 0.5.0 release,
+  the mixed root worktree, the accepted product limitations, and every
+  semantic-cutover, runtime, deployment, release, and publication hold;
+  publication remains separately gated.
+reason: >-
+  The reviewer-bound 88-route canonical oracle exposed ten deterministic
+  model-context fixtures still bound to the Core 0.5.0 map/source set and two
+  smoke expectations that differ from the production compiler/oracle contract.
+  The production acceptance suite is RED and a disposable exact-scope probe
+  proves this eleven-file correction is sufficient.
+controlled_master_roots:
+  - requirements.md
+  - traceability-matrix.md
+  - .traceweaver/intent-contract.yml
+allowed_scope:
+  - fixtures/model-context-routing/oracle-review-complete.json
+  - fixtures/model-context-routing/route-floors-expected.yml
+  - fixtures/model-context-routing/source-manifest-complete.json
+  - fixtures/model-context-routing/source-manifest-delivery-direct.json
+  - fixtures/model-context-routing/source-manifest-delivery-locator.json
+  - fixtures/model-context-routing/source-manifest-delivery-shard.json
+  - fixtures/model-context-routing/source-manifest-temporal-external-excluded.json
+  - fixtures/model-context-routing/source-manifest-temporal-external-required.json
+  - fixtures/model-context-routing/strict-v1-consumer.rb
+  - fixtures/model-context-routing/v1-receipts.json
+  - scripts/traceweaver-smoke-model-context-routing
+  - controlled authority, profile, plan, V&V, trace, and evidence bindings necessary for revision 5
+  - one focused verification attempt through scripts/traceweaver-smoke-model-context-routing
+  - one fresh exact-product rebinding and explicit owner disposition after the functional digest changes
+  - one verification-only continuation by the existing integrated Terra reviewer limited to the eleven-file delta
+held_scope:
+  - any functional file outside the eleven named paths
+  - any semantic or public behavior expansion beyond deterministic fixture and test convergence
+  - consumer repository mutation
+  - a new reviewer identity, full review, reviewer fan-out, repair subagent, or second continuation
+  - semantic HTML authority cutover, served-model, deployment, runtime-health, release-ready, or publication claims
+  - staging, commit, push, PR, merge, tag, GitHub Release, deployment, or publication
+rollback: exact restoration of the eleven pre-change SHA-256 values recorded in RED-TW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001
+expiry: >-
+  First of one focused correction/verification attempt, one new exact-product
+  disposition, one verification-only same-reviewer result, scope expansion, or
+  owner withdrawal.
+activation_preconditions:
+  workflow_profile_revision: 5
+  correction_specific_red_evidence: passed_expected_failure_and_isolated_exact_scope_probe
+  document_review: clean_required
+  vv_capsule_review_preflight: passed_required
+  authority_gate_result: proceed_required_before_behavior_change
+next_step: Stop. Obtain a new explicit owner decision and fresh authority gate before rebinding the seven requirements-digest fixtures or invoking a second model-context smoke.

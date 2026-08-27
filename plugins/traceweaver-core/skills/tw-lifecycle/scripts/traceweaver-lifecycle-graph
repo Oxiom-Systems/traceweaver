@@ -1,0 +1,557 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-graph-control; req=REQ-TW-139,REQ-TW-140,REQ-TW-142; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: entrypoint=lifecycle_graph_projection_navigation_and_closure; req=REQ-TW-139,REQ-TW-140,REQ-TW-142; trace=TRACE-TW-074; ver=VER-TW-094
+
+require "digest"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+require "set"
+
+GRAPH_SCHEMA = "tw-lifecycle-graph/1"
+RECORD_SCHEMA = "tw-lifecycle-record/1"
+RECORD_TYPES = %w[
+  commitment intent need requirement constraint decision interface risk change
+  product_artifact verification_definition verification_result
+  validation_definition validation_result acceptance_decision baseline evidence
+].freeze
+RELATIONSHIP_TYPES = %w[
+  derived_from refines satisfies allocated_to constrained_by decided_by
+  exposes_interface mitigates changes impacts implemented_by verified_by
+  validated_by accepted_by baselines evidences supersedes duplicates_candidate
+  depends_on invalidates reverified_by
+].freeze
+NON_AUTHORITATIVE_CLASSES = %w[imported_candidate external_reference evidence derived].freeze
+AUTHORITY_CLASSES = %w[authoritative candidate imported_candidate external_reference evidence derived].freeze
+APPLICABILITY_STATES = %w[applicable not_applicable unknown].freeze
+FRESHNESS_STATES = %w[current stale held unknown].freeze
+ACCEPTANCE_STATES = %w[proposed prepared observed_not_accepted accepted rejected held superseded].freeze
+HISTORICAL_EVIDENCE_TYPES = %w[evidence verification_result validation_result].freeze
+DIGEST_PATTERN = /\Asha256:[0-9a-f]{64}\z/
+RECORD_ID_PATTERN = /\A[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+\z/
+STOP_TERMS = Set.new(%w[a an and are as at be by for from in into is it of on or that the this to with]).freeze
+INTEGRITY = Pathname.new(__dir__).join("traceweaver-lifecycle-integrity").realpath
+
+class GraphError < StandardError
+  attr_reader :finding, :details
+
+  def initialize(finding, message, details = {})
+    super(message)
+    @finding = finding
+    @details = details
+  end
+end
+
+def fail!(finding, message, details = {})
+  raise GraphError.new(finding, message, details)
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.each_with_object({}) do |key, result|
+      source_key = value.key?(key) ? key : value.keys.find { |candidate| candidate.to_s == key }
+      result[key] = canonical(value.fetch(source_key))
+    end
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_value(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def present_string?(value)
+  value.is_a?(String) && !value.strip.empty?
+end
+
+def digest?(value)
+  present_string?(value) && value.match?(DIGEST_PATTERN)
+end
+
+def load_json(path, missing_finding, malformed_finding)
+  fail!(missing_finding, "file is missing", "path" => path.to_s) unless path.file?
+  fail!("unsafe_path", "symlink inputs are prohibited", "path" => path.to_s) if path.symlink?
+  bytes = path.binread
+  fail!("unsupported_encoding", "UTF-8 BOM is prohibited", "path" => path.to_s) if bytes.start_with?("\xEF\xBB\xBF".b)
+  fail!("unsupported_line_endings", "inputs must use LF line endings", "path" => path.to_s) if bytes.include?("\r".b)
+  JSON.parse(bytes)
+rescue JSON::ParserError => error
+  fail!(malformed_finding, "file is not valid JSON", "path" => path.to_s, "error" => error.message)
+end
+
+def path_inside_root(root, value, finding, directory: false)
+  candidate = Pathname.new(value)
+  candidate = root.join(candidate) unless candidate.absolute?
+  candidate = candidate.expand_path
+  fail!("unsafe_path", "symlink paths are prohibited", "path" => candidate.to_s) if candidate.symlink?
+  real = if candidate.exist?
+    candidate.realpath
+  elsif candidate.parent.directory?
+    candidate.parent.realpath.join(candidate.basename)
+  else
+    candidate
+  end
+  relative = real.relative_path_from(root).to_s
+  fail!(finding, "path escapes repository root", "path" => value) if relative == ".." || relative.start_with?("../")
+  fail!(finding, "directory is missing", "path" => value) if directory && !real.directory?
+  real
+rescue ArgumentError
+  fail!(finding, "path escapes repository root", "path" => value)
+end
+
+def run_integrity(*arguments)
+  stdout, stderr, status = Open3.capture3(INTEGRITY.to_s, *arguments)
+  parsed = JSON.parse(stdout)
+  return parsed if status.success?
+
+  fail!(parsed["finding"] || "integrity_check_failed", parsed["reason"] || stderr, parsed["details"] || {})
+rescue JSON::ParserError => error
+  fail!("integrity_output_invalid", "integrity control returned malformed output", "error" => error.message, "stderr" => stderr)
+end
+
+def validate_record!(record, path)
+  fail!("malformed_lifecycle_record", "record root must be an object", "path" => path.to_s) unless record.is_a?(Hash)
+  allowed = %w[
+    schema_version record_id record_type title owner authority_class source
+    applicability baseline freshness acceptance_state acceptance relationships fields
+  ]
+  required = allowed - %w[acceptance]
+  fail!("record_unknown_field", "record contains unsupported fields", "fields" => record.keys - allowed) unless (record.keys - allowed).empty?
+  fail!("record_missing_field", "record is incomplete", "fields" => required - record.keys) unless (required - record.keys).empty?
+  fail!("unsupported_record_schema", "record schema is unsupported", "path" => path.to_s) unless record["schema_version"] == RECORD_SCHEMA
+  fail!("invalid_record_id", "record_id is invalid", "path" => path.to_s) unless present_string?(record["record_id"]) && record["record_id"].match?(RECORD_ID_PATTERN)
+  fail!("unsupported_record_type", "record_type is unsupported", "record_id" => record["record_id"]) unless RECORD_TYPES.include?(record["record_type"])
+  %w[title owner authority_class applicability freshness acceptance_state].each do |field|
+    fail!("record_field_invalid", "record field must be non-empty", "record_id" => record["record_id"], "field" => field) unless present_string?(record[field])
+  end
+  fail!("invalid_authority_class", "record authority class is unsupported", "record_id" => record["record_id"]) unless AUTHORITY_CLASSES.include?(record["authority_class"])
+  fail!("invalid_applicability", "record applicability is unsupported", "record_id" => record["record_id"]) unless APPLICABILITY_STATES.include?(record["applicability"])
+  fail!("invalid_freshness", "record freshness is unsupported", "record_id" => record["record_id"]) unless FRESHNESS_STATES.include?(record["freshness"])
+  fail!("invalid_acceptance_state", "record acceptance state is unsupported", "record_id" => record["record_id"]) unless ACCEPTANCE_STATES.include?(record["acceptance_state"])
+  fail!("record_fields_invalid", "record fields must be an object", "record_id" => record["record_id"]) unless record["fields"].is_a?(Hash)
+
+  source = record["source"]
+  source_required = %w[source_id locator version digest role provenance]
+  source_allowed = source_required + %w[receipt_id]
+  fail!("record_provenance_missing", "record source is incomplete", "record_id" => record["record_id"]) unless source.is_a?(Hash) && (source_required - source.keys).empty? && (source.keys - source_allowed).empty? && source_required.all? { |field| present_string?(source[field]) }
+  fail!("invalid_digest", "record source digest is invalid", "record_id" => record["record_id"]) unless digest?(source["digest"])
+  if NON_AUTHORITATIVE_CLASSES.include?(record["authority_class"])
+    fail!("source_receipt_missing", "non-authoritative records require an immutable source receipt", "record_id" => record["record_id"]) unless digest?(source["receipt_id"])
+  end
+
+  baseline = record["baseline"]
+  baseline_fields = %w[baseline_id generation digest]
+  fail!("record_baseline_invalid", "record baseline is incomplete", "record_id" => record["record_id"]) unless baseline.is_a?(Hash) && baseline.keys.sort == baseline_fields.sort && baseline_fields.all? { |field| present_string?(baseline[field]) } && digest?(baseline["digest"])
+
+  relationships = record["relationships"]
+  fail!("record_relationships_invalid", "relationships must be an array", "record_id" => record["record_id"]) unless relationships.is_a?(Array)
+  identities = Set.new
+  relationships.each do |relationship|
+    fields = %w[source_id target_id relationship_type applicable provenance]
+    fail!("record_relationship_invalid", "relationship envelope is invalid", "record_id" => record["record_id"]) unless relationship.is_a?(Hash) && relationship.keys.sort == fields.sort
+    fail!("relationship_source_mismatch", "relationship source differs from record", "record_id" => record["record_id"]) unless relationship["source_id"] == record["record_id"]
+    fail!("unsupported_relationship_type", "relationship type is unsupported", "record_id" => record["record_id"]) unless RELATIONSHIP_TYPES.include?(relationship["relationship_type"])
+    fail!("relationship_target_invalid", "relationship target is invalid", "record_id" => record["record_id"]) unless present_string?(relationship["target_id"]) && relationship["target_id"].match?(RECORD_ID_PATTERN)
+    fail!("relationship_applicability_invalid", "relationship applicable must be boolean", "record_id" => record["record_id"]) unless [true, false].include?(relationship["applicable"])
+    fail!("record_provenance_missing", "relationship provenance is required", "record_id" => record["record_id"]) unless present_string?(relationship["provenance"])
+    identity = [relationship["target_id"], relationship["relationship_type"], relationship["applicable"]]
+    fail!("duplicate_relationship", "relationship identity is duplicated", "record_id" => record["record_id"], "identity" => identity) if identities.include?(identity)
+    identities << identity
+  end
+
+  if record["acceptance_state"] == "accepted"
+    acceptance = record["acceptance"]
+    acceptance_fields = %w[decision_id accepted_by accepted_at authority_source_id]
+    fail!("false_authority_promotion", "accepted records must be authoritative", "record_id" => record["record_id"]) unless record["authority_class"] == "authoritative"
+    fail!("acceptance_decision_missing", "accepted record requires one closed named-human decision", "record_id" => record["record_id"]) unless acceptance.is_a?(Hash) && acceptance.keys.sort == acceptance_fields.sort && acceptance_fields.all? { |field| present_string?(acceptance[field]) }
+  elsif record.key?("acceptance")
+    fail!("false_authority_promotion", "non-accepted record cannot carry an acceptance decision", "record_id" => record["record_id"])
+  end
+  record
+end
+
+def tokens(*values)
+  values.flatten.compact.join(" ").downcase.scan(/[a-z0-9]+/).reject { |term| term.length < 2 || STOP_TERMS.include?(term) }.uniq.sort
+end
+
+def record_node(record)
+  {
+    "record_id" => record["record_id"],
+    "record_type" => record["record_type"],
+    "title" => record["title"],
+    "owner" => record["owner"],
+    "authority_class" => record["authority_class"],
+    "source_id" => record.dig("source", "source_id"),
+    "source_locator" => record.dig("source", "locator"),
+    "source_digest" => record.dig("source", "digest"),
+    "applicability" => record["applicability"],
+    "baseline" => record["baseline"],
+    "freshness" => record["freshness"],
+    "acceptance_state" => record["acceptance_state"],
+    "record_digest" => digest_value(record),
+    "search_terms" => tokens(record["record_id"], record["record_type"], record["title"], record["owner"], JSON.generate(canonical(record["fields"])))
+  }
+end
+
+def build_graph(root, registry_path, records_dir)
+  registry_check = run_integrity("registry-check", "--root", root.to_s, "--registry", registry_path.to_s)
+  registry = load_json(registry_path, "missing_registry", "malformed_registry")
+  sources = registry.fetch("sources").each_with_object({}) { |source, result| result[source.fetch("source_id")] = source }
+
+  record_members = records_dir.children
+  unsupported_members = record_members.reject { |path| path.extname == ".json" && (path.file? || path.symlink?) }
+  fail!("unsupported_record_member", "record closure contains a non-JSON or nested member", "paths" => unsupported_members.map { |path| path.basename.to_s }.sort) unless unsupported_members.empty?
+  record_paths = record_members.sort_by { |path| path.basename.to_s }
+  fail!("empty_record_closure", "lifecycle record closure is empty") if record_paths.empty?
+  records = record_paths.map do |path|
+    fail!("unsafe_path", "record symlinks are prohibited", "path" => path.to_s) if path.symlink?
+    validate_record!(load_json(path, "missing_record", "malformed_lifecycle_record"), path)
+  end
+  record_ids = records.map { |record| record["record_id"] }
+  duplicate_ids = record_ids.group_by(&:itself).select { |_id, values| values.length > 1 }.keys.sort
+  fail!("duplicate_record_id", "record IDs must be unique", "record_ids" => duplicate_ids) unless duplicate_ids.empty?
+  record_id_set = record_ids.to_set
+
+  current_records = records.reject { |record| record["freshness"] == "stale" && HISTORICAL_EVIDENCE_TYPES.include?(record["record_type"]) }
+  fail!("current_baseline_missing", "closure requires at least one non-historical current record") if current_records.empty?
+  current_baselines = current_records.map { |record| canonical(record["baseline"]) }.uniq
+  fail!("mixed_baseline", "current lifecycle records must share one exact baseline", "baselines" => current_baselines) unless current_baselines.length == 1
+  baseline = current_records.first.fetch("baseline")
+  records.each do |record|
+    historical = record["freshness"] == "stale" && HISTORICAL_EVIDENCE_TYPES.include?(record["record_type"])
+    unless historical
+      fail!("mixed_baseline", "current records must share the graph authority baseline", "record_id" => record["record_id"]) unless canonical(record["baseline"]) == canonical(baseline)
+      fail!("mixed_generation", "current record baseline generation differs from registry", "record_id" => record["record_id"]) unless record.dig("baseline", "generation") == registry_check["generation"]
+    end
+    source = sources[record.dig("source", "source_id")]
+    fail!("unregistered_record_source", "record source is not registered", "record_id" => record["record_id"], "source_id" => record.dig("source", "source_id")) unless source
+    expected_version = source["version"] || source["generation"]
+    expected = {
+      "locator" => source["normalized_locator"],
+      "version" => expected_version,
+      "digest" => source["digest"],
+      "role" => source["role"]
+    }
+    actual = record.fetch("source").slice(*expected.keys)
+    fail!("record_source_mismatch", "record source identity differs from registered source", "record_id" => record["record_id"], "expected" => expected, "actual" => actual) unless actual == expected
+  end
+
+  used_source_ids = records.map { |record| record.dig("source", "source_id") }.uniq.sort
+  unused_source_ids = sources.keys.sort - used_source_ids
+  fail!("orphan_registered_source", "every registered source must contribute at least one lifecycle record", "source_ids" => unused_source_ids) unless unused_source_ids.empty?
+
+  receipts = {}
+  records.select { |record| NON_AUTHORITATIVE_CLASSES.include?(record["authority_class"]) }.map { |record| record.dig("source", "source_id") }.uniq.sort.each do |source_id|
+    receipts[source_id] = run_integrity("source-receipt", "--root", root.to_s, "--registry", registry_path.to_s, "--source-id", source_id)["receipt_id"]
+  end
+  records.each do |record|
+    next unless NON_AUTHORITATIVE_CLASSES.include?(record["authority_class"])
+    expected = receipts.fetch(record.dig("source", "source_id"))
+    fail!("source_receipt_mismatch", "record receipt does not match the exact registered source", "record_id" => record["record_id"], "expected" => expected, "actual" => record.dig("source", "receipt_id")) unless record.dig("source", "receipt_id") == expected
+  end
+
+  nodes = records.map { |record| record_node(record) }.sort_by { |node| node["record_id"] }
+  node_digests = nodes.each_with_object({}) { |node, result| result[node["record_id"]] = node["record_digest"] }
+  record_baseline_digests = records.each_with_object({}) { |record, result| result[record["record_id"]] = record.dig("baseline", "digest") }
+  edges = records.flat_map do |record|
+    record["relationships"].map do |relationship|
+      fail!("unresolved_relationship_target", "relationship target is absent from closure", "source_id" => record["record_id"], "target_id" => relationship["target_id"]) unless record_id_set.include?(relationship["target_id"])
+      relationship.merge(
+        "source_record_digest" => node_digests.fetch(record["record_id"]),
+        "baseline_digest" => record_baseline_digests.fetch(record["record_id"])
+      )
+    end
+  end.sort_by { |edge| [edge["source_id"], edge["target_id"], edge["relationship_type"], edge["applicable"] ? 1 : 0, edge["provenance"]] }
+
+  if records.length > 1
+    connected = Set.new(edges.flat_map { |edge| [edge["source_id"], edge["target_id"]] })
+    orphans = record_ids.reject { |id| connected.include?(id) }.sort
+    fail!("orphan_record", "records outside the relationship closure are prohibited", "record_ids" => orphans) unless orphans.empty?
+  end
+
+  source_closure = sources.values.sort_by { |source| source["source_id"] }.map do |source|
+    entry = {
+      "source_id" => source["source_id"],
+      "locator" => source["normalized_locator"],
+      "source_type" => source["source_type"],
+      "digest" => source["digest"],
+      "version" => source["version"] || source["generation"],
+      "role" => source["role"],
+      "authority_class" => source["authority_class"],
+      "record_ids" => records.select { |record| record.dig("source", "source_id") == source["source_id"] }.map { |record| record["record_id"] }.sort,
+      "external_fetches" => 0
+    }
+    entry["receipt_id"] = receipts[source["source_id"]] if receipts.key?(source["source_id"])
+    entry
+  end
+
+  graph_body = {
+    "schema_version" => GRAPH_SCHEMA,
+    "provenance" => {
+      "engine" => "traceweaver-tw-graph-lifecycle-projection",
+      "provider" => "provider_independent",
+      "registry_id" => registry_check["registry_id"],
+      "registry_digest" => registry_check["registry_digest"],
+      "generation" => registry_check["generation"],
+      "records_digest" => digest_value(nodes.map { |node| [node["record_id"], node["record_digest"]] }),
+      "graphify_enrichment" => false,
+      "refresh_policy" => "one_refresh_per_accepted_change_cycle_and_clean_ci_rebuild"
+    },
+    "baseline" => baseline,
+    "source_closure" => source_closure,
+    "nodes" => nodes,
+    "edges" => edges,
+    "authority_effect" => "none"
+  }
+  graph_body.merge("graph_id" => digest_value(graph_body))
+end
+
+def load_graph(path)
+  graph = load_json(path, "missing_graph", "malformed_graph")
+  fail!("unsupported_graph_schema", "graph schema is unsupported") unless graph["schema_version"] == GRAPH_SCHEMA
+  top_fields = %w[schema_version graph_id provenance baseline source_closure nodes edges authority_effect]
+  fail!("graph_shape_invalid", "graph does not contain the closed envelope", "fields" => graph.keys) unless graph.keys.sort == top_fields.sort
+  expected = digest_value(graph.reject { |key, _| key == "graph_id" })
+  fail!("graph_identity_mismatch", "graph identity does not match canonical content", "expected" => expected, "actual" => graph["graph_id"]) unless graph["graph_id"] == expected
+  fail!("graph_authority_promotion", "lifecycle graph cannot write authority") unless graph["authority_effect"] == "none"
+  provenance = graph["provenance"]
+  fail!("graph_provenance_invalid", "graph provenance is not provider-independent tw-graph projection") unless provenance.is_a?(Hash) && provenance["engine"] == "traceweaver-tw-graph-lifecycle-projection" && provenance["provider"] == "provider_independent" && provenance["graphify_enrichment"] == false && digest?(provenance["registry_digest"]) && digest?(provenance["records_digest"])
+  fail!("graph_shape_invalid", "graph nodes and edges must be arrays") unless graph["nodes"].is_a?(Array) && graph["edges"].is_a?(Array) && graph["source_closure"].is_a?(Array)
+  ids = graph["nodes"].map { |node| node.is_a?(Hash) ? node["record_id"] : nil }
+  fail!("duplicate_record_id", "graph node IDs must be non-empty and unique") unless ids.all? { |id| present_string?(id) } && ids.uniq == ids
+  id_set = ids.to_set
+  graph["edges"].each do |edge|
+    fail!("graph_edge_invalid", "graph edge is malformed") unless edge.is_a?(Hash) && id_set.include?(edge["source_id"]) && id_set.include?(edge["target_id"]) && RELATIONSHIP_TYPES.include?(edge["relationship_type"]) && digest?(edge["source_record_digest"]) && digest?(edge["baseline_digest"])
+  end
+  graph
+end
+
+def node_index(graph)
+  graph.fetch("nodes").each_with_object({}) { |node, result| result[node.fetch("record_id")] = node }
+end
+
+def require_node(graph, id)
+  node = node_index(graph)[id]
+  fail!("unknown_record_id", "record ID is absent from graph", "record_id" => id) unless node
+  node
+end
+
+def edge_adjacency(graph, directed: true)
+  adjacency = Hash.new { |hash, key| hash[key] = [] }
+  graph.fetch("edges").each do |edge|
+    adjacency[edge["source_id"]] << [edge["target_id"], edge]
+    adjacency[edge["target_id"]] << [edge["source_id"], edge] unless directed
+  end
+  adjacency.each_value { |values| values.sort_by! { |id, edge| [id, edge["relationship_type"], edge["source_id"], edge["target_id"]] } }
+  adjacency
+end
+
+def shortest_path(graph, from, to, directed: true)
+  require_node(graph, from)
+  require_node(graph, to)
+  return [from] if from == to
+  adjacency = edge_adjacency(graph, directed: directed)
+  queue = [from]
+  previous = {from => nil}
+  until queue.empty?
+    current = queue.shift
+    adjacency[current].each do |neighbor, _edge|
+      next if previous.key?(neighbor)
+      previous[neighbor] = current
+      if neighbor == to
+        path = [to]
+        path.unshift(previous[path.first]) while previous[path.first]
+        return path
+      end
+      queue << neighbor
+    end
+  end
+  []
+end
+
+command = ARGV.shift
+options = {root: Dir.pwd, limit: 25}
+OptionParser.new do |parser|
+  parser.banner = "Usage: traceweaver-lifecycle-graph <build|check|status|search|related|path|impact|duplicate-candidate> [options]"
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--registry PATH") { |value| options[:registry] = value }
+  parser.on("--records PATH") { |value| options[:records] = value }
+  parser.on("--output PATH") { |value| options[:output] = value }
+  parser.on("--graph PATH") { |value| options[:graph] = value }
+  parser.on("--id ID") { |value| options[:id] = value }
+  parser.on("--query TEXT") { |value| options[:query] = value }
+  parser.on("--from ID") { |value| options[:from] = value }
+  parser.on("--to ID") { |value| options[:to] = value }
+  parser.on("--limit N", Integer) { |value| options[:limit] = value }
+end.parse!
+
+begin
+  commands = %w[build check status search related path impact duplicate-candidate]
+  fail!("invalid_command", "unsupported graph operation", "operation" => command) unless commands.include?(command)
+  fail!("usage_error", "--limit must be a positive integer") unless options[:limit].is_a?(Integer) && options[:limit].positive?
+
+  if %w[build check].include?(command)
+    root = Pathname.new(options[:root]).expand_path
+    fail!("invalid_root", "--root must be a directory") unless root.directory?
+    root = root.realpath
+    %i[registry records].each { |key| fail!("usage_error", "--#{key} is required") unless present_string?(options[key]) }
+    registry_path = path_inside_root(root, options[:registry], "registry_path_escape")
+    records_dir = path_inside_root(root, options[:records], "records_path_escape", directory: true)
+    current = build_graph(root, registry_path, records_dir)
+
+    if command == "build"
+      fail!("usage_error", "--output is required") unless present_string?(options[:output])
+      output = path_inside_root(root, options[:output], "output_path_escape")
+      fail!("output_parent_missing", "graph output parent is missing", "path" => output.parent.to_s) unless output.parent.directory?
+      fail!("unsafe_path", "graph output cannot be a symlink", "path" => output.to_s) if output.symlink?
+      output.binwrite(canonical_json(current))
+      puts canonical_json(
+        "schema_version" => "tw-lifecycle-graph-build/1",
+        "status" => "pass",
+        "graph_id" => current["graph_id"],
+        "registry_digest" => current.dig("provenance", "registry_digest"),
+        "records_digest" => current.dig("provenance", "records_digest"),
+        "record_count" => current["nodes"].length,
+        "relationship_count" => current["edges"].length,
+        "source_count" => current["source_closure"].length,
+        "external_fetches" => 0,
+        "authority_effect" => "none",
+        "findings" => []
+      )
+    else
+      fail!("usage_error", "--graph is required") unless present_string?(options[:graph])
+      graph_path = path_inside_root(root, options[:graph], "graph_path_escape")
+      existing = load_graph(graph_path)
+      fail!("stale_graph", "graph differs from the current deterministic closure", "expected" => current["graph_id"], "actual" => existing["graph_id"]) unless canonical(existing) == canonical(current)
+      puts canonical_json(
+        "schema_version" => "tw-lifecycle-graph-check/1",
+        "status" => "pass",
+        "freshness" => "current",
+        "graph_id" => current["graph_id"],
+        "record_count" => current["nodes"].length,
+        "relationship_count" => current["edges"].length,
+        "authority_effect" => "none",
+        "findings" => []
+      )
+    end
+    exit 0
+  end
+
+  fail!("usage_error", "--graph is required") unless present_string?(options[:graph])
+  graph = load_graph(Pathname.new(options[:graph]).expand_path)
+  nodes = node_index(graph)
+
+  case command
+  when "status"
+    fail!("usage_error", "--id is required") unless present_string?(options[:id])
+    node = require_node(graph, options[:id])
+    puts canonical_json("schema_version" => "tw-lifecycle-status/1", "status" => "pass", "record" => node, "registered_repository_wide_searches" => 0, "graph_id" => graph["graph_id"], "authority_effect" => "none")
+  when "search"
+    fail!("usage_error", "--query is required") unless present_string?(options[:query])
+    query = options[:query]
+    query_terms = tokens(query)
+    results = graph.fetch("nodes").map do |node|
+      exact = node["record_id"].casecmp?(query)
+      overlap = query_terms & node.fetch("search_terms")
+      next unless exact || !overlap.empty?
+      {
+        "record_id" => node["record_id"],
+        "record_type" => node["record_type"],
+        "title" => node["title"],
+        "match" => exact ? "exact_id" : "text",
+        "score" => exact ? 1.0 : (overlap.length.to_f / [query_terms.length, 1].max).round(6),
+        "shared_terms" => overlap.sort
+      }
+    end.compact.sort_by { |entry| [entry["match"] == "exact_id" ? 0 : 1, -entry["score"], entry["record_id"]] }.first(options[:limit])
+    puts canonical_json("schema_version" => "tw-lifecycle-search/1", "status" => "pass", "query" => query, "results" => results, "registered_repository_wide_searches" => 0, "graph_id" => graph["graph_id"], "authority_effect" => "none")
+  when "related"
+    fail!("usage_error", "--id is required") unless present_string?(options[:id])
+    require_node(graph, options[:id])
+    incoming = graph.fetch("edges").select { |edge| edge["target_id"] == options[:id] }.map { |edge| edge.merge("record_id" => edge["source_id"]) }
+    outgoing = graph.fetch("edges").select { |edge| edge["source_id"] == options[:id] }.map { |edge| edge.merge("record_id" => edge["target_id"]) }
+    puts canonical_json("schema_version" => "tw-lifecycle-related/1", "status" => "pass", "record_id" => options[:id], "incoming" => incoming, "outgoing" => outgoing, "graph_id" => graph["graph_id"], "authority_effect" => "none")
+  when "path"
+    fail!("usage_error", "--from and --to are required") unless present_string?(options[:from]) && present_string?(options[:to])
+    ids = shortest_path(graph, options[:from], options[:to], directed: true)
+    puts canonical_json("schema_version" => "tw-lifecycle-path/1", "status" => "pass", "from" => options[:from], "to" => options[:to], "found" => !ids.empty?, "record_ids" => ids, "graph_id" => graph["graph_id"], "authority_effect" => "none")
+  when "impact"
+    fail!("usage_error", "--id is required") unless present_string?(options[:id])
+    require_node(graph, options[:id])
+    adjacency = edge_adjacency(graph, directed: false)
+    queue = [options[:id]]
+    previous = {options[:id] => nil}
+    until queue.empty?
+      current = queue.shift
+      adjacency[current].each do |neighbor, _edge|
+        next if previous.key?(neighbor)
+        previous[neighbor] = current
+        queue << neighbor
+      end
+    end
+    impacted_ids = previous.keys.reject { |id| id == options[:id] }.sort
+    selected_ids = impacted_ids.first(options[:limit])
+    stale_evidence_ids = impacted_ids.select do |id|
+      HISTORICAL_EVIDENCE_TYPES.include?(nodes.fetch(id)["record_type"]) && nodes.fetch(id)["freshness"] == "stale"
+    end
+    materialize = lambda do |id|
+      path = [id]
+      path.unshift(previous[path.first]) while previous[path.first]
+      {"record_id" => id, "record_type" => nodes.fetch(id)["record_type"], "freshness" => nodes.fetch(id)["freshness"], "path" => path}
+    end
+    impacted = selected_ids.map { |id| materialize.call(id) }
+    invalidated = stale_evidence_ids.map { |id| materialize.call(id) }
+    puts canonical_json("schema_version" => "tw-lifecycle-impact/1", "status" => "pass", "record_id" => options[:id], "impact_count" => impacted_ids.length, "result_limit" => options[:limit], "impacted" => impacted, "invalidated_evidence" => invalidated, "reverification_required" => !invalidated.empty?, "registered_repository_wide_searches" => 0, "graph_id" => graph["graph_id"], "authority_effect" => "none")
+  when "duplicate-candidate"
+    fail!("usage_error", "--id is required") unless present_string?(options[:id])
+    origin = require_node(graph, options[:id])
+    explicit = graph.fetch("edges").select do |edge|
+      edge["relationship_type"] == "duplicates_candidate" && [edge["source_id"], edge["target_id"]].include?(options[:id])
+    end.each_with_object({}) do |edge, result|
+      other = edge["source_id"] == options[:id] ? edge["target_id"] : edge["source_id"]
+      result[other] = edge["provenance"]
+    end
+    candidates = graph.fetch("nodes").reject { |node| node["record_id"] == options[:id] }.map do |node|
+      shared = origin.fetch("search_terms") & node.fetch("search_terms")
+      union = origin.fetch("search_terms") | node.fetch("search_terms")
+      confidence = union.empty? ? 0.0 : (shared.length.to_f / union.length).round(6)
+      next unless explicit.key?(node["record_id"]) || confidence >= 0.25
+      {
+        "record_id" => node["record_id"],
+        "record_type" => node["record_type"],
+        "title" => node["title"],
+        "shared_terms" => shared.sort,
+        "confidence" => explicit.key?(node["record_id"]) ? [confidence, 0.5].max : confidence,
+        "source_id" => node["source_id"],
+        "provenance" => explicit[node["record_id"]] || "deterministic_jaccard_title_and_record_terms"
+      }
+    end.compact.sort_by { |entry| [-entry["confidence"], entry["record_id"]] }.first(options[:limit])
+    puts canonical_json("schema_version" => "tw-lifecycle-duplicate-candidate/1", "status" => "pass", "record_id" => options[:id], "candidates" => candidates, "authority_effect" => "none", "graph_id" => graph["graph_id"])
+  end
+rescue GraphError => error
+  puts canonical_json(
+    "schema_version" => "tw-lifecycle-graph-finding/1",
+    "status" => "blocked",
+    "finding" => error.finding,
+    "reason" => error.message,
+    "details" => error.details,
+    "authority_effect" => "none"
+  )
+  exit 1
+rescue OptionParser::ParseError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-graph-finding/1", "status" => "blocked", "finding" => "usage_error", "reason" => error.message, "details" => {}, "authority_effect" => "none")
+  exit 2
+rescue StandardError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-graph-finding/1", "status" => "blocked", "finding" => "unexpected_graph_error", "reason" => error.message, "details" => {"class" => error.class.name}, "authority_effect" => "none")
+  exit 1
+end

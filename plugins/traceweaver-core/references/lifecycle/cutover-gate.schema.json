@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-cutover-gate/1",
+  "title": "TraceWeaver semantic HTML atomic cutover gate",
+  "description": "Fail-closed gate separating a derived semantic HTML candidate from any authority cutover. Eligibility requires a closed independently reproduced consumer census and parity, accessibility, security, usability, and rollback evidence in one exact generation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "gate_id", "current_generation", "candidate_generation",
+    "candidate_manifest_digest", "controlling_before", "requested_after",
+    "consumer_census", "evidence", "owner_decision", "remaining_holds",
+    "authority_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-cutover-gate/1"},
+    "gate_id": {"$ref": "#/$defs/digest"},
+    "current_generation": {"type": "string", "minLength": 1},
+    "candidate_generation": {"type": "string", "minLength": 1},
+    "candidate_manifest_digest": {"$ref": "#/$defs/digest"},
+    "controlling_before": {"const": "markdown_yaml"},
+    "requested_after": {"const": "semantic_html"},
+    "consumer_census": {"$ref": "#/$defs/census"},
+    "evidence": {"$ref": "#/$defs/evidence"},
+    "owner_decision": {"$ref": "#/$defs/owner_decision"},
+    "remaining_holds": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+    "authority_effect": {"const": "none"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "census": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest", "locator", "closed", "independently_reproduced", "readers", "writers", "migrated_paths"],
+      "properties": {
+        "digest": {"$ref": "#/$defs/digest"},
+        "locator": {"type": "string", "minLength": 1},
+        "closed": {"type": "boolean"},
+        "independently_reproduced": {"type": "boolean"},
+        "readers": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "writers": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true},
+        "migrated_paths": {"type": "array", "items": {"type": "string", "minLength": 1}, "uniqueItems": true}
+      }
+    },
+    "evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["parity", "accessibility", "security", "usability", "rollback_rehearsal"],
+      "properties": {
+        "parity": {"$ref": "#/$defs/evidence_ref"},
+        "accessibility": {"$ref": "#/$defs/evidence_ref"},
+        "security": {"$ref": "#/$defs/evidence_ref"},
+        "usability": {"$ref": "#/$defs/evidence_ref"},
+        "rollback_rehearsal": {"$ref": "#/$defs/evidence_ref"}
+      }
+    },
+    "evidence_ref": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "evidence_id", "locator", "digest"],
+      "properties": {
+        "state": {"enum": ["passed", "failed", "held"]},
+        "evidence_id": {"type": "string", "minLength": 1},
+        "locator": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "owner_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state", "owner", "decision_id", "decision_locator", "decision_digest"],
+      "properties": {
+        "state": {"enum": ["held", "accepted", "rejected"]},
+        "owner": {"type": "string", "minLength": 1},
+        "decision_id": {"type": "string", "minLength": 1},
+        "decision_locator": {"type": "string", "minLength": 1},
+        "decision_digest": {"$ref": "#/$defs/digest"}
+      }
+    }
+  }
+}

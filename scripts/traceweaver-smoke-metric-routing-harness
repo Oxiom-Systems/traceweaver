@@ -1,0 +1,473 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=metric-routing-harness-acceptance-smoke; req=REQ-TW-124,REQ-TW-125,REQ-TW-126,REQ-TW-127,REQ-TW-128,REQ-TW-129; trace=TRACE-TW-073; ver=VER-TW-093
+# TRACEWEAVER: verifies=ATP-TW-050; req=REQ-TW-124,REQ-TW-125,REQ-TW-126,REQ-TW-127,REQ-TW-128,REQ-TW-129; trace=TRACE-TW-073; ver=VER-TW-093
+#
+# Deterministic, offline-only pre-builder contract for ART-TW-080.  Before the
+# harness exists this smoke validates the frozen ATP inventory and independent
+# statistics oracle, then reports the named implementation groups that are
+# intentionally absent.  Once every group exists, it captures each evaluator's
+# canonical JSON stdout into a fresh temporary file and gives that immutable
+# evidence to the local validator without a shell, provider, network, or
+# credential.
+
+require "digest"
+require "json"
+require "open3"
+require "pathname"
+require "rbconfig"
+require "tmpdir"
+require "yaml"
+
+ROOT = File.realpath(File.expand_path("..", __dir__))
+MANIFEST_REL = "fixtures/metric-routing-harness/acceptance-cases.yml"
+GOLDEN_REL = "fixtures/metric-routing-harness/golden-statistics.yml"
+REFERENCE_REL = "plugins/traceweaver-core/references/metric-routing-harness.yml"
+REFERENCE_MIRROR_REL = "plugins/traceweaver-core/skills/tw-auto/references/metric-routing-harness.yml"
+VALIDATOR_REL = "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-validate-metric-routing-evidence"
+EVALUATOR_REL = "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-evaluate-metric-routing"
+FROZEN_MANIFEST_SHA256 = "c15c289205d8a392588d17f8e35a17fbdc3e5dc485346d7855a77c70e511dc1a"
+FROZEN_GOLDEN_SHA256 = "ded5bc102b15c14c23eb940e54c92c0e3ce82720fbf65ad3ed97aa7732e219d2"
+
+FROZEN_CASES = [
+  ["MR124_VALID_TRUSTED_ATTESTATION", "REQ-TW-124", "fixture_predicate_passed"],
+  ["MR124_SIGNATURE_TAMPERED", "REQ-TW-124", "held_attestation_signature_invalid"],
+  ["MR124_UNSIGNED", "REQ-TW-124", "held_attestation_signature_missing"],
+  ["MR124_ESTIMATED_VALUE", "REQ-TW-124", "held_attestation_estimated"],
+  ["MR124_INCOMPLETE_EXECUTION_BINDING", "REQ-TW-124", "held_attestation_incomplete"],
+  ["MR124_CANONICAL_DUPLICATE", "REQ-TW-124", "held_attestation_noncanonical"],
+  ["MR124_KEY_SUBSTITUTION", "REQ-TW-124", "held_attestation_trust_or_suite_mismatch"],
+  ["MR124_TRUST_DIGEST_DRIFT", "REQ-TW-124", "held_attestation_trust_or_suite_mismatch"],
+  ["MR124_TRUST_ROOT_ROTATION", "REQ-TW-124", "held_attestation_trust_or_suite_mismatch"],
+  ["MR124_SIGNATURE_SUITE_DRIFT", "REQ-TW-124", "held_attestation_trust_or_suite_mismatch"],
+  ["MR124_SELF_ATTESTING_COLLECTOR", "REQ-TW-124", "held_attestation_self_attested"],
+  ["MR124_REPLAY", "REQ-TW-124", "held_attestation_replayed"],
+  ["MR124_CROSS_CELL_REUSE", "REQ-TW-124", "held_attestation_cross_cell"],
+  ["MR124_CONTENT_BEARING", "REQ-TW-124", "held_privacy_content_forbidden"],
+  ["MR124_LOCATOR_ABSOLUTE", "REQ-TW-124", "held_locator_unsafe"],
+  ["MR124_LOCATOR_TRAVERSAL", "REQ-TW-124", "held_locator_unsafe"],
+  ["MR124_LOCATOR_SYMLINK", "REQ-TW-124", "held_locator_unsafe"],
+  ["MR124_LOCATOR_OVERSIZED", "REQ-TW-124", "held_locator_unsafe"],
+  ["MR125_FROZEN_POLICY_AND_EXACT_PAIR", "REQ-TW-125", "fixture_predicate_passed"],
+  ["MR125_PILOT_NONQUALIFYING", "REQ-TW-125", "held_pilot_or_underpowered"],
+  ["MR125_POLICY_DRIFT", "REQ-TW-125", "held_policy_identity_mismatch"],
+  ["MR125_CORPUS_DRIFT", "REQ-TW-125", "held_corpus_identity_mismatch"],
+  ["MR125_METHOD_POWER_BOUNDARY", "REQ-TW-125", "fixture_predicate_passed"],
+  ["MR125_ADAPTIVE_STOPPING", "REQ-TW-125", "held_adaptive_stopping"],
+  ["MR125_POST_RESULT_EXCLUSION", "REQ-TW-125", "held_post_result_exclusion"],
+  ["MR125_REPLACEMENT_OVER_CAP", "REQ-TW-125", "held_replacement_over_cap"],
+  ["MR125_DUPLICATE_PAIR", "REQ-TW-125", "held_duplicate_pair"],
+  ["MR125_CHANGED_AXIS", "REQ-TW-125", "held_changed_axis"],
+  ["MR126_QUALITY_CONJUNCTION", "REQ-TW-126", "fixture_predicate_passed"],
+  ["MR126_HARD_INVARIANT", "REQ-TW-126", "held_quality_hard_invariant"],
+  ["MR126_SCORE_FLOOR", "REQ-TW-126", "held_quality_floor"],
+  ["MR126_MISSING_RATING", "REQ-TW-126", "held_quality_missing_rating"],
+  ["MR126_UNBLINDED_RATER", "REQ-TW-126", "held_quality_unblinded"],
+  ["MR126_NONINDEPENDENT_RATER", "REQ-TW-126", "held_quality_nonindependent"],
+  ["MR126_KAPPA_BELOW", "REQ-TW-126", "held_quality_kappa_below_threshold"],
+  ["MR126_KAPPA_EQUAL", "REQ-TW-126", "fixture_predicate_passed"],
+  ["MR126_KAPPA_ZERO_VARIANCE", "REQ-TW-126", "held_quality_kappa_undefined"],
+  ["MR126_NONINFERIORITY_BELOW", "REQ-TW-126", "held_quality_noninferiority_below_threshold"],
+  ["MR126_NONINFERIORITY_EQUAL", "REQ-TW-126", "fixture_predicate_passed"],
+  ["MR126_NO_EFFICIENCY_COMPENSATION", "REQ-TW-126", "held_quality_conjunctive_failure"],
+  ["MR127_VALID_ACCOUNTING_INTERVAL", "REQ-TW-127", "fixture_predicate_passed"],
+  ["MR127_CACHED_INPUT_RETRY_SHARD_ACCOUNTING", "REQ-TW-127", "fixture_predicate_passed"],
+  ["MR127_INVALID_PAIR_ISOLATION", "REQ-TW-127", "held_accounting_invalid_pair"],
+  ["MR127_PARTIAL_PAIR_ISOLATION", "REQ-TW-127", "held_accounting_partial_pair"],
+  ["MR127_UNDERPOWERED", "REQ-TW-127", "held_accounting_underpowered"],
+  ["MR127_TOKEN_BOUNDARY_BELOW", "REQ-TW-127", "held_token_reduction_below_threshold"],
+  ["MR127_TOKEN_BOUNDARY_EQUAL", "REQ-TW-127", "fixture_predicate_passed"],
+  ["MR127_TOKEN_BOUNDARY_ABOVE", "REQ-TW-127", "fixture_predicate_passed"],
+  ["MR127_LATENCY_BOUNDARY_BELOW", "REQ-TW-127", "fixture_predicate_passed"],
+  ["MR127_LATENCY_BOUNDARY_EQUAL", "REQ-TW-127", "fixture_predicate_passed"],
+  ["MR127_LATENCY_BOUNDARY_ABOVE", "REQ-TW-127", "held_latency_ratio_above_threshold"],
+  ["MR128_POSITIVE_SUFFICIENCY_FIXTURE_ONLY", "REQ-TW-128", "fixture_only_sufficiency_predicate_passed"],
+  ["MR128_NEGATIVE_DOES_NOT_SUFFICE", "REQ-TW-128", "held_negative_control_not_sufficient"],
+  ["MR128_PROHIBITED_OVERFLOW", "REQ-TW-128", "held_positive_sufficiency_overflow"],
+  ["MR128_PROHIBITED_TRUNCATION", "REQ-TW-128", "held_positive_sufficiency_truncation"],
+  ["MR128_PROHIBITED_DELETION", "REQ-TW-128", "held_positive_sufficiency_deletion"],
+  ["MR128_PROHIBITED_DOWNGRADE", "REQ-TW-128", "held_positive_sufficiency_downgrade"],
+  ["MR128_PROHIBITED_LOSSY_COMPACTION", "REQ-TW-128", "held_positive_sufficiency_lossy"],
+  ["MR128_UNBOUNDED_RETRY", "REQ-TW-128", "held_positive_sufficiency_retry"],
+  ["MR128_HIDDEN_PROMOTION", "REQ-TW-128", "held_positive_sufficiency_hidden_promotion"],
+  ["MR129_EXACT_CELL_FIXTURE_PREDICATE", "REQ-TW-129", "fixture_qualification_predicate_passed"],
+  ["MR129_MISSING_VALIDATION", "REQ-TW-129", "held_exact_cell_validation_missing"],
+  ["MR129_EXPIRY_RESET", "REQ-TW-129", "structurally_eligible_reset"],
+  ["MR129_EXACT_CELL_RESET", "REQ-TW-129", "structurally_eligible_reset"],
+  ["MR129_CAPABILITY_DRIFT", "REQ-TW-129", "structurally_eligible_reset"],
+  ["MR129_TOKENIZER_DRIFT", "REQ-TW-129", "structurally_eligible_reset"],
+  ["MR129_PROFILE_DRIFT", "REQ-TW-129", "structurally_eligible_reset"],
+  ["MR129_ORACLE_DRIFT", "REQ-TW-129", "structurally_eligible_reset"],
+  ["MR129_ALIAS_INHERITANCE_NONTRANSFERABLE", "REQ-TW-129", "held_exact_cell_evidence_nontransferable"],
+  ["MR129_CROSS_CELL_NONTRANSFERABLE", "REQ-TW-129", "held_exact_cell_evidence_nontransferable"],
+  ["MR129_HELD_CLAIM_BOUNDARY", "REQ-TW-129", "held_claim_boundary_preserved"]
+].freeze
+
+EXPECTED_REQUIREMENTS = (124..129).map { |number| "REQ-TW-#{number}" }.freeze
+
+def usage_failure!(finding)
+  warn "metric_routing_finding=#{finding}"
+  exit 2
+end
+
+def contract_failure!(finding)
+  warn "metric_routing_finding=#{finding}"
+  exit 2
+end
+
+def rational!(value, label)
+  Rational(value.to_s)
+rescue ArgumentError, ZeroDivisionError
+  contract_failure!("golden_invalid_rational=#{label}")
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.map(&:to_s).sort.to_h { |key| [key, canonical(value.fetch(key))] }
+  when Array
+    value.map { |item| canonical(item) }
+  else
+    value
+  end
+end
+
+def record_identity(record, own_identity_field)
+  payload = record.reject { |key, _value| key == own_identity_field }
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(payload)))}"
+end
+
+def choose(n, k)
+  return 0 if k.negative? || k > n
+
+  k = [k, n - k].min
+  (1..k).reduce(1) { |value, index| value * (n - k + index) / index }
+end
+
+def cutoff(n, alpha)
+  (0..n).find do |k|
+    (k..n).sum { |j| Rational(choose(n, j), 2**n) } <= alpha
+  end
+end
+
+def sign_power(n, cutoff_value, p1)
+  (cutoff_value..n).sum do |j|
+    Rational(choose(n, j)) * p1**j * (1 - p1)**(n - j)
+  end
+end
+
+def order_statistic_rank(n, alpha)
+  (1..n).select do |k|
+    (0..k - 1).sum { |j| Rational(choose(n, j), 2**n) } <= alpha
+  end.max
+end
+
+def quadratic_weighted_kappa(first, second, categories)
+  contract_failure!("golden_kappa_rating_count") unless first.length == second.length && !first.empty?
+
+  width = categories.max - categories.min
+  contract_failure!("golden_kappa_category_range") unless width.positive?
+  weight = lambda { |left, right| Rational((left - right)**2, width**2) }
+  observed = first.zip(second).sum { |left, right| weight.call(left, right) } / first.length
+  first_counts = categories.to_h { |category| [category, first.count(category)] }
+  second_counts = categories.to_h { |category| [category, second.count(category)] }
+  expected = categories.product(categories).sum do |left, right|
+    weight.call(left, right) * Rational(first_counts.fetch(left) * second_counts.fetch(right), first.length**2)
+  end
+  contract_failure!("golden_kappa_zero_expected") unless expected.positive?
+
+  1 - observed / expected
+end
+
+def safe_relative?(value)
+  return false unless value.is_a?(String) && !value.empty?
+
+  path = Pathname.new(value)
+  return false if path.absolute?
+
+  parts = value.split("/")
+  parts.all? { |part| !part.empty? && part != "." && part != ".." }
+end
+
+def existing_safe_file?(root, relative)
+  return false unless safe_relative?(relative)
+
+  cursor = root
+  relative.split("/").each do |part|
+    cursor = File.join(cursor, part)
+    return false if File.symlink?(cursor)
+  end
+  return false unless File.file?(cursor)
+  return false if File.size(cursor) > 1_048_576
+
+  resolved = File.realpath(cursor)
+  resolved == root || resolved.start_with?("#{root}/")
+end
+
+def load_yaml!(path, finding)
+  YAML.safe_load(File.read(path), aliases: false)
+rescue Psych::Exception, Errno::ENOENT
+  contract_failure!(finding)
+end
+
+def verify_frozen_file!(path, expected_sha256, finding)
+  contract_failure!(finding) unless File.file?(path) && Digest::SHA256.file(path).hexdigest == expected_sha256
+end
+
+def enforce_offline_source!(path, label)
+  source = File.binread(path)
+  allowed_requires = %w[base64 date digest fileutils json openssl optparse pathname set stringio time tmpdir yaml]
+  declared_requires = source.scan(/^\s*require\s*(?:\(\s*)?["']([^"']+)["']/).flatten
+  disallowed_require = declared_requires.reject { |library| allowed_requires.include?(library) }
+  contract_failure!("#{label}_offline_guard=disallowed_require:#{disallowed_require.join(',')}") unless disallowed_require.empty?
+  prohibited = {
+    "environment_access" => /\bENV(?:\[|\.|\s*fetch)/,
+    "local_or_dynamic_load" => /\b(?:require_relative|load|autoload)\b/,
+    "network_library" => /\b(?:TCPSocket|TCPServer|UDPSocket|IPSocket|Socket|Addrinfo|Net::HTTP|OpenURI|Resolv)\b/,
+    "network_require" => /require\s*(?:\(\s*)?["'](?:net\/http|net\/https|socket|open-uri|resolv)["']/,
+    "subprocess" => /(?:\b(?:system|spawn|exec|fork)\s*(?:\(|["'])|\bIO\.popen\b|\bOpen3\b|`)/,
+    "network_command" => /\b(?:curl|wget|ssh|scp|nc|netcat)\b/,
+    "credential_name" => /\b(?:OPENAI|ANTHROPIC|GEMINI|AWS_|GOOGLE_|AZURE_|API_KEY|ACCESS_TOKEN|BEARER_TOKEN)\b/i
+  }
+  finding = prohibited.find { |_name, pattern| source.match?(pattern) }
+  contract_failure!("#{label}_offline_guard=#{finding.first}") if finding
+end
+
+def validate_golden!(golden)
+  contract_failure!("golden_schema") unless golden.is_a?(Hash) && golden["schema_version"] == "tw-metric-routing-golden-statistics/1"
+  contract_failure!("golden_method_suite") unless golden["method_suite"] == "tw-metric-exact-paired/1"
+
+  sign = golden.fetch("sign_design") { contract_failure!("golden_sign_design") }
+  alpha = rational!(sign.fetch("alpha") { contract_failure!("golden_alpha") }, "alpha")
+  null_probability = rational!(sign.fetch("null_favorable_probability") { contract_failure!("golden_null_probability") }, "null_probability")
+  p1 = rational!(sign.fetch("alternative_favorable_probability") { contract_failure!("golden_p1") }, "p1")
+  power_target = rational!(sign.fetch("power_target") { contract_failure!("golden_power_target") }, "power_target")
+  fixed_minimum = Integer(sign.fetch("fixed_minimum_valid_positive_pairs") { contract_failure!("golden_fixed_minimum") })
+  contract_failure!("golden_sign_constants") unless alpha == Rational(1, 20) && null_probability == Rational(1, 2) && p1 == Rational(4, 5) && power_target == Rational(4, 5) && fixed_minimum == 10
+
+  powered = sign.fetch("powered_minimum") { contract_failure!("golden_powered_minimum") }
+  n = Integer(powered.fetch("n"))
+  expected_cutoff = Integer(powered.fetch("cutoff"))
+  expected_power = rational!(powered.fetch("power"), "powered_minimum.power")
+  actual_cutoff = cutoff(n, alpha)
+  actual_power = sign_power(n, actual_cutoff, p1)
+  contract_failure!("golden_powered_minimum_mismatch") unless n == 18 && actual_cutoff == expected_cutoff && actual_power == expected_power && actual_power >= power_target
+  contract_failure!("golden_powered_minimum_not_minimal") unless (fixed_minimum...n).all? { |candidate| candidate_cutoff = cutoff(candidate, alpha); candidate_cutoff.nil? || sign_power(candidate, candidate_cutoff, p1) < power_target }
+
+  order = golden.fetch("order_statistic") { contract_failure!("golden_order_statistic") }
+  confidence = rational!(order.fetch("confidence") { contract_failure!("golden_order_confidence") }, "order.confidence")
+  order_n = Integer(order.fetch("n"))
+  order_rank = Integer(order.fetch("rank"))
+  contract_failure!("golden_order_statistic_mismatch") unless confidence == Rational(19, 20) && order_n == 10 && order_rank == 2 && order_statistic_rank(order_n, alpha) == order_rank && Integer(order.fetch("lower_index")) == order_rank && Integer(order.fetch("upper_index")) == order_n - order_rank + 1
+
+  kappa = golden.fetch("quadratic_weighted_kappa") { contract_failure!("golden_kappa") }
+  contract_failure!("golden_kappa_category_range") unless kappa["category_range"] == "0..4"
+  categories = (0..4).to_a
+  rater_ids = kappa.fetch("rater_ids") { contract_failure!("golden_kappa_raters") }
+  ratings = kappa.fetch("raw_ratings") { contract_failure!("golden_kappa_ratings") }
+  contract_failure!("golden_kappa_rater_ids") unless rater_ids == %w[rater-a rater-b rater-c]
+  contract_failure!("golden_kappa_rating_rows") unless ratings.is_a?(Array) && ratings.length == 20 && ratings.map { |row| row["scenario"] }.uniq.length == ratings.length
+  ratings.each do |row|
+    values = row.is_a?(Hash) ? row["ratings"] : nil
+    contract_failure!("golden_kappa_rating_schema") unless values.is_a?(Hash) && values.keys == rater_ids && values.values.all? { |value| value.is_a?(Integer) && categories.include?(value) }
+  end
+  computed_pairwise = rater_ids.combination(2).to_h do |left, right|
+    left_values = ratings.map { |row| row.fetch("ratings").fetch(left) }
+    right_values = ratings.map { |row| row.fetch("ratings").fetch(right) }
+    ["#{left}__#{right}", quadratic_weighted_kappa(left_values, right_values, categories)]
+  end
+  declared_pairwise = kappa.fetch("expected_pairwise_kappa") { contract_failure!("golden_kappa_expected_pairs") }
+  parsed_pairwise = declared_pairwise.to_h { |pair, value| [pair, rational!(value, "kappa.#{pair}")] }
+  contract_failure!("golden_kappa_pairwise_mismatch") unless parsed_pairwise == computed_pairwise
+  declared_minimum = rational!(kappa.fetch("expected_minimum_pairwise_kappa"), "kappa.minimum")
+  contract_failure!("golden_kappa_boundary") unless declared_minimum == Rational(4, 5) && computed_pairwise.values.min == declared_minimum
+
+  thresholds = golden.fetch("inclusive_threshold_boundaries") { contract_failure!("golden_thresholds") }
+  {
+    "quality_difference_lower_bound" => [Rational(-13, 50), Rational(-1, 4), Rational(-6, 25)],
+    "token_reduction_lower_bound" => [Rational(19, 100), Rational(1, 5), Rational(21, 100)],
+    "latency_ratio_upper_bound" => [Rational(119, 100), Rational(6, 5), Rational(121, 100)]
+  }.each do |name, values|
+    boundary = thresholds.fetch(name) { contract_failure!("golden_threshold_missing=#{name}") }
+    actual = %w[below equal above].map { |key| rational!(boundary.fetch(key), "#{name}.#{key}") }
+    contract_failure!("golden_threshold_mismatch=#{name}") unless actual == values
+  end
+
+  other = golden.fetch("other_exact_thresholds") { contract_failure!("golden_other_thresholds") }
+  contract_failure!("golden_other_thresholds_mismatch") unless
+    Integer(other["valid_positive_pairs_minimum"]) == 10 &&
+    Integer(other["replacement_cap_pairs"]) == 1 &&
+    rational!(other["replacement_cap_fraction"], "replacement_cap_fraction") == Rational(1, 10) &&
+    Integer(other["absolute_score_floor"]) == 3 &&
+    Integer(other["blinded_independent_raters_minimum"]) == 2 &&
+    rational!(other["hard_invariants_required_fraction"], "hard_invariants_required_fraction") == Rational(1, 1) &&
+    other["threshold_comparisons"] == "inclusive"
+end
+
+def validate_manifest!(manifest)
+  contract_failure!("manifest_schema") unless manifest.is_a?(Hash) && manifest["schema_version"] == "tw-metric-routing-acceptance-cases/1"
+  contract_failure!("manifest_atp") unless manifest["acceptance_test_id"] == "ATP-TW-050"
+  contract_failure!("manifest_offline_boundary") unless manifest["offline_only"] == true && manifest["network_forbidden"] == true && manifest["provider_calls_forbidden"] == true && manifest["credential_free"] == true
+  contract_failure!("manifest_frozen_case_count") unless manifest["frozen_case_count"] == FROZEN_CASES.length
+  commands = manifest["commands"]
+  contract_failure!("manifest_commands") unless commands.is_a?(Hash) && commands["full"] == "scripts/traceweaver-smoke-metric-routing-harness" && commands["single_case"] == "scripts/traceweaver-smoke-metric-routing-harness --case ID"
+
+  cases = manifest["cases"]
+  contract_failure!("manifest_cases") unless cases.is_a?(Array)
+  ids = cases.map { |entry| entry.is_a?(Hash) ? entry["id"] : nil }
+  contract_failure!("manifest_duplicate_case_id") unless ids.uniq.length == ids.length
+  expected_ids = FROZEN_CASES.map(&:first)
+  contract_failure!("manifest_unknown_or_renamed_case") unless ids == expected_ids
+
+  cases.each_with_index do |entry, index|
+    id, requirement, outcome = FROZEN_CASES.fetch(index)
+    contract_failure!("manifest_case_schema=#{id}") unless entry.is_a?(Hash)
+    contract_failure!("manifest_case_mutated=#{id}") unless entry["id"] == id && entry["req"] == requirement && entry["expected_outcome"] == outcome && entry["status"] == "frozen" && !entry.key?("skip") && !entry.key?("skipped")
+    locators = entry["future_fixture_locators"]
+    contract_failure!("manifest_case_missing_fixture_locator=#{id}") unless locators.is_a?(Array) && !locators.empty? && locators.all? { |locator| safe_relative?(locator) }
+  end
+  contract_failure!("manifest_requirement_coverage") unless cases.map { |entry| entry["req"] }.uniq.sort == EXPECTED_REQUIREMENTS
+
+  groups = manifest["required_groups"]
+  contract_failure!("manifest_required_groups") unless groups.is_a?(Array) && !groups.empty?
+  group_names = groups.map { |group| group.is_a?(Hash) ? group["name"] : nil }
+  contract_failure!("manifest_duplicate_group") unless group_names.uniq.length == group_names.length
+  groups.each do |group|
+    contract_failure!("manifest_group_schema") unless group.is_a?(Hash) && group["name"].is_a?(String) && group["kind"].is_a?(String)
+    files = group["files"]
+    contract_failure!("manifest_group_files=#{group['name']}") unless files.is_a?(Array) && !files.empty? && files.all? { |file| safe_relative?(file) }
+  end
+  [cases, groups]
+end
+
+def reject_untracked_fixture_files!(root, cases, groups)
+  fixture_root = File.join(root, "fixtures/metric-routing-harness")
+  declared = [MANIFEST_REL, GOLDEN_REL]
+  declared.concat(cases.flat_map { |entry| entry.fetch("future_fixture_locators") })
+  declared.concat(groups.flat_map { |group| group.fetch("files") }.select { |file| file.start_with?("fixtures/metric-routing-harness/") })
+  actual = Dir.glob(File.join(fixture_root, "**", "*"), File::FNM_DOTMATCH)
+    .select { |path| File.file?(path) || File.symlink?(path) }
+    .map { |path| Pathname.new(path).relative_path_from(Pathname.new(root)).to_s }
+  untracked = actual - declared.uniq
+  contract_failure!("manifest_untracked_fixture=#{untracked.sort.join(',')}") unless untracked.empty?
+end
+
+def validate_fixture_digest_binding!(root, cases, groups)
+  canonical_path = File.join(root, REFERENCE_REL)
+  mirror_path = File.join(root, REFERENCE_MIRROR_REL)
+  contract_failure!("reference_mirror_mismatch") unless File.binread(canonical_path) == File.binread(mirror_path)
+  reference = load_yaml!(canonical_path, "reference_unreadable")
+  contract_failure!("reference_schema") unless reference.is_a?(Hash) && reference["schema_version"] == "tw-metric-routing-harness/1"
+  inventory = reference["fixture_inventory"]
+  contract_failure!("reference_fixture_inventory_schema") unless inventory.is_a?(Hash) && inventory["schema_version"] == "tw-metric-routing-fixture-inventory/1"
+  entries = inventory["entries"]
+  contract_failure!("reference_fixture_inventory_entries") unless entries.is_a?(Array)
+  expected_locators = [MANIFEST_REL, GOLDEN_REL]
+  expected_locators.concat(cases.flat_map { |entry| entry.fetch("future_fixture_locators") })
+  expected_locators.concat(groups.flat_map { |group| group.fetch("files") }.select { |file| file.start_with?("fixtures/metric-routing-harness/") })
+  expected_locators = expected_locators.uniq.sort
+  actual_locators = entries.map { |entry| entry.is_a?(Hash) ? entry["locator"] : nil }
+  contract_failure!("reference_fixture_inventory_locator_set") unless actual_locators == expected_locators
+  entries.each do |entry|
+    contract_failure!("reference_fixture_inventory_entry") unless entry.keys.sort == %w[locator sha256]
+    locator = entry.fetch("locator")
+    expected = entry.fetch("sha256")
+    contract_failure!("reference_fixture_inventory_digest_shape=#{locator}") unless expected.is_a?(String) && expected.match?(/\Asha256:[0-9a-f]{64}\z/)
+    actual = "sha256:#{Digest::SHA256.file(File.join(root, locator)).hexdigest}"
+    contract_failure!("reference_fixture_inventory_digest_mismatch=#{locator}") unless expected == actual
+  end
+end
+
+selected_case = ""
+arguments = ARGV.dup
+if arguments.first == "--case"
+  usage_failure!("missing_case_id") if arguments.length < 2 || arguments[1].empty?
+  selected_case = arguments[1]
+  arguments = arguments.drop(2)
+end
+usage_failure!("unexpected_arguments") unless arguments.empty?
+
+manifest_path = File.join(ROOT, MANIFEST_REL)
+golden_path = File.join(ROOT, GOLDEN_REL)
+verify_frozen_file!(manifest_path, FROZEN_MANIFEST_SHA256, "manifest_frozen_digest")
+verify_frozen_file!(golden_path, FROZEN_GOLDEN_SHA256, "golden_frozen_digest")
+manifest = load_yaml!(manifest_path, "manifest_unreadable")
+golden = load_yaml!(golden_path, "golden_unreadable")
+validate_golden!(golden)
+cases, groups = validate_manifest!(manifest)
+reject_untracked_fixture_files!(ROOT, cases, groups)
+ids = cases.map { |entry| entry.fetch("id") }
+usage_failure!("unknown_case_id=#{selected_case}") unless selected_case.empty? || ids.include?(selected_case)
+selected = selected_case.empty? ? cases : cases.select { |entry| entry.fetch("id") == selected_case }
+
+puts "metric_routing_contract_status=valid"
+puts "metric_routing_smoke_case_count=#{cases.length}"
+puts "metric_routing_smoke_requirement_coverage=#{EXPECTED_REQUIREMENTS.join(',')}"
+puts "metric_routing_smoke_selected_case=#{selected_case.empty? ? 'all' : selected_case}"
+puts "metric_routing_smoke_network=forbidden"
+
+missing_groups = groups.select { |group| group.fetch("files").any? { |relative| !existing_safe_file?(ROOT, relative) } }
+case_fixture_missing = cases.flat_map { |entry| entry.fetch("future_fixture_locators") }.uniq.any? do |relative|
+  !existing_safe_file?(ROOT, relative)
+end
+missing_groups << { "name" => "fixture_frozen_case_locators" } if case_fixture_missing
+unless missing_groups.empty?
+  puts "metric_routing_smoke_status=blocked"
+  puts "metric_routing_smoke_phase=prebuilder_contract_validated"
+  missing_groups.each { |group| puts "metric_routing_smoke_missing_group=#{group.fetch('name')}" }
+  exit 1
+end
+
+validate_fixture_digest_binding!(ROOT, cases, groups)
+
+evaluator = File.join(ROOT, EVALUATOR_REL)
+validator = File.join(ROOT, VALIDATOR_REL)
+contract_failure!("evaluator_missing_or_unsafe") unless existing_safe_file?(ROOT, EVALUATOR_REL) && File.executable?(evaluator)
+contract_failure!("validator_missing_or_unsafe") unless existing_safe_file?(ROOT, VALIDATOR_REL) && File.executable?(validator)
+enforce_offline_source!(evaluator, "evaluator")
+enforce_offline_source!(validator, "validator")
+selected.each do |entry|
+  Dir.mktmpdir("traceweaver-metric-routing-") do |state_dir|
+    evidence_path = File.join(state_dir, "#{entry.fetch('id')}-evaluator-evidence.json")
+    child_environment = { "HOME" => state_dir, "TMPDIR" => state_dir, "LANG" => "C", "LC_ALL" => "C", "TZ" => "UTC", "TRACEWEAVER_OFFLINE" => "1" }
+    output, error, status = Open3.capture3(child_environment, RbConfig.ruby, "--disable-gems", evaluator, "--root", ROOT, "--case", entry.fetch("id"), "--fixtures", entry.fetch("future_fixture_locators").join(","), "--state-dir", state_dir, unsetenv_others: true, chdir: ROOT)
+    unless status.success?
+      warn "metric_routing_finding=evaluator_failed=#{entry.fetch('id')} exit=#{status.exitstatus} expected=#{entry.fetch('expected_outcome')} stdout=#{output.strip.inspect} stderr=#{error.strip.inspect}"
+      exit 1
+    end
+    raw_evidence = output.strip
+    begin
+      evidence = JSON.parse(raw_evidence)
+    rescue JSON::ParserError
+      contract_failure!("evaluator_evidence_invalid=#{entry.fetch('id')}")
+    end
+    unless evidence.is_a?(Hash) && evidence["schema_version"] == "tw-metric-routing-evaluator-evidence/1" && evidence["case_id"] == entry.fetch("id") && evidence["outcome"] == entry.fetch("expected_outcome") && evidence["evidence_identity"] == record_identity(evidence, "evidence_identity")
+      contract_failure!("evaluator_evidence_contract_mismatch=#{entry.fetch('id')}")
+    end
+    contract_failure!("evaluator_evidence_noncanonical=#{entry.fetch('id')}") unless raw_evidence == JSON.generate(canonical(evidence))
+    File.binwrite(evidence_path, "#{raw_evidence}\n")
+    evaluator_sha256 = "sha256:#{Digest::SHA256.file(evidence_path).hexdigest}"
+    output, error, status = Open3.capture3(child_environment, RbConfig.ruby, "--disable-gems", validator, "--root", ROOT, "--case", entry.fetch("id"), "--fixtures", entry.fetch("future_fixture_locators").join(","), "--evidence", evidence_path, unsetenv_others: true, chdir: ROOT)
+    contract_failure!("validator_mutated_evidence=#{entry.fetch('id')}") unless evaluator_sha256 == "sha256:#{Digest::SHA256.file(evidence_path).hexdigest}"
+    begin
+      validation = JSON.parse(output.strip)
+    rescue JSON::ParserError
+      validation = nil
+    end
+    validation_contract = validation.is_a?(Hash) &&
+      validation["schema_version"] == "tw-metric-routing-validator-evidence/1" &&
+      validation["case_id"] == entry.fetch("id") &&
+      validation["outcome"] == entry.fetch("expected_outcome") &&
+      validation["evaluator_evidence_sha256"] == evaluator_sha256 &&
+      validation["evaluator_evidence_identity"] == evidence["evidence_identity"] &&
+      validation["validation_identity"] == record_identity(validation, "validation_identity") &&
+      output.strip == JSON.generate(canonical(validation))
+    unless status.success? && validation_contract
+      warn "metric_routing_finding=validator_failed=#{entry.fetch('id')} exit=#{status.exitstatus} expected=#{entry.fetch('expected_outcome')} stdout=#{output.strip.inspect} stderr=#{error.strip.inspect}"
+      exit 1
+    end
+  end
+  puts "metric_routing_case_passed=#{entry.fetch('id')}"
+end
+
+puts "metric_routing_smoke_status=pass"

@@ -68,6 +68,8 @@ def packaged_references(source, skill)
       "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
     elsif filename == "workflow-profile-template.yml" && %w[tw-auto tw-plan tw-work tw-code-review tw-doc-review].include?(skill)
       "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
+    elsif filename == "bounded-convergence-window-guide.md" && %w[tw-auto tw-plan tw-authority-gate tw-work tw-vv-define].include?(skill)
+      "plugins/traceweaver-core/skills/tw-auto/references/#{filename}"
     elsif filename == "tw-graph-lifecycle.md"
       "plugins/traceweaver-core/references/#{filename}"
     else

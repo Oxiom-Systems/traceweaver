@@ -1,0 +1,50 @@
+id: CHG-TW-2026-08-24-002
+record_type: traceweaver_change_control
+status: promoted_authority_proceed_one_bounded_repair_active_publication_held
+owner: Oxiom Systems
+created_at: "2026-08-24"
+approved_at: "2026-08-26"
+linked_intent: [INTENT-TW-012, INTENT-TW-013]
+linked_requirements: [REQ-TW-037, REQ-TW-130, REQ-TW-136, REQ-TW-143, REQ-TW-144, REQ-TW-145]
+linked_trace: TRACE-TW-074
+linked_verification: VER-TW-094
+linked_validation: VAL-TW-042
+linked_exception: EXC-TW-019
+source_review: TW-INTEGRATED-REVIEW-2026-08-24-V060-TARGETED-CONTINUATION-001
+owner_decision_source: >-
+  Approve CHG-TW-2026-08-24-002 and EXC-TW-019 for one final
+  release-control repair of P1-005-continuation and P1-006-continuation,
+  followed by exact-product rebinding and one retained-finding-only
+  continuation of the existing integrated Terra reviewer; publication remains
+  separately gated.
+reason: >-
+  The accepted exact product result exposed two release-control contradictions:
+  the enforced lifecycle oracle sources remain bound to rejected historical
+  evidence, and the production v3 gate cannot accept the real accepted V&V
+  capsule state that its synthetic fixture accepts.
+affected_authority:
+  requirements: [REQ-TW-037, REQ-TW-130, REQ-TW-136, REQ-TW-143, REQ-TW-144, REQ-TW-145]
+  findings: [P1-005-continuation, P1-006-continuation]
+  evidence: [TRACE-TW-074, VER-TW-094, VAL-TW-042]
+controlled_master_roots:
+  - requirements.md
+  - traceability-matrix.md
+  - .traceweaver/intent-contract.yml
+allowed_scope:
+  - scripts/traceweaver-refresh-v060-model-context-oracle
+  - scripts/traceweaver-check-release-readiness
+  - scripts/traceweaver-smoke-v060-release-integrity and directly linked fixtures
+  - controlled authority, profile, plan, V&V, trace, and evidence bindings
+  - fresh exact-product rebinding after one resulting functional-scope change
+  - one retained-finding-only continuation by the existing integrated Terra reviewer
+held_scope:
+  - packaged lifecycle capability beyond the two findings
+  - consumer repository mutation
+  - a new reviewer identity, full review, fan-out, or repair subagent
+  - semantic HTML authority cutover
+  - staging, commit, push, PR, merge, tag, release, deployment, or publication
+expiry: >-
+  First of one bounded repair attempt, one new exact-product disposition, one
+  retained-finding-only reviewer result, scope expansion, or owner withdrawal.
+review_gate: TW-REQ-REVIEW-2026-08-26-V060-TERMINAL-RELEASE-TRUTH-001
+next_step: Promote profile revision 3 and L3 V&V, capture RED, then obtain a clean authority Proceed before behavior mutation.

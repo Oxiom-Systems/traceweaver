@@ -1,0 +1,427 @@
+{
+  "schema_version": "tw-vv-capsule/1",
+  "workflow_profile": "L3",
+  "workflow_profile_revision": 5,
+  "workflow_profile_hash": "sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7",
+  "work_item_id": "TW-PLAN-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+  "plan_ref": "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md",
+  "baseline_id": "REQ-BASELINE-2026-04-30-001",
+  "baseline_hash_sha256": "64efb7325451f031bc15935bef264e95ae185a717854d4a7d5305067eca62c5e",
+  "definition_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-definition.md",
+  "definition_state": "release_candidate_product_accepted_final_integrated_review_closed_clean_publication_held",
+  "product_validation": {
+    "status": "accepted_exact_candidate_publication_separately_gated",
+    "validation_id": "VAL-TW-042",
+    "functional_scope_digest": "sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8",
+    "result_digest": "sha256:20711caa202b0a0d4a4419ed87260aaa8ed7ee15a994aa79ac604614d45dfed0",
+    "result_path": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-product-validation-result-release-candidate-acyclic-final-exact.json",
+    "intermediate_corrected_result_digest": "sha256:521531c448cb1190c941202cf29742729b98f3e2cb6e67d9d285240c83958e85",
+    "rejected_fixed_route_result_digest": "sha256:a56ab36faaa7b0baf47c748e86e48d5e4afa86843a763df73daf6ff8ddc6a794",
+    "historical_result_digest": "sha256:d565f30a0e1f6c8f7ea3264593fb3886a12b93c5f9478682a1c36301e6b4631f",
+    "correction_change_id": "CHG-TW-2026-08-24-001",
+    "correction_exception_id": "EXC-TW-018",
+    "correction_profile_revision": 2,
+    "correction_profile_hash": "sha256:68b130c712098cbbe389c42e53d8539f810d0e4ad793a60fb0d123ab1cfe4dbc",
+    "correction_red_evidence": "docs/validation/traceweaver-2026-08-24-v060-real-product-depth-red-evidence.md",
+    "correction_red_finding": "missing_source_census",
+    "correction_green_status": "passed",
+    "correction_scope_rollback": "docs/validation/traceweaver-2026-08-24-v060-real-product-depth-exact-scope-rollback-verification.md",
+    "prior_accepted_vestro_raw_digest": "sha256:2be22dd8a353c0ef92655726b2e29fdd0ff83aa423e66372fdcd1332a68a2001",
+    "prior_accepted_air_router_raw_digest": "sha256:4ceb488fbc27e0744d26b45fdf53e3cfa85e15fe437b6ac427aa08b879d55703",
+    "terminal_change_id": "CHG-TW-2026-08-24-002",
+    "terminal_exception_id": "EXC-TW-019",
+    "terminal_profile_revision": 3,
+    "terminal_profile_hash": "sha256:4216516563801166003354286256243b486deb4bb7a9dc8830e54f915a0a21a0",
+    "terminal_red_evidence": "docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-red-evidence.md",
+    "terminal_red_findings": [
+      "historical_oracle_source_set_not_refused",
+      "real_accepted_capsule_rejected_while_synthetic_passes"
+    ],
+    "terminal_green_source_contract": "implemented_focused_static_checks_passed",
+    "acyclic_oracle_change_id": "CHG-TW-2026-08-26-003",
+    "acyclic_oracle_exception_id": "EXC-TW-020",
+    "acyclic_oracle_profile_revision": 4,
+    "acyclic_oracle_profile_hash": "sha256:a51724b649534563d09deb2f27feccee1e7dd5dd50c5e24451fb38eb677e2f6c",
+    "acyclic_oracle_red_evidence": "docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-red-evidence.md",
+    "acyclic_oracle_red_finding": "post_oracle_receipts_circularly_required_as_pre_oracle_sources",
+    "acyclic_oracle_green_status": "passed_bounded_correction_product_rebinding_accepted_reviewer_closed",
+    "post_oracle_ci_convergence_change_id": "CHG-TW-2026-08-26-004",
+    "post_oracle_ci_convergence_exception_id": "EXC-TW-021",
+    "post_oracle_ci_convergence_profile_revision": 5,
+    "post_oracle_ci_convergence_profile_hash": "sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7",
+    "post_oracle_ci_convergence_red_evidence": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md",
+    "post_oracle_ci_convergence_focused_verification": "failed_nonclean_at_MC110_EXACT_ROUTE_requirements_physical_digest_mismatch_attempt_consumed",
+    "post_oracle_ci_convergence_focused_result": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-focused-verification-result.md",
+    "fresh_rebinding_required": false,
+    "vestro_raw_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9",
+    "air_router_raw_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197",
+    "publication_change_id": "CHG-TW-2026-08-27-006",
+    "release_candidate_rebinding_status": "passed_final_acyclic_same_revisions_thresholds_truth_stages_and_limitations_no_new_limitation"
+  },
+  "requirements": [
+    {
+      "req_id": "REQ-TW-130",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-131",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-132",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-133",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-134",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-135",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-136",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-137",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-138",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-139",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-140",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-141",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-142",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-143",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-144",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    },
+    {
+      "req_id": "REQ-TW-145",
+      "trace_id": "TRACE-TW-074",
+      "ver_id": "VER-TW-094",
+      "val_id": "VAL-TW-042",
+      "verification_artifact": "scripts/traceweaver-smoke-v060-product-lifecycle",
+      "red_evidence": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md",
+      "validation_artifact": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+      "matrix_row_ref": "TRACE-TW-074",
+      "reviews": [
+        {
+          "gate": "tw-code-review",
+          "id": "TW-CODE-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        },
+        {
+          "gate": "tw-doc-review",
+          "id": "TW-DOC-REVIEW-2026-08-24-V060-INTEGRATED-001",
+          "status": "closed_clean"
+        }
+      ]
+    }
+  ],
+  "high_risk_controls": {
+    "rollback": "Protected branch and recovery stashes before merge; complete prior matched Markdown/YAML generation for semantic cutover rollback; no rewrite of the published 0.5.0 tag or release.",
+    "owner_decision": "TW-OWNER-DECISION-2026-08-24-V060-PRODUCT-LIFECYCLE-001 plus consumed CHG-TW-2026-08-24-002 / EXC-TW-019, CHG-TW-2026-08-26-003 / EXC-TW-020, non-clean consumed CHG-TW-2026-08-26-004 / EXC-TW-021, and approved CHG-TW-2026-08-27-006 bounded convergence. The final acyclic rebinding and retained verification continuation are complete; stage, commit, push, PR, merge, tag, and release remain separately capsule or workflow gated."
+  },
+  "held_claims": [
+    "final release-readiness receipt remains pending; the clean isolated Core 0.6.0 reinstall passed",
+    "stage, commit, push, and PR require one validated single-use publication capsule",
+    "merge requires passing exact PR checks and a separate merge-only capsule",
+    "the exact-main traceweaver-core--v0.6.0 tag and GitHub Release remain pending",
+    "semantic-HTML authority cutover, deployment, and runtime-health claims remain held",
+    "Core 0.6.1 publication is outside this route"
+  ]
+}

@@ -138,6 +138,7 @@ assert_file "$skills_root/tw-commit-push-pr/SKILL.md"
 for skill_name in \
   tw-strategy \
   tw-ideate \
+  tw-lifecycle \
   tw-brainstorm \
   tw-audit \
   tw-compound \

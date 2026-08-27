@@ -1,0 +1,41 @@
+id: CHG-TW-2026-08-27-006
+record_type: traceweaver_change_control
+status: approved_conditional_exact_candidate_publication
+owner: Oxiom Systems
+approved_by: Hannes Zietsman
+created_at: "2026-08-27"
+linked_intent: [INTENT-TW-012, INTENT-TW-013]
+linked_requirements: [REQ-TW-136, REQ-TW-141, REQ-TW-143, REQ-TW-144, REQ-TW-145]
+linked_trace: [TRACE-TW-074]
+linked_verification: [VER-TW-094]
+linked_validation: VAL-TW-042
+predecessor_change: CHG-TW-2026-08-26-005
+baseline_id: REQ-BASELINE-2026-04-30-001
+baseline_hash_sha256: 94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf
+decision: >-
+  Release TraceWeaver Core 0.6.0 now through one controlled PR, required
+  checks, merge, exact-main tag, and GitHub Release route. Reserve Core 0.6.1
+  for later fixes; do not retarget this candidate to 0.6.1.
+allowed_scope:
+  - freeze the current Core 0.6.0 functional candidate after controlled authority convergence
+  - rebind current model-context, V&V, product-validation, oracle, graph, reinstall, and release-integrity evidence once
+  - accept fresh Vestro and Air Router cells only when they reproduce the already accepted immutable product revisions, thresholds, truth-stage behavior, and recorded limitations with no new limitation
+  - run final independent code and document reviews for the frozen candidate
+  - create and consume one exact publication capsule for stage, commit, push, and PR creation
+  - after required PR checks pass, create and consume one separate merge-only capsule
+  - permit the exact-main release workflow to create traceweaver-core--v0.6.0 and the matching GitHub Release
+held_scope:
+  - any new product behavior, public API, lifecycle schema, or semantic scope
+  - any new or worsened Vestro or Air Router limitation
+  - semantic HTML authority cutover
+  - deployment or runtime-health claims
+  - independently attested served-model claims not already proven
+  - rewriting Core 0.5.0 or an existing mismatched tag or release
+  - any Core 0.6.1 publication in this route
+  - any mutation of the mixed root worktree on codex/lean-convergence
+stop_conditions:
+  - fresh product cell fails, changes product revision, or introduces a new limitation
+  - final verification, traceability, code review, or document review has an open blocking finding
+  - staged-tree identity, remote, target branch, credential, PR check, merge SHA, tag, or release identity conflicts
+publication_authority: conditional_exact_candidate_only
+next_step: Complete same-candidate evidence, then use the controlled publication capsule route. Do not publish on a failed or changed gate.

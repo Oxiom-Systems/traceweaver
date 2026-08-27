@@ -1,0 +1,397 @@
+---
+id: TW-RELEASE-CANDIDATE-2026-08-24-0.6.0-001
+status: ready_for_version_bump
+date: '2026-08-27'
+version: 0.6.0
+tag: traceweaver-core--v0.6.0
+released_predecessor_tag: traceweaver-core--v0.5.0
+released_predecessor_sha: 3a1f3c56b093e61b88e9f6282637878e8ebbf163
+integration_base: e53faeb437cfee3b91f43e1b0f4ed3b1cb1e2c33
+requirement: REQ-TW-145
+trace: TRACE-TW-074
+verification: VER-TW-094
+validation: VAL-TW-042
+release_readiness:
+  schema_version: tw-release-readiness/3
+  terminal_status: ready_for_version_bump
+  version: 0.6.0
+  release_label: minor
+  candidate_scope:
+    algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
+    digest: sha256:8535b1db4dd6ffec9070522d4d0b12aa2ab9513ffefc12f1a457e5b9724f8060
+    paths:
+    - ".claude-plugin/marketplace.json"
+    - ".github/workflows/release-on-version-bump.yml"
+    - ".github/workflows/smoke-tests.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-24-002-terminal-release-truth.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-26-003-acyclic-oracle.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-26-004-post-oracle-ci-convergence.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-26-005-current-source-digest-rebinding.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-27-006-v060-publication.yml"
+    - ".traceweaver/exceptions/EXC-TW-019-terminal-release-truth.yml"
+    - ".traceweaver/exceptions/EXC-TW-020-acyclic-oracle.yml"
+    - ".traceweaver/exceptions/EXC-TW-021-post-oracle-ci-convergence.yml"
+    - ".traceweaver/exceptions/EXC-TW-022-current-source-digest-rebinding.yml"
+    - ".traceweaver/intent-contract.current.yml"
+    - ".traceweaver/intent-contract.yml"
+    - ".traceweaver/review-series/RS-GEN-2026-08-24-V060-AUTHORITY-BASELINE-001.json"
+    - ".traceweaver/workflow-profile.yml"
+    - CHANGELOG.md
+    - README.md
+    - docs/generated/traceability-dashboard.md
+    - docs/generated/traceability-data.json
+    - docs/plans/2026-08-21-traceweaver-0.5.0-plm-assurance-implementation-plan.md
+    - docs/plans/2026-08-21-traceweaver-0.5.0-product-intent-plm-handover.md
+    - docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md
+    - docs/validation/traceweaver-2026-08-24-v050-isolated-predecessor-dogfood.md
+    - docs/validation/traceweaver-2026-08-24-v060-integrated-review-targeted-continuation.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-authority-review.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result-real-product-depth-exact.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result-real-product-depth-exact.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result-real-product-depth.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result-real-product-depth.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-raw-real-product-depth-exact/airrouter-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-raw-real-product-depth-exact/vestro-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-raw-real-product-depth/airrouter-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-raw-real-product-depth/vestro-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-raw/airrouter-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-raw/vestro-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-red-evidence.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-release-readiness.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-representative-validation.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-scope-rollback-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-semantic-html-release-gate.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice1-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice2-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-benchmark.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice4-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice5-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice6-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice7-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-source-baselines-real-product-depth.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-source-baselines.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-capsule.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-definition.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-validation-rejection-gap.md
+    - docs/validation/traceweaver-2026-08-24-v060-real-product-depth-authority-gate.md
+    - docs/validation/traceweaver-2026-08-24-v060-real-product-depth-change-proposal.md
+    - docs/validation/traceweaver-2026-08-24-v060-real-product-depth-exact-scope-rollback-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-real-product-depth-red-evidence.md
+    - docs/validation/traceweaver-2026-08-24-v060-real-product-depth-requirements-review.md
+    - docs/validation/traceweaver-2026-08-24-v060-real-product-depth-scope-rollback-verification.md
+    - docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-authority-gate.md
+    - docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-change-proposal.md
+    - docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-authority-doc-review.md
+    - docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-green-evidence.md
+    - docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-post-promotion-authority-gate.md
+    - docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-product-disposition-candidate.md
+    - docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-red-evidence.md
+    - docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-review-route.yml
+    - docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-scope-rollback-verification.md
+    - docs/validation/traceweaver-2026-08-26-v060-current-source-digest-bounded-convergence-result.md
+    - docs/validation/traceweaver-2026-08-26-v060-current-source-digest-rebinding-owner-decision-packet.md
+    - docs/validation/traceweaver-2026-08-26-v060-integrated-review-retained-finding-continuation.md
+    - docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-authority-gate.md
+    - docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-approval.md
+    - docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-decision-packet.md
+    - docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-requirements-review.md
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-doc-review.md
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-gate.md
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-focused-verification-result.md
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-owner-approval.md
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-owner-decision-packet.md
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-post-promotion-authority-gate.md
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-requirements-review.md
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-review-closure-route.yml
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-review-route.yml
+    - docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-vv-capsule.json
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-exact.json
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-exact.md
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.json
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.md
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-acyclic-oracle-final-exact/airrouter-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-acyclic-oracle-final-exact/vestro-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-exact/airrouter-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-exact/vestro-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/airrouter-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/vestro-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-authority-doc-review.md
+    - docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-red-evidence.md
+    - docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-requirements-review.md
+    - docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-scope-rollback-verification.md
+    - docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-product-validation-result-release-candidate-acyclic-final-exact.json
+    - docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-product-validation-result-release-candidate-acyclic-final-exact.md
+    - docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-product-validation-result-release-candidate-exact.json
+    - docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-product-validation-result-release-candidate-exact.md
+    - docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-exact/airrouter-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-exact/vestro-lc-001-machine-observation.json
+    - docs/validation/traceweaver-2026-08-27-v060-publication-authority-gate.md
+    - docs/validation/traceweaver-2026-08-27-v060-publication-requirements-review.md
+    - docs/validation/traceweaver-2026-08-27-v060-publication-review.json
+    - docs/validation/traceweaver-2026-08-27-v060-release-candidate-clean-reinstall-verification.md
+    - docs/validation/traceweaver-2026-08-27-v060-release-candidate-integrated-review.md
+    - docs/validation/traceweaver-2026-08-27-v060-release-candidate-release-integrity-verification.md
+    - docs/validation/traceweaver-2026-08-27-v060-release-candidate-representative-validation.md
+    - docs/validation/traceweaver-2026-08-27-v060-release-candidate-scope-rollback-verification.md
+    - fixtures/metric-routing-harness/qualification-valid.json
+    - fixtures/model-context-routing/inventory-expected.yml
+    - fixtures/model-context-routing/oracle-review-complete.json
+    - fixtures/model-context-routing/route-floors-expected.yml
+    - fixtures/model-context-routing/source-manifest-complete.json
+    - fixtures/model-context-routing/source-manifest-delivery-direct.json
+    - fixtures/model-context-routing/source-manifest-delivery-locator.json
+    - fixtures/model-context-routing/source-manifest-delivery-shard.json
+    - fixtures/model-context-routing/source-manifest-temporal-external-excluded.json
+    - fixtures/model-context-routing/source-manifest-temporal-external-required.json
+    - fixtures/model-context-routing/strict-v1-consumer.rb
+    - fixtures/model-context-routing/v1-receipts.json
+    - plugins/traceweaver-core/.antigravity-plugin/plugin.json
+    - plugins/traceweaver-core/.claude-plugin/plugin.json
+    - plugins/traceweaver-core/.codex-plugin/plugin.json
+    - plugins/traceweaver-core/.cursor-plugin/plugin.json
+    - plugins/traceweaver-core/README.md
+    - plugins/traceweaver-core/references/bounded-convergence-window-guide.md
+    - plugins/traceweaver-core/references/lifecycle/acceptance-hub.schema.json
+    - plugins/traceweaver-core/references/lifecycle/acceptance-pack.schema.json
+    - plugins/traceweaver-core/references/lifecycle/capture-pack.schema.json
+    - plugins/traceweaver-core/references/lifecycle/change-approval.schema.json
+    - plugins/traceweaver-core/references/lifecycle/change-request.schema.json
+    - plugins/traceweaver-core/references/lifecycle/cutover-gate.schema.json
+    - plugins/traceweaver-core/references/lifecycle/evidence-receipt.schema.json
+    - plugins/traceweaver-core/references/lifecycle/lifecycle-graph.schema.json
+    - plugins/traceweaver-core/references/lifecycle/lifecycle-record.schema.json
+    - plugins/traceweaver-core/references/lifecycle/product-validation.schema.json
+    - plugins/traceweaver-core/references/lifecycle/semantic-html-parser-lock.json
+    - plugins/traceweaver-core/references/lifecycle/semantic-html.schema.json
+    - plugins/traceweaver-core/references/lifecycle/source-receipt.schema.json
+    - plugins/traceweaver-core/references/lifecycle/source-registry.schema.json
+    - plugins/traceweaver-core/references/lifecycle/truth-stage.schema.json
+    - plugins/traceweaver-core/references/metric-routing-harness.yml
+    - plugins/traceweaver-core/references/model-context-map.yml
+    - plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
+    - plugins/traceweaver-core/references/skill-execution-contracts.yml
+    - plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md
+    - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+    - plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md
+    - plugins/traceweaver-core/skills/tw-auto/references/metric-routing-harness.yml
+    - plugins/traceweaver-core/skills/tw-auto/references/model-context-map.yml
+    - plugins/traceweaver-core/skills/tw-auto/references/model-context-oracle-adequacy-review.json
+    - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map
+    - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-skill-execution-contract-registry
+    - plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-acceptance-hub
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-capture
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-cutover
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-evidence
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-product-validation
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-project
+    - plugins/traceweaver-core/skills/tw-plan/SKILL.md
+    - plugins/traceweaver-core/skills/tw-vv-define/SKILL.md
+    - plugins/traceweaver-core/skills/tw-work/SKILL.md
+    - requirements.md
+    - scripts/traceweaver-benchmark-v060-product-lifecycle
+    - scripts/traceweaver-check-release-readiness
+    - scripts/traceweaver-refresh-v060-model-context-oracle
+    - scripts/traceweaver-run-v060-representative-product-trials
+    - scripts/traceweaver-smoke-antigravity-discovery
+    - scripts/traceweaver-smoke-codex-discovery
+    - scripts/traceweaver-smoke-codex-host-reconciliation
+    - scripts/traceweaver-smoke-codex-host-registry
+    - scripts/traceweaver-smoke-installer-transaction
+    - scripts/traceweaver-smoke-model-context-routing
+    - scripts/traceweaver-smoke-release-readiness
+    - scripts/traceweaver-smoke-skill-execution-contract
+    - scripts/traceweaver-smoke-tw-skill-behavior
+    - scripts/traceweaver-smoke-v060-lifecycle-acceptance-hub
+    - scripts/traceweaver-smoke-v060-lifecycle-capture
+    - scripts/traceweaver-smoke-v060-lifecycle-closure
+    - scripts/traceweaver-smoke-v060-lifecycle-cutover
+    - scripts/traceweaver-smoke-v060-lifecycle-evidence
+    - scripts/traceweaver-smoke-v060-lifecycle-graph
+    - scripts/traceweaver-smoke-v060-lifecycle-html
+    - scripts/traceweaver-smoke-v060-lifecycle-product-validation
+    - scripts/traceweaver-smoke-v060-lifecycle-schema
+    - scripts/traceweaver-smoke-v060-lifecycle-staleness
+    - scripts/traceweaver-smoke-v060-product-lifecycle
+    - scripts/traceweaver-smoke-v060-real-product-depth
+    - scripts/traceweaver-smoke-v060-release-integrity
+    - traceability-matrix.md
+    excluded_paths:
+    - ".traceweaver/tw-graph-freshness.json"
+    - docs/validation/traceweaver-plugin-0.6.0-release-candidate.md
+  functional_scope:
+    algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
+    digest: sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8
+    paths:
+    - ".claude-plugin/marketplace.json"
+    - ".github/workflows/release-on-version-bump.yml"
+    - ".github/workflows/smoke-tests.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-24-002-terminal-release-truth.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-26-003-acyclic-oracle.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-26-004-post-oracle-ci-convergence.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-26-005-current-source-digest-rebinding.yml"
+    - ".traceweaver/changes/CHG-TW-2026-08-27-006-v060-publication.yml"
+    - ".traceweaver/exceptions/EXC-TW-019-terminal-release-truth.yml"
+    - ".traceweaver/exceptions/EXC-TW-020-acyclic-oracle.yml"
+    - ".traceweaver/exceptions/EXC-TW-021-post-oracle-ci-convergence.yml"
+    - ".traceweaver/exceptions/EXC-TW-022-current-source-digest-rebinding.yml"
+    - ".traceweaver/intent-contract.yml"
+    - ".traceweaver/workflow-profile.yml"
+    - CHANGELOG.md
+    - README.md
+    - docs/plans/2026-08-21-traceweaver-0.5.0-plm-assurance-implementation-plan.md
+    - docs/plans/2026-08-21-traceweaver-0.5.0-product-intent-plm-handover.md
+    - docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md
+    - fixtures/metric-routing-harness/qualification-valid.json
+    - fixtures/model-context-routing/inventory-expected.yml
+    - fixtures/model-context-routing/oracle-review-complete.json
+    - fixtures/model-context-routing/route-floors-expected.yml
+    - fixtures/model-context-routing/source-manifest-complete.json
+    - fixtures/model-context-routing/source-manifest-delivery-direct.json
+    - fixtures/model-context-routing/source-manifest-delivery-locator.json
+    - fixtures/model-context-routing/source-manifest-delivery-shard.json
+    - fixtures/model-context-routing/source-manifest-temporal-external-excluded.json
+    - fixtures/model-context-routing/source-manifest-temporal-external-required.json
+    - fixtures/model-context-routing/strict-v1-consumer.rb
+    - fixtures/model-context-routing/v1-receipts.json
+    - plugins/traceweaver-core/.antigravity-plugin/plugin.json
+    - plugins/traceweaver-core/.claude-plugin/plugin.json
+    - plugins/traceweaver-core/.codex-plugin/plugin.json
+    - plugins/traceweaver-core/.cursor-plugin/plugin.json
+    - plugins/traceweaver-core/README.md
+    - plugins/traceweaver-core/references/bounded-convergence-window-guide.md
+    - plugins/traceweaver-core/references/lifecycle/acceptance-hub.schema.json
+    - plugins/traceweaver-core/references/lifecycle/acceptance-pack.schema.json
+    - plugins/traceweaver-core/references/lifecycle/capture-pack.schema.json
+    - plugins/traceweaver-core/references/lifecycle/change-approval.schema.json
+    - plugins/traceweaver-core/references/lifecycle/change-request.schema.json
+    - plugins/traceweaver-core/references/lifecycle/cutover-gate.schema.json
+    - plugins/traceweaver-core/references/lifecycle/evidence-receipt.schema.json
+    - plugins/traceweaver-core/references/lifecycle/lifecycle-graph.schema.json
+    - plugins/traceweaver-core/references/lifecycle/lifecycle-record.schema.json
+    - plugins/traceweaver-core/references/lifecycle/product-validation.schema.json
+    - plugins/traceweaver-core/references/lifecycle/semantic-html-parser-lock.json
+    - plugins/traceweaver-core/references/lifecycle/semantic-html.schema.json
+    - plugins/traceweaver-core/references/lifecycle/source-receipt.schema.json
+    - plugins/traceweaver-core/references/lifecycle/source-registry.schema.json
+    - plugins/traceweaver-core/references/lifecycle/truth-stage.schema.json
+    - plugins/traceweaver-core/references/metric-routing-harness.yml
+    - plugins/traceweaver-core/references/model-context-map.yml
+    - plugins/traceweaver-core/references/skill-execution-contracts.yml
+    - plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md
+    - plugins/traceweaver-core/skills/tw-auto/SKILL.md
+    - plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md
+    - plugins/traceweaver-core/skills/tw-auto/references/metric-routing-harness.yml
+    - plugins/traceweaver-core/skills/tw-auto/references/model-context-map.yml
+    - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-model-context-map
+    - plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-generate-skill-execution-contract-registry
+    - plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-acceptance-hub
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-capture
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-cutover
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-evidence
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-product-validation
+    - plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-project
+    - plugins/traceweaver-core/skills/tw-plan/SKILL.md
+    - plugins/traceweaver-core/skills/tw-vv-define/SKILL.md
+    - plugins/traceweaver-core/skills/tw-work/SKILL.md
+    - requirements.md
+    - scripts/traceweaver-benchmark-v060-product-lifecycle
+    - scripts/traceweaver-check-release-readiness
+    - scripts/traceweaver-refresh-v060-model-context-oracle
+    - scripts/traceweaver-run-v060-representative-product-trials
+    - scripts/traceweaver-smoke-antigravity-discovery
+    - scripts/traceweaver-smoke-codex-discovery
+    - scripts/traceweaver-smoke-codex-host-reconciliation
+    - scripts/traceweaver-smoke-codex-host-registry
+    - scripts/traceweaver-smoke-installer-transaction
+    - scripts/traceweaver-smoke-model-context-routing
+    - scripts/traceweaver-smoke-release-readiness
+    - scripts/traceweaver-smoke-skill-execution-contract
+    - scripts/traceweaver-smoke-tw-skill-behavior
+    - scripts/traceweaver-smoke-v060-lifecycle-acceptance-hub
+    - scripts/traceweaver-smoke-v060-lifecycle-capture
+    - scripts/traceweaver-smoke-v060-lifecycle-closure
+    - scripts/traceweaver-smoke-v060-lifecycle-cutover
+    - scripts/traceweaver-smoke-v060-lifecycle-evidence
+    - scripts/traceweaver-smoke-v060-lifecycle-graph
+    - scripts/traceweaver-smoke-v060-lifecycle-html
+    - scripts/traceweaver-smoke-v060-lifecycle-product-validation
+    - scripts/traceweaver-smoke-v060-lifecycle-schema
+    - scripts/traceweaver-smoke-v060-lifecycle-staleness
+    - scripts/traceweaver-smoke-v060-product-lifecycle
+    - scripts/traceweaver-smoke-v060-real-product-depth
+    - scripts/traceweaver-smoke-v060-release-integrity
+    - traceability-matrix.md
+  candidate_identity:
+    functional_scope_digest: sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8
+    functional_scope_path_count: 102
+    review_id: TW-CODE-REVIEW-2026-08-27-V060-RELEASE-CANDIDATE-001
+    product_validation_id: VAL-TW-042
+    requirements_hash_sha256: sha256:94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf
+    model_context_oracle_digest: sha256:69488637fc95e2a00cd9c47495d98cc06871c0d5666c3e5d37bc0f791f1e1bcd
+    model_context_oracle_review_id: ORACLE-ADEQUACY-TW-051-V060-RELEASE-001
+    model_context_oracle_reviewer: terra-integrated-reviewer:root-v060-integrated-review
+    model_context_route_count: 88
+  prerequisites:
+    authority: accepted
+    exact_predecessor_dogfood: passed
+    slice_verification: passed
+    product_validation: passed
+    integrated_review: passed
+    scope_rollback: passed
+    graph_freshness: passed
+    manifest_equality: passed
+    clean_reinstall: passed
+    model_context_oracle: passed
+    exact_sha_ci: required_by_release_workflow
+    publication: required_by_release_workflow
+  evidence:
+    product_validation_result_json: docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-product-validation-result-release-candidate-acyclic-final-exact.json
+    representative_validation: docs/validation/traceweaver-2026-08-27-v060-release-candidate-representative-validation.md
+    integrated_review: docs/validation/traceweaver-2026-08-27-v060-release-candidate-integrated-review.md
+    scope_rollback: docs/validation/traceweaver-2026-08-27-v060-release-candidate-scope-rollback-verification.md
+    reinstall: docs/validation/traceweaver-2026-08-27-v060-release-candidate-clean-reinstall-verification.md
+    release_integrity: docs/validation/traceweaver-2026-08-27-v060-release-candidate-release-integrity-verification.md
+    graph_freshness: ".traceweaver/tw-graph-freshness.json"
+    model_context_oracle: plugins/traceweaver-core/references/model-context-oracle-adequacy-review.json
+  held_claims:
+  - publication_until_exact_main_sha_ci
+  - tag_and_github_release_until_main_workflow
+  - deployment_not_claimed
+  - semantic_html_authority_cutover_not_claimed
+  - runtime_health_not_claimed
+  - core_0_6_1_not_part_of_this_release
+---
+
+<!-- TRACEWEAVER: file-role=v060-release-candidate; req=REQ-TW-143,REQ-TW-145; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042 -->
+
+# TraceWeaver Core 0.6.0 Release Candidate
+
+This receipt binds the exact Core 0.6.0 functional candidate, complete
+downstream evidence, the retained Terra review identity, graph freshness,
+clean isolated installation, and manifest equality. The frozen functional
+scope is `sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8` across 102 paths; the
+complete candidate scope is `sha256:8535b1db4dd6ffec9070522d4d0b12aa2ab9513ffefc12f1a457e5b9724f8060` across
+206 paths.
+
+The receipt excludes only itself and the independently checked graph
+freshness receipt from the candidate-scope digest to avoid self-reference.
+It does not authorize merge, tag, GitHub Release, deployment, runtime health,
+or semantic-HTML authority-cutover claims. PR publication requires a
+validated single-use capsule. Merge requires a separate capsule after
+required checks pass. The exact-main release workflow must then verify Smoke
+tests and CodeQL before it creates `traceweaver-core--v0.6.0` and the matching
+GitHub Release.

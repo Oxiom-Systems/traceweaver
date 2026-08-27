@@ -75,6 +75,16 @@ assert_not_contains() {
   fi
 }
 
+assert_same_file() {
+  local first="$1"
+  local second="$2"
+  local label="$3"
+  if ! cmp -s "$first" "$second"; then
+    echo "$label=failed_file_drift first=$first second=$second" >&2
+    exit 1
+  fi
+}
+
 assert_line_before() {
   local path="$1"
   local first="$2"
@@ -123,10 +133,13 @@ tw_auto="$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/SKILL.md"
 tw_strategy="$ROOT_DIR/plugins/traceweaver-core/skills/tw-strategy/SKILL.md"
 tw_ideate="$ROOT_DIR/plugins/traceweaver-core/skills/tw-ideate/SKILL.md"
 wrapper_handoff_policy="$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/references/traceweaver-wrapper-handoff-discipline.md"
+bounded_convergence_guide="$ROOT_DIR/plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md"
+bounded_convergence_canonical="$ROOT_DIR/plugins/traceweaver-core/references/bounded-convergence-window-guide.md"
 tw_plan="$ROOT_DIR/plugins/traceweaver-core/skills/tw-plan/SKILL.md"
 tw_authority_gate="$ROOT_DIR/plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md"
 tw_requirements_review="$ROOT_DIR/plugins/traceweaver-core/skills/tw-requirements-review/SKILL.md"
 tw_work="$ROOT_DIR/plugins/traceweaver-core/skills/tw-work/SKILL.md"
+tw_vv_define="$ROOT_DIR/plugins/traceweaver-core/skills/tw-vv-define/SKILL.md"
 tw_debug="$ROOT_DIR/plugins/traceweaver-core/skills/tw-debug/SKILL.md"
 tw_commit="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit/SKILL.md"
 tw_commit_push_pr="$ROOT_DIR/plugins/traceweaver-core/skills/tw-commit-push-pr/SKILL.md"
@@ -175,10 +188,13 @@ require_file "$tw_auto"
 require_file "$tw_strategy"
 require_file "$tw_ideate"
 require_file "$wrapper_handoff_policy"
+require_file "$bounded_convergence_guide"
+require_file "$bounded_convergence_canonical"
 require_file "$tw_plan"
 require_file "$tw_authority_gate"
 require_file "$tw_requirements_review"
 require_file "$tw_work"
+require_file "$tw_vv_define"
 require_file "$tw_debug"
 require_file "$tw_commit"
 require_file "$tw_commit_push_pr"
@@ -315,7 +331,25 @@ assert_contains "$tw_auto" "mechanical_closure" "tw_auto_zero_dispatch_closure"
 assert_contains "$tw_auto" "held_no_progress" "tw_auto_no_progress_hold"
 assert_contains "$tw_auto" "Publication Boundary" "tw_auto_publication_boundary"
 assert_not_contains "$tw_auto" "Run scoped \`tw-doc-review\` only when" "tw_auto_no_legacy_mixed_doc_fanout"
+assert_same_file "$bounded_convergence_canonical" "$bounded_convergence_guide" "bounded_convergence_canonical_mirror_parity"
+assert_contains "$bounded_convergence_guide" "A gate may inspect a candidate, but it must never mutate the candidate it gates" "bounded_convergence_immutable_gate_invariant"
+assert_contains "$bounded_convergence_guide" "Three-Plane Model" "bounded_convergence_three_plane_model"
+assert_contains "$bounded_convergence_guide" "Append-only after an attempt" "bounded_convergence_append_only_evidence"
+assert_contains "$bounded_convergence_guide" "An in-scope failed attempt consumes the budget but is" "bounded_convergence_failure_not_reapproval"
+assert_contains "$bounded_convergence_guide" "Do not spend a counted verification attempt before static source closure" "bounded_convergence_static_preflight"
+assert_contains "$bounded_convergence_guide" "Do not let convergence imply commit, push, PR, merge, tag, release" "bounded_convergence_publication_hold"
+assert_contains "$tw_auto" "<skills-root>/tw-auto/references/bounded-convergence-window-guide.md" "tw_auto_loads_bounded_convergence_guide"
+assert_contains "$tw_auto" "reopen \`tw-authority-gate\`" "tw_auto_in_scope_failure_no_gate_reopen"
+assert_contains "$tw_plan" "<skills-root>/tw-auto/references/bounded-convergence-window-guide.md" "tw_plan_loads_bounded_convergence_guide"
+assert_contains "$tw_plan" "define one bounded convergence window instead of one approval per attempt" "tw_plan_single_window_decision"
+assert_contains "$tw_authority_gate" "<skills-root>/tw-auto/references/bounded-convergence-window-guide.md" "tw_authority_gate_loads_bounded_convergence_guide"
+assert_contains "$tw_authority_gate" "Do not require a new" "tw_authority_gate_no_per_attempt_approval"
+assert_contains "$tw_work" "<skills-root>/tw-auto/references/bounded-convergence-window-guide.md" "tw_work_loads_bounded_convergence_guide"
+assert_contains "$tw_work" "without rerunning \`tw-authority-gate\`" "tw_work_continues_inside_window"
+assert_contains "$tw_vv_define" "<skills-root>/tw-auto/references/bounded-convergence-window-guide.md" "tw_vv_define_loads_bounded_convergence_guide"
+assert_contains "$tw_vv_define" "An in-scope" "tw_vv_define_failure_consumes_budget"
 echo "tw_auto_consolidated_delivery_contract=pass"
+echo "tw_bounded_convergence_window_contract=pass"
 assert_contains "$wrapper_handoff_policy" "Highest-Level Next Wrapper Rule" "wrapper_handoff_policy_highest_level_rule"
 assert_contains "$wrapper_handoff_policy" "Embedded Gate Contract" "wrapper_handoff_policy_embedded_gate_contract"
 assert_contains "$tw_auto" "Exception Routes" "tw_auto_handoff_discipline_section"
@@ -371,8 +405,8 @@ for ce_skill in "$ROOT_DIR"/plugins/traceweaver-core/skills/ce-*/SKILL.md; do
     imported_ce_unanchored_total=$((imported_ce_unanchored_total + 1))
   fi
 done
-if [[ "$skill_file_total" != "54" ]]; then
-  echo "traceweaver_skill_file_total=failed expected=54 actual=$skill_file_total" >&2
+if [[ "$skill_file_total" != "55" ]]; then
+  echo "traceweaver_skill_file_total=failed expected=55 actual=$skill_file_total" >&2
   exit 1
 fi
 if [[ "$anchored_skill_total" != "49" ]]; then

@@ -1,0 +1,452 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-product-capture-change-smoke; req=REQ-TW-130,REQ-TW-135,REQ-TW-137,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-130,REQ-TW-135,REQ-TW-137,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+CAPTURE = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-capture")
+INTEGRITY = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity")
+GRAPH = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph")
+SCHEMAS = %w[capture-pack.schema.json change-request.schema.json change-approval.schema.json].map do |name|
+  ROOT.join("plugins/traceweaver-core/references/lifecycle", name)
+end.freeze
+
+def fail!(message)
+  warn "v060_lifecycle_capture_smoke=failed reason=#{message}"
+  exit 1
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_bytes(value)
+  "sha256:#{Digest::SHA256.hexdigest(value)}"
+end
+
+def digest_value(value)
+  digest_bytes(JSON.generate(canonical(value)))
+end
+
+def identify(value, field)
+  identified = Marshal.load(Marshal.dump(value))
+  identified.delete(field)
+  identified[field] = digest_value(identified)
+  identified
+end
+
+def write_json(path, value)
+  path.binwrite(canonical_json(value))
+end
+
+def run(executable, *arguments)
+  Open3.capture3(executable.to_s, *arguments.map(&:to_s))
+end
+
+def require_pass(executable, *arguments)
+  stdout, stderr, status = run(executable, *arguments)
+  fail!("expected_pass executable=#{executable.basename} args=#{arguments.join(" ")} stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.success?
+  JSON.parse(stdout)
+rescue JSON::ParserError => error
+  fail!("success_output_not_json executable=#{executable.basename} error=#{error.message}")
+end
+
+def require_blocked(executable, finding, *arguments)
+  stdout, stderr, status = run(executable, *arguments)
+  fail!("expected_blocked finding=#{finding} args=#{arguments.join(" ")}") if status.success?
+  parsed = JSON.parse(stdout)
+  fail!("wrong_finding expected=#{finding} actual=#{parsed["finding"].inspect} stderr=#{stderr.inspect}") unless parsed["finding"] == finding
+  parsed
+rescue JSON::ParserError => error
+  fail!("blocked_output_not_json finding=#{finding} error=#{error.message} stdout=#{stdout.inspect} stderr=#{stderr.inspect}")
+end
+
+def source_envelope(source, provenance: "exact registered source bytes", receipt_id: nil)
+  envelope = {
+    "source_id" => source.fetch("source_id"),
+    "locator" => source.fetch("normalized_locator"),
+    "version" => source["version"] || source.fetch("generation"),
+    "digest" => source.fetch("digest"),
+    "role" => source.fetch("role"),
+    "provenance" => provenance
+  }
+  envelope["receipt_id"] = receipt_id if receipt_id
+  envelope
+end
+
+def relationship(source_id, target_id, type)
+  {
+    "source_id" => source_id,
+    "target_id" => target_id,
+    "relationship_type" => type,
+    "applicable" => true,
+    "provenance" => "named lifecycle capture fixture"
+  }
+end
+
+def record(id:, type:, title:, source:, baseline:, authority_class:, acceptance_state:, relationships:, fields:, acceptance: nil, receipt_id: nil)
+  value = {
+    "schema_version" => "tw-lifecycle-record/1",
+    "record_id" => id,
+    "record_type" => type,
+    "title" => title,
+    "owner" => "Lifecycle Owner",
+    "authority_class" => authority_class,
+    "source" => source_envelope(source, receipt_id: receipt_id),
+    "applicability" => "applicable",
+    "baseline" => baseline,
+    "freshness" => "current",
+    "acceptance_state" => acceptance_state,
+    "relationships" => relationships,
+    "fields" => fields
+  }
+  value["acceptance"] = acceptance if acceptance
+  value
+end
+
+def snapshot(root)
+  paths = [root.join("authority.md"), root.join("source-registry.json")]
+  paths.concat(root.join("records").children.select(&:file?).sort)
+  paths.each_with_object({}) do |path, result|
+    result[path.relative_path_from(root).to_s] = digest_bytes(path.binread)
+  end
+end
+
+def apply_arguments(root, change: "change.json", approval: "approval.json", output: "application.json")
+  [
+    "apply", "--root", root, "--registry", "source-registry.json",
+    "--source-id", "SRC-LIFECYCLE-AUTHORITY-001", "--records", "records",
+    "--change-request", change, "--approval", approval, "--output", output
+  ]
+end
+
+fail!("missing_capture_executable") unless CAPTURE.file? && CAPTURE.executable?
+fail!("missing_integrity_executable") unless INTEGRITY.file? && INTEGRITY.executable?
+fail!("missing_graph_executable") unless GRAPH.file? && GRAPH.executable?
+fail!("missing_capture_schema") unless SCHEMAS.all?(&:file?)
+expected_schema_ids = %w[tw-lifecycle-capture-pack/1 tw-lifecycle-change-request/1 tw-lifecycle-change-approval/1]
+actual_schema_ids = SCHEMAS.map { |path| JSON.parse(path.read).fetch("$id") }
+fail!("capture_schema_identity") unless actual_schema_ids == expected_schema_ids
+
+Dir.mktmpdir("traceweaver-v060-lifecycle-capture-") do |directory|
+  workspace = Pathname.new(directory)
+  root = workspace.join("project")
+  records_dir = root.join("records")
+  records_dir.mkpath
+
+  authority_text = <<~MARKDOWN
+    # Product authority
+
+    The lifecycle dashboard shall show approved change impact.
+  MARKDOWN
+  authority_path = root.join("authority.md")
+  authority_path.binwrite(authority_text)
+  source = {
+    "source_id" => "SRC-LIFECYCLE-AUTHORITY-001",
+    "role" => "authority_baseline",
+    "locator" => "authority.md",
+    "normalized_locator" => "authority.md",
+    "source_type" => "markdown",
+    "schema_version" => "tw-lifecycle-markdown/1",
+    "digest" => digest_bytes(authority_text),
+    "owner" => "Lifecycle Owner",
+    "authority_class" => "authoritative",
+    "owned_field_families" => ["lifecycle_records"],
+    "generation" => "LC-GEN-001",
+    "observed_at" => "2026-08-24T00:00:00Z",
+    "version" => "v1",
+    "mutable" => false,
+    "normalization" => {"encoding" => "UTF-8", "line_endings" => "LF", "case" => "exact", "legacy_locators" => []}
+  }
+  registry = {
+    "schema_version" => "tw-lifecycle-source-registry/1",
+    "registry_id" => "LC-REGISTRY-001",
+    "generation" => "LC-GEN-001",
+    "owner" => "Lifecycle Owner",
+    "sources" => [source]
+  }
+  registry_path = root.join("source-registry.json")
+  write_json(registry_path, registry)
+  registry_check = require_pass(INTEGRITY, "registry-check", "--root", root, "--registry", registry_path)
+  baseline = {"baseline_id" => "BASELINE-LC-001", "generation" => "LC-GEN-001", "digest" => registry_check.fetch("registry_digest")}
+  source_receipt = require_pass(INTEGRITY, "source-receipt", "--root", root, "--registry", registry_path, "--source-id", source.fetch("source_id"))
+
+  accepted = {
+    "decision_id" => "DEC-LC-000",
+    "accepted_by" => "Lifecycle Owner",
+    "accepted_at" => "2026-08-24T00:00:00Z",
+    "authority_source_id" => source.fetch("source_id")
+  }
+  existing_requirement = record(
+    id: "REQ-#{''}LC-001", type: "requirement", title: "Show product impact", source: source,
+    baseline: baseline, authority_class: "authoritative", acceptance_state: "accepted",
+    relationships: [], fields: {"statement" => "Show product impact.", "validation_question" => "Can the owner see every impact?"},
+    acceptance: accepted
+  )
+  existing_evidence = record(
+    id: "EVIDENCE-LC-001", type: "evidence", title: "Prior impact evidence", source: source,
+    baseline: baseline, authority_class: "evidence", acceptance_state: "observed_not_accepted",
+    relationships: [relationship("EVIDENCE-LC-001", "REQ-#{''}LC-001", "evidences")],
+    fields: {"observation" => "The former requirement passed."}, receipt_id: source_receipt.fetch("receipt_id")
+  )
+  write_json(records_dir.join("REQ-#{''}LC-001.json"), existing_requirement)
+  write_json(records_dir.join("EVIDENCE-LC-001.json"), existing_evidence)
+  require_pass(INTEGRITY, "record-check", "--root", root, "--record", records_dir.join("REQ-#{''}LC-001.json"))
+  require_pass(INTEGRITY, "record-check", "--root", root, "--record", records_dir.join("EVIDENCE-LC-001.json"))
+
+  excerpt_text = "The lifecycle dashboard shall show approved change impact."
+  excerpt_start = authority_text.b.index(excerpt_text.b)
+  fail!("fixture_excerpt_missing") unless excerpt_start
+  excerpt = {
+    "kind" => "local_byte_span",
+    "locator" => "authority.md",
+    "start_byte" => excerpt_start,
+    "end_byte" => excerpt_start + excerpt_text.bytesize,
+    "text" => excerpt_text,
+    "digest" => digest_bytes(excerpt_text)
+  }
+  proposed_requirement = record(
+    id: "REQ-#{''}LC-001", type: "requirement", title: "Show approved product change impact", source: source,
+    baseline: baseline, authority_class: "candidate", acceptance_state: "proposed",
+    relationships: [], fields: {"statement" => excerpt_text, "validation_question" => "Can the owner see every approved impact?"}
+  )
+  proposed_constraint = record(
+    id: "CONSTRAINT-LC-001", type: "constraint", title: "No implicit authority promotion", source: source,
+    baseline: baseline, authority_class: "candidate", acceptance_state: "proposed",
+    relationships: [relationship("CONSTRAINT-LC-001", "REQ-#{''}LC-001", "constrained_by")],
+    fields: {"statement" => "Only a named human approval may apply the prepared delta."}
+  )
+  proposed_risk = record(
+    id: "RISK-LC-001", type: "risk", title: "Unreviewed capture risk", source: source,
+    baseline: baseline, authority_class: "candidate", acceptance_state: "proposed",
+    relationships: [relationship("RISK-LC-001", "REQ-#{''}LC-001", "impacts")],
+    fields: {"statement" => "An inferred record could overstate authority."}
+  )
+  candidates = [
+    {
+      "candidate_id" => "CANDIDATE-LC-001", "operation" => "update",
+      "target_record_id" => "REQ-#{''}LC-001", "target_record_digest" => digest_value(existing_requirement),
+      "proposed_record" => proposed_requirement, "source_excerpt" => excerpt,
+      "duplicate_candidates" => [{"record_id" => "REQ-#{''}LC-001", "reason" => "Same stable record identity", "confidence" => 1.0}],
+      "conflicts" => [{"record_id" => "EVIDENCE-LC-001", "reason" => "Prior evidence covers the former statement", "confidence" => 1.0}],
+      "downstream_consequences" => ["EVIDENCE-LC-001"],
+      "vv_definition" => {
+        "verification_definition_id" => "VERDEF-LC-001", "validation_definition_id" => "VALDEF-LC-001",
+        "verification_method" => "test", "validation_question" => "Can the owner recover the changed requirement and stale evidence?"
+      }
+    },
+    {
+      "candidate_id" => "CANDIDATE-LC-002", "operation" => "create",
+      "proposed_record" => proposed_constraint, "source_excerpt" => excerpt,
+      "duplicate_candidates" => [], "conflicts" => [], "downstream_consequences" => []
+    },
+    {
+      "candidate_id" => "CANDIDATE-LC-003", "operation" => "create",
+      "proposed_record" => proposed_risk, "source_excerpt" => excerpt,
+      "duplicate_candidates" => [], "conflicts" => [], "downstream_consequences" => []
+    }
+  ]
+  proposal = identify(
+    {
+      "schema_version" => "tw-lifecycle-capture-proposal/1",
+      "source_id" => source.fetch("source_id"), "source_digest" => source.fetch("digest"),
+      "baseline" => baseline, "candidates" => candidates, "authority_effect" => "none"
+    },
+    "proposal_id"
+  )
+  proposal_path = root.join("proposal.json")
+  write_json(proposal_path, proposal)
+  prepare = require_pass(
+    CAPTURE, "prepare", "--root", root, "--registry", registry_path, "--source-id", source.fetch("source_id"),
+    "--proposal", proposal_path, "--output", "pack.json", "--confirmation-html", "confirmation.html"
+  )
+  fail!("prepare_result") unless prepare["status"] == "pass" && prepare["candidate_count"] == 3 && prepare["human_confirmation_required"] == true && prepare["authority_effect"] == "none"
+  pack = JSON.parse(root.join("pack.json").read)
+  fail!("pack_false_authority") unless pack["candidates"].all? { |entry| entry.dig("proposed_record", "authority_class") == "candidate" && entry.dig("proposed_record", "acceptance_state") == "proposed" }
+  html = root.join("confirmation.html").read
+  ["Duplicate candidates", "Conflicts", "Downstream consequences", "V&amp;V at capture", "Pending named human confirmation"].each do |needle|
+    fail!("confirmation_surface_missing_#{needle.tr(" ", "_")}") unless html.include?(needle)
+  end
+  fail!("confirmation_surface_missing_source") unless html.include?(excerpt_text)
+
+  negative_cases = {
+    "false_authority_promotion" => lambda do |value|
+      value["candidates"][0]["proposed_record"]["authority_class"] = "authoritative"
+    end,
+    "source_excerpt_mismatch" => lambda do |value|
+      bad = "The lifecycle dashboard shall hide approved change impact."
+      value["candidates"][0]["source_excerpt"]["text"] = bad
+      value["candidates"][0]["source_excerpt"]["digest"] = digest_bytes(bad)
+    end,
+    "vv_definition_missing" => lambda do |value|
+      value["candidates"][0].delete("vv_definition")
+    end,
+    "candidate_relationship_invalid" => lambda do |value|
+      value["candidates"][1]["proposed_record"]["relationships"][0]["relationship_type"] = "other"
+    end
+  }
+  negative_cases.each_with_index do |(finding, mutation), index|
+    invalid = Marshal.load(Marshal.dump(proposal))
+    mutation.call(invalid)
+    invalid = identify(invalid, "proposal_id")
+    path = root.join("proposal-invalid-#{index}.json")
+    write_json(path, invalid)
+    require_blocked(
+      CAPTURE, finding, "prepare", "--root", root, "--registry", registry_path,
+      "--source-id", source.fetch("source_id"), "--proposal", path,
+      "--output", "pack-invalid-#{index}.json", "--confirmation-html", "confirmation-invalid-#{index}.html"
+    )
+  end
+
+  edited_requirement = Marshal.load(Marshal.dump(proposed_requirement))
+  edited_requirement["title"] = "Human-edited approved product impact"
+  decision = identify(
+    {
+      "schema_version" => "tw-lifecycle-human-decision/1", "decision_id" => "DEC-LC-001",
+      "pack_id" => pack.fetch("pack_id"), "owner" => "Lifecycle Owner", "decided_at" => "2026-08-24T01:00:00Z",
+      "dispositions" => [
+        {"candidate_id" => "CANDIDATE-LC-001", "action" => "edit", "reason" => "Clarify the owner-facing title", "edited_record" => edited_requirement},
+        {"candidate_id" => "CANDIDATE-LC-002", "action" => "accept", "reason" => "The authority constraint is required"},
+        {"candidate_id" => "CANDIDATE-LC-003", "action" => "reject", "reason" => "The constraint already controls this risk"}
+      ],
+      "authority_effect" => "prepare_change_only"
+    },
+    "decision_digest"
+  )
+  write_json(root.join("decision.json"), decision)
+  confirm = require_pass(CAPTURE, "confirm", "--root", root, "--pack", "pack.json", "--decision", "decision.json", "--output", "change.json")
+  fail!("confirm_result") unless confirm["accepted_count"] == 2 && confirm["rejected_count"] == 1 && confirm["reviewer_dispatch_count"] == 1 && confirm["authority_effect"] == "none"
+  change = JSON.parse(root.join("change.json").read)
+  changed_requirement = change.fetch("accepted_candidates").find { |entry| entry.dig("proposed_record", "record_id") == "REQ-#{''}LC-001" }
+  fail!("human_edit_lost") unless changed_requirement && changed_requirement.dig("proposed_record", "title") == edited_requirement["title"] && changed_requirement.dig("human_disposition", "action") == "edit"
+
+  no_change_decision = identify(
+    {
+      "schema_version" => "tw-lifecycle-human-decision/1", "decision_id" => "DEC-LC-NOCHANGE-001",
+      "pack_id" => pack.fetch("pack_id"), "owner" => "Lifecycle Owner", "decided_at" => "2026-08-24T01:05:00Z",
+      "dispositions" => candidates.map { |candidate| {"candidate_id" => candidate.fetch("candidate_id"), "action" => "reject", "reason" => "No controlled change is required"} },
+      "authority_effect" => "prepare_change_only"
+    },
+    "decision_digest"
+  )
+  write_json(root.join("decision-no-change.json"), no_change_decision)
+  no_change_result = require_pass(CAPTURE, "confirm", "--root", root, "--pack", "pack.json", "--decision", "decision-no-change.json", "--output", "change-no-change.json")
+  fail!("no_change_closure") unless no_change_result["closure"] == "no_change_mechanical_closure" && no_change_result["reviewer_dispatch_count"] == 0 && no_change_result["next_gate"] == "none_no_change_closed"
+
+  approval_body = {
+    "schema_version" => "tw-lifecycle-change-approval/1", "change_request_id" => change.fetch("change_request_id"),
+    "registry_digest" => registry_check.fetch("registry_digest"), "source_id" => source.fetch("source_id"), "source_digest" => source.fetch("digest"),
+    "new_generation" => "LC-GEN-002", "new_baseline_id" => "BASELINE-LC-002", "allowed_record_ids" => ["CONSTRAINT-LC-001", "REQ-#{''}LC-001"],
+    "owner" => "Lifecycle Owner", "decision_id" => "DEC-LC-001", "accepted_at" => "2026-08-24T01:10:00Z",
+    "authority_effect" => "named_human_approved_delta_only"
+  }
+  approval = identify(approval_body, "approval_id")
+  write_json(root.join("approval.json"), approval)
+  no_change = JSON.parse(root.join("change-no-change.json").read)
+  no_change_approval = Marshal.load(Marshal.dump(approval_body))
+  no_change_approval["change_request_id"] = no_change.fetch("change_request_id")
+  no_change_approval["decision_id"] = "DEC-LC-NOCHANGE-001"
+  no_change_approval["allowed_record_ids"] = []
+  write_json(root.join("approval-no-change.json"), identify(no_change_approval, "approval_id"))
+  require_blocked(CAPTURE, "no_change_requires_no_apply", *apply_arguments(root, change: "change-no-change.json", approval: "approval-no-change.json", output: "application-no-change.json"))
+
+  before_negative_apply = snapshot(root)
+  wrong_preimage = Marshal.load(Marshal.dump(approval_body))
+  wrong_preimage["registry_digest"] = "sha256:#{"f" * 64}"
+  write_json(root.join("approval-wrong-preimage.json"), identify(wrong_preimage, "approval_id"))
+  require_blocked(CAPTURE, "approval_preimage_mismatch", *apply_arguments(root, approval: "approval-wrong-preimage.json", output: "application-wrong-preimage.json"))
+  fail!("preimage_failure_mutated_state") unless snapshot(root) == before_negative_apply
+
+  wrong_decision = Marshal.load(Marshal.dump(approval_body))
+  wrong_decision["decision_id"] = "DEC-LC-OTHER-001"
+  write_json(root.join("approval-wrong-decision.json"), identify(wrong_decision, "approval_id"))
+  require_blocked(CAPTURE, "change_approval_decision_mismatch", *apply_arguments(root, approval: "approval-wrong-decision.json", output: "application-wrong-decision.json"))
+  fail!("decision_failure_mutated_state") unless snapshot(root) == before_negative_apply
+
+  rollback_root = workspace.join("rollback-project")
+  FileUtils.cp_r(root, rollback_root)
+  rollback_before = snapshot(rollback_root)
+  require_blocked(CAPTURE, "injected_change_failure", *apply_arguments(rollback_root, output: "application-rollback.json"), "--inject-failure-after-authority")
+  fail!("transaction_rollback_incomplete") unless snapshot(rollback_root) == rollback_before && !rollback_root.join("application-rollback.json").exist?
+
+  recovered_generation = nil
+  (0..6).each do |phase|
+    kill_root = workspace.join("kill-phase-#{phase}")
+    FileUtils.cp_r(root, kill_root)
+    stdout, stderr, status = run(CAPTURE, *apply_arguments(kill_root), "--inject-kill-after-phase", phase)
+    fail!("kill_phase_not_killed phase=#{phase} status=#{status.inspect} stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.signaled? && status.termsig == Signal.list.fetch("KILL")
+    fail!("kill_phase_journal_missing phase=#{phase}") unless kill_root.join(".traceweaver/lifecycle-capture-transaction.json").file?
+    recovered = require_pass(CAPTURE, *apply_arguments(kill_root))
+    fail!("kill_phase_recovery_result phase=#{phase}") unless recovered["status"] == "applied" && recovered["new_generation"] == "LC-GEN-002"
+    fail!("kill_phase_journal_not_cleared phase=#{phase}") if kill_root.join(".traceweaver/lifecycle-capture-transaction.json").exist?
+    transaction_parent = kill_root.join(".traceweaver/lifecycle-capture-transactions")
+    fail!("kill_phase_transaction_residue phase=#{phase}") if transaction_parent.directory? && transaction_parent.children.any?
+    require_pass(INTEGRITY, "registry-check", "--root", kill_root, "--registry", "source-registry.json")
+    kill_root.join("records").children.select { |path| path.extname == ".json" }.sort.each do |record_path|
+      require_pass(INTEGRITY, "record-check", "--root", kill_root, "--record", record_path)
+    end
+    generation = snapshot(kill_root).merge("application.json" => digest_bytes(kill_root.join("application.json").binread))
+    recovered_generation ||= generation
+    fail!("kill_phase_mixed_generation phase=#{phase}") unless generation == recovered_generation
+  end
+
+  application = require_pass(CAPTURE, *apply_arguments(root))
+  fail!("application_result") unless application["status"] == "applied" && application["new_generation"] == "LC-GEN-002" && application["changed_record_ids"] == ["CONSTRAINT-LC-001", "REQ-#{''}LC-001"] && application["stale_evidence_ids"] == ["EVIDENCE-LC-001"] && application["reverification_required"] == true
+  fail!("application_record_identities") unless application["record_digests"].is_a?(Hash) && application["record_digests"].keys.sort == ["CONSTRAINT-LC-001", "EVIDENCE-LC-001", "REQ-#{''}LC-001"]
+  new_registry = JSON.parse(registry_path.read)
+  fail!("registry_generation_not_advanced") unless new_registry["generation"] == "LC-GEN-002" && new_registry["sources"].all? { |entry| entry["generation"] == "LC-GEN-002" }
+  fail!("registry_source_digest_not_advanced") unless new_registry.dig("sources", 0, "digest") == digest_bytes(authority_path.binread) && new_registry.dig("sources", 0, "version") == "LC-GEN-002"
+  fail!("registry_identity_not_bound") unless application["new_registry_digest"] == digest_value(new_registry)
+  updated_requirement = JSON.parse(records_dir.join("REQ-#{''}LC-001.json").read)
+  accepted_constraint = JSON.parse(records_dir.join("CONSTRAINT-LC-001.json").read)
+  stale_evidence = JSON.parse(records_dir.join("EVIDENCE-LC-001.json").read)
+  fail!("human_approval_not_applied") unless updated_requirement["authority_class"] == "authoritative" && updated_requirement["acceptance_state"] == "accepted" && updated_requirement.dig("acceptance", "decision_id") == "DEC-LC-001"
+  fail!("accepted_create_not_applied") unless accepted_constraint["authority_class"] == "authoritative" && accepted_constraint["acceptance_state"] == "accepted"
+  fail!("evidence_not_stale") unless stale_evidence["freshness"] == "stale" && stale_evidence.dig("baseline", "generation") == "LC-GEN-001"
+  fail!("current_records_not_rebaselined") unless [updated_requirement, accepted_constraint].all? { |entry| entry.dig("baseline", "generation") == "LC-GEN-002" && entry.dig("baseline", "digest") == application["new_registry_digest"] }
+  fail!("authority_block_missing") unless authority_path.read.scan("TRACEWEAVER-LIFECYCLE-RECORDS:BEGIN").length == 1 && authority_path.read.scan("TRACEWEAVER-LIFECYCLE-RECORDS:END").length == 1
+
+  graph_path = root.join("lifecycle-graph.json")
+  graph_build = require_pass(GRAPH, "build", "--root", root, "--registry", registry_path, "--records", records_dir, "--output", graph_path)
+  fail!("graph_rebuild_after_change") unless graph_build["status"] == "pass" && graph_build["record_count"] == 3
+  impact = require_pass(GRAPH, "impact", "--graph", graph_path, "--id", "REQ-#{''}LC-001")
+  fail!("stale_evidence_impact_missing") unless impact["reverification_required"] == true && impact["invalidated_evidence"].any? { |entry| entry["record_id"] == "EVIDENCE-LC-001" }
+
+  after_application = snapshot(root).merge("application.json" => digest_bytes(root.join("application.json").binread), "lifecycle-graph.json" => digest_bytes(graph_path.binread))
+  repeat = require_pass(CAPTURE, *apply_arguments(root))
+  after_repeat = snapshot(root).merge("application.json" => digest_bytes(root.join("application.json").binread), "lifecycle-graph.json" => digest_bytes(graph_path.binread))
+  fail!("application_not_idempotent") unless repeat == application && after_repeat == after_application
+
+  tamper_root = workspace.join("tamper-project")
+  FileUtils.cp_r(root, tamper_root)
+  tampered = JSON.parse(tamper_root.join("records/CONSTRAINT-LC-001.json").read)
+  tampered["fields"]["statement"] = "Tampered after application."
+  write_json(tamper_root.join("records/CONSTRAINT-LC-001.json"), tampered)
+  require_blocked(CAPTURE, "idempotent_receipt_state_mismatch", *apply_arguments(tamper_root))
+end
+
+puts "v060_lifecycle_capture_smoke=pass"
+puts "v060_lifecycle_human_confirmation_boundary=pass"
+puts "v060_lifecycle_change_transaction_and_idempotency=pass"
+puts "v060_lifecycle_stale_evidence_reverification=pass"
+puts "v060_lifecycle_no_change_mechanical_closure=pass"
+puts "v060_lifecycle_capture_crash_recovery=pass"

@@ -88,6 +88,7 @@ assert_success_projection() {
     target_root="$home/.codex/traceweaver-core"
     install_manifest="$target_root/install-manifest.json"
     [[ -f "$target_root/skills/tw-auto/references/model-context-map.yml" ]]
+    [[ -f "$target_root/skills/tw-auto/references/bounded-convergence-window-guide.md" ]]
     [[ -f "$target_root/skills/tw-auto/references/workflow-profile-template.yml" ]]
     [[ -x "$target_root/skills/tw-auto/scripts/traceweaver-route-convergence" ]]
     [[ -x "$target_root/skills/tw-commit-push-pr/scripts/traceweaver-check-publication-review" ]]
@@ -106,6 +107,8 @@ assert_success_projection() {
   [[ -f "$target_root/$generated_routing_artifact" ]]
   cmp "$repo_root/plugins/traceweaver-core/references/model-context-map.yml" "$target_root/references/model-context-map.yml"
   cmp "$repo_root/plugins/traceweaver-core/skills/tw-auto/references/model-context-map.yml" "$target_root/skills/tw-auto/references/model-context-map.yml"
+  cmp "$repo_root/plugins/traceweaver-core/references/bounded-convergence-window-guide.md" "$target_root/references/bounded-convergence-window-guide.md"
+  cmp "$repo_root/plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md" "$target_root/skills/tw-auto/references/bounded-convergence-window-guide.md"
   cmp "$repo_root/plugins/traceweaver-core/references/workflow-profile-template.yml" "$target_root/references/workflow-profile-template.yml"
   cmp "$repo_root/plugins/traceweaver-core/skills/tw-auto/references/workflow-profile-template.yml" "$target_root/skills/tw-auto/references/workflow-profile-template.yml"
   python3 - "$target" "$repo_root/plugins/traceweaver-core" "$source_manifest" "$repo_root/plugins/traceweaver-core/references/model-context-map.yml" "$install_manifest" "$target_root/$generated_routing_artifact" "$target_root" <<'PY'
@@ -178,9 +181,9 @@ import sys
 
 inventory = json.load(open(sys.argv[1], encoding="utf-8"))
 assert inventory["schema_version"] == "tw-model-context-inventory/1", inventory
-assert inventory["top_level_callable_count"] == 28, inventory
-assert inventory["declared_route_count"] == 87, inventory
-assert len(inventory["routes"]) == 87, inventory
+assert inventory["top_level_callable_count"] == 29, inventory
+assert inventory["declared_route_count"] == 88, inventory
+assert len(inventory["routes"]) == 88, inventory
 PY
   if [[ "$target" == "codex" ]]; then
     "$home/.codex/skills/tw-auto/scripts/traceweaver-generate-model-context-map" \

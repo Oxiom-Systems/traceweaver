@@ -1,0 +1,223 @@
+{
+  "schema_version": "tw-review-series-ledger/1",
+  "series_generation_id": "RS-GEN-2026-08-23-METRIC-ROUTING-AUTHORITY-DOC-001",
+  "predecessor_series_identity": null,
+  "authorization_reason": "Oxiom Systems approved the exact metric-routing envelope and authorized one controlled master-root promotion followed by one consolidated scoped document review.",
+  "review_mode": "standalone_document_review",
+  "series_identity": "sha256:073145e3470306a8c5a93e94cf3b62c2528d454f6d2fa86cf21daa6d6b0d44dc",
+  "frozen_scope_identity": "sha256:47eedd0570de3c06b55f36dc3c9110a71051d0bfb8c264f9a7cbcebb808b544f",
+  "routing_scope": {
+    "target_paths": [
+      ".traceweaver/changes/CHG-TW-2026-08-22-003-metric-routing.yml",
+      ".traceweaver/intent-contract.current.yml",
+      ".traceweaver/intent-contract.yml",
+      "docs/generated/traceability-dashboard.md",
+      "docs/generated/traceability-data.json",
+      "docs/generated/traceability-graph.mmd",
+      "docs/traceability/metric-routing.md",
+      "docs/validation/traceweaver-2026-08-22-metric-routing-requirements-authority-envelope.md",
+      "docs/validation/traceweaver-2026-08-23-metric-routing-formal-authority-acceptance.md",
+      "requirements.md",
+      "traceability-matrix.md"
+    ],
+    "review_objective": "Determine in one pass whether the exact staged document set faithfully promotes the approved metric-routing authority into the three master roots, preserves every hold, and is coherent and sufficient for one later consolidated plan without authorizing implementation.",
+    "concerns": [
+      "ART-TW-080, TRACE-TW-073, ATP-TW-050, RESULT-TW-050, VER-TW-093, VAL-TW-041, and EXC-TW-016 must form a complete non-circular chain across all roots.",
+      "REQ-TW-124 through REQ-TW-129, DEC-TW-010, IF-TW-006, RISK-TW-012 and RISK-TW-013 must retain their accepted meaning and exact thresholds.",
+      "Released TraceWeaver Core 0.5.0 and v1 behavior must remain the unchanged predecessor; no metric implementation, replay, instrumentation, qualification, quantitative claim, cutover, publication, or release may be implied.",
+      "The canonical requirements hash, bounded snapshot, generated views, statuses, and next-step routing must agree across the package.",
+      "The exact approved source snapshot and document-set digest must remain byte-identical and correctly bound to the owner acceptance receipt.",
+      "The next authorized workflow step after a clean review must be one consolidated plan, not requirement-level micro-review fan-out."
+    ],
+    "policy_epoch": "tw-scoped-review-protocol/1@sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+  },
+  "frozen_scope": {
+    "semantic_authority_digest": "sha256:d7155a93a7cbe229c07f54b048c0f4fd5539dd15ab8bda0c29417cd180e05f39",
+    "behavior_digest": "sha256:b72037350b6700b55148bee749419f8e22656085fe75a94fc504877a7f3037d1",
+    "verification_digest": "sha256:19b03e0d9abb2693b71dd91d8f98a1899e9c06aa39fa6b702507fec78e70ed19",
+    "policy_epoch": "tw-scoped-review-protocol/1@sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d",
+    "requirements_baseline_hash": "sha256:68eff474c6772b6cdd000c1ddcc29532b22adaec436222f5cb040ef7b46a3a54",
+    "workflow_profile_hash": "sha256:c1a0b9164d672df0d961633ac9b63acc2a1426e7d7f73f1321e4e926e3cdf13b",
+    "target_paths": [
+      ".traceweaver/changes/CHG-TW-2026-08-22-003-metric-routing.yml",
+      ".traceweaver/intent-contract.current.yml",
+      ".traceweaver/intent-contract.yml",
+      "docs/generated/traceability-dashboard.md",
+      "docs/generated/traceability-data.json",
+      "docs/generated/traceability-graph.mmd",
+      "docs/traceability/metric-routing.md",
+      "docs/validation/traceweaver-2026-08-22-metric-routing-requirements-authority-envelope.md",
+      "docs/validation/traceweaver-2026-08-23-metric-routing-formal-authority-acceptance.md",
+      "requirements.md",
+      "traceability-matrix.md"
+    ],
+    "review_objective": "Determine in one pass whether the exact staged document set faithfully promotes the approved metric-routing authority into the three master roots, preserves every hold, and is coherent and sufficient for one later consolidated plan without authorizing implementation.",
+    "concerns": [
+      "ART-TW-080, TRACE-TW-073, ATP-TW-050, RESULT-TW-050, VER-TW-093, VAL-TW-041, and EXC-TW-016 must form a complete non-circular chain across all roots.",
+      "REQ-TW-124 through REQ-TW-129, DEC-TW-010, IF-TW-006, RISK-TW-012 and RISK-TW-013 must retain their accepted meaning and exact thresholds.",
+      "Released TraceWeaver Core 0.5.0 and v1 behavior must remain the unchanged predecessor; no metric implementation, replay, instrumentation, qualification, quantitative claim, cutover, publication, or release may be implied.",
+      "The canonical requirements hash, bounded snapshot, generated views, statuses, and next-step routing must agree across the package.",
+      "The exact approved source snapshot and document-set digest must remain byte-identical and correctly bound to the owner acceptance receipt.",
+      "The next authorized workflow step after a clean review must be one consolidated plan, not requirement-level micro-review fan-out."
+    ],
+    "canonical_protocol": {
+      "path": "plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md",
+      "version": "tw-scoped-review-protocol/1",
+      "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+    }
+  },
+  "formal_authority_accepted": true,
+  "authority_acceptance_state": "authority_accepted",
+  "authority_acceptance_receipt": "TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001",
+  "accounting": {
+    "discovery_consumed": true,
+    "repair_cycles_opened": 0,
+    "routine_repair_cycle_limit": 1,
+    "repair_cycle_limit": 1,
+    "remaining_repair_cycles": 1,
+    "severe_blocker_exception": null
+  },
+  "attempts": [
+    {
+      "stage": "discovery",
+      "attempt_index": 0,
+      "attempt_identity": "sha256:fd6fb59e48475c33a136084d250bdd2634e7d1f3421b0c0eacf9f4bb90ba63d0",
+      "status": "complete",
+      "opened_session_id": "metric-routing-authority-promotion-2026-08-23",
+      "dispatch_identities": [
+        "sha256:7bbabb473230023f03362eac6a740f0af084ce1e2148654855ad5a9cdd8d0fe1"
+      ],
+      "completed_session_id": "metric-routing-authority-promotion-2026-08-23",
+      "unresolved_blocking_fingerprints": [
+
+      ],
+      "relevant_evidence_digest": "sha256:0119e4650447c37c569e689c4950c846e398126379c1e1f3ade2d8363b6b5c42"
+    }
+  ],
+  "current_attempt": null,
+  "dispatches": [
+    {
+      "dispatch_identity": "sha256:7bbabb473230023f03362eac6a740f0af084ce1e2148654855ad5a9cdd8d0fe1",
+      "dispatch_sequence": 1,
+      "series_identity": "sha256:073145e3470306a8c5a93e94cf3b62c2528d454f6d2fa86cf21daa6d6b0d44dc",
+      "stage": "discovery",
+      "attempt_identity": "sha256:fd6fb59e48475c33a136084d250bdd2634e7d1f3421b0c0eacf9f4bb90ba63d0",
+      "wrapper": "tw-doc-review",
+      "role": "independent_metric_routing_authority_document_reviewer",
+      "session_id": "metric-routing-authority-promotion-2026-08-23"
+    }
+  ],
+  "finding_history": [
+
+  ],
+  "current_findings": [
+
+  ],
+  "evidence_history": [
+    {
+      "stage": "discovery",
+      "attempt_identity": "sha256:fd6fb59e48475c33a136084d250bdd2634e7d1f3421b0c0eacf9f4bb90ba63d0",
+      "relevant_evidence_digest": "sha256:0119e4650447c37c569e689c4950c846e398126379c1e1f3ade2d8363b6b5c42",
+      "semantic_authority_digest": "sha256:d7155a93a7cbe229c07f54b048c0f4fd5539dd15ab8bda0c29417cd180e05f39",
+      "behavior_digest": "sha256:b72037350b6700b55148bee749419f8e22656085fe75a94fc504877a7f3037d1",
+      "verification_digest": "sha256:19b03e0d9abb2693b71dd91d8f98a1899e9c06aa39fa6b702507fec78e70ed19",
+      "verification_outcome": "pass",
+      "evidence_changed": true,
+      "unresolved_blocking_fingerprints": [
+
+      ]
+    }
+  ],
+  "accepted_review": {
+    "identity": "sha256:ae7fec240a034d09942785ca4454ab903d5127bc22924674930af8730e827a8e",
+    "inputs": {
+      "semantic_authority_digest": "sha256:d7155a93a7cbe229c07f54b048c0f4fd5539dd15ab8bda0c29417cd180e05f39",
+      "behavior_digest": "sha256:b72037350b6700b55148bee749419f8e22656085fe75a94fc504877a7f3037d1",
+      "verification_digest": "sha256:19b03e0d9abb2693b71dd91d8f98a1899e9c06aa39fa6b702507fec78e70ed19",
+      "policy_epoch": "tw-scoped-review-protocol/1@sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+    },
+    "review_route": "document_review",
+    "recorded_session_id": "metric-routing-authority-promotion-2026-08-23"
+  },
+  "mechanical_closures": [
+    {
+      "sequence": 1,
+      "changes": [
+        "generated_view",
+        "git_index",
+        "matrix_projection",
+        "receipt",
+        "requirements_baseline_metadata",
+        "review_id",
+        "status"
+      ],
+      "audit_metadata": {
+        "final_requirements_baseline_hash": "sha256:aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5",
+        "graph_cycle_id": "RS-GEN-2026-08-23-METRIC-ROUTING-AUTHORITY-DOC-001",
+        "graph_freshness_state": "fresh",
+        "graph_materialization_count": 1,
+        "graph_receipt_hash": "sha256:7b00f6d8d6fa972747269486596a4cef0be6c463ec176686469a912552f3698f",
+        "implementation_authority": "held_pending_separately_accepted_consolidated_plan_and_vv_definition",
+        "review_receipt": "docs/validation/traceweaver-2026-08-23-metric-routing-promoted-baseline-doc-review.md"
+      },
+      "session_id": "metric-routing-authority-promotion-2026-08-23",
+      "atomic_with_accepted_review": false,
+      "reviewer_dispatch_count": 0,
+      "closure_identity": "sha256:5cc7203bde6635c90ecd5aa1efc754dac652b4d491d65005f379801f316b8fa1"
+    }
+  ],
+  "audit_metadata_history": [
+    {
+      "requirements_baseline_hash": "sha256:68eff474c6772b6cdd000c1ddcc29532b22adaec436222f5cb040ef7b46a3a54",
+      "workflow_profile_hash": "sha256:c1a0b9164d672df0d961633ac9b63acc2a1426e7d7f73f1321e4e926e3cdf13b",
+      "canonical_protocol": {
+        "path": "plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md",
+        "version": "tw-scoped-review-protocol/1",
+        "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+      },
+      "semantic_authority_digest": "sha256:d7155a93a7cbe229c07f54b048c0f4fd5539dd15ab8bda0c29417cd180e05f39",
+      "behavior_digest": "sha256:b72037350b6700b55148bee749419f8e22656085fe75a94fc504877a7f3037d1",
+      "verification_digest": "sha256:19b03e0d9abb2693b71dd91d8f98a1899e9c06aa39fa6b702507fec78e70ed19",
+      "session_id": "metric-routing-authority-promotion-2026-08-23"
+    }
+  ],
+  "terminal_outcome": "candidate_review_saturated",
+  "terminal_receipts": [
+    {
+      "schema_version": "tw-review-series-receipt/1",
+      "command": "terminal_evaluation",
+      "series_generation_id": "RS-GEN-2026-08-23-METRIC-ROUTING-AUTHORITY-DOC-001",
+      "predecessor_series_identity": null,
+      "series_identity": "sha256:073145e3470306a8c5a93e94cf3b62c2528d454f6d2fa86cf21daa6d6b0d44dc",
+      "frozen_scope_identity": "sha256:47eedd0570de3c06b55f36dc3c9110a71051d0bfb8c264f9a7cbcebb808b544f",
+      "canonical_protocol": {
+        "path": "plugins/traceweaver-core/skills/tw-auto/references/scoped-review-protocol.md",
+        "version": "tw-scoped-review-protocol/1",
+        "digest": "sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d"
+      },
+      "policy_epoch": "tw-scoped-review-protocol/1@sha256:1197e46b963ce737346642e4b09965e90784046fedabf237414a74c4b243368d",
+      "ledger_digest": "sha256:6a99eea39a3a0bf181aafa77d8bd2925c1f4d6026223597a0f95c8fdab889796",
+      "stage": "discovery",
+      "attempt_identity": "sha256:fd6fb59e48475c33a136084d250bdd2634e7d1f3421b0c0eacf9f4bb90ba63d0",
+      "dispatch_identities": [
+        "sha256:7bbabb473230023f03362eac6a740f0af084ce1e2148654855ad5a9cdd8d0fe1"
+      ],
+      "remaining_repair_cycles": 1,
+      "unresolved_blocking_count": 0,
+      "nonblocking_debt_count": 0,
+      "terminal_outcome": "candidate_review_saturated",
+      "authority_acceptance_state": "authority_accepted",
+      "authority_acceptance_receipt": "TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001",
+      "last_session_id": "metric-routing-authority-promotion-2026-08-23",
+      "terminal_reasons": [
+        "zero_unresolved_in_scope_blockers"
+      ],
+      "receipt_sequence": 1,
+      "receipt_identity": "sha256:5a82514dc96d4141a1bb2eb926114d0bee1813a96c31d3eb0b41c359b498eba6"
+    }
+  ],
+  "session_history": [
+    "metric-routing-authority-promotion-2026-08-23"
+  ],
+  "last_session_id": "metric-routing-authority-promotion-2026-08-23"
+}

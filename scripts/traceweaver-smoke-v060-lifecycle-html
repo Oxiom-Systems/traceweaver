@@ -1,0 +1,222 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-semantic-html-smoke; req=REQ-TW-131,REQ-TW-132,REQ-TW-133,REQ-TW-138; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-131,REQ-TW-132,REQ-TW-133,REQ-TW-138; trace=TRACE-TW-074
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+PROJECT = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-project")
+CUTOVER = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-cutover")
+SCHEMA = ROOT.join("plugins/traceweaver-core/references/lifecycle/semantic-html.schema.json")
+PARSER_LOCK = ROOT.join("plugins/traceweaver-core/references/lifecycle/semantic-html-parser-lock.json")
+GRAPH = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph")
+
+def fail!(message)
+  warn "v060_lifecycle_html_smoke=failed reason=#{message}"
+  exit 1
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def write_json(path, value)
+  path.binwrite("#{JSON.generate(canonical(value))}\n")
+end
+
+def digest_file(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def run(executable, *arguments)
+  Open3.capture3(executable.to_s, *arguments)
+end
+
+def require_pass(executable, *arguments)
+  stdout, stderr, status = run(executable, *arguments)
+  fail!("expected_pass executable=#{executable.basename} args=#{arguments.join(" ")} stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.success?
+  [stdout, JSON.parse(stdout)]
+rescue JSON::ParserError => error
+  fail!("success_output_not_json error=#{error.message}")
+end
+
+def require_blocked(expected_finding, executable, *arguments)
+  stdout, stderr, status = run(executable, *arguments)
+  fail!("expected_blocked finding=#{expected_finding}") if status.success?
+  combined = "#{stdout}\n#{stderr}"
+  fail!("missing_finding expected=#{expected_finding} actual=#{combined.inspect}") unless combined.include?(expected_finding)
+end
+
+def record(id:, type:, title:, source:, baseline:, relationships: [], freshness: "current")
+  {
+    "schema_version" => "tw-lifecycle-record/1",
+    "record_id" => id,
+    "record_type" => type,
+    "title" => title,
+    "owner" => "Lifecycle HTML Owner",
+    "authority_class" => "authoritative",
+    "source" => {
+      "source_id" => source["source_id"],
+      "locator" => source["normalized_locator"],
+      "version" => source["version"],
+      "digest" => source["digest"],
+      "role" => source["role"],
+      "provenance" => "exact registered authority source"
+    },
+    "applicability" => "applicable",
+    "baseline" => baseline,
+    "freshness" => freshness,
+    "acceptance_state" => "prepared",
+    "relationships" => relationships,
+    "fields" => {
+      "controlled_statement" => "Visible controlled field for #{id}",
+      "validation_question" => "Can an owner recover #{id} without hidden content?"
+    }
+  }
+end
+
+fail!("missing_project_executable") unless PROJECT.file? && PROJECT.executable?
+fail!("missing_cutover_executable") unless CUTOVER.file? && CUTOVER.executable?
+fail!("missing_semantic_html_schema") unless SCHEMA.file?
+fail!("missing_parser_lock") unless PARSER_LOCK.file?
+fail!("missing_graph_executable") unless GRAPH.file? && GRAPH.executable?
+
+schema = JSON.parse(SCHEMA.read)
+lock = JSON.parse(PARSER_LOCK.read)
+fail!("semantic_html_schema_id") unless schema["$id"] == "tw-lifecycle-html/1"
+fail!("parser_lock_schema") unless lock["schema_version"] == "tw-semantic-html-parser-lock/1"
+
+Dir.mktmpdir("traceweaver-v060-lifecycle-html-") do |directory|
+  root = Pathname.new(directory)
+  records_dir = root.join("records")
+  records_dir.mkdir
+  authority_path = root.join("authority.md")
+  authority_path.write("# Lifecycle HTML authority\n\nVisible strict projection fixture.\n")
+  source = {
+    "source_id" => "SRC-HTML-AUTHORITY-001",
+    "role" => "authority_baseline",
+    "locator" => "authority.md",
+    "normalized_locator" => "authority.md",
+    "source_type" => "markdown",
+    "schema_version" => "tw-lifecycle-markdown/1",
+    "digest" => digest_file(authority_path),
+    "owner" => "Lifecycle HTML Owner",
+    "authority_class" => "authoritative",
+    "owned_field_families" => ["html_fixture_authority"],
+    "generation" => "LC-HTML-GEN-001",
+    "observed_at" => "2026-08-24T00:00:00Z",
+    "version" => "html-v1",
+    "mutable" => false,
+    "normalization" => {"encoding" => "UTF-8", "line_endings" => "LF", "case" => "exact", "legacy_locators" => []}
+  }
+  registry = {
+    "schema_version" => "tw-lifecycle-source-registry/1",
+    "registry_id" => "LC-HTML-REGISTRY-001",
+    "generation" => "LC-HTML-GEN-001",
+    "owner" => "Lifecycle HTML Owner",
+    "sources" => [source]
+  }
+  registry_path = root.join("source-registry.json")
+  write_json(registry_path, registry)
+  baseline = {"baseline_id" => "BASELINE-HTML-001", "generation" => "LC-HTML-GEN-001", "digest" => "sha256:#{"b" * 64}"}
+  records = [
+    record(id: "INTENT-HTML-001", type: "intent", title: "Trust lifecycle presentation — naïve café", source: source, baseline: baseline),
+    record(id: "REQ-#{''}HTML-001", type: "requirement", title: "Show every controlled field 🔐", source: source, baseline: baseline, relationships: [
+      {"source_id" => "REQ-#{''}HTML-001", "target_id" => "INTENT-HTML-001", "relationship_type" => "derived_from", "applicable" => true, "provenance" => "authority.md#requirement"}
+    ]),
+    record(id: "EVIDENCE-HTML-001", type: "evidence", title: "Stale evidence remains visible", source: source, baseline: baseline, freshness: "stale", relationships: [
+      {"source_id" => "EVIDENCE-HTML-001", "target_id" => "REQ-#{''}HTML-001", "relationship_type" => "invalidates", "applicable" => true, "provenance" => "authority.md#evidence"}
+    ])
+  ]
+  records.each { |entry| write_json(records_dir.join("#{entry["record_id"]}.json"), entry) }
+  graph_path = root.join("lifecycle-graph.json")
+  require_pass(GRAPH, "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--output", graph_path.to_s)
+
+  output_a = root.join("html-a")
+  output_b = root.join("html-b")
+  build_args = ["--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--graph", graph_path.to_s]
+  _, first = require_pass(PROJECT, "build", *build_args, "--output", output_a.to_s)
+  _, second = require_pass(PROJECT, "build", *build_args, "--output", output_b.to_s)
+  fail!("project_result") unless first["status"] == "pass" && first["authority_role"] == "derived_non_authoritative" && first["authority_effect"] == "none" && first["record_count"] == 3
+  fail!("double_build_manifest") unless first["manifest_id"] == second["manifest_id"]
+  names_a = output_a.children.map { |path| path.basename.to_s }.sort
+  fail!("output_file_set") unless names_a == %w[index.html lifecycle.html manifest.json]
+  names_a.each { |name| fail!("double_build_bytes path=#{name}") unless output_a.join(name).binread == output_b.join(name).binread }
+  require_pass(PROJECT, "check", *build_args, "--output", output_a.to_s)
+
+  manifest = JSON.parse(output_a.join("manifest.json").read)
+  fail!("manifest_schema") unless manifest["schema_version"] == "tw-lifecycle-html/1" && manifest["profile"] == "strict_static_accessible_offline_printable"
+  fail!("manifest_parser_pin") unless manifest.dig("parser_lock", "parser") == "nokogiri-1.13.8-html5-libgumbo-1.0.0-nokogiri"
+  fail!("manifest_record_parity") unless manifest["records"].map { |entry| entry["record_id"] }.sort == records.map { |entry| entry["record_id"] }.sort
+  fail!("manifest_relationship_parity") unless manifest["relationship_count"] == 2 && manifest["relationships"].all? { |entry| entry["digest"].start_with?("sha256:") }
+  lifecycle = output_a.join("lifecycle.html").read
+  lifecycle_bytes = output_a.join("lifecycle.html").binread
+  manifest_records = manifest.fetch("records").to_h { |entry| [entry.fetch("record_id"), entry] }
+  records.each do |entry|
+    fail!("visible_record_id id=#{entry["record_id"]}") unless lifecycle.include?(%(<article class="record" id="#{entry["record_id"]}">)) && lifecycle.include?(%(<code class="stable-id">#{entry["record_id"]}</code>))
+    fail!("visible_controlled_field id=#{entry["record_id"]}") unless lifecycle.include?(entry.dig("fields", "controlled_statement"))
+    start_token = %(<article class="record" id="#{entry["record_id"]}">).b
+    start = lifecycle_bytes.index(start_token)
+    finish = lifecycle_bytes.index("</article>".b, start)
+    fail!("independent_unicode_span_missing id=#{entry["record_id"]}") unless start && finish
+    exact_span = lifecycle_bytes.byteslice(start, finish + "</article>".bytesize - start)
+    fail!("independent_unicode_span_boundary id=#{entry["record_id"]}") unless exact_span.start_with?(start_token) && exact_span.end_with?("</article>".b)
+    expected_span_digest = "sha256:#{Digest::SHA256.hexdigest(exact_span)}"
+    fail!("independent_unicode_span_digest id=#{entry["record_id"]}") unless manifest_records.fetch(entry["record_id"]).fetch("article_span_digest") == expected_span_digest
+  end
+  fail!("typed_link_missing") unless lifecycle.include?(%(<a href="#REQ-#{''}HTML-001"><code>REQ-#{''}HTML-001</code></a>))
+  fail!("derived_boundary_missing") unless output_a.join("index.html").read.include?("DERIVED, STATIC, NON-AUTHORITATIVE")
+  fail!("active_or_remote_output") if output_a.children.grep(/\.html\z/).any? { |path| path.read.match?(/<script|https?:|javascript:|data:/i) }
+
+  active_output = root.join("html-active")
+  FileUtils.cp_r(output_a, active_output)
+  active_output.join("lifecycle.html").write(active_output.join("lifecycle.html").read.sub("</body>", "<script>bad()</script></body>"))
+  require_blocked("active_html_content", PROJECT, "check", *build_args, "--output", active_output.to_s)
+
+  hidden_output = root.join("html-hidden")
+  FileUtils.cp_r(output_a, hidden_output)
+  hidden_output.join("lifecycle.html").write(hidden_output.join("lifecycle.html").read.sub("</body>", "<p hidden>hidden authority</p></body>"))
+  require_blocked("hidden_authority_content", PROJECT, "check", *build_args, "--output", hidden_output.to_s)
+
+  broken_output = root.join("html-broken")
+  FileUtils.cp_r(output_a, broken_output)
+  broken_output.join("lifecycle.html").write(broken_output.join("lifecycle.html").read.sub("#REQ-#{''}HTML-001", "#REQ-#{''}HTML-999"))
+  require_blocked("broken_html_link", PROJECT, "check", *build_args, "--output", broken_output.to_s)
+
+  edited_output = root.join("html-edited")
+  FileUtils.cp_r(output_a, edited_output)
+  edited_output.join("index.html").write(edited_output.join("index.html").read.sub("Lifecycle assurance index", "Hand-edited lifecycle index"))
+  require_blocked("stale_or_hand_edited_projection", PROJECT, "check", *build_args, "--output", edited_output.to_s)
+
+  wrong_lock = root.join("wrong-parser-lock.json")
+  wrong = JSON.parse(PARSER_LOCK.read)
+  wrong["parser"]["version"] = "9.9.9"
+  write_json(wrong_lock, wrong)
+  require_blocked("parser_pin_mismatch", PROJECT, "build", *build_args, "--output", root.join("wrong-lock-output").to_s, "--parser-lock", wrong_lock.to_s)
+
+  stale = JSON.parse(records_dir.join("REQ-#{''}HTML-001.json").read)
+  stale["title"] = "Changed after graph acceptance"
+  write_json(records_dir.join("REQ-#{''}HTML-001.json"), stale)
+  require_blocked("stale_graph", PROJECT, "build", *build_args, "--output", root.join("stale-output").to_s)
+end
+
+puts "v060_lifecycle_html_smoke=pass"
+puts "v060_lifecycle_html_parser_and_span_pin=pass"
+puts "v060_lifecycle_html_projection_parity=pass"
+puts "v060_lifecycle_html_accessible_offline_print=pass"
+puts "v060_lifecycle_html_active_hidden_remote_refusal=pass"
+puts "v060_lifecycle_html_stale_and_hand_edit_refusal=pass"

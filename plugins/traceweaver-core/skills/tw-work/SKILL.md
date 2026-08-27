@@ -84,6 +84,8 @@ Before changing meaningful behavior, load and cite:
 - `requirements.md`
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
+- `<skills-root>/tw-auto/references/bounded-convergence-window-guide.md` when
+  the approved handoff includes bounded repair/verification attempts
 - skill-local `references/traceweaver-operating-modes.md`
 - skill-local `references/trace-anchor-authoring.md`
 - any relevant `.traceweaver/` task, gap, change, exception, trace, or evidence
@@ -204,6 +206,21 @@ formatting, generated, vendored, or no-behavior refactor changes; record the
 scoped decision instead. Non-test or post-implementation-only verification is
 allowed only when the approved requirement permits it or an approved
 exception records owner, scope, reason, review condition, and next step.
+
+## Bounded Convergence Execution
+
+When the approved handoff includes a bounded convergence window, preserve its
+frozen authority plane and mutate only its named candidate scope. Before every
+counted verification attempt, complete the named static source-closure
+preflight. An anticipated in-scope failure may be repaired inside the remaining
+budget without rerunning `tw-authority-gate`; append the attempt result and
+continue in the same retained context.
+
+Stop immediately for semantic scope or authority change, an unsafe or
+out-of-scope finding, a disallowed mutation, or exhausted budget. After success
+or hold, consolidate terminal evidence/status once. Result receipts and gate
+outputs must not become inputs to or mutate the candidate inspected by the same
+attempt. Publication and other separately held actions remain held.
 
 ## Closure-Claim Validation Gate
 

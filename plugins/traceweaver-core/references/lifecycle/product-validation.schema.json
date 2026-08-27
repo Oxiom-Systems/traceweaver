@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-product-validation/1",
+  "title": "TraceWeaver non-compensable representative product validation result",
+  "description": "A same-candidate Vestro and Air Router validation result. Deterministic fixtures can verify this contract but cannot populate or pass a release result.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "validation_id", "candidate", "preregistration", "source_baseline_receipt", "cells", "owner_disposition"],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-product-validation/1"},
+    "validation_id": {"const": "VAL-TW-042"},
+    "candidate": {"$ref": "#/$defs/candidate"},
+    "preregistration": {"$ref": "#/$defs/preregistration"},
+    "source_baseline_receipt": {"$ref": "#/$defs/boundReceipt"},
+    "cells": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {"$ref": "#/$defs/cell"}
+    },
+    "owner_disposition": {"$ref": "#/$defs/ownerDisposition"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "dateTime": {"type": "string", "format": "date-time"},
+    "safeLocator": {"type": "string", "minLength": 1, "pattern": "^(?!/)(?!.*(?:^|/)\\.\\.(?:/|$)).+$"},
+    "boundReceipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["locator", "digest"],
+      "properties": {
+        "locator": {"$ref": "#/$defs/safeLocator"},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["release_version", "baseline_id", "requirements_hash_sha256", "tree_digest"],
+      "properties": {
+        "release_version": {"const": "0.6.0"},
+        "baseline_id": {"type": "string", "minLength": 1},
+        "requirements_hash_sha256": {"$ref": "#/$defs/digest"},
+        "tree_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "preregistration": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["plan_ref", "frozen_at", "scenario_ids"],
+      "properties": {
+        "plan_ref": {"$ref": "#/$defs/safeLocator"},
+        "frozen_at": {"$ref": "#/$defs/dateTime"},
+        "scenario_ids": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "uniqueItems": true,
+          "items": {"enum": ["VESTRO-LC-001", "AIRROUTER-LC-001", "ACCEPT-LC-001"]}
+        }
+      }
+    },
+    "sourceAuthorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["authority_id", "authorized_by", "relationship", "repository_locator", "revision", "revision_digest", "source_inventory_digest", "source_locators"],
+      "properties": {
+        "authority_id": {"type": "string", "minLength": 1},
+        "authorized_by": {"type": "string", "minLength": 1},
+        "relationship": {"type": "string", "minLength": 1},
+        "repository_locator": {"$ref": "#/$defs/safeLocator"},
+        "revision": {"type": "string", "pattern": "^[0-9a-f]{40,64}$"},
+        "revision_digest": {"$ref": "#/$defs/digest"},
+        "source_inventory_digest": {"$ref": "#/$defs/digest"},
+        "source_locators": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"$ref": "#/$defs/safeLocator"}}
+      }
+    },
+    "rater": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["name", "relationship", "independence"],
+      "properties": {
+        "name": {"type": "string", "minLength": 3},
+        "relationship": {"type": "string", "minLength": 3},
+        "independence": {"type": "string", "minLength": 12}
+      }
+    },
+    "task": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["task_type", "required_record_links", "recovered_record_links", "false_authority_promotions", "false_truth_stage_promotions", "elapsed_ms", "outcome", "raw_evidence_locator", "raw_evidence_digest"],
+      "properties": {
+        "task_type": {"enum": ["source_registration", "candidate_capture", "duplicate_navigation", "impact_navigation", "vv_before_work", "stale_evidence", "strict_html_navigation", "acceptance_pack"]},
+        "required_record_links": {"type": "integer", "minimum": 1},
+        "recovered_record_links": {"type": "integer", "minimum": 0},
+        "false_authority_promotions": {"type": "integer", "minimum": 0},
+        "false_truth_stage_promotions": {"type": "integer", "minimum": 0},
+        "elapsed_ms": {"type": "integer", "minimum": 1},
+        "outcome": {"enum": ["passed", "failed", "blocked"]},
+        "raw_evidence_locator": {"$ref": "#/$defs/safeLocator"},
+        "raw_evidence_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "seededImpact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["record_id", "expected_link_ids", "observed_link_ids"],
+      "properties": {
+        "record_id": {"type": "string", "minLength": 1},
+        "expected_link_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+        "observed_link_ids": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}}
+      }
+    },
+    "routeComparison": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["markdown_manual_matrix_elapsed_ms", "strict_html_elapsed_ms"],
+      "properties": {
+        "markdown_manual_matrix_elapsed_ms": {"type": "array", "minItems": 3, "items": {"type": "integer", "minimum": 1}},
+        "strict_html_elapsed_ms": {"type": "array", "minItems": 3, "items": {"type": "integer", "minimum": 1}}
+      }
+    },
+    "nonCodeArtifact": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "source_id", "locator", "digest", "impact_evidence_locator", "impact_evidence_digest"],
+      "properties": {
+        "artifact_id": {"type": "string", "minLength": 1},
+        "source_id": {"type": "string", "pattern": "^SRC-[A-Z0-9][A-Z0-9-]+$"},
+        "locator": {"$ref": "#/$defs/safeLocator"},
+        "digest": {"$ref": "#/$defs/digest"},
+        "impact_evidence_locator": {"$ref": "#/$defs/safeLocator"},
+        "impact_evidence_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "cell": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["product", "scenario_id", "source_authorization", "rater", "tasks", "seeded_impacts", "route_comparison", "acceptance_signal", "acceptance_rationale", "limitations", "raw_evidence_locator", "raw_evidence_digest", "observed_at"],
+      "properties": {
+        "product": {"enum": ["Vestro", "Air Router"]},
+        "scenario_id": {"enum": ["VESTRO-LC-001", "AIRROUTER-LC-001"]},
+        "source_authorization": {"$ref": "#/$defs/sourceAuthorization"},
+        "rater": {"$ref": "#/$defs/rater"},
+        "tasks": {"type": "array", "minItems": 8, "maxItems": 8, "items": {"$ref": "#/$defs/task"}},
+        "seeded_impacts": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/seededImpact"}},
+        "route_comparison": {"$ref": "#/$defs/routeComparison"},
+        "non_code_artifact": {"$ref": "#/$defs/nonCodeArtifact"},
+        "acceptance_signal": {"enum": ["accepted", "rejected", "held"]},
+        "acceptance_rationale": {"type": "string", "minLength": 12},
+        "limitations": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}},
+        "raw_evidence_locator": {"$ref": "#/$defs/safeLocator"},
+        "raw_evidence_digest": {"$ref": "#/$defs/digest"},
+        "observed_at": {"$ref": "#/$defs/dateTime"}
+      },
+      "allOf": [
+        {
+          "if": {"properties": {"product": {"const": "Air Router"}}, "required": ["product"]},
+          "then": {"required": ["non_code_artifact"]}
+        }
+      ]
+    },
+    "ownerDisposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner_name", "relationship", "decision", "reviewed_cell_raw_digests", "limitations_acknowledged", "remaining_holds", "decided_at"],
+      "properties": {
+        "owner_name": {"type": "string", "minLength": 3},
+        "relationship": {"type": "string", "minLength": 3},
+        "decision": {"enum": ["accepted", "rejected", "held"]},
+        "reviewed_cell_raw_digests": {"type": "array", "minItems": 2, "maxItems": 2, "uniqueItems": true, "items": {"$ref": "#/$defs/digest"}},
+        "limitations_acknowledged": {"const": true},
+        "remaining_holds": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 3}},
+        "decided_at": {"$ref": "#/$defs/dateTime"}
+      }
+    }
+  }
+}

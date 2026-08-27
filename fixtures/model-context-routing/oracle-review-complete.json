@@ -1,15 +1,15 @@
 {
-  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092; req=REQ-TW-123; trace=TRACE-TW-072; ver=VER-TW-092",
+  "_traceweaver": "TRACEWEAVER: file-role=model-context-verification-fixture; verifies=VER-TW-092,VER-TW-094; req=REQ-TW-123,REQ-TW-145; trace=TRACE-TW-072,TRACE-TW-074; ver=VER-TW-092,VER-TW-094",
   "schema_version": "tw-model-context-oracle-adequacy-review/1",
-  "review_id": "ORACLE-ADEQUACY-TW-049-RELEASE-001",
+  "review_id": "ORACLE-ADEQUACY-TW-051-V060-FIXTURE-001",
   "reviewer": {
     "identity": "independent-adequacy-reviewer",
     "relationship": "did_not_implement_compiler_or_author_source_oracle",
     "independent": true
   },
-  "map_digest": "sha256:2eab40f5e2e459dfb1ff1f655b0fb0cdacfe8c40478f04368d7185b219c988f2",
-  "inventory_digest": "sha256:fd0eb117987ece30d1f2d3c576d051e8f5f14a3c97e7d55581c22e5a43afdf01",
-  "route_count": 87,
+  "map_digest": "sha256:4e4157b75b4f5542b709628d8d311e7cf59d61084f406ad6d144869b833c1718",
+  "inventory_digest": "sha256:426176c6fa2d1d4c9b430739c81c01db4122016930a2f677c41906bab85d0d64",
+  "route_count": 88,
   "category_count": 6,
   "route_category_cells": [
     {
@@ -25,7 +25,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d"
         }
       ]
     },
@@ -54,7 +54,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
-          "digest": "sha256:5a4f1183aa36f92d43b4571f59a15116eaf97a2d0d02f5ae0d43a03e0d2ff141"
+          "digest": "sha256:e36711fe8b4c67f93af66faa2693821cf4b712c6aafb87380e2d46cc65107984"
         }
       ]
     },
@@ -66,7 +66,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -77,6 +77,11 @@
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
           "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md",
+          "digest": "sha256:9fb3d011834590cdea00022956626eb06af53e7674da0e83fe18e005d16548e4"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -106,12 +111,12 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
-          "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447"
+          "digest": "sha256:18edc015750b1ff26a7b0f21397ac79c5e20d96149746929d1ae2afd51570cb1"
         },
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/skills/tw-work/SKILL.md",
-          "digest": "sha256:837202d39be53af82f38783a90fa1fb6b132a9cd5868942367ffba37b80e62dd"
+          "digest": "sha256:913237b138aabe74c13a4f26b6d9fe78811cc41637a18457e34a74cf14200f15"
         }
       ]
     },
@@ -183,7 +188,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -238,7 +243,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-authority-gate/SKILL.md",
-          "digest": "sha256:5f2132d13b42ef12035ee5da51efbe2c5f4ce2347abf3ef9ba3acb8118bd53b3"
+          "digest": "sha256:1ef613415755d991b8dd3616dede444fd73b14d3bbfb911e19a74934b7da36f7"
         }
       ]
     },
@@ -250,7 +255,12 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md",
+          "digest": "sha256:9fb3d011834590cdea00022956626eb06af53e7674da0e83fe18e005d16548e4"
         }
       ]
     },
@@ -286,7 +296,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d"
         }
       ]
     },
@@ -315,7 +325,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-auto/SKILL.md",
-          "digest": "sha256:5a4f1183aa36f92d43b4571f59a15116eaf97a2d0d02f5ae0d43a03e0d2ff141"
+          "digest": "sha256:e36711fe8b4c67f93af66faa2693821cf4b712c6aafb87380e2d46cc65107984"
         }
       ]
     },
@@ -327,7 +337,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -338,6 +348,11 @@
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/workflow-profile-template.yml",
           "digest": "sha256:bb524b4295b24cc7b8e3e197e56589646c33bed50eaeec79585e761b63e67ead"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md",
+          "digest": "sha256:9fb3d011834590cdea00022956626eb06af53e7674da0e83fe18e005d16548e4"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -367,12 +382,12 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
-          "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447"
+          "digest": "sha256:18edc015750b1ff26a7b0f21397ac79c5e20d96149746929d1ae2afd51570cb1"
         },
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/skills/tw-work/SKILL.md",
-          "digest": "sha256:837202d39be53af82f38783a90fa1fb6b132a9cd5868942367ffba37b80e62dd"
+          "digest": "sha256:913237b138aabe74c13a4f26b6d9fe78811cc41637a18457e34a74cf14200f15"
         }
       ]
     },
@@ -444,7 +459,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -511,7 +526,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -547,7 +562,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d"
         }
       ]
     },
@@ -588,7 +603,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -705,7 +720,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -772,7 +787,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -839,7 +854,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -906,7 +921,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -973,7 +988,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1040,7 +1055,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1107,7 +1122,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1174,7 +1189,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1241,7 +1256,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1308,7 +1323,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1375,7 +1390,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1442,7 +1457,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1509,7 +1524,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1576,7 +1591,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1643,7 +1658,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1710,7 +1725,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1777,7 +1792,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -1864,7 +1879,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -1944,7 +1959,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -1956,7 +1971,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2011,7 +2026,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2023,7 +2038,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2090,7 +2105,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2157,7 +2172,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2224,7 +2239,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2291,7 +2306,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2358,7 +2373,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2425,7 +2440,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2492,7 +2507,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2559,7 +2574,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2626,7 +2641,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2693,7 +2708,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2748,7 +2763,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2760,7 +2775,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -2796,7 +2811,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d"
         }
       ]
     },
@@ -2837,7 +2852,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -2944,7 +2959,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3011,7 +3026,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3078,7 +3093,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3145,7 +3160,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3212,7 +3227,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3279,7 +3294,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3346,7 +3361,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3413,7 +3428,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3480,7 +3495,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3547,7 +3562,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3614,7 +3629,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3681,7 +3696,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3748,7 +3763,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3815,7 +3830,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3882,7 +3897,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -3906,6 +3921,408 @@
       ]
     },
     {
+      "route_id": "tw-lifecycle",
+      "category": "controlling_authority",
+      "disposition": "satisfied",
+      "source_refs": [
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": "requirements.md",
+          "digest": "sha256:28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": "traceability-matrix.md",
+          "digest": "sha256:71de5f24e7bf5ab256e83c42c078fe2e489fb8efc481e8d26dabc3728fda438d"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": ".traceweaver/intent-contract.yml",
+          "digest": "sha256:cfe9ae01dc1438b150dcd24c091b05436fd185dabf53828e36c0d42e762aff42"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": ".traceweaver/changes/CHG-TW-2026-08-26-003-acyclic-oracle.yml",
+          "digest": "sha256:5fe26aa49661a287eecb6daeb44c431a08f0ca24e7c30cc7e3d070e26a618b91"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": ".traceweaver/exceptions/EXC-TW-020-acyclic-oracle.yml",
+          "digest": "sha256:268cad4822dc4920d63f22174f530d872bb4bd6e0f94e1c499b4216015df3d8d"
+        },
+        {
+          "source_manifest_category": "controlling_authority",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md",
+          "digest": "sha256:70efac967ece5252e8dd8c8c57b6304a5b11b813eb1aa6dd2e497c3f8c8123d8"
+        }
+      ]
+    },
+    {
+      "route_id": "tw-lifecycle",
+      "category": "task_scope",
+      "disposition": "satisfied",
+      "source_refs": [
+        {
+          "source_manifest_category": "task_scope",
+          "locator": "docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md",
+          "digest": "sha256:d5b6aaba8039d7bb8f32e5521a79a4cd439a671851aa7fb979840f919b036a66"
+        },
+        {
+          "source_manifest_category": "task_scope",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+          "digest": "sha256:54813313af8590af712df0a3bf94840a79eb057f3e8560d4642e58ccadc01f14"
+        },
+        {
+          "source_manifest_category": "task_scope",
+          "locator": ".traceweaver/workflow-profile.yml",
+          "digest": "sha256:a25c24a7405f475bded5362922957b717c3b45028b726ebf30570a3dc882daea"
+        }
+      ]
+    },
+    {
+      "route_id": "tw-lifecycle",
+      "category": "skill_contract",
+      "disposition": "satisfied",
+      "source_refs": [
+        {
+          "source_manifest_category": "skill_contract",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md",
+          "digest": "sha256:d690a39e5f7dfa5d8791ab3b78d2378710d9b900ababf83846acfb3751727632"
+        }
+      ]
+    },
+    {
+      "route_id": "tw-lifecycle",
+      "category": "implementation_dependencies",
+      "disposition": "satisfied",
+      "source_refs": [
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/acceptance-hub.schema.json",
+          "digest": "sha256:47885f74931c6bedc09d649cf14af97c57958566108445e3d44eaf6d710a8b9e"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/acceptance-pack.schema.json",
+          "digest": "sha256:b452cb2b7acfd92f623f948beaa195041a7d6dd73c75b8cc096f0cba9726a53a"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/capture-pack.schema.json",
+          "digest": "sha256:02a85fc6d60fa4f24564ac81d19017d4c50869327d9df93b39e8dbdf16a7a3a4"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/change-approval.schema.json",
+          "digest": "sha256:ba8b0b800817b361fde2f3bf6ddd21ed28d6d8a747e6a53b4ef163da25fbfb51"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/change-request.schema.json",
+          "digest": "sha256:a5ca5c222a95e15d899179ef3d8b7086f37a46ec3efaed3e38dac92bdd7aec4f"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/cutover-gate.schema.json",
+          "digest": "sha256:39cfa8dbc1b6287135042b7e56e7bff9999a7bafa08e3ea301020a54c782832e"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/evidence-receipt.schema.json",
+          "digest": "sha256:42c6f950c5204a36396bed4335bcdbfc8b3d8561bd594d92176b244a26c41fa5"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/lifecycle-graph.schema.json",
+          "digest": "sha256:c4f9c5d539f7033bfb1d8caea5f03116424d997f5963571c14c3eaf2893fe1ce"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/lifecycle-record.schema.json",
+          "digest": "sha256:2e9597424002948d7c6c222f1f7728527c881033e6c15a751a21656917348619"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/product-validation.schema.json",
+          "digest": "sha256:e8fc133753e4d089109237260cbd369450e1a5b7dff361aab2b5e9455fca1ef4"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/semantic-html-parser-lock.json",
+          "digest": "sha256:c9ee7d53dfc353f03c1357f9fbcd7588a9e1126d518e3012497097fda6acecf5"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/semantic-html.schema.json",
+          "digest": "sha256:c8c26fe22084c66a16faa952c9731c6f28c0b1f55592eaaaac585f91f6322123"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/source-receipt.schema.json",
+          "digest": "sha256:173bfe8c49716e3338d8398d87b055f146ae847ad4135e7c08b4abc2ec619a89"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/source-registry.schema.json",
+          "digest": "sha256:a004f6d766b29913338a697c803992a908482c44b5805fea06a48a675664797e"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/lifecycle/truth-stage.schema.json",
+          "digest": "sha256:8173af7b9edfa1938cc515918d3ba5c6d110035a51e052cd91a97bef4389d443"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/references/model-context-map.yml",
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/SKILL.md",
+          "digest": "sha256:d690a39e5f7dfa5d8791ab3b78d2378710d9b900ababf83846acfb3751727632"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-acceptance-hub",
+          "digest": "sha256:49028daf2bfe494813f1515825d333fa64e40b2de704fd8cfad43285624caf06"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-capture",
+          "digest": "sha256:580d8c04dbf02658d2eece5ddf89ea1dbb2295e3145020b05cf7e2a41e450677"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-cutover",
+          "digest": "sha256:b9a50320f40191d14f1076ccea0eb924ea7c34568dc6a615008d16486367b584"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-evidence",
+          "digest": "sha256:887ea9c97a5f6bff58cd745bd4ebb321aa5388e759e2808c374cc4fc1405666e"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph",
+          "digest": "sha256:348ce34bc06cbaf950b5384e5dc152ee00629151d68d30b8e526bbe5a039d469"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity",
+          "digest": "sha256:dbcc8673bfed9d3083c696f609f8430d5b323eddc0f968157ca475d6cb673ee7"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-product-validation",
+          "digest": "sha256:71cdc6fc66cd75d4c203e441fb2ea5daec01d732ee6212fb4a292446c977d552"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-project",
+          "digest": "sha256:9fb03aba414890d726f7f683b42d3e4f968b665f2a820b00fd4e36cbeb199eba"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "scripts/traceweaver-check-release-readiness",
+          "digest": "sha256:a02c67da1cd63ed99e66c30b7a6d2e2b52a898e2241bf874e42960be780ab077"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "scripts/traceweaver-refresh-v060-model-context-oracle",
+          "digest": "sha256:603121cbeceb631fde034476c34d3c3e77979fc34386b3a07507bc044b83eae2"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "scripts/traceweaver-run-v060-representative-product-trials",
+          "digest": "sha256:f4d2651e4f0d8be9f3d2184879831bf66fae1e37d82a2b59b5e70a5103d9cfd2"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "scripts/traceweaver-smoke-v060-real-product-depth",
+          "digest": "sha256:d5a7d2c99de7ca879cf1a051a71c050cacad4b0dfedefd37407c8512f4a9faf1"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "scripts/traceweaver-smoke-v060-release-integrity",
+          "digest": "sha256:7532f67384ecebcb78b9f44ded537e779be009f9e41ca685afa0534bd2f415e9"
+        }
+      ]
+    },
+    {
+      "route_id": "tw-lifecycle",
+      "category": "current_external_sources",
+      "disposition": "excluded_by_authority",
+      "exclusion_authority": "TW-OWNER-DECISION-2026-08-24-V060-PRODUCT-LIFECYCLE-001",
+      "exclusion_rationale": "The packaged static route performs no implicit product or network fetch; exact Vestro and Air Router source observations are separately content-addressed validation evidence."
+    },
+    {
+      "route_id": "tw-lifecycle",
+      "category": "accepted_evidence",
+      "disposition": "satisfied",
+      "source_refs": [
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-definition.md",
+          "digest": "sha256:be773b5e699e0d414b05626762b436b399ce48083ebce7bdd721f9218fd1b995"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice1-verification.md",
+          "digest": "sha256:cb12ce3c2d7dad873ac607c05d6b05b8962b002e3663906e8fbd6ee3e42400c3"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice2-verification.md",
+          "digest": "sha256:1d977f179528ae103f60f16a4de88a0249fc5f0c8347e41b148a55e35eaf874b"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-verification.md",
+          "digest": "sha256:f2af67bf9bc5fdbec600d659be755a428eeede483af4e1823aa1567e7ed6879b"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice4-verification.md",
+          "digest": "sha256:4c5aba243854904aed7b46643c3e7682e2494199ca9b7b627bd7b4bb604318ca"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice5-verification.md",
+          "digest": "sha256:af24bf6667328a1bb57159d783d79f2dfe5eaebd73d3aa492cc9312048c6453c"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice6-verification.md",
+          "digest": "sha256:a9d268a3646dba57630a55d8bf7c2323c256da2ea99014b67c99d72273bd50c7"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice7-verification.md",
+          "digest": "sha256:84188971a8b8459a0b063a894ef7a9b2862a83e082f4746a57197fd3e55a067f"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-benchmark.json",
+          "digest": "sha256:77d61bda0c051735394a64029140211f6825ae7501eb0a9d912d06bcc6e36573"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-semantic-html-release-gate.md",
+          "digest": "sha256:3a02ca3128f6a68bb8a8a73b8174c24e07c7033fac6b29d7cf9b8826b367453b"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-scope-rollback-verification.md",
+          "digest": "sha256:598788e4834a48900fd5f405613660e2ed07d531fb1daea060d5be904bf7aaee"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-release-readiness.md",
+          "digest": "sha256:4c7e877a272cdc56335e4ca3c86a42f1857d0616dd04cc4f33f0037b2a4f6a21"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.json",
+          "digest": "sha256:867db3991e0cdc3a0eca4835247046552ed3e29dd604b51ebf365815df860094"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-product-validation-result-terminal-release-truth-final-exact.md",
+          "digest": "sha256:1fdc1e321436a9e2313f9c1a2fa4ed90cde137dc2437cda0c33f28266b567f9b"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-representative-validation.md",
+          "digest": "sha256:bd86a89ebf43aee5434eb3df37af81af022517aa94a1c0662c50094f1ce81c98"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-source-baselines-real-product-depth.json",
+          "digest": "sha256:f6406867be68b99b0cfa89f7ecf33130821d7d6d7fae1ccd135d7c6da4c6d22e"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/vestro-lc-001-machine-observation.json",
+          "digest": "sha256:1cc5233c3ce59dbd837857af42d830eda808389dfb68fd898afcda04a4ce219f"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-product-lifecycle-raw-terminal-release-truth-final-exact/airrouter-lc-001-machine-observation.json",
+          "digest": "sha256:8e444328ffac9b8200904951d36c7087fb143e6c9636b75dd9b6b8307374ee36"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-real-product-depth-authority-gate.md",
+          "digest": "sha256:6f1c07bb6d2d1d299f9d5981f20cb84714b4d97f956ad2334f7fd0b839eb47f8"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-real-product-depth-red-evidence.md",
+          "digest": "sha256:86e4344c14fd0a1eb45cac3f209c2a560320a2fe325cc35da0b24ba174c59790"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-scope-rollback-verification.md",
+          "digest": "sha256:2996b4f104d64c97fb85e0cb842d9156c0f029fb42d4458ffe8a8d1dafc5d0b7"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-integrated-review-targeted-continuation.md",
+          "digest": "sha256:9c7fd690013fd6403a5c430830b1daefcd4624bf6497cb09d0aa6bd1f7f06a1a"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-change-proposal.md",
+          "digest": "sha256:9183c56718258a31522f257838a7649c4c33fbfeeaa992d3ac1810a652302694"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-requirements-review.md",
+          "digest": "sha256:e5b270219a7a540e6e7d5377a1240dacdaa2f12b6b649b3cf38ea671bd79611a"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-authority-doc-review.md",
+          "digest": "sha256:25098226041c7a73d8f37e78dd28d2180208a66e33eea61639ec0708432f978e"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-authority-gate.md",
+          "digest": "sha256:03c595aa73be606c2eb25e1b7ba0b71c24fe1bd6e15adfb41551eeee04e5b239"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-red-evidence.md",
+          "digest": "sha256:24f82adf6165f4fbc251184b3f02e2e066a2c50261f70bf7ec922638c21cc322"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-approval.md",
+          "digest": "sha256:60d82fe608380e436d46d323dff04bbd43eebbb647aaa75c44df92e4c2649f6a"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-requirements-review.md",
+          "digest": "sha256:9267b31a87e8e69ef92c82de4d88a572d366f9ef91490cd9df294ab3c74514e6"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-red-evidence.md",
+          "digest": "sha256:9628e6a8b11dc342bc3b95e75528793ff84f9975b85c4438aec006da2b1b62b6"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-authority-doc-review.md",
+          "digest": "sha256:483bc50d07917d19174b0f0711c0230699e2cc47f550f710acb08f767be80346"
+        },
+        {
+          "source_manifest_category": "accepted_evidence",
+          "locator": "docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-post-promotion-authority-gate.md",
+          "digest": "sha256:18a68e56baf3f5458435c4de1d270a81192b3c7eb9e78d94da1630a1d13d44e5"
+        }
+      ]
+    },
+    {
       "route_id": "tw-plan",
       "category": "controlling_authority",
       "disposition": "satisfied",
@@ -3918,7 +4335,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d"
         }
       ]
     },
@@ -3947,7 +4364,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-plan/SKILL.md",
-          "digest": "sha256:90b8b4d78fd25554cf1ca73d510f328205e49ce2458e26f1a6eddb9fa3faa447"
+          "digest": "sha256:18edc015750b1ff26a7b0f21397ac79c5e20d96149746929d1ae2afd51570cb1"
         }
       ]
     },
@@ -3959,7 +4376,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -3970,6 +4387,11 @@
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/skills/ce-plan/SKILL.md",
           "digest": "sha256:b4f8768827552f2fdf55ad29e5f1144156ad983f683e8e751cb08900d3f391e5"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md",
+          "digest": "sha256:9fb3d011834590cdea00022956626eb06af53e7674da0e83fe18e005d16548e4"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -4056,7 +4478,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4123,7 +4545,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4190,7 +4612,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4257,7 +4679,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4324,7 +4746,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4391,7 +4813,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4458,7 +4880,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4525,7 +4947,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4592,7 +5014,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4659,7 +5081,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4726,7 +5148,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4793,7 +5215,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4860,7 +5282,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4927,7 +5349,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -4994,7 +5416,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5061,7 +5483,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5128,7 +5550,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5195,7 +5617,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5262,7 +5684,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5329,7 +5751,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5396,7 +5818,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5463,7 +5885,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5530,7 +5952,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5597,7 +6019,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5664,7 +6086,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5731,7 +6153,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -5786,7 +6208,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-vv-define/SKILL.md",
-          "digest": "sha256:5c88808ef0d58ffac38d2712ae24f2eda285237cf724e261346903f86366b445"
+          "digest": "sha256:f96c01fd8a6d521cdc51c86a60b1c832537b4531a7e79c4d3cfbc52a1581d890"
         }
       ]
     },
@@ -5798,7 +6220,12 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md",
+          "digest": "sha256:9fb3d011834590cdea00022956626eb06af53e7674da0e83fe18e005d16548e4"
         }
       ]
     },
@@ -5834,7 +6261,7 @@
         {
           "source_manifest_category": "controlling_authority",
           "locator": "requirements.md",
-          "digest": "sha256:2c4503706056df7e3c3bdcbbe0922a8bb661118bf83638762646bcaca63f0d91"
+          "digest": "sha256:28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d"
         }
       ]
     },
@@ -5863,7 +6290,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/skills/tw-work/SKILL.md",
-          "digest": "sha256:837202d39be53af82f38783a90fa1fb6b132a9cd5868942367ffba37b80e62dd"
+          "digest": "sha256:913237b138aabe74c13a4f26b6d9fe78811cc41637a18457e34a74cf14200f15"
         }
       ]
     },
@@ -5875,7 +6302,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -5891,6 +6318,11 @@
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/skills/ce-work/SKILL.md",
           "digest": "sha256:765d165999f2df5f6647a7d11c5a7d4ce7fc1a85e4e2b1cf4a62b9dc2d383c01"
+        },
+        {
+          "source_manifest_category": "implementation_dependencies",
+          "locator": "plugins/traceweaver-core/skills/tw-auto/references/bounded-convergence-window-guide.md",
+          "digest": "sha256:9fb3d011834590cdea00022956626eb06af53e7674da0e83fe18e005d16548e4"
         },
         {
           "source_manifest_category": "implementation_dependencies",
@@ -6002,7 +6434,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -6069,7 +6501,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -6136,7 +6568,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -6191,7 +6623,7 @@
         {
           "source_manifest_category": "skill_contract",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -6203,7 +6635,7 @@
         {
           "source_manifest_category": "implementation_dependencies",
           "locator": "plugins/traceweaver-core/references/model-context-map.yml",
-          "digest": "sha256:a8fdba8531b05f22291f2dc4ecfc706d5da9f105c0f21cb7eb2e225082e367cb"
+          "digest": "sha256:861d05408f57a085e4f3f157ce66d0c42c33c9d817fbdac6bd610b954f68460a"
         }
       ]
     },
@@ -6230,6 +6662,6 @@
   "open_or_uncertain_cells": [
 
   ],
-  "expected": "pass_every_release_route_category_dispositioned",
-  "oracle_digest": "sha256:31f9378b16b8a0920221149d755a682887e9f533718eaa78444e70163a09ec06"
+  "expected": "pass_every_core_0_6_0_release_route_category_dispositioned",
+  "oracle_digest": "sha256:ef67e8392203bfe6fcc863c9d1d84524c597d61c244a6be7dbf28afaa5f69c32"
 }

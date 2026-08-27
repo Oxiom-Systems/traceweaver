@@ -1,0 +1,25 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-acceptance-pack/1",
+  "title": "TraceWeaver lifecycle acceptance pack",
+  "description": "Deterministic summary of a named baseline and evidence receipt. It exposes holds and never creates acceptance authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "pack_id", "baseline", "evidence_receipt_id",
+    "requirements", "truth_stage_states", "remaining_holds",
+    "owner_disposition", "acceptance_state", "authority_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-acceptance-pack/1"},
+    "pack_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "baseline": {"type": "object"},
+    "evidence_receipt_id": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "requirements": {"type": "array", "minItems": 1, "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "truth_stage_states": {"type": "object"},
+    "remaining_holds": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "owner_disposition": {"type": "object"},
+    "acceptance_state": {"enum": ["held", "accepted"]},
+    "authority_effect": {"const": "none"}
+  }
+}

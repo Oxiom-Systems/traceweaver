@@ -2,7 +2,7 @@
 # This is a shadow-only declaration. It does not alter v1 routing or establish
 # active descendant enforcement, model attestation, savings, or sufficiency.
 schema_version: tw-model-context-map/1
-map_id: MC-MAP-TW-0.5.0-001
+map_id: MC-MAP-TW-0.6.0-001
 map_status: approved_shadow_hypothesis
 canonicalization: sha256-recursively-key-sorted-json-arrays-preserved-map-digest-excluded
 model_role: advisory_shadow_context_recommendation
@@ -18,13 +18,14 @@ efficiency_eligibility: false
 profile_contract: plugins/traceweaver-core/references/workflow-profile-template.yml
 profile_schema: tw-model-context-profile/1
 
-# REQ-TW-114: the complete top-level callable inventory is the 27 SEC tw-*
-# callables plus the one explicit lfg alias.  Floors are not model identities.
+# REQ-TW-114 / REQ-TW-137: the complete top-level callable inventory is the
+# 28 SEC tw-* callables plus the one explicit lfg alias. Floors are not model
+# identities.
 top_level_route_floors:
   B0: [tw-graph, tw-setup, tw-update]
   B1: [tw-authority-gate, tw-commit, tw-commit-push-pr, tw-requirements-review, tw-sessions, tw-strategy, tw-test-browser, tw-test-xcode, tw-worktree]
   B2: [tw-brainstorm, tw-code-review, tw-compound, tw-compound-refresh, tw-debug, tw-doc-review, tw-grill, tw-ideate, tw-resolve-pr-feedback, tw-traceability-check]
-  B3: [tw-audit, tw-auto, tw-plan, tw-vv-define, tw-work]
+  B3: [tw-audit, tw-auto, tw-lifecycle, tw-plan, tw-vv-define, tw-work]
 aliases:
   lfg: tw-auto
 
@@ -67,7 +68,7 @@ source_oracle:
   adequacy_review_schema: tw-model-context-oracle-adequacy-review/1
 
 route_kinds:
-  implementation: [tw-auto, tw-work, tw-worktree]
+  implementation: [tw-auto, tw-lifecycle, tw-work, tw-worktree]
   review: [tw-audit, tw-code-review, tw-doc-review, tw-resolve-pr-feedback, tw-test-browser, tw-test-xcode, tw-traceability-check]
   publication: [tw-commit, tw-commit-push-pr]
 
@@ -86,4 +87,4 @@ receipt:
   v1_embedding: prohibited
   isolated_replay: separately_authorized_only
 held_claims: [active_descendant_enforcement, active_routing, provider_replay_qualification, served_model_attestation, token_sufficiency, material_token_savings, quality_equivalence, active_cutover]
-map_digest: sha256:2eab40f5e2e459dfb1ff1f655b0fb0cdacfe8c40478f04368d7185b219c988f2
+map_digest: sha256:4e4157b75b4f5542b709628d8d311e7cf59d61084f406ad6d144869b833c1718

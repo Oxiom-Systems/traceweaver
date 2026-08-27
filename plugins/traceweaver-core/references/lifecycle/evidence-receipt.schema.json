@@ -1,0 +1,149 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-evidence-receipt/1",
+  "title": "TraceWeaver lifecycle evidence receipt",
+  "description": "Canonical evidence envelope binding changed scope, applicability, V&V definitions, observations, separated truth stages, holds, owner disposition, and next gate without becoming authority.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "receipt_id", "work_item_id", "changed_scope_digest",
+    "baseline", "control_closure_digest", "applicability", "vv_definitions",
+    "evidence_links", "review_links", "truth_stages", "model_attestation",
+    "remaining_holds", "owner_disposition", "next_gate", "authority_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-evidence-receipt/1"},
+    "receipt_id": {"$ref": "#/$defs/digest"},
+    "work_item_id": {"type": "string", "minLength": 1},
+    "changed_scope_digest": {"$ref": "#/$defs/digest"},
+    "baseline": {"$ref": "#/$defs/baseline"},
+    "control_closure_digest": {"$ref": "#/$defs/digest"},
+    "applicability": {"$ref": "#/$defs/applicability"},
+    "vv_definitions": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/vv_definition"}},
+    "evidence_links": {"type": "array", "items": {"$ref": "#/$defs/evidence_link"}},
+    "review_links": {"type": "array", "items": {"$ref": "#/$defs/review_link"}},
+    "truth_stages": {"$ref": "truth-stage.schema.json"},
+    "model_attestation": {"$ref": "#/$defs/model_attestation"},
+    "remaining_holds": {"type": "array", "uniqueItems": true, "items": {"type": "string", "minLength": 1}},
+    "owner_disposition": {"$ref": "#/$defs/owner_disposition"},
+    "next_gate": {"type": "string", "minLength": 1},
+    "authority_effect": {"const": "none"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+    "baseline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["baseline_id", "generation", "digest"],
+      "properties": {
+        "baseline_id": {"type": "string", "minLength": 1},
+        "generation": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "identity_digest": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["digest"],
+      "properties": {
+        "requirement_id": {"type": "string", "minLength": 1},
+        "artifact_id": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"}
+      },
+      "oneOf": [
+        {"required": ["requirement_id"], "not": {"required": ["artifact_id"]}},
+        {"required": ["artifact_id"], "not": {"required": ["requirement_id"]}}
+      ]
+    },
+    "applicability": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["requirements", "artifacts", "environment_digest"],
+      "properties": {
+        "requirements": {"type": "array", "minItems": 1, "items": {"$ref": "#/$defs/identity_digest"}},
+        "artifacts": {"type": "array", "items": {"$ref": "#/$defs/identity_digest"}},
+        "environment_digest": {"$ref": "#/$defs/digest"}
+      }
+    },
+    "vv_definition": {
+      "oneOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["requirement_id", "verification_definition_id", "validation_definition_id", "verification_method", "validation_question"],
+          "properties": {
+            "requirement_id": {"type": "string", "minLength": 1},
+            "verification_definition_id": {"type": "string", "minLength": 1},
+            "validation_definition_id": {"type": "string", "minLength": 1},
+            "verification_method": {"enum": ["test", "analysis", "inspection", "demonstration"]},
+            "validation_question": {"type": "string", "minLength": 1}
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["requirement_id", "not_applicable"],
+          "properties": {
+            "requirement_id": {"type": "string", "minLength": 1},
+            "not_applicable": {
+              "type": "object",
+              "additionalProperties": false,
+              "required": ["scope", "reason", "decision_id", "owner"],
+              "properties": {
+                "scope": {"type": "string", "minLength": 1},
+                "reason": {"type": "string", "minLength": 1},
+                "decision_id": {"type": "string", "minLength": 1},
+                "owner": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      ]
+    },
+    "evidence_link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["evidence_id", "locator", "digest", "evidence_type"],
+      "properties": {
+        "evidence_id": {"type": "string", "minLength": 1},
+        "locator": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"},
+        "evidence_type": {
+          "enum": ["raw_observation", "technical_verification", "independent_review", "pr", "merge", "deployment", "runtime_health", "release", "stakeholder_validation", "acceptance", "publication"]
+        }
+      }
+    },
+    "review_link": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["review_id", "locator", "digest", "state"],
+      "properties": {
+        "review_id": {"type": "string", "minLength": 1},
+        "locator": {"type": "string", "minLength": 1},
+        "digest": {"$ref": "#/$defs/digest"},
+        "state": {"enum": ["pending", "passed", "failed", "held"]}
+      }
+    },
+    "model_attestation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["state"],
+      "properties": {
+        "state": {"enum": ["attested", "unattested", "not_applicable"]},
+        "receipt_id": {"$ref": "#/$defs/digest"},
+        "held_reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "owner_disposition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["owner", "state"],
+      "properties": {
+        "owner": {"type": "string", "minLength": 1},
+        "state": {"enum": ["pending", "accepted", "rejected", "held"]},
+        "decision_id": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1}
+      }
+    }
+  }
+}

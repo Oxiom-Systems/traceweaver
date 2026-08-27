@@ -1,0 +1,54 @@
+exception_id: EXC-TW-019
+status: active_owner_approved_terminal_candidate_exception
+exception_type: one_time_terminal_release_control_repair
+linked_intent: [INTENT-TW-012, INTENT-TW-013]
+linked_requirements: [REQ-TW-037, REQ-TW-130, REQ-TW-136, REQ-TW-143, REQ-TW-144, REQ-TW-145]
+linked_change: CHG-TW-2026-08-24-002
+linked_findings: [P1-005-continuation, P1-006-continuation]
+owner: Oxiom Systems
+approved_by: Hannes Zietsman
+created_at: "2026-08-24"
+approved_at: "2026-08-26"
+decision_source: >-
+  Approve CHG-TW-2026-08-24-002 and EXC-TW-019 for one final
+  release-control repair of P1-005-continuation and P1-006-continuation,
+  followed by exact-product rebinding and one retained-finding-only
+  continuation of the existing integrated Terra reviewer; publication remains
+  separately gated.
+reason: >-
+  The normal repair and EXC-TW-018 validation-method correction are consumed.
+  The two retained findings block truthful release control for the otherwise
+  accepted exact product candidate and cannot be implemented from a review
+  finding alone.
+allowed_claims:
+  - one bounded main-thread repair of the two named findings
+  - one fresh exact-product binding and explicit owner disposition
+  - one retained-finding-only continuation by the same Terra reviewer identity
+blocked_claims:
+  - publication
+  - release_ready
+  - tag
+  - GitHub_Release
+  - deployment
+  - runtime_health
+  - semantic_html_authority_cutover
+  - any additional repair or reviewer cycle
+activation_preconditions:
+  requirements_review: accepted_clean
+  workflow_profile_revision: 3
+  correction_specific_red_evidence: required
+  authority_gate_result: proceed_required_before_behavior_change
+expiry:
+  expires_when_any:
+    - one bounded repair attempt completes
+    - one new exact-product disposition is recorded
+    - one retained-finding-only reviewer result is recorded
+    - scope expands beyond the two fingerprints
+    - owner withdraws approval
+  after_expiry: held_owner_decision_required
+stale_reset_triggers:
+  - linked requirement or exact allowed scope changes
+  - reviewer identity changes
+  - functional scope changes after exact-product disposition
+  - any publication action is attempted
+next_step: Complete profile revision 3, RED evidence, and the terminal authority gate.

@@ -1,0 +1,243 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-semantic-html-cutover-smoke; req=REQ-TW-134,REQ-TW-138; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-134,REQ-TW-138; trace=TRACE-TW-074
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+CUTOVER = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-cutover")
+SCHEMA = ROOT.join("plugins/traceweaver-core/references/lifecycle/cutover-gate.schema.json")
+
+def fail!(message)
+  warn "v060_lifecycle_cutover_smoke=failed reason=#{message}"
+  exit 1
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def digest_value(value)
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(value)))}"
+end
+
+def digest_file(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def write_json(path, value)
+  FileUtils.mkdir_p(path.dirname)
+  path.binwrite("#{JSON.generate(canonical(value))}\n")
+end
+
+def gate(root:, candidate_manifest_digest:, closed:, reproduced:, migrated:, evidence_pass:, owner_state:, holds: [], rollback_pass: evidence_pass)
+  token = Digest::SHA256.hexdigest(JSON.generate([closed, reproduced, migrated, evidence_pass, owner_state, holds, rollback_pass]))[0, 12]
+  census_body = {
+    "locator" => "evidence/#{token}/consumer-census.json",
+    "closed" => closed,
+    "independently_reproduced" => reproduced,
+    "readers" => ["consumers/read-authority"],
+    "writers" => ["consumers/write-authority"],
+    "migrated_paths" => migrated
+  }
+  census_path = root.join(census_body["locator"])
+  write_json(census_path, census_body)
+  census = census_body.merge("digest" => digest_file(census_path))
+  evidence = %w[parity accessibility security usability rollback_rehearsal].each_with_object({}) do |name, result|
+    passed = name == "rollback_rehearsal" ? rollback_pass : evidence_pass
+    evidence_body = {
+      "state" => passed ? "passed" : "held",
+      "evidence_id" => "EVIDENCE-HTML-#{name.upcase.tr("_", "-")}-001"
+    }
+    locator = "evidence/#{token}/#{name}.json"
+    evidence_path = root.join(locator)
+    write_json(evidence_path, evidence_body)
+    result[name] = evidence_body.merge("locator" => locator, "digest" => digest_file(evidence_path))
+  end
+  owner_body = {"state" => owner_state, "owner" => "Lifecycle Owner", "decision_id" => "DEC-HTML-CUTOVER-001"}
+  owner_locator = "evidence/#{token}/owner-decision.json"
+  owner_path = root.join(owner_locator)
+  write_json(owner_path, owner_body)
+  body = {
+    "schema_version" => "tw-lifecycle-cutover-gate/1",
+    "current_generation" => "LC-GEN-MARKDOWN-001",
+    "candidate_generation" => "LC-GEN-HTML-002",
+    "candidate_manifest_digest" => candidate_manifest_digest,
+    "controlling_before" => "markdown_yaml",
+    "requested_after" => "semantic_html",
+    "consumer_census" => census,
+    "evidence" => evidence,
+    "owner_decision" => owner_body.merge("decision_locator" => owner_locator, "decision_digest" => digest_file(owner_path)),
+    "remaining_holds" => holds,
+    "authority_effect" => "none"
+  }
+  body.merge("gate_id" => digest_value(body))
+end
+
+def run(*arguments)
+  Open3.capture3(CUTOVER.to_s, *arguments)
+end
+
+def require_pass(*arguments)
+  stdout, stderr, status = run(*arguments)
+  fail!("expected_pass args=#{arguments.join(" ")} stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.success?
+  [stdout, JSON.parse(stdout)]
+rescue JSON::ParserError => error
+  fail!("success_output_not_json error=#{error.message}")
+end
+
+def require_blocked(expected_finding, *arguments)
+  stdout, stderr, status = run(*arguments)
+  fail!("expected_blocked finding=#{expected_finding}") if status.success?
+  combined = "#{stdout}\n#{stderr}"
+  fail!("missing_finding expected=#{expected_finding} actual=#{combined.inspect}") unless combined.include?(expected_finding)
+end
+
+fail!("missing_cutover_executable") unless CUTOVER.file? && CUTOVER.executable?
+fail!("missing_cutover_schema") unless SCHEMA.file?
+schema = JSON.parse(SCHEMA.read)
+fail!("cutover_schema_id") unless schema["$id"] == "tw-lifecycle-cutover-gate/1"
+
+Dir.mktmpdir("traceweaver-v060-cutover-") do |directory|
+  root = Pathname.new(directory)
+  root.join(".traceweaver-cutover-rehearsal").write("tw-lifecycle-cutover-rehearsal/1\n")
+  active = root.join("active-authority")
+  candidate = root.join("candidate-authority")
+  active.mkdir
+  candidate.mkdir
+  active.join("requirements.md").write("# Markdown authority generation 1\n")
+  active.join("traceability-matrix.md").write("# Markdown trace generation 1\n")
+  candidate.join("index.html").write("<!doctype html><html lang=\"en\"><body><main>Candidate generation 2</main></body></html>\n")
+  candidate.join("manifest.json").write("{\"schema_version\":\"tw-lifecycle-html/1\",\"manifest_id\":\"sha256:#{"a" * 64}\"}\n")
+  candidate_manifest_digest = digest_file(candidate.join("manifest.json"))
+  original_files = active.children.sort.map { |path| [path.basename.to_s, path.binread] }.to_h
+
+  held_gate = gate(
+    root: root,
+    candidate_manifest_digest: candidate_manifest_digest,
+    closed: false,
+    reproduced: false,
+    migrated: ["consumers/read-authority"],
+    evidence_pass: false,
+    owner_state: "held",
+    holds: ["consumer_census", "usability", "owner_acceptance"]
+  )
+  held_path = root.join("held-gate.json")
+  write_json(held_path, held_gate)
+  require_blocked("cutover_gate_held", "check", "--root", root.to_s, "--gate", held_path.to_s, "--candidate", candidate.to_s)
+
+  rehearsal_gate = gate(
+    root: root,
+    candidate_manifest_digest: candidate_manifest_digest,
+    closed: true,
+    reproduced: true,
+    migrated: ["consumers/read-authority", "consumers/write-authority"],
+    evidence_pass: true,
+    owner_state: "accepted",
+    rollback_pass: false
+  )
+  rehearsal_path = root.join("rehearsal-gate.json")
+  write_json(rehearsal_path, rehearsal_gate)
+  require_blocked("cutover_gate_held", "check", "--root", root.to_s, "--gate", rehearsal_path.to_s, "--candidate", candidate.to_s)
+  _, rehearsal = require_pass("rehearse", "--root", root.to_s, "--gate", rehearsal_path.to_s, "--active", active.to_s, "--candidate", candidate.to_s)
+  fail!("rehearsal_result") unless rehearsal["transaction_exercised"] && rehearsal["candidate_generation_observed"] == "LC-GEN-HTML-002" && rehearsal["prior_generation_restored"] && rehearsal["mixed_generation_observed"] == false && rehearsal["authority_effect"] == "none"
+  restored_files = active.children.sort.map { |path| [path.basename.to_s, path.binread] }.to_h
+  fail!("successful_rehearsal_restore") unless restored_files == original_files
+
+  eligible_gate = gate(
+    root: root,
+    candidate_manifest_digest: candidate_manifest_digest,
+    closed: true,
+    reproduced: true,
+    migrated: ["consumers/read-authority", "consumers/write-authority"],
+    evidence_pass: true,
+    owner_state: "accepted",
+    rollback_pass: true
+  )
+  eligible_path = root.join("eligible-gate.json")
+  write_json(eligible_path, eligible_gate)
+  _, check = require_pass("check", "--root", root.to_s, "--gate", eligible_path.to_s, "--candidate", candidate.to_s)
+  fail!("eligible_check") unless check["eligibility"] == "eligible_for_separately_authorized_atomic_cutover" && check["authority_effect"] == "none"
+
+  require_blocked("injected_rehearsal_failure", "rehearse", "--root", root.to_s, "--gate", eligible_path.to_s, "--active", active.to_s, "--candidate", candidate.to_s, "--inject-failure")
+  failure_restored = active.children.sort.map { |path| [path.basename.to_s, path.binread] }.to_h
+  fail!("failure_rehearsal_restore") unless failure_restored == original_files
+  residue = active.parent.children.select { |path| path.basename.to_s.start_with?(".active-authority.") }
+  fail!("transaction_residue") unless residue.empty?
+
+  partial_gate = gate(
+    root: root,
+    candidate_manifest_digest: candidate_manifest_digest,
+    closed: true,
+    reproduced: true,
+    migrated: ["consumers/read-authority"],
+    evidence_pass: true,
+    owner_state: "accepted"
+  )
+  partial_path = root.join("partial-gate.json")
+  write_json(partial_path, partial_gate)
+  require_blocked("cutover_gate_held", "check", "--root", root.to_s, "--gate", partial_path.to_s, "--candidate", candidate.to_s)
+
+  wrong_manifest = Marshal.load(Marshal.dump(eligible_gate))
+  wrong_manifest["candidate_manifest_digest"] = "sha256:#{"f" * 64}"
+  wrong_manifest["gate_id"] = digest_value(wrong_manifest.reject { |key, _| key == "gate_id" })
+  wrong_path = root.join("wrong-manifest-gate.json")
+  write_json(wrong_path, wrong_manifest)
+  require_blocked("candidate_manifest_mismatch", "rehearse", "--root", root.to_s, "--gate", wrong_path.to_s, "--active", active.to_s, "--candidate", candidate.to_s)
+  require_blocked("candidate_manifest_mismatch", "check", "--root", root.to_s, "--gate", wrong_path.to_s, "--candidate", candidate.to_s)
+
+  missing_evidence = Marshal.load(Marshal.dump(eligible_gate))
+  missing_evidence["evidence"]["parity"]["locator"] = "evidence/missing-parity.json"
+  missing_evidence["gate_id"] = digest_value(missing_evidence.reject { |key, _| key == "gate_id" })
+  missing_evidence_path = root.join("missing-evidence-gate.json")
+  write_json(missing_evidence_path, missing_evidence)
+  require_blocked("cutover_evidence_missing", "check", "--root", root.to_s, "--gate", missing_evidence_path.to_s, "--candidate", candidate.to_s)
+
+  mismatched_evidence = Marshal.load(Marshal.dump(eligible_gate))
+  mismatched_evidence["evidence"]["security"]["digest"] = "sha256:#{"f" * 64}"
+  mismatched_evidence["gate_id"] = digest_value(mismatched_evidence.reject { |key, _| key == "gate_id" })
+  mismatched_evidence_path = root.join("mismatched-evidence-gate.json")
+  write_json(mismatched_evidence_path, mismatched_evidence)
+  require_blocked("cutover_evidence_digest_mismatch", "check", "--root", root.to_s, "--gate", mismatched_evidence_path.to_s, "--candidate", candidate.to_s)
+
+  parity_path = root.join(eligible_gate.dig("evidence", "parity", "locator"))
+  symlink_locator = parity_path.dirname.relative_path_from(root).join("parity-symlink.json").to_s
+  FileUtils.ln_s(parity_path.basename, root.join(symlink_locator))
+  symlinked_evidence = Marshal.load(Marshal.dump(eligible_gate))
+  symlinked_evidence["evidence"]["parity"]["locator"] = symlink_locator
+  symlinked_evidence["gate_id"] = digest_value(symlinked_evidence.reject { |key, _| key == "gate_id" })
+  symlinked_evidence_path = root.join("symlinked-evidence-gate.json")
+  write_json(symlinked_evidence_path, symlinked_evidence)
+  require_blocked("unsafe_path", "check", "--root", root.to_s, "--gate", symlinked_evidence_path.to_s, "--candidate", candidate.to_s)
+
+  forged_owner = Marshal.load(Marshal.dump(eligible_gate))
+  forged_owner["owner_decision"]["decision_digest"] = "sha256:#{"e" * 64}"
+  forged_owner["gate_id"] = digest_value(forged_owner.reject { |key, _| key == "gate_id" })
+  forged_owner_path = root.join("forged-owner-gate.json")
+  write_json(forged_owner_path, forged_owner)
+  require_blocked("owner_decision_digest_mismatch", "check", "--root", root.to_s, "--gate", forged_owner_path.to_s, "--candidate", candidate.to_s)
+
+  require_blocked("usage_error", "check", "--root", root.to_s, "--gate", eligible_path.to_s)
+end
+
+puts "v060_lifecycle_cutover_smoke=pass"
+puts "v060_lifecycle_cutover_default_held=pass"
+puts "v060_lifecycle_consumer_census_closed_boundary=pass"
+puts "v060_lifecycle_atomic_rehearsal=pass"
+puts "v060_lifecycle_full_rollback=pass"
+puts "v060_lifecycle_mixed_generation_refusal=pass"
+puts "v060_lifecycle_cutover_content_bindings=pass"

@@ -5,16 +5,71 @@ created_at: 2026-04-30
 owner: Oxiom Systems
 
 baseline_id: REQ-BASELINE-2026-04-30-001
-baseline_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+baseline_hash_sha256: 94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf
 baseline_source: requirements.md
 baseline_review_id: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
-baseline_review_scope: original accepted baseline plus approved amendments and the owner-approved 0.5.0 shadow model-governance delivery authority
+baseline_review_scope: original accepted baseline plus approved amendments, released 0.5.0 shadow model-governance authority, owner-approved post-0.5.0 metric-routing planning authority, and the Core 0.6.0 product-lifecycle exact-candidate publication authority
 v050_model_governance_decision_id: TW-DECISION-2026-08-22-V050-MODEL-GOVERNANCE-DIRECT-DELIVERY-001
 v050_model_governance_decision_source: docs/validation/traceweaver-2026-08-22-v050-model-governance-direct-delivery-authority.md
 v050_model_governance_decision_sha256: 83545c19b330e6374f891c61570135d0b9db1c82a59b556d3f95e84d4942d3f5
 v050_model_governance_requirements_review_id: TW-REQ-AUTH-REVIEW-2026-08-22-V050-MODEL-GOVERNANCE-001
 v050_model_governance_scope: REQ-TW-109_through_REQ-TW-123_shadow_only_v1_authoritative
 v050_model_governance_release_authority: conditional_same_candidate_verification_review_rollback_validation_PR_checks_and_release_receipt
+metric_routing_envelope_id: TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001
+metric_routing_envelope_document_set_sha256: 879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409
+metric_routing_formal_authority_acceptance_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001
+metric_routing_formal_authority_acceptance_receipt: docs/validation/traceweaver-2026-08-23-metric-routing-formal-authority-acceptance.md
+metric_routing_change_id: CHG-TW-2026-08-22-003
+metric_routing_scope: REQ-TW-124_through_REQ-TW-129_planning_authority_after_clean_scoped_review
+metric_routing_promotion_status: controlled_master_root_promotion_complete_scoped_document_review_clean_consolidated_planning_allowed_implementation_and_claims_held
+v060_product_lifecycle_owner_decision_id: TW-OWNER-DECISION-2026-08-24-V060-PRODUCT-LIFECYCLE-001
+v060_product_lifecycle_owner_decision_source: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md
+v060_product_lifecycle_owner_decision_sha256: 70efac967ece5252e8dd8c8c57b6304a5b11b813eb1aa6dd2e497c3f8c8123d8
+v060_product_lifecycle_plan_id: TW-PLAN-2026-08-24-V060-PRODUCT-LIFECYCLE-001
+v060_product_lifecycle_plan_source: docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md
+v060_product_lifecycle_plan_sha256: d5b6aaba8039d7bb8f32e5521a79a4cd439a671851aa7fb979840f919b036a66
+v060_product_lifecycle_document_set_sha256: dda8178b9d4c48e2291e354d7763260efb049be225a04a6ccd04cd4c2cf135b1
+v060_product_lifecycle_scope: REQ-TW-130_through_REQ-TW-145_slices_1_through_8_component_green_exact_candidate_release_gates_pending
+v060_product_lifecycle_review_id: TW-DOC-REVIEW-2026-08-24-V060-PRODUCT-LIFECYCLE-AUTHORITY-001
+v060_product_lifecycle_formal_acceptance_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-24-V060-PRODUCT-LIFECYCLE-001
+v060_product_lifecycle_accepted_review_identity: sha256:385d982cd8a3a96d4f5d7bca9f7d154b38154f5d919c40d867dcb371ea2ed8a0
+v060_real_product_depth_change_id: CHG-TW-2026-08-24-001
+v060_real_product_depth_exception_id: EXC-TW-018
+v060_real_product_depth_owner_approval: Hannes_Zietsman_2026_08_24
+v060_real_product_depth_authority_gate_id: TW-AUTH-GATE-2026-08-24-V060-REAL-PRODUCT-DEPTH-001
+v060_real_product_depth_status: approved_one_bounded_validation_method_correction_profile_revision_2_publication_held
+v060_terminal_release_truth_change_id: CHG-TW-2026-08-24-002
+v060_terminal_release_truth_exception_id: EXC-TW-019
+v060_terminal_release_truth_owner_approval: Hannes_Zietsman_2026_08_26
+v060_terminal_release_truth_requirements_review_id: TW-REQ-REVIEW-2026-08-26-V060-TERMINAL-RELEASE-TRUTH-001
+v060_terminal_release_truth_authority_gate_id: TW-AUTH-GATE-2026-08-24-V060-TERMINAL-RELEASE-TRUTH-001
+v060_terminal_release_truth_status: consumed_expired_p1_006_closed_p1_005_open_publication_held
+v060_acyclic_oracle_change_id: CHG-TW-2026-08-26-003
+v060_acyclic_oracle_exception_id: EXC-TW-020
+v060_acyclic_oracle_owner_approval_id: TW-OWNER-APPROVAL-2026-08-26-V060-ORACLE-SOURCE-CYCLE-001
+v060_acyclic_oracle_requirements_review_id: TW-REQ-REVIEW-2026-08-26-V060-ORACLE-SOURCE-CYCLE-001
+v060_acyclic_oracle_workflow_profile_revision: 4
+v060_acyclic_oracle_workflow_profile_hash: sha256:a51724b649534563d09deb2f27feccee1e7dd5dd50c5e24451fb38eb677e2f6c
+v060_acyclic_oracle_status: consumed_expired_p1_005_closed_clean_oracle_written_publication_and_release_held
+v060_post_oracle_ci_convergence_change_id: CHG-TW-2026-08-26-004
+v060_post_oracle_ci_convergence_exception_id: EXC-TW-021
+v060_post_oracle_ci_convergence_owner_approval_id: TW-OWNER-APPROVAL-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001
+v060_post_oracle_ci_convergence_requirements_review_id: TW-REQ-REVIEW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001
+v060_post_oracle_ci_convergence_document_review_id: TW-DOC-REVIEW-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-001
+v060_post_oracle_ci_convergence_authority_gate_id: TW-AUTH-GATE-2026-08-26-V060-POST-ORACLE-CI-CONVERGENCE-POST-PROMOTION-001
+v060_post_oracle_ci_convergence_workflow_profile_revision: 5
+v060_post_oracle_ci_convergence_workflow_profile_hash: sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7
+v060_post_oracle_ci_convergence_status: single_focused_attempt_consumed_nonclean_superseded_by_current_source_digest_convergence
+v060_current_source_digest_change_id: CHG-TW-2026-08-26-005
+v060_current_source_digest_exception_id: EXC-TW-022
+v060_current_source_digest_result: docs/validation/traceweaver-2026-08-26-v060-current-source-digest-bounded-convergence-result.md
+v060_current_source_digest_workflow_profile_revision: 6
+v060_current_source_digest_workflow_profile_hash: sha256:b2c83404cd67e946b82bb34a12534cb37e218a70b62697339925c81a40d74d10
+v060_current_source_digest_status: bounded_convergence_passed_two_of_two_attempts_model_context_72_of_72_reviewer_findings_closed
+v060_publication_change_id: CHG-TW-2026-08-27-006
+v060_publication_requirements_review_id: TW-REQ-REVIEW-2026-08-27-V060-PUBLICATION-001
+v060_publication_authority_gate_id: TW-AUTH-GATE-2026-08-27-V060-PUBLICATION-001
+v060_publication_status: exact_core_0_6_0_route_conditionally_authorized_core_0_6_1_reserved_for_later_fixes
 u0_repair_draft:
   amendment_id: REQ-AMEND-2026-07-22-001
   status: conditionally_approved_no_behavior_authority_until_active_EXC_TW_011
@@ -67,7 +122,7 @@ lean_convergence_implementation_status: bounded_static_controller_protocol_polic
 lean_convergence_verification_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-verification.md
 lean_convergence_code_review_id: TW-CODE-REVIEW-2026-08-21-REVIEW-SERIES-CONVERGENCE-001
 lean_convergence_code_review_receipt: docs/validation/traceweaver-2026-08-21-review-series-convergence-code-review.md
-candidate_requirements_working_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+candidate_requirements_working_hash_sha256: 94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf
 baseline_hash_authority_status: accepted_requirements_including_req_tw_048_static_advisory_source_evidence_with_req_tw_049_req_tw_050_req_tw_051_req_tw_052_req_tw_053_req_tw_055_req_tw_056_candidate_authority_doc_review_passed_planning_input_req_tw_054_prior_scanner_wording_authority_doc_review_passed_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_planning_input_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_req_tw_057_implementation_gate_candidate_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_and_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 baseline_status: accepted_controlled_baseline_with_prior_refreshed_authority_state_code_review_passed_doc_review_passed_u9_unit1_authority_doc_review_passed_u9_unit2_fixture_smoke_doc_review_passed_u9_unit3_gate_behavior_smoke_code_review_passed_doc_review_passed_u9_unit4_boundary_smoke_code_review_passed_doc_review_passed_u9_unit5_host_registry_filesystem_probe_code_review_passed_doc_review_passed_u9_unit7_host_install_attempt_doc_review_passed_u9_unit8_separate_home_install_passed_fresh_exec_registry_reviewed_held_code_review_passed_authority_doc_review_passed_u9_unit9_registry_shape_auth_boundary_patch_code_review_passed_authority_doc_review_passed_req_tw_048_amendment_doc_review_passed_u9_unit10_auth_safe_fresh_exec_and_active_host_runtime_probes_code_review_passed_authority_doc_review_passed_reviewed_held_u9_unit11_active_host_reconciled_runtime_pass_code_review_passed_authority_doc_review_passed_constrained_runtime_accepted_dogfood_classifier_code_review_passed_authority_doc_review_passed_skill_behavior_audit_unit1_behavior_contracts_authority_doc_review_passed_runtime_held_wrapper_direct_callable_expansion_recorded_code_review_passed_authority_doc_review_passed_runtime_held_review_wrapper_skills_recorded_authority_doc_review_passed_runtime_held_ce_350_skill_surface_inventory_source_refreshed_authority_doc_review_passed_parity_held_tw_wrapper_backlog_reviewed_against_ce_350_authority_doc_review_passed_per_wrapper_proof_pending_controlled_publication_gate_recorded_authority_doc_review_passed_behavior_held_controlled_publication_route_fixture_smoke_passed_fixture_only_per_target_publication_gate_required_publication_runtime_held_code_test_trace_anchor_prior_requirement_recorded_authority_doc_review_passed_scanner_held_req_tw_054_code_anchor_hierarchy_correction_authority_doc_review_passed_authoring_fixture_smoke_passed_code_review_passed_narrow_traceweaver_project_write_allowance_open_authority_doc_review_passed_trace_anchor_explicit_mapping_active_host_code_review_passed_authority_doc_review_passed_trace_anchor_tdd_chain_code_review_passed_status_hash_doc_review_pending_structured_traceability_findings_fixture_smoke_patched_code_review_passed_authority_doc_review_passed_runtime_held_tw_auto_closure_loop_requirement_recorded_authority_doc_review_passed_tw_auto_code_review_passed_behavior_held_tw_skill_behavior_fixture_smoke_passed_code_review_passed_authority_doc_review_passed_active_host_tw_traceability_check_structured_runtime_passed_authority_doc_review_passed_clean_ce_delegation_fixture_recorded_code_review_passed_authority_doc_review_passed_req_tw_057_code_traceability_scanner_fixture_smoke_passed_install_discovery_passed_code_review_passed_authority_doc_review_passed_active_host_tw_auto_reconciliation_rerun_passed_review_routing_surface_current_nested_skill_backup_code_review_passed_status_hash_doc_review_passed_active_session_prompt_registry_passed_constrained_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_tw_auto_runtime_driver_boundary_code_review_passed_status_hash_doc_review_passed_tw_debug_wrapper_static_fixture_code_review_passed_authority_doc_review_passed_anchor_alias_clarity_code_review_passed_status_hash_doc_review_passed_req_tw_058_non_blocking_trace_anchor_ambiguity_requirements_review_passed_authority_doc_review_passed_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_publication_held_tw_auto_runtime_driver_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_boundary_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_review_staging_closure_loop_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_runtime_held_tw_auto_post_work_review_closure_fixture_smoke_passed_active_host_currentness_refreshed_code_review_passed_status_hash_doc_review_passed_prompt_registry_runtime_invocation_passed_status_hash_doc_review_passed_full_runtime_driver_held_req_tw_059_imported_ce_component_boundary_requirements_review_passed_authority_doc_review_passed_behavior_held_req_tw_060_model_default_policy_requirements_review_passed_authority_doc_review_passed_implementation_code_review_passed_status_hash_doc_review_passed_runtime_enforcement_held_req_tw_061_063_systems_engineering_audit_closure_fixture_smoke_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held_tw_auto_runtime_harness_validator_publication_boundary_code_review_passed_status_hash_doc_review_passed_runtime_trace_record_decision_binding_code_review_passed_status_hash_doc_review_passed_driver_invocation_held_standalone_packaging_surface_code_review_passed_status_hash_doc_review_passed_readme_boundary_code_review_passed_status_hash_doc_review_passed_wrapper_handoff_discipline_code_review_passed_status_hash_doc_review_passed_active_host_currentness_code_review_passed_status_hash_doc_review_passed_runtime_held_req_tw_064_strategy_ideation_wrapper_static_implementation_added_smokes_passed_code_review_passed_status_hash_doc_review_passed_active_host_currentness_passed_status_hash_doc_review_passed_runtime_held
 active_authority_review_gate: traceweaver_core_0_2_2_release_published_post_release_evidence_doc_review_passed
@@ -961,7 +1016,7 @@ controlled_publication_route_fixture_aggregate_sha256: 5e3187b24cb59b78a6252f2a1
 controlled_publication_route_fixture_result: controlled_publication_stale_authority=blocked; controlled_publication_missing_trace=blocked; controlled_publication_failed_tests=blocked; controlled_publication_review_findings=blocked; controlled_publication_dirty_untracked_authority=blocked; controlled_publication_target_mismatch=blocked; controlled_publication_credential_remote_uncertainty=blocked; controlled_publication_clean_no_real_remote=allowed; controlled_publication_no_external_mutation=pass; controlled_publication_route_smoke=pass
 controlled_publication_route_fixture_accepted_scope: fixture_only_publication_gate_evidence_real_publication_held_until_exact_clean_per_target_tw_commit_push_pr_route
 controlled_publication_route_fixture_held_scope: real stage/commit/push/PR mutation, real remote/credential use, active-host tw-auto publication runtime, publication wrappers, release/package/upstream readiness, clean replacement, R31, and unconstrained host support
-matrix_hash_sha256: b928d100d219a01065f3a9700730a985eea349b53ec881506185ee621f1c9a49
+matrix_hash_sha256: 9ee1fd667d52cc529a9bbf1f4434e4168f3b8b32c9c23b5508c30b524d7b14c7
 u7_static_advisory_record: docs/validation/traceweaver-u7-static-advisory-claims.md
 u7_static_advisory_record_sha256: ab1c6aaf0185c453cdc3d2f4fc94b89743df91092752a47f65abbe0e2e365f0f
 u7_static_advisory_state: static_advisory_accepted_runtime_held
@@ -2263,12 +2318,21 @@ held_claims:
     claim: one_time_0_3_recovery_bootstrap
     reason: The U0 recovery exception is inactive until the owner original-plan and amendment hashes, final canonical baseline hash, exact U1-U6 allowlists, expiry, hard process ceiling, independent Sol ACCEPT receipt, and reviewed semantic diff digest are recorded in .traceweaver/exceptions/EXC-TW-011-0.3-recovery-bootstrap.yml.
     close_condition: U1-U6 integrate with focused verification, the owner rejects the repair, or the process hard ceiling is reached; U7 and publication/install/deploy/product claims remain outside scope.
+  - id: EXC-TW-016
+    linked_requirements: [REQ-TW-124, REQ-TW-125, REQ-TW-126, REQ-TW-127, REQ-TW-128, REQ-TW-129]
+    claim: metric_routing_implementation_instrumentation_replay_qualification_quantitative_claims_cutover_publication_or_release
+    reason: The owner-approved envelope authorizes controlled master-root promotion and planning after one clean scoped review; it does not authorize implementation, host/provider instrumentation, replay, qualification, active cutover, publication, release, or any savings, latency, sufficiency, quality-equivalence, or served-model claim.
+    close_condition: A separately authorized consolidated plan implements and verifies ATP-TW-050; current exact-cell RESULT-TW-050 and VER-TW-093 pass; every qualified cell has current cell-specific VAL-TW-041 acceptance or an approved proxy; and any cutover, publication, or release passes its separate owner gate.
 
 closed_exceptions:
   - id: EXC-TW-005
     linked_requirements: [REQ-TW-001, REQ-TW-002]
     reason: Bootstrap exception closed by accepted baseline and recorded baseline hash.
     close_evidence: CE-DOC-REVIEW-2026-04-30-REQ-MASTER-CLEAN-001
+  - id: EXC-TW-017
+    linked_requirements: [REQ-TW-093, REQ-TW-094, REQ-TW-095, REQ-TW-096, REQ-TW-097, REQ-TW-098, REQ-TW-099, REQ-TW-100, REQ-TW-101, REQ-TW-102, REQ-TW-103, REQ-TW-104, REQ-TW-105, REQ-TW-106, REQ-TW-107, REQ-TW-108, REQ-TW-130, REQ-TW-131, REQ-TW-132, REQ-TW-133, REQ-TW-134, REQ-TW-135, REQ-TW-136, REQ-TW-137, REQ-TW-138, REQ-TW-139, REQ-TW-140, REQ-TW-141, REQ-TW-142, REQ-TW-143, REQ-TW-144, REQ-TW-145]
+    reason: The historical 0.5.0 lifecycle allocation remains reserved and outside the immutable 0.5.0 release; Oxiom Systems selected the fresh Core 0.6.0 successor route on 2026-08-24.
+    close_evidence: TW-OWNER-DECISION-2026-08-24-V060-PRODUCT-LIFECYCLE-001
 
 must_not_change:
   - Do not treat ideas, brainstorm notes, review findings, task IDs, inferred requirements, draft requirements, bare risk IDs, or traceability debt as implementation authority by themselves.
@@ -2279,6 +2343,14 @@ must_not_change:
   - Do not let TraceWeaver CE wrappers redefine Core requirements quality, traceability, verification, validation, risk/gap, or baseline semantics.
   - Do not vendor CE files without upstream source pin or an accepted local-cache-only limitation.
   - Do not include private paths, protected source names, raw standards text, copied source material, or unsupported compliance claims in public artifacts.
+  - Do not record prompt, tool-result, secret, or source-content bytes in metric observations; only approved counts, enums, digests, and repository-contained locators may cross the metric interface.
+  - Do not use pilot, estimated, unsigned, self-attested, replayed, underpowered, pooled, inherited, cross-cell, or mechanism-only evidence to qualify a metric-routing cell or support quantitative claims.
+  - Do not change model role, risk effort, tools, authority, required sources, scenario, or environment inside a matched packet-budget or delivery comparison.
+  - Do not make any metric-qualified v2 route active without a separate owner-approved cutover gate.
+  - Do not rewrite, move, or reinterpret the published traceweaver-core--v0.5.0 tag or release as product-lifecycle content.
+  - Do not reuse INTENT-TW-009..010, NEED-TW-009..012, REQ-TW-093..108, DEC-TW-004..008, IF-TW-001..005, RISK-TW-001..010, ART-TW-078, TRACE-TW-071, ATP-TW-048, RESULT-TW-048, VER-TW-091, or VAL-TW-039.
+  - Do not promote imported, inferred, generated, graph-derived, or externally referenced lifecycle material without a named human acceptance decision.
+  - Do not cut over to semantic-HTML authority partially or without parity, consumer-census, accessibility, security, usability, and complete rollback evidence.
 
 blocked_assumptions:
   - id: ASM-TW-001
@@ -2339,7 +2411,7 @@ workflow_controls:
 task_capsule_minimum:
   task_id: required
   baseline_id: REQ-BASELINE-2026-04-30-001
-  baseline_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+  baseline_hash_sha256: aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5
   authorized_by: approved requirement ID or approved exception ID required for meaningful implementation
   intent_served: at least one INTENT-TW ID
   verification_required: required
@@ -2954,7 +3026,9 @@ v050_shadow_model_governance_2026_08_22:
     result: RESULT-TW-049
     verification: VER-TW-092
     validation: VAL-TW-040
-  status: owner_approved_integrated_delivery_validation_accepted_merge_ready_preparation_in_progress
+  status: released_as_traceweaver_core_v0_5_0_predecessor_baseline
+  release_tag: traceweaver-core--v0.5.0
+  release_predecessor_commit: 3a1f3c56b093e61b88e9f6282637878e8ebbf163
   implementation_mode: advisory_shadow_compile
   authoritative_runtime: v1
   workflow:
@@ -2975,9 +3049,9 @@ v050_shadow_model_governance_2026_08_22:
     - package-wide transactional install rollback
     - integrated release-readiness schema and exact 0.5.0 metadata
     - controlled PR and pre-merge checks after all same-candidate gates pass
-  current_execution_boundary:
-    terminal: ready_to_merge
-    authorized:
+  historical_execution_boundary:
+    terminal: released
+    prior_authorized:
       - implementation and the single consolidated repair series
       - same-candidate verification, validation, trace, graph, and evidence reconciliation
       - commit, push, pull-request creation, review-thread closure, and required PR checks
@@ -3007,8 +3081,483 @@ v050_shadow_model_governance_2026_08_22:
     reserved_ids: INTENT-TW-009..010, NEED-TW-009..012, REQ-TW-093..108, DEC-TW-004..008, IF-TW-001..005, RISK-TW-001..010, ART-TW-078, TRACE-TW-071, ATP-TW-048, RESULT-TW-048, VER-TW-091, VAL-TW-039
     disposition: preserved_on_historical_worktree_deferred_outside_0_5_0_not_a_release_gate_or_release_content
 
+metric_routing_authority_2026_08_23:
+  envelope_id: TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001
+  source_document_set_sha256: 879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409
+  source_paths:
+    - docs/traceability/metric-routing.md
+    - docs/validation/traceweaver-2026-08-22-metric-routing-requirements-authority-envelope.md
+  source_component_sha256:
+    docs/traceability/metric-routing.md: aef6f037a4db0de646c0709cfeaa421751a5b3083e2651a1c3345bbe0e2a270d
+    docs/validation/traceweaver-2026-08-22-metric-routing-requirements-authority-envelope.md: 658477ec0dd95e720c3fe61c733884987d4e719ed51e1f3b73d7f94382ca105a
+  acceptance:
+    owner: Oxiom Systems
+    accepted_at: 2026-08-23
+    receipt_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-23-METRIC-ROUTING-001
+    receipt_path: docs/validation/traceweaver-2026-08-23-metric-routing-formal-authority-acceptance.md
+    change_id: CHG-TW-2026-08-22-003
+  predecessor:
+    release: TraceWeaver Core 0.5.0
+    tag: traceweaver-core--v0.5.0
+    commit: 3a1f3c56b093e61b88e9f6282637878e8ebbf163
+    authoritative_runtime: v1
+  intent: INTENT-TW-011
+  need: NEED-TW-013
+  requirements:
+    - REQ-TW-124
+    - REQ-TW-125
+    - REQ-TW-126
+    - REQ-TW-127
+    - REQ-TW-128
+    - REQ-TW-129
+  interface_specification: IF-TW-006
+  design_decision: DEC-TW-010
+  risks:
+    - RISK-TW-012
+    - RISK-TW-013
+  evidence_chain:
+    artifact: ART-TW-080
+    trace: TRACE-TW-073
+    acceptance_test: ATP-TW-050
+    result: RESULT-TW-050
+    verification: VER-TW-093
+    validation: VAL-TW-041
+  evaluation_defaults:
+    pilot_valid_pairs: 3
+    pilot_qualifies: false
+    one_sided_alpha_max: 0.05
+    paired_power_min: 0.80
+    valid_positive_pairs_per_exact_cell_min: 10
+    invalid_pair_replacement_cap: lower_of_one_pair_or_10_percent_of_qualification_sample
+    hard_invariant_success: 100_percent
+    applicable_rubric_dimension_floor: 3_of_4
+    blinded_independent_evaluators_min: 2
+    weighted_cohens_kappa_min: 0.80
+    one_sided_95_percent_quality_difference_lower_bound_min: -0.25
+    paired_median_whole_workflow_token_reduction_95_percent_lower_bound_min: 20_percent
+    paired_median_monotonic_latency_ratio_95_percent_upper_bound_max: 1.20
+    qualification_scope: exact_evaluated_cell_only
+  interface:
+    observation_schema: tw-model-context-observation/1
+    qualification_schema: tw-model-context-qualification/1
+    canonical_identity: SHA-256_over_recursively_key_sorted_JSON_array_order_preserved_own_identity_excluded
+    measurement_truth: requires_owner_approved_independent_signed_execution_bound_collector_attestation
+    content_boundary: counts_enums_digests_and_repository_contained_locators_only
+    invalid_conditions: non_identical_duplicate_replay_cross_cell_reuse_protected_mutation_missing_provenance_invalid_signature_or_incomplete_binding
+  promotion:
+    previous_requirements_hash_sha256: 42ceb76c7ee5d794f1a9e426e24ddfff3913a7f363b9ad33d57c9c929df0c1d5
+    promoted_requirements_hash_sha256: aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5
+    scoped_review_id: TW-DOC-REVIEW-2026-08-23-METRIC-ROUTING-PROMOTED-BASELINE-001
+    scoped_review_status: accepted_clean
+    accepted_review_identity: sha256:ae7fec240a034d09942785ca4454ab903d5127bc22924674930af8730e827a8e
+    review_receipt: docs/validation/traceweaver-2026-08-23-metric-routing-promoted-baseline-doc-review.md
+  allowed_scope:
+    - controlled master-root promotion of the exact accepted authority snapshot
+    - one consolidated scoped document review and mechanical bookkeeping closure
+    - one consolidated metric-routing implementation and V&V plan only after the scoped review passes
+  held_scope:
+    - metric harness, collector, instrumentation, fixtures, policy engine, qualification ledger, and product behavior implementation
+    - provider replay, external service calls, spend, or host mutation
+    - route qualification or observed-sufficiency state
+    - served-model, savings, token-sufficiency, latency, quality-equivalence, materiality, global, or route-family claims
+    - v2 active cutover, autonomous routing, publication, release, deployment, or consumer mutation
+  next_gate: one_consolidated_tw_plan_for_ART_TW_080_and_ATP_TW_050
+
+v060_product_lifecycle_assurance_2026_08_24:
+  decision_id: TW-OWNER-DECISION-2026-08-24-V060-PRODUCT-LIFECYCLE-001
+  decision_source: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-successor-authority.md
+  decision_sha256: 70efac967ece5252e8dd8c8c57b6304a5b11b813eb1aa6dd2e497c3f8c8123d8
+  plan_id: TW-PLAN-2026-08-24-V060-PRODUCT-LIFECYCLE-001
+  plan_source: docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md
+  plan_sha256: d5b6aaba8039d7bb8f32e5521a79a4cd439a671851aa7fb979840f919b036a66
+  source_document_set_sha256: dda8178b9d4c48e2291e354d7763260efb049be225a04a6ccd04cd4c2cf135b1
+  candidate_requirements_hash_sha256: 94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf
+  owner: Oxiom Systems
+  owner_decision_observed_at: 2026-08-24
+  status: bounded_convergence_passed_exact_core_0_6_0_publication_conditionally_authorized_same_candidate_gates_pending
+  authority_review_id: TW-DOC-REVIEW-2026-08-24-V060-PRODUCT-LIFECYCLE-AUTHORITY-001
+  formal_acceptance_id: TW-FORMAL-AUTHORITY-ACCEPTANCE-2026-08-24-V060-PRODUCT-LIFECYCLE-001
+  accepted_review_identity: sha256:385d982cd8a3a96d4f5d7bca9f7d154b38154f5d919c40d867dcb371ea2ed8a0
+  predecessor:
+    release: TraceWeaver Core 0.5.0
+    tag: traceweaver-core--v0.5.0
+    commit: 3a1f3c56b093e61b88e9f6282637878e8ebbf163
+    semantics: immutable_shadow_model_governance_release_product_lifecycle_program_deferred
+    dogfood:
+      method: isolated_clean_install_of_exact_published_release_before_slice_1
+      required_identity: release_tag_commit_five_manifest_versions_package_install_manifest_and_selected_callable_skill_hashes
+      status: passed
+      evidence: docs/validation/traceweaver-2026-08-24-v050-isolated-predecessor-dogfood.md
+      evidence_id: TW-DOGFOOD-2026-08-24-V050-ISOLATED-PREDECESSOR-001
+      authority_gate_invocation: TW-AUTHORITY-GATE-2026-08-24-V050-ISOLATED-DOGFOOD-001
+      authority_gate_receipt: sha256:537d9d2ef904cb2903fd568b0686957701e9520810f9486d18dadcffe2c3db90
+      tw_auto_invocation: TW-AUTO-2026-08-24-V050-ISOLATED-DOGFOOD-001
+      tw_auto_receipt: sha256:45aba3d2d25070cf00f000a372c9b5654bf97afeff979dbd08939007b9ed182d
+      active_host_mixed_root_install_is_evidence: false
+      branch_local_0_6_0_files_are_predecessor_evidence: false
+  real_product_depth_correction:
+    change_id: CHG-TW-2026-08-24-001
+    exception_id: EXC-TW-018
+    owner_approval: "Approve CHG-TW-2026-08-24-001 and EXC-TW-018."
+    owner: Hannes Zietsman
+    approved_at: 2026-08-24
+    requirements_review: docs/validation/traceweaver-2026-08-24-v060-real-product-depth-requirements-review.md
+    authority_gate: docs/validation/traceweaver-2026-08-24-v060-real-product-depth-authority-gate.md
+    change_proposal: docs/validation/traceweaver-2026-08-24-v060-real-product-depth-change-proposal.md
+    rejection_gap: docs/validation/traceweaver-2026-08-24-v060-product-validation-rejection-gap.md
+    correction_specific_red_evidence: docs/validation/traceweaver-2026-08-24-v060-real-product-depth-red-evidence.md
+    correction_specific_red_status: passed_expected_failure_missing_source_census_then_same_smoke_green
+    corrected_scope_rollback: docs/validation/traceweaver-2026-08-24-v060-real-product-depth-scope-rollback-verification.md
+    corrected_functional_scope_path_count: 72
+    corrected_runner_sha256: 909c099997f9aca0c49cb22eaebb13f5a2c8ab42dc476cb525ef2e4267b195a3
+    focused_smoke_status: passed
+    allowed_scope: representative_trial_runner_focused_depth_smoke_and_evidence_only
+    required_method: source_derived_actual_lifecycle_census_and_relationship_recovery_from_authorized_Vestro_and_Air_Router_sources
+    cycle_cap: one_final_validation_method_only_correction
+    product_scope_expansion: prohibited
+    publication_scope_expansion: prohibited
+    reviewer_scope_expansion: prohibited
+    expiry: exact_corrected_candidate_product_disposition_or_any_out_of_scope_change
+  terminal_release_truth_correction:
+    change_id: CHG-TW-2026-08-24-002
+    exception_id: EXC-TW-019
+    owner_approval: "Approve CHG-TW-2026-08-24-002 and EXC-TW-019 for one final release-control repair of P1-005-continuation and P1-006-continuation, followed by exact-product rebinding and one retained-finding-only continuation of the existing integrated Terra reviewer; publication remains separately gated."
+    owner: Hannes Zietsman
+    approved_at: 2026-08-26
+    requirements_review: docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-requirements-review.md
+    authority_gate: docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-authority-gate.md
+    change_proposal: docs/validation/traceweaver-2026-08-24-v060-terminal-release-truth-change-proposal.md
+    source_review: docs/validation/traceweaver-2026-08-24-v060-integrated-review-targeted-continuation.md
+    retained_findings: [P1-005-continuation, P1-006-continuation]
+    workflow_profile_revision: 3
+    workflow_profile_hash: sha256:4216516563801166003354286256243b486deb4bb7a9dc8830e54f915a0a21a0
+    correction_specific_red_evidence: docs/validation/traceweaver-2026-08-26-v060-terminal-release-truth-red-evidence.md
+    status: consumed_expired_p1_006_closed_p1_005_open
+    repair_owner: codex_main_session
+    reviewer_identity: existing_integrated_terra_reviewer_only
+    reviewer_continuation: one_retained_finding_only_continuation_after_fresh_exact_product_acceptance
+    allowed_scope: release_oracle_source_contract_real_capsule_terminal_path_and_controlled_evidence_bindings_only
+    product_rebinding: required_after_functional_change
+    publication_authority: none
+    expiry: first_repair_attempt_or_new_exact_product_disposition_or_retained_reviewer_result_or_scope_expansion_or_owner_withdrawal
+  acyclic_oracle_correction:
+    change_id: CHG-TW-2026-08-26-003
+    exception_id: EXC-TW-020
+    owner_approval: "Approve CHG-TW-2026-08-26-003 and EXC-TW-020 for one acyclic-oracle correction of P1-005-continuation only: separate pre-oracle inputs from post-oracle GREEN and retained-review receipts across the oracle refresher, v3 readiness checker, and release-integrity smoke; permit one main-thread repair, exact-product rebinding if the functional digest changes, and one verification-only continuation of the same integrated Terra reviewer. Preserve the published 0.5.0 release, the mixed root worktree, and every semantic-cutover, runtime, deployment, release, and publication hold; publication remains separately gated."
+    owner: Hannes Zietsman
+    approved_at: 2026-08-26
+    owner_approval_evidence: docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-approval.md
+    owner_decision_packet: docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-decision-packet.md
+    requirements_review: docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-requirements-review.md
+    historical_preapproval_authority_gate: docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-authority-gate.md
+    source_review: docs/validation/traceweaver-2026-08-26-v060-integrated-review-retained-finding-continuation.md
+    retained_findings: [P1-005-continuation]
+    workflow_profile_revision: 4
+    workflow_profile_hash: sha256:a51724b649534563d09deb2f27feccee1e7dd5dd50c5e24451fb38eb677e2f6c
+    status: consumed_expired_p1_005_closed_clean_oracle_written
+    repair_owner: codex_main_session
+    reviewer_identity: existing_integrated_terra_reviewer_only
+    reviewer_continuation: one_verification_only_continuation_after_fresh_exact_product_acceptance
+    allowed_scope: pre_oracle_source_contract_post_oracle_receipt_separation_across_three_named_release_control_scripts_and_controlled_evidence_only
+    correction_specific_red_evidence: docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-red-evidence.md
+    correction_specific_red_status: passed_expected_failure_post_oracle_receipt_required_as_pre_oracle_source
+    document_review: docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-authority-doc-review.md
+    authority_gate: docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-post-promotion-authority-gate.md
+    product_rebinding: required_after_controlled_functional_authority_change
+    historical_product_functional_scope_digest: sha256:8b417a73193da9df15b303d0766391330cf42cd4caf48e0be8faf2cb9692b957
+    publication_authority: none
+    expiry: first_repair_attempt_or_new_exact_product_disposition_or_verification_only_reviewer_result_or_scope_expansion_or_owner_withdrawal
+  post_oracle_ci_convergence_correction:
+    change_id: CHG-TW-2026-08-26-004
+    exception_id: EXC-TW-021
+    owner_approval: "Approve CHG-TW-2026-08-26-004 and EXC-TW-021 for one profile-revision-5 main-thread post-oracle CI convergence correction only: refresh the ten named Core 0.5.0 model-context fixtures to current approved Core 0.6.0 map, oracle, SEC, README, route-inventory, and receipt bindings; and correct scripts/traceweaver-smoke-model-context-routing so its isolated canonical-oracle negative invokes the compiler copied into the tampered package and its tw-lifecycle direct-dependency expectation exactly matches the production oracle. Permit one focused verification attempt, fresh exact Vestro and Air Router product rebinding after the functional digest changes, and one verification-only continuation of the same integrated Terra reviewer limited to this eleven-file delta. Preserve the published Core 0.5.0 release, the mixed root worktree, the accepted product limitations, and every semantic-cutover, runtime, deployment, release, and publication hold; publication remains separately gated."
+    owner: Hannes Zietsman
+    approved_at: 2026-08-26
+    owner_approval_evidence: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-owner-approval.md
+    owner_decision_packet: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-owner-decision-packet.md
+    requirements_review: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-requirements-review.md
+    historical_preapproval_authority_gate: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-gate.md
+    correction_specific_red_evidence: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md
+    workflow_profile_revision: 5
+    workflow_profile_hash: sha256:52e2732d13df824411d3bdb7f9553d9e6b9d88af66b39a50c4bce187917b14e7
+    status: consumed_nonclean_superseded_by_current_source_digest_convergence
+    correction_owner: codex_main_session
+    reviewer_identity: existing_integrated_terra_reviewer_only
+    reviewer_continuation: one_verification_only_continuation_after_fresh_exact_product_acceptance_limited_to_eleven_file_delta
+    allowed_scope: ten_named_model_context_fixture_rebindings_and_one_model_context_smoke_canonical_oracle_negative_and_tw_lifecycle_dependency_expectation_only
+    focused_verification: scripts/traceweaver-smoke-model-context-routing_once
+    product_rebinding: required_after_functional_digest_change
+    historical_product_functional_scope_digest: sha256:22d5d66acfa3b0c5abbe27ef7d478106768ee386f45c9332a1d25f72627d8719
+    document_review: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-authority-doc-review.md
+    vv_capsule_preflight: passed_require_review_passed
+    authority_gate: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-post-promotion-authority-gate.md
+    focused_verification_result: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-focused-verification-result.md
+    publication_authority: none
+    expiry: first_focused_correction_verification_attempt_or_new_exact_product_disposition_or_verification_only_reviewer_result_or_scope_expansion_or_owner_withdrawal
+  current_source_digest_convergence:
+    change_id: CHG-TW-2026-08-26-005
+    exception_id: EXC-TW-022
+    owner_direction: apply_this_guide_through_tw_auto_as_one_bounded_convergence_window_without_repeating_authority_gate_after_each_in_scope_failure
+    owner: Hannes Zietsman
+    approved_at: 2026-08-26
+    workflow_profile_revision: 6
+    workflow_profile_hash: sha256:b2c83404cd67e946b82bb34a12534cb37e218a70b62697339925c81a40d74d10
+    guide: plugins/traceweaver-core/references/bounded-convergence-window-guide.md
+    result: docs/validation/traceweaver-2026-08-26-v060-current-source-digest-bounded-convergence-result.md
+    status: consumed_passed_two_of_two_attempts
+    terminal_verification: model_context_routing_smoke_pass_cases_72
+    reviewer_identity: terra-integrated-reviewer:root-v060-integrated-review
+    retained_review_status: closed_clean_zero_open_p0_p1
+    publication_authority: none
+  publication_decision:
+    change_id: CHG-TW-2026-08-27-006
+    requirements_review: docs/validation/traceweaver-2026-08-27-v060-publication-requirements-review.md
+    authority_gate: docs/validation/traceweaver-2026-08-27-v060-publication-authority-gate.md
+    owner: Hannes Zietsman
+    approved_at: 2026-08-27
+    decision: release_core_0_6_0_now_reserve_0_6_1_for_later_fixes
+    status: conditional_exact_candidate_publication_authorized
+    product_disposition: accept_fresh_cells_only_if_same_revisions_thresholds_truth_stage_results_and_limitations_with_no_new_limitation
+    publication_route: one_stage_commit_push_pr_capsule_then_one_separate_merge_only_capsule_then_exact_main_release_workflow
+    target_version: 0.6.0
+    target_tag: traceweaver-core--v0.6.0
+    prohibited_target: 0.6.1
+    held_claims: [semantic_html_authority_cutover, deployment, runtime_health, unsupported_served_model_attestation]
+  preimplementation_vv:
+    status: revision_6_bounded_convergence_passed_final_same_candidate_evidence_and_review_pending
+    definition: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-definition.md
+    capsule: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-vv-capsule.json
+    red_evidence: docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-red-evidence.md
+    validation_plan: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md
+    executable_harness: scripts/traceweaver-smoke-v060-product-lifecycle
+    invocation: TW-VV-DEFINE-2026-08-24-V060-PRODUCT-LIFECYCLE-001
+    receipt: sha256:f3cdc2a0f2b7d6b8226712c6865d99166a578c36c1c1771e0e2a2b14d062dd32
+    capsule_check: pass
+    complete_mixed_candidate_review: held_pending_complete_mixed_candidate
+  slice_1:
+    status: component_green_integrated_review_and_product_validation_held
+    result_id: RESULT-TW-051-SLICE-1
+    evidence: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice1-verification.md
+    verification_command: scripts/traceweaver-smoke-v060-lifecycle-schema
+    callable_route_invocation: TW-LIFECYCLE-2026-08-24-V060-SLICE1-002
+    callable_route_receipt: sha256:6a6b1a1a1ec4dba67de2c0d43d6fad23b79cce616a406e052e05a54602e9ef41
+    authority_effect: none
+  slice_2:
+    status: component_green_integrated_review_and_validation_held
+    result_id: RESULT-TW-051-SLICE-2
+    evidence: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice2-verification.md
+    verification_command: scripts/traceweaver-smoke-v060-lifecycle-evidence
+    staleness_entrypoint: scripts/traceweaver-smoke-v060-lifecycle-staleness
+    authority_effect: none
+  slice_3:
+    status: component_green_integrated_review_and_validation_held
+    result_id: RESULT-TW-051-SLICE-3
+    evidence: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-verification.md
+    raw_benchmark: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice3-benchmark.json
+    graph_verification_command: scripts/traceweaver-smoke-v060-lifecycle-graph
+    closure_verification_command: scripts/traceweaver-smoke-v060-lifecycle-closure
+    performance_command: scripts/traceweaver-benchmark-v060-product-lifecycle
+    callable_route_invocation: TW-LIFECYCLE-2026-08-24-V060-SLICE3-001
+    callable_route_receipt: sha256:ebc8f65fc3dbf0aab4eed5806514beefaefc214288b271e4a3d73f62efd387fe
+    fixed_corpus_records: 2000
+    warmups_per_operation: 10
+    measured_samples_per_operation: 30
+    build_p95_ms: 369.846
+    warm_status_p95_ms: 127.051
+    warm_search_p95_ms: 129.077
+    warm_impact_p95_ms: 134.162
+    registered_repository_search_reduction_percent: 100.0
+    terminal_repository_graph_refresh: held_until_frozen_candidate_and_integrated_review
+    authority_effect: none
+  slice_4:
+    status: component_green_real_product_and_authority_cutover_held
+    result_id: RESULT-TW-051-SLICE-4
+    evidence: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice4-verification.md
+    semantic_html_release_gate: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-semantic-html-release-gate.md
+    html_verification_command: scripts/traceweaver-smoke-v060-lifecycle-html
+    cutover_verification_command: scripts/traceweaver-smoke-v060-lifecycle-cutover
+    callable_route_invocation: TW-LIFECYCLE-2026-08-24-V060-SLICE4-001
+    callable_route_receipt: sha256:f286e5b29638ed394c30a94772d8fb94e7818d73332e11a8cd48d04b5172b38d
+    parser: nokogiri_1_13_8_html5_libgumbo_1_0_0_nokogiri
+    source_span_adapter: traceweaver_generated_html_source_span_1
+    controlling_sources: registered_markdown_yaml_and_immutable_external_receipts
+    semantic_html_role: derived_non_authoritative
+    component_projection: passed
+    component_cutover_rehearsal: passed_in_disposable_fixture
+    actual_consumer_census: held_not_independently_frozen_or_migrated
+    actual_product_usability: held_for_vestro_and_air_router
+    actual_authority_cutover: not_eligible_not_attempted
+    authority_effect: none
+  slice_5:
+    status: component_green_integrated_review_and_product_validation_held
+    result_id: RESULT-TW-051-SLICE-5
+    evidence: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice5-verification.md
+    capture_verification_command: scripts/traceweaver-smoke-v060-lifecycle-capture
+    callable_route_invocation: TW-LIFECYCLE-2026-08-24-V060-SLICE5-001
+    callable_route_receipt: sha256:703756bbbc2f871cfd56b22c0a0fc73226d84204b774474f4f7c7ce69c3ee562
+    exact_source_capture: passed
+    human_confirmation_edit_accept_reject: passed
+    approved_change_transaction: passed
+    injected_failure_full_rollback: passed
+    idempotent_reapplication: passed
+    stale_evidence_and_reverification_path: passed
+    no_change_reviewer_dispatch_count: 0
+    authority_effect: exact_named_human_approved_delta_only
+  slice_6:
+    status: component_green_representative_validation_and_integrated_review_held
+    result_id: RESULT-TW-051-SLICE-6
+    evidence: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-slice6-verification.md
+    verification_command: scripts/traceweaver-smoke-v060-lifecycle-acceptance-hub
+    callable_route_invocation: TW-LIFECYCLE-2026-08-24-V060-SLICE6-001
+    callable_route_receipt: sha256:b19079772e327401f825a115f53e05144a323d7e76ae0bc96bb363d23e493f57
+    pre_slice_requirements_baseline: ad08c409ca0ff8d3380ddd3fc4fd3983245e509889f732be491d51f06a3b5317
+    deterministic_complete_hub_build: passed
+    strict_static_accessible_offline_printable: passed
+    owner_record_and_relationship_drilldown: passed
+    named_baseline_pack_manifest: passed
+    held_and_accepted_pack_authority_effect: none
+    active_hidden_remote_tamper_refusal: passed
+    authority_effect: none
+  slice_7:
+    status: historical_fixed_route_rejected_real_product_depth_correction_authorized
+    result_id: RESULT-TW-051-SLICE-7
+    protocol_verification_command: scripts/traceweaver-smoke-v060-lifecycle-product-validation
+    product_trial_command: scripts/traceweaver-run-v060-representative-product-trials
+    source_baselines: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-source-baselines.json
+    product_result: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-product-validation-result.md
+    representative_validation: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-representative-validation.md
+    callable_route_invocation: TW-LIFECYCLE-2026-08-24-V060-SLICE7-001
+    callable_route_receipt: sha256:8e20960551028b57370c9e52f172e9dcd5b924fc2cfb3b19c7768cdd9ecf2cde
+    vestro_required_records_links: 40
+    vestro_recovered_records_links: 40
+    air_router_required_records_links: 40
+    air_router_recovered_records_links: 40
+    false_authority_or_truth_promotions: 0
+    air_router_non_code_artifact: SRC-AIR-042
+    functional_candidate_rebind: passed
+    bound_evidence: docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-representative-validation.md
+    historical_product_result_status: rejected_real_product_depth
+    correction_authority: CHG-TW-2026-08-24-001_and_EXC-TW-018
+    corrected_method: source_derived_actual_lifecycle_census_and_relationship_recovery
+    correction_specific_red_evidence: docs/validation/traceweaver-2026-08-24-v060-real-product-depth-red-evidence.md
+    corrected_product_result: pending_exact_scope_bound_trial_execution
+    named_rater_and_owner_disposition: held_pending_corrected_exact_candidate
+    authority_effect: none
+  slice_8:
+    status: release_integrity_component_green_terminal_release_gates_held
+    result_id: RESULT-TW-051-SLICE-8
+    verification_command: scripts/traceweaver-smoke-v060-release-integrity
+    release_readiness_schema: tw-release-readiness/3
+    release_label: minor
+    target_version: 0.6.0
+    manifests_equal: passed
+    readme_and_changelog: passed
+    missing_validation_refusal: passed
+    exact_sha_and_scope_controls: passed
+    production_release_readiness: held_for_product_disposition_review_graph_reinstall_and_exact_main_ci
+    authority_effect: none
+  integration_base:
+    pull_request: 61
+    head_sha: e53faeb437cfee3b91f43e1b0f4ed3b1cb1e2c33
+  release_target:
+    version: 0.6.0
+    tag: traceweaver-core--v0.6.0
+  workflow_profile:
+    path: .traceweaver/workflow-profile.yml
+    revision: 6
+    risk: L3
+    profile_hash: sha256:b2c83404cd67e946b82bb34a12534cb37e218a70b62697339925c81a40d74d10
+    coordinator_model: gpt-5.6-sol
+    integrated_reviewer_model: gpt-5.6-terra
+    integrated_reviewer_reasoning_effort: xhigh
+  intent:
+    - INTENT-TW-012
+    - INTENT-TW-013
+  needs:
+    - NEED-TW-014
+    - NEED-TW-015
+    - NEED-TW-016
+    - NEED-TW-017
+  requirements:
+    - REQ-TW-130
+    - REQ-TW-131
+    - REQ-TW-132
+    - REQ-TW-133
+    - REQ-TW-134
+    - REQ-TW-135
+    - REQ-TW-136
+    - REQ-TW-137
+    - REQ-TW-138
+    - REQ-TW-139
+    - REQ-TW-140
+    - REQ-TW-141
+    - REQ-TW-142
+    - REQ-TW-143
+    - REQ-TW-144
+    - REQ-TW-145
+  decisions:
+    - DEC-TW-011
+    - DEC-TW-012
+    - DEC-TW-013
+    - DEC-TW-014
+    - DEC-TW-015
+  interfaces:
+    - IF-TW-007
+    - IF-TW-008
+    - IF-TW-009
+    - IF-TW-010
+    - IF-TW-011
+  risks:
+    - RISK-TW-014
+    - RISK-TW-015
+    - RISK-TW-016
+    - RISK-TW-017
+    - RISK-TW-018
+    - RISK-TW-019
+    - RISK-TW-020
+    - RISK-TW-021
+    - RISK-TW-022
+    - RISK-TW-023
+  evidence_chain:
+    artifact: ART-TW-081
+    trace: TRACE-TW-074
+    acceptance_test: ATP-TW-051
+    result: RESULT-TW-051
+    verification: VER-TW-094
+    validation: VAL-TW-042
+  historical_allocation:
+    status: permanently_reserved_non_authoritative_not_reused
+    ids: INTENT-TW-009..010, NEED-TW-009..012, REQ-TW-093..108, DEC-TW-004..008, IF-TW-001..005, RISK-TW-001..010, ART-TW-078, TRACE-TW-071, ATP-TW-048, RESULT-TW-048, VER-TW-091, VAL-TW-039
+  allowed_scope_after_scoped_baseline_review:
+    - isolated exact published Core 0.5.0 predecessor install and advisory dogfood evidence without active-host or mixed-root mutation
+    - versioned lifecycle object, relationship, source-registry, receipt, V&V, acceptance, and evidence schemas
+    - deterministic candidate source capture with explicit human acceptance boundary
+    - stale-evidence and downstream impact behavior
+    - lifecycle tw-graph queries and fixed performance proof
+    - strict static semantic-HTML views, offline acceptance hub, and named-baseline acceptance pack
+    - atomic semantic-HTML cutover only after its complete separately accepted gate
+    - Vestro and Air Router representative product validation
+    - coherent Core 0.6.0 release automation and exact-main publication after all separate gates pass
+  must_not_change:
+    - published Core 0.5.0 tag, release, receipts, evidence, and shadow-only semantics
+    - Sol coordinator, explicit Terra native-child policy, L0-L3 risk effort, and unattested served-model holds
+    - imported CE-derived component bodies without a separately reviewed overlay
+    - human authority for commitment, requirement, risk, validation, acceptance, and publication decisions
+    - derived graph, HTML, imports, dashboards, and acceptance packs remain unable to approve or supersede authority
+    - mixed root worktree on codex/lean-convergence remains untouched
+  held_claims:
+    - semantic-HTML authority cutover before complete parity, census, accessibility, security, usability, and rollback proof
+    - independently attested served-model identity when the external trust proof is absent
+    - real-product acceptance before non-compensable Vestro and Air Router source-derived validation and exact-candidate owner disposition
+    - completion, publication, merge, tag, or GitHub Release before same-candidate gates and the applicable single-use capsule pass
+    - deployment and runtime-health claims
+  next_gate: freeze_functional_sources_then_exact_product_verification_review_graph_reinstall_readiness_and_controlled_publication_capsules
+
 next_recommended_steps:
-  - Finish the exact 0.5.0 model-governance evidence carriers, consolidated review confirmation, trace and graph reconciliation, commit, push, PR, and required checks; stop when the PR is demonstrably ready to merge.
-  - Do not merge, tag, create a GitHub Release, or create a post-merge release receipt without a new explicit Oxiom Systems direction.
-  - Keep the older 0.4.0 PR sequencing and deferred product-lifecycle Slices 1--8 as historical/deferred context, not active 0.5.0 agent goals.
-  - Keep active routing, descendant enforcement, independent served-model attestation, quantitative savings or sufficiency, quality equivalence, provider replay, semantic-HTML cutover, deployment, and autonomous publication held for later evidence.
+  - Freeze the revision-6 functional source set, rebind its physical source and product evidence once, and run the complete exact-candidate verification suite.
+  - Require fresh non-compensable Vestro and Air Router cells with unchanged revisions, thresholds, truth-stage behavior, and limitations; stop on any new limitation.
+  - Complete traceability, final independent code/document review, graph freshness, clean reinstall, release integrity, and readiness before issuing the publication capsule.
+  - Create one PR to main, wait for the exact required checks, use a separate merge-only capsule, and verify the exact-main traceweaver-core--v0.6.0 GitHub Release.
+  - Keep semantic-HTML authority cutover, deployment, runtime health, and unsupported model or metric claims held.
+  - Draft one consolidated tw-plan for the whole ART-TW-080 implementation and ATP-TW-050 V&V package when the independent metric-routing program is selected; do not mix it into the Core 0.6.0 lifecycle implementation candidate.
+  - Treat released TraceWeaver Core 0.5.0 and v1 routing behavior as the unchanged predecessor baseline.

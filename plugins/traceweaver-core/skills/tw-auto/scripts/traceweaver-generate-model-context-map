@@ -16,7 +16,7 @@ FLOORS = {
   "B0" => %w[tw-graph tw-setup tw-update],
   "B1" => %w[tw-authority-gate tw-commit tw-commit-push-pr tw-requirements-review tw-sessions tw-strategy tw-test-browser tw-test-xcode tw-worktree],
   "B2" => %w[tw-brainstorm tw-code-review tw-compound tw-compound-refresh tw-debug tw-doc-review tw-grill tw-ideate tw-resolve-pr-feedback tw-traceability-check],
-  "B3" => %w[tw-audit tw-auto tw-plan tw-vv-define tw-work]
+  "B3" => %w[tw-audit tw-auto tw-lifecycle tw-plan tw-vv-define tw-work]
 }.freeze
 SOURCE_CATEGORIES = %w[
   controlling_authority task_scope skill_contract implementation_dependencies
@@ -42,7 +42,7 @@ GENERIC_FAMILIES = [
   ["tw-worktree", "worktree_operator"]
 ].freeze
 ROUTE_KINDS = {
-  "implementation" => %w[tw-auto tw-work tw-worktree],
+  "implementation" => %w[tw-auto tw-lifecycle tw-work tw-worktree],
   "review" => %w[tw-audit tw-code-review tw-doc-review tw-resolve-pr-feedback tw-test-browser tw-test-xcode tw-traceability-check],
   "publication" => %w[tw-commit tw-commit-push-pr]
 }.freeze
@@ -359,7 +359,7 @@ def inventory(root, map)
     "schema_version" => INVENTORY_SCHEMA,
     "map_id" => map.fetch("map_id"),
     "map_digest" => map.fetch("map_digest"),
-    "top_level_callable_count" => 28,
+    "top_level_callable_count" => canonical_names.length,
     "declared_route_count" => routes.length,
     "routes" => routes,
     "inventory_digest" => digest(routes)

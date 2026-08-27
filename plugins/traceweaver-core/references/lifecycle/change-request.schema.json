@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-change-request/1",
+  "title": "TraceWeaver human-confirmed lifecycle change request",
+  "description": "Prepared delta from a named human confirmation. It remains non-authoritative until a separate exact-preimage change approval is applied.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "change_request_id", "pack_id", "decision",
+    "source_receipt", "baseline", "accepted_candidates", "rejected_candidates",
+    "downstream_consequences", "status", "reviewer_dispatch_count",
+    "next_gate", "authority_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-change-request/1"},
+    "change_request_id": {"$ref": "#/$defs/digest"},
+    "pack_id": {"$ref": "#/$defs/digest"},
+    "decision": {"type": "object"},
+    "source_receipt": {"type": "object"},
+    "baseline": {"type": "object"},
+    "accepted_candidates": {"type": "array"},
+    "rejected_candidates": {"type": "array"},
+    "downstream_consequences": {"type": "array", "items": {"type": "string"}, "uniqueItems": true},
+    "status": {"enum": ["prepared_human_confirmed_delta", "no_change_mechanical_closure"]},
+    "reviewer_dispatch_count": {"enum": [0, 1]},
+    "next_gate": {"enum": ["authority_gate_for_exact_preimage_change_approval", "none_no_change_closed"]},
+    "authority_effect": {"const": "none"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

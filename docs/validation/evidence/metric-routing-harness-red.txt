@@ -1,0 +1,25 @@
+command=scripts/traceweaver-smoke-metric-routing-harness
+working_directory=/Users/hanneszietsman/CrypotAI/TraceWeaver/.worktrees/codex/v050-consolidated-convergence
+observed_exit=1
+network=not_used
+credentials=not_used
+provider_calls=not_used
+timestamp=2026-08-23
+
+Ignoring io-console-0.8.2 because its extensions are not built. Try: gem pristine io-console --version 0.8.2
+metric_routing_contract_status=valid
+metric_routing_smoke_case_count=71
+metric_routing_smoke_requirement_coverage=REQ-TW-124,REQ-TW-125,REQ-TW-126,REQ-TW-127,REQ-TW-128,REQ-TW-129
+metric_routing_smoke_selected_case=all
+metric_routing_smoke_network=forbidden
+metric_routing_smoke_status=blocked
+metric_routing_smoke_phase=prebuilder_contract_validated
+metric_routing_smoke_missing_group=production_metric_routing_reference
+metric_routing_smoke_missing_group=production_metric_routing_evaluator
+metric_routing_smoke_missing_group=production_metric_routing_validator
+metric_routing_smoke_missing_group=fixture_policy_and_corpus
+metric_routing_smoke_missing_group=fixture_trust_and_attestation
+metric_routing_smoke_missing_group=fixture_quality
+metric_routing_smoke_missing_group=fixture_accounting_and_sufficiency
+metric_routing_smoke_missing_group=fixture_qualification_and_templates
+metric_routing_smoke_missing_group=fixture_frozen_case_locators

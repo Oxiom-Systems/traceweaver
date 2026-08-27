@@ -1,12 +1,14 @@
 # TRACEWEAVER: file-role=code-traceability-ci-workflow; req=REQ-TW-054; trace=TRACE-TW-032; ver=VER-TW-041
 # TRACEWEAVER: verifies=VER-TW-087; req=REQ-TW-037,REQ-TW-056,REQ-TW-057; trace=TRACE-TW-067
 # TRACEWEAVER: verifies=VER-TW-092; req=REQ-TW-109,REQ-TW-122; trace=TRACE-TW-072
+# TRACEWEAVER: verifies=VER-TW-093; req=REQ-TW-124,REQ-TW-125,REQ-TW-126,REQ-TW-127,REQ-TW-128,REQ-TW-129; trace=TRACE-TW-073
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-130,REQ-TW-131,REQ-TW-132,REQ-TW-133,REQ-TW-134,REQ-TW-135,REQ-TW-136,REQ-TW-137,REQ-TW-138,REQ-TW-139,REQ-TW-140,REQ-TW-141,REQ-TW-142,REQ-TW-143,REQ-TW-144,REQ-TW-145; trace=TRACE-TW-074
 name: Smoke tests
 
 # Runs the TraceWeaver discovery/traceability smokes on pull requests and on
 # pushes to main. Includes the Codex discovery smoke, which needs the Codex CLI
-# and bun (both installed via npm). ruby, python3, jq, and perl are preinstalled
-# on ubuntu-latest.
+# and bun (both installed via npm). Ruby is pinned explicitly for the frozen
+# lifecycle parser; python3, jq, and perl are preinstalled on ubuntu-latest.
 #
 # Intentionally excluded:
 # - scripts/traceweaver-audit-plugin-scope — its hash baseline
@@ -40,17 +42,106 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+
       - name: Install bun and the Codex CLI
         run: |
           npm install -g bun @openai/codex
           echo "bun: $(bun --version)"
           echo "codex: $(codex --version)"
 
+      - name: Install frozen lifecycle HTML parser
+        run: gem install nokogiri --version 1.13.8 --no-document
+
       - name: Skill Execution Contract smoke
         run: scripts/traceweaver-smoke-skill-execution-contract
 
       - name: Shadow model-context routing smoke
         run: scripts/traceweaver-smoke-model-context-routing
+
+      - name: Deterministic metric-routing harness smoke
+        run: scripts/traceweaver-smoke-metric-routing-harness
+
+      - name: Deterministic metric-routing atomic replay regression
+        run: |
+          ruby --disable-gems - <<'RUBY'
+          require "json"
+          require "rbconfig"
+          require "tmpdir"
+
+          root = Dir.pwd
+          evaluator = File.join(root, "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-evaluate-metric-routing")
+          fixtures = %w[
+            fixtures/metric-routing-harness/collector-trust.yml
+            fixtures/metric-routing-harness/observation-valid.json
+            fixtures/metric-routing-harness/attestation-valid.json
+          ].join(",")
+
+          wave = lambda do |prefill_bytes|
+            Dir.mktmpdir("traceweaver-metric-routing-") do |state|
+              ledger = File.join(state, "attestation-replay-ledger.jsonl")
+              line = "noise-ledger-entry-not-an-attestation\n"
+              File.binwrite(ledger, line * (prefill_bytes / line.bytesize)) if prefill_bytes.positive?
+              initial_lines = File.exist?(ledger) ? File.foreach(ledger).count : 0
+              gate_reader, gate_writer = IO.pipe
+              pids = 24.times.map do |index|
+                fork do
+                  gate_writer.close
+                  gate_reader.read(1)
+                  STDOUT.reopen(File.join(state, "out-#{index}.json"), "wb")
+                  STDERR.reopen(File.join(state, "err-#{index}.txt"), "wb")
+                  environment = {"HOME" => state, "TMPDIR" => state, "LANG" => "C", "LC_ALL" => "C", "TZ" => "UTC", "TRACEWEAVER_OFFLINE" => "1"}
+                  exec(environment, RbConfig.ruby, "--disable-gems", evaluator,
+                       "--root", root, "--case", "ATOMIC-#{index}", "--fixtures", fixtures,
+                       "--state-dir", state, unsetenv_others: true, chdir: root)
+                end
+              end
+              gate_reader.close
+              gate_writer.write("x" * pids.length)
+              gate_writer.close
+              statuses = pids.map { |pid| Process.wait2(pid).last }
+              outcomes = 24.times.map { |index| JSON.parse(File.binread(File.join(state, "out-#{index}.json"))).fetch("outcome") }
+              final_lines = File.foreach(ledger).count
+              raise "atomic replay failed" unless outcomes.count("fixture_predicate_passed") == 1 && outcomes.count("held_attestation_replayed") == 23 && statuses.all?(&:success?) && final_lines == initial_lines + 1
+            end
+          end
+
+          wave.call(0)
+          wave.call(524_288)
+          Dir.mktmpdir("traceweaver-metric-routing-") do |state|
+            ledger = File.join(state, "attestation-replay-ledger.jsonl")
+            File.binwrite(ledger, "x" * 1_048_577)
+            environment = {"HOME" => state, "TMPDIR" => state, "LANG" => "C", "LC_ALL" => "C", "TZ" => "UTC", "TRACEWEAVER_OFFLINE" => "1"}
+            success = system(environment, RbConfig.ruby, "--disable-gems", evaluator,
+                             "--root", root, "--case", "OVERSIZED", "--fixtures", fixtures,
+                             "--state-dir", state, out: File::NULL, err: File::NULL,
+                             unsetenv_others: true, chdir: root)
+            raise "oversized replay ledger did not fail closed" if success
+          end
+          puts "metric-routing atomic replay regression: PASS"
+          RUBY
+
+      - name: Deterministic metric-routing evidence-template regression
+        run: plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-evaluate-metric-routing --root . --self-test evidence-templates
+
+      - name: Core 0.6.0 product-lifecycle assurance
+        run: |
+          scripts/traceweaver-smoke-v060-product-lifecycle
+          scripts/traceweaver-smoke-v060-lifecycle-schema
+          scripts/traceweaver-smoke-v060-lifecycle-evidence
+          scripts/traceweaver-smoke-v060-lifecycle-staleness
+          scripts/traceweaver-smoke-v060-lifecycle-graph
+          scripts/traceweaver-smoke-v060-lifecycle-closure
+          scripts/traceweaver-benchmark-v060-product-lifecycle
+          scripts/traceweaver-smoke-v060-lifecycle-html
+          scripts/traceweaver-smoke-v060-lifecycle-cutover
+          scripts/traceweaver-smoke-v060-lifecycle-capture
+          scripts/traceweaver-smoke-v060-lifecycle-acceptance-hub
+          scripts/traceweaver-smoke-v060-lifecycle-product-validation
+          scripts/traceweaver-smoke-v060-release-integrity
 
       - name: Terra native-child routing contract
         run: scripts/traceweaver-smoke-terra-routing

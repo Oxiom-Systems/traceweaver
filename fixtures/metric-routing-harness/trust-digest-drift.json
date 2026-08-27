@@ -1,0 +1,1 @@
+{"_traceweaver":{"req":"REQ-TW-124","trace":"TRACE-TW-073","verifies":"VER-TW-093"},"base":"fixtures/metric-routing-harness/attestation-valid.json","category":"attestation","mutations":[{"op":"replace","path":"trust_registry_digest","value":"sha256:0000000000000000000000000000000000000000000000000000000000000000"}],"schema_version":"tw-metric-routing-mutation/1"}

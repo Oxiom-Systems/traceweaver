@@ -1,0 +1,262 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-evidence-staleness-smoke; req=REQ-TW-135,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-135,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+EVIDENCE = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-evidence")
+SCHEMA_ROOT = ROOT.join("plugins/traceweaver-core/references/lifecycle")
+SCHEMAS = {
+  "evidence-receipt.schema.json" => "tw-lifecycle-evidence-receipt/1",
+  "truth-stage.schema.json" => "tw-lifecycle-truth-stage/1",
+  "acceptance-pack.schema.json" => "tw-lifecycle-acceptance-pack/1"
+}.freeze
+
+def fail!(message)
+  warn "v060_lifecycle_evidence_smoke=failed reason=#{message}"
+  exit 1
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def identity(value, excluded)
+  payload = value.reject { |key, _| key == excluded }
+  "sha256:#{Digest::SHA256.hexdigest(JSON.generate(canonical(payload)))}"
+end
+
+def write_json(path, value)
+  FileUtils.mkdir_p(Pathname.new(path).dirname)
+  File.write(path, "#{JSON.generate(canonical(value))}\n")
+end
+
+def file_digest(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def run_tool(*arguments)
+  Open3.capture3(EVIDENCE.to_s, *arguments)
+end
+
+def require_pass(*arguments)
+  stdout, stderr, status = run_tool(*arguments)
+  fail!("expected_pass args=#{arguments.join(" ")} stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.success?
+  [stdout, JSON.parse(stdout)]
+rescue JSON::ParserError => error
+  fail!("success_output_not_json error=#{error.message}")
+end
+
+def require_blocked(expected_finding, *arguments)
+  stdout, stderr, status = run_tool(*arguments)
+  fail!("expected_blocked finding=#{expected_finding}") if status.success?
+  combined = "#{stdout}\n#{stderr}"
+  fail!("missing_finding expected=#{expected_finding} actual=#{combined.inspect}") unless combined.include?(expected_finding)
+end
+
+fail!("missing_evidence_executable") unless EVIDENCE.file? && EVIDENCE.executable?
+SCHEMAS.each do |filename, expected_id|
+  path = SCHEMA_ROOT.join(filename)
+  fail!("missing_schema path=#{filename}") unless path.file? && path.size.positive?
+  parsed = JSON.parse(path.read)
+  fail!("schema_id path=#{filename}") unless parsed["$id"] == expected_id
+  fail!("schema_draft path=#{filename}") unless parsed["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+end
+
+Dir.mktmpdir("traceweaver-v060-lifecycle-evidence-") do |directory|
+  root = Pathname.new(directory)
+  digest_a = "sha256:#{"a" * 64}"
+  digest_b = "sha256:#{"b" * 64}"
+  digest_c = "sha256:#{"c" * 64}"
+  observation_path = root.join("evidence/observation.json")
+  verification_path = root.join("evidence/verification.json")
+  review_path = root.join("evidence/review.json")
+  acceptance_path = root.join("evidence/acceptance.json")
+  write_json(observation_path, {"observed" => true})
+  write_json(verification_path, {"passed" => true})
+  write_json(review_path, {"state" => "held"})
+  write_json(acceptance_path, {"accepted" => true})
+  evidence_links = [
+    {"evidence_id" => "EVIDENCE-CLIENT-OBS-001", "locator" => "evidence/observation.json", "digest" => file_digest(observation_path), "evidence_type" => "raw_observation"},
+    {"evidence_id" => "EVIDENCE-CLIENT-VER-001", "locator" => "evidence/verification.json", "digest" => file_digest(verification_path), "evidence_type" => "technical_verification"}
+  ]
+  stage = lambda do |state, ids = [], held_reason = nil|
+    value = {"state" => state, "evidence_ids" => ids}
+    value["held_reason"] = held_reason if held_reason
+    value
+  end
+  truth_stages = {
+    "observation" => stage.call("observed", ["EVIDENCE-CLIENT-OBS-001"]),
+    "technical_verification" => stage.call("passed", ["EVIDENCE-CLIENT-VER-001"]),
+    "independent_review" => stage.call("held", [], "integrated review pending complete candidate"),
+    "pr" => stage.call("not_observed"),
+    "merge" => stage.call("not_observed"),
+    "deployment" => stage.call("not_observed"),
+    "runtime_health" => stage.call("not_observed"),
+    "release" => stage.call("not_observed"),
+    "stakeholder_validation" => stage.call("held", [], "representative product validation pending"),
+    "acceptance" => stage.call("held", [], "owner disposition pending validation"),
+    "publication" => stage.call("not_observed")
+  }
+  receipt = {
+    "schema_version" => "tw-lifecycle-evidence-receipt/1",
+    "receipt_id" => "pending",
+    "work_item_id" => "WORK-CLIENT-001",
+    "changed_scope_digest" => digest_a,
+    "baseline" => {"baseline_id" => "BASELINE-CLIENT-001", "generation" => "LC-GEN-001", "digest" => digest_b},
+    "control_closure_digest" => digest_c,
+    "applicability" => {
+      "requirements" => [{"requirement_id" => "REQ-#{''}CLIENT-001", "digest" => digest_a}],
+      "artifacts" => [{"artifact_id" => "ART-CLIENT-001", "digest" => digest_b}],
+      "environment_digest" => digest_c
+    },
+    "vv_definitions" => [
+      {
+        "requirement_id" => "REQ-#{''}CLIENT-001",
+        "verification_definition_id" => "VER-#{''}CLIENT-001",
+        "validation_definition_id" => "VAL-CLIENT-001",
+        "verification_method" => "test",
+        "validation_question" => "Can the owner recover the exact accepted chain?"
+      }
+    ],
+    "evidence_links" => evidence_links,
+    "review_links" => [{"review_id" => "REVIEW-CLIENT-001", "locator" => "evidence/review.json", "digest" => file_digest(review_path), "state" => "held"}],
+    "truth_stages" => truth_stages,
+    "model_attestation" => {"state" => "unattested", "held_reason" => "no independent served-model attestation"},
+    "remaining_holds" => ["integrated_review", "stakeholder_validation", "acceptance", "publication"],
+    "owner_disposition" => {"owner" => "Client Owner", "state" => "held", "reason" => "validation pending"},
+    "next_gate" => "integrated_review_then_representative_validation",
+    "authority_effect" => "none"
+  }
+  receipt["receipt_id"] = identity(receipt, "receipt_id")
+  receipt_path = root.join("evidence-receipt.json")
+  write_json(receipt_path, receipt)
+
+  first_bytes, first = require_pass("evidence-check", "--root", root.to_s, "--evidence", receipt_path.to_s)
+  second_bytes, second = require_pass("evidence-check", "--root", root.to_s, "--evidence", receipt_path.to_s)
+  fail!("evidence_check_non_deterministic") unless first_bytes == second_bytes && first == second
+  fail!("evidence_check_status") unless first["status"] == "pass" && first["authority_effect"] == "none"
+
+  not_applicable = Marshal.load(Marshal.dump(receipt))
+  not_applicable["applicability"]["requirements"] << {"requirement_id" => "REQ-#{''}CLIENT-002", "digest" => digest_b}
+  not_applicable["vv_definitions"] << {
+    "requirement_id" => "REQ-#{''}CLIENT-002",
+    "not_applicable" => {
+      "scope" => "documentation-only metadata correction",
+      "reason" => "No executable product behavior changes.",
+      "decision_id" => "EXC-CLIENT-002",
+      "owner" => "Client Owner"
+    }
+  }
+  not_applicable["receipt_id"] = identity(not_applicable, "receipt_id")
+  not_applicable_path = root.join("evidence-vv-not-applicable.json")
+  write_json(not_applicable_path, not_applicable)
+  _, not_applicable_result = require_pass("evidence-check", "--root", root.to_s, "--evidence", not_applicable_path.to_s)
+  fail!("vv_not_applicable_disposition") unless not_applicable_result["requirements"].include?("REQ-#{''}CLIENT-002")
+
+  current = {
+    "schema_version" => "tw-lifecycle-current-state/1",
+    "baseline" => receipt["baseline"],
+    "requirements" => receipt.dig("applicability", "requirements"),
+    "artifacts" => receipt.dig("applicability", "artifacts"),
+    "environment_digest" => receipt.dig("applicability", "environment_digest")
+  }
+  current_path = root.join("current.json")
+  write_json(current_path, current)
+  _, fresh = require_pass("staleness", "--root", root.to_s, "--evidence", receipt_path.to_s, "--current", current_path.to_s)
+  fail!("expected_fresh") unless fresh["freshness"] == "current" && fresh["changed_inputs"].empty?
+
+  changed = Marshal.load(Marshal.dump(current))
+  changed["requirements"].first["digest"] = digest_c
+  changed_path = root.join("current-changed.json")
+  write_json(changed_path, changed)
+  _, stale = require_pass("staleness", "--root", root.to_s, "--evidence", receipt_path.to_s, "--current", changed_path.to_s)
+  fail!("expected_stale") unless stale["freshness"] == "stale" && stale["changed_inputs"].include?("requirement:REQ-#{''}CLIENT-001") && stale["reverify_requirements"] == ["REQ-#{''}CLIENT-001"]
+
+  pack_bytes, pack = require_pass("acceptance-pack", "--root", root.to_s, "--evidence", receipt_path.to_s)
+  pack_bytes_again, pack_again = require_pass("acceptance-pack", "--root", root.to_s, "--evidence", receipt_path.to_s)
+  fail!("acceptance_pack_non_deterministic") unless pack_bytes == pack_bytes_again && pack == pack_again
+  fail!("acceptance_pack_false_promotion") unless pack["acceptance_state"] == "held" && pack["authority_effect"] == "none" && pack["remaining_holds"].include?("stakeholder_validation")
+
+  tampered = Marshal.load(Marshal.dump(receipt))
+  tampered["next_gate"] = "skip_all_gates"
+  tampered_path = root.join("evidence-tampered.json")
+  write_json(tampered_path, tampered)
+  require_blocked("receipt_identity_mismatch", "evidence-check", "--root", root.to_s, "--evidence", tampered_path.to_s)
+
+  missing_vv = Marshal.load(Marshal.dump(receipt))
+  missing_vv["vv_definitions"] = []
+  missing_vv["receipt_id"] = identity(missing_vv, "receipt_id")
+  missing_vv_path = root.join("evidence-missing-vv.json")
+  write_json(missing_vv_path, missing_vv)
+  require_blocked("vv_definition_missing", "evidence-check", "--root", root.to_s, "--evidence", missing_vv_path.to_s)
+
+  false_review = Marshal.load(Marshal.dump(receipt))
+  false_review["truth_stages"]["technical_verification"] = stage.call("held", [], "verification pending")
+  false_review["evidence_links"] << {"evidence_id" => "EVIDENCE-CLIENT-REVIEW-001", "locator" => "evidence/review.json", "digest" => file_digest(review_path), "evidence_type" => "independent_review"}
+  false_review["truth_stages"]["independent_review"] = stage.call("passed", ["EVIDENCE-CLIENT-REVIEW-001"])
+  false_review["receipt_id"] = identity(false_review, "receipt_id")
+  false_review_path = root.join("evidence-false-review.json")
+  write_json(false_review_path, false_review)
+  require_blocked("truth_stage_transition", "evidence-check", "--root", root.to_s, "--evidence", false_review_path.to_s)
+
+  false_acceptance = Marshal.load(Marshal.dump(receipt))
+  false_acceptance["evidence_links"] << {"evidence_id" => "EVIDENCE-CLIENT-ACCEPT-001", "locator" => "evidence/acceptance.json", "digest" => file_digest(acceptance_path), "evidence_type" => "acceptance"}
+  false_acceptance["truth_stages"]["acceptance"] = stage.call("passed", ["EVIDENCE-CLIENT-ACCEPT-001"])
+  false_acceptance["owner_disposition"] = {"owner" => "Client Owner", "state" => "accepted", "decision_id" => "DEC-CLIENT-001"}
+  false_acceptance["receipt_id"] = identity(false_acceptance, "receipt_id")
+  false_acceptance_path = root.join("evidence-false-acceptance.json")
+  write_json(false_acceptance_path, false_acceptance)
+  require_blocked("truth_stage_transition", "evidence-check", "--root", root.to_s, "--evidence", false_acceptance_path.to_s)
+
+  nonexistent_link = Marshal.load(Marshal.dump(receipt))
+  nonexistent_link["evidence_links"].first["locator"] = "evidence/missing.json"
+  nonexistent_link["receipt_id"] = identity(nonexistent_link, "receipt_id")
+  nonexistent_path = root.join("evidence-nonexistent-link.json")
+  write_json(nonexistent_path, nonexistent_link)
+  require_blocked("evidence_link_missing", "evidence-check", "--root", root.to_s, "--evidence", nonexistent_path.to_s)
+
+  mismatched_link = Marshal.load(Marshal.dump(receipt))
+  mismatched_link["evidence_links"].first["digest"] = digest_a
+  mismatched_link["receipt_id"] = identity(mismatched_link, "receipt_id")
+  mismatched_path = root.join("evidence-mismatched-link.json")
+  write_json(mismatched_path, mismatched_link)
+  require_blocked("evidence_link_digest_mismatch", "evidence-check", "--root", root.to_s, "--evidence", mismatched_path.to_s)
+
+  FileUtils.ln_s(observation_path.basename, root.join("evidence/observation-symlink.json"))
+  symlinked_link = Marshal.load(Marshal.dump(receipt))
+  symlinked_link["evidence_links"].first["locator"] = "evidence/observation-symlink.json"
+  symlinked_link["receipt_id"] = identity(symlinked_link, "receipt_id")
+  symlinked_path = root.join("evidence-symlinked-link.json")
+  write_json(symlinked_path, symlinked_link)
+  require_blocked("symlink_input", "evidence-check", "--root", root.to_s, "--evidence", symlinked_path.to_s)
+
+  mismatched_review = Marshal.load(Marshal.dump(receipt))
+  mismatched_review["review_links"].first["digest"] = digest_b
+  mismatched_review["receipt_id"] = identity(mismatched_review, "receipt_id")
+  mismatched_review_path = root.join("evidence-mismatched-review.json")
+  write_json(mismatched_review_path, mismatched_review)
+  require_blocked("review_link_digest_mismatch", "evidence-check", "--root", root.to_s, "--evidence", mismatched_review_path.to_s)
+end
+
+puts "v060_lifecycle_evidence_smoke=pass"
+puts "v060_lifecycle_vv_at_capture=pass"
+puts "v060_lifecycle_truth_stage_separation=pass"
+puts "v060_lifecycle_staleness=pass"
+puts "v060_lifecycle_acceptance_pack_hold=pass"
+puts "v060_lifecycle_evidence_content_bindings=pass"

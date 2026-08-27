@@ -1,0 +1,522 @@
+{
+  "schema_version": "tw-lifecycle-product-validation/1",
+  "validation_id": "VAL-TW-042",
+  "candidate": {
+    "release_version": "0.6.0",
+    "baseline_id": "REQ-BASELINE-2026-04-30-001",
+    "requirements_hash_sha256": "sha256:94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf",
+    "tree_digest": "sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8"
+  },
+  "preregistration": {
+    "plan_ref": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md",
+    "frozen_at": "2026-08-27T00:00:00+02:00",
+    "scenario_ids": [
+      "VESTRO-LC-001",
+      "AIRROUTER-LC-001",
+      "ACCEPT-LC-001"
+    ]
+  },
+  "source_baseline_receipt": {
+    "locator": "docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-source-baselines-real-product-depth.json",
+    "digest": "sha256:f6406867be68b99b0cfa89f7ecf33130821d7d6d7fae1ccd135d7c6da4c6d22e"
+  },
+  "cells": [
+    {
+      "product": "Vestro",
+      "scenario_id": "VESTRO-LC-001",
+      "source_authorization": {
+        "authority_id": "TW-VALIDATION-2026-08-21-0.4.0-CONSUMERS-001",
+        "authorized_by": "Hannes Zietsman",
+        "relationship": "Authorized Vestro product representative and maintainer",
+        "repository_locator": "github.com/cryptolabsza/vestro",
+        "revision": "8bc3b724f56cc72f08f8162c783a7f8e2816b990",
+        "revision_digest": "sha256:c564ca26eb968342e1602fd160da6f0c1bfafb159a2024d86964fcf04bee16d5",
+        "source_inventory_digest": "sha256:de4de0c453e52b40974a4c4d06d202decc6d96a81f1f1aad97beb4a6e98c6d68",
+        "source_locators": [
+          "REQUIREMENTS.md",
+          "traceability-matrix.md",
+          ".traceweaver/intent-contract.yml"
+        ]
+      },
+      "rater": {
+        "name": "Hannes Zietsman",
+        "relationship": "Authorized Vestro product representative and maintainer",
+        "independence": "Did not implement the TraceWeaver Core 0.6.0 candidate; explicitly accepted the fresh exact-product machine evidence and recorded limitations."
+      },
+      "tasks": [
+        {
+          "count_basis": "registered_authorized_source_files",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:f22d6b3e68444f3261e2881e1f91934b24b9f7d74f02f613f70423f98d04a245",
+          "recovered_record_links": 3,
+          "required_record_links": 3,
+          "task_type": "source_registration",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9"
+        },
+        {
+          "count_basis": "source_derived_target_requirement_delta",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:970a9f14d89cef964647ac7664fe14e63879f41324a5949b1b54bd024c1618db",
+          "recovered_record_links": 1,
+          "required_record_links": 1,
+          "task_type": "candidate_capture",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9"
+        },
+        {
+          "count_basis": "source_text_direct_duplicate_pair",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:8b496a7a2806ffc6b1d6c5adb8f511be5b2d76a13a79601a9534daa8d655719b",
+          "recovered_record_links": 2,
+          "required_record_links": 2,
+          "task_type": "duplicate_navigation",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9"
+        },
+        {
+          "count_basis": "source_text_direct_relationships_for_changed_requirement",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:7b37439ba2343e24c7769c4978830272ef4af6252770db37e2da3e360b8eb4ca",
+          "recovered_record_links": 21,
+          "required_record_links": 21,
+          "task_type": "impact_navigation",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9"
+        },
+        {
+          "count_basis": "source_derived_verification_and_validation_records",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:f314432fa1e15054a7d9e26c6dbe2869984c5f0e75c7fea3ea5731d7ca8659d8",
+          "recovered_record_links": 2,
+          "required_record_links": 2,
+          "task_type": "vv_before_work",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9"
+        },
+        {
+          "count_basis": "source_derived_downstream_evidence_invalidated_by_controlled_change",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:ccf3920716ce16e9f2c98dd268fda18a5387519bd0f2e6e6d8f25b9204b328df",
+          "recovered_record_links": 3,
+          "required_record_links": 3,
+          "task_type": "stale_evidence",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9"
+        },
+        {
+          "count_basis": "deterministic_source_derived_navigation_sample",
+          "elapsed_ms": 4,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:4bb80d5b11175a1e2246f885c9b4e9ac439f525d7c120dc943417aff9616de5e",
+          "recovered_record_links": 40,
+          "required_record_links": 40,
+          "task_type": "strict_html_navigation",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9"
+        },
+        {
+          "count_basis": "complete_source_derived_record_census_in_acceptance_pack",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:ac381348a5ef6b8d64a9a3ed972ca3712406fc8e4afd2c938bb3348aaf539f5f",
+          "recovered_record_links": 626,
+          "required_record_links": 626,
+          "task_type": "acceptance_pack",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9"
+        }
+      ],
+      "seeded_impacts": [
+        {
+          "expected_link_ids": [
+            "NEED-VESTRO-006",
+            "REQ-ADMIN-UI-001",
+            "REQ-ADMIN-UI-005",
+            "REQ-ADMIN-UI-007",
+            "REQ-CORE-003",
+            "REQ-DATA-001",
+            "REQ-MANAGED-ENTRY-001",
+            "REQ-NFR-033",
+            "REQ-SAFE-009",
+            "RESULT-VESTRO-016",
+            "RESULT-VESTRO-017",
+            "RESULT-VESTRO-024",
+            "TRACE-VESTRO-008",
+            "TRACE-VESTRO-024",
+            "TRACE-VESTRO-026",
+            "TRACE-VESTRO-038",
+            "TRACE-VESTRO-061",
+            "TRACE-VESTRO-PHASE-B",
+            "VER-VESTRO-008",
+            "VER-VESTRO-026",
+            "VER-VESTRO-PHASE-B"
+          ],
+          "observed_link_ids": [
+            "NEED-VESTRO-006",
+            "REQ-ADMIN-UI-001",
+            "REQ-ADMIN-UI-005",
+            "REQ-ADMIN-UI-007",
+            "REQ-CORE-003",
+            "REQ-DATA-001",
+            "REQ-MANAGED-ENTRY-001",
+            "REQ-NFR-033",
+            "REQ-SAFE-009",
+            "RESULT-VESTRO-016",
+            "RESULT-VESTRO-017",
+            "RESULT-VESTRO-024",
+            "TRACE-VESTRO-008",
+            "TRACE-VESTRO-024",
+            "TRACE-VESTRO-026",
+            "TRACE-VESTRO-038",
+            "TRACE-VESTRO-061",
+            "TRACE-VESTRO-PHASE-B",
+            "VER-VESTRO-008",
+            "VER-VESTRO-026",
+            "VER-VESTRO-PHASE-B"
+          ],
+          "record_id": "REQ-ADMIN-UI-006"
+        }
+      ],
+      "route_comparison": {
+        "markdown_manual_matrix_elapsed_ms": [
+          4,
+          4,
+          4
+        ],
+        "strict_html_elapsed_ms": [
+          4,
+          4,
+          4
+        ]
+      },
+      "acceptance_signal": "accepted",
+      "acceptance_rationale": "Accepted under approved CHG-TW-2026-08-27-006 because this final CI-converged release-candidate cell reproduces the immutable product revision, thresholds, truth-stage behavior, and recorded limitations with no new limitation for functional scope sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8 and raw digest sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9; publication remains separately capsule-gated.",
+      "limitations": [
+        "The Vestro source worktree had 144 observed dirty entries and remains bound to revision 8bc3b724f56cc72f08f8162c783a7f8e2816b990 plus worktree-state digest sha256:c564ca26eb968342e1602fd160da6f0c1bfafb159a2024d86964fcf04bee16d5.",
+        "The source-derived census contains 626 actual lifecycle records and 2,657 relationships; registered-source baseline membership is explicitly labelled where an otherwise isolated stable ID requires graph closure.",
+        "The controlled change occurred only in a disposable copy; this cell does not claim deployment, runtime health, semantic-HTML authority cutover, publication, or release."
+      ],
+      "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/vestro-lc-001-machine-observation.json",
+      "raw_evidence_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9",
+      "observed_at": "2026-08-27T00:00:00+02:00"
+    },
+    {
+      "product": "Air Router",
+      "scenario_id": "AIRROUTER-LC-001",
+      "source_authorization": {
+        "authority_id": "TW-VALIDATION-2026-08-21-0.4.0-CONSUMERS-001",
+        "authorized_by": "Hannes Zietsman",
+        "relationship": "Oxiom Systems Air Router product owner and maintainer",
+        "repository_locator": "github.com/Oxiom-Systems/Air-Router",
+        "revision": "0fc9b6514e112f8ece4196f5a6e0fbb80e3ee56b",
+        "revision_digest": "sha256:4f06cca8d20f20b6ce1aa4f54fdd3a6d12666d0b9e1b28b2722a7c7fcb8a9417",
+        "source_inventory_digest": "sha256:dbeb89c0ae350ba98735078bfe7a0061c070a8ac2ee0d6e04a4100149d62e5fe",
+        "source_locators": [
+          "requirements.md",
+          "traceability-matrix.md",
+          ".traceweaver/intent-contract.yml",
+          "config/phase25-hls-contract.json"
+        ]
+      },
+      "rater": {
+        "name": "Hannes Zietsman",
+        "relationship": "Oxiom Systems Air Router product owner and maintainer",
+        "independence": "Did not implement the TraceWeaver Core 0.6.0 candidate; explicitly accepted the fresh exact-product machine evidence and recorded limitations."
+      },
+      "tasks": [
+        {
+          "count_basis": "registered_authorized_source_files",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:15b40613f7a29fc96ca0650a72a37cf737e6183d32eec64ef5276efaf4d92821",
+          "recovered_record_links": 4,
+          "required_record_links": 4,
+          "task_type": "source_registration",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+        },
+        {
+          "count_basis": "source_derived_target_requirement_delta",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:7bd335f163ee3b4e5383a111db3c56b0058a7199fa0d6dd37a56a6815a6ff2b9",
+          "recovered_record_links": 1,
+          "required_record_links": 1,
+          "task_type": "candidate_capture",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+        },
+        {
+          "count_basis": "source_text_direct_duplicate_pair",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:19cccb1a66668787a6ab8590c2c8c6a56b61139c56935e3a866733907289823f",
+          "recovered_record_links": 2,
+          "required_record_links": 2,
+          "task_type": "duplicate_navigation",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+        },
+        {
+          "count_basis": "source_text_direct_relationships_for_changed_requirement",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:01f650f58a37e3930a979fef4bb7e5306dbce806c7fa6cb6a77c1f7f312fae62",
+          "recovered_record_links": 52,
+          "required_record_links": 52,
+          "task_type": "impact_navigation",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+        },
+        {
+          "count_basis": "source_derived_verification_and_validation_records",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:cb66823b92eaa36a9bf83ee9c62152afbf1f99bb6526a2e4a0dfb901d58d401c",
+          "recovered_record_links": 2,
+          "required_record_links": 2,
+          "task_type": "vv_before_work",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+        },
+        {
+          "count_basis": "source_derived_downstream_evidence_invalidated_by_controlled_change",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:904eae53f58ea85cff719f1d54b151611c4a92a50c9ed38d35597280f22dac4c",
+          "recovered_record_links": 1,
+          "required_record_links": 1,
+          "task_type": "stale_evidence",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+        },
+        {
+          "count_basis": "deterministic_source_derived_navigation_sample",
+          "elapsed_ms": 4,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:6620771950c331643e925e57bc48fc60126272c6cd87e2c3bbe6f26dc2606b6e",
+          "recovered_record_links": 39,
+          "required_record_links": 39,
+          "task_type": "strict_html_navigation",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+        },
+        {
+          "count_basis": "complete_source_derived_record_census_in_acceptance_pack",
+          "elapsed_ms": 1,
+          "false_authority_promotions": 0,
+          "false_truth_stage_promotions": 0,
+          "outcome": "passed",
+          "output_digest": "sha256:ac381348a5ef6b8d64a9a3ed972ca3712406fc8e4afd2c938bb3348aaf539f5f",
+          "recovered_record_links": 719,
+          "required_record_links": 719,
+          "task_type": "acceptance_pack",
+          "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+          "raw_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+        }
+      ],
+      "seeded_impacts": [
+        {
+          "expected_link_ids": [
+            "CHANGE-AIR-2026-07-16-014",
+            "DEC-AIR-2026-07-16-017",
+            "GAP-AIR-010",
+            "HOLD-AIR-004",
+            "HOLD-AIR-006",
+            "HOLD-AIR-021",
+            "INTENT-AIR-002",
+            "INTENT-AIR-004",
+            "INTENT-AIR-005",
+            "INTENT-AIR-011",
+            "NEED-AIR-002",
+            "NEED-AIR-004",
+            "NEED-AIR-005",
+            "NEED-AIR-011",
+            "REQ-AIR-011",
+            "REQ-AIR-013",
+            "REQ-AIR-097",
+            "REQ-AIR-098",
+            "REQ-AIR-103",
+            "REQ-AIR-105",
+            "REQ-AIR-109",
+            "REQ-AIR-110",
+            "REQ-AIR-112",
+            "REQ-AIR-114",
+            "REQ-AIR-116",
+            "REQ-AIR-118",
+            "REQ-AIR-119",
+            "REQ-AIR-157",
+            "REQ-BASELINE-2026-07-15-014",
+            "SRC-AIR-035",
+            "SRC-AIR-036",
+            "SRC-AIR-037",
+            "SRC-AIR-038",
+            "SRC-AIR-082",
+            "TRACE-AIR-098",
+            "TRACE-AIR-108",
+            "TRACE-AIR-109",
+            "TRACE-AIR-110",
+            "TRACE-AIR-112",
+            "TRACE-AIR-114",
+            "TRACE-AIR-116",
+            "TRACE-AIR-118",
+            "TRACE-AIR-119",
+            "VAL-AIR-010",
+            "VER-AIR-108",
+            "VER-AIR-109",
+            "VER-AIR-110",
+            "VER-AIR-112",
+            "VER-AIR-114",
+            "VER-AIR-116",
+            "VER-AIR-118",
+            "VER-AIR-119"
+          ],
+          "observed_link_ids": [
+            "CHANGE-AIR-2026-07-16-014",
+            "DEC-AIR-2026-07-16-017",
+            "GAP-AIR-010",
+            "HOLD-AIR-004",
+            "HOLD-AIR-006",
+            "HOLD-AIR-021",
+            "INTENT-AIR-002",
+            "INTENT-AIR-004",
+            "INTENT-AIR-005",
+            "INTENT-AIR-011",
+            "NEED-AIR-002",
+            "NEED-AIR-004",
+            "NEED-AIR-005",
+            "NEED-AIR-011",
+            "REQ-AIR-011",
+            "REQ-AIR-013",
+            "REQ-AIR-097",
+            "REQ-AIR-098",
+            "REQ-AIR-103",
+            "REQ-AIR-105",
+            "REQ-AIR-109",
+            "REQ-AIR-110",
+            "REQ-AIR-112",
+            "REQ-AIR-114",
+            "REQ-AIR-116",
+            "REQ-AIR-118",
+            "REQ-AIR-119",
+            "REQ-AIR-157",
+            "REQ-BASELINE-2026-07-15-014",
+            "SRC-AIR-035",
+            "SRC-AIR-036",
+            "SRC-AIR-037",
+            "SRC-AIR-038",
+            "SRC-AIR-082",
+            "TRACE-AIR-098",
+            "TRACE-AIR-108",
+            "TRACE-AIR-109",
+            "TRACE-AIR-110",
+            "TRACE-AIR-112",
+            "TRACE-AIR-114",
+            "TRACE-AIR-116",
+            "TRACE-AIR-118",
+            "TRACE-AIR-119",
+            "VAL-AIR-010",
+            "VER-AIR-108",
+            "VER-AIR-109",
+            "VER-AIR-110",
+            "VER-AIR-112",
+            "VER-AIR-114",
+            "VER-AIR-116",
+            "VER-AIR-118",
+            "VER-AIR-119"
+          ],
+          "record_id": "REQ-AIR-108"
+        }
+      ],
+      "route_comparison": {
+        "markdown_manual_matrix_elapsed_ms": [
+          5,
+          5,
+          5
+        ],
+        "strict_html_elapsed_ms": [
+          4,
+          4,
+          5
+        ]
+      },
+      "acceptance_signal": "accepted",
+      "acceptance_rationale": "Accepted under approved CHG-TW-2026-08-27-006 because this final CI-converged release-candidate cell reproduces the immutable product revision, thresholds, truth-stage behavior, and recorded limitations with no new limitation for functional scope sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8 and raw digest sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197; publication remains separately capsule-gated.",
+      "limitations": [
+        "The Air Router source worktree had 210 observed dirty entries and remains bound to revision 0fc9b6514e112f8ece4196f5a6e0fbb80e3ee56b plus worktree-state digest sha256:4f06cca8d20f20b6ce1aa4f54fdd3a6d12666d0b9e1b28b2722a7c7fcb8a9417.",
+        "The source-derived census contains 719 actual lifecycle records and 5,584 relationships; registered-source baseline membership is explicitly labelled where an otherwise isolated stable ID requires graph closure.",
+        "The controlled change occurred only in a disposable copy; this cell does not claim deployment, runtime health, semantic-HTML authority cutover, publication, or release."
+      ],
+      "raw_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+      "raw_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197",
+      "observed_at": "2026-08-27T00:00:00+02:00",
+      "non_code_artifact": {
+        "acceptance_pack_visible": true,
+        "artifact_id": "AIR-ROUTER-PHASE25-DIAGNOSTIC-LAB-002",
+        "digest": "sha256:021fad9e5eade34915fe67d4c42378fb72794c4934b6d3001a7a73665035e2da",
+        "impact_visible": true,
+        "locator": "config/phase25-hls-contract.json",
+        "source_id": "SRC-AIR-042",
+        "impact_evidence_locator": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-raw-release-candidate-acyclic-final-exact/airrouter-lc-001-machine-observation.json",
+        "impact_evidence_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+      }
+    }
+  ],
+  "owner_disposition": {
+    "owner_name": "Hannes Zietsman",
+    "relationship": "Oxiom Systems TraceWeaver release owner and representative product owner",
+    "decision": "accepted",
+    "reviewed_cell_raw_digests": [
+      "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9",
+      "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197"
+    ],
+    "limitations_acknowledged": true,
+    "remaining_holds": [
+      "One final verification-only continuation of the same integrated Terra reviewer for the frozen candidate",
+      "Clean isolated Core 0.6.0 reinstall and exact release-readiness receipt",
+      "Single-use publication capsule before stage, commit, push, and PR creation",
+      "Required PR checks, exact-main smoke tests, CodeQL, and separate merge-only capsule",
+      "Serialized traceweaver-core--v0.6.0 tag and matching GitHub Release publication",
+      "Semantic-HTML authority cutover remains held and was not attempted",
+      "No deployment or runtime-health claim is made"
+    ],
+    "decided_at": "2026-08-27T00:00:00+02:00"
+  }
+}

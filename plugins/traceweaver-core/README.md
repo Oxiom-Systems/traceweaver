@@ -4,6 +4,7 @@
 <!-- TRACEWEAVER: file-role=strategy-ideation-plugin-readme; req=REQ-TW-064; trace=TRACE-TW-047; ver=VER-TW-060 -->
 <!-- TRACEWEAVER: file-role=plugin-readme; req=REQ-TW-068; trace=TRACE-TW-054; ver=VAL-TW-016 -->
 <!-- TRACEWEAVER: file-role=v050-shadow-governance-plugin-guide; req=REQ-TW-122; trace=TRACE-TW-072; ver=VER-TW-092; val=VAL-TW-040 -->
+<!-- TRACEWEAVER: file-role=v060-product-lifecycle-plugin-guide; req=REQ-TW-130,REQ-TW-135,REQ-TW-138,REQ-TW-145; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042 -->
 
 TraceWeaver Core adds systems-engineering authority control to agentic software
 work. This alpha plugin wires requirement quality, traceability checks, and
@@ -36,7 +37,7 @@ or held claims rather than silently accepted as implementation authority.
 
 Runtime scope: `light-v0.1-authority-traceability`
 
-Plugin version: `0.5.0` (integrated shadow-governance release candidate;
+Plugin version: `0.6.0` (federated product-lifecycle assurance release candidate;
 publication occurs only
 after exact-merge-SHA smoke and CodeQL pass)
 
@@ -48,6 +49,7 @@ Included skills:
 - `tw-requirements-review`
 - `tw-strategy`
 - `tw-ideate`
+- `tw-lifecycle`
 - `tw-grill`
 - `tw-authority-gate`
 - `tw-audit`
@@ -177,9 +179,9 @@ package. Bump every peer plugin manifest carried by the release:
 - `plugins/traceweaver-core/.cursor-plugin/plugin.json`
 
 Release tags should use the Claude Code plugin tag convention:
-`traceweaver-core--v0.5.0`.
+`traceweaver-core--v0.6.0`.
 
-The 0.5.0 tag is available only after its GitHub Release is published; this
+The 0.6.0 tag is available only after its GitHub Release is published; this
 draft candidate does not claim that the tag exists.
 
 Tagging and the GitHub Release are automated: when the single release PR's
@@ -190,7 +192,10 @@ commit that bumps the plugin version lands on `main`, the `Release on version bu
 push may resume an interrupted publication only while its tag is absent, and
 becomes a successful no-op after that tag exists. The workflow first checks all five release
 manifests for exact equality and a repository-owned, fail-closed dated release
-receipt. The 0.5.0 readiness-v2 record binds one integrated candidate instead
+receipt. The 0.6.0 readiness-v3 record binds the frozen functional candidate,
+non-compensable product validation, integrated review, rollback, reinstall,
+graph, manifest, and release-integrity evidence. The historical 0.5.0
+readiness-v2 record binds one integrated candidate instead
 of treating the historical 0.4.0 PR1/PR2 sequence as a prerequisite. The
 receipt hashes a fixed candidate file set and does not predict its own commit
 SHA. On `main`, the serialized workflow waits for smoke
@@ -198,7 +203,29 @@ and every observed CodeQL matrix job on the exact merge SHA, rejects any
 tag-to-SHA conflict, and attaches its runtime evidence receipt to the GitHub
 Release.
 
-## What's New in 0.5.0
+## What's New in 0.6.0
+
+Core 0.6.0 adds the `tw-lifecycle` federated assurance surface and versioned
+schemas under `references/lifecycle/`. Exact product sources remain owned by
+their existing systems. TraceWeaver registers immutable identities, prepares
+candidate lifecycle records, requires visible named-human confirmation and a
+separate exact-preimage approval before source changes, records staleness, and
+projects deterministic graph and strict static HTML views.
+
+The acceptance hub is offline, printable, accessible, content-addressed, and
+explicitly non-authoritative. It keeps observation, verification, independent
+review, PR, merge, deployment, runtime health, release, stakeholder validation,
+acceptance, and publication separate. Even a complete pack has authority
+effect `none` outside its governing named decisions.
+
+The Core 0.6.0 release gate requires independent Vestro and Air Router
+lifecycle cells on the same frozen candidate, an authorized Air Router
+non-code artifact, one integrated independent review, terminal graph
+freshness, scope/rollback and clean-reinstall proof, equal versions across all
+five manifests, and exact-main smoke plus CodeQL. Markdown/YAML remain
+controlling; semantic HTML authority cutover remains separately held.
+
+## 0.5.0 Shadow Model/Context Governance
 
 TraceWeaver Core 0.5.0 adds a deterministic, inspectable, shadow-only
 model-context map and compiler adjacent to the existing workflow profile and

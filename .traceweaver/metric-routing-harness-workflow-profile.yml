@@ -1,0 +1,152 @@
+schema_version: tw-workflow-profile/1
+task_id: TraceWeaver-qn57
+profile_revision: 1
+risk: L3
+selection_rationale: The deterministic offline harness verifies signed measurement attestations, privacy-preserving evidence, statistical qualification, and claim integrity across multiple model-context components; provider replay, spend, publication, deployment, and cutover remain excluded.
+
+authority_binding:
+  requirements_baseline_id: REQ-BASELINE-2026-04-30-001
+  requirements_baseline_hash_sha256: aecd891d455f71a1dbe71a8e10acd11803d88a9cd7dce6714f0bb44454bda0b5
+  accepted_envelope_id: TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001
+  accepted_document_set_sha256: 879962081cb01ba9846b4f81ecb74de6892423cd5ba5817daf32558c4ed66409
+  accepted_review_identity: sha256:ae7fec240a034d09942785ca4454ab903d5127bc22924674930af8730e827a8e
+  requirements: [REQ-TW-124, REQ-TW-125, REQ-TW-126, REQ-TW-127, REQ-TW-128, REQ-TW-129]
+  decision: DEC-TW-010
+  interface: IF-TW-006
+  evidence_chain: [ART-TW-080, TRACE-TW-073, ATP-TW-050, RESULT-TW-050, VER-TW-093, VAL-TW-041]
+
+governance_profile:
+  path: .traceweaver/v050-model-governance-workflow-profile.yml
+  profile_hash: sha256:c3c12581d6f3700f56a66061037e9820f2502042dc469d76ae39743e5b6b9814
+
+process_budget:
+  target_total_effort_percent: 20
+  hard_ceiling_total_effort_percent: 50
+  target_process_to_delivery_ratio_percent: 25
+  hard_ceiling_process_to_delivery_ratio_percent: 100
+  estimated_delivery_minutes: 300
+  estimated_process_target_minutes: 75
+  estimated_process_ceiling_minutes: 300
+
+selected_controls:
+  - accepted_promoted_authority_and_scoped_review
+  - one_consolidated_implementation_gate_plan
+  - full_l3_vv_definition_with_red_evidence
+  - deterministic_offline_positive_and_adversarial_fixtures
+  - independent_signature_trust_and_privacy_boundary
+  - exact_cell_qualification_and_claim_holds
+  - one_independent_reviewer
+  - one_repair_cycle_cap
+  - traceability_and_graph_freshness_closure
+
+permitted_process_children:
+  planner: { wrapper: tw-plan, model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 25, category: process }
+  document_reviewer: { wrapper: tw-doc-review, model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 20, category: process }
+  vv_definer: { wrapper: tw-vv-define, model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 25, category: process }
+  authority_gate: { wrapper: tw-authority-gate, model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 10, category: process }
+  traceability_checker: { wrapper: tw-traceability-check, model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 20, category: process }
+
+child_roles:
+  builder: { model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 180 }
+  verifier: { model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 60 }
+  reviewer: { model: gpt-5.6-terra, reasoning_effort: xhigh, maximum_timebox_minutes: 30 }
+  deployer: { model: not_applicable, maximum_timebox_minutes: 0 }
+  dogfooder: { model: not_applicable, maximum_timebox_minutes: 0 }
+
+model_selection:
+  availability: [current coordinator session, native subagent request surface exposes gpt-5.6-terra]
+  choice: current coordinator routes bounded gpt-5.6-terra xhigh children; served-model identity remains unattested and is never metric-qualification evidence
+  rationale: Preserves the released 0.5.0 main/child governance while the harness is built; deterministic repository verification, not child self-attestation, decides artifact acceptance.
+  unavailable_consequence: held_model_unavailable; no silent fallback
+
+reviewer_cap: 1
+repair_cycle_cap: 1
+severe_blocker_exception_cycle_cap: 0
+requires_deploy: false
+requires_chrome_dogfood: false
+
+high_risk_controls:
+  rollback: Reverse only task-specific unstaged harness, fixture, plan, V&V, and trace edits while preserving the pre-existing staged metric-authority promotion; no runtime or external state is changed.
+  owner_decision: Oxiom Systems /tw-auto direction on 2026-08-23 constrained by TW-METRIC-ROUTING-ENVELOPE-2026-08-22-001
+  held_claims: [provider_replay, host_metric_collection, external_spend, quantitative_savings, quality_equivalence, observed_sufficiency, qualified_route, publication, release, active_cutover]
+
+profile_hash_algorithm: sha256-canonical-json-v1
+profile_hash_excluded_top_level_fields: [profile_hash, profile_status, accounting]
+immutable_after_building:
+  fields: [schema_version, task_id, profile_revision, risk, selection_rationale, authority_binding, governance_profile, process_budget, selected_controls, permitted_process_children, child_roles, model_selection, reviewer_cap, repair_cycle_cap, severe_blocker_exception_cycle_cap, requires_deploy, requires_chrome_dogfood, high_risk_controls, profile_hash_algorithm, profile_hash_excluded_top_level_fields, immutable_after_building, profile_hash]
+  expansion_rule: After the first builder dispatch, create a new profile revision with an owner-approved escalation reason; never silently add scope, control, reviewer, model, provider replay, publication, or cutover behavior.
+profile_hash: sha256:de1b8121909d9f7c2fdedaa637e6f812ed83b8a88459dc886e627df5cc5bbeef
+
+# Excluded from the canonical profile payload.
+profile_status: reviewing
+accounting:
+  observer: orchestration_harness
+  clock: monotonic
+  child_self_report: advisory_only
+  fixed_categories: [process, delivery, unclassified]
+  unclassified_rule: counts_as_process_until_reviewer_resolves
+  repair_cycles_used: 1
+  reviewer_turns_used: 2
+  receipts:
+    - receipt_id: metric-routing-planner-001
+      role: planner
+      wrapper: tw-plan
+      category: process
+      observer_start_monotonic_seconds: 974553.25681
+      observer_return_monotonic_seconds: 975242.287607
+      observed_duration_seconds: 689.030797
+      observed_duration_minutes: 11.483847
+      child_self_report: advisory_only
+      outcome: plan_materialized
+      artifact: docs/plans/2026-08-23-001-feat-deterministic-metric-routing-harness-plan.md
+    - receipt_id: metric-routing-plan-review-preflight-invalid-001
+      role: document_reviewer_preflight
+      wrapper: tw-doc-review
+      category: process
+      observer_start_monotonic_seconds: 975336.566487
+      observer_return_monotonic_seconds: 975412.419235
+      observed_duration_seconds: 75.852748
+      observed_duration_minutes: 1.264212
+      child_self_report: advisory_only
+      outcome: invalid_contract_risk_value_before_review
+      finding: risk_high_was_refused_before_substantive_review
+    - receipt_id: metric-routing-plan-review-001
+      role: document_reviewer
+      wrapper: tw-doc-review
+      category: process
+      observer_start_monotonic_seconds: 975412.419235
+      observer_return_monotonic_seconds: 975733.255969
+      observed_duration_seconds: 320.836734
+      observed_duration_minutes: 5.347279
+      child_self_report: advisory_only
+      native_route_receipt: sha256:6d102ce60d438e3efb079fb7213ba3851dd73d7764714c921d0a64930d1f9eaa
+      skill_contract_receipt: sha256:ed13db5662cc73e6feb445d5aa215a4880ea951496c00a9b3d76771f197ba500
+      outcome: four_p1_findings_batched_for_single_repair
+      artifact: docs/plans/2026-08-23-001-feat-deterministic-metric-routing-harness-plan.md
+    - receipt_id: metric-routing-plan-review-closure-001
+      role: document_reviewer
+      wrapper: tw-doc-review
+      category: process
+      observer_start_monotonic_seconds: 975951.687191
+      observer_return_monotonic_seconds: 976012.017346
+      observed_duration_seconds: 60.330155
+      observed_duration_minutes: 1.005503
+      child_self_report: advisory_only
+      outcome: closed_clean_same_reviewer
+      artifact: docs/validation/traceweaver-2026-08-23-metric-routing-harness-plan-doc-review.md
+    - receipt_id: metric-routing-vv-define-001
+      role: vv_definer
+      wrapper: tw-vv-define
+      category: process
+      observer_start_monotonic_seconds: 976156.393076
+      observer_return_monotonic_seconds: 977192.486423
+      observed_duration_seconds: 1036.093347
+      observed_duration_minutes: 17.268222
+      child_self_report: advisory_only
+      native_route_receipt: sha256:46a0a55b414404228f30fbfb272d52ed79b63ab92015e219d4cca308a75e7e99
+      outcome: l3_capsule_checker_pass_red_observed
+      artifact: docs/validation/traceweaver-2026-08-23-metric-routing-vv-capsule.json
+  terminal_rules:
+    target: actual_process_minutes <= 0.25 * actual_delivery_minutes
+    hard_hold: actual_process_minutes > actual_delivery_minutes => held_process_budget
+    no_in_task_exception: true

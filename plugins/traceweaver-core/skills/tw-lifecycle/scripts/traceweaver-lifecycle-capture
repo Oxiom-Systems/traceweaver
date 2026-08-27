@@ -1,0 +1,749 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-product-capture-change-control; req=REQ-TW-130,REQ-TW-135,REQ-TW-137,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: entrypoint=lifecycle_prepare_confirm_and_apply_approved_change; req=REQ-TW-130,REQ-TW-135,REQ-TW-137,REQ-TW-140,REQ-TW-141; trace=TRACE-TW-074; ver=VER-TW-094
+
+require "cgi"
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "optparse"
+require "pathname"
+require "securerandom"
+require "set"
+require "tmpdir"
+
+PROPOSAL_SCHEMA = "tw-lifecycle-capture-proposal/1"
+PACK_SCHEMA = "tw-lifecycle-capture-pack/1"
+DECISION_SCHEMA = "tw-lifecycle-human-decision/1"
+CHANGE_SCHEMA = "tw-lifecycle-change-request/1"
+APPROVAL_SCHEMA = "tw-lifecycle-change-approval/1"
+RECORD_SCHEMA = "tw-lifecycle-record/1"
+APPLICATION_SCHEMA = "tw-lifecycle-change-application/1"
+TRANSACTION_SCHEMA = "tw-lifecycle-capture-transaction/1"
+DIGEST_PATTERN = /\Asha256:[0-9a-f]{64}\z/
+RECORD_ID_PATTERN = /\A[A-Z][A-Z0-9]*(?:-[A-Z0-9]+)+\z/
+RFC3339_PATTERN = /\A\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d+)?Z\z/
+RECORD_TYPES = %w[
+  commitment intent need requirement constraint decision interface risk change
+  product_artifact verification_definition verification_result
+  validation_definition validation_result acceptance_decision baseline evidence
+].freeze
+RELATIONSHIP_TYPES = %w[
+  derived_from refines satisfies allocated_to constrained_by decided_by
+  exposes_interface mitigates changes impacts implemented_by verified_by
+  validated_by accepted_by baselines evidences supersedes duplicates_candidate
+  depends_on invalidates reverified_by
+].freeze
+HISTORICAL_EVIDENCE_TYPES = %w[evidence verification_result validation_result].freeze
+BEGIN_MARKER = "<!-- TRACEWEAVER-LIFECYCLE-RECORDS:BEGIN -->"
+END_MARKER = "<!-- TRACEWEAVER-LIFECYCLE-RECORDS:END -->"
+INTEGRITY = Pathname.new(__dir__).join("traceweaver-lifecycle-integrity").realpath
+
+class CaptureError < StandardError
+  attr_reader :finding, :details
+
+  def initialize(finding, message, details = {})
+    super(message)
+    @finding = finding
+    @details = details
+  end
+end
+
+def fail!(finding, message, details = {})
+  raise CaptureError.new(finding, message, details)
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def canonical_json(value)
+  "#{JSON.generate(canonical(value))}\n"
+end
+
+def digest_bytes(value)
+  "sha256:#{Digest::SHA256.hexdigest(value)}"
+end
+
+def digest_value(value)
+  digest_bytes(JSON.generate(canonical(value)))
+end
+
+def present_string?(value)
+  value.is_a?(String) && !value.strip.empty?
+end
+
+def digest?(value)
+  present_string?(value) && value.match?(DIGEST_PATTERN)
+end
+
+def load_json(path, missing, malformed)
+  fail!(missing, "file is missing", "path" => path.to_s) unless path.file?
+  fail!("unsafe_path", "symlink inputs are prohibited", "path" => path.to_s) if path.symlink?
+  bytes = path.binread
+  fail!("unsupported_encoding", "UTF-8 BOM is prohibited", "path" => path.to_s) if bytes.start_with?("\xEF\xBB\xBF".b)
+  fail!("unsupported_line_endings", "LF line endings are required", "path" => path.to_s) if bytes.include?("\r".b)
+  JSON.parse(bytes)
+rescue JSON::ParserError => error
+  fail!(malformed, "file is not valid JSON", "path" => path.to_s, "error" => error.message)
+end
+
+def resolve_inside(root, value, finding, must_exist: false, directory: false)
+  candidate = Pathname.new(value)
+  candidate = root.join(candidate) unless candidate.absolute?
+  candidate = candidate.expand_path
+  fail!("unsafe_path", "symlink path is prohibited", "path" => candidate.to_s) if candidate.symlink?
+  resolved = if candidate.exist?
+    candidate.realpath
+  elsif candidate.parent.directory?
+    candidate.parent.realpath.join(candidate.basename)
+  else
+    candidate
+  end
+  relative = resolved.relative_path_from(root).to_s
+  fail!(finding, "path escapes root", "path" => value) if relative == ".." || relative.start_with?("../")
+  fail!(finding, "path is missing", "path" => value) if must_exist && !resolved.exist?
+  fail!(finding, "directory is missing", "path" => value) if directory && !resolved.directory?
+  resolved
+rescue ArgumentError
+  fail!(finding, "path escapes root", "path" => value)
+end
+
+def run_integrity(*arguments)
+  stdout, stderr, status = Open3.capture3({"TRACEWEAVER_CAPTURE_INTERNAL" => "1"}, INTEGRITY.to_s, *arguments)
+  parsed = JSON.parse(stdout)
+  return parsed if status.success?
+  fail!(parsed["finding"] || "integrity_check_failed", parsed["reason"] || stderr, parsed["details"] || {})
+rescue JSON::ParserError => error
+  fail!("integrity_output_invalid", "integrity output is malformed", "error" => error.message, "stderr" => stderr)
+end
+
+def source_receipt(registry, registry_digest, source)
+  body = {
+    "schema_version" => "tw-lifecycle-source-receipt/1",
+    "registry_id" => registry["registry_id"],
+    "registry_digest" => registry_digest,
+    "source_id" => source["source_id"],
+    "role" => source["role"],
+    "locator" => source["locator"],
+    "normalized_locator" => source["normalized_locator"],
+    "source_type" => source["source_type"],
+    "source_schema_version" => source["schema_version"],
+    "source_digest" => source["digest"],
+    "source_version" => source["version"] || source["generation"],
+    "owner" => source["owner"],
+    "authority_class" => source["authority_class"],
+    "owned_field_families" => source["owned_field_families"],
+    "generation" => source["generation"],
+    "observed_at" => source["observed_at"],
+    "normalization" => source["normalization"],
+    "extraction_method" => source["source_type"] == "external_record_stub" ? "external_immutable_reference_no_fetch" : "exact_bytes_sha256",
+    "authority_effect" => "none",
+    "acceptance_state" => "observed_not_accepted"
+  }
+  body.merge("receipt_id" => digest_value(body))
+end
+
+def validate_identity!(value, identity_field, schema, finding)
+  fail!(finding, "schema is unsupported") unless value.is_a?(Hash) && value["schema_version"] == schema
+  expected = digest_value(value.reject { |key, _| key == identity_field })
+  fail!(finding, "canonical identity is invalid", "expected" => expected, "actual" => value[identity_field]) unless value[identity_field] == expected
+  value
+end
+
+def validate_baseline!(baseline)
+  fields = %w[baseline_id generation digest]
+  fail!("baseline_invalid", "baseline identity is incomplete") unless baseline.is_a?(Hash) && baseline.keys.sort == fields.sort && fields.all? { |field| present_string?(baseline[field]) } && digest?(baseline["digest"])
+end
+
+def validate_record!(record, expected_source = nil)
+  required = %w[schema_version record_id record_type title owner authority_class source applicability baseline freshness acceptance_state relationships fields]
+  allowed = required + %w[acceptance]
+  fail!("candidate_record_invalid", "candidate record does not contain the closed lifecycle envelope") unless record.is_a?(Hash) && (required - record.keys).empty? && (record.keys - allowed).empty?
+  fail!("candidate_record_invalid", "record schema or ID is invalid") unless record["schema_version"] == RECORD_SCHEMA && present_string?(record["record_id"]) && record["record_id"].match?(RECORD_ID_PATTERN)
+  fail!("candidate_record_invalid", "record type is unsupported", "record_id" => record["record_id"]) unless RECORD_TYPES.include?(record["record_type"])
+  fail!("false_authority_promotion", "prepared capture records must remain candidate/proposed", "record_id" => record["record_id"]) unless record["authority_class"] == "candidate" && record["acceptance_state"] == "proposed" && !record.key?("acceptance")
+  fail!("candidate_record_invalid", "candidate title and owner are required") unless present_string?(record["title"]) && present_string?(record["owner"])
+  fail!("candidate_record_invalid", "candidate applicability or freshness is unsupported") unless %w[applicable not_applicable unknown].include?(record["applicability"]) && %w[current held unknown].include?(record["freshness"])
+  validate_baseline!(record["baseline"])
+  fail!("candidate_record_invalid", "candidate fields must be an object") unless record["fields"].is_a?(Hash)
+  source = record["source"]
+  source_fields = %w[source_id locator version digest role provenance]
+  fail!("candidate_source_invalid", "candidate source identity is incomplete") unless source.is_a?(Hash) && (source_fields - source.keys).empty? && source_fields.all? { |field| present_string?(source[field]) } && digest?(source["digest"])
+  if expected_source
+    expected = {"source_id" => expected_source["source_id"], "locator" => expected_source["normalized_locator"], "version" => expected_source["version"] || expected_source["generation"], "digest" => expected_source["digest"], "role" => expected_source["role"]}
+    actual = source.slice(*expected.keys)
+    fail!("candidate_source_mismatch", "candidate source differs from exact registered source", "expected" => expected, "actual" => actual) unless actual == expected
+  end
+  relationships = record["relationships"]
+  fail!("candidate_relationship_invalid", "candidate relationships must be an array") unless relationships.is_a?(Array)
+  identities = Set.new
+  relationships.each do |relationship|
+    fields = %w[source_id target_id relationship_type applicable provenance]
+    fail!("candidate_relationship_invalid", "candidate relationship envelope is invalid") unless relationship.is_a?(Hash) && relationship.keys.sort == fields.sort && relationship["source_id"] == record["record_id"] && present_string?(relationship["target_id"]) && [true, false].include?(relationship["applicable"]) && present_string?(relationship["provenance"])
+    fail!("candidate_relationship_invalid", "candidate relationship type is outside the closed vocabulary", "relationship_type" => relationship["relationship_type"]) unless RELATIONSHIP_TYPES.include?(relationship["relationship_type"])
+    identity = [relationship["target_id"], relationship["relationship_type"], relationship["applicable"]]
+    fail!("candidate_relationship_duplicate", "candidate relationship is duplicated") if identities.include?(identity)
+    identities << identity
+  end
+  record
+end
+
+def validate_candidate!(candidate, source, source_receipt, source_bytes)
+  allowed = %w[candidate_id operation target_record_id target_record_digest proposed_record source_excerpt duplicate_candidates conflicts downstream_consequences vv_definition]
+  required = %w[candidate_id operation proposed_record source_excerpt duplicate_candidates conflicts downstream_consequences]
+  fail!("candidate_invalid", "candidate entry is incomplete or contains unknown fields") unless candidate.is_a?(Hash) && (required - candidate.keys).empty? && (candidate.keys - allowed).empty?
+  fail!("candidate_invalid", "candidate ID and operation are invalid") unless present_string?(candidate["candidate_id"]) && %w[create update].include?(candidate["operation"])
+  record = validate_record!(candidate["proposed_record"], source)
+  if candidate["operation"] == "update"
+    fail!("candidate_target_missing", "update candidate requires exact target identity") unless present_string?(candidate["target_record_id"]) && digest?(candidate["target_record_digest"]) && candidate["target_record_id"] == record["record_id"]
+  else
+    fail!("candidate_target_invalid", "create candidate cannot carry a target identity") if candidate.key?("target_record_id") || candidate.key?("target_record_digest")
+  end
+  excerpt = candidate["source_excerpt"]
+  if source["source_type"] == "external_record_stub"
+    fields = %w[kind locator receipt_id digest]
+    fail!("source_excerpt_invalid", "external excerpt requires immutable reference identity") unless excerpt.is_a?(Hash) && excerpt.keys.sort == fields.sort && excerpt["kind"] == "external_reference" && excerpt["locator"] == source["locator"] && excerpt["receipt_id"] == source_receipt["receipt_id"] && excerpt["digest"] == source["digest"]
+  else
+    fields = %w[kind locator start_byte end_byte text digest]
+    fail!("source_excerpt_invalid", "local excerpt requires exact byte span") unless excerpt.is_a?(Hash) && excerpt.keys.sort == fields.sort && excerpt["kind"] == "local_byte_span" && excerpt["locator"] == source["normalized_locator"] && excerpt["start_byte"].is_a?(Integer) && excerpt["end_byte"].is_a?(Integer) && excerpt["start_byte"] >= 0 && excerpt["end_byte"] > excerpt["start_byte"] && present_string?(excerpt["text"]) && digest?(excerpt["digest"])
+    actual = source_bytes.byteslice(excerpt["start_byte"], excerpt["end_byte"] - excerpt["start_byte"])
+    fail!("source_excerpt_mismatch", "source excerpt bytes differ from registered source", "candidate_id" => candidate["candidate_id"]) unless actual == excerpt["text"].b && digest_bytes(actual) == excerpt["digest"]
+  end
+  %w[duplicate_candidates conflicts].each do |field|
+    entries = candidate[field]
+    fail!("candidate_context_invalid", "candidate context must be an array", "field" => field) unless entries.is_a?(Array)
+    entries.each do |entry|
+      fields = %w[record_id reason confidence]
+      fail!("candidate_context_invalid", "candidate context entry is invalid", "field" => field) unless entry.is_a?(Hash) && entry.keys.sort == fields.sort && present_string?(entry["record_id"]) && present_string?(entry["reason"]) && entry["confidence"].is_a?(Numeric) && entry["confidence"] >= 0.0 && entry["confidence"] <= 1.0
+    end
+  end
+  consequences = candidate["downstream_consequences"]
+  fail!("candidate_consequences_invalid", "downstream consequences must be lexical unique IDs") unless consequences.is_a?(Array) && consequences == consequences.sort && consequences.uniq == consequences && consequences.all? { |id| present_string?(id) }
+  if record["record_type"] == "requirement"
+    vv = candidate["vv_definition"]
+    fields = %w[verification_definition_id validation_definition_id verification_method validation_question]
+    fail!("vv_definition_missing", "requirement candidate requires V&V at capture", "candidate_id" => candidate["candidate_id"]) unless vv.is_a?(Hash) && vv.keys.sort == fields.sort && fields.all? { |field| present_string?(vv[field]) } && %w[test analysis inspection demonstration].include?(vv["verification_method"])
+  end
+  candidate
+end
+
+def confirmation_html(proposal_id, source_receipt, candidates)
+  sections = candidates.map do |candidate|
+    record = candidate["proposed_record"]
+    context = lambda do |name|
+      entries = candidate[name]
+      entries.empty? ? "<li>None recorded.</li>" : entries.map { |entry| "<li><code>#{CGI.escapeHTML(entry["record_id"])}</code> — #{CGI.escapeHTML(entry["reason"])} — confidence #{entry["confidence"]}</li>" }.join
+    end
+    consequences = candidate["downstream_consequences"].empty? ? "<li>None recorded.</li>" : candidate["downstream_consequences"].map { |id| "<li><code>#{CGI.escapeHTML(id)}</code></li>" }.join
+    vv = candidate["vv_definition"] ? "<pre>#{CGI.escapeHTML(JSON.pretty_generate(canonical(candidate["vv_definition"])))}</pre>" : "<p>Not a requirement candidate.</p>"
+    <<~HTML
+      <article id="#{CGI.escapeHTML(candidate["candidate_id"])}"><p><strong>Pending named human confirmation</strong></p><h2><code>#{CGI.escapeHTML(record["record_id"])}</code> — #{CGI.escapeHTML(record["title"])}</h2><dl><dt>Operation</dt><dd>#{CGI.escapeHTML(candidate["operation"])}</dd><dt>Record type</dt><dd>#{CGI.escapeHTML(record["record_type"])}</dd><dt>Source excerpt</dt><dd><pre>#{CGI.escapeHTML(candidate.dig("source_excerpt", "text") || "External immutable reference; no implicit fetch.")}</pre></dd><dt>Authority state</dt><dd>candidate / proposed / not accepted</dd></dl><h3>Duplicate candidates</h3><ul>#{context.call("duplicate_candidates")}</ul><h3>Conflicts</h3><ul>#{context.call("conflicts")}</ul><h3>Downstream consequences</h3><ul>#{consequences}</ul><h3>V&amp;V at capture</h3>#{vv}</article>
+    HTML
+  end.join("\n")
+  <<~HTML
+    <!doctype html>
+    <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Prepared lifecycle confirmation</title><style>body{max-width:980px;margin:auto;padding:24px;font:16px/1.5 system-ui,sans-serif}article{border:1px solid #ccd5d8;padding:18px;margin:0 0 20px}code,pre{font-family:ui-monospace,monospace}pre{white-space:pre-wrap}dl{display:grid;grid-template-columns:180px 1fr}dt,dd{padding:6px;border-top:1px solid #ddd}dd{margin:0}@media(max-width:650px){dl{grid-template-columns:1fr}}@media print{body{padding:0}article{break-inside:avoid}}</style></head><body><header><h1>Prepared lifecycle confirmation</h1><p><strong>Candidate evidence only.</strong> This surface cannot approve authority. A named human must accept, edit, or reject every candidate in a separate canonical decision.</p></header><main><section><h2>Exact source receipt</h2><dl><dt>Proposal</dt><dd><code>#{proposal_id}</code></dd><dt>Source</dt><dd><code>#{CGI.escapeHTML(source_receipt["source_id"])}</code> / <code>#{CGI.escapeHTML(source_receipt["source_digest"])}</code></dd><dt>Receipt</dt><dd><code>#{CGI.escapeHTML(source_receipt["receipt_id"])}</code></dd></dl></section>#{sections}</main><footer>Authority effect: none. Next gate: named human confirmation.</footer></body></html>
+  HTML
+end
+
+def record_core(record)
+  record.slice("record_id", "record_type", "title", "owner", "applicability", "freshness", "acceptance_state", "acceptance", "relationships", "fields")
+end
+
+def render_authority(original, cores)
+  begin_count = original.scan(BEGIN_MARKER).length
+  end_count = original.scan(END_MARKER).length
+  fail!("authority_marker_invalid", "authority record markers are unbalanced or duplicated") unless begin_count == end_count && begin_count <= 1
+  block = "#{BEGIN_MARKER}\n## Accepted lifecycle records\n\n```json\n#{JSON.pretty_generate(canonical(cores.sort_by { |core| core["record_id"] }))}\n```\n#{END_MARKER}\n"
+  if begin_count == 1
+    original.sub(/#{Regexp.escape(BEGIN_MARKER)}.*?#{Regexp.escape(END_MARKER)}\n?/m, block)
+  else
+    "#{original.rstrip}\n\n#{block}"
+  end
+end
+
+def fsync_directory(path)
+  File.open(path.to_s, File::RDONLY) { |directory| directory.fsync }
+rescue Errno::EINVAL, Errno::ENOTSUP
+  nil
+end
+
+def durable_write(path, bytes)
+  FileUtils.mkdir_p(path.dirname)
+  File.open(path.to_s, File::WRONLY | File::CREAT | File::TRUNC, 0o600) do |file|
+    file.binmode
+    file.write(bytes)
+    file.flush
+    file.fsync
+  end
+  fsync_directory(path.dirname)
+end
+
+def atomic_publish(path, bytes, token)
+  fail!("unsafe_path", "transaction target may not be a symlink", "path" => path.to_s) if path.symlink?
+  FileUtils.mkdir_p(path.dirname)
+  temporary = path.dirname.join(".#{path.basename}.traceweaver-#{token}")
+  fail!("transaction_residue", "transaction temporary path already exists", "path" => temporary.to_s) if temporary.exist? || temporary.symlink?
+  durable_write(temporary, bytes)
+  temporary.rename(path)
+  fsync_directory(path.dirname)
+end
+
+def delete_durable(path)
+  fail!("unsafe_path", "transaction target may not be a symlink", "path" => path.to_s) if path.symlink?
+  path.delete if path.exist?
+  fsync_directory(path.dirname)
+end
+
+def relative_target(root, path)
+  relative = path.relative_path_from(root).to_s
+  fail!("transaction_path_escape", "transaction target escapes root", "path" => path.to_s) if relative == ".." || relative.start_with?("../")
+  relative
+rescue ArgumentError
+  fail!("transaction_path_escape", "transaction target escapes root", "path" => path.to_s)
+end
+
+def validate_staged_generation!(root, new_registry, new_authority, authority_source_id, record_bytes)
+  Dir.mktmpdir("traceweaver-capture-next-generation-") do |directory|
+    shadow = Pathname.new(directory).realpath
+    new_registry["sources"].each do |source|
+      next if source["source_type"] == "external_record_stub"
+      locator = source["normalized_locator"]
+      original = resolve_inside(root, locator, "staged_source_path_escape", must_exist: true)
+      fail!("unsafe_path", "staged source may not be a symlink", "path" => original.to_s) if original.symlink?
+      bytes = source["source_id"] == authority_source_id ? new_authority : original.binread
+      destination = shadow.join(locator)
+      FileUtils.mkdir_p(destination.dirname)
+      destination.binwrite(bytes)
+    end
+    registry_path = shadow.join("source-registry.json")
+    registry_path.binwrite(canonical_json(new_registry))
+    records_dir = shadow.join("records")
+    records_dir.mkdir
+    record_bytes.each { |record_id, bytes| records_dir.join("#{record_id}.json").binwrite(bytes) }
+    run_integrity("registry-check", "--root", shadow.to_s, "--registry", registry_path.to_s)
+    record_bytes.keys.sort.each do |record_id|
+      run_integrity("record-check", "--root", shadow.to_s, "--record", records_dir.join("#{record_id}.json").to_s)
+    end
+  end
+end
+
+def transaction_pointer(root)
+  root.join(".traceweaver/lifecycle-capture-transaction.json")
+end
+
+def recover_transaction!(root)
+  pointer = transaction_pointer(root)
+  return false unless pointer.exist?
+  fail!("unsafe_path", "capture transaction journal may not be a symlink") if pointer.symlink?
+  journal = load_json(pointer, "transaction_journal_missing", "transaction_journal_malformed")
+  fields = %w[schema_version transaction_id transaction_dir targets authority_effect]
+  fail!("transaction_journal_invalid", "capture transaction journal has an invalid envelope") unless journal.is_a?(Hash) && journal.keys.sort == fields.sort && journal["schema_version"] == TRANSACTION_SCHEMA && present_string?(journal["transaction_id"]) && journal["authority_effect"] == "none"
+  transaction_dir = resolve_inside(root, journal["transaction_dir"], "transaction_path_escape", must_exist: true, directory: true)
+  expected_parent = root.join(".traceweaver/lifecycle-capture-transactions").expand_path
+  fail!("transaction_path_escape", "transaction directory is outside the managed transaction root") unless transaction_dir.parent == expected_parent
+  targets = journal["targets"]
+  fail!("transaction_journal_invalid", "capture transaction journal has no targets") unless targets.is_a?(Array) && !targets.empty?
+  resolved = targets.map do |entry|
+    entry_fields = %w[target next_image preimage next_digest original_digest original_exists]
+    fail!("transaction_journal_invalid", "capture transaction target is invalid") unless entry.is_a?(Hash) && entry.keys.sort == entry_fields.sort && digest?(entry["next_digest"]) && [true, false].include?(entry["original_exists"])
+    target = resolve_inside(root, entry["target"], "transaction_path_escape")
+    next_image = resolve_inside(transaction_dir, entry["next_image"], "transaction_path_escape", must_exist: true)
+    fail!("transaction_image_mismatch", "next transaction image digest is invalid") unless digest_bytes(next_image.binread) == entry["next_digest"]
+    preimage = nil
+    if entry["original_exists"]
+      fail!("transaction_journal_invalid", "original transaction digest is invalid") unless digest?(entry["original_digest"])
+      preimage = resolve_inside(transaction_dir, entry["preimage"], "transaction_path_escape", must_exist: true)
+      fail!("transaction_image_mismatch", "transaction preimage digest is invalid") unless digest_bytes(preimage.binread) == entry["original_digest"]
+    else
+      fail!("transaction_journal_invalid", "absent target cannot have an original digest") unless entry["original_digest"].nil?
+    end
+    [entry, target, next_image, preimage]
+  end
+  all_next = resolved.all? { |entry, target, _next_image, _preimage| target.file? && !target.symlink? && digest_bytes(target.binread) == entry["next_digest"] }
+  unless all_next
+    resolved.reverse_each do |entry, target, _next_image, preimage|
+      if entry["original_exists"]
+        atomic_publish(target, preimage.binread, "recover-#{journal['transaction_id']}")
+      else
+        delete_durable(target)
+      end
+    end
+    restored = resolved.all? do |entry, target, _next_image, _preimage|
+      if entry["original_exists"]
+        target.file? && !target.symlink? && digest_bytes(target.binread) == entry["original_digest"]
+      else
+        !target.exist?
+      end
+    end
+    fail!("transaction_recovery_failed", "capture transaction preimage restoration is incomplete") unless restored
+  end
+  pointer.delete
+  fsync_directory(pointer.dirname)
+  FileUtils.remove_entry(transaction_dir) if transaction_dir.exist?
+  fsync_directory(expected_parent)
+  true
+end
+
+def publish_transaction!(root, target_values, inject_kill_phase, inject_failure_after_first: false)
+  transaction_id = SecureRandom.hex(16)
+  transaction_parent = root.join(".traceweaver/lifecycle-capture-transactions")
+  FileUtils.mkdir_p(transaction_parent)
+  transaction_dir = transaction_parent.join(transaction_id)
+  transaction_dir.mkdir
+  targets = target_values.each_with_index.map do |(target, next_bytes), index|
+    target = target.expand_path
+    relative = relative_target(root, target)
+    original_exists = target.file?
+    fail!("unsafe_path", "transaction target may not be a symlink", "path" => target.to_s) if target.symlink?
+    original_bytes = original_exists ? target.binread : nil
+    next_image = "next/#{format('%04d', index)}"
+    preimage = "preimage/#{format('%04d', index)}"
+    durable_write(transaction_dir.join(next_image), next_bytes)
+    durable_write(transaction_dir.join(preimage), original_bytes) if original_exists
+    {
+      "target" => relative,
+      "next_image" => next_image,
+      "preimage" => preimage,
+      "next_digest" => digest_bytes(next_bytes),
+      "original_digest" => original_bytes ? digest_bytes(original_bytes) : nil,
+      "original_exists" => original_exists
+    }
+  end
+  journal = {
+    "schema_version" => TRANSACTION_SCHEMA,
+    "transaction_id" => transaction_id,
+    "transaction_dir" => relative_target(root, transaction_dir),
+    "targets" => targets,
+    "authority_effect" => "none"
+  }
+  durable_write(transaction_dir.join("journal.json"), canonical_json(journal))
+  fsync_directory(transaction_dir)
+  pointer = transaction_pointer(root)
+  atomic_publish(pointer, canonical_json(journal), transaction_id)
+  Process.kill("KILL", Process.pid) if inject_kill_phase == 0
+  targets.each_with_index do |entry, index|
+    target = root.join(entry["target"])
+    next_bytes = transaction_dir.join(entry["next_image"]).binread
+    atomic_publish(target, next_bytes, transaction_id)
+    fail!("injected_change_failure", "fault injected after authority write") if inject_failure_after_first && index.zero?
+    Process.kill("KILL", Process.pid) if inject_kill_phase == index + 1
+  end
+  recover_transaction!(root)
+end
+
+command = ARGV.shift
+options = {root: Dir.pwd, inject_failure: false, inject_kill_phase: nil}
+OptionParser.new do |parser|
+  parser.banner = "Usage: traceweaver-lifecycle-capture <prepare|confirm|apply|recover> [options]"
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--registry PATH") { |value| options[:registry] = value }
+  parser.on("--source-id ID") { |value| options[:source_id] = value }
+  parser.on("--proposal PATH") { |value| options[:proposal] = value }
+  parser.on("--pack PATH") { |value| options[:pack] = value }
+  parser.on("--decision PATH") { |value| options[:decision] = value }
+  parser.on("--change-request PATH") { |value| options[:change_request] = value }
+  parser.on("--approval PATH") { |value| options[:approval] = value }
+  parser.on("--records PATH") { |value| options[:records] = value }
+  parser.on("--output PATH") { |value| options[:output] = value }
+  parser.on("--confirmation-html PATH") { |value| options[:confirmation_html] = value }
+  parser.on("--inject-failure-after-authority") { options[:inject_failure] = true }
+  parser.on("--inject-kill-after-phase N", Integer) { |value| options[:inject_kill_phase] = value }
+end.parse!
+
+begin
+  fail!("invalid_command", "unsupported capture operation", "operation" => command) unless %w[prepare confirm apply recover].include?(command)
+  root = Pathname.new(options[:root]).expand_path
+  fail!("invalid_root", "--root must be a directory") unless root.directory?
+  root = root.realpath
+  lock_path = root.join(".traceweaver/state/lifecycle-capture.lock")
+  FileUtils.mkdir_p(lock_path.parent)
+  capture_lock = File.open(lock_path.to_s, File::RDWR | File::CREAT, 0o600)
+  capture_lock.flock(File::LOCK_EX)
+  recovered = recover_transaction!(root)
+  if command == "recover"
+    puts canonical_json("schema_version" => "tw-lifecycle-capture-recovery/1", "status" => "pass", "recovered" => recovered, "authority_effect" => "none")
+    exit 0
+  end
+  fail!("usage_error", "--output is required") unless present_string?(options[:output])
+  output_path = resolve_inside(root, options[:output], "output_path_escape")
+  fail!("output_parent_missing", "output parent is missing") unless output_path.parent.directory?
+
+  if command == "prepare"
+    %i[registry source_id proposal confirmation_html].each { |key| fail!("usage_error", "--#{key.to_s.tr("_", "-")} is required") unless present_string?(options[key]) }
+    registry_path = resolve_inside(root, options[:registry], "registry_path_escape", must_exist: true)
+    proposal_path = resolve_inside(root, options[:proposal], "proposal_path_escape", must_exist: true)
+    confirmation_path = resolve_inside(root, options[:confirmation_html], "confirmation_path_escape")
+    fail!("confirmation_parent_missing", "confirmation surface parent is missing") unless confirmation_path.parent.directory?
+    registry_check = run_integrity("registry-check", "--root", root.to_s, "--registry", registry_path.to_s)
+    registry = load_json(registry_path, "missing_registry", "malformed_registry")
+    source = registry.fetch("sources").find { |entry| entry["source_id"] == options[:source_id] }
+    fail!("unknown_source_id", "capture source is not registered", "source_id" => options[:source_id]) unless source
+    source_receipt = run_integrity("source-receipt", "--root", root.to_s, "--registry", registry_path.to_s, "--source-id", options[:source_id])
+    proposal = validate_identity!(load_json(proposal_path, "missing_proposal", "malformed_proposal"), "proposal_id", PROPOSAL_SCHEMA, "proposal_identity")
+    fields = %w[schema_version proposal_id source_id source_digest baseline candidates authority_effect]
+    fail!("proposal_shape", "proposal does not contain the closed envelope") unless proposal.keys.sort == fields.sort && proposal["authority_effect"] == "none" && proposal["source_id"] == source["source_id"] && proposal["source_digest"] == source["digest"]
+    validate_baseline!(proposal["baseline"])
+    fail!("proposal_baseline", "proposal baseline differs from current registry") unless proposal.dig("baseline", "generation") == registry_check["generation"] && proposal.dig("baseline", "digest") == registry_check["registry_digest"]
+    source_bytes = source["source_type"] == "external_record_stub" ? nil : root.join(source["normalized_locator"]).binread
+    candidates = proposal["candidates"]
+    fail!("proposal_candidates_invalid", "candidates must be a lexical unique array") unless candidates.is_a?(Array) && candidates.map { |candidate| candidate["candidate_id"] } == candidates.map { |candidate| candidate["candidate_id"] }.sort && candidates.map { |candidate| candidate["candidate_id"] }.uniq.length == candidates.length
+    candidates.each { |candidate| validate_candidate!(candidate, source, source_receipt, source_bytes) }
+    surface = confirmation_html(proposal["proposal_id"], source_receipt, candidates)
+    surface_digest = digest_bytes(surface)
+    body = {
+      "schema_version" => PACK_SCHEMA,
+      "proposal_id" => proposal["proposal_id"],
+      "source_receipt" => source_receipt,
+      "baseline" => proposal["baseline"],
+      "candidates" => candidates,
+      "confirmation_surface" => {"locator" => confirmation_path.relative_path_from(root).to_s, "digest" => surface_digest, "media_type" => "text/html; charset=utf-8"},
+      "status" => candidates.empty? ? "prepared_no_candidate_change" : "prepared_pending_human_confirmation",
+      "human_confirmation_required" => true,
+      "authority_effect" => "none"
+    }
+    pack = body.merge("pack_id" => digest_value(body))
+    confirmation_path.binwrite(surface)
+    output_path.binwrite(canonical_json(pack))
+    puts canonical_json("schema_version" => "tw-lifecycle-capture-result/1", "operation" => "prepare", "status" => "pass", "pack_id" => pack["pack_id"], "candidate_count" => candidates.length, "human_confirmation_required" => true, "confirmation_surface_digest" => surface_digest, "authority_effect" => "none", "next_gate" => "named_human_confirmation")
+    exit 0
+  end
+
+  if command == "confirm"
+    %i[pack decision].each { |key| fail!("usage_error", "--#{key} is required") unless present_string?(options[key]) }
+    pack_path = resolve_inside(root, options[:pack], "pack_path_escape", must_exist: true)
+    decision_path = resolve_inside(root, options[:decision], "decision_path_escape", must_exist: true)
+    pack = validate_identity!(load_json(pack_path, "missing_pack", "malformed_pack"), "pack_id", PACK_SCHEMA, "pack_identity")
+    decision = validate_identity!(load_json(decision_path, "missing_decision", "malformed_decision"), "decision_digest", DECISION_SCHEMA, "decision_identity")
+    decision_fields = %w[schema_version decision_digest decision_id pack_id owner decided_at dispositions authority_effect]
+    fail!("decision_shape", "human decision does not contain the closed envelope") unless decision.keys.sort == decision_fields.sort && decision["pack_id"] == pack["pack_id"] && present_string?(decision["decision_id"]) && present_string?(decision["owner"]) && decision["decided_at"].match?(RFC3339_PATTERN) && decision["authority_effect"] == "prepare_change_only"
+    candidates = pack["candidates"].each_with_object({}) { |candidate, result| result[candidate["candidate_id"]] = candidate }
+    dispositions = decision["dispositions"]
+    fail!("decision_dispositions", "decision must dispose every candidate once in lexical order") unless dispositions.is_a?(Array) && dispositions.map { |entry| entry["candidate_id"] } == candidates.keys.sort && dispositions.map { |entry| entry["candidate_id"] }.uniq.length == candidates.length
+    accepted = []
+    rejected = []
+    dispositions.each do |disposition|
+      fields = %w[candidate_id action reason edited_record]
+      fail!("decision_disposition_invalid", "decision disposition is malformed") unless disposition.is_a?(Hash) && (disposition.keys - fields).empty? && %w[candidate_id action reason].all? { |field| disposition.key?(field) } && candidates.key?(disposition["candidate_id"]) && %w[accept reject edit].include?(disposition["action"]) && present_string?(disposition["reason"])
+      candidate = Marshal.load(Marshal.dump(candidates.fetch(disposition["candidate_id"])))
+      if disposition["action"] == "reject"
+        fail!("decision_disposition_invalid", "rejected candidate cannot carry edited_record") if disposition.key?("edited_record")
+        rejected << {"candidate_id" => disposition["candidate_id"], "reason" => disposition["reason"]}
+      else
+        if disposition["action"] == "edit"
+          fail!("decision_disposition_invalid", "edited candidate requires replacement record") unless disposition["edited_record"].is_a?(Hash)
+          original_source = candidate["proposed_record"]["source"]
+          validate_record!(disposition["edited_record"])
+          fail!("edited_record_source_mismatch", "edited record must retain exact source identity") unless disposition["edited_record"]["source"] == original_source
+          candidate["proposed_record"] = disposition["edited_record"]
+        elsif disposition.key?("edited_record")
+          fail!("decision_disposition_invalid", "accepted candidate cannot carry edited_record")
+        end
+        candidate["human_disposition"] = {"action" => disposition["action"], "reason" => disposition["reason"]}
+        accepted << candidate
+      end
+    end
+    consequences = accepted.flat_map { |candidate| candidate["downstream_consequences"] }.uniq.sort
+    body = {
+      "schema_version" => CHANGE_SCHEMA,
+      "pack_id" => pack["pack_id"],
+      "decision" => decision.slice("decision_digest", "decision_id", "owner", "decided_at"),
+      "source_receipt" => pack["source_receipt"],
+      "baseline" => pack["baseline"],
+      "accepted_candidates" => accepted,
+      "rejected_candidates" => rejected,
+      "downstream_consequences" => consequences,
+      "status" => accepted.empty? ? "no_change_mechanical_closure" : "prepared_human_confirmed_delta",
+      "reviewer_dispatch_count" => accepted.empty? ? 0 : 1,
+      "next_gate" => accepted.empty? ? "none_no_change_closed" : "authority_gate_for_exact_preimage_change_approval",
+      "authority_effect" => "none"
+    }
+    change = body.merge("change_request_id" => digest_value(body))
+    output_path.binwrite(canonical_json(change))
+    puts canonical_json("schema_version" => "tw-lifecycle-capture-result/1", "operation" => "confirm", "status" => "pass", "change_request_id" => change["change_request_id"], "accepted_count" => accepted.length, "rejected_count" => rejected.length, "closure" => change["status"], "reviewer_dispatch_count" => change["reviewer_dispatch_count"], "authority_effect" => "none", "next_gate" => change["next_gate"])
+    exit 0
+  end
+
+  %i[registry source_id records change_request approval].each { |key| fail!("usage_error", "--#{key.to_s.tr("_", "-")} is required") unless present_string?(options[key]) }
+  registry_path = resolve_inside(root, options[:registry], "registry_path_escape", must_exist: true)
+  records_dir = resolve_inside(root, options[:records], "records_path_escape", must_exist: true, directory: true)
+  change_path = resolve_inside(root, options[:change_request], "change_path_escape", must_exist: true)
+  approval_path = resolve_inside(root, options[:approval], "approval_path_escape", must_exist: true)
+  change = validate_identity!(load_json(change_path, "missing_change_request", "malformed_change_request"), "change_request_id", CHANGE_SCHEMA, "change_request_identity")
+  approval = validate_identity!(load_json(approval_path, "missing_change_approval", "malformed_change_approval"), "approval_id", APPROVAL_SCHEMA, "change_approval_identity")
+  change_fields = %w[schema_version change_request_id pack_id decision source_receipt baseline accepted_candidates rejected_candidates downstream_consequences status reviewer_dispatch_count next_gate authority_effect]
+  fail!("change_request_shape", "change request does not contain the closed envelope") unless change.keys.sort == change_fields.sort && change["authority_effect"] == "none"
+  fail!("change_request_shape", "change request decision identity is incomplete") unless change["decision"].is_a?(Hash) && change["decision"].keys.sort == %w[decided_at decision_digest decision_id owner] && change["decision"].values.all? { |value| present_string?(value) }
+  fail!("change_request_shape", "change request arrays are invalid") unless change["accepted_candidates"].is_a?(Array) && change["rejected_candidates"].is_a?(Array) && change["downstream_consequences"].is_a?(Array) && change["downstream_consequences"] == change["downstream_consequences"].sort && change["downstream_consequences"].uniq == change["downstream_consequences"]
+  fail!("no_change_requires_no_apply", "mechanical no-change closure cannot be applied") if change["status"] == "no_change_mechanical_closure" || change["accepted_candidates"].empty?
+  approval_fields = %w[schema_version approval_id change_request_id registry_digest source_id source_digest new_generation new_baseline_id allowed_record_ids owner decision_id accepted_at authority_effect]
+  fail!("change_approval_shape", "change approval does not contain the closed envelope") unless approval.keys.sort == approval_fields.sort && approval["change_request_id"] == change["change_request_id"] && approval["source_id"] == options[:source_id] && approval["authority_effect"] == "named_human_approved_delta_only" && approval["accepted_at"].match?(RFC3339_PATTERN)
+  fail!("change_approval_decision_mismatch", "change approval must bind the exact human decision") unless approval["decision_id"] == change.dig("decision", "decision_id")
+
+  if output_path.file?
+    existing_receipt = validate_identity!(load_json(output_path, "missing_application_receipt", "malformed_application_receipt"), "application_id", APPLICATION_SCHEMA, "application_identity")
+    if existing_receipt["approval_id"] == approval["approval_id"] && existing_receipt["change_request_id"] == change["change_request_id"]
+      current_check = run_integrity("registry-check", "--root", root.to_s, "--registry", registry_path.to_s)
+      fail!("idempotent_receipt_state_mismatch", "stored application receipt does not match current registry") unless current_check["registry_digest"] == existing_receipt["new_registry_digest"]
+      record_digests = existing_receipt["record_digests"]
+      fail!("idempotent_receipt_state_mismatch", "stored application receipt lacks exact record identities") unless record_digests.is_a?(Hash) && !record_digests.empty?
+      record_digests.each do |record_id, expected_digest|
+        record_path = records_dir.join("#{record_id}.json")
+        fail!("idempotent_receipt_state_mismatch", "stored application record is missing", "record_id" => record_id) unless record_path.file? && !record_path.symlink?
+        current_record = load_json(record_path, "missing_record", "malformed_lifecycle_record")
+        fail!("idempotent_receipt_state_mismatch", "stored application record differs", "record_id" => record_id) unless digest_value(current_record) == expected_digest
+      end
+      puts canonical_json(existing_receipt)
+      exit 0
+    end
+    fail!("application_receipt_conflict", "output already contains a different application receipt")
+  end
+
+  registry_check = run_integrity("registry-check", "--root", root.to_s, "--registry", registry_path.to_s)
+  registry = load_json(registry_path, "missing_registry", "malformed_registry")
+  source = registry.fetch("sources").find { |entry| entry["source_id"] == options[:source_id] }
+  fail!("unknown_source_id", "approved change source is not registered") unless source
+  fail!("change_source_type", "approved authority mutation currently requires a repository-local Markdown lifecycle source") unless source["source_type"] == "markdown"
+  authority_path = resolve_inside(root, source["normalized_locator"], "authority_path_escape", must_exist: true)
+  authority_bytes = authority_path.binread
+  current_source_receipt = run_integrity("source-receipt", "--root", root.to_s, "--registry", registry_path.to_s, "--source-id", options[:source_id])
+  change_source_receipt = validate_identity!(change["source_receipt"], "receipt_id", "tw-lifecycle-source-receipt/1", "change_source_receipt_identity")
+  fail!("change_source_mismatch", "change request receipt differs from the exact current source receipt") unless change_source_receipt == current_source_receipt
+  validate_baseline!(change["baseline"])
+  fail!("change_baseline_mismatch", "change request baseline differs from the current registry") unless change.dig("baseline", "generation") == registry_check["generation"] && change.dig("baseline", "digest") == registry_check["registry_digest"]
+  fail!("approval_preimage_mismatch", "approval registry preimage differs", "expected" => approval["registry_digest"], "actual" => registry_check["registry_digest"]) unless approval["registry_digest"] == registry_check["registry_digest"]
+  fail!("approval_preimage_mismatch", "approval source preimage differs", "expected" => approval["source_digest"], "actual" => digest_bytes(authority_bytes)) unless approval["source_digest"] == source["digest"] && approval["source_digest"] == digest_bytes(authority_bytes)
+  fail!("change_source_mismatch", "change request source differs from approval") unless change.dig("source_receipt", "source_id") == source["source_id"] && change.dig("source_receipt", "source_digest") == source["digest"]
+  accepted_ids = change["accepted_candidates"].map { |candidate| candidate.dig("proposed_record", "record_id") }.sort
+  fail!("approval_scope_mismatch", "approval record scope differs from human-confirmed delta", "expected" => accepted_ids, "actual" => approval["allowed_record_ids"]) unless approval["allowed_record_ids"] == accepted_ids
+  fail!("change_generation_invalid", "new generation must differ from current") unless present_string?(approval["new_generation"]) && approval["new_generation"] != registry["generation"] && present_string?(approval["new_baseline_id"])
+
+  record_paths = records_dir.children.select { |path| path.extname == ".json" }.sort
+  fail!("unsafe_path", "record symlinks are prohibited") if record_paths.any?(&:symlink?)
+  existing_records = record_paths.map { |path| load_json(path, "missing_record", "malformed_lifecycle_record") }
+  existing_by_id = existing_records.each_with_object({}) { |record, result| result[record.fetch("record_id")] = record }
+  fail!("duplicate_record_id", "existing record IDs must be unique") unless existing_by_id.length == existing_records.length
+  changed_ids = []
+  change["accepted_candidates"].each do |candidate|
+    candidate_fields = %w[candidate_id operation target_record_id target_record_digest proposed_record source_excerpt duplicate_candidates conflicts downstream_consequences vv_definition human_disposition]
+    fail!("change_candidate_invalid", "accepted candidate contains unsupported fields") unless candidate.is_a?(Hash) && (candidate.keys - candidate_fields).empty? && candidate["human_disposition"].is_a?(Hash) && candidate["human_disposition"].keys.sort == %w[action reason] && %w[accept edit].include?(candidate.dig("human_disposition", "action")) && present_string?(candidate.dig("human_disposition", "reason"))
+    prepared_candidate = candidate.reject { |key, _| key == "human_disposition" }
+    validate_candidate!(prepared_candidate, source, current_source_receipt, authority_bytes)
+    proposed = validate_record!(candidate["proposed_record"], source)
+    id = proposed["record_id"]
+    if candidate["operation"] == "create"
+      fail!("record_id_already_exists", "create candidate record already exists", "record_id" => id) if existing_by_id.key?(id)
+    else
+      target = existing_by_id[candidate["target_record_id"]]
+      fail!("update_target_missing", "update target is missing", "record_id" => candidate["target_record_id"]) unless target
+      fail!("update_target_stale", "update target digest differs", "record_id" => candidate["target_record_id"]) unless digest_value(target) == candidate["target_record_digest"]
+    end
+    accepted = Marshal.load(Marshal.dump(proposed))
+    accepted["authority_class"] = "authoritative"
+    accepted["acceptance_state"] = "accepted"
+    accepted["freshness"] = "current"
+    accepted["acceptance"] = {"decision_id" => approval["decision_id"], "accepted_by" => approval["owner"], "accepted_at" => approval["accepted_at"], "authority_source_id" => source["source_id"]}
+    existing_by_id[id] = accepted
+    changed_ids << id
+  end
+  consequences = change["downstream_consequences"]
+  stale_ids = existing_by_id.values.select do |record|
+    next false unless HISTORICAL_EVIDENCE_TYPES.include?(record["record_type"])
+    consequences.include?(record["record_id"]) || record["relationships"].any? { |relationship| changed_ids.include?(relationship["target_id"]) } || change["accepted_candidates"].any? { |candidate| candidate["proposed_record"]["relationships"].any? { |relationship| relationship["target_id"] == record["record_id"] } }
+  end.map { |record| record["record_id"] }.sort
+  stale_ids.each { |id| existing_by_id.fetch(id)["freshness"] = "stale" }
+
+  target_cores = existing_by_id.values.select { |record| record.dig("source", "source_id") == source["source_id"] || changed_ids.include?(record["record_id"]) }.map { |record| record_core(record) }
+  new_authority = render_authority(authority_bytes.force_encoding(Encoding::UTF_8), target_cores)
+  fail!("authority_encoding", "rendered authority is not UTF-8/LF") unless new_authority.valid_encoding? && !new_authority.include?("\r")
+  new_source_digest = digest_bytes(new_authority)
+  new_registry = Marshal.load(Marshal.dump(registry))
+  new_registry["generation"] = approval["new_generation"]
+  new_registry["sources"].each { |entry| entry["generation"] = approval["new_generation"] }
+  new_source = new_registry["sources"].find { |entry| entry["source_id"] == source["source_id"] }
+  new_source["digest"] = new_source_digest
+  new_source["version"] = approval["new_generation"]
+  new_source["observed_at"] = approval["accepted_at"]
+  new_registry_bytes = canonical_json(new_registry)
+  new_registry_digest = digest_value(new_registry)
+  new_baseline = {"baseline_id" => approval["new_baseline_id"], "generation" => approval["new_generation"], "digest" => new_registry_digest}
+
+  sources_by_id = new_registry["sources"].each_with_object({}) { |entry, result| result[entry["source_id"]] = entry }
+  receipt_by_source = {}
+  existing_by_id.values.each do |record|
+    source_entry = sources_by_id[record.dig("source", "source_id")]
+    fail!("unregistered_record_source", "record source is absent after approved change", "record_id" => record["record_id"]) unless source_entry
+    historical = stale_ids.include?(record["record_id"]) || (record["freshness"] == "stale" && HISTORICAL_EVIDENCE_TYPES.include?(record["record_type"]))
+    record["baseline"] = new_baseline unless historical
+    record["source"]["locator"] = source_entry["normalized_locator"]
+    record["source"]["version"] = source_entry["version"] || source_entry["generation"]
+    record["source"]["digest"] = source_entry["digest"]
+    record["source"]["role"] = source_entry["role"]
+    if %w[imported_candidate external_reference evidence derived].include?(record["authority_class"])
+      receipt_by_source[source_entry["source_id"]] ||= source_receipt(new_registry, new_registry_digest, source_entry)["receipt_id"]
+      record["source"]["receipt_id"] = receipt_by_source[source_entry["source_id"]]
+    else
+      record["source"].delete("receipt_id")
+    end
+  end
+  record_bytes = existing_by_id.keys.sort.to_h { |record_id| [record_id, canonical_json(existing_by_id.fetch(record_id))] }
+  record_digests = existing_by_id.keys.sort.to_h { |record_id| [record_id, digest_value(existing_by_id.fetch(record_id))] }
+  receipt_body = {
+    "schema_version" => APPLICATION_SCHEMA,
+    "status" => "applied",
+    "approval_id" => approval["approval_id"],
+    "change_request_id" => change["change_request_id"],
+    "owner" => approval["owner"],
+    "decision_id" => approval["decision_id"],
+    "previous_registry_digest" => registry_check["registry_digest"],
+    "previous_source_digest" => source["digest"],
+    "new_registry_digest" => new_registry_digest,
+    "new_source_digest" => new_source_digest,
+    "new_generation" => approval["new_generation"],
+    "new_baseline" => new_baseline,
+    "changed_record_ids" => changed_ids.sort,
+    "stale_evidence_ids" => stale_ids,
+    "record_digests" => record_digests,
+    "reverification_required" => !stale_ids.empty?,
+    "reviewer_dispatch_count" => 1,
+    "idempotent" => true,
+    "authority_effect" => "named_human_approved_delta_applied",
+    "next_gate" => "rebuild_graph_then_bounded_work_or_review"
+  }
+  receipt = receipt_body.merge("application_id" => digest_value(receipt_body))
+  receipt_bytes = canonical_json(receipt)
+  validate_staged_generation!(root, new_registry, new_authority, source["source_id"], record_bytes)
+  target_values = [
+    [authority_path, new_authority.b],
+    [registry_path, new_registry_bytes.b]
+  ]
+  record_bytes.each { |record_id, bytes| target_values << [records_dir.join("#{record_id}.json"), bytes.b] }
+  target_values << [output_path, receipt_bytes.b]
+  begin
+    publish_transaction!(root, target_values, options[:inject_kill_phase], inject_failure_after_first: options[:inject_failure])
+  rescue StandardError
+    recover_transaction!(root)
+    raise
+  end
+  puts receipt_bytes
+rescue CaptureError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-capture-finding/1", "status" => "blocked", "finding" => error.finding, "reason" => error.message, "details" => error.details, "authority_effect" => "none")
+  exit 1
+rescue OptionParser::ParseError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-capture-finding/1", "status" => "blocked", "finding" => "usage_error", "reason" => error.message, "details" => {}, "authority_effect" => "none")
+  exit 2
+rescue StandardError => error
+  puts canonical_json("schema_version" => "tw-lifecycle-capture-finding/1", "status" => "blocked", "finding" => "unexpected_capture_error", "reason" => error.message, "details" => {"class" => error.class.name}, "authority_effect" => "none")
+  exit 1
+end

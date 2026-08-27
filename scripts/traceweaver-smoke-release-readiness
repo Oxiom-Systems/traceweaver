@@ -10,6 +10,7 @@ runtime_ready="fixtures/release-readiness/runtime-receipt-ready.json"
 fixture_sha="aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 fixture_scope_digest="sha256:1111111111111111111111111111111111111111111111111111111111111111"
 released_base="e1b2886ea51ceae03249c4ae09ff75308678970a"
+released_v050_head="3a1f3c56b093e61b88e9f6282637878e8ebbf163"
 worktree_head="$(git rev-parse HEAD)"
 temp_dir="$(mktemp -d)"
 repo_temp_dir="fixtures/release-readiness/.memsearch/release-readiness-smoke.$$"
@@ -141,7 +142,10 @@ if [ -f "$candidate_record" ]; then
     abort("candidate exclusions mismatch") unless scope["excluded_paths"].sort == expected
     abort("candidate excluded path entered scope") unless (scope["paths"] & expected).empty?
   ' "$candidate_record"
-  if grep -Eq '\bPENDING(_[A-Z0-9]+)*\b' "$candidate_record"; then
+  if git cat-file -e "$released_v050_head^{commit}" 2>/dev/null &&
+     git merge-base --is-ancestor "$released_v050_head" "$worktree_head"; then
+    candidate_state_gate=pass_released_predecessor
+  elif grep -Eq '\bPENDING(_[A-Z0-9]+)*\b' "$candidate_record"; then
     expect_rejected release_readiness_pending_integrated_candidate \
       ruby "$checker" --receipt "$candidate_record" --version 0.5.0 --root .
     grep -Fq 'receipt contains a PENDING placeholder' "$temp_dir/release_readiness_pending_integrated_candidate.err"
@@ -189,6 +193,8 @@ runtime_negative runtime_bad_scope '.candidate_scope_digest = "sha256:2222222222
 runtime_negative runtime_bad_workflow '.workflow_url = "https://example.invalid/actions/runs/123"' 'runtime receipt workflow_url is invalid'
 runtime_negative runtime_bad_required_ci '.required_ci.state = "pending"' 'runtime receipt required_ci state is not ready'
 
+current_plugin_version="$(jq -r '.version' plugins/traceweaver-core/.claude-plugin/plugin.json)"
+if [ "$current_plugin_version" = "0.5.0" ]; then
 # Exercise the production-only contract in an isolated clone rooted at the
 # fixed released base. No smoke scratch path enters the real repository delta.
 source_root="$PWD"
@@ -318,10 +324,12 @@ reviewed_behavior_digest="$(calculate_paths_digest "${production_behavior_paths[
 reviewed_behavior_path_count="${#production_behavior_paths[@]}"
 
 # Populate the excluded graph-freshness carrier only after the provisional
-# behavior identity is fixed. The smoke does not refresh the real repository
-# graph and this carrier never enters semantic review identity or candidate
-# scope.
-copy_current_path .traceweaver/tw-graph-freshness.json
+# behavior identity is fixed. This fixture represents the exact pre-release
+# candidate, so its receipt comes from the released 0.5.0 commit rather than
+# the current follow-on cycle. Current repository freshness is checked by the
+# mandatory root tw-graph gate before this smoke runs.
+mkdir -p "$production_repo/.traceweaver"
+git -C "$source_root" show "$released_v050_head:.traceweaver/tw-graph-freshness.json" >"$production_repo/.traceweaver/tw-graph-freshness.json"
 
 mkdir -p "$production_repo/docs/validation"
 cat >"$production_repo/docs/validation/traceweaver-2026-08-22-v050-model-governance-code-review.md" <<EOF
@@ -929,13 +937,17 @@ cp "$graph_fixture" "$temp_dir/production-graph-good.json"
 ruby -rjson -e '
   path = ARGV.fetch(0)
   data = JSON.parse(File.read(path))
-  data["cycle_id"] = "TW-AUTHORITY-GATE-WRONG"
+  data["cycle_id"] = "OTHER-CYCLE-1"
   File.write(path, JSON.pretty_generate(data) + "\n")
 ' "$graph_fixture"
 expect_rejected production_bad_graph_cycle check_production_pass
 grep -Fq 'graph freshness cycle_id is invalid' "$temp_dir/production_bad_graph_cycle.err"
 cp "$temp_dir/production-graph-good.json" "$graph_fixture"
 check_production_pass >/dev/null
+else
+  candidate_state_pending=0
+  candidate_state_gate="historical_v2_production_fixture_skipped_for_${current_plugin_version}"
+fi
 
 ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/ready.json >"$temp_dir/ready.json"
 ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/pending.json >"$temp_dir/pending.json"

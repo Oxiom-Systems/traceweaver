@@ -1,0 +1,42 @@
+schema_version: tw-review-route/1
+review_id: TW-DOC-REVIEW-2026-08-26-V060-ACYCLIC-ORACLE-AUTHORITY-001
+mode: authority_baseline
+scope:
+  change_id: CHG-TW-2026-08-26-003
+  exception_id: EXC-TW-020
+  finding: P1-005-continuation
+  documents:
+    - requirements.md
+    - traceability-matrix.md
+    - .traceweaver/intent-contract.yml
+    - .traceweaver/workflow-profile.yml
+    - .traceweaver/changes/CHG-TW-2026-08-26-003-acyclic-oracle.yml
+    - .traceweaver/exceptions/EXC-TW-020-acyclic-oracle.yml
+    - docs/plans/2026-08-24-traceweaver-0.6.0-product-lifecycle-assurance-plan.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-definition.md
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-vv-capsule.json
+    - docs/validation/traceweaver-2026-08-24-v060-product-lifecycle-validation-plan.md
+    - docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-owner-approval.md
+    - docs/validation/traceweaver-2026-08-26-v060-oracle-source-cycle-requirements-review.md
+    - docs/validation/traceweaver-2026-08-26-v060-acyclic-oracle-red-evidence.md
+identity_method:
+  semantic_authority: sha256_of_canonical_sorted_json_requirements_profile_change_exception_finding_scope
+  behavior: sha256_of_canonical_sorted_json_path_to_sha256_for_the_three_unchanged_scripts
+  verification: raw_sha256_of_the_applicable_red_evidence
+  bookkeeping: sha256_of_canonical_sorted_json_path_to_sha256_for_current_snapshot_plan_and_capsule
+accepted:
+  semantic_authority_digest: sha256:76d2f4596a8117015775661acf58169a40f6b4bac7f9005691b6c9f04238aba9
+  behavior_digest: sha256:43d404e7ae8d81d4141ab274381d0c51c44152a950ab8ef40317b81beede5467
+  verification_digest: sha256:24f82adf6165f4fbc251184b3f02e2e066a2c50261f70bf7ec922638c21cc322
+  bookkeeping_digest: sha256:e6d31a58aa2b2979ec11dc9354bc497496bfc38534602b7a28ab031283226dc6
+  session_id: preapproval_revision_3_terminal_authority
+candidate:
+  semantic_authority_digest: sha256:fe61a0ac43acf4fda2ebf05d93bd664f2781bc8868a4b944bd9d922c1250e8da
+  behavior_digest: sha256:43d404e7ae8d81d4141ab274381d0c51c44152a950ab8ef40317b81beede5467
+  verification_digest: sha256:9628e6a8b11dc342bc3b95e75528793ff84f9975b85c4438aec006da2b1b62b6
+  bookkeeping_digest: sha256:a3abda203ab5f6f46397108a4106da712a40fc00060716b1640c9b37f50daa00
+  session_id: revision_4_acyclic_oracle_authority_2026_08_26
+constraints:
+  reviewer_dispatch: prohibited_by_exact_EXC_TW_020_no_new_reviewer_identity_and_existing_Terra_continuation_reserved_for_post_product_verification
+  review_execution: scoped_main_thread_document_review
+  publication_authority: none

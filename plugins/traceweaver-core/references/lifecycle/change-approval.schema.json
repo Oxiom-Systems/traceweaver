@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "tw-lifecycle-change-approval/1",
+  "title": "TraceWeaver exact-preimage lifecycle change approval",
+  "description": "Named human approval binding one prepared change request to exact current registry/source bytes and one new generation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version", "approval_id", "change_request_id", "registry_digest",
+    "source_id", "source_digest", "new_generation", "new_baseline_id",
+    "allowed_record_ids", "owner", "decision_id", "accepted_at",
+    "authority_effect"
+  ],
+  "properties": {
+    "schema_version": {"const": "tw-lifecycle-change-approval/1"},
+    "approval_id": {"$ref": "#/$defs/digest"},
+    "change_request_id": {"$ref": "#/$defs/digest"},
+    "registry_digest": {"$ref": "#/$defs/digest"},
+    "source_id": {"type": "string", "minLength": 1},
+    "source_digest": {"$ref": "#/$defs/digest"},
+    "new_generation": {"type": "string", "minLength": 1},
+    "new_baseline_id": {"type": "string", "minLength": 1},
+    "allowed_record_ids": {"type": "array", "items": {"type": "string"}, "minItems": 1, "uniqueItems": true},
+    "owner": {"type": "string", "minLength": 1},
+    "decision_id": {"type": "string", "minLength": 1},
+    "accepted_at": {"type": "string", "format": "date-time"},
+    "authority_effect": {"const": "named_human_approved_delta_only"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"}
+  }
+}

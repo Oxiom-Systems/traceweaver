@@ -41,6 +41,8 @@ Before returning an authority decision, load and cite:
 - `traceability-matrix.md`
 - `.traceweaver/intent-contract.yml`
 - the planned task, plan, changed-file scope, or requested behavior
+- `<skills-root>/tw-auto/references/bounded-convergence-window-guide.md` when
+  the decision covers bounded repair/verification attempts
 - skill-local `references/baseline-configuration-control-guide.md` when judging
   baseline identity, change control, or authority custody
 - the claimed requirement IDs, trace IDs, verification target, validation
@@ -62,7 +64,12 @@ claims, and baseline/configuration-control judgment.
    `requirements-reviewer` to check approval readiness.
 4. Use `systems-engineering-traceability` to check whether the behavior traces
    to approved authority and planned verification/validation evidence.
-5. Return `Proceed`, `Reduce scope`, `Revise`, `Human decision`, or `Blocked`.
+5. For an eligible repair/verification sequence, return one bounded-window
+   decision with frozen authority, candidate scope, allowed repairs, static
+   source-closure preflight, verification/pass condition, attempt budget, stop
+   conditions, evidence closure, and separate holds. Do not require a new
+   authority decision after each anticipated in-scope failure.
+6. Return `Proceed`, `Reduce scope`, `Revise`, `Human decision`, or `Blocked`.
 
 ## Highest-Level Handoff Discipline
 
@@ -91,3 +98,7 @@ Return:
 
 Meaningful behavior must not proceed from task ID, agent interpretation, draft
 requirement, inferred requirement, or bare risk ID alone.
+
+A gate may inspect a candidate, but it must never mutate the candidate it
+gates. A semantic scope or authority change ends a bounded window; an ordinary
+in-scope verification failure does not.

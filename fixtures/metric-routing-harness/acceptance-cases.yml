@@ -1,0 +1,92 @@
+schema_version: tw-metric-routing-acceptance-cases/1
+acceptance_test_id: ATP-TW-050
+inventory_status: frozen_prebuilder_contract
+frozen_case_count: 71
+offline_only: true
+network_forbidden: true
+provider_calls_forbidden: true
+credential_free: true
+commands:
+  full: scripts/traceweaver-smoke-metric-routing-harness
+  single_case: scripts/traceweaver-smoke-metric-routing-harness --case ID
+required_groups:
+  - { name: production_metric_routing_reference, kind: production, files: [plugins/traceweaver-core/references/metric-routing-harness.yml, plugins/traceweaver-core/skills/tw-auto/references/metric-routing-harness.yml] }
+  - { name: production_metric_routing_evaluator, kind: production, files: [plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-evaluate-metric-routing] }
+  - { name: production_metric_routing_validator, kind: production, files: [plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-validate-metric-routing-evidence] }
+  - { name: fixture_policy_and_corpus, kind: fixture, files: [fixtures/metric-routing-harness/policy-valid.yml, fixtures/metric-routing-harness/corpus-valid.json, fixtures/metric-routing-harness/matched-pairs-valid.json] }
+  - { name: fixture_trust_and_attestation, kind: fixture, files: [fixtures/metric-routing-harness/collector-trust.yml, fixtures/metric-routing-harness/observation-valid.json, fixtures/metric-routing-harness/attestation-valid.json] }
+  - { name: fixture_quality, kind: fixture, files: [fixtures/metric-routing-harness/quality-scores-valid.json, fixtures/metric-routing-harness/quality-floor-fail.json, fixtures/metric-routing-harness/quality-agreement-fail.json, fixtures/metric-routing-harness/quality-non-inferiority-fail.json] }
+  - { name: fixture_accounting_and_sufficiency, kind: fixture, files: [fixtures/metric-routing-harness/accounting-valid.json, fixtures/metric-routing-harness/accounting-cached-input.json, fixtures/metric-routing-harness/accounting-underpowered.json, fixtures/metric-routing-harness/positive-sufficiency-valid.json, fixtures/metric-routing-harness/negative-safe-hold.json, fixtures/metric-routing-harness/overflow-prohibited.json] }
+  - { name: fixture_qualification_and_templates, kind: fixture, files: [fixtures/metric-routing-harness/qualification-valid.json, fixtures/metric-routing-harness/qualification-missing-validation.json, fixtures/metric-routing-harness/qualification-identity-drift.json, fixtures/metric-routing-harness/claim-hold-boundary.json, fixtures/metric-routing-harness/result-tw-050-template.json, fixtures/metric-routing-harness/ver-tw-093-template.yml, fixtures/metric-routing-harness/val-tw-041-template.yml] }
+cases:
+  - { id: MR124_VALID_TRUSTED_ATTESTATION, req: REQ-TW-124, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/collector-trust.yml, fixtures/metric-routing-harness/observation-valid.json, fixtures/metric-routing-harness/attestation-valid.json] }
+  - { id: MR124_SIGNATURE_TAMPERED, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_signature_invalid, future_fixture_locators: [fixtures/metric-routing-harness/attestation-tampered.json] }
+  - { id: MR124_UNSIGNED, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_signature_missing, future_fixture_locators: [fixtures/metric-routing-harness/attestation-unsigned.json] }
+  - { id: MR124_ESTIMATED_VALUE, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_estimated, future_fixture_locators: [fixtures/metric-routing-harness/attestation-estimated.json] }
+  - { id: MR124_INCOMPLETE_EXECUTION_BINDING, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_incomplete, future_fixture_locators: [fixtures/metric-routing-harness/attestation-incomplete.json] }
+  - { id: MR124_CANONICAL_DUPLICATE, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_noncanonical, future_fixture_locators: [fixtures/metric-routing-harness/attestation-duplicate-key.json] }
+  - { id: MR124_KEY_SUBSTITUTION, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_trust_or_suite_mismatch, future_fixture_locators: [fixtures/metric-routing-harness/key-substitution.json] }
+  - { id: MR124_TRUST_DIGEST_DRIFT, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_trust_or_suite_mismatch, future_fixture_locators: [fixtures/metric-routing-harness/trust-digest-drift.json] }
+  - { id: MR124_TRUST_ROOT_ROTATION, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_trust_or_suite_mismatch, future_fixture_locators: [fixtures/metric-routing-harness/trust-root-rotation.json] }
+  - { id: MR124_SIGNATURE_SUITE_DRIFT, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_trust_or_suite_mismatch, future_fixture_locators: [fixtures/metric-routing-harness/signature-suite-drift.json] }
+  - { id: MR124_SELF_ATTESTING_COLLECTOR, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_self_attested, future_fixture_locators: [fixtures/metric-routing-harness/attestation-self-attested.json] }
+  - { id: MR124_REPLAY, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_replayed, future_fixture_locators: [fixtures/metric-routing-harness/attestation-replay.jsonl] }
+  - { id: MR124_CROSS_CELL_REUSE, req: REQ-TW-124, status: frozen, expected_outcome: held_attestation_cross_cell, future_fixture_locators: [fixtures/metric-routing-harness/attestation-cross-cell.json] }
+  - { id: MR124_CONTENT_BEARING, req: REQ-TW-124, status: frozen, expected_outcome: held_privacy_content_forbidden, future_fixture_locators: [fixtures/metric-routing-harness/observation-content-leak.json] }
+  - { id: MR124_LOCATOR_ABSOLUTE, req: REQ-TW-124, status: frozen, expected_outcome: held_locator_unsafe, future_fixture_locators: [fixtures/metric-routing-harness/locator-absolute.json] }
+  - { id: MR124_LOCATOR_TRAVERSAL, req: REQ-TW-124, status: frozen, expected_outcome: held_locator_unsafe, future_fixture_locators: [fixtures/metric-routing-harness/locator-traversal.json] }
+  - { id: MR124_LOCATOR_SYMLINK, req: REQ-TW-124, status: frozen, expected_outcome: held_locator_unsafe, future_fixture_locators: [fixtures/metric-routing-harness/locator-symlink.json] }
+  - { id: MR124_LOCATOR_OVERSIZED, req: REQ-TW-124, status: frozen, expected_outcome: held_locator_unsafe, future_fixture_locators: [fixtures/metric-routing-harness/locator-oversized.json] }
+  - { id: MR125_FROZEN_POLICY_AND_EXACT_PAIR, req: REQ-TW-125, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/policy-valid.yml, fixtures/metric-routing-harness/corpus-valid.json, fixtures/metric-routing-harness/matched-pairs-valid.json] }
+  - { id: MR125_PILOT_NONQUALIFYING, req: REQ-TW-125, status: frozen, expected_outcome: held_pilot_or_underpowered, future_fixture_locators: [fixtures/metric-routing-harness/matched-pairs-pilot.json] }
+  - { id: MR125_POLICY_DRIFT, req: REQ-TW-125, status: frozen, expected_outcome: held_policy_identity_mismatch, future_fixture_locators: [fixtures/metric-routing-harness/policy-drift.yml] }
+  - { id: MR125_CORPUS_DRIFT, req: REQ-TW-125, status: frozen, expected_outcome: held_corpus_identity_mismatch, future_fixture_locators: [fixtures/metric-routing-harness/corpus-drift.json] }
+  - { id: MR125_METHOD_POWER_BOUNDARY, req: REQ-TW-125, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/power-boundary.json] }
+  - { id: MR125_ADAPTIVE_STOPPING, req: REQ-TW-125, status: frozen, expected_outcome: held_adaptive_stopping, future_fixture_locators: [fixtures/metric-routing-harness/adaptive-stopping.json] }
+  - { id: MR125_POST_RESULT_EXCLUSION, req: REQ-TW-125, status: frozen, expected_outcome: held_post_result_exclusion, future_fixture_locators: [fixtures/metric-routing-harness/post-result-exclusion.json] }
+  - { id: MR125_REPLACEMENT_OVER_CAP, req: REQ-TW-125, status: frozen, expected_outcome: held_replacement_over_cap, future_fixture_locators: [fixtures/metric-routing-harness/replacement-over-cap.json] }
+  - { id: MR125_DUPLICATE_PAIR, req: REQ-TW-125, status: frozen, expected_outcome: held_duplicate_pair, future_fixture_locators: [fixtures/metric-routing-harness/duplicate-pair.json] }
+  - { id: MR125_CHANGED_AXIS, req: REQ-TW-125, status: frozen, expected_outcome: held_changed_axis, future_fixture_locators: [fixtures/metric-routing-harness/changed-axis.json] }
+  - { id: MR126_QUALITY_CONJUNCTION, req: REQ-TW-126, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/quality-scores-valid.json] }
+  - { id: MR126_HARD_INVARIANT, req: REQ-TW-126, status: frozen, expected_outcome: held_quality_hard_invariant, future_fixture_locators: [fixtures/metric-routing-harness/quality-hard-invariant-fail.json] }
+  - { id: MR126_SCORE_FLOOR, req: REQ-TW-126, status: frozen, expected_outcome: held_quality_floor, future_fixture_locators: [fixtures/metric-routing-harness/quality-floor-fail.json] }
+  - { id: MR126_MISSING_RATING, req: REQ-TW-126, status: frozen, expected_outcome: held_quality_missing_rating, future_fixture_locators: [fixtures/metric-routing-harness/quality-missing-rating.json] }
+  - { id: MR126_UNBLINDED_RATER, req: REQ-TW-126, status: frozen, expected_outcome: held_quality_unblinded, future_fixture_locators: [fixtures/metric-routing-harness/quality-unblinded.json] }
+  - { id: MR126_NONINDEPENDENT_RATER, req: REQ-TW-126, status: frozen, expected_outcome: held_quality_nonindependent, future_fixture_locators: [fixtures/metric-routing-harness/quality-nonindependent.json] }
+  - { id: MR126_KAPPA_BELOW, req: REQ-TW-126, status: frozen, expected_outcome: held_quality_kappa_below_threshold, future_fixture_locators: [fixtures/metric-routing-harness/quality-agreement-fail.json] }
+  - { id: MR126_KAPPA_EQUAL, req: REQ-TW-126, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/quality-kappa-equal.json] }
+  - { id: MR126_KAPPA_ZERO_VARIANCE, req: REQ-TW-126, status: frozen, expected_outcome: held_quality_kappa_undefined, future_fixture_locators: [fixtures/metric-routing-harness/quality-kappa-zero-variance.json] }
+  - { id: MR126_NONINFERIORITY_BELOW, req: REQ-TW-126, status: frozen, expected_outcome: held_quality_noninferiority_below_threshold, future_fixture_locators: [fixtures/metric-routing-harness/quality-non-inferiority-fail.json] }
+  - { id: MR126_NONINFERIORITY_EQUAL, req: REQ-TW-126, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/quality-non-inferiority-equal.json] }
+  - { id: MR126_NO_EFFICIENCY_COMPENSATION, req: REQ-TW-126, status: frozen, expected_outcome: held_quality_conjunctive_failure, future_fixture_locators: [fixtures/metric-routing-harness/quality-with-efficiency.json] }
+  - { id: MR127_VALID_ACCOUNTING_INTERVAL, req: REQ-TW-127, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/accounting-valid.json] }
+  - { id: MR127_CACHED_INPUT_RETRY_SHARD_ACCOUNTING, req: REQ-TW-127, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/accounting-cached-input.json] }
+  - { id: MR127_INVALID_PAIR_ISOLATION, req: REQ-TW-127, status: frozen, expected_outcome: held_accounting_invalid_pair, future_fixture_locators: [fixtures/metric-routing-harness/accounting-invalid.json] }
+  - { id: MR127_PARTIAL_PAIR_ISOLATION, req: REQ-TW-127, status: frozen, expected_outcome: held_accounting_partial_pair, future_fixture_locators: [fixtures/metric-routing-harness/accounting-partial.json] }
+  - { id: MR127_UNDERPOWERED, req: REQ-TW-127, status: frozen, expected_outcome: held_accounting_underpowered, future_fixture_locators: [fixtures/metric-routing-harness/accounting-underpowered.json] }
+  - { id: MR127_TOKEN_BOUNDARY_BELOW, req: REQ-TW-127, status: frozen, expected_outcome: held_token_reduction_below_threshold, future_fixture_locators: [fixtures/metric-routing-harness/accounting-token-below.json] }
+  - { id: MR127_TOKEN_BOUNDARY_EQUAL, req: REQ-TW-127, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/accounting-token-equal.json] }
+  - { id: MR127_TOKEN_BOUNDARY_ABOVE, req: REQ-TW-127, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/accounting-token-above.json] }
+  - { id: MR127_LATENCY_BOUNDARY_BELOW, req: REQ-TW-127, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/accounting-latency-below.json] }
+  - { id: MR127_LATENCY_BOUNDARY_EQUAL, req: REQ-TW-127, status: frozen, expected_outcome: fixture_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/accounting-latency-equal.json] }
+  - { id: MR127_LATENCY_BOUNDARY_ABOVE, req: REQ-TW-127, status: frozen, expected_outcome: held_latency_ratio_above_threshold, future_fixture_locators: [fixtures/metric-routing-harness/accounting-latency-above.json] }
+  - { id: MR128_POSITIVE_SUFFICIENCY_FIXTURE_ONLY, req: REQ-TW-128, status: frozen, expected_outcome: fixture_only_sufficiency_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/positive-sufficiency-valid.json] }
+  - { id: MR128_NEGATIVE_DOES_NOT_SUFFICE, req: REQ-TW-128, status: frozen, expected_outcome: held_negative_control_not_sufficient, future_fixture_locators: [fixtures/metric-routing-harness/negative-safe-hold.json] }
+  - { id: MR128_PROHIBITED_OVERFLOW, req: REQ-TW-128, status: frozen, expected_outcome: held_positive_sufficiency_overflow, future_fixture_locators: [fixtures/metric-routing-harness/overflow-prohibited.json] }
+  - { id: MR128_PROHIBITED_TRUNCATION, req: REQ-TW-128, status: frozen, expected_outcome: held_positive_sufficiency_truncation, future_fixture_locators: [fixtures/metric-routing-harness/truncation-prohibited.json] }
+  - { id: MR128_PROHIBITED_DELETION, req: REQ-TW-128, status: frozen, expected_outcome: held_positive_sufficiency_deletion, future_fixture_locators: [fixtures/metric-routing-harness/deletion-prohibited.json] }
+  - { id: MR128_PROHIBITED_DOWNGRADE, req: REQ-TW-128, status: frozen, expected_outcome: held_positive_sufficiency_downgrade, future_fixture_locators: [fixtures/metric-routing-harness/downgrade-prohibited.json] }
+  - { id: MR128_PROHIBITED_LOSSY_COMPACTION, req: REQ-TW-128, status: frozen, expected_outcome: held_positive_sufficiency_lossy, future_fixture_locators: [fixtures/metric-routing-harness/lossy-compaction-prohibited.json] }
+  - { id: MR128_UNBOUNDED_RETRY, req: REQ-TW-128, status: frozen, expected_outcome: held_positive_sufficiency_retry, future_fixture_locators: [fixtures/metric-routing-harness/unbounded-retry.json] }
+  - { id: MR128_HIDDEN_PROMOTION, req: REQ-TW-128, status: frozen, expected_outcome: held_positive_sufficiency_hidden_promotion, future_fixture_locators: [fixtures/metric-routing-harness/hidden-promotion.json] }
+  - { id: MR129_EXACT_CELL_FIXTURE_PREDICATE, req: REQ-TW-129, status: frozen, expected_outcome: fixture_qualification_predicate_passed, future_fixture_locators: [fixtures/metric-routing-harness/qualification-valid.json] }
+  - { id: MR129_MISSING_VALIDATION, req: REQ-TW-129, status: frozen, expected_outcome: held_exact_cell_validation_missing, future_fixture_locators: [fixtures/metric-routing-harness/qualification-missing-validation.json] }
+  - { id: MR129_EXPIRY_RESET, req: REQ-TW-129, status: frozen, expected_outcome: structurally_eligible_reset, future_fixture_locators: [fixtures/metric-routing-harness/qualification-expired.json] }
+  - { id: MR129_EXACT_CELL_RESET, req: REQ-TW-129, status: frozen, expected_outcome: structurally_eligible_reset, future_fixture_locators: [fixtures/metric-routing-harness/qualification-identity-drift.json] }
+  - { id: MR129_CAPABILITY_DRIFT, req: REQ-TW-129, status: frozen, expected_outcome: structurally_eligible_reset, future_fixture_locators: [fixtures/metric-routing-harness/capability-drift.json] }
+  - { id: MR129_TOKENIZER_DRIFT, req: REQ-TW-129, status: frozen, expected_outcome: structurally_eligible_reset, future_fixture_locators: [fixtures/metric-routing-harness/tokenizer-drift.json] }
+  - { id: MR129_PROFILE_DRIFT, req: REQ-TW-129, status: frozen, expected_outcome: structurally_eligible_reset, future_fixture_locators: [fixtures/metric-routing-harness/profile-drift.json] }
+  - { id: MR129_ORACLE_DRIFT, req: REQ-TW-129, status: frozen, expected_outcome: structurally_eligible_reset, future_fixture_locators: [fixtures/metric-routing-harness/oracle-drift.json] }
+  - { id: MR129_ALIAS_INHERITANCE_NONTRANSFERABLE, req: REQ-TW-129, status: frozen, expected_outcome: held_exact_cell_evidence_nontransferable, future_fixture_locators: [fixtures/metric-routing-harness/qualification-alias-inheritance.json] }
+  - { id: MR129_CROSS_CELL_NONTRANSFERABLE, req: REQ-TW-129, status: frozen, expected_outcome: held_exact_cell_evidence_nontransferable, future_fixture_locators: [fixtures/metric-routing-harness/qualification-cross-cell.json] }
+  - { id: MR129_HELD_CLAIM_BOUNDARY, req: REQ-TW-129, status: frozen, expected_outcome: held_claim_boundary_preserved, future_fixture_locators: [fixtures/metric-routing-harness/claim-hold-boundary.json] }

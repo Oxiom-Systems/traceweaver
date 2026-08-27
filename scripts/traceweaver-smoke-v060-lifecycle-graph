@@ -1,0 +1,227 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+# TRACEWEAVER: file-role=v060-lifecycle-graph-smoke; req=REQ-TW-139,REQ-TW-140,REQ-TW-142; trace=TRACE-TW-074; ver=VER-TW-094
+# TRACEWEAVER: verifies=VER-TW-094; req=REQ-TW-139,REQ-TW-140,REQ-TW-142; trace=TRACE-TW-074
+
+require "digest"
+require "fileutils"
+require "json"
+require "open3"
+require "pathname"
+require "tmpdir"
+
+ROOT = Pathname.new(__dir__).parent.realpath
+GRAPH = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-graph")
+INTEGRITY = ROOT.join("plugins/traceweaver-core/skills/tw-lifecycle/scripts/traceweaver-lifecycle-integrity")
+SCHEMA = ROOT.join("plugins/traceweaver-core/references/lifecycle/lifecycle-graph.schema.json")
+
+def fail!(message)
+  warn "v060_lifecycle_graph_smoke=failed reason=#{message}"
+  exit 1
+end
+
+def canonical(value)
+  case value
+  when Hash
+    value.keys.sort.each_with_object({}) { |key, result| result[key] = canonical(value.fetch(key)) }
+  when Array
+    value.map { |entry| canonical(entry) }
+  else
+    value
+  end
+end
+
+def write_json(path, value)
+  File.write(path, "#{JSON.generate(canonical(value))}\n")
+end
+
+def digest_file(path)
+  "sha256:#{Digest::SHA256.file(path).hexdigest}"
+end
+
+def run_tool(*arguments)
+  Open3.capture3(GRAPH.to_s, *arguments)
+end
+
+def require_pass(*arguments)
+  stdout, stderr, status = run_tool(*arguments)
+  fail!("expected_pass args=#{arguments.join(" ")} stdout=#{stdout.inspect} stderr=#{stderr.inspect}") unless status.success?
+  [stdout, JSON.parse(stdout)]
+rescue JSON::ParserError => error
+  fail!("success_output_not_json error=#{error.message}")
+end
+
+def require_blocked(expected_finding, *arguments)
+  stdout, stderr, status = run_tool(*arguments)
+  fail!("expected_blocked finding=#{expected_finding}") if status.success?
+  combined = "#{stdout}\n#{stderr}"
+  fail!("missing_finding expected=#{expected_finding} actual=#{combined.inspect}") unless combined.include?(expected_finding)
+end
+
+def record(id:, type:, source:, baseline:, title: nil, authority_class: "authoritative", acceptance_state: "prepared", relationships: [], receipt_id: nil, freshness: "current")
+  source_envelope = {
+    "source_id" => source.fetch("source_id"),
+    "locator" => source.fetch("normalized_locator"),
+    "version" => source["version"] || source.fetch("generation"),
+    "digest" => source.fetch("digest"),
+    "role" => source.fetch("role"),
+    "provenance" => "exact registered source bytes"
+  }
+  source_envelope["receipt_id"] = receipt_id if receipt_id
+  {
+    "schema_version" => "tw-lifecycle-record/1",
+    "record_id" => id,
+    "record_type" => type,
+    "title" => title || id.split("-").join(" ").downcase,
+    "owner" => "Lifecycle Owner",
+    "authority_class" => authority_class,
+    "source" => source_envelope,
+    "applicability" => "applicable",
+    "baseline" => baseline,
+    "freshness" => freshness,
+    "acceptance_state" => acceptance_state,
+    "relationships" => relationships,
+    "fields" => {"summary" => "deterministic lifecycle fixture for #{id}"}
+  }
+end
+
+fail!("missing_graph_executable") unless GRAPH.file? && GRAPH.executable?
+fail!("missing_integrity_executable") unless INTEGRITY.file? && INTEGRITY.executable?
+fail!("missing_graph_schema") unless SCHEMA.file?
+schema = JSON.parse(SCHEMA.read)
+fail!("graph_schema_id") unless schema["$id"] == "tw-lifecycle-graph/1"
+fail!("graph_schema_draft") unless schema["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+
+Dir.mktmpdir("traceweaver-v060-lifecycle-graph-") do |directory|
+  root = Pathname.new(directory)
+  records_dir = root.join("records")
+  records_dir.mkdir
+  source_path = root.join("authority.md")
+  source_path.write("# Lifecycle authority\n\nStable fixture source.\n")
+  source = {
+    "source_id" => "SRC-LIFECYCLE-AUTHORITY-001",
+    "role" => "authority_baseline",
+    "locator" => "authority.md",
+    "normalized_locator" => "authority.md",
+    "source_type" => "markdown",
+    "schema_version" => "tw-lifecycle-markdown/1",
+    "digest" => digest_file(source_path),
+    "owner" => "Lifecycle Owner",
+    "authority_class" => "authoritative",
+    "owned_field_families" => ["lifecycle_records"],
+    "generation" => "LC-GEN-001",
+    "observed_at" => "2026-08-24T00:00:00Z",
+    "version" => "v1",
+    "mutable" => false,
+    "normalization" => {"encoding" => "UTF-8", "line_endings" => "LF", "case" => "exact", "legacy_locators" => []}
+  }
+  registry = {
+    "schema_version" => "tw-lifecycle-source-registry/1",
+    "registry_id" => "LC-REGISTRY-001",
+    "generation" => "LC-GEN-001",
+    "owner" => "Lifecycle Owner",
+    "sources" => [source]
+  }
+  registry_path = root.join("source-registry.json")
+  write_json(registry_path, registry)
+  baseline = {"baseline_id" => "BASELINE-LIFECYCLE-001", "generation" => "LC-GEN-001", "digest" => "sha256:#{"b" * 64}"}
+
+  records = [
+    record(id: "INTENT-LC-001", type: "intent", source: source, baseline: baseline, title: "Assure product intent"),
+    record(id: "NEED-LC-001", type: "need", source: source, baseline: baseline, title: "Recover the accepted lifecycle", relationships: [
+      {"source_id" => "NEED-LC-001", "target_id" => "INTENT-LC-001", "relationship_type" => "derived_from", "applicable" => true, "provenance" => "authority.md#need"}
+    ]),
+    record(id: "REQ-#{''}LC-001", type: "requirement", source: source, baseline: baseline, title: "Deterministic lifecycle evidence", relationships: [
+      {"source_id" => "REQ-#{''}LC-001", "target_id" => "NEED-LC-001", "relationship_type" => "refines", "applicable" => true, "provenance" => "authority.md#requirement"}
+    ]),
+    record(id: "ART-LC-001", type: "product_artifact", source: source, baseline: baseline, title: "Lifecycle evidence artifact", relationships: [
+      {"source_id" => "ART-LC-001", "target_id" => "REQ-#{''}LC-001", "relationship_type" => "satisfies", "applicable" => true, "provenance" => "authority.md#artifact"}
+    ]),
+    record(id: "VER-#{''}LC-001", type: "verification_result", source: source, baseline: baseline, title: "Lifecycle graph verification", freshness: "stale", relationships: [
+      {"source_id" => "VER-#{''}LC-001", "target_id" => "ART-LC-001", "relationship_type" => "verified_by", "applicable" => true, "provenance" => "authority.md#verification"}
+    ]),
+    record(id: "VAL-LC-001", type: "validation_result", source: source, baseline: baseline, title: "Lifecycle graph validation", freshness: "stale", relationships: [
+      {"source_id" => "VAL-LC-001", "target_id" => "REQ-#{''}LC-001", "relationship_type" => "validated_by", "applicable" => true, "provenance" => "authority.md#validation"}
+    ]),
+    record(id: "EVIDENCE-LC-001", type: "evidence", source: source, baseline: {"baseline_id" => "BASELINE-LIFECYCLE-HISTORICAL-001", "generation" => "LC-GEN-HISTORICAL-001", "digest" => "sha256:#{"d" * 64}"}, title: "Invalidated lifecycle evidence", freshness: "stale", relationships: [
+      {"source_id" => "EVIDENCE-LC-001", "target_id" => "VER-#{''}LC-001", "relationship_type" => "evidences", "applicable" => true, "provenance" => "authority.md#evidence"},
+      {"source_id" => "EVIDENCE-LC-001", "target_id" => "REQ-#{''}LC-001", "relationship_type" => "invalidates", "applicable" => true, "provenance" => "authority.md#staleness"}
+    ]),
+    record(id: "REQ-#{''}LC-002", type: "requirement", source: source, baseline: baseline, title: "Deterministic lifecycle evidence trail", relationships: [
+      {"source_id" => "REQ-#{''}LC-002", "target_id" => "NEED-LC-001", "relationship_type" => "refines", "applicable" => true, "provenance" => "authority.md#requirement-2"},
+      {"source_id" => "REQ-#{''}LC-002", "target_id" => "REQ-#{''}LC-001", "relationship_type" => "duplicates_candidate", "applicable" => true, "provenance" => "shared deterministic lifecycle evidence terms"}
+    ])
+  ]
+  records.each { |entry| write_json(records_dir.join("#{entry.fetch("record_id")}.json"), entry) }
+
+  graph_a = root.join("graph-a.json")
+  graph_b = root.join("graph-b.json")
+  build_a_bytes, build_a = require_pass("build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--output", graph_a.to_s)
+  build_b_bytes, build_b = require_pass("build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--output", graph_b.to_s)
+  fail!("graph_build_non_deterministic") unless graph_a.binread == graph_b.binread && build_a_bytes == build_b_bytes && build_a == build_b
+  fail!("graph_build_status") unless build_a["status"] == "pass" && build_a["record_count"] == records.length && build_a["authority_effect"] == "none"
+  graph_payload = JSON.parse(graph_a.read)
+  historical_node = graph_payload.fetch("nodes").find { |node| node["record_id"] == "EVIDENCE-LC-001" }
+  fail!("historical_evidence_baseline_lost") unless historical_node.dig("baseline", "baseline_id") == "BASELINE-LIFECYCLE-HISTORICAL-001" && graph_payload.dig("baseline", "baseline_id") == "BASELINE-LIFECYCLE-001"
+
+  _, check = require_pass("check", "--root", root.to_s, "--registry", registry_path.to_s, "--records", records_dir.to_s, "--graph", graph_a.to_s)
+  fail!("graph_check_status") unless check["status"] == "pass" && check["freshness"] == "current"
+
+  _, exact = require_pass("search", "--graph", graph_a.to_s, "--query", "REQ-#{''}LC-001")
+  fail!("exact_id_not_first") unless exact.fetch("results").first.fetch("record_id") == "REQ-#{''}LC-001" && exact.fetch("results").first.fetch("match") == "exact_id"
+  _, fuzzy = require_pass("search", "--graph", graph_a.to_s, "--query", "lifecycle evidence")
+  fail!("fuzzy_search_empty") if fuzzy.fetch("results").empty?
+  _, related = require_pass("related", "--graph", graph_a.to_s, "--id", "REQ-#{''}LC-001")
+  fail!("related_missing") unless related.fetch("incoming").any? { |entry| entry["record_id"] == "ART-LC-001" }
+  _, path = require_pass("path", "--graph", graph_a.to_s, "--from", "EVIDENCE-LC-001", "--to", "INTENT-LC-001")
+  fail!("path_missing") unless path.fetch("found") && path.fetch("record_ids").first == "EVIDENCE-LC-001" && path.fetch("record_ids").last == "INTENT-LC-001"
+  _, impact = require_pass("impact", "--graph", graph_a.to_s, "--id", "REQ-#{''}LC-001")
+  invalidated_by_type = impact.fetch("invalidated_evidence").to_h { |entry| [entry.fetch("record_type"), entry.fetch("record_id")] }
+  fail!("invalidated_evidence_path_missing") unless invalidated_by_type["evidence"] == "EVIDENCE-LC-001"
+  fail!("invalidated_verification_result_path_missing") unless invalidated_by_type["verification_result"] == "VER-#{''}LC-001"
+  fail!("invalidated_validation_result_path_missing") unless invalidated_by_type["validation_result"] == "VAL-LC-001"
+  fail!("historical_result_reverification_missing") unless impact["reverification_required"] == true
+  _, duplicates = require_pass("duplicate-candidate", "--graph", graph_a.to_s, "--id", "REQ-#{''}LC-001")
+  candidate = duplicates.fetch("candidates").find { |entry| entry["record_id"] == "REQ-#{''}LC-002" }
+  fail!("duplicate_explanation_missing") unless candidate && candidate["shared_terms"].include?("lifecycle") && candidate["confidence"].is_a?(Numeric) && candidate["provenance"]
+
+  duplicate_dir = root.join("records-duplicate")
+  FileUtils.cp_r(records_dir, duplicate_dir)
+  duplicate = Marshal.load(Marshal.dump(records.first))
+  write_json(duplicate_dir.join("duplicate.json"), duplicate)
+  require_blocked("duplicate_record_id", "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", duplicate_dir.to_s, "--output", root.join("duplicate-graph.json").to_s)
+
+  missing_target_dir = root.join("records-missing-target")
+  FileUtils.cp_r(records_dir, missing_target_dir)
+  missing_target = JSON.parse(missing_target_dir.join("REQ-#{''}LC-001.json").read)
+  missing_target["relationships"] << {"source_id" => "REQ-#{''}LC-001", "target_id" => "REQ-#{''}LC-999", "relationship_type" => "depends_on", "applicable" => true, "provenance" => "negative fixture"}
+  write_json(missing_target_dir.join("REQ-#{''}LC-001.json"), missing_target)
+  require_blocked("unresolved_relationship_target", "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", missing_target_dir.to_s, "--output", root.join("missing-target-graph.json").to_s)
+
+  orphan_dir = root.join("records-orphan")
+  FileUtils.cp_r(records_dir, orphan_dir)
+  orphan = record(id: "RISK-LC-999", type: "risk", source: source, baseline: baseline)
+  write_json(orphan_dir.join("RISK-LC-999.json"), orphan)
+  require_blocked("orphan_record", "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", orphan_dir.to_s, "--output", root.join("orphan-graph.json").to_s)
+
+  mixed_dir = root.join("records-mixed-baseline")
+  FileUtils.cp_r(records_dir, mixed_dir)
+  mixed = JSON.parse(mixed_dir.join("REQ-#{''}LC-002.json").read)
+  mixed["baseline"]["generation"] = "LC-GEN-OTHER"
+  write_json(mixed_dir.join("REQ-#{''}LC-002.json"), mixed)
+  require_blocked("mixed_baseline", "build", "--root", root.to_s, "--registry", registry_path.to_s, "--records", mixed_dir.to_s, "--output", root.join("mixed-graph.json").to_s)
+
+  stale_registry = Marshal.load(Marshal.dump(registry))
+  stale_registry["sources"].first["digest"] = "sha256:#{"f" * 64}"
+  stale_registry_path = root.join("source-registry-stale.json")
+  write_json(stale_registry_path, stale_registry)
+  require_blocked("stale_digest", "build", "--root", root.to_s, "--registry", stale_registry_path.to_s, "--records", records_dir.to_s, "--output", root.join("stale-graph.json").to_s)
+end
+
+puts "v060_lifecycle_graph_smoke=pass"
+puts "v060_lifecycle_graph_determinism=pass"
+puts "v060_lifecycle_exact_id_and_navigation=pass"
+puts "v060_lifecycle_impact_invalidation=pass"
+puts "v060_lifecycle_duplicate_explanations=pass"
+puts "v060_lifecycle_closure_negatives=pass"

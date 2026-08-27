@@ -1,0 +1,381 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+# TRACEWEAVER: file-role=lifecycle-product-validation-validator; req=REQ-TW-136,REQ-TW-144; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042
+# TRACEWEAVER: entrypoint=lifecycle_product_validation_check; req=REQ-TW-136,REQ-TW-144; trace=TRACE-TW-074; ver=VER-TW-094; val=VAL-TW-042
+
+require "digest"
+require "json"
+require "optparse"
+require "pathname"
+require "time"
+
+SCHEMA_VERSION = "tw-lifecycle-product-validation/1"
+EXPECTED_SCENARIOS = {
+  "Vestro" => "VESTRO-LC-001",
+  "Air Router" => "AIRROUTER-LC-001"
+}.freeze
+EXPECTED_TASKS = %w[
+  source_registration candidate_capture duplicate_navigation impact_navigation
+  vv_before_work stale_evidence strict_html_navigation acceptance_pack
+].freeze
+DIGEST_RE = /\Asha256:[0-9a-f]{64}\z/
+REVISION_RE = /\A[0-9a-f]{40,64}\z/
+
+options = {root: Dir.pwd, result: nil}
+OptionParser.new do |parser|
+  parser.on("--root PATH") { |value| options[:root] = value }
+  parser.on("--result PATH") { |value| options[:result] = value }
+end.parse!
+
+if options[:result].nil?
+  warn "product_validation_usage=missing_result"
+  exit 2
+end
+
+root = Pathname.new(options[:root]).expand_path
+result_path = Pathname.new(options[:result]).expand_path
+unless root.directory? && result_path.file?
+  warn "product_validation_usage=invalid_root_or_result"
+  exit 2
+end
+
+begin
+  result = JSON.parse(result_path.read)
+rescue JSON::ParserError => e
+  warn "product_validation_status=failed"
+  warn "product_validation_finding=invalid_json detail=#{e.message.lines.first.to_s.strip}"
+  exit 1
+end
+
+findings = []
+finding = ->(code, detail = nil) { findings << [code, detail].compact.join(" detail=") }
+digest = ->(value) { value.is_a?(String) && DIGEST_RE.match?(value) }
+text = ->(value) { value.is_a?(String) && !value.strip.empty? }
+named = lambda do |value|
+  text.call(value) && value.strip.split(/\s+/).length >= 2 &&
+    !value.match?(/\b(?:placeholder|pending|unknown|unnamed|tbd)\b/i)
+end
+safe_locator = lambda do |value|
+  next false unless text.call(value)
+  path = Pathname.new(value)
+  !path.absolute? && !path.each_filename.to_a.include?("..")
+end
+valid_time = lambda do |value|
+  Time.iso8601(value)
+  true
+rescue ArgumentError, TypeError
+  false
+end
+median = lambda do |values|
+  ordered = values.sort
+  middle = ordered.length / 2
+  ordered.length.odd? ? ordered[middle].to_f : (ordered[middle - 1] + ordered[middle]).fdiv(2)
+end
+bound_json_cache = {}
+bound_json = lambda do |locator, expected_digest, label|
+  unless safe_locator.call(locator) && digest.call(expected_digest)
+    finding.call("#{label}_binding_invalid")
+    next nil
+  end
+  cache_key = [locator, expected_digest]
+  next bound_json_cache[cache_key] if bound_json_cache.key?(cache_key)
+  path = root.join(locator).expand_path
+  unless path.file? && !path.symlink?
+    finding.call("#{label}_missing", locator)
+    next nil
+  end
+  begin
+    real = path.realpath
+    relative = real.relative_path_from(root.realpath).to_s
+    if relative == ".." || relative.start_with?("../")
+      finding.call("#{label}_path_escape", locator)
+      next nil
+    end
+    actual_digest = "sha256:#{Digest::SHA256.file(real).hexdigest}"
+    unless actual_digest == expected_digest
+      finding.call("#{label}_digest_mismatch", "#{locator}:#{actual_digest}")
+      next nil
+    end
+    bound_json_cache[cache_key] = JSON.parse(real.binread)
+  rescue ArgumentError, Errno::ENOENT
+    finding.call("#{label}_path_escape", locator)
+    nil
+  rescue JSON::ParserError => e
+    finding.call("#{label}_invalid_json", "#{locator}:#{e.message.lines.first.to_s.strip}")
+    nil
+  end
+end
+
+finding.call("wrong_schema_version") unless result["schema_version"] == SCHEMA_VERSION
+finding.call("wrong_validation_id") unless result["validation_id"] == "VAL-TW-042"
+
+candidate = result["candidate"]
+unless candidate.is_a?(Hash)
+  finding.call("candidate_missing")
+  candidate = {}
+end
+finding.call("wrong_release_version") unless candidate["release_version"] == "0.6.0"
+finding.call("candidate_baseline_missing") unless text.call(candidate["baseline_id"])
+finding.call("candidate_requirements_hash_invalid") unless digest.call(candidate["requirements_hash_sha256"])
+finding.call("candidate_tree_digest_invalid") unless digest.call(candidate["tree_digest"])
+
+preregistration = result["preregistration"]
+unless preregistration.is_a?(Hash)
+  finding.call("preregistration_missing")
+  preregistration = {}
+end
+plan_ref = preregistration["plan_ref"]
+finding.call("unsafe_preregistration_plan_ref") unless safe_locator.call(plan_ref)
+if safe_locator.call(plan_ref) && !root.join(plan_ref).file?
+  finding.call("preregistration_plan_missing")
+end
+finding.call("preregistration_time_invalid") unless valid_time.call(preregistration["frozen_at"])
+scenario_ids = preregistration["scenario_ids"]
+finding.call("preregistered_scenarios_incomplete") unless scenario_ids.is_a?(Array) && scenario_ids.sort == %w[ACCEPT-LC-001 AIRROUTER-LC-001 VESTRO-LC-001].sort
+
+source_baseline_binding = result["source_baseline_receipt"]
+unless source_baseline_binding.is_a?(Hash)
+  finding.call("source_baseline_receipt_missing")
+  source_baseline_binding = {}
+end
+source_baseline_receipt = bound_json.call(
+  source_baseline_binding["locator"], source_baseline_binding["digest"], "source_baseline_receipt"
+)
+unless source_baseline_receipt.is_a?(Hash) && source_baseline_receipt["schema_version"] == "tw-lifecycle-product-source-baselines/1" && source_baseline_receipt["authority_effect"] == "none"
+  finding.call("source_baseline_receipt_invalid")
+  source_baseline_receipt = {}
+end
+source_baselines_by_product = Array(source_baseline_receipt["products"]).each_with_object({}) do |entry, values|
+  values[entry["product"]] = entry if entry.is_a?(Hash) && text.call(entry["product"])
+end
+
+cells = result["cells"]
+unless cells.is_a?(Array) && cells.length == 2
+  finding.call("non_compensable_cells_missing")
+  cells = []
+end
+products = cells.each_with_object([]) do |cell, values|
+  values << cell["product"] if cell.is_a?(Hash)
+end
+finding.call("product_cells_not_exact") unless products.sort == EXPECTED_SCENARIOS.keys.sort
+
+metrics = {}
+cells.each do |cell|
+  unless cell.is_a?(Hash)
+    finding.call("cell_not_object")
+    next
+  end
+  product = cell["product"].to_s
+  key = product.downcase.gsub(/[^a-z0-9]+/, "_").sub(/_\z/, "")
+  prefix = key.empty? ? "unknown" : key
+  finding.call("scenario_product_mismatch", product) unless cell["scenario_id"] == EXPECTED_SCENARIOS[product]
+
+  raw_observation = bound_json.call(
+    cell["raw_evidence_locator"], cell["raw_evidence_digest"], "cell_raw_evidence"
+  )
+  unless raw_observation.is_a?(Hash)
+    raw_observation = {}
+  else
+    finding.call("raw_observation_schema_mismatch", product) unless raw_observation["schema_version"] == "tw-lifecycle-product-trial-observation/1"
+    finding.call("raw_observation_product_mismatch", product) unless raw_observation["product"] == product && raw_observation["scenario_id"] == cell["scenario_id"]
+    finding.call("raw_observation_candidate_mismatch", product) unless raw_observation["candidate_tree_digest"] == candidate["tree_digest"]
+    finding.call("raw_observation_authority_effect", product) unless raw_observation["authority_effect"] == "none"
+  end
+
+  authorization = cell["source_authorization"]
+  unless authorization.is_a?(Hash)
+    finding.call("source_authorization_missing", product)
+    authorization = {}
+  end
+  %w[authority_id relationship].each do |field|
+    finding.call("source_authorization_#{field}_missing", product) unless text.call(authorization[field])
+  end
+  finding.call("source_authorizer_not_named", product) unless named.call(authorization["authorized_by"])
+  repository_locator = authorization["repository_locator"]
+  finding.call("unsafe_repository_locator", product) unless safe_locator.call(repository_locator)
+  if text.call(repository_locator) && repository_locator.match?(%r{(?:\A|/)fixtures?(?:/|\z)}i)
+    finding.call("repository_only_fixture_substitution", product)
+  end
+  finding.call("immutable_revision_invalid", product) unless authorization["revision"].is_a?(String) && REVISION_RE.match?(authorization["revision"])
+  finding.call("revision_digest_invalid", product) unless digest.call(authorization["revision_digest"])
+  finding.call("source_inventory_digest_invalid", product) unless digest.call(authorization["source_inventory_digest"])
+  source_locators = authorization["source_locators"]
+  unless source_locators.is_a?(Array) && !source_locators.empty? && source_locators.uniq.length == source_locators.length && source_locators.all? { |locator| safe_locator.call(locator) }
+    finding.call("source_locators_invalid", product)
+  end
+  raw_authorization = raw_observation["source_authorization"]
+  unless raw_authorization.is_a?(Hash) &&
+         raw_authorization["repository_locator"] == authorization["repository_locator"] &&
+         raw_authorization["revision"] == authorization["revision"] &&
+         raw_authorization["source_inventory_digest"] == authorization["source_inventory_digest"]
+    finding.call("raw_source_authorization_mismatch", product)
+  end
+  baseline_entry = source_baselines_by_product[product]
+  unless baseline_entry.is_a?(Hash) &&
+         baseline_entry["repository_locator"] == authorization["repository_locator"] &&
+         baseline_entry["head"] == authorization["revision"] &&
+         baseline_entry["worktree_state_digest"] == authorization["revision_digest"] &&
+         baseline_entry["source_inventory_digest"] == authorization["source_inventory_digest"] &&
+         source_locators.is_a?(Array) && source_locators.all? { |locator| baseline_entry.fetch("source_digests", {}).key?(locator) }
+    finding.call("source_baseline_authorization_mismatch", product)
+  end
+
+  rater = cell["rater"]
+  unless rater.is_a?(Hash)
+    finding.call("named_rater_missing", product)
+    rater = {}
+  end
+  finding.call("named_rater_missing", product) unless named.call(rater["name"])
+  finding.call("rater_relationship_missing", product) unless text.call(rater["relationship"])
+  finding.call("rater_independence_missing", product) unless text.call(rater["independence"]) && rater["independence"].length >= 12
+
+  tasks = cell["tasks"]
+  unless tasks.is_a?(Array)
+    finding.call("required_tasks_incomplete", product)
+    tasks = []
+  end
+  task_types = tasks.each_with_object([]) do |task, values|
+    values << task["task_type"] if task.is_a?(Hash)
+  end
+  finding.call("required_tasks_incomplete", product) unless task_types.sort == EXPECTED_TASKS.sort && task_types.uniq.length == EXPECTED_TASKS.length
+  required_links = 0
+  recovered_links = 0
+  false_authority = 0
+  false_truth = 0
+  tasks.each do |task|
+    unless task.is_a?(Hash)
+      finding.call("task_not_object", product)
+      next
+    end
+    required = task["required_record_links"]
+    recovered = task["recovered_record_links"]
+    if !required.is_a?(Integer) || required <= 0 || !recovered.is_a?(Integer) || recovered.negative? || recovered > required
+      finding.call("task_record_link_counts_invalid", "#{product}:#{task['task_type']}")
+    else
+      required_links += required
+      recovered_links += recovered
+    end
+    authority_count = task["false_authority_promotions"]
+    truth_count = task["false_truth_stage_promotions"]
+    finding.call("false_authority_promotion", product) unless authority_count == 0
+    finding.call("false_truth_stage_promotion", product) unless truth_count == 0
+    false_authority += authority_count if authority_count.is_a?(Integer)
+    false_truth += truth_count if truth_count.is_a?(Integer)
+    finding.call("task_not_passed", "#{product}:#{task['task_type']}") unless task["outcome"] == "passed"
+    finding.call("task_elapsed_invalid", product) unless task["elapsed_ms"].is_a?(Integer) && task["elapsed_ms"].positive?
+    finding.call("unsafe_evidence_locator", product) unless safe_locator.call(task["raw_evidence_locator"])
+    finding.call("task_evidence_digest_invalid", product) unless digest.call(task["raw_evidence_digest"])
+    unless task["raw_evidence_locator"] == cell["raw_evidence_locator"] && task["raw_evidence_digest"] == cell["raw_evidence_digest"]
+      finding.call("task_cell_evidence_binding_mismatch", "#{product}:#{task['task_type']}")
+    end
+    bound_json.call(task["raw_evidence_locator"], task["raw_evidence_digest"], "task_raw_evidence")
+    raw_task = Array(raw_observation["tasks"]).find { |entry| entry.is_a?(Hash) && entry["task_type"] == task["task_type"] }
+    comparable_fields = %w[task_type required_record_links recovered_record_links false_authority_promotions false_truth_stage_promotions elapsed_ms outcome]
+    unless raw_task && raw_task.slice(*comparable_fields) == task.slice(*comparable_fields)
+      finding.call("task_raw_observation_mismatch", "#{product}:#{task['task_type']}")
+    end
+  end
+  recovery_percent = required_links.positive? ? recovered_links.fdiv(required_links) * 100 : 0.0
+  finding.call("recovery_below_95_percent", "#{product}:#{format('%.3f', recovery_percent)}") if recovery_percent < 95.0
+
+  impacts = cell["seeded_impacts"]
+  unless impacts.is_a?(Array) && !impacts.empty?
+    finding.call("seeded_impacts_missing", product)
+    impacts = []
+  end
+  impacts.each do |impact|
+    unless impact.is_a?(Hash) && text.call(impact["record_id"]) && impact["expected_link_ids"].is_a?(Array) && !impact["expected_link_ids"].empty? && impact["observed_link_ids"].is_a?(Array)
+      finding.call("seeded_impact_invalid", product)
+      next
+    end
+    missing = impact["expected_link_ids"] - impact["observed_link_ids"]
+    finding.call("seeded_impact_missing", "#{product}:#{impact['record_id']}:#{missing.join(',')}") unless missing.empty?
+  end
+  finding.call("seeded_impact_raw_observation_mismatch", product) unless raw_observation["seeded_impacts"] == impacts
+
+  comparison = cell["route_comparison"]
+  markdown_times = comparison.is_a?(Hash) ? comparison["markdown_manual_matrix_elapsed_ms"] : nil
+  html_times = comparison.is_a?(Hash) ? comparison["strict_html_elapsed_ms"] : nil
+  valid_times = ->(values) { values.is_a?(Array) && values.length >= 3 && values.all? { |value| value.is_a?(Integer) && value.positive? } }
+  if valid_times.call(markdown_times) && valid_times.call(html_times)
+    markdown_median = median.call(markdown_times)
+    html_median = median.call(html_times)
+    finding.call("html_median_regressed", "#{product}:#{html_median}>#{markdown_median}") if html_median > markdown_median
+  else
+    markdown_median = html_median = 0.0
+    finding.call("route_comparison_invalid", product)
+  end
+  finding.call("route_comparison_raw_observation_mismatch", product) unless raw_observation["route_comparison"] == comparison
+
+  if product == "Air Router"
+    artifact = cell["non_code_artifact"]
+    unless artifact.is_a?(Hash)
+      finding.call("air_router_non_code_artifact_missing")
+    else
+      finding.call("air_router_non_code_artifact_invalid") unless %w[artifact_id source_id locator].all? { |field| text.call(artifact[field]) } && safe_locator.call(artifact["locator"]) && digest.call(artifact["digest"]) && safe_locator.call(artifact["impact_evidence_locator"]) && digest.call(artifact["impact_evidence_digest"])
+      raw_artifact = raw_observation["non_code_artifact"]
+      baseline_artifact = baseline_entry.is_a?(Hash) ? baseline_entry["authorized_non_code_artifact"] : nil
+      comparable_artifact = artifact.slice("artifact_id", "source_id", "locator", "digest")
+      unless raw_artifact.is_a?(Hash) && raw_artifact.slice("artifact_id", "source_id", "locator", "digest") == comparable_artifact && raw_artifact["impact_visible"] == true && raw_artifact["acceptance_pack_visible"] == true
+        finding.call("air_router_raw_non_code_artifact_mismatch")
+      end
+      finding.call("air_router_baseline_non_code_artifact_mismatch") unless baseline_artifact == comparable_artifact
+      unless artifact["impact_evidence_locator"] == cell["raw_evidence_locator"] && artifact["impact_evidence_digest"] == cell["raw_evidence_digest"]
+        finding.call("air_router_non_code_impact_binding_mismatch")
+      end
+    end
+  end
+
+  finding.call("cell_not_independently_accepted", product) unless cell["acceptance_signal"] == "accepted"
+  finding.call("acceptance_rationale_missing", product) unless text.call(cell["acceptance_rationale"]) && cell["acceptance_rationale"].length >= 12
+  limitations = cell["limitations"]
+  finding.call("limitations_missing", product) unless limitations.is_a?(Array) && !limitations.empty? && limitations.all? { |item| text.call(item) }
+  finding.call("unsafe_evidence_locator", product) unless safe_locator.call(cell["raw_evidence_locator"])
+  finding.call("cell_raw_evidence_digest_invalid", product) unless digest.call(cell["raw_evidence_digest"])
+  finding.call("observation_time_invalid", product) unless valid_time.call(cell["observed_at"])
+
+  metrics[prefix] = {
+    recovery_percent: recovery_percent,
+    false_authority: false_authority,
+    false_truth: false_truth,
+    markdown_median: markdown_median,
+    html_median: html_median,
+    raw_digest: cell["raw_evidence_digest"]
+  }
+end
+
+owner = result["owner_disposition"]
+unless owner.is_a?(Hash)
+  finding.call("owner_disposition_missing")
+  owner = {}
+end
+finding.call("owner_not_named") unless named.call(owner["owner_name"])
+finding.call("owner_relationship_missing") unless text.call(owner["relationship"])
+finding.call("owner_disposition_not_accepted") unless owner["decision"] == "accepted"
+finding.call("owner_limitations_not_acknowledged") unless owner["limitations_acknowledged"] == true
+holds = owner["remaining_holds"]
+finding.call("owner_remaining_holds_missing") unless holds.is_a?(Array) && !holds.empty? && holds.all? { |item| text.call(item) }
+finding.call("owner_decision_time_invalid") unless valid_time.call(owner["decided_at"])
+reviewed_digests = owner["reviewed_cell_raw_digests"]
+cell_digests = cells.each_with_object([]) do |cell, values|
+  values << cell["raw_evidence_digest"] if cell.is_a?(Hash) && digest.call(cell["raw_evidence_digest"])
+end
+unless reviewed_digests.is_a?(Array) && reviewed_digests.uniq.sort == cell_digests.uniq.sort && reviewed_digests.length == 2
+  finding.call("owner_disposition_cell_digest_mismatch")
+end
+
+if findings.empty?
+  puts "product_validation_status=passed"
+  metrics.sort.each do |key, value|
+    puts "product_validation_cell=#{key} recovery_percent=#{format('%.3f', value[:recovery_percent])} false_authority=#{value[:false_authority]} false_truth_stage=#{value[:false_truth]} markdown_median_ms=#{format('%.3f', value[:markdown_median])} html_median_ms=#{format('%.3f', value[:html_median])} raw_digest=#{value[:raw_digest]}"
+  end
+  puts "product_validation_authority_effect=none"
+  puts "product_validation_release_gate=passed"
+  exit 0
+end
+
+puts "product_validation_status=failed"
+puts "product_validation_release_gate=held"
+puts "product_validation_authority_effect=none"
+findings.uniq.each { |item| puts "product_validation_finding=#{item}" }
+exit 1
