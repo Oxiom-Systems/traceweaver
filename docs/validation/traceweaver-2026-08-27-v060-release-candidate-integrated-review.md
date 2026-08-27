@@ -4,7 +4,7 @@ status: closed_clean
 date: 2026-08-27
 owner: Oxiom Systems
 reviewer: terra-integrated-reviewer:root-v060-integrated-review
-functional_scope_digest: sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c
+functional_scope_digest: sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8
 functional_scope_path_count: 102
 reviewed_findings:
   open_p0: 0
@@ -29,7 +29,7 @@ reviewer or nested reviewer dispatch was used.
 
 **Closed clean:** zero open P0 and zero open P1 findings. The reviewer
 reproduced the 102-path functional scope digest
-`sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c`,
+`sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8`,
 confirmed the accepted Vestro and Air Router bindings, metric-routing parity,
 implementation traceability, and release-integrity checks, and authorized the
 candidate to proceed to the release receipt and publication capsule.
@@ -57,6 +57,20 @@ including `MR129_EXACT_CELL_FIXTURE_PREDICATE`; the oracle remains acyclic and
 unchanged. Fresh exact-product rebinding retained 100% recovery, zero false
 authority or truth-stage promotions, the same product revisions, and the same
 accepted limitations.
+
+## PR runner prerequisite convergence
+
+The corrected PR Smoke then reached the lifecycle HTML suite and failed only
+because the runner had no installed copy of the frozen Nokogiri 1.13.8 parser.
+The exact correction now sets up Ruby 3.2 with `ruby/setup-ruby@v1`, installs
+Nokogiri 1.13.8 before any smoke executes, and leaves the parser lock and
+product implementation unchanged. The same reviewer verified the final
+102-path functional digest
+`sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8`,
+the passing HTML and release-integrity smokes, zero traceability findings, and
+fresh Vestro/Air Router results with 100% recovery, zero false authority or
+truth-stage promotions, unchanged revisions and limitations, and no new
+limitation. The review remains closed clean with zero open P0/P1 findings.
 
 ## Retained graph finding
 

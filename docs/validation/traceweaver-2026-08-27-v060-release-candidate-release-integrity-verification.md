@@ -3,7 +3,7 @@ id: VER-TW-094-V060-RELEASE-CANDIDATE-INTEGRITY-001
 status: passed
 date: 2026-08-27
 owner: Oxiom Systems
-functional_scope_digest: sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c
+functional_scope_digest: sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8
 functional_scope_path_count: 102
 integration_base: e53faeb437cfee3b91f43e1b0f4ed3b1cb1e2c33
 version: 0.6.0

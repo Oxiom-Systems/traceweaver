@@ -7,8 +7,8 @@ name: Smoke tests
 
 # Runs the TraceWeaver discovery/traceability smokes on pull requests and on
 # pushes to main. Includes the Codex discovery smoke, which needs the Codex CLI
-# and bun (both installed via npm). ruby, python3, jq, and perl are preinstalled
-# on ubuntu-latest.
+# and bun (both installed via npm). Ruby is pinned explicitly for the frozen
+# lifecycle parser; python3, jq, and perl are preinstalled on ubuntu-latest.
 #
 # Intentionally excluded:
 # - scripts/traceweaver-audit-plugin-scope — its hash baseline
@@ -42,11 +42,19 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.2"
+
       - name: Install bun and the Codex CLI
         run: |
           npm install -g bun @openai/codex
           echo "bun: $(bun --version)"
           echo "codex: $(codex --version)"
+
+      - name: Install frozen lifecycle HTML parser
+        run: gem install nokogiri --version 1.13.8 --no-document
 
       - name: Skill Execution Contract smoke
         run: scripts/traceweaver-smoke-skill-execution-contract

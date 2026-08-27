@@ -1,12 +1,12 @@
 {
   "schema_version": "tw-publication-review/1",
   "candidate_kind": "mixed",
-  "candidate_digest": "sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c",
+  "candidate_digest": "sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8",
   "status": "clean",
   "review_route": "tw-code-review",
   "reviewer_identity": "terra-integrated-reviewer:root-v060-integrated-review",
   "reviewer_identity_count": 1,
-  "review_turn_count": 2,
+  "review_turn_count": 3,
   "nested_reviewer_dispatches": 0,
   "coverage": [
     "behavior",

@@ -18,7 +18,7 @@ release_readiness:
   release_label: minor
   candidate_scope:
     algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
-    digest: sha256:211166fd38d775306c323cc4f4e9fcafdcc845a0369363239feb4dc2896d75eb
+    digest: sha256:8535b1db4dd6ffec9070522d4d0b12aa2ab9513ffefc12f1a457e5b9724f8060
     paths:
     - ".claude-plugin/marketplace.json"
     - ".github/workflows/release-on-version-bump.yml"
@@ -231,7 +231,7 @@ release_readiness:
     - docs/validation/traceweaver-plugin-0.6.0-release-candidate.md
   functional_scope:
     algorithm: sha256(sorted(path + NUL + git_mode + NUL + sha256(file_bytes) + LF))
-    digest: sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c
+    digest: sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8
     paths:
     - ".claude-plugin/marketplace.json"
     - ".github/workflows/release-on-version-bump.yml"
@@ -336,7 +336,7 @@ release_readiness:
     - scripts/traceweaver-smoke-v060-release-integrity
     - traceability-matrix.md
   candidate_identity:
-    functional_scope_digest: sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c
+    functional_scope_digest: sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8
     functional_scope_path_count: 102
     review_id: TW-CODE-REVIEW-2026-08-27-V060-RELEASE-CANDIDATE-001
     product_validation_id: VAL-TW-042
@@ -383,8 +383,8 @@ release_readiness:
 This receipt binds the exact Core 0.6.0 functional candidate, complete
 downstream evidence, the retained Terra review identity, graph freshness,
 clean isolated installation, and manifest equality. The frozen functional
-scope is `sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c` across 102 paths; the
-complete candidate scope is `sha256:211166fd38d775306c323cc4f4e9fcafdcc845a0369363239feb4dc2896d75eb` across
+scope is `sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8` across 102 paths; the
+complete candidate scope is `sha256:8535b1db4dd6ffec9070522d4d0b12aa2ab9513ffefc12f1a457e5b9724f8060` across
 206 paths.
 
 The receipt excludes only itself and the independently checked graph

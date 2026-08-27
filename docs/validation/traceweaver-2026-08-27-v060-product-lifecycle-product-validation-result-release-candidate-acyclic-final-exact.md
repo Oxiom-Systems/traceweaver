@@ -3,10 +3,10 @@ id: VAL-TW-042-V060-RELEASE-CANDIDATE-ACYCLIC-FINAL-EXACT-RESULT-2026-08-27-001
 status: accepted_exact_candidate_publication_separately_gated
 date: 2026-08-27
 owner: Oxiom Systems
-functional_scope_digest: sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c
+functional_scope_digest: sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8
 functional_scope_path_count: 102
 requirements_baseline_hash_sha256: 94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf
-result_json_sha256: 2f1692e348b44b2487d827cbf638c825868a7a9d306627a8f5e24e3f07df5a1d
+result_json_sha256: 20711caa202b0a0d4a4419ed87260aaa8ed7ee15a994aa79ac604614d45dfed0
 change_id: CHG-TW-2026-08-27-006
 exception_id: none
 authority_effect: none
@@ -26,12 +26,12 @@ revision, thresholds, truth-stage behavior, and recorded limitations with no
 new or worsened limitation. The exact product validator passed
 `docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-product-validation-result-release-candidate-acyclic-final-exact.json`
 with SHA-256
-`2f1692e348b44b2487d827cbf638c825868a7a9d306627a8f5e24e3f07df5a1d`.
+`20711caa202b0a0d4a4419ed87260aaa8ed7ee15a994aa79ac604614d45dfed0`.
 
 ## Exact bindings
 
 - Functional scope:
-  `sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c`
+  `sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8`
   across 102 paths.
 - Requirements baseline:
   `sha256:94b7980db1ec9ed18b1fcc1902818d1d87c4de67f80f65e1e4782c0c824a3bdf`.
@@ -44,8 +44,8 @@ with SHA-256
 
 | Cell | Actual source census | Recovered task links | Direct seeded impact | Route timings | False promotions | Raw receipt |
 | --- | ---: | ---: | ---: | --- | ---: | --- |
-| Vestro | 3 sources; 626 records; 2,657 relationships | 698 / 698 (100%) | 21 / 21 | Markdown 5/5/5 ms; strict HTML 4/4/4 ms | 0 authority; 0 truth-stage | `sha256:5b4f4778aa8683def31bdd7993201e93ed22eadb1f766bf901061b5c1524ed4e` |
-| Air Router | 4 sources; 719 records; 5,584 relationships | 820 / 820 (100%) | 52 / 52 | Markdown 6/6/6 ms; strict HTML 5/5/6 ms | 0 authority; 0 truth-stage | `sha256:f391237690754c99b383476d067b3aaebf218adc808c72c420b089213fe9bd82` |
+| Vestro | 3 sources; 626 records; 2,657 relationships | 698 / 698 (100%) | 21 / 21 | Markdown 4/4/4 ms; strict HTML 4/4/4 ms | 0 authority; 0 truth-stage | `sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9` |
+| Air Router | 4 sources; 719 records; 5,584 relationships | 820 / 820 (100%) | 52 / 52 | Markdown 5/5/5 ms; strict HTML 4/4/5 ms | 0 authority; 0 truth-stage | `sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197` |
 
 Air Router binds non-code source `SRC-AIR-042` and artifact
 `AIR-ROUTER-PHASE25-DIAGNOSTIC-LAB-002` through impact and acceptance-pack

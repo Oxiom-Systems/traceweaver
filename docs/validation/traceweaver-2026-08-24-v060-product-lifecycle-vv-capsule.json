@@ -12,8 +12,8 @@
   "product_validation": {
     "status": "accepted_exact_candidate_publication_separately_gated",
     "validation_id": "VAL-TW-042",
-    "functional_scope_digest": "sha256:118896968ba3963e5ce06800a465b74be309c26a14e17cbdfc99e09b5157862c",
-    "result_digest": "sha256:2f1692e348b44b2487d827cbf638c825868a7a9d306627a8f5e24e3f07df5a1d",
+    "functional_scope_digest": "sha256:468c14d389ef06f738eabc22eca177c9a572f4e374d751795e10e06e2dc0b3e8",
+    "result_digest": "sha256:20711caa202b0a0d4a4419ed87260aaa8ed7ee15a994aa79ac604614d45dfed0",
     "result_path": "docs/validation/traceweaver-2026-08-27-v060-product-lifecycle-product-validation-result-release-candidate-acyclic-final-exact.json",
     "intermediate_corrected_result_digest": "sha256:521531c448cb1190c941202cf29742729b98f3e2cb6e67d9d285240c83958e85",
     "rejected_fixed_route_result_digest": "sha256:a56ab36faaa7b0baf47c748e86e48d5e4afa86843a763df73daf6ff8ddc6a794",
@@ -53,8 +53,8 @@
     "post_oracle_ci_convergence_focused_verification": "failed_nonclean_at_MC110_EXACT_ROUTE_requirements_physical_digest_mismatch_attempt_consumed",
     "post_oracle_ci_convergence_focused_result": "docs/validation/traceweaver-2026-08-26-v060-post-oracle-ci-convergence-focused-verification-result.md",
     "fresh_rebinding_required": false,
-    "vestro_raw_digest": "sha256:5b4f4778aa8683def31bdd7993201e93ed22eadb1f766bf901061b5c1524ed4e",
-    "air_router_raw_digest": "sha256:f391237690754c99b383476d067b3aaebf218adc808c72c420b089213fe9bd82",
+    "vestro_raw_digest": "sha256:b1bf74148f3b207230ba2ab2fca5f346450a142dfbb7dc320cc836b3561d99d9",
+    "air_router_raw_digest": "sha256:f52879d9e401885bed6ceaeda4588517c75a538b7c4b3a0966f3edca41a49197",
     "publication_change_id": "CHG-TW-2026-08-27-006",
     "release_candidate_rebinding_status": "passed_final_acyclic_same_revisions_thresholds_truth_stages_and_limitations_no_new_limitation"
   },
