@@ -64,6 +64,12 @@ class PublicBuildRouteTest(unittest.TestCase):
         self.assertNotIn('sudo ', source + dockerfile)
         self.assertNotIn('docker.sock', source + dockerfile)
 
+    def test_caller_pins_the_own_repository_leaf_without_secret_or_ref_inputs(self):
+        source = (ROOT / '.github/workflows/smoke-tests.yml').read_text()
+        self.assertRegex(source, r'uses: Oxiom-Systems/traceweaver/\.github/workflows/ci-build-recipe\.yml@[a-f0-9]{40}')
+        for forbidden in ('secrets:', 'inputs:', 'with:', ': write', 'pull_request_target', 'repository_dispatch'):
+            self.assertNotIn(forbidden, source)
+
     def test_original_functional_checks_remain_in_the_leaf(self):
         source = self.source()
         for command in ['gem install nokogiri --version 1.13.8 --no-document', 'npm install -g bun @openai/codex', 'scripts/traceweaver-smoke-skill-execution-contract', 'scripts/traceweaver-smoke-v060-product-lifecycle', 'scripts/traceweaver-smoke-terra-routing', 'scripts/traceweaver-smoke-tw-graph', 'scripts/traceweaver-smoke-release-readiness', 'scripts/traceweaver-smoke-distilled-coverage']:
