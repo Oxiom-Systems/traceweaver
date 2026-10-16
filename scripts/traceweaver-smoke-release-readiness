@@ -953,8 +953,11 @@ ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/ready
 ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/pending.json >"$temp_dir/pending.json"
 ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/failed.json >"$temp_dir/failed.json"
 ruby "$evaluator" --sha bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb --input fixtures/release-check-runs/pending.json >"$temp_dir/wrong-sha.json"
+ruby "$evaluator" --sha "$fixture_sha" --input fixtures/release-check-runs/legacy-smoke-name.json >"$temp_dir/legacy-smoke-name.json"
 
 [ "$(jq -r .state "$temp_dir/ready.json")" = ready ]
+[ "$(jq -r .state "$temp_dir/legacy-smoke-name.json")" = pending ]
+[ "$(jq -r '.missing | index("smoke") != null' "$temp_dir/legacy-smoke-name.json")" = true ]
 [ "$(jq -r .state "$temp_dir/pending.json")" = pending ]
 [ "$(jq -r .state "$temp_dir/failed.json")" = failed ]
 [ "$(jq -r .terminal_state "$temp_dir/failed.json")" = held_ci_failed ]

@@ -3,7 +3,7 @@
   "check_runs": [
     {
       "id": 301,
-      "name": "smoke",
+      "name": "smoke / smoke",
       "head_sha": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
       "status": "completed",
       "conclusion": "failure",

@@ -319,7 +319,7 @@ Dir.mktmpdir("traceweaver-terra-routing-") do |state_dir|
   expect!(replay.fetch("outcome") == "held_model_unattested", "execution-attestation replay was accepted")
 end
 
-workflow = File.read(File.join(root, ".github/workflows/smoke-tests.yml"))
+workflow = File.read(File.join(root, ".github/workflows/ci-build-recipe.yml"))
 expect!(workflow.include?("scripts/traceweaver-smoke-terra-routing"), "CI does not reject forbidden TraceWeaver child routes")
 
 puts "terra-routing: PASS"
