@@ -22,12 +22,16 @@ permissions:
 
 jobs:
   tag-release:
-    runs-on: ubuntu-latest
+    runs-on:
+      group: ci-build-public-ephemeral
+      labels: [ci-publication-held-r1221696377]
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
         with:
           fetch-depth: 0
+          ref: ${{ github.sha }}
+          persist-credentials: false
 
       - name: Resolve version and tag
         id: version

@@ -1,0 +1,299 @@
+name: traceweaver public CPU build recipe
+on:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  smoke:
+    if: >-
+      github.repository_id == '1221696377' &&
+      (
+        ((github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+         github.ref_protected == true &&
+         (github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/main')) ||
+        (github.event_name == 'pull_request' &&
+         github.event.pull_request.head.repo.id == 1221696377 &&
+         (github.base_ref == 'dev' || github.base_ref == 'main'))
+      )
+    runs-on:
+      group: ci-build-public-ephemeral
+      labels: [ci-linux-cpu-v1-r1221696377]
+    timeout-minutes: 45
+    permissions:
+      contents: read
+    steps:
+      - name: Check out the event SHA without persisted credentials
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Set up managed Python for public route contracts
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1
+        with:
+          python-version: '3.12'
+      - name: Test the public leaf event and isolation contracts
+        run: python -m unittest discover -s tests -p 'test_ci_public_route.py'
+      - name: Prepare isolated guest-local tool container
+        shell: bash
+        run: |
+          set -euo pipefail
+          DOCKER_BUILDKIT=0 docker build --platform linux/amd64 --tag ci-public-tools --file .github/ci-toolchain.Dockerfile .github
+          docker create --name ci-public-build --cpus 2 --memory 3g --memory-swap 3g --pids-limit 512 \
+            --env CI=true --env GITHUB_ACTIONS=true --env GITHUB_SHA --env GITHUB_REPOSITORY \
+            --env GITHUB_RUN_ID --env GITHUB_RUN_ATTEMPT --env RUNNER_TEMP=/tmp/ci-runner \
+            ci-public-tools sleep infinity
+          docker start ci-public-build
+          docker exec ci-public-build mkdir -p /workspace /tmp/ci-runner
+          docker cp "$GITHUB_WORKSPACE/." ci-public-build:/workspace/
+          docker exec ci-public-build git config --global --add safe.directory /workspace
+          docker exec ci-public-build git config --global --add safe.directory /workspace/.git
+          docker exec ci-public-build node --version
+          docker exec ci-public-build ruby --version
+      - name: Install bun and the Codex CLI
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          npm install -g bun @openai/codex
+          echo "bun: $(bun --version)"
+          echo "codex: $(codex --version)"
+          CI_COMMAND
+        shell: bash
+      - name: Install frozen lifecycle HTML parser
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          gem install nokogiri --version 1.13.8 --no-document
+          CI_COMMAND
+        shell: bash
+      - name: Skill Execution Contract smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-skill-execution-contract
+          CI_COMMAND
+        shell: bash
+      - name: Shadow model-context routing smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-model-context-routing
+          CI_COMMAND
+        shell: bash
+      - name: Deterministic metric-routing harness smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-metric-routing-harness
+          CI_COMMAND
+        shell: bash
+      - name: Deterministic metric-routing atomic replay regression
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          ruby --disable-gems - <<'RUBY'
+          require "json"
+          require "rbconfig"
+          require "tmpdir"
+    
+          root = Dir.pwd
+          evaluator = File.join(root, "plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-evaluate-metric-routing")
+          fixtures = %w[
+            fixtures/metric-routing-harness/collector-trust.yml
+            fixtures/metric-routing-harness/observation-valid.json
+            fixtures/metric-routing-harness/attestation-valid.json
+          ].join(",")
+    
+          wave = lambda do |prefill_bytes|
+            Dir.mktmpdir("traceweaver-metric-routing-") do |state|
+              ledger = File.join(state, "attestation-replay-ledger.jsonl")
+              line = "noise-ledger-entry-not-an-attestation\n"
+              File.binwrite(ledger, line * (prefill_bytes / line.bytesize)) if prefill_bytes.positive?
+              initial_lines = File.exist?(ledger) ? File.foreach(ledger).count : 0
+              gate_reader, gate_writer = IO.pipe
+              pids = 24.times.map do |index|
+                fork do
+                  gate_writer.close
+                  gate_reader.read(1)
+                  STDOUT.reopen(File.join(state, "out-#{index}.json"), "wb")
+                  STDERR.reopen(File.join(state, "err-#{index}.txt"), "wb")
+                  environment = {"HOME" => state, "TMPDIR" => state, "LANG" => "C", "LC_ALL" => "C", "TZ" => "UTC", "TRACEWEAVER_OFFLINE" => "1"}
+                  exec(environment, RbConfig.ruby, "--disable-gems", evaluator,
+                       "--root", root, "--case", "ATOMIC-#{index}", "--fixtures", fixtures,
+                       "--state-dir", state, unsetenv_others: true, chdir: root)
+                end
+              end
+              gate_reader.close
+              gate_writer.write("x" * pids.length)
+              gate_writer.close
+              statuses = pids.map { |pid| Process.wait2(pid).last }
+              outcomes = 24.times.map { |index| JSON.parse(File.binread(File.join(state, "out-#{index}.json"))).fetch("outcome") }
+              final_lines = File.foreach(ledger).count
+              raise "atomic replay failed" unless outcomes.count("fixture_predicate_passed") == 1 && outcomes.count("held_attestation_replayed") == 23 && statuses.all?(&:success?) && final_lines == initial_lines + 1
+            end
+          end
+    
+          wave.call(0)
+          wave.call(524_288)
+          Dir.mktmpdir("traceweaver-metric-routing-") do |state|
+            ledger = File.join(state, "attestation-replay-ledger.jsonl")
+            File.binwrite(ledger, "x" * 1_048_577)
+            environment = {"HOME" => state, "TMPDIR" => state, "LANG" => "C", "LC_ALL" => "C", "TZ" => "UTC", "TRACEWEAVER_OFFLINE" => "1"}
+            success = system(environment, RbConfig.ruby, "--disable-gems", evaluator,
+                             "--root", root, "--case", "OVERSIZED", "--fixtures", fixtures,
+                             "--state-dir", state, out: File::NULL, err: File::NULL,
+                             unsetenv_others: true, chdir: root)
+            raise "oversized replay ledger did not fail closed" if success
+          end
+          puts "metric-routing atomic replay regression: PASS"
+          RUBY
+          CI_COMMAND
+        shell: bash
+      - name: Deterministic metric-routing evidence-template regression
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          plugins/traceweaver-core/skills/tw-auto/scripts/traceweaver-evaluate-metric-routing --root . --self-test evidence-templates
+          CI_COMMAND
+        shell: bash
+      - name: Core 0.6.0 product-lifecycle assurance
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-v060-product-lifecycle
+          scripts/traceweaver-smoke-v060-lifecycle-schema
+          scripts/traceweaver-smoke-v060-lifecycle-evidence
+          scripts/traceweaver-smoke-v060-lifecycle-staleness
+          scripts/traceweaver-smoke-v060-lifecycle-graph
+          scripts/traceweaver-smoke-v060-lifecycle-closure
+          scripts/traceweaver-benchmark-v060-product-lifecycle
+          scripts/traceweaver-smoke-v060-lifecycle-html
+          scripts/traceweaver-smoke-v060-lifecycle-cutover
+          scripts/traceweaver-smoke-v060-lifecycle-capture
+          scripts/traceweaver-smoke-v060-lifecycle-acceptance-hub
+          scripts/traceweaver-smoke-v060-lifecycle-product-validation
+          scripts/traceweaver-smoke-v060-release-integrity
+          CI_COMMAND
+        shell: bash
+      - name: Terra native-child routing contract
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-terra-routing
+          CI_COMMAND
+        shell: bash
+      - name: Mandatory authority graph contract and freshness
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-tw-graph
+          plugins/traceweaver-core/skills/tw-graph/scripts/traceweaver-tw-graph check --root .
+          CI_COMMAND
+        shell: bash
+      - name: Derived semantic HTML preview
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-semantic-html-preview
+          CI_COMMAND
+        shell: bash
+      - name: Codex discovery smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          TRACEWEAVER_HOST_RUNTIME_EXEC=0 scripts/traceweaver-smoke-codex-discovery
+          CI_COMMAND
+        shell: bash
+      - name: V&V definition smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-vv-define
+          CI_COMMAND
+        shell: bash
+      - name: SessionStart hook smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-hook-session-start
+          CI_COMMAND
+        shell: bash
+      - name: PreToolUse TDD gate hook smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-hook-pretooluse-tdd-gate
+          CI_COMMAND
+        shell: bash
+      - name: Antigravity discovery smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-antigravity-discovery
+          CI_COMMAND
+        shell: bash
+      - name: Generated-views drift smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-traceability-generated-views
+          CI_COMMAND
+        shell: bash
+      - name: Review-series convergence smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-review-series-convergence
+          CI_COMMAND
+        shell: bash
+      - name: Scoped-review regression smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-scoped-review
+          CI_COMMAND
+        shell: bash
+      - name: Workflow-profile regression smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-workflow-profile
+          CI_COMMAND
+        shell: bash
+      - name: Consolidated Sol delivery convergence smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-consolidated-convergence
+          CI_COMMAND
+        shell: bash
+      - name: No-publication regression smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-no-publication
+          CI_COMMAND
+        shell: bash
+      - name: TraceWeaver skill-behavior regression smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          TRACEWEAVER_TW_SKILL_BEHAVIOR_RUNTIME=0 scripts/traceweaver-smoke-tw-skill-behavior
+          CI_COMMAND
+        shell: bash
+      - name: Code traceability smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-code-traceability
+          CI_COMMAND
+        shell: bash
+      - name: Code trace-anchor authoring smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-code-trace-authoring
+          CI_COMMAND
+        shell: bash
+      - name: Release readiness and exact-merge-SHA regression smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-release-readiness
+          CI_COMMAND
+        shell: bash
+      - name: Controlled-publication smoke
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-controlled-publication
+          CI_COMMAND
+        shell: bash
+      - name: Verify gate (baseline hash, bounded snapshot drift, intent-fidelity metrics)
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-verify
+          CI_COMMAND
+        shell: bash
+      - name: Distilled-knowledge coverage gate (anti-stranding, drift, skill wiring)
+        run: |
+          docker exec -i ci-public-build bash -e -o pipefail -s <<'CI_COMMAND'
+          scripts/traceweaver-smoke-distilled-coverage
+          CI_COMMAND
+        shell: bash
+      - name: Remove the guest-local tool container
+        if: always()
+        run: docker rm --force ci-public-build

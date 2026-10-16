@@ -43,7 +43,7 @@ def latest(runs)
 end
 
 smoke = latest(exact.select do |run|
-  app_slug(run) == "github-actions" && run["name"].to_s == "smoke"
+  app_slug(run) == "github-actions" && run["name"].to_s == "smoke / smoke"
 end)
 
 codeql_candidates = exact.select do |run|
