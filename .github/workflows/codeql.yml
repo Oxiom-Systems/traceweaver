@@ -13,7 +13,7 @@ permissions:
   security-events: write
 jobs:
   analyze:
-    uses: Oxiom-Systems/traceweaver/.github/workflows/ci-codeql-recipe.yml@c6af257ebabff124810959e0bf88ec5ba3866ff8
+    uses: Oxiom-Systems/traceweaver/.github/workflows/ci-codeql-recipe.yml@8a8b81c9f8718c00ad30cdfea2f0098ce1c3f3d4
     with:
       # Root flips this literal only after canaries and managed-default retirement.
       upload_results: false
