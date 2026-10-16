@@ -65,6 +65,10 @@ class PublicBuildRouteTest(unittest.TestCase):
         self.assertNotIn('--progress=', source)
         self.assertNotIn('sudo ', source + dockerfile)
         self.assertNotIn('docker.sock', source + dockerfile)
+        self.assertIn('https://nodejs.org/dist/v22.23.3/node-v22.23.3-linux-x64.tar.xz', dockerfile)
+        self.assertIn('df450af89261115ef9f9e3830c3eeb2cc9213b63c720b1af623cb5dcbe2e02de', dockerfile)
+        self.assertIn('sha256sum --check --strict', dockerfile)
+        self.assertNotIn('COPY --from=', dockerfile)
 
     def test_caller_pins_the_own_repository_leaf_without_secret_or_ref_inputs(self):
         source = (ROOT / '.github/workflows/smoke-tests.yml').read_text()
