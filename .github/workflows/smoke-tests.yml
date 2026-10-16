@@ -35,4 +35,4 @@ jobs:
   smoke:
     permissions:
       contents: read
-    uses: Oxiom-Systems/traceweaver/.github/workflows/ci-build-recipe.yml@4c78c3682b3b1ab58145b8cd8e0eb47397b9bdcf
+    uses: Oxiom-Systems/traceweaver/.github/workflows/ci-build-recipe.yml@56cf724a25150b9856e6d910717e33449a7125c2
