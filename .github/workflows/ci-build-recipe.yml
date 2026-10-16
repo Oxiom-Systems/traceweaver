@@ -47,6 +47,7 @@ jobs:
           docker exec ci-public-build mkdir -p /workspace /tmp/ci-runner
           docker cp "$GITHUB_WORKSPACE/." ci-public-build:/workspace/
           docker exec ci-public-build git config --global --add safe.directory /workspace
+          docker exec ci-public-build git config --global --add safe.directory /workspace/.git
           docker exec ci-public-build node --version
           docker exec ci-public-build ruby --version
       - name: Install bun and the Codex CLI
