@@ -70,6 +70,13 @@ class PublicBuildRouteTest(unittest.TestCase):
         self.assertIn('sha256sum --check --strict', dockerfile)
         self.assertNotIn('COPY --from=', dockerfile)
 
+    def test_container_trust_covers_the_local_clone_git_directory_only(self):
+        source = self.source()
+        trusted = re.findall(r'docker exec ci-public-build git config --global --add safe.directory (\S+)', source)
+        self.assertEqual(trusted, ['/workspace', '/workspace/.git'])
+        self.assertLess(source.index('safe.directory /workspace/.git'),
+                        source.index('scripts/traceweaver-smoke-v060-release-integrity'))
+
     def test_caller_pins_the_own_repository_leaf_without_secret_or_ref_inputs(self):
         source = (ROOT / '.github/workflows/smoke-tests.yml').read_text()
         self.assertRegex(source, r'uses: Oxiom-Systems/traceweaver/\.github/workflows/ci-build-recipe\.yml@[a-f0-9]{40}')
