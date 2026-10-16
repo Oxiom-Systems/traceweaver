@@ -7,7 +7,7 @@ set -euo pipefail
 root="$(cd "$(dirname "$0")/.." && pwd)"
 helper="$root/plugins/traceweaver-core/skills/tw-graph/scripts/traceweaver-tw-graph"
 lifecycle="$root/plugins/traceweaver-core/references/tw-graph-lifecycle.md"
-workflow="$root/.github/workflows/smoke-tests.yml"
+workflow="$root/.github/workflows/ci-build-recipe.yml"
 
 fail() {
   echo "tw-graph: $1" >&2
