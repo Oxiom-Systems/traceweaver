@@ -1,0 +1,18 @@
+{
+  "schema": "owner-directed-ci-budget-exception/1",
+  "stakeholder_intent": "all builds CI should have120mincap",
+  "approved_exception": "Owner-authorized scalar budget and exact immutable recipe/caller closure only. Underlying PR64/65 migration remains held; this record grants no merge, runtime, release, or publication acceptance.",
+  "source_base_sha": "93a6b81a06330b48574d2621d8f99369abb1ae7e",
+  "source_branch": "feat/codeql-simple-20261016",
+  "owner_plan_sha256": "1734c6c4df69966d2a1ef080492633059aef38b12d7e7e01894b1af95d603f17",
+  "current_baseline": {
+    "requirements.md": "28fcc5418062aeac5051af4facb98cee0864c74002e0910c4dd0dc8633aab45d",
+    "traceability-matrix.md": "71de5f24e7bf5ab256e83c42c078fe2e489fb8efc481e8d26dabc3728fda438d",
+    ".traceweaver/intent-contract.yml": "cfe9ae01dc1438b150dcd24c091b05436fd185dabf53828e36c0d42e762aff42"
+  },
+  "verification_method": "Existing tests/test_ci_public_route.py and CodeQL contracts where present; exact source120 and immutable closure checks with workflow byte preservation.",
+  "validation_question": "Does each admitted build/test/scan leaf in this bounded source closure have 120 minutes with exact full-SHA callers, while every held publication and nonbuild budget stays unchanged?",
+  "local_evidence_capsule": "ci-runner-operations-archive/20261025-all-build-timeouts/artifacts/oxiom-implementation",
+  "runtime_acceptance": "held",
+  "publication_route": "Timeout-only candidate based on exact existing migration PR head; root must keep migration hold intact."
+}
